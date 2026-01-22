@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 
 import '../utils/assets.dart';
 import '../utils/color_constant.dart';
@@ -29,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
       await Future.delayed(Duration(milliseconds: _duration - 800));
 
       if (mounted) {
-        // TODO: Navigate here
+        context.go(UserManagement.routeName);
       }
     });
   }

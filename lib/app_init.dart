@@ -36,11 +36,10 @@ class AppInit extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: 'SkinSync Clinic',
-          initialRoute: '/',
-          onGenerateRoute: RouteGenerator.generateRoute,
+          title: 'SkinSync Admin',
+          routerConfig: RouteGenerator.router,
           themeMode: themeMode,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
