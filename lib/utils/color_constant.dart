@@ -12,46 +12,11 @@ class CustomColors {
   static const Color iconColor = Color(0xffF2F2F2);
   static const Color textGreyColor = Color(0xff494949);
   static const Color textFeildBoaderColor = Color(0xff939393);
+  static const Color blueColor = Color(0xFF1763E0);
 
   static const LinearGradient purpleBlueGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xff88E3FB), Color(0xffE7C6E8)],
-  );
-
-  static LinearGradient blueWhitePurpleGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [
-      Color(0xff88E3FB).withValues(alpha: 0.05),
-      Color(0xffFFFFFF),
-      Color(0xffE7C6E8),
-    ],
-  );
-   static LinearGradient whitePurpleGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [
-      Color(0xffFFF0FF),
-      Color(0xffE7C6E8),
-    ],
-  );
-  static const LinearGradient purpleWhiteBlueGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xffE7C6E8), Color(0xffFFFFFF), Color(0xff88E3FB)],
-  );
-  static LinearGradient BlueWithWhiteGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [
-      Color(0xffFFFFFF).withOpacity(0.0), // fully transparent
-      Color(0xffFFFFFF).withOpacity(0.8),
-      Color(0xff88E3FB).withOpacity(0.3),
-      Color(0xff88E3FB).withOpacity(0.5),
-      Color(0xff88E3FB).withOpacity(0.5),
-      Color(0xffFFFFFF).withOpacity(0.6),
-      Color(0xffFFFFFF).withOpacity(1.0),
-    ],
+    colors: [Color(0xff92FBFD), Color(0xffA595B9)],
   );
 }

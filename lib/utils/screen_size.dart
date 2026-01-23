@@ -3,22 +3,27 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 
 Size getDesignSize({required BuildContext context}) {
-  // Get the actual screen size
+  const sizesMap = {
+    'LARGE': Size(1200, 1600),
+    'MEDIUM': Size(768, 1024),
+    'SMALL': Size(600, 900),
+    'DEFAULT': Size(375, 812),
+  };
   final window = View.of(context);
   final size = window.physicalSize / window.devicePixelRatio;
-  // Return appropriate design size based on screen width
+  late String name;
   if (size.width >= 1200) {
-    log('LARGE: ${size.width}');
-    return Size(1200, 1600);
-    // Large tablets/Desktop
+    name = 'LARGE';
   } else if (size.width >= 800) {
-    log('MEDIUM: ${size.width}');
-    return Size(768, 1024); // Tablets
+    name = 'MEDIUM';
   } else if (size.width >= 600) {
-    log('SMALL: ${size.width}');
-    return Size(600, 900); // Small tablets
+    name = 'SMALL';
   } else {
-    log('DEFAULT: ${size.width}');
-    return const Size(440, 956);
+    name = 'DEFAULT';
   }
+  log('NAME: $name');
+  final appSize = sizesMap[name]!;
+  return size.width > size.height
+      ? Size(appSize.height, appSize.width)
+      : appSize;
 }
