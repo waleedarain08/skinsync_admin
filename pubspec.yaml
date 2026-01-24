@@ -51,6 +51,8 @@ dependencies:
   get_it: ^9.2.0
   go_router: ^17.0.1
   google_fonts: ^7.1.0
+  dropdown_button2: ^2.3.9
+  syncfusion_flutter_charts: ^32.1.24
 
 dev_dependencies:
   flutter_test:

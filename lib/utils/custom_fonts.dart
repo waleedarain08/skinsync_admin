@@ -32,6 +32,13 @@ class CustomFonts {
     color: CustomColors.whiteColor,
     fontFamily: 'Degular',
   );
+  static TextStyle white20w400 = TextStyle(
+    height: 0,
+    fontSize: 20.sp,
+    fontWeight: FontWeight.w400,
+    color: CustomColors.whiteColor,
+    fontFamily: 'Degular',
+  );
   static TextStyle white20w700 = TextStyle(
     height: 0,
     fontSize: 20.sp,
@@ -217,6 +224,13 @@ class CustomFonts {
     color: CustomColors.blackColor,
     fontFamily: 'Degular',
   );
+  static TextStyle black20w400 = TextStyle(
+    height: 0,
+    fontSize: 20.sp,
+    fontWeight: FontWeight.w600,
+    color: CustomColors.blackColor,
+    fontFamily: 'Degular',
+  );
   static TextStyle black20w600Underlined = TextStyle(
     height: 0,
     fontSize: 20.sp,
@@ -266,6 +280,13 @@ class CustomFonts {
     color: CustomColors.blackColor,
     fontFamily: 'Degular',
   );
+  static TextStyle black16w600 = TextStyle(
+    height: 0,
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w600,
+    color: CustomColors.blackColor,
+    fontFamily: 'Degular',
+  );
   static TextStyle black17w500 = TextStyle(
     height: 0,
     fontSize: 17.sp,
@@ -285,7 +306,15 @@ class CustomFonts {
     fontSize: 20.sp,
     fontWeight: FontWeight.w600,
     decoration: TextDecoration.underline,
-    color: CustomColors.purpleColor,
+    color: CustomColors.drakPurpleColor,
+    fontFamily: 'Degular',
+  );
+
+  static TextStyle green16w400 = TextStyle(
+    height: 0,
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w400,
+    color: CustomColors.greenColor,
     fontFamily: 'Degular',
   );
 }

@@ -13,6 +13,9 @@ class CustomColors {
   static const Color textGreyColor = Color(0xff494949);
   static const Color textFeildBoaderColor = Color(0xff939393);
   static const Color blueColor = Color(0xFF1763E0);
+  static const Color fillColor = Color(0xffF3F3F5);
+  static const Color greenColor = Color(0Xff00A63E);
+  static const Color drakPurpleColor = Color(0xFF4F39F6);
 
   static const LinearGradient purpleBlueGradient = LinearGradient(
     begin: Alignment.topCenter,
