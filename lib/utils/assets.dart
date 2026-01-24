@@ -21,6 +21,7 @@ class PngAssets {
   static const String syringe = "${_assets}syringe.png";
   static const String hand = "${_assets}hand.png";
   static const String logo = '${_assets}logo.png';
+  static const String signup = '${_assets}signup.png';
 }
 
 class SvgAssets {
@@ -59,6 +60,7 @@ class SvgAssets {
   static const String user = '${_assets}user.svg';
   static const String patient = '${_assets}patient.svg';
   static const String clinic = '${_assets}clinic.svg';
+  static const String stethoscope = '${_assets}stethoscope.svg';
 
   // bottom nav icons
   static const String notification = "${_assets}notification.svg";

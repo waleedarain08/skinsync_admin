@@ -2,6 +2,8 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/home_page.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
+import 'package:skinsync_admin/screens/sign_in_screen.dart';
+import 'package:skinsync_admin/screens/signup_screen.dart';
 
 import 'screens/bottom_nav_screens/clinic_management.dart';
 import 'screens/splash_screen.dart';
@@ -13,6 +15,16 @@ class RouteGenerator {
         name: SplashScreen.routeName,
         path: SplashScreen.routeName,
         builder: (_, _) => SplashScreen(),
+      ),
+      GoRoute(
+        name: SignUpScreen.routeName,
+        path: SignUpScreen.routeName,
+        builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
+        name: SignInScreen.routeName,
+        path: SignInScreen.routeName,
+        builder: (context, state) => const SignInScreen(), // Create this screen
       ),
       ShellRoute(
         builder: (_, _, child) {
