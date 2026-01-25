@@ -1,7 +1,11 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:skinsync_admin/utils/assets.dart';
+
+import '../widgets/dailogbox/on_view_dailog_box.dart';
 
 class DisputeScreen extends StatelessWidget {
   const DisputeScreen({super.key});
@@ -99,7 +103,7 @@ class DisputeScreen extends StatelessWidget {
                   _buildDisputesTable(
                     isPending: true,
                     rows: [
-                      const DataRow2(
+                      DataRow2(
                         cells: [
                           DataCell(Text('DSP-2025-001')),
                           DataCell(
@@ -120,10 +124,29 @@ class DisputeScreen extends StatelessWidget {
                           DataCell(
                             _StatusBadge(text: 'Active', isActive: true),
                           ),
-                          DataCell(Icon(Icons.more_vert)),
+                          DataCell(
+                            _popMenuButton(
+                              onAccept: () {
+                                // accept logic
+                              },
+                              onReject: () {
+                                // reject logic
+                              },
+                              onView: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => const DisputeDetailsDialog(),
+                                );
+                              },
+                            ),
+                          ),
+
+                          // DataCell(
+                          //   InkWell(onTap: () {}, child: Icon(Icons.more_vert)),
+                          // ),
                         ],
                       ),
-                      const DataRow2(
+                      DataRow2(
                         cells: [
                           DataCell(
                             Text('Clear Skin Institute'),
@@ -144,7 +167,22 @@ class DisputeScreen extends StatelessWidget {
                           DataCell(
                             _StatusBadge(text: 'Active', isActive: true),
                           ),
-                          DataCell(Icon(Icons.more_vert)),
+                          DataCell(
+                            _popMenuButton(
+                              onAccept: () {
+                                // accept logic
+                              },
+                              onReject: () {
+                                // reject logic
+                              },
+                              onView: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => const DisputeDetailsDialog(),
+                                );
+                              },
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -371,6 +409,74 @@ class DisputeScreen extends StatelessWidget {
         ],
         rows: rows,
       ),
+    );
+  }
+
+  Widget _popMenuButton({
+    required void Function() onAccept,
+    required void Function() onReject,
+    required void Function() onView,
+    Offset offset = const Offset(0, 40),
+  }) {
+    return PopupMenuButton<String>(
+      color: Colors.white,
+      icon: const Icon(Icons.more_vert),
+      offset: offset,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      onSelected: (value) {
+        switch (value) {
+          case 'accept':
+            onAccept();
+            break;
+          case 'reject':
+            onReject();
+            break;
+          case 'view':
+            onView();
+            break;
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          height: 20.h,
+          value: 'accept',
+          child: Row(
+            children: [
+              SvgPicture.asset(
+                SvgAssets.circleTick,
+                height: 18.sp,
+                color: Color(0xFF00A63E),
+              ),
+              SizedBox(width: 5.w),
+              Text('Accept', style: TextStyle(color: Color(0xFF00A63E))),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          height: 20.h,
+          value: 'reject',
+          child: Row(
+            children: [
+              Icon(Icons.cancel, color: Color(0xFFE7000B), size: 18.sp),
+              SizedBox(width: 5.w),
+              Text('Reject', style: TextStyle(color: Color(0xFFE7000B))),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(),
+        PopupMenuItem(
+          height: 20.h,
+          value: 'view',
+          child: Row(
+            children: [
+              Icon(Icons.visibility, size: 18.sp),
+              SizedBox(width: 5.w),
+              Text('View'),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
