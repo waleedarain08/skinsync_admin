@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
-import 'package:skinsync_admin/screens/signup_screen.dart';
 
 import '../utils/assets.dart';
 import '../utils/color_constant.dart';

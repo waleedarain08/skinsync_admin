@@ -9,6 +9,7 @@ import '../widgets/dailogbox/on_view_dailog_box.dart';
 
 class DisputeScreen extends StatelessWidget {
   const DisputeScreen({super.key});
+  static const String routeName = '/dispute-screen';
 
   @override
   Widget build(BuildContext context) {
