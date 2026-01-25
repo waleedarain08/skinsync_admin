@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skinsync_admin/screens/sign_in_screen.dart';
 
 import 'route_generator.dart';
 import 'utils/color_constant.dart';
@@ -36,10 +37,11 @@ class AppInit extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_, child) {
-        return MaterialApp.router(
+        return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'SkinSync Admin',
-          routerConfig: RouteGenerator.router,
+          // routerConfig: RouteGenerator.router,
+          home: SignInScreen(),
           themeMode: themeMode,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
