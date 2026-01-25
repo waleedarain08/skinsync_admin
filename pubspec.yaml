@@ -53,6 +53,7 @@ dependencies:
   google_fonts: ^7.1.0
   dropdown_button2: ^2.3.9
   syncfusion_flutter_charts: ^32.1.24
+  data_table_2: ^2.7.2
 
 dev_dependencies:
   flutter_test:
