@@ -10,6 +10,7 @@ import 'screens/splash_screen.dart';
 
 class RouteGenerator {
   static final GoRouter router = GoRouter(
+    initialLocation: SplashScreen.routeName,
     routes: [
       GoRoute(
         name: SplashScreen.routeName,
