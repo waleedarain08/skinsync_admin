@@ -9,6 +9,7 @@ import '../widgets/dailogbox/payment_dailog_box.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
+  static const String routeName = '/payment-screen';
 
   @override
   Widget build(BuildContext context) {

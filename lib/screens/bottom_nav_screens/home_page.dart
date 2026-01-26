@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/screens/dispute_screen.dart';
+import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 
@@ -53,6 +55,18 @@ class HomePage extends StatelessWidget {
             title: 'Clinic Management',
             icon: SvgAssets.clinic,
             routeName: ClinicManagement.routeName,
+          ),
+          _buildRailItem(
+            context: context,
+            title: 'Dispute Management',
+            icon: SvgAssets.disputeManagement,
+            routeName: DisputeScreen.routeName,
+          ),
+          _buildRailItem(
+            context: context,
+            title: 'Payment Management',
+            icon: SvgAssets.paymentManagement,
+            routeName: PaymentScreen.routeName,
           ),
         ],
       ),
