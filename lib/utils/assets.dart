@@ -21,6 +21,7 @@ class PngAssets {
   static const String syringe = "${_assets}syringe.png";
   static const String hand = "${_assets}hand.png";
   static const String logo = '${_assets}logo.png';
+  static const String signup = '${_assets}signup.png';
 }
 
 class SvgAssets {
@@ -59,11 +60,16 @@ class SvgAssets {
   static const String user = '${_assets}user.svg';
   static const String patient = '${_assets}patient.svg';
   static const String clinic = '${_assets}clinic.svg';
+  static const String stethoscope = '${_assets}stethoscope.svg';
+  static const String circleTick = '${_assets}circle_tick.svg';
+  static const String money = '${_assets}money.svg';
 
   // bottom nav icons
   static const String notification = "${_assets}notification.svg";
   static const String faceId = "${_assets}face_id.svg";
   static const String dail = "${_assets}dail.svg";
+  static const String disputeManagement = "${_assets}dispute_management.svg";
+  static const String paymentManagement = "${_assets}payment_management.svg";
 }
 
 class LottieAssets {

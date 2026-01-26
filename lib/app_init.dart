@@ -40,6 +40,7 @@ class AppInit extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'SkinSync Admin',
           routerConfig: RouteGenerator.router,
+          // home: PaymentScreen(),
           themeMode: themeMode,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,

@@ -1,6 +1,6 @@
 {
-    "name": "skinsync_admin",
-    "short_name": "skinsync_admin",
+    "name": "SkinSync Admin",
+    "short_name": "SkinSync Admin",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
