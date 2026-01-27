@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/app_init.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/home_page.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
@@ -12,6 +13,7 @@ import 'screens/splash_screen.dart';
 
 class RouteGenerator {
   static final GoRouter router = GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: SplashScreen.routeName,
     routes: [
       GoRoute(

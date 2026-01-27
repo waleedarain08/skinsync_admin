@@ -6,8 +6,9 @@ import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
+import 'package:skinsync_admin/widgets/custom_app_bar.dart';
 
-import '../../widgets/custom_app_bar.dart';
+import '../../utils/responsive.dart';
 import 'clinic_management.dart';
 import 'patient_management.dart';
 import 'user_management.dart';
@@ -20,56 +21,83 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(),
+      // appBar: CustomAppBar(),
+      drawer: Responsive.when(
+        defaultValue: SizedBox.shrink(),
+        mobile: () => _buildRail(),
+        tablet: () => _buildRail(),
+      ),
       body: Row(
         children: [
-          _buildDrawer(context),
-          Expanded(child: Center(child: child)),
+          Responsive.when(
+            defaultValue: SizedBox.shrink(),
+            desktop: () => _buildRail(),
+          ),
+          Expanded(
+            child: Column(
+              children: [
+                CustomAppBar(),
+
+                Expanded(child: child),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    return Container(
-      width: 314.w,
-      padding: EdgeInsets.symmetric(vertical: 38.h),
-      decoration: BoxDecoration(gradient: CustomColors.purpleBlueGradient),
-      child: Column(
-        spacing: 10.h,
-        children: [
-          _buildRailItem(
-            context: context,
-            title: 'User Management',
-            icon: SvgAssets.user,
-            routeName: UserManagement.routeName,
+  Widget _buildRail() {
+    return Builder(
+      builder: (context) {
+        return Container(
+          width: 314.w,
+          padding: EdgeInsets.symmetric(vertical: 38.h),
+          margin: EdgeInsets.all(5.w),
+          decoration: BoxDecoration(
+            gradient: CustomColors.purpleBlueGradient,
+            borderRadius: BorderRadiusGeometry.circular(10.r),
           ),
-          _buildRailItem(
-            context: context,
-            title: 'Patient Management',
-            icon: SvgAssets.patient,
-            routeName: PatientManagement.routeName,
+          child: Column(
+            spacing: 10.h,
+            children: [
+              Image.asset(PngAssets.splashLogo, width: 48.w, height: 48.w),
+              Image.asset(PngAssets.logo),
+              SizedBox(height: 30.h),
+              _buildRailItem(
+                context: context,
+                title: 'User Management',
+                icon: SvgAssets.user,
+                routeName: UserManagement.routeName,
+              ),
+              _buildRailItem(
+                context: context,
+                title: 'Patient Management',
+                icon: SvgAssets.patient,
+                routeName: PatientManagement.routeName,
+              ),
+              _buildRailItem(
+                context: context,
+                title: 'Clinic Management',
+                icon: SvgAssets.clinic,
+                routeName: ClinicManagement.routeName,
+              ),
+              _buildRailItem(
+                context: context,
+                title: 'Dispute Management',
+                icon: SvgAssets.disputeManagement,
+                routeName: DisputeScreen.routeName,
+              ),
+              _buildRailItem(
+                context: context,
+                title: 'Payment Management',
+                icon: SvgAssets.paymentManagement,
+                routeName: PaymentScreen.routeName,
+              ),
+            ],
           ),
-          _buildRailItem(
-            context: context,
-            title: 'Clinic Management',
-            icon: SvgAssets.clinic,
-            routeName: ClinicManagement.routeName,
-          ),
-          _buildRailItem(
-            context: context,
-            title: 'Dispute Management',
-            icon: SvgAssets.disputeManagement,
-            routeName: DisputeScreen.routeName,
-          ),
-          _buildRailItem(
-            context: context,
-            title: 'Payment Management',
-            icon: SvgAssets.paymentManagement,
-            routeName: PaymentScreen.routeName,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -86,13 +114,19 @@ class HomePage extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: () {
           context.go(routeName);
+          if (Scaffold.of(context).hasDrawer) {
+            Scaffold.of(context).closeDrawer();
+          }
         },
-        label: Text(
-          title,
-          style: TextStyle(
-            fontSize: 15.sp,
-            fontWeight: FontWeight.w500,
-            color: CustomColors.blackColor,
+        label: SizedBox(
+          width: 180.w,
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w500,
+              color: CustomColors.blackColor,
+            ),
           ),
         ),
         icon: SvgPicture.asset(

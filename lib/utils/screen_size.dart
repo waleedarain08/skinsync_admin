@@ -9,6 +9,8 @@ Size getDesignSize({required BuildContext context}) {
     'SMALL': Size(600, 900),
     'DEFAULT': Size(375, 812),
   };
+  final size1 = MediaQuery.sizeOf(context);
+  log('SIZE: $size1');
   final window = View.of(context);
   final size = window.physicalSize / window.devicePixelRatio;
   late String name;
