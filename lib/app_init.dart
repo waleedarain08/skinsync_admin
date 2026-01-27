@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 import 'route_generator.dart';
 import 'utils/color_constant.dart';
 import 'utils/screen_size.dart';
 import 'utils/theme.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 class AppInit extends StatelessWidget {
   const AppInit({super.key});
@@ -44,6 +47,15 @@ class AppInit extends StatelessWidget {
           themeMode: themeMode,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
+          builder: (context, child) => ResponsiveBreakpoints.builder(
+            child: child!,
+            breakpoints: [
+              const Breakpoint(start: 0, end: 480, name: MOBILE),
+              const Breakpoint(start: 481, end: 1024, name: TABLET),
+              const Breakpoint(start: 1025, end: 1920, name: DESKTOP),
+              const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+            ],
+          ),
         );
       },
     );

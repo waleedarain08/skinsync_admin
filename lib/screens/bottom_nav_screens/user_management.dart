@@ -98,7 +98,7 @@ class UserManagement extends StatelessWidget {
 }
 
 class UserDataTable extends StatelessWidget {
-  const UserDataTable({Key? key}) : super(key: key);
+  const UserDataTable({super.key});
 
   @override
   Widget build(BuildContext context) {
