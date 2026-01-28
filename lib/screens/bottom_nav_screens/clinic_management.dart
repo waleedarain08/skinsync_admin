@@ -25,19 +25,19 @@ class ClinicManagement extends StatelessWidget {
     ClientManamentMiniTileModel(
       title: "Active Clinic",
       subTitle: "1,250",
-      icon: Icons.people,
+      icon: Icons.stacked_line_chart_rounded,
       iconBgColor: Colors.green,
     ),
     ClientManamentMiniTileModel(
       title: "Total Revenue",
       subTitle: "\$2458K",
-      icon: Icons.local_hospital,
+      icon: Icons.monetization_on_outlined,
       iconBgColor: Colors.purple,
     ),
     ClientManamentMiniTileModel(
       title: "Avg Rating",
       subTitle: "4.7",
-      icon: Icons.calendar_today,
+      icon: Icons.star_border_outlined,
       iconBgColor: Colors.amber,
     ),
   ];
