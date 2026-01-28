@@ -186,47 +186,234 @@ class PushNotificationScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: 34.5.h,),
+                    SizedBox(height: 34.5.h),
                   ],
                 ),
               ),
-             SizedBox(height: 20.h,),
+              SizedBox(height: 20.h),
+              Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.r),
+                  border: Border.all(color: CustomColors.greyColor),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "Notification History",
+                      style: CustomFonts.black20w600,
+                    ),
+                    SizedBox(height: 20.h),
+                    PushNotificationTable(),
+                     SizedBox(height: 20.h),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20.h),
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                        vertical: 15.h,
-                        horizontal: 15.w,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.r),
-                        color: Color(0xFFFAF5FF),
-                        border: Border.all(color: Color(0XFFE9D4FF)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: .start,
-                        children: [
-                          Text("Best Practices for Push Notifications:",style: CustomFonts.black20w600,),
-                          SizedBox(height: 5.h,),
-                          Text(" • Keep titles short and actionable (under 50 characters)",style: CustomFonts.black16w400 ,),
-                          SizedBox(height: 5.h,),
-                          Text(" • Make messages clear and concise (under 200 characters)",style: CustomFonts.black16w400 ,),
-                          SizedBox(height: 5.h,),
-                          Text(" • Target the right audience to improve engagement",style: CustomFonts.black16w400 ,),
-                           SizedBox(height: 5.h,),
-                          Text(" • Avoid sending too many notifications to prevent user fatigue",style: CustomFonts.black16w400 ,),
-                           SizedBox(height: 5.h,),
-                          Text(" • Use notifications for important updates, offers, and alerts only",style: CustomFonts.black16w400 ,)
-                    
-
-                       
-                        ],
-                      ),
+                padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 15.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.r),
+                  color: Color(0xFFFAF5FF),
+                  border: Border.all(color: Color(0XFFE9D4FF)),
+                ),
+                child: Column(
+                  crossAxisAlignment: .start,
+                  children: [
+                    Text(
+                      "Best Practices for Push Notifications:",
+                      style: CustomFonts.black20w600,
+                    ),
+                    SizedBox(height: 5.h),
+                    Text(
+                      " • Keep titles short and actionable (under 50 characters)",
+                      style: CustomFonts.black16w400,
+                    ),
+                    SizedBox(height: 5.h),
+                    Text(
+                      " • Make messages clear and concise (under 200 characters)",
+                      style: CustomFonts.black16w400,
+                    ),
+                    SizedBox(height: 5.h),
+                    Text(
+                      " • Target the right audience to improve engagement",
+                      style: CustomFonts.black16w400,
+                    ),
+                    SizedBox(height: 5.h),
+                    Text(
+                      " • Avoid sending too many notifications to prevent user fatigue",
+                      style: CustomFonts.black16w400,
+                    ),
+                    SizedBox(height: 5.h),
+                    Text(
+                      " • Use notifications for important updates, offers, and alerts only",
+                      style: CustomFonts.black16w400,
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 30.h,)
+              SizedBox(height: 30.h),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class PushNotificationTable extends StatelessWidget {
+  const PushNotificationTable({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+              child: DataTable(
+                headingRowColor: MaterialStateProperty.all(
+                  Colors.grey.shade100,
+                ),
+                headingRowHeight: 50.h,
+                dataRowHeight: 60.h,
+                columnSpacing: 40.w,
+                border: TableBorder(
+                  horizontalInside: BorderSide(
+                    color: Colors.grey.shade300,
+                    width: 1,
+                  ),
+                  verticalInside: BorderSide(
+                    color: Colors.grey.shade300,
+                    width: 1,
+                  ),
+                ),
+                columns: [
+                  DataColumn(
+                    columnWidth: FixedColumnWidth(176.w),
+                    label: Text('Title', style: CustomFonts.black16w600),
+                  ),
+                  DataColumn(
+                    columnWidth: FixedColumnWidth(260.w),
+                    label: Text('Message',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis, 
+                    style: CustomFonts.black16w600),
+                  ),
+                  DataColumn(
+                    columnWidth: FixedColumnWidth(192.w),
+                    label: Text('Audience', style: CustomFonts.black16w600),
+                  ),
+                  DataColumn(
+                    columnWidth: FixedColumnWidth(130.w),
+                    label: Text('Recipients', style: CustomFonts.black16w600),
+                  ),
+                  DataColumn(
+                    columnWidth: FixedColumnWidth(102.w),
+                    label: Text('Sent At', style: CustomFonts.black16w600),
+                  ),
+                  DataColumn(
+                    columnWidth: FixedColumnWidth(130.w),
+                    label: Text('Sent At', style: CustomFonts.black16w600),
+                  ),
+                  DataColumn(
+                    columnWidth: FixedColumnWidth(114.w),
+                    label: Text('Status', style: CustomFonts.black16w600),
+                  ),
+                ],
+                rows: [
+                  _buildDataRow(
+                    'New Feature Launch',
+                    'Check out our new AI-powered skin consultation feature!',
+                    'Radiant Skin Clinic',
+                    'All Users',
+                    "1,247",
+                    "Nov 1, 2025, 10:30 AM",
+                    "Sent",
+                  ),
+                  _buildDataRow(
+                    'New Feature Launch',
+                    'Check out our new AI-powered skin consultation feature!',
+                    'Radiant Skin Clinic',
+                    'All Users',
+                    "1,247",
+                    "Nov 1, 2025, 10:30 AM",
+                    "Sent",
+                  ),
+                  _buildDataRow(
+                    'New Feature Launch',
+                    'Check out our new AI-powered skin consultation feature!',
+                    'Radiant Skin Clinic',
+                    'All Users',
+                    "1,247",
+                    "Nov 1, 2025, 10:30 AM",
+                    "Sent",
+                  ),
+                  _buildDataRow(
+                    'New Feature Launch',
+                    'Check out our new AI-powered skin consultation feature!',
+                    'Radiant Skin Clinic',
+                    'All Users',
+                    "1,247",
+                    "Nov 1, 2025, 10:30 AM",
+                    "Sent",
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  DataRow _buildDataRow(
+    String title,
+    String message,
+    String audience,
+    String recipients,
+    String sentAtTime,
+    String sentAtDate,
+    String status,
+  ) {
+    return DataRow(
+      cells: [
+        DataCell(Text(title, style: CustomFonts.black14w400)),
+        DataCell(Text(message, style: CustomFonts.black14w400)),
+        DataCell(Text(audience, style: CustomFonts.black14w400)),
+        DataCell(Text(recipients, style: CustomFonts.black14w400)),
+        DataCell(Text(sentAtTime, style: CustomFonts.black14w400)),
+        DataCell(Text(sentAtDate, style: CustomFonts.black14w400)),
+        DataCell(
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: CustomColors.greenColor,
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  color: Colors.white,
+                  size: 10.sp,
+                ),
+                SizedBox(width: 10.w),
+                Text(status, style: CustomFonts.white16w400),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
