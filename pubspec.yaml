@@ -55,6 +55,7 @@ dependencies:
   syncfusion_flutter_charts: ^32.1.24
   data_table_2: ^2.7.2
   responsive_framework: ^1.5.1
+  fl_chart: ^1.1.1
 
 dev_dependencies:
   flutter_test:

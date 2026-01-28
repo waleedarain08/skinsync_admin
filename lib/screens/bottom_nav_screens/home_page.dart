@@ -23,6 +23,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       // appBar: CustomAppBar(),
+      backgroundColor: CustomColors.dashboardBackgroundColor,
       drawer: Responsive.when(
         defaultValue: SizedBox.shrink(),
         mobile: () => _buildRail(),
