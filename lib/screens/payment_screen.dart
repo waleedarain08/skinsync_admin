@@ -324,7 +324,11 @@ class PaymentScreen extends StatelessWidget {
           minWidth: 900, // Ensure horizontal scrolling on small screens
           dataRowHeight: rowHeight,
           headingRowHeight: headingHeight,
-          headingRowColor: MaterialStateProperty.all(const Color(0xFFF9FAFB)),
+          headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
+          columnResizingParameters: ColumnResizingParameters(
+            desktopMode: true,
+            realTime: true,
+          ),
           headingTextStyle: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.black,
@@ -448,27 +452,30 @@ class _StatusBadge extends StatelessWidget {
           ),
         );
       },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: Color(0xFF00A63E),
           borderRadius: BorderRadius.circular(8.r),
         ),
-        child: Row(
-          children: [
-            SvgPicture.asset(image),
-            SizedBox(width: 6.w),
-            Expanded(
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w500,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 6.w),
+          child: Row(
+            children: [
+              SvgPicture.asset(image),
+              SizedBox(width: 6.w),
+              Expanded(
+                child: Text(
+                  text,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

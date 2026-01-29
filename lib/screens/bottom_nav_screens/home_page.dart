@@ -51,7 +51,7 @@ class HomePage extends StatelessWidget {
     return Builder(
       builder: (context) {
         return Container(
-          width: 314.w,
+          width: 270.w,
           padding: EdgeInsets.symmetric(vertical: 38.h),
           margin: EdgeInsets.all(5.w),
           decoration: BoxDecoration(
@@ -60,9 +60,16 @@ class HomePage extends StatelessWidget {
           ),
           child: Column(
             spacing: 10.h,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(PngAssets.splashLogo, width: 48.w, height: 48.w),
-              Image.asset(PngAssets.logo),
+              Center(
+                child: Image.asset(
+                  PngAssets.splashLogo,
+                  width: 48.w,
+                  height: 48.w,
+                ),
+              ),
+              Center(child: Image.asset(PngAssets.logo)),
               SizedBox(height: 30.h),
               _buildRailItem(
                 context: context,
@@ -109,8 +116,8 @@ class HomePage extends StatelessWidget {
   }) {
     final uri = GoRouter.of(context).state.path;
     final isSelected = uri == routeName;
-    return SizedBox(
-      width: 200.w,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.w),
       child: ElevatedButton.icon(
         onPressed: () {
           context.go(routeName);
@@ -119,7 +126,7 @@ class HomePage extends StatelessWidget {
           }
         },
         label: SizedBox(
-          width: 180.w,
+          width: double.infinity,
           child: Text(
             title,
             style: TextStyle(
