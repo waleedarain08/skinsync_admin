@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
+import 'package:skinsync_admin/screens/static_content.dart';
 
 import 'route_generator.dart';
 import 'utils/color_constant.dart';
@@ -43,7 +44,7 @@ class AppInit extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'SkinSync Admin',
           //routerConfig: RouteGenerator.router,
-          home: DisputeScreen(),
+          home: StaticContentScreen(),
           themeMode: themeMode,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
