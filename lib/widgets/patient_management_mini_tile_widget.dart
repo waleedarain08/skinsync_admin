@@ -11,31 +11,29 @@ class PatientManagementMiniTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        borderRadius: 10,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(data.title, style: CustomFonts.black16w600),
-                Text(data.subTitle, style: CustomFonts.black20w600),
-              ],
+    return BorderdContainerWidget(
+      borderRadius: 10,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(data.title, style: CustomFonts.black16w600),
+              Text(data.subTitle, style: CustomFonts.black20w600),
+            ],
+          ),
+          // SizedBox(width: 20.w),
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: data.iconBgColor.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(15),
             ),
-            // SizedBox(width: 20.w),
-            Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: data.iconBgColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Icon(data.icon, color: data.iconBgColor),
-            ),
-          ],
-        ),
+            child: Icon(data.icon, color: data.iconBgColor),
+          ),
+        ],
       ),
     );
   }

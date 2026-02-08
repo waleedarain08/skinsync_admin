@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 
+import '../utils/responsive.dart';
 import '../widgets/dailogbox/payment_dailog_box.dart';
 
 class PaymentScreen extends StatelessWidget {
@@ -39,41 +40,7 @@ class PaymentScreen extends StatelessWidget {
             SizedBox(height: 24.h),
 
             // Stats Row
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    title: 'Pending Payments',
-                    count: '\$620',
-                    subtitle: "2 transactions",
-                    icon: Iconsax.clock,
-                    color: const Color(0xFFFF4C4C),
-                    bgColor: const Color(0xFFFFF0F0),
-                  ),
-                ),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: _buildStatCard(
-                    title: 'Pending',
-                    count: '10',
-                    subtitle: "2 transactions",
-                    icon: Iconsax.tick_circle,
-                    color: const Color(0xFFFDB528),
-                    bgColor: const Color(0xFFFFF8E5),
-                  ),
-                ),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: _buildStatCard(
-                    title: 'Resolved',
-                    count: '5',
-                    icon: Iconsax.card,
-                    color: const Color(0xFF155DFC),
-                    bgColor: const Color(0xFFE8FAF0),
-                  ),
-                ),
-              ],
-            ),
+            _buildPendingPaymentStatsTile(),
             SizedBox(height: 32.h),
 
             // Pending Disputes Table
@@ -221,6 +188,39 @@ class PaymentScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPendingPaymentStatsTile() {
+    return AdaptiveLayoutRowColumn(
+      expandedWidget: true,
+      children: [
+        _buildStatCard(
+          title: 'Pending Payments',
+          count: '\$620',
+          subtitle: "2 transactions",
+          icon: Iconsax.clock,
+          color: const Color(0xFFFF4C4C),
+          bgColor: const Color(0xFFFFF0F0),
+        ),
+        SizedBox(width: 16.w),
+        _buildStatCard(
+          title: 'Pending',
+          count: '10',
+          subtitle: "2 transactions",
+          icon: Iconsax.tick_circle,
+          color: const Color(0xFFFDB528),
+          bgColor: const Color(0xFFFFF8E5),
+        ),
+        SizedBox(width: 16.w),
+        _buildStatCard(
+          title: 'Resolved',
+          count: '5',
+          icon: Iconsax.card,
+          color: const Color(0xFF155DFC),
+          bgColor: const Color(0xFFE8FAF0),
+        ),
+      ],
     );
   }
 

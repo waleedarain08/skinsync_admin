@@ -8,6 +8,7 @@ import 'package:skinsync_admin/widgets/revenue_trend_widget.dart';
 
 import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
+import '../../utils/responsive.dart';
 import '../../widgets/comming_soon_widget.dart';
 import '../../widgets/custom_dropdown_widget.dart';
 
@@ -61,12 +62,8 @@ class ClinicManagement extends StatelessWidget {
             SizedBox(height: 20.h),
             Divider(color: CustomColors.greyColor),
             SizedBox(height: 50.h),
-            Row(
-              children: List.generate(
-                4,
-                (index) => PatientManagementMiniTileWidget(data: tiles[index]),
-              ),
-            ),
+            _buildStatsTile(),
+
             RevenueTrendWidget(),
             BorderdContainerWidget(
               child: Row(
@@ -98,6 +95,16 @@ class ClinicManagement extends StatelessWidget {
             RegisteredClinicsTable(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildStatsTile() {
+    return AdaptiveLayoutRowColumn(
+      expandedWidget: true,
+      children: List.generate(
+        4,
+        (index) => PatientManagementMiniTileWidget(data: tiles[index]),
       ),
     );
   }
