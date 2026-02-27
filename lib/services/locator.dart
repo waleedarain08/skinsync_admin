@@ -1,5 +1,4 @@
 import 'package:get_it/get_it.dart';
-
 import '../repositories/auth_repository.dart';
 import 'api_base_helper.dart';
 import 'auth_service.dart';
@@ -13,7 +12,10 @@ Future<void> initializeServices() async {
   /// Services
   final apiBaseHelper = ApiBaseHelper();
   locator.registerLazySingleton<AuthRepository>(
-    () => AuthService(apiClient: apiBaseHelper),
+    () => AuthService(api: apiBaseHelper),
   );
-  locator.registerSingleton(StorageService());
+  final secureStorageService = SecureStorageService();
+  await secureStorageService.init();
+  locator.registerSingleton(secureStorageService);
+  locator.registerSingleton(apiBaseHelper);
 }

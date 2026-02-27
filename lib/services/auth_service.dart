@@ -1,49 +1,38 @@
 import 'dart:async';
-import 'dart:convert';
 
-import '../models/requests/sign_in_request.dart';
-import '../models/responses/auth_response.dart';
+import '../models/requests/login_request_model.dart';
+import '../models/responses/base_response_model.dart';
+import '../models/responses/login_response_model.dart';
 import '../repositories/auth_repository.dart';
 import '../utils/enums.dart';
+import '../utils/exception.dart';
 import 'api_base_helper.dart';
 import 'locator.dart';
 import 'storage_service.dart';
 
 class AuthService implements AuthRepository {
-  final ApiBaseHelper _apiClient;
-  final StorageService _secureStorage = locator<StorageService>();
+  final ApiBaseHelper _api;
+  final SecureStorageService _secureStorage = locator<SecureStorageService>();
 
-  AuthService({required ApiBaseHelper apiClient}) : _apiClient = apiClient;
+  AuthService({required ApiBaseHelper api}) : _api = api;
 
   @override
-  Future<AuthResponse> signInApi({required SignInRequest signInRequest}) async {
-    try {
-      final response = await _apiClient.httpRequest(
-        endPoint: Endpoint.signIn,
-        requestType: 'POST',
-        requestBody: signInRequest,
-        params: '',
-      );
+  Future<LoginResponseModel> login({required LoginRequestModel req}) async {
+    final jsonResponse = await _api.post(Endpoint.login, body: req.toJson());
+    final response = BaseApiResponseModel<LoginResponseModel>.fromJson(
+      jsonResponse,
+      (json) => LoginResponseModel.fromJson(json as Map<String, dynamic>),
+    );
 
-      // Check HTTP status code
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        final parsed = json.decode(response.body);
-        AuthResponse authResponse = AuthResponse.fromJson(parsed);
-        if (authResponse.isSuccess == true) {
-          _secureStorage.saveAccessToken(authResponse.data?.clientToken);
-        }
-        return authResponse;
-      } else {
-        // Handle HTTP error status codes
-        final parsed = json.decode(response.body);
-        return AuthResponse.fromJson(parsed);
-      }
-    } catch (e) {
-      // Return error response on exception
-      return AuthResponse(
-        isSuccess: false,
-        message: 'An error occurred. Please try again.',
-      );
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
     }
+    if (response.data?.accessToken == null) {
+      throw UnknownException(response.message);
+    }
+
+    await _secureStorage.saveToken(response.data!.accessToken!);
+    await _secureStorage.saveUser(response.data!.user);
+    return response.data!;
   }
 }

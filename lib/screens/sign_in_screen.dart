@@ -1,22 +1,27 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 
+import '../models/requests/login_request_model.dart';
+import '../utils/validators.dart';
+import '../view_models/auth_view_model.dart';
 import 'bottom_nav_screens/user_management.dart';
 
-class SignInScreen extends StatefulWidget {
+class SignInScreen extends ConsumerStatefulWidget {
   static const String routeName = '/sign-in-screen';
 
   const SignInScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  ConsumerState<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -142,7 +147,27 @@ class _SignInScreenState extends State<SignInScreen> {
                     // Create Account Button
                     GestureDetector(
                       onTap: () {
-                        context.go(UserManagement.routeName);
+                        if (!_formKey.currentState!.validate()) return;
+                        if (!_acceptTerms) {
+                          EasyLoading.showError(
+                            "Please accept the terms & conditions",
+                          );
+                          return;
+                        }
+
+                        ref
+                            .read(authViewModelProvider.notifier)
+                            .login(
+                              loginReq: LoginRequestModel(
+                                email: _emailController.text.trim(),
+                                password: _passwordController.text.trim(),
+                              ),
+                            )
+                            .then((success) {
+                              if (success && context.mounted) {
+                                context.goNamed(UserManagement.routeName);
+                              }
+                            });
                       },
                       child: Container(
                         // width: 215.w,
@@ -207,6 +232,7 @@ class _SignInScreenState extends State<SignInScreen> {
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
+          validator: Validators.email,
           keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hintText,
@@ -266,6 +292,7 @@ class _SignInScreenState extends State<SignInScreen> {
         TextFormField(
           controller: controller,
           obscureText: obscureText,
+          validator: Validators.password,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(
