@@ -5,6 +5,7 @@ import '../models/user_model.dart';
 import '../repositories/auth_repository.dart';
 import '../services/locator.dart';
 import '../services/storage_service.dart';
+import 'base_state_model.dart';
 import 'base_view_model.dart';
 
 final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
@@ -35,14 +36,13 @@ class AuthViewModel extends BaseViewModel<AuthState> {
   }
 }
 
-class AuthState {
-  final bool loading;
+class AuthState extends BaseStateModel {
   final bool isAuthenticated;
   final UserModel? user;
   final String? error;
 
   AuthState({
-    this.loading = false,
+    super.loading = false,
     this.isAuthenticated = false,
     this.error,
     this.user,
