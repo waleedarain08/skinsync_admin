@@ -309,48 +309,45 @@ class PaymentScreen extends StatelessWidget {
 
     return Container(
       height: totalHeight,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        // Remove container border if DataTable handles it, or keep for outer rounding if TableBorder is rectangular
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-      ),
+      // decoration: BoxDecoration(
+      //   color: Colors.white,
+      //   borderRadius: BorderRadius.circular(12.r),
+      //   // Remove container border if DataTable handles it, or keep for outer rounding if TableBorder is rectangular
+      //   border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      // ),
       // padding: EdgeInsets.all(16.w),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
-        child: DataTable2(
-          columnSpacing: 12,
-          horizontalMargin: 12,
-          minWidth: 900, // Ensure horizontal scrolling on small screens
-          dataRowHeight: rowHeight,
-          headingRowHeight: headingHeight,
-          headingRowColor: MaterialStateProperty.all(const Color(0xFFF9FAFB)),
-          headingTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-            fontSize: 14.sp,
-          ),
-          // Add Grid Borders
-          border: TableBorder(
-            // top: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            // bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            // left: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            // right: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            verticalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            horizontalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
-          ),
-          columns: const [
-            DataColumn2(label: Text('Transaction ID'), size: ColumnSize.L),
-            DataColumn2(label: Text('Patient'), size: ColumnSize.L),
-            DataColumn2(label: Text('Clinic'), size: ColumnSize.L),
-            DataColumn2(label: Text('Service'), size: ColumnSize.L),
-            DataColumn2(label: Text('Amount'), size: ColumnSize.M),
-            DataColumn2(label: Text('Date'), size: ColumnSize.M),
-            DataColumn2(label: Text('Payment Method'), size: ColumnSize.M),
-            DataColumn2(label: Text('Actions'), size: ColumnSize.M),
-          ],
-          rows: rows,
+      child: DataTable2(
+        columnSpacing: 12,
+        horizontalMargin: 12,
+        minWidth: 900, // Ensure horizontal scrolling on small screens
+        dataRowHeight: rowHeight,
+        headingRowHeight: headingHeight,
+        headingRowColor: MaterialStateProperty.all(const Color(0xFFF9FAFB)),
+        headingTextStyle: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+          fontSize: 14.sp,
         ),
+        // Add Grid Borders
+        border: TableBorder(
+          top: BorderSide(color: Colors.grey.withOpacity(0.2)),
+          bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
+          left: BorderSide(color: Colors.grey.withOpacity(0.2)),
+          right: BorderSide(color: Colors.grey.withOpacity(0.2)),
+          verticalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
+          horizontalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
+        ),
+        columns: const [
+          DataColumn2(label: Text('Transaction ID'), size: ColumnSize.L),
+          DataColumn2(label: Text('Patient'), size: ColumnSize.L),
+          DataColumn2(label: Text('Clinic'), size: ColumnSize.L),
+          DataColumn2(label: Text('Service'), size: ColumnSize.L),
+          DataColumn2(label: Text('Amount'), size: ColumnSize.M),
+          DataColumn2(label: Text('Date'), size: ColumnSize.M),
+          DataColumn2(label: Text('Payment Method'), size: ColumnSize.M),
+          DataColumn2(label: Text('Actions'), size: ColumnSize.M),
+        ],
+        rows: rows,
       ),
     );
   }

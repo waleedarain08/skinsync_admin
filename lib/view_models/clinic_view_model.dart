@@ -20,11 +20,17 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
   }
 
   Future<bool> getClinics() async {
-    return await runSafely<bool?>(showLoading: false, () async {
-          final clinics = await _clinicRepository.getClinics();
-          state = state.copyWith(clinics: clinics);
-          return true;
-        }) ??
+    return await runSafely<bool?>(
+          showLoading: false,
+          onLoadingChange: (loading) {
+            state = state.copyWith(loading: loading);
+          },
+          () async {
+            final clinics = await _clinicRepository.getClinics();
+            state = state.copyWith(clinics: clinics);
+            return true;
+          },
+        ) ??
         false;
   }
 
@@ -49,7 +55,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 }
 
 class ClinicState extends BaseStateModel {
-  final List<ClinicModel>? clinics;
+  List<ClinicModel>? clinics = [];
   ClinicState({super.loading, this.clinics});
 
   ClinicState copyWith({bool? loading, List<ClinicModel>? clinics}) {
