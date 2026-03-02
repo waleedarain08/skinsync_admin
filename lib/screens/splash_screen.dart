@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 
+import '../services/storage_service.dart';
 import '../utils/assets.dart';
 import '../utils/color_constant.dart';
 
@@ -24,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(milliseconds: 1000));
+      await Future.delayed(Duration(milliseconds: _duration));
       setState(() {
         _animate = true;
       });
@@ -32,7 +33,11 @@ class _SplashScreenState extends State<SplashScreen> {
       await Future.delayed(Duration(milliseconds: _duration - 800));
 
       if (mounted) {
-        context.go(SignInScreen.routeName);
+        if (SecureStorageService().isLoggedIn) {
+          context.go(UserManagement.routeName);
+        } else {
+          context.goNamed(SignInScreen.routeName);
+        }
       }
     });
   }

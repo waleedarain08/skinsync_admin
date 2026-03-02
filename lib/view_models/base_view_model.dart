@@ -16,13 +16,29 @@ abstract class BaseViewModel<S> extends Notifier<S> {
     return initialState;
   }
 
-  Future<T?> runSafely<T>(AsyncValueGetter<T> action) async {
+  Future<T?> runSafely<T>(
+    AsyncValueGetter<T> action, {
+    bool showLoading = true,
+    void Function(bool)? onLoadingChange,
+  }) async {
     try {
+      if (showLoading) {
+        EasyLoading.show();
+      }
+
+      onLoadingChange?.call(true);
+
       return await action.call();
     } catch (e, s) {
-      log(e.toString(), stackTrace: s);
+      log('BASE: $e', stackTrace: s);
       onError(e.toString().replaceAll('Exception:', ''));
       return null;
+    } finally {
+      onLoadingChange?.call(false);
+
+      if (showLoading) {
+        EasyLoading.dismiss();
+      }
     }
   }
 

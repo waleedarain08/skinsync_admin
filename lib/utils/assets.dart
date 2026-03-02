@@ -63,6 +63,7 @@ class SvgAssets {
   static const String stethoscope = '${_assets}stethoscope.svg';
   static const String circleTick = '${_assets}circle_tick.svg';
   static const String money = '${_assets}money.svg';
+  static const String pushNotification = '${_assets}push_notifications.svg';
 
   // bottom nav icons
   static const String notification = "${_assets}notification.svg";

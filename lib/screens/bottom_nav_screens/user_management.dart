@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/widgets/dailogbox/payment_dailog_box.dart';
+import 'package:skinsync_admin/widgets/dailogbox/user_management_dailog_box.dart';
 
 class UserManagement extends StatelessWidget {
   static const String routeName = '/user-management';
@@ -238,7 +240,20 @@ class UserDataTable extends StatelessWidget {
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 1,
-
+                onTap: () {
+                  showDialog<bool>(
+                    context: context,
+                    builder: (context) => UserManagementDailogBox(
+                      transactionId: "TXN-2025-10-001",
+                      patientName: "Emma Johnson",
+                      clinicName: "Radiant Skin Clinic",
+                      serviceName: "Botox Treatment",
+                      amount: "\$450",
+                      feedbackMessage:
+                          "The treatment was rushed and did not meet the promised duration. I felt the service quality was below expectations.",
+                    ),
+                  );
+                },
                 child: Container(
                   padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(

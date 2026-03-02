@@ -6,7 +6,9 @@ class CustomColors {
   static const Color bottomNavText = Color(0xff636363);
   static const Color purpleColor = Color(0xffEEA1F0);
   static const Color blackColor = Color(0xff000000);
+  static const Color borderColor = Color(0x1010101A);
   static const Color whiteColor = Color(0xffffffff);
+  static const Color dashboardBackgroundColor = Color(0xffF9FAFB);
   static const Color silverColor = Color(0xff657296);
   static const Color greyColor = Color(0xffE9E9E9);
   static const Color iconColor = Color(0xffF2F2F2);
