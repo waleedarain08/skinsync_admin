@@ -223,7 +223,7 @@ class RegisteredClinicsTable extends StatelessWidget {
                   rows: state.loading
                       ? []
                       : List.generate(
-                          state.clinics?.length ?? 0,
+                          state.clinics!.length,
                           (index) => DataRow(
                             cells: [
                               DataCell(
