@@ -50,7 +50,7 @@ class AppTheme {
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 19.h),
+          padding: EdgeInsets.symmetric(vertical: 19.h, horizontal: 24.w),
           textStyle: CustomFonts.white22w600,
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,

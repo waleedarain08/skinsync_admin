@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/patient_mangement_graph.dart';
 
@@ -67,99 +68,11 @@ class _PatientManagementState extends State<PatientManagement> {
                   borderRadius: BorderRadius.circular(20.r),
                   border: Border.all(color: CustomColors.greyColor),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Clinic Dropdown
-                    Expanded(
-                      child: buildDropdown(
-                        label: "Filter by Clinic",
-                        value: selectedClinic,
-                        items: clinicItems,
-                        onChanged: (v) => setState(() => selectedClinic = v),
-                      ),
-                    ),
-                    SizedBox(width: 15.w),
-
-                    // Date Range Dropdown
-                    Expanded(
-                      child: buildDropdown(
-                        label: "Date Range",
-                        value: selectedDateRange,
-                        items: dateRangeItems,
-                        onChanged: (v) => setState(() => selectedDateRange = v),
-                      ),
-                    ),
-                    SizedBox(width: 15.w),
-
-                    // Treatment Dropdown
-                    Expanded(
-                      child: buildDropdown(
-                        label: "Treatment Type",
-                        value: selectedTreatment,
-                        items: treatmentItems,
-                        onChanged: (v) => setState(() => selectedTreatment = v),
-                      ),
-                    ),
-                  ],
-                ),
+                child: _buildFiltersDropDown(),
               ),
               SizedBox(height: 20.h),
-              Row(
-                children: List.generate(4, (index) {
-                  return Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(right: index != 3 ? 15.w : 0),
-                      child: Container(
-                        padding: EdgeInsets.all(20.w),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20.r),
-                          border: Border.all(color: CustomColors.greyColor),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Total Patients",
-                                    style: CustomFonts.black16w600,
-                                  ),
-                                  SizedBox(height: 5.h),
-                                  Text("1,247", style: CustomFonts.black16w600),
-                                  SizedBox(height: 10.h),
-                                  Text(
-                                    "+12.5% from last period",
-                                    overflow: TextOverflow.ellipsis,
-                                    style: CustomFonts.green16w400,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(12.w),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.r),
-                                color: CustomColors.drakPurpleColor.withValues(
-                                  alpha: 0.1,
-                                ),
-                              ),
-                              child: Icon(
-                                Icons.people_alt_outlined,
-                                size: 24.sp,
-                                color: CustomColors.drakPurpleColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
+              _buildPatientsTile(),
+
               SizedBox(height: 20.h),
               Container(
                 padding: EdgeInsets.all(20.w),
@@ -302,6 +215,39 @@ class _PatientManagementState extends State<PatientManagement> {
     );
   }
 
+  Widget _buildFiltersDropDown() {
+    return AdaptiveLayoutRowColumn(
+      expandedWidget: true,
+      children: [
+        // Clinic Dropdown
+        buildDropdown(
+          label: "Filter by Clinic",
+          value: selectedClinic,
+          items: clinicItems,
+          onChanged: (v) => setState(() => selectedClinic = v),
+        ),
+        SizedBox(width: 15.w),
+
+        // Date Range Dropdown
+        buildDropdown(
+          label: "Date Range",
+          value: selectedDateRange,
+          items: dateRangeItems,
+          onChanged: (v) => setState(() => selectedDateRange = v),
+        ),
+        SizedBox(width: 15.w),
+
+        // Treatment Dropdown
+        buildDropdown(
+          label: "Treatment Type",
+          value: selectedTreatment,
+          items: treatmentItems,
+          onChanged: (v) => setState(() => selectedTreatment = v),
+        ),
+      ],
+    );
+  }
+
   /// Reusable dropdown builder
   Widget buildDropdown({
     required String label,
@@ -323,4 +269,54 @@ class _PatientManagementState extends State<PatientManagement> {
       ],
     );
   }
+}
+
+Widget _buildPatientsTile() {
+  return AdaptiveLayoutRowColumn(
+    expandedWidget: true,
+    children: List.generate(
+      4,
+      (index) => Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(color: CustomColors.greyColor),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Total Patients", style: CustomFonts.black16w600),
+                  SizedBox(height: 5.h),
+                  Text("1,247", style: CustomFonts.black16w600),
+                  SizedBox(height: 10.h),
+                  Text(
+                    "+12.5% from last period",
+                    overflow: TextOverflow.ellipsis,
+                    style: CustomFonts.green16w400,
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.r),
+                color: CustomColors.drakPurpleColor.withValues(alpha: 0.1),
+              ),
+              child: Icon(
+                Icons.people_alt_outlined,
+                size: 24.sp,
+                color: CustomColors.drakPurpleColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }

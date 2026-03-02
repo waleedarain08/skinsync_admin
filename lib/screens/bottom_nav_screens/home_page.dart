@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
@@ -22,6 +23,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       // appBar: CustomAppBar(),
+      backgroundColor: CustomColors.dashboardBackgroundColor,
       drawer: Responsive.when(
         defaultValue: SizedBox.shrink(),
         mobile: () => _buildRail(),
@@ -100,6 +102,12 @@ class HomePage extends StatelessWidget {
                 title: 'Payment Management',
                 icon: SvgAssets.paymentManagement,
                 routeName: PaymentScreen.routeName,
+              ),
+              _buildRailItem(
+                context: context,
+                title: 'Push Notifications',
+                icon: SvgAssets.pushNotification,
+                routeName: PushNotificationScreen.routeName,
               ),
             ],
           ),

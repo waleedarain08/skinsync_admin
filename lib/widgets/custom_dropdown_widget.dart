@@ -7,7 +7,7 @@ import 'package:skinsync_admin/utils/custom_fonts.dart';
 class CustomDropdown extends StatelessWidget {
   final String hint;
   final String? value;
-  final List<String>? items; // make nullable
+  final List<String>? items;
   final Function(String?) onChanged;
 
   const CustomDropdown({
