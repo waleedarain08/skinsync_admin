@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-import 'package:skinsync_admin/widgets/dailogbox/register_clinic_dailogbox.dart';
 import 'package:skinsync_admin/widgets/patient_management_mini_tile_widget.dart';
 import 'package:skinsync_admin/widgets/revenue_trend_widget.dart';
 
@@ -12,6 +11,7 @@ import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
 import '../../utils/responsive.dart';
 import '../../widgets/custom_dropdown_widget.dart';
+import '../../widgets/dailogbox/register_clinic_dailogbox.dart';
 
 class ClinicManagement extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-management';
@@ -29,6 +29,33 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
       ref.read(clinicViewModelProvider.notifier).initialize();
     });
   }
+
+  List<ClientManamentMiniTileModel> get tiles => [
+    ClientManamentMiniTileModel(
+      title: "Total Clinics",
+      subTitle: "48",
+      icon: Icons.business,
+      iconBgColor: Colors.blueAccent,
+    ),
+    ClientManamentMiniTileModel(
+      title: "Active Clinic",
+      subTitle: "1,250",
+      icon: Icons.stacked_line_chart_rounded,
+      iconBgColor: Colors.green,
+    ),
+    ClientManamentMiniTileModel(
+      title: "Total Revenue",
+      subTitle: "\$2458K",
+      icon: Icons.monetization_on_outlined,
+      iconBgColor: Colors.purple,
+    ),
+    ClientManamentMiniTileModel(
+      title: "Avg Rating",
+      subTitle: "4.7",
+      icon: Icons.star_border_outlined,
+      iconBgColor: Colors.amber,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -120,84 +147,15 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
   }
 
   Widget _buildStatsTile() {
-    return Consumer(
-      builder: (context, ref, _) {
-        final state = ref.watch(clinicViewModelProvider);
-
-        return AdaptiveLayoutRowColumn(
-          expandedWidget: true,
-          children: [
-            PatientManagementMiniTileWidget(
-              data: ClientManamentMiniTileModel(
-                title: "Total Clinics",
-                subTitle: state.loading
-                    ? 'Loading...'
-                    : state.clinics?.length.toString() ?? '0',
-                icon: Icons.business,
-                iconBgColor: Colors.blueAccent,
-              ),
-            ),
-            PatientManagementMiniTileWidget(
-              data: ClientManamentMiniTileModel(
-                title: "Active Clinic",
-                subTitle: state.loading
-                    ? 'Loading...'
-                    : state.clinics!
-                          .where((clinic) => clinic.status == "active")
-                          .length
-                          .toString(),
-                icon: Icons.stacked_line_chart_rounded,
-                iconBgColor: Colors.green,
-              ),
-            ),
-            PatientManagementMiniTileWidget(
-              data: ClientManamentMiniTileModel(
-                title: "Total Revenue",
-                subTitle: "\$2458K",
-                icon: Icons.monetization_on_outlined,
-                iconBgColor: Colors.purple,
-              ),
-            ),
-            PatientManagementMiniTileWidget(
-              data: ClientManamentMiniTileModel(
-                title: "Avg Rating",
-                subTitle: "4.7",
-                icon: Icons.star_border_outlined,
-                iconBgColor: Colors.amber,
-              ),
-            ),
-          ],
-        );
-      },
+    return AdaptiveLayoutRowColumn(
+      expandedWidget: true,
+      children: List.generate(
+        4,
+        (index) => PatientManagementMiniTileWidget(data: tiles[index]),
+      ),
     );
   }
 }
-// List<ClientManamentMiniTileModel> get tiles => [
-//   ClientManamentMiniTileModel(
-//     title: "Total Clinics",
-//     subTitle: "48",
-//     icon: Icons.business,
-//     iconBgColor: Colors.blueAccent,
-//   ),
-//   ClientManamentMiniTileModel(
-//     title: "Active Clinic",
-//     subTitle: "1,250",
-//     icon: Icons.stacked_line_chart_rounded,
-//     iconBgColor: Colors.green,
-//   ),
-//   ClientManamentMiniTileModel(
-//     title: "Total Revenue",
-//     subTitle: "\$2458K",
-//     icon: Icons.monetization_on_outlined,
-//     iconBgColor: Colors.purple,
-//   ),
-//   ClientManamentMiniTileModel(
-//     title: "Avg Rating",
-//     subTitle: "4.7",
-//     icon: Icons.star_border_outlined,
-//     iconBgColor: Colors.amber,
-//   ),
-// ];
 
 class ClientManamentMiniTileModel {
   final String title;
@@ -276,7 +234,7 @@ class RegisteredClinicsTable extends StatelessWidget {
                               ),
                               DataCell(
                                 Text(
-                                  state.clinics![index].email ?? 'N/A',
+                                  state.clinics![index].address ?? 'N/A',
                                   style: CustomFonts.black14w400,
                                 ),
                               ),
