@@ -56,7 +56,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
 class ClinicState extends BaseStateModel {
   List<ClinicModel>? clinics = [];
-  ClinicState({super.loading, this.clinics});
+  ClinicState({super.loading, this.clinics = const []});
 
   ClinicState copyWith({bool? loading, List<ClinicModel>? clinics}) {
     return ClinicState(
