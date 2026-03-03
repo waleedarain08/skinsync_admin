@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
+import 'package:skinsync_admin/screens/treatment_management_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/widgets/custom_app_bar.dart';
@@ -96,6 +97,12 @@ class HomePage extends StatelessWidget {
                 title: 'Dispute Management',
                 icon: SvgAssets.disputeManagement,
                 routeName: DisputeScreen.routeName,
+              ),
+              _buildRailItem(
+                context: context,
+                title: 'Treatment Management',
+                icon: SvgAssets.disputeManagement,
+                routeName: TreatmentManagementScreen.routeName,
               ),
               _buildRailItem(
                 context: context,

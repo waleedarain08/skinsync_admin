@@ -7,6 +7,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/signup_screen.dart';
+import 'package:skinsync_admin/screens/treatment_management_screen.dart';
 
 import 'screens/bottom_nav_screens/clinic_management.dart';
 import 'screens/payment_screen.dart';
@@ -56,6 +57,11 @@ class RouteGenerator {
             name: DisputeScreen.routeName,
             path: DisputeScreen.routeName,
             builder: (_, _) => DisputeScreen(),
+          ),
+          GoRoute(
+            name: TreatmentManagementScreen.routeName,
+            path: TreatmentManagementScreen.routeName,
+            builder: (_, _) => TreatmentManagementScreen(),
           ),
           GoRoute(
             name: PaymentScreen.routeName,

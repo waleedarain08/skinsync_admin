@@ -2,9 +2,11 @@ import 'package:get_it/get_it.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/clinic_services.dart';
 import '../repositories/auth_repository.dart';
+import '../repositories/treatment_repository.dart';
 import 'api_base_helper.dart';
 import 'auth_service.dart';
 import 'storage_service.dart';
+import 'treatment_services.dart';
 
 final locator = GetIt.instance;
 
@@ -18,6 +20,9 @@ Future<void> initializeServices() async {
   );
   locator.registerLazySingleton<ClinicRepository>(
     () => ClinicService(api: apiBaseHelper),
+  );
+  locator.registerLazySingleton<TreatmentRepository>(
+    () => TreatmentServices(api: apiBaseHelper),
   );
   final secureStorageService = SecureStorageService();
   await secureStorageService.init();

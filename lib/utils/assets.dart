@@ -22,6 +22,7 @@ class PngAssets {
   static const String hand = "${_assets}hand.png";
   static const String logo = '${_assets}logo.png';
   static const String signup = '${_assets}signup.png';
+  static const String empty = '${_assets}empty.png';
 }
 
 class SvgAssets {
