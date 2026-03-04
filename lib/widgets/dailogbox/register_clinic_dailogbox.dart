@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/utils/Colored_print.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+
 import '../../models/requests/register_clinic_request_model.dart';
 import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
