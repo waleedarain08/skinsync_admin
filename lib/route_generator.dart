@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/home_page.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
@@ -72,6 +73,11 @@ class RouteGenerator {
             name: PushNotificationScreen.routeName,
             path: PushNotificationScreen.routeName,
             builder: (_, _) => PushNotificationScreen(),
+          ),
+          GoRoute(
+            name: ProductManagement.routeName,
+            path: ProductManagement.routeName,
+            builder: (_, _) => ProductManagement(),
           ),
         ],
       ),

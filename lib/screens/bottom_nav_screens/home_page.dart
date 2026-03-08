@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
@@ -103,6 +104,12 @@ class HomePage extends StatelessWidget {
                 title: 'Treatment Management',
                 icon: SvgAssets.disputeManagement,
                 routeName: TreatmentManagementScreen.routeName,
+              ),
+              _buildRailItem(
+                context: context,
+                title: 'Product Management',
+                icon: SvgAssets.product,
+                routeName: ProductManagement.routeName,
               ),
               _buildRailItem(
                 context: context,

@@ -72,6 +72,7 @@ class SvgAssets {
   static const String dail = "${_assets}dail.svg";
   static const String disputeManagement = "${_assets}dispute_management.svg";
   static const String paymentManagement = "${_assets}payment_management.svg";
+  static const String product = "${_assets}product.svg";
 }
 
 class LottieAssets {
