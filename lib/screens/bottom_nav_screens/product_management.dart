@@ -177,20 +177,18 @@ Widget _buildInventoryCard(ProductModel item) {
                 overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: 8.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'units: ${item.units}',
-                    style: CustomFonts.black14w600.copyWith(
-                      color: CustomColors.purpleColor,
-                    ),
-                  ),
-                  // Text(
-                  //   'per unit',
-                  //   style: CustomFonts.grey14w500.copyWith(fontSize: 12.sp),
-                  // ),
-                ],
+              Text(
+                'units: ${item.units}',
+                style: CustomFonts.black14w600.copyWith(
+                  color: CustomColors.purpleColor,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+                style: CustomFonts.black13w400,
               ),
             ],
           ),
