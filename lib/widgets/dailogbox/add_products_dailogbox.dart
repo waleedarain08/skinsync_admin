@@ -23,12 +23,14 @@ class _AddProductsDailogboxState extends State<AddProductsDailogbox> {
 
   final TextEditingController _nameController = TextEditingController();
 
-  final TextEditingController _unitEmailController = TextEditingController();
+  final TextEditingController _unitController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
-    _unitEmailController.dispose();
+    _unitController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -87,6 +89,19 @@ class _AddProductsDailogboxState extends State<AddProductsDailogbox> {
               ),
               SizedBox(height: 8.h),
               BuildTextField(
+                maxLines: 5,
+                // prefixIcon: Icon(
+                //   Icons.email,
+                //   color: CustomColors.blueColor,
+                //   size: 20.sp,
+                // ),
+                validator: Validators.empty,
+                label: 'Description',
+                controller: _descriptionController,
+                hintText: 'Enter product description',
+              ),
+              SizedBox(height: 8.h),
+              BuildTextField(
                 prefixIcon: Icon(
                   Icons.email,
                   color: CustomColors.blueColor,
@@ -95,7 +110,7 @@ class _AddProductsDailogboxState extends State<AddProductsDailogbox> {
                 validator: Validators.empty,
 
                 label: 'Total Units',
-                controller: _unitEmailController,
+                controller: _unitController,
                 hintText: 'Enter available Units',
               ),
               SizedBox(height: 8.h),
@@ -116,7 +131,7 @@ class _AddProductsDailogboxState extends State<AddProductsDailogbox> {
                                   AddProductReqModel(
                                     name: _nameController.text,
                                     // clinicPhone: _clinicPhoneController.text,
-                                    units: _unitEmailController.text,
+                                    units: _unitController.text,
                                     // clinicAddress:
                                     //     _clinicAddressController.text,
                                     // ownerName: _clinicOwnerNameController.text,
