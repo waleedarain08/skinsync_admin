@@ -40,7 +40,8 @@ class BuildTextField extends StatelessWidget {
           keyboardType: keyboardType,
           validator: validator,
           inputFormatters: [
-            if (keyboardType == TextInputType.phone)
+            if (keyboardType == TextInputType.phone ||
+                keyboardType == TextInputType.number)
               FilteringTextInputFormatter.digitsOnly,
           ],
           onChanged: onChanged,

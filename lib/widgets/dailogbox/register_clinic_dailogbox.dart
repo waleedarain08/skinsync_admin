@@ -35,6 +35,13 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
 
   final TextEditingController _clinicOwnerEmailController =
       TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _latitudeController = TextEditingController();
+  final TextEditingController _longitudeController = TextEditingController();
+  final TextEditingController _consultationFeeController =
+      TextEditingController();
+  final TextEditingController _initialDepositController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -185,7 +192,7 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   validator: Validators.empty,
 
                   label: 'Address',
-                  controller: _clinicOwnerEmailController,
+                  controller: _addressController,
                   hintText: 'Enter Address',
                 ),
               ),
@@ -193,6 +200,7 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
                 child: BuildTextField(
+                  keyboardType: TextInputType.number,
                   prefixIcon: Icon(
                     Icons.location_on,
                     color: CustomColors.blueColor,
@@ -201,7 +209,7 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   validator: Validators.empty,
 
                   label: 'Latitude',
-                  controller: _clinicOwnerEmailController,
+                  controller: _latitudeController,
                   hintText: 'Enter Latitude',
                 ),
               ),
@@ -209,6 +217,7 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
                 child: BuildTextField(
+                  keyboardType: TextInputType.number,
                   prefixIcon: Icon(
                     Icons.location_on,
                     color: CustomColors.blueColor,
@@ -217,7 +226,7 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   validator: Validators.empty,
 
                   label: 'Longitude',
-                  controller: _clinicOwnerEmailController,
+                  controller: _longitudeController,
                   hintText: 'Enter Longitude',
                 ),
               ),
@@ -225,6 +234,7 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
                 child: BuildTextField(
+                  keyboardType: TextInputType.number,
                   prefixIcon: Icon(
                     color: CustomColors.blueColor,
                     Icons.payment,
@@ -233,7 +243,7 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   validator: Validators.empty,
 
                   label: 'consultation fee',
-                  controller: _clinicOwnerEmailController,
+                  controller: _consultationFeeController,
                   hintText: 'Enter consultation fee',
                 ),
               ),
@@ -241,6 +251,7 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
                 child: BuildTextField(
+                  keyboardType: TextInputType.phone,
                   prefixIcon: Icon(
                     color: CustomColors.blueColor,
                     Icons.percent_outlined,
@@ -249,7 +260,7 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   validator: Validators.empty,
 
                   label: 'Initial Deposit',
-                  controller: _clinicOwnerEmailController,
+                  controller: _initialDepositController,
                   hintText: 'Enter initial deposit',
                 ),
               ),
