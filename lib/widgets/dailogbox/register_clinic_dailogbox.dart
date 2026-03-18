@@ -173,6 +173,86 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   hintText: 'Enter owner email',
                 ),
               ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.email,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
+
+                  label: 'Address',
+                  controller: _clinicOwnerEmailController,
+                  hintText: 'Enter Address',
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.location_on,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
+
+                  label: 'Latitude',
+                  controller: _clinicOwnerEmailController,
+                  hintText: 'Enter Latitude',
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.location_on,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
+
+                  label: 'Longitude',
+                  controller: _clinicOwnerEmailController,
+                  hintText: 'Enter Longitude',
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    color: CustomColors.blueColor,
+                    Icons.payment,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
+
+                  label: 'consultation fee',
+                  controller: _clinicOwnerEmailController,
+                  hintText: 'Enter consultation fee',
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    color: CustomColors.blueColor,
+                    Icons.percent_outlined,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
+
+                  label: 'Initial Deposit',
+                  controller: _clinicOwnerEmailController,
+                  hintText: 'Enter initial deposit',
+                ),
+              ),
               Row(
                 children: [
                   Expanded(
