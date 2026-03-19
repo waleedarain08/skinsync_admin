@@ -43,6 +43,25 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
   final TextEditingController _initialDepositController =
       TextEditingController();
 
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
+
+  Future<TimeOfDay?> pickTime(TimeOfDay? time) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: (time ?? TimeOfDay.now()),
+    );
+
+    return picked;
+  }
+
+  String formatTime(TimeOfDay? time) {
+    if (time == null) return "Select Time";
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    return TimeOfDay.fromDateTime(dt).format(context);
+  }
+
   @override
   void dispose() {
     _clinicNameController.dispose();
@@ -264,6 +283,96 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   hintText: 'Enter initial deposit',
                 ),
               ),
+              SizedBox(height: 8.h),
+              Text("Availability", style: CustomFonts.black14w500),
+              SizedBox(height: 10.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Start Time:",
+                    style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        pickTime(startTime).then((picked) {
+                          if (picked != null) {
+                            setState(() {
+                              startTime = picked;
+                            });
+                          }
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10.h,
+                          horizontal: 10.w,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            formatTime(startTime),
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20.w),
+                  Text(
+                    "End Time:",
+                    style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        pickTime(endTime).then((picked) {
+                          if (picked != null) {
+                            setState(() {
+                              endTime = picked;
+                            });
+                          }
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10.h,
+                          horizontal: 10.w,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            formatTime(endTime),
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10.h),
               Row(
                 children: [
                   Expanded(
