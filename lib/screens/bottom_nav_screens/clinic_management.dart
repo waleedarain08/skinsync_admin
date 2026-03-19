@@ -11,7 +11,7 @@ import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
 import '../../utils/responsive.dart';
 import '../../widgets/custom_dropdown_widget.dart';
-import '../../widgets/dailogbox/register_clinic_dailogbox.dart';
+import '../../widgets/dailogbox/clinic_dailogbox.dart';
 
 class ClinicManagement extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-management';
@@ -285,17 +285,46 @@ class RegisteredClinicsTable extends StatelessWidget {
                               ),
                               DataCell(
                                 Row(
-                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
-                                      Icons.visibility_outlined,
-                                      color: CustomColors.blackColor,
-                                      size: 16.sp,
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.visibility_outlined,
+                                          color: CustomColors.blackColor,
+                                          size: 16.sp,
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        Text(
+                                          'View',
+                                          style: CustomFonts.black14w500,
+                                        ),
+                                      ],
                                     ),
-                                    SizedBox(width: 4.w),
-                                    Text(
-                                      'View',
-                                      style: CustomFonts.black14w500,
+                                    SizedBox(width: 20.w),
+                                    InkWell(
+                                      onTap: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              const EditClinicDailogBox(),
+                                        );
+                                      },
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.edit_outlined,
+                                            color: CustomColors.blackColor,
+                                            size: 16.sp,
+                                          ),
+                                          SizedBox(width: 4.w),
+                                          Text(
+                                            'Edit',
+                                            style: CustomFonts.black14w500,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),

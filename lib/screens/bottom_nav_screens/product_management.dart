@@ -16,7 +16,7 @@ import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
 import '../../utils/responsive.dart';
 import '../../widgets/custom_dropdown_widget.dart';
-import '../../widgets/dailogbox/register_clinic_dailogbox.dart';
+import '../../widgets/dailogbox/clinic_dailogbox.dart';
 
 class ProductManagement extends ConsumerStatefulWidget {
   static const String routeName = '/product-management';
