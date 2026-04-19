@@ -7,6 +7,8 @@ import 'api_base_helper.dart';
 import 'auth_service.dart';
 import 'storage_service.dart';
 import 'treatment_services.dart';
+import '../repositories/setting_repository.dart';
+import 'setting_service.dart';
 
 final locator = GetIt.instance;
 
@@ -23,6 +25,9 @@ Future<void> initializeServices() async {
   );
   locator.registerLazySingleton<TreatmentRepository>(
     () => TreatmentServices(api: apiBaseHelper),
+  );
+  locator.registerLazySingleton<SettingRepository>(
+    () => SettingService(api: apiBaseHelper),
   );
   final secureStorageService = SecureStorageService();
   await secureStorageService.init();
