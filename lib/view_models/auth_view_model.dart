@@ -1,3 +1,4 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/requests/login_request_model.dart';
@@ -34,18 +35,24 @@ class AuthViewModel extends BaseViewModel<AuthState> {
         }) ??
         false;
   }
+
+  void setCountry(CountryCode country) {
+    state = state.copyWith(country: country);
+  }
 }
 
 class AuthState extends BaseStateModel {
   final bool isAuthenticated;
   final UserModel? user;
   final String? error;
+  final CountryCode? country;
 
   AuthState({
     super.loading = false,
     this.isAuthenticated = false,
     this.error,
     this.user,
+    this.country,
   });
 
   AuthState copyWith({
@@ -53,12 +60,14 @@ class AuthState extends BaseStateModel {
     bool? isAuthenticated,
     String? error,
     UserModel? user,
+    CountryCode? country,
   }) {
     return AuthState(
       loading: loading ?? this.loading,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       user: user ?? this.user,
       error: error,
+      country: country ?? this.country,
     );
   }
 }
