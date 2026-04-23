@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/assets.dart';
+import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/widgets/phone_widget.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const String routeName = '/sign-up-screen';
@@ -167,15 +169,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           keyboardType: TextInputType.emailAddress,
                         ),
                         SizedBox(height: 20.h),
-
-                        // Phone Number Field
-                        _buildTextField(
-                          label: "Phone Number",
-                          hintText: "+1 (555) 123-4567",
-                          controller: _phoneController,
-                          isRequired: true,
-                          keyboardType: TextInputType.phone,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Phone Number',
+                              style: CustomFonts.black14w500,
+                            ),
+                            SizedBox(height: 8.h),
+                            PhoneWidget(controller: _phoneController),
+                          ],
                         ),
+                        // Phone Number Field
+                        // _buildTextField(
+                        //   label: "Phone Number",
+                        //   hintText: "+1 (555) 123-4567",
+                        //   controller: _phoneController,
+                        //   isRequired: true,
+                        //   keyboardType: TextInputType.phone,
+                        // ),
                         SizedBox(height: 20.h),
 
                         // Password Field
