@@ -4,10 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/phone_widget.dart';
 
 import '../../models/requests/register_clinic_request_model.dart';
 import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
+import '../../view_models/auth_view_model.dart';
 import '../build_textfield.dart';
 
 class RegisterClinicDailogbox extends StatefulWidget {
@@ -135,20 +137,16 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                 ),
               ),
               SizedBox(height: 8.h),
+
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
-                child: BuildTextField(
-                  keyboardType: TextInputType.phone,
-                  prefixIcon: Icon(
-                    Icons.phone,
-                    color: CustomColors.blueColor,
-                    size: 20.sp,
-                  ),
-                  validator: Validators.phone,
-
-                  label: 'Clinic Phone',
-                  controller: _clinicPhoneController,
-                  hintText: 'Enter clinic phone number',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Phone Number", style: CustomFonts.black14w500),
+                    SizedBox(height: 10.h),
+                    PhoneWidget(controller: _clinicPhoneController),
+                  ],
                 ),
               ),
               SizedBox(height: 8.h),
@@ -383,6 +381,11 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                             if (!_formKey.currentState!.validate()) {
                               return;
                             }
+
+                            final selectedCountry = ref
+                                .watch(authViewModelProvider)
+                                .country;
+
                             ref
                                 .read(clinicViewModelProvider.notifier)
                                 .registerClinic(
@@ -395,6 +398,8 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                                     ownerName: _clinicOwnerNameController.text,
                                     ownerEmail:
                                         _clinicOwnerEmailController.text,
+                                    cc: selectedCountry?.dialCode ?? '',
+                                    country: selectedCountry?.name ?? '',
                                   ),
                                 )
                                 .then((value) {
@@ -427,6 +432,63 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   ),
                 ],
               ),
+
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: Consumer(
+              //         builder: (context, ref, _) {
+              //           return ElevatedButton(
+              //             onPressed: () {
+              //               if (!_formKey.currentState!.validate()) {
+              //                 return;
+              //               }
+              //               ref
+              //                   .read(clinicViewModelProvider.notifier)
+              //                   .registerClinic(
+              //                     RegisterClinicReqModel(
+              //                       clinicName: _clinicNameController.text,
+              //                       clinicPhone: _clinicPhoneController.text,
+              //                       clinicEmail: _clinicEmailController.text,
+              //                       clinicAddress:
+              //                           _clinicAddressController.text,
+              //                       ownerName: _clinicOwnerNameController.text,
+              //                       ownerEmail:
+              //                           _clinicOwnerEmailController.text,
+              //                       cc: '',
+              //                       country: '',
+              //                     ),
+              //                   )
+              //                   .then((value) {
+              //                     if (value && context.mounted) {
+              //                       context.pop();
+              //                     }
+              //                   });
+              //             },
+              //             style: ElevatedButton.styleFrom(
+              //               backgroundColor: Colors.black,
+              //               padding: EdgeInsets.symmetric(vertical: 20.h),
+              //             ),
+              //             child: Text(
+              //               ref.watch(clinicViewModelProvider).loading
+              //                   ? 'Creating...'
+              //                   : 'Create',
+              //               style: CustomFonts.white14w500,
+              //             ),
+              //           );
+              //         },
+              //       ),
+              //     ),
+              //     SizedBox(width: 16.w),
+              //     Expanded(
+              //       child: OutlinedButton(
+              //         onPressed: () =>
+              //             Navigator.of(context).pop(), // close dialog
+              //         child: Text('Cancel', style: CustomFonts.black18w500),
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),
