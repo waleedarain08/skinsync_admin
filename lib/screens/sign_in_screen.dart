@@ -3,7 +3,9 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/services/url_launcher_services.dart';
 import 'package:skinsync_admin/utils/assets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/requests/login_request_model.dart';
 import '../utils/validators.dart';
@@ -234,25 +236,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hintText,
-            // hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey.shade400),
-            // filled: true,
-            // fillColor: Colors.white,
-            // border: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(8.r),
-            //   borderSide: BorderSide(color: Colors.grey.shade300),
-            // ),
-            // enabledBorder: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(8.r),
-            //   borderSide: BorderSide(color: Colors.grey.shade300),
-            // ),
-            // focusedBorder: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(8.r),
-            //   borderSide: BorderSide(color: Colors.blue, width: 1.5),
-            // ),
-            // contentPadding: EdgeInsets.symmetric(
-            //   horizontal: 16.w,
-            //   vertical: 14.h,
-            // ),
+            hintStyle: TextStyle(
+              height: 0,
+
+              fontSize: 14.sp,
+              color: Colors.grey.shade400,
+            ),
           ),
         ),
       ],
@@ -357,28 +346,35 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           ),
         ),
         SizedBox(width: 10.w),
-        Column(
-          crossAxisAlignment: .start,
-          children: [
-            Text(
-              "I accept the  Terms & Conditions",
-              style: TextStyle(
-                fontSize: 18.sp,
-                height: 0,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
+        GestureDetector(
+          onTap: () {
+            UrlLauncherService.instance.launchURL(
+              "https://skinsyncai.com/terms-of-service/",
+            );
+          },
+          child: Column(
+            crossAxisAlignment: .start,
+            children: [
+              Text(
+                "I accept the  Terms & Conditions",
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  height: 0,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            SizedBox(height: 2.h),
-            Text(
-              "Secured with Profile Verification API",
-              style: TextStyle(
-                fontSize: 14.sp,
-                height: 0,
-                color: Colors.grey.shade500,
+              SizedBox(height: 2.h),
+              Text(
+                "Secured with Profile Verification API",
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  height: 0,
+                  color: Colors.grey.shade500,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
