@@ -69,7 +69,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
             SizedBox(height: 40.h),
             Row(
               children: [
-                Text("Patient Management", style: CustomFonts.black30w600),
+                Text("Clinic Management", style: CustomFonts.black30w600),
                 Spacer(),
                 ElevatedButton(
                   onPressed: () {
@@ -103,7 +103,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
             ),
             SizedBox(height: 10.h),
             Text(
-              "Analyze patient data, treatment trends, and engagement metrics across all clinics",
+              "Analyze Clinic data, treatment trends, and engagement metrics across all clinics",
               style: CustomFonts.grey18w400,
             ),
             SizedBox(height: 20.h),

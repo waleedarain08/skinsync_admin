@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/utils/assets.dart';
+import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import '../../models/treatment_model.dart';
 import '../../utils/color_constant.dart';
@@ -41,7 +42,15 @@ class _CreateTreatmentDialogState extends State<CreateTreatmentDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: CustomColors.whiteColor,
-      insetPadding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 50.h),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: Responsive.when(
+          defaultValue: 300.w,
+          desktop: () => 300,
+          mobile: () => 10.w,
+          tablet: () => 80.w,
+        ),
+        vertical: 50.h,
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: SingleChildScrollView(
         padding: EdgeInsets.all(24.w),
@@ -152,11 +161,12 @@ class _CreateTreatmentDialogState extends State<CreateTreatmentDialog> {
                       context: context,
                       builder: (context) => Dialog(
                         backgroundColor: CustomColors.whiteColor,
+
                         constraints: BoxConstraints(
                           minHeight: 20.w,
                           // maxHeight: 40.sh,
-                          minWidth: 20,
-                          maxWidth: 0.2.sw,
+                          minWidth: 200,
+                          maxWidth: 300,
                         ),
                         insetPadding: EdgeInsets.symmetric(
                           horizontal: 50.w,

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
+import '../screens/sign_in_screen.dart';
+import '../services/locator.dart';
+import '../services/storage_service.dart';
 import '../utils/assets.dart';
+import '../utils/color_constant.dart';
 import '../utils/responsive.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -15,10 +20,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       constraints: BoxConstraints(minHeight: 101.h),
       padding: EdgeInsets.symmetric(
         horizontal: Responsive.when(
-          defaultValue: 100.w,
-          desktop: () => 100.w,
-          tablet: () => 30.w,
-          mobile: () => 20.w,
+          defaultValue: 20.w,
+          // desktop: () => 20.w,
+          // tablet: () => 30.w,
+          // mobile: () => 20.w,
         ),
         vertical: 24.h,
       ),
@@ -36,7 +41,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               Text(
                 'Admin Portal',
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
                   height: 0,
                 ),
@@ -45,8 +50,43 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 'Super Administrator',
                 style: TextStyle(
                   fontWeight: FontWeight.w400,
-                  fontSize: 12.sp,
+                  fontSize: 10.sp,
                   height: 0,
+                ),
+              ),
+            ],
+          ),
+          PopupMenuButton(
+            padding: EdgeInsets.zero,
+            offset: Offset(0, 40.h),
+            icon: Icon(
+              Icons.arrow_drop_down_circle_outlined,
+              size: 18.sp,
+              color: CustomColors.blackColor,
+            ),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                height: 40.h,
+                onTap: () async {
+                  final _secureStorage = locator<SecureStorageService>();
+                  await _secureStorage.clearToken();
+                  if (!context.mounted) return;
+                  context.goNamed(SignInScreen.routeName);
+                },
+
+                child: Row(
+                  children: [
+                    Icon(Icons.logout_rounded, color: Colors.red, size: 18.sp),
+                    SizedBox(width: 8.w),
+                    Text(
+                      'Logout',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

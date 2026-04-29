@@ -23,8 +23,12 @@ class SignInScreen extends ConsumerStatefulWidget {
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController(
+    text: "superadmin@test.com",
+  );
+  final TextEditingController _passwordController = TextEditingController(
+    text: "Admin123",
+  );
 
   bool _obscurePassword = true;
   String selectedValue = 'Doctor (Clinic Owner)';
@@ -322,7 +326,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     );
   }
 
-  bool _acceptTerms = false;
+  bool _acceptTerms = true;
   Widget _rowWidget() {
     return Row(
       crossAxisAlignment: .start,
