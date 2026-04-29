@@ -24,10 +24,10 @@ class SignInScreen extends ConsumerStatefulWidget {
 class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController(
-    text: "superadmin@test.com",
+    // text: "superadmin@test.com",
   );
   final TextEditingController _passwordController = TextEditingController(
-    text: "Admin123",
+    // text: "Admin123",
   );
 
   bool _obscurePassword = true;
@@ -326,7 +326,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     );
   }
 
-  bool _acceptTerms = true;
+  bool _acceptTerms = false;
   Widget _rowWidget() {
     return Row(
       crossAxisAlignment: .start,

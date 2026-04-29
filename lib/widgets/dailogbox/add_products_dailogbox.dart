@@ -6,9 +6,9 @@ import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import '../../models/requests/add_product_req_model.dart';
-import '../../models/requests/register_clinic_request_model.dart';
 import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
+import '../../utils/responsive.dart';
 import '../build_textfield.dart';
 
 class AddProductsDailogbox extends StatefulWidget {
@@ -38,7 +38,14 @@ class _AddProductsDailogboxState extends State<AddProductsDailogbox> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: CustomColors.whiteColor,
-      insetPadding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 50.h),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: Responsive.when(
+          defaultValue: 120.w,
+          mobile: () => 16.w,
+          tablet: () => 20.w,
+        ),
+        vertical: 50.h,
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: SingleChildScrollView(
         padding: EdgeInsets.all(24.w),
@@ -113,7 +120,7 @@ class _AddProductsDailogboxState extends State<AddProductsDailogbox> {
                 controller: _unitController,
                 hintText: 'Enter available Units',
               ),
-              SizedBox(height: 8.h),
+              SizedBox(height: 30.h),
 
               Row(
                 children: [
