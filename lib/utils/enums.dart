@@ -17,6 +17,8 @@ enum Endpoint {
   login('admin/login'),
   refreshToken('clinic/auth/refresh'),
   // getAdminTreatmentsSideAreas('clinic/side-areas/treatment/{treatmentId}'),
+  //products
+  products('admin/products'),
   //clinics
   getClinics('clinics'),
   registerClinic('admin/clinic/register'),

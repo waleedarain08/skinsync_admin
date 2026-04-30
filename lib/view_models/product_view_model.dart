@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/models/requests/add_product_req_model.dart';
 import 'package:skinsync_admin/repositories/product_repository.dart';
 import '../models/product_model.dart';
 import '../services/locator.dart';
@@ -35,7 +34,7 @@ class ProductViewModel extends BaseViewModel<ProductState> {
         false;
   }
 
-  Future<bool> addProduct(AddProductReqModel req) async {
+  Future<bool> addProduct(ProductModel req) async {
     final success =
         await runSafely<bool?>(
           showLoading: false,

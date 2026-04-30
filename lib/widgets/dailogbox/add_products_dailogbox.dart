@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
-import '../../models/requests/add_product_req_model.dart';
 import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
 import '../../utils/responsive.dart';
@@ -135,15 +135,13 @@ class _AddProductsDailogboxState extends State<AddProductsDailogbox> {
                             ref
                                 .read(productViewModelProvider.notifier)
                                 .addProduct(
-                                  AddProductReqModel(
+                                  ProductModel(
+                                    id: null,
                                     name: _nameController.text,
-                                    // clinicPhone: _clinicPhoneController.text,
-                                    units: _unitController.text,
-                                    // clinicAddress:
-                                    //     _clinicAddressController.text,
-                                    // ownerName: _clinicOwnerNameController.text,
-                                    // ownerEmail:
-                                    //     _clinicOwnerEmailController.text,
+                                    image:
+                                        "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png",
+                                    unit: _unitController.text,
+                                    description: _descriptionController.text,
                                   ),
                                 )
                                 .then((value) {

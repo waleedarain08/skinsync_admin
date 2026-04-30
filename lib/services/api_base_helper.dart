@@ -26,7 +26,7 @@ class ApiBaseHelper {
   Future<T> _safeRequest<T>(Future<T> Function() request) async {
     try {
       await _checkInternet();
-      await _refreshToken();
+      // await _refreshToken();
       return await request();
     } on SocketException {
       throw const NoInternetException();

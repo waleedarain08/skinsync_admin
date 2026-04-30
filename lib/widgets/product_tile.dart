@@ -1,77 +1,106 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/models/product_model.dart';
-import '../models/treatment_model.dart';
-import '../utils/assets.dart';
+import 'package:skinsync_admin/widgets/custom_cashed_image_widget.dart';
 import '../utils/color_constant.dart';
 import '../utils/custom_fonts.dart';
-import '../utils/responsive.dart';
 
-class ProductTile extends ConsumerWidget {
+class ProductTile extends StatelessWidget {
   const ProductTile({super.key, required this.product});
 
   final ProductModel product;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Container(
-      // height: context.isLandscape ? 300.h : 500.h,
-      margin: EdgeInsets.all(20.w),
-      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: BorderRadius.circular(15.r),
         boxShadow: [
           BoxShadow(
-            color: CustomColors.lightBlueColor,
+            color: CustomColors.lightBlueColor.withValues(alpha: 0.2),
             blurRadius: 8.r,
             offset: Offset(0, 2.h),
           ),
           BoxShadow(
-            color: CustomColors.lightPurpleColor,
+            color: CustomColors.lightPurpleColor.withValues(alpha: 0.1),
             blurRadius: 10.r,
             offset: Offset(2.h, 0),
           ),
         ],
-        borderRadius: BorderRadius.circular(15.r),
       ),
-      child: AdaptiveLayoutRowColumn(
-        size: MainAxisSize.max,
-        expandedWidget: true,
-        alignment: MainAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12.r),
-            child: Image.asset(
-              PngAssets.image,
-              // width: 0.5.sw,
-              fit: BoxFit.fitWidth,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Color(0xFFE8E8E8),
-                child: Icon(Icons.broken_image, color: Colors.grey),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(15.r)),
+              child: Stack(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: CustomCachedImage(
+                      width: double.infinity,
+                      imageUrl: product.image,
+                    ),
+                  ),
+                  // Positioned(
+                  //   top: 10.h,
+                  //   right: 10.w,
+                  //   child: Container(
+                  //     padding: EdgeInsets.symmetric(
+                  //       horizontal: 8.w,
+                  //       vertical: 4.h,
+                  //     ),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.white.withValues(alpha: 0.9),
+                  //       borderRadius: BorderRadius.circular(20.r),
+                  //     ),
+                  //     child: Text(
+                  //       'Units: ${item.units}',
+                  //       style: CustomFonts.black12w600.copyWith(
+                  //         color: item.quantity < 20 ? Colors.red : Colors.green,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                ],
               ),
             ),
           ),
-
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title
-              Text(product.name ?? "N/A", style: CustomFonts.black18w600),
-              SizedBox(height: 20.h),
-
-              // Area
-              Text(
-                " Units: ${product.units ?? ""}",
-                style: CustomFonts.black18w600.copyWith(
-                  color: CustomColors.purpleColor,
-                ),
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: EdgeInsets.all(12.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    style: CustomFonts.black16w600,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'units: ${product.unit}',
+                    style: CustomFonts.black14w600.copyWith(
+                      color: CustomColors.purpleColor,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Expanded(
+                    child: Text(
+                      product.description,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                      style: CustomFonts.black13w400,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-
-          // Icon(Icons.edit),
         ],
       ),
     );

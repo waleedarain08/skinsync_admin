@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:skinsync_admin/models/product_model.dart';
-import 'package:skinsync_admin/models/requests/add_product_req_model.dart';
 import '../models/responses/base_response_model.dart';
 import '../repositories/product_repository.dart';
 import '../utils/enums.dart';
@@ -13,11 +12,8 @@ class ProductServices implements ProductRepository {
   ProductServices({required ApiBaseHelper api}) : _api = api;
 
   @override
-  Future<ProductModel> addProduct({required AddProductReqModel req}) async {
-    final jsonResponse = await _api.post(
-      Endpoint.registerClinic,
-      body: req.toJson(),
-    );
+  Future<ProductModel> addProduct({required ProductModel req}) async {
+    final jsonResponse = await _api.post(Endpoint.products, body: req.toJson());
     final response = BaseApiResponseModel<ProductModel>.fromJson(
       jsonResponse,
       (json) => ProductModel.fromJson(json as Map<String, dynamic>),
@@ -31,7 +27,7 @@ class ProductServices implements ProductRepository {
 
   @override
   Future<List<ProductModel>> getProducts() async {
-    final jsonResponse = await _api.get(Endpoint.getClinics);
+    final jsonResponse = await _api.get(Endpoint.products);
     final response = BaseApiResponseModel<List<ProductModel>>.fromJson(
       jsonResponse,
       (json) {
