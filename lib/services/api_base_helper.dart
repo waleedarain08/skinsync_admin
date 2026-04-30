@@ -3,10 +3,15 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
+import '../app_init.dart';
+import '../models/responses/refresh_token_response.dart';
+import '../screens/sign_in_screen.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
+import 'locator.dart';
 import 'storage_service.dart';
 
 class ApiBaseHelper {
@@ -19,12 +24,18 @@ class ApiBaseHelper {
   // ---------------- SAFE REQUEST WRAPPER ----------------
 
   Future<T> _safeRequest<T>(Future<T> Function() request) async {
-    await _checkInternet();
     try {
+      await _checkInternet();
+      await _refreshToken();
       return await request();
     } on SocketException {
       throw const NoInternetException();
-    } on AppException {
+    } on AppException catch (e, s) {
+      log(e.toString(), stackTrace: s);
+      if (e is UnauthorizedException) {
+        await _storage.clearToken();
+        GoRouter.of(navigatorKey.currentContext!).go(SignInScreen.routeName);
+      }
       rethrow;
     } catch (e) {
       throw UnknownException(e.toString());
@@ -47,7 +58,9 @@ class ApiBaseHelper {
         '${baseUrl.url}$urlPath',
       ).replace(queryParameters: queryParams);
       log('URL: $uri');
-      final response = await _client.get(uri, headers: _headers());
+      final headers = await _headers();
+      log('HEADERS: $headers');
+      final response = await _client.get(uri, headers: headers);
       log('RESPONSE: ${response.body}');
 
       return _processResponse(response);
@@ -60,18 +73,30 @@ class ApiBaseHelper {
       log('REQUEST: $body');
       final response = await _client.post(
         Uri.parse('${baseUrl.url}${endpoint.path}'),
-        headers: _headers(),
+        headers: await _headers(),
         body: jsonEncode(body),
       );
       return _processResponse(response);
     });
   }
 
-  Future<dynamic> put(Endpoint endpoint, {Object? body}) {
+  Future<dynamic> put(
+    Endpoint endpoint, {
+    Object? body,
+    Map<String, String>? pathParams,
+    Map<String, String>? queryParams,
+  }) {
+    final urlPath = pathParams != null
+        ? endpoint.withParams(pathParams)
+        : endpoint.path;
+
+    final uri = Uri.parse(
+      '${baseUrl.url}$urlPath',
+    ).replace(queryParameters: queryParams);
     return _safeRequest(() async {
       final response = await _client.put(
-        Uri.parse('${baseUrl.url}${endpoint.path}'),
-        headers: _headers(),
+        uri,
+        headers: await _headers(),
         body: jsonEncode(body),
       );
       return _processResponse(response);
@@ -82,7 +107,7 @@ class ApiBaseHelper {
     return _safeRequest(() async {
       final response = await _client.patch(
         Uri.parse('${baseUrl.url}${endpoint.path}'),
-        headers: _headers(),
+        headers: await _headers(),
         body: jsonEncode(body),
       );
       return _processResponse(response);
@@ -103,19 +128,20 @@ class ApiBaseHelper {
         '${baseUrl.url}$urlPath',
       ).replace(queryParameters: queryParams);
       log('URL: $uri');
-      final response = await _client.delete(uri, headers: _headers());
+      final response = await _client.delete(uri, headers: await _headers());
       return _processResponse(response);
     });
   }
 
   // ---------------- HELPERS ----------------
 
-  Map<String, String> _headers() {
+  Future<Map<String, String>> _headers() async {
+    final token = await _storage.getToken();
     return {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       // if (_storage.token != null)
-      'Authorization': 'Bearer ${_storage.token}',
+      'Authorization': 'Bearer $token',
     };
   }
 
@@ -124,6 +150,51 @@ class ApiBaseHelper {
     if (result.any((result) => result == ConnectivityResult.none)) {
       throw const NoInternetException();
     }
+  }
+
+  Future<void> _refreshToken() async {
+    if (_storage.token == null) {
+      return;
+    }
+    final expiry = await _storage.getAccessTokenExpiry();
+    final now = DateTime.now();
+    if (expiry?.isAfter(now) ?? false) {
+      return;
+    }
+    final refreshExpiry = await _storage.getRefreshTokenExpiry();
+    if (refreshExpiry?.isBefore(now) ?? true) {
+      throw UnauthorizedException('Unauthorized');
+    }
+    final refreshToken = await _storage.getRefreshToken();
+    if (refreshToken == null) {
+      throw UnauthorizedException('Unauthorized');
+    }
+    log('EXPIRY: $expiry');
+    log('REFRESH EXPIRY: $refreshExpiry');
+    final uri = Uri.parse('${baseUrl.url}${Endpoint.refreshToken.path}');
+    log('URL: $uri');
+    final request = {'refresh_token': refreshToken};
+    log('REQUEST: $request');
+    final json = await http.post(uri, body: jsonEncode(request));
+    log('RESPONSE: ${json.body}');
+    final response = RefreshTokenResponse.fromJson(_processResponse(json));
+    if (!response.isSuccess) {
+      throw UnauthorizedException('Unauthorized');
+    }
+    final secureStorage = locator<SecureStorageService>();
+    await secureStorage.saveToken(response.data!.accessToken!);
+    await secureStorage.saveRefreshToken(response.data!.refreshToken!);
+    await secureStorage.saveAccessTokenExpiry(
+      DateTime.fromMillisecondsSinceEpoch(
+        response.data!.accessExpiresAt! * 1000,
+      ),
+    );
+    await secureStorage.saveRefreshTokenExpiry(
+      DateTime.fromMillisecondsSinceEpoch(
+        response.data!.refreshExpiresAt! * 1000,
+      ),
+    );
+    log('TOKEN REFRESHED');
   }
 
   dynamic _processResponse(http.Response response) {
@@ -137,7 +208,7 @@ class ApiBaseHelper {
 
       case 401:
       case 403:
-        _storage.clearToken();
+        // _storage.clearToken();
         throw UnauthorizedException(_message(response));
 
       case 404:

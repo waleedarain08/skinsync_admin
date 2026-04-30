@@ -8,6 +8,8 @@ import 'package:skinsync_admin/firebase_options.dart';
 import 'app_init.dart';
 import 'services/locator.dart';
 
+bool isDeploymentMode = false;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
