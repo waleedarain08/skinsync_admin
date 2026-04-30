@@ -15,7 +15,9 @@ enum Endpoint {
   // getAdminTreatmentsSideAreas('clinic/side-areas/treatment/{treatmentId}'),
   //clinics
   getClinics('clinics'),
-  registerClinic('admin/clinic/register');
+  registerClinic('admin/clinic/register'),
+  updateCustomerAppVersion('admin/app-version/customer'),
+  updateClinicAppVersion('admin/app-version/clinicapp');
 
   final String path;
   const Endpoint(this.path);

@@ -14,6 +14,7 @@ import 'package:skinsync_admin/widgets/custom_app_bar.dart';
 import '../../utils/responsive.dart';
 import 'clinic_management.dart';
 import 'patient_management.dart';
+import 'setting_screen.dart';
 import 'user_management.dart';
 
 class HomePage extends StatelessWidget {
@@ -122,6 +123,12 @@ class HomePage extends StatelessWidget {
                 title: 'Push Notifications',
                 icon: SvgAssets.pushNotification,
                 routeName: PushNotificationScreen.routeName,
+              ),
+              _buildRailItem(
+                context: context,
+                title: 'Settings',
+                icon: SvgAssets.setting,
+                routeName: SettingScreen.routeName,
               ),
             ],
           ),
