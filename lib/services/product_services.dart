@@ -26,6 +26,20 @@ class ProductServices implements ProductRepository {
   }
 
   @override
+  Future<ProductModel> updateProduct({required ProductModel req}) async {
+    final jsonResponse = await _api.put(Endpoint.products, body: req.toJson());
+    final response = BaseApiResponseModel<ProductModel>.fromJson(
+      jsonResponse,
+      (json) => ProductModel.fromJson(json as Map<String, dynamic>),
+    );
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response.data!;
+  }
+
+  @override
   Future<List<ProductModel>> getProducts() async {
     final jsonResponse = await _api.get(Endpoint.products);
     final response = BaseApiResponseModel<List<ProductModel>>.fromJson(

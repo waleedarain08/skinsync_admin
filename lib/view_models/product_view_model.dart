@@ -52,6 +52,27 @@ class ProductViewModel extends BaseViewModel<ProductState> {
 
     return success;
   }
+
+  Future<bool> updateProduct(ProductModel req) async {
+    final success =
+        await runSafely<bool?>(
+          showLoading: false,
+          onLoadingChange: (loading) {
+            state = state.copyWith(loading: loading);
+          },
+          () async {
+            final produdct = await _productRepository.updateProduct(req: req);
+            final currentList = state.products ?? [];
+            currentList.removeWhere((element) => element.id == produdct.id);
+            currentList.add(produdct);
+            state = state.copyWith(products: currentList);
+            return true;
+          },
+        ) ??
+        false;
+
+    return success;
+  }
 }
 
 class ProductState extends BaseStateModel {

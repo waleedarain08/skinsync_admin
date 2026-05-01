@@ -7,7 +7,7 @@ import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-import 'package:skinsync_admin/widgets/dailogbox/add_products_dailogbox.dart';
+import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
 import 'package:skinsync_admin/widgets/patient_management_mini_tile_widget.dart';
 import 'package:skinsync_admin/widgets/product_tile.dart';
 import 'package:skinsync_admin/widgets/revenue_trend_widget.dart';
