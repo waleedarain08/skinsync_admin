@@ -32,7 +32,18 @@ class AuthService implements AuthRepository {
     }
 
     await _secureStorage.saveToken(response.data!.accessToken!);
+    await _secureStorage.saveRefreshToken(response.data!.refreshToken!);
     await _secureStorage.saveUser(response.data!.user);
+    await _secureStorage.saveAccessTokenExpiry(
+      DateTime.fromMillisecondsSinceEpoch(
+        response.data!.accessExpiresAt! * 1000,
+      ),
+    );
+    await _secureStorage.saveRefreshTokenExpiry(
+      DateTime.fromMillisecondsSinceEpoch(
+        response.data!.refreshExpiresAt! * 1000,
+      ),
+    );
     return response.data!;
   }
 }
