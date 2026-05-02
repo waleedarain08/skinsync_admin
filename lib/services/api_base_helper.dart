@@ -57,11 +57,11 @@ class ApiBaseHelper {
       final uri = Uri.parse(
         '${baseUrl.url}$urlPath',
       ).replace(queryParameters: queryParams);
-      log('URL: $uri');
+      // log('URL: $uri');
       final headers = await _headers();
-      log('HEADERS: $headers');
+      // log('HEADERS: $headers');
       final response = await _client.get(uri, headers: headers);
-      log('RESPONSE: ${response.body}');
+      // log('RESPONSE: ${response.body}');
 
       return _processResponse(response);
     });
@@ -69,8 +69,8 @@ class ApiBaseHelper {
 
   Future<dynamic> post(Endpoint endpoint, {Object? body}) {
     return _safeRequest(() async {
-      log('URL: ${baseUrl.url}${endpoint.path}');
-      log('REQUEST: $body');
+      // log('URL: ${baseUrl.url}${endpoint.path}');
+      // log('REQUEST: $body');
       final response = await _client.post(
         Uri.parse('${baseUrl.url}${endpoint.path}'),
         headers: await _headers(),
@@ -136,7 +136,7 @@ class ApiBaseHelper {
       final uri = Uri.parse(
         '${baseUrl.url}$urlPath',
       ).replace(queryParameters: queryParams);
-      log('URL: $uri');
+      // log('URL: $uri');
       final response = await _client.delete(uri, headers: await _headers());
       return _processResponse(response);
     });
