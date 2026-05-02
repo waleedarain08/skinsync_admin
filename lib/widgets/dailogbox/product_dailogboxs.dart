@@ -127,13 +127,17 @@ class _AddProductsDailogboxState extends State<AddProductsDailogbox> {
                   Expanded(
                     child: Consumer(
                       builder: (context, ref, _) {
+                        final state = ref.watch(productViewModelProvider);
+                        final notifier = ref.read(
+                          productViewModelProvider.notifier,
+                        );
                         return ElevatedButton(
                           onPressed: () {
-                            if (!_formKey.currentState!.validate()) {
+                            if (!_formKey.currentState!.validate() ||
+                                state.loading) {
                               return;
                             }
-                            ref
-                                .read(productViewModelProvider.notifier)
+                            notifier
                                 .addProduct(
                                   ProductModel(
                                     id: null,
@@ -155,9 +159,7 @@ class _AddProductsDailogboxState extends State<AddProductsDailogbox> {
                             padding: EdgeInsets.symmetric(vertical: 20.h),
                           ),
                           child: Text(
-                            ref.watch(clinicViewModelProvider).loading
-                                ? 'Creating...'
-                                : 'Create',
+                            state.loading ? 'Creating...' : 'Create',
                             style: CustomFonts.white14w500,
                           ),
                         );
@@ -308,16 +310,20 @@ class _EditProductDailogBoxState extends State<EditProductDailogBox> {
                   Expanded(
                     child: Consumer(
                       builder: (context, ref, _) {
+                        final state = ref.watch(productViewModelProvider);
+                        final notifier = ref.read(
+                          productViewModelProvider.notifier,
+                        );
                         return ElevatedButton(
                           onPressed: () {
-                            if (!_formKey.currentState!.validate()) {
+                            if (!_formKey.currentState!.validate() ||
+                                state.loading) {
                               return;
                             }
-                            ref
-                                .read(productViewModelProvider.notifier)
-                                .addProduct(
+                            notifier
+                                .updateProduct(
                                   ProductModel(
-                                    id: null,
+                                    id: widget.product.id,
                                     name: _nameController.text,
                                     image:
                                         "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png",
@@ -336,9 +342,7 @@ class _EditProductDailogBoxState extends State<EditProductDailogBox> {
                             padding: EdgeInsets.symmetric(vertical: 20.h),
                           ),
                           child: Text(
-                            ref.watch(clinicViewModelProvider).loading
-                                ? 'Updating...'
-                                : 'Update',
+                            state.loading ? 'Updating...' : 'Update',
                             style: CustomFonts.white14w500,
                           ),
                         );

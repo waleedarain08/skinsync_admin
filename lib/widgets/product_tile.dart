@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/widgets/custom_cashed_image_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
 import '../utils/color_constant.dart';
 import '../utils/custom_fonts.dart';
+import '../view_models/product_view_model.dart';
 
-class ProductTile extends StatelessWidget {
+class ProductTile extends ConsumerWidget {
   const ProductTile({super.key, required this.product});
 
   final ProductModel product;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
         showDialog(
           context: context,
           builder: (context) => EditProductDailogBox(product: product),
         );
+      },
+      onDoubleTap: () {
+        ref.read(productViewModelProvider.notifier).deleteProduct(product.id!);
       },
       child: Container(
         decoration: BoxDecoration(

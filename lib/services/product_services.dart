@@ -27,7 +27,11 @@ class ProductServices implements ProductRepository {
 
   @override
   Future<ProductModel> updateProduct({required ProductModel req}) async {
-    final jsonResponse = await _api.put(Endpoint.products, body: req.toJson());
+    final jsonResponse = await _api.patch(
+      Endpoint.updateProduct,
+      body: req.toJson(),
+      pathParams: {'id': req.id.toString()},
+    );
     final response = BaseApiResponseModel<ProductModel>.fromJson(
       jsonResponse,
       (json) => ProductModel.fromJson(json as Map<String, dynamic>),
@@ -37,6 +41,23 @@ class ProductServices implements ProductRepository {
       throw BadRequestException(response.message);
     }
     return response.data!;
+  }
+
+  @override
+  Future<BaseApiResponseModel> deleteProduct({required int id}) async {
+    final jsonResponse = await _api.delete(
+      Endpoint.updateProduct,
+      pathParams: {'id': id.toString()},
+    );
+    final response = BaseApiResponseModel<Null>.fromJson(
+      jsonResponse,
+      (_) => null,
+    );
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 
   @override

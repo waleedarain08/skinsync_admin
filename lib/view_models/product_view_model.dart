@@ -1,3 +1,4 @@
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/repositories/product_repository.dart';
 import '../models/product_model.dart';
@@ -66,6 +67,27 @@ class ProductViewModel extends BaseViewModel<ProductState> {
             currentList.removeWhere((element) => element.id == produdct.id);
             currentList.add(produdct);
             state = state.copyWith(products: currentList);
+            return true;
+          },
+        ) ??
+        false;
+
+    return success;
+  }
+
+  Future<bool> deleteProduct(int id) async {
+    final success =
+        await runSafely<bool?>(
+          showLoading: true,
+          // onLoadingChange: (loading) {
+          //   state = state.copyWith(loading: loading);
+          // },
+          () async {
+            final response = await _productRepository.deleteProduct(id: id);
+            final currentList = state.products ?? [];
+            currentList.removeWhere((element) => element.id == id);
+            state = state.copyWith(products: currentList);
+            EasyLoading.showSuccess(response.message);
             return true;
           },
         ) ??

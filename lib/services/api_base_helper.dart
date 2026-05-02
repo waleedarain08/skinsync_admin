@@ -15,7 +15,7 @@ import 'locator.dart';
 import 'storage_service.dart';
 
 class ApiBaseHelper {
-  static BaseUrls baseUrl = BaseUrls.api;
+  static BaseUrls baseUrl = BaseUrls.apiQa;
 
   final http.Client _client = http.Client();
   final Connectivity _connectivity = Connectivity();
@@ -103,10 +103,19 @@ class ApiBaseHelper {
     });
   }
 
-  Future<dynamic> patch(Endpoint endpoint, {Object? body}) {
+  Future<dynamic> patch(
+    Endpoint endpoint, {
+    Object? body,
+    Map<String, String>? pathParams,
+  }) {
+    final urlPath = pathParams != null
+        ? endpoint.withParams(pathParams)
+        : endpoint.path;
+
+    final uri = Uri.parse('${baseUrl.url}$urlPath');
     return _safeRequest(() async {
       final response = await _client.patch(
-        Uri.parse('${baseUrl.url}${endpoint.path}'),
+        uri,
         headers: await _headers(),
         body: jsonEncode(body),
       );

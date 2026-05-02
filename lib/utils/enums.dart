@@ -19,6 +19,7 @@ enum Endpoint {
   // getAdminTreatmentsSideAreas('clinic/side-areas/treatment/{treatmentId}'),
   //products
   products('admin/products'),
+  updateProduct('admin/products/{id}'),
   //clinics
   getClinics('clinics'),
   registerClinic('admin/clinic/register'),
