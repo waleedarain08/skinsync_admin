@@ -13,12 +13,19 @@ enum SharedPreferencesKeys {
 
 enum DoctorRole { doctor, injector }
 
+enum AuthScreen { login, forgetPassword, verifyOtp, createNewPassword }
+
 enum Endpoint {
+  // auth
   login('admin/login'),
   refreshToken('clinic/auth/refresh'),
-  // getAdminTreatmentsSideAreas('clinic/side-areas/treatment/{treatmentId}'),
+  forgotPassword('admin/forgot-password'),
+  resendOtp('admin/reset-password'),
+  verifyOtp('admin/reset-password'),
+  resetPassword('admin/reset-password'),
   //products
   products('admin/products'),
+  updateProduct('admin/products/{id}'),
   //clinics
   getClinics('clinics'),
   registerClinic('admin/clinic/register'),

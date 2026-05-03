@@ -15,7 +15,7 @@ import 'locator.dart';
 import 'storage_service.dart';
 
 class ApiBaseHelper {
-  static BaseUrls baseUrl = BaseUrls.api;
+  static BaseUrls baseUrl = BaseUrls.apiQa;
 
   final http.Client _client = http.Client();
   final Connectivity _connectivity = Connectivity();
@@ -57,11 +57,11 @@ class ApiBaseHelper {
       final uri = Uri.parse(
         '${baseUrl.url}$urlPath',
       ).replace(queryParameters: queryParams);
-      log('URL: $uri');
+      // log('URL: $uri');
       final headers = await _headers();
-      log('HEADERS: $headers');
+      // log('HEADERS: $headers');
       final response = await _client.get(uri, headers: headers);
-      log('RESPONSE: ${response.body}');
+      // log('RESPONSE: ${response.body}');
 
       return _processResponse(response);
     });
@@ -69,8 +69,8 @@ class ApiBaseHelper {
 
   Future<dynamic> post(Endpoint endpoint, {Object? body}) {
     return _safeRequest(() async {
-      log('URL: ${baseUrl.url}${endpoint.path}');
-      log('REQUEST: $body');
+      // log('URL: ${baseUrl.url}${endpoint.path}');
+      // log('REQUEST: $body');
       final response = await _client.post(
         Uri.parse('${baseUrl.url}${endpoint.path}'),
         headers: await _headers(),
@@ -103,10 +103,19 @@ class ApiBaseHelper {
     });
   }
 
-  Future<dynamic> patch(Endpoint endpoint, {Object? body}) {
+  Future<dynamic> patch(
+    Endpoint endpoint, {
+    Object? body,
+    Map<String, String>? pathParams,
+  }) {
+    final urlPath = pathParams != null
+        ? endpoint.withParams(pathParams)
+        : endpoint.path;
+
+    final uri = Uri.parse('${baseUrl.url}$urlPath');
     return _safeRequest(() async {
       final response = await _client.patch(
-        Uri.parse('${baseUrl.url}${endpoint.path}'),
+        uri,
         headers: await _headers(),
         body: jsonEncode(body),
       );
@@ -127,7 +136,7 @@ class ApiBaseHelper {
       final uri = Uri.parse(
         '${baseUrl.url}$urlPath',
       ).replace(queryParameters: queryParams);
-      log('URL: $uri');
+      // log('URL: $uri');
       final response = await _client.delete(uri, headers: await _headers());
       return _processResponse(response);
     });

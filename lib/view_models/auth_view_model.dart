@@ -1,7 +1,9 @@
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/requests/login_request_model.dart';
+import '../models/requests/auth_req_models.dart';
 import '../models/user_model.dart';
 import '../repositories/auth_repository.dart';
 import '../services/locator.dart';
@@ -31,6 +33,45 @@ class AuthViewModel extends BaseViewModel<AuthState> {
           final response = await _authRepository.login(req: loginReq);
           state = state.copyWith(user: response.user);
 
+          return true;
+        }) ??
+        false;
+  }
+
+  Future<bool> forgotPassword({required String email}) async {
+    return await runSafely<bool?>(showLoading: true, () async {
+          await _authRepository.forgotPassword(email: email);
+
+          return true;
+        }) ??
+        false;
+  }
+
+  Future<bool> resendOtp({required String email}) async {
+    return await runSafely<bool?>(showLoading: true, () async {
+          final response = await _authRepository.reSendOtp(email: email);
+          EasyLoading.showSuccess(response.message);
+          return true;
+        }) ??
+        false;
+  }
+
+  Future<bool> verifyOtp({required String email, required String otp}) async {
+    return await runSafely<bool?>(showLoading: true, () async {
+          final response = await _authRepository.verifyOtp(
+            email: email,
+            otp: otp,
+          );
+          EasyLoading.showSuccess("OTP Verified successfully");
+          return true;
+        }) ??
+        false;
+  }
+
+  Future<bool> resetPassword({required ResetPasswordReqModel req}) async {
+    return await runSafely<bool?>(showLoading: true, () async {
+          final response = await _authRepository.resetPassword(req: req);
+          EasyLoading.showSuccess(response.message);
           return true;
         }) ??
         false;

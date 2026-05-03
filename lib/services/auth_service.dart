@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import '../models/requests/login_request_model.dart';
+import '../models/requests/auth_req_models.dart';
 import '../models/responses/base_response_model.dart';
 import '../models/responses/login_response_model.dart';
 import '../repositories/auth_repository.dart';
@@ -45,5 +45,71 @@ class AuthService implements AuthRepository {
       ),
     );
     return response.data!;
+  }
+
+  @override
+  Future<BaseApiResponseModel> forgotPassword({required String email}) async {
+    final jsonResponse = await _api.post(
+      Endpoint.forgotPassword,
+      body: {'email': email},
+    );
+    final response = BaseApiResponseModel<Null>.fromJson(
+      jsonResponse,
+      (_) => null,
+    );
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<String> verifyOtp({required String email, required String otp}) async {
+    final jsonResponse = await _api.post(
+      Endpoint.verifyOtp,
+      body: {'email': email, 'otp': otp},
+    );
+    final response = BaseApiResponseModel<String>.fromJson(
+      jsonResponse,
+      (json) => json as String,
+    );
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response.data!;
+  }
+
+  @override
+  Future<BaseApiResponseModel> reSendOtp({required String email}) async {
+    final jsonResponse = await _api.post(
+      Endpoint.resendOtp,
+      body: {'email': email},
+    );
+    final response = BaseApiResponseModel<Null>.fromJson(
+      jsonResponse,
+      (_) => null,
+    );
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<BaseApiResponseModel> resetPassword({
+    required ResetPasswordReqModel req,
+  }) async {
+    final jsonResponse = await _api.post(
+      Endpoint.resetPassword,
+      body: req.toJson(),
+    );
+    final response = BaseApiResponseModel<Null>.fromJson(
+      jsonResponse,
+      (_) => null,
+    );
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 }
