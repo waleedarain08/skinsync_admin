@@ -2,6 +2,8 @@ class RegisterClinicReqModel {
   String? clinicName;
   String? clinicEmail;
   String? clinicPhone;
+  String? cc;
+  String? country;
   String? clinicAddress;
   String? clinicLogo;
   String? ownerName;
@@ -11,6 +13,8 @@ class RegisterClinicReqModel {
     this.clinicName,
     this.clinicEmail,
     this.clinicPhone,
+    this.cc,
+    this.country,
     this.clinicAddress,
     this.clinicLogo = "https://example.com/logo.png",
     this.ownerName,
@@ -31,6 +35,8 @@ class RegisterClinicReqModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['clinic_name'] = clinicName;
     data['clinic_email'] = clinicEmail;
+    data['cc'] = cc;
+    data['country'] = country;
     data['clinic_phone'] = clinicPhone;
     data['clinic_address'] = clinicAddress;
     data['clinic_logo'] = clinicLogo;

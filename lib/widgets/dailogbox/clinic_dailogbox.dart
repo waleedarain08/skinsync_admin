@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 
 import '../../models/requests/register_clinic_request_model.dart';
 import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
+import '../../utils/responsive.dart';
+import '../../view_models/auth_view_model.dart';
 import '../build_textfield.dart';
+import '../phone_widget.dart';
 
 class RegisterClinicDailogbox extends StatefulWidget {
   const RegisterClinicDailogbox({super.key});
@@ -109,6 +111,8 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
               // SizedBox(height: 24.h),
               // Text('Treatment Details', style: CustomFonts.black22w600),
               SizedBox(height: 40.h),
+
+              SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
                 child: Row(
@@ -154,47 +158,32 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
               SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          keyboardType: TextInputType.phone,
-                          prefixIcon: Icon(
-                            Icons.phone,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.phone,
-
-                          label: 'Clinic Phone',
-                          controller: _clinicPhoneController,
-                          hintText: 'Enter clinic phone number',
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20.w),
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          prefixIcon: Icon(
-                            Icons.location_city,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.empty,
-
-                          label: 'Clinic Address',
-                          controller: _clinicAddressController,
-                          hintText: 'Enter clinic address',
-                        ),
-                      ),
-                    ),
+                    Text("Phone Number", style: CustomFonts.black14w500),
+                    SizedBox(height: 10.h),
+                    PhoneWidget(controller: _clinicPhoneController),
                   ],
                 ),
               ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.location_city,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
+
+                  label: 'Clinic Address',
+                  controller: _clinicAddressController,
+                  hintText: 'Enter clinic address',
+                ),
+              ),
+
               SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
@@ -238,7 +227,6 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   ],
                 ),
               ),
-
               SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
@@ -345,7 +333,6 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                   ],
                 ),
               ),
-
               SizedBox(height: 8.h),
               Text("Availability", style: CustomFonts.black14w500),
               SizedBox(height: 10.h),
@@ -451,6 +438,11 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                             if (!_formKey.currentState!.validate()) {
                               return;
                             }
+
+                            final selectedCountry = ref
+                                .watch(authViewModelProvider)
+                                .country;
+
                             ref
                                 .read(clinicViewModelProvider.notifier)
                                 .registerClinic(
@@ -463,6 +455,8 @@ class _RegisterClinicDailogboxState extends State<RegisterClinicDailogbox> {
                                     ownerName: _clinicOwnerNameController.text,
                                     ownerEmail:
                                         _clinicOwnerEmailController.text,
+                                    cc: selectedCountry?.dialCode ?? '',
+                                    country: selectedCountry?.name ?? '',
                                   ),
                                 )
                                 .then((value) {
@@ -569,14 +563,7 @@ class _EditClinicDailogBoxState extends State<EditClinicDailogBox> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: CustomColors.whiteColor,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: Responsive.when(
-          defaultValue: 120.w,
-          mobile: () => 16.w,
-          tablet: () => 20.w,
-        ),
-        vertical: 50.h,
-      ),
+      insetPadding: EdgeInsets.symmetric(horizontal: 50.w, vertical: 50.h),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: SingleChildScrollView(
         padding: EdgeInsets.all(24.w),
@@ -597,141 +584,107 @@ class _EditClinicDailogBoxState extends State<EditClinicDailogBox> {
                   ),
                 ],
               ),
-
               // SizedBox(height: 24.h),
               // Text('Treatment Details', style: CustomFonts.black22w600),
-              // SizedBox(height: 40.h),
               SizedBox(height: 40.h),
+
+              SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          prefixIcon: Icon(
-                            Icons.medical_information,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.empty,
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.medical_information,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
 
-                          label: 'Clinic Name',
-                          controller: _clinicNameController,
-                          hintText: 'Enter clinic name',
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20.w),
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          prefixIcon: Icon(
-                            Icons.email,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.email,
-
-                          label: 'Clinic Email',
-                          controller: _clinicEmailController,
-                          hintText: 'Enter clinic email',
-                        ),
-                      ),
-                    ),
-                  ],
+                  label: 'Clinic Name',
+                  controller: _clinicNameController,
+                  hintText: 'Enter clinic name',
                 ),
               ),
               SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          keyboardType: TextInputType.phone,
-                          prefixIcon: Icon(
-                            Icons.phone,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.phone,
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.email,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.email,
 
-                          label: 'Clinic Phone',
-                          controller: _clinicPhoneController,
-                          hintText: 'Enter clinic phone number',
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20.w),
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          prefixIcon: Icon(
-                            Icons.location_city,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.empty,
-
-                          label: 'Clinic Address',
-                          controller: _clinicAddressController,
-                          hintText: 'Enter clinic address',
-                        ),
-                      ),
-                    ),
-                  ],
+                  label: 'Clinic Email',
+                  controller: _clinicEmailController,
+                  hintText: 'Enter clinic email',
                 ),
               ),
               SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          prefixIcon: Icon(
-                            Icons.person,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.empty,
+                child: BuildTextField(
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: Icon(
+                    Icons.phone,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.phone,
 
-                          label: 'Clinic Owner Name',
-                          controller: _clinicOwnerNameController,
-                          hintText: 'Enter clinic owner name',
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20.w),
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          prefixIcon: Icon(
-                            Icons.location_city,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.empty,
-
-                          label: 'Clinic Address',
-                          controller: _clinicAddressController,
-                          hintText: 'Enter clinic address',
-                        ),
-                      ),
-                    ),
-                  ],
+                  label: 'Clinic Phone',
+                  controller: _clinicPhoneController,
+                  hintText: 'Enter clinic phone number',
                 ),
               ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.location_city,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
 
+                  label: 'Clinic Address',
+                  controller: _clinicAddressController,
+                  hintText: 'Enter clinic address',
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.person,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
+
+                  label: 'Clinic Owner Name',
+                  controller: _clinicOwnerNameController,
+                  hintText: 'Enter clinic owner name',
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.email,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.email,
+
+                  label: 'Owner Email',
+                  controller: _clinicOwnerEmailController,
+                  hintText: 'Enter owner email',
+                ),
+              ),
               SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
@@ -751,94 +704,71 @@ class _EditClinicDailogBoxState extends State<EditClinicDailogBox> {
               SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          keyboardType: TextInputType.number,
-                          prefixIcon: Icon(
-                            Icons.location_on,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.empty,
+                child: BuildTextField(
+                  keyboardType: TextInputType.number,
+                  prefixIcon: Icon(
+                    Icons.location_on,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
 
-                          label: 'Latitude',
-                          controller: _latitudeController,
-                          hintText: 'Enter Latitude',
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20.w),
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          keyboardType: TextInputType.number,
-                          prefixIcon: Icon(
-                            Icons.location_on,
-                            color: CustomColors.blueColor,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.empty,
-
-                          label: 'Longitude',
-                          controller: _longitudeController,
-                          hintText: 'Enter Longitude',
-                        ),
-                      ),
-                    ),
-                  ],
+                  label: 'Latitude',
+                  controller: _latitudeController,
+                  hintText: 'Enter Latitude',
                 ),
               ),
               SizedBox(height: 8.h),
               Padding(
                 padding: EdgeInsets.only(bottom: 30.h),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          keyboardType: TextInputType.number,
-                          prefixIcon: Icon(
-                            color: CustomColors.blueColor,
-                            Icons.payment,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.empty,
+                child: BuildTextField(
+                  keyboardType: TextInputType.number,
+                  prefixIcon: Icon(
+                    Icons.location_on,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
 
-                          label: 'consultation fee',
-                          controller: _consultationFeeController,
-                          hintText: 'Enter consultation fee',
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20.w),
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: BuildTextField(
-                          keyboardType: TextInputType.phone,
-                          prefixIcon: Icon(
-                            color: CustomColors.blueColor,
-                            Icons.percent_outlined,
-                            size: 20.sp,
-                          ),
-                          validator: Validators.empty,
-
-                          label: 'Initial Deposit',
-                          controller: _initialDepositController,
-                          hintText: 'Enter initial deposit',
-                        ),
-                      ),
-                    ),
-                  ],
+                  label: 'Longitude',
+                  controller: _longitudeController,
+                  hintText: 'Enter Longitude',
                 ),
               ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  keyboardType: TextInputType.number,
+                  prefixIcon: Icon(
+                    color: CustomColors.blueColor,
+                    Icons.payment,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
 
+                  label: 'consultation fee',
+                  controller: _consultationFeeController,
+                  hintText: 'Enter consultation fee',
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: BuildTextField(
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: Icon(
+                    color: CustomColors.blueColor,
+                    Icons.percent_outlined,
+                    size: 20.sp,
+                  ),
+                  validator: Validators.empty,
+
+                  label: 'Initial Deposit',
+                  controller: _initialDepositController,
+                  hintText: 'Enter initial deposit',
+                ),
+              ),
               SizedBox(height: 8.h),
               Text("Availability", style: CustomFonts.black14w500),
               SizedBox(height: 10.h),
@@ -876,9 +806,6 @@ class _EditClinicDailogBoxState extends State<EditClinicDailogBox> {
                         child: Center(
                           child: Text(
                             formatTime(startTime),
-
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: Colors.grey,
@@ -920,8 +847,6 @@ class _EditClinicDailogBoxState extends State<EditClinicDailogBox> {
                         child: Center(
                           child: Text(
                             formatTime(endTime),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: Colors.grey,
@@ -933,7 +858,7 @@ class _EditClinicDailogBoxState extends State<EditClinicDailogBox> {
                   ),
                 ],
               ),
-              SizedBox(height: 30.h),
+              SizedBox(height: 10.h),
               Row(
                 children: [
                   Expanded(

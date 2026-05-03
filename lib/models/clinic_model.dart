@@ -6,6 +6,8 @@ class ClinicModel {
   String? address;
   String? logo;
   String? status;
+  String? createdAt;
+  String? updatedAt;
 
   ClinicModel({
     this.id,
@@ -15,16 +17,20 @@ class ClinicModel {
     this.address,
     this.logo,
     this.status,
+    this.createdAt,
+    this.updatedAt,
   });
 
   ClinicModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     email = json['email'];
-    phone = json['owner_email'];
-    address = json['owner_password'];
+    phone = json['phone'];
+    address = json['address'];
     logo = json['logo'];
     status = json['status'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
@@ -32,10 +38,12 @@ class ClinicModel {
     data['id'] = id;
     data['name'] = name;
     data['email'] = email;
-    data['owner_email'] = phone;
-    data['owner_password'] = address;
+    data['phone'] = phone;
+    data['address'] = address;
     data['logo'] = logo;
     data['status'] = status;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }
