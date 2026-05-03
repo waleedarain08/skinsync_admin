@@ -28,8 +28,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // 📩 Controllers
-  final _emailController = TextEditingController(text: "superadmin@test.com");
-  final _passwordController = TextEditingController(text: "Admin123");
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   final _otpController = TextEditingController();
 
@@ -51,7 +51,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     });
   }
 
-  bool _acceptTerms = true;
+  bool _acceptTerms = false;
   Widget _rowWidget() {
     return Row(
       mainAxisAlignment: .center,
