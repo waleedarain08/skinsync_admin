@@ -20,8 +20,8 @@ enum Endpoint {
   login('admin/login'),
   refreshToken('clinic/auth/refresh'),
   forgotPassword('admin/forgot-password'),
-  resendOtp('admin/reset-password'),
-  verifyOtp('admin/reset-password'),
+  // resendOtp('admin/reset-password'),
+  verifyResetOtp('admin/verify-reset-otp'),
   resetPassword('admin/reset-password'),
   //products
   products('admin/products'),

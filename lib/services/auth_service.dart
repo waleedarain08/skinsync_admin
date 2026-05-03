@@ -66,7 +66,7 @@ class AuthService implements AuthRepository {
   @override
   Future<String> verifyOtp({required String email, required String otp}) async {
     final jsonResponse = await _api.post(
-      Endpoint.verifyOtp,
+      Endpoint.verifyResetOtp,
       body: {'email': email, 'otp': otp},
     );
     final response = BaseApiResponseModel<String>.fromJson(
@@ -82,7 +82,7 @@ class AuthService implements AuthRepository {
   @override
   Future<BaseApiResponseModel> reSendOtp({required String email}) async {
     final jsonResponse = await _api.post(
-      Endpoint.resendOtp,
+      Endpoint.verifyResetOtp,
       body: {'email': email},
     );
     final response = BaseApiResponseModel<Null>.fromJson(
