@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
+import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import '../../utils/responsive.dart';
 import '../../view_models/treatment_view_model.dart';
 import '../utils/custom_fonts.dart';
 import '../utils/extentions.dart';
-import '../widgets/dailogbox/create_treatment_dailogbox.dart';
 import '../widgets/empty_widget.dart';
 import '../widgets/treatment_list_tile.dart';
 
@@ -24,15 +25,11 @@ class _TreatmentManagementScreenState
     extends ConsumerState<TreatmentManagementScreen> {
   @override
   void initState() {
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    // ref.read(treatmentViewModelProvider.notifier).getTreatments();
-    // });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // final state = ref.watch(treatmentViewModelProvider);
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
@@ -46,15 +43,7 @@ class _TreatmentManagementScreenState
                 Spacer(),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle create staff
-                    // ref
-                    //     .read(treatmentViewModelProvider.notifier)
-                    //     .getTreatments();
-                    // context.push(AddTreatmentScreen.routeName);
-                    showDialog(
-                      context: context,
-                      builder: (context) => CreateTreatmentDialog(),
-                    );
+                    context.push(CreateTreatmentScreen.routeName);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
@@ -95,7 +84,6 @@ class _TreatmentManagementScreenState
                           padding: EdgeInsets.all(20.w),
                           decoration: BoxDecoration(
                             color: Colors.white,
-
                             borderRadius: BorderRadius.circular(15.r),
                           ),
                         );
@@ -110,8 +98,6 @@ class _TreatmentManagementScreenState
                     // itemCount: state.treatments.length,
                     separatorBuilder: (_, __) => SizedBox(height: 20.h),
                     itemBuilder: (context, index) {
-                      // final treatment = state.treatments[index];
-
                       return TreatmentListTile(
                         treatment: TreatmentModel(
                           id: 1,

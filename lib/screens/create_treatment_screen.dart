@@ -1,200 +1,49 @@
-import 'dart:io';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/models/treatment_model.dart';
+import 'package:skinsync_admin/utils/assets.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
+import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/validators.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
 
-import 'business_info_screen.dart';
-
-class CreateTreatmentScreen extends StatefulWidget {
+class CreateTreatmentScreen extends ConsumerStatefulWidget {
   const CreateTreatmentScreen({super.key});
 
+  static const String routeName = '/create-treatment';
+
   @override
-  State<CreateTreatmentScreen> createState() => _CreateTreatmentScreenState();
+  ConsumerState<CreateTreatmentScreen> createState() => _CreateTreatmentScreenState();
 }
 
-class _CreateTreatmentScreenState extends State<CreateTreatmentScreen> {
-  final TextEditingController _treatmentNameController =
-      TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final ImagePicker _imagePicker = ImagePicker();
-  XFile? _selectedImage;
+  late final ValueNotifier<TreatmentModel> _treatment;
+  late final TextEditingController _treatmentNameController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _priceController;
 
-  // Dropdown values
-  String? _selectedCategory;
-  String? _selectedSubcategory;
-
-  // Dropdown lists
-  final List<String> _categories = [
-    'Facial Treatments',
-    'Body Treatments',
-    'Skin Care',
-    'Hair Treatments',
-    'Massage Therapy',
-    'Wellness',
-  ];
-
-  final List<String> _subcategories = [
-    'Anti-Aging',
-    'Hydration',
-    'Acne Treatment',
-    'Brightening',
-    'Relaxation',
-    'Deep Tissue',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _treatment = ValueNotifier(TreatmentModel(sideAreas: []));
+    _treatmentNameController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _priceController = TextEditingController();
+  }
 
   @override
   void dispose() {
     _treatmentNameController.dispose();
     _descriptionController.dispose();
+    _priceController.dispose();
+    _treatment.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-      ),
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Select Image',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
-              ),
-              SizedBox(height: 20.h),
-              ListTile(
-                leading: Container(
-                  padding: EdgeInsets.all(10.w),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Icon(
-                    Icons.photo_library_outlined,
-                    color: Colors.blue,
-                    size: 24.sp,
-                  ),
-                ),
-                title: Text(
-                  'Choose from Gallery',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickFromGallery();
-                },
-              ),
-              SizedBox(height: 8.h),
-              ListTile(
-                leading: Container(
-                  padding: EdgeInsets.all(10.w),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Icon(
-                    Icons.camera_alt_outlined,
-                    color: Colors.green,
-                    size: 24.sp,
-                  ),
-                ),
-                title: Text(
-                  'Take a Photo',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickFromCamera();
-                },
-              ),
-              if (_selectedImage != null) ...[
-                SizedBox(height: 8.h),
-                ListTile(
-                  leading: Container(
-                    padding: EdgeInsets.all(10.w),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: 24.sp,
-                    ),
-                  ),
-                  title: Text(
-                    'Remove Photo',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.red,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(() {
-                      _selectedImage = null;
-                    });
-                  },
-                ),
-              ],
-              SizedBox(height: 16.h),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickFromGallery() async {
-    try {
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 800,
-        maxHeight: 800,
-        imageQuality: 85,
-      );
-      if (image != null) {
-        setState(() {
-          _selectedImage = image;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error picking image from gallery: $e');
-    }
-  }
-
-  Future<void> _pickFromCamera() async {
-    try {
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 800,
-        maxHeight: 800,
-        imageQuality: 85,
-      );
-      if (image != null) {
-        setState(() {
-          _selectedImage = image;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error picking image from camera: $e');
-    }
   }
 
   @override
@@ -202,17 +51,20 @@ class _CreateTreatmentScreenState extends State<CreateTreatmentScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with back button
-              _buildHeader(),
-              SizedBox(height: 24.h),
-              // Main Form Container
-              _buildFormContainer(),
-            ],
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 800.w),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 24.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  SizedBox(height: 24.h),
+                  _buildFormContainer(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -223,17 +75,20 @@ class _CreateTreatmentScreenState extends State<CreateTreatmentScreen> {
     return Row(
       children: [
         GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Icon(Icons.arrow_back, size: 24.sp, color: Colors.black),
-        ),
-        SizedBox(width: 12.w),
-        Text(
-          'Create Staff',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
+          onTap: () => context.pop(),
+          child: Container(
+            padding: EdgeInsets.all(8.r),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Icon(Icons.arrow_back, size: 24.sp, color: Colors.black),
           ),
+        ),
+        SizedBox(width: 16.w),
+        Text(
+          'Create Treatment',
+          style: CustomFonts.black22w600,
         ),
       ],
     );
@@ -242,7 +97,7 @@ class _CreateTreatmentScreenState extends State<CreateTreatmentScreen> {
   Widget _buildFormContainer() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(24.w),
+      padding: EdgeInsets.all(32.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
@@ -254,280 +109,335 @@ class _CreateTreatmentScreenState extends State<CreateTreatmentScreen> {
           ),
         ],
       ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Treatment Details',
+              style: CustomFonts.black18w600,
+            ),
+            SizedBox(height: 32.h),
+            BuildTextField(
+              prefixIcon: Icon(
+                Icons.medication,
+                color: CustomColors.blueColor,
+                size: 20.sp,
+              ),
+              controller: _treatmentNameController,
+              validator: Validators.empty,
+              label: 'Treatment Name',
+              hintText: 'e.g. Botox',
+            ),
+            SizedBox(height: 24.h),
+            BuildTextField(
+              prefixIcon: Icon(
+                Icons.description,
+                color: CustomColors.blueColor,
+                size: 20.sp,
+              ),
+              controller: _descriptionController,
+              label: 'Description',
+              hintText: 'Enter treatment description',
+              maxLines: 3,
+            ),
+            SizedBox(height: 24.h),
+            BuildTextField(
+              prefixIcon: Icon(
+                Icons.attach_money,
+                color: CustomColors.blueColor,
+                size: 20.sp,
+              ),
+              controller: _priceController,
+              label: 'Price',
+              hintText: 'Enter price',
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 32.h),
+            Divider(color: Colors.grey[200]),
+            SizedBox(height: 32.h),
+            _buildSideAreasSection(),
+            SizedBox(height: 40.h),
+            _buildActionButtons(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSideAreasSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Side Areas', style: CustomFonts.black18w600),
+            ElevatedButton.icon(
+              onPressed: _showAddSideAreaDialog,
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: Text('Add Side Area', style: CustomFonts.white14w500),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        ValueListenableBuilder(
+          valueListenable: _treatment,
+          builder: (context, treatment, _) {
+            final sideAreas = treatment.sideAreas ?? [];
+            if (sideAreas.isEmpty) {
+              return Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: Center(
+                  child: Text(
+                    'No side areas added yet',
+                    style: TextStyle(color: Colors.grey[500]),
+                  ),
+                ),
+              );
+            }
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16.w,
+                mainAxisSpacing: 16.h,
+                mainAxisExtent: 260.h,
+              ),
+              itemCount: sideAreas.length,
+              itemBuilder: (context, index) {
+                final area = sideAreas[index];
+                return _buildSideAreaCard(area, index);
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSideAreaCard(SideAreaModel area, int index) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Profile Picture Section
-          Text(
-            'Treatment Details',
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w800,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(height: 24.h),
-          // Treatment Name
-          _buildTextField(
-            label: 'Treatment Name',
-            controller: _treatmentNameController,
-            hintText: 'e.g., Botox, Dermal Fillers',
-          ),
-          SizedBox(height: 20.h),
-          // Category Dropdown
-          _buildDropdownField(
-            label: 'Category',
-            hintText: 'Select category',
-            value: _selectedCategory,
-            items: _categories,
-            onChanged: (value) {
-              setState(() {
-                _selectedCategory = value;
-              });
-            },
-          ),
-          SizedBox(height: 20.h),
-          // Subcategory Dropdown
-          _buildDropdownField(
-            label: 'Subcategory',
-            hintText: 'Select category',
-            value: _selectedSubcategory,
-            items: _subcategories,
-            onChanged: (value) {
-              setState(() {
-                _selectedSubcategory = value;
-              });
-            },
-          ),
-          SizedBox(height: 20.h),
-          // Description
-          _buildTextField(
-            label: 'Description',
-            controller: _descriptionController,
-            hintText: 'Describe the treatment and its benefits',
-            maxLines: 5,
-          ),
-          SizedBox(height: 20.h),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Stack(
             children: [
-              Expanded(
-                child: _buildTextField(
-                  label: 'Price',
-                  controller: _treatmentNameController,
-                  hintText: '\$500',
+              Container(
+                height: 180.h,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+                  image: DecorationImage(
+                    image: AssetImage(PngAssets.image),
+                    fit: BoxFit.cover,
+                    opacity: 0.6,
+                  ),
                 ),
               ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: _buildTextField(
-                  label: 'Discount',
-                  controller: _treatmentNameController,
-                  hintText: '%30 Off',
+              PositionDetector(
+                onTap: () {
+                  final updatedSideAreas = List<SideAreaModel>.from(_treatment.value.sideAreas!);
+                  updatedSideAreas.removeAt(index);
+                  _treatment.value = _treatment.value.copyWith(sideAreas: updatedSideAreas);
+                },
+                child: Positioned(
+                  top: 8.r,
+                  right: 8.r,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 14.r,
+                    child: Icon(Icons.close, size: 16.r, color: Colors.red),
+                  ),
                 ),
               ),
             ],
           ),
-
-          SizedBox(height: 32.h),
-
-          // Buttons Row
-          _buildButtonsRow(),
+          Padding(
+            padding: EdgeInsets.all(12.w),
+            child: Text(
+              area.name ?? 'N/A',
+              style: CustomFonts.black14w500,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    required String hintText,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey[400]),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 14.h,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdownField({
-    required String label,
-    required String hintText,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
-        ),
-        SizedBox(height: 8.h),
-        DropdownButtonHideUnderline(
-          child: DropdownButton2<String>(
-            isExpanded: true,
-            hint: Text(
-              hintText,
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[400]),
-            ),
-            value: value,
-            items: items
-                .map(
-                  (item) => DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(
-                      item,
-                      style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-                    ),
-                  ),
-                )
-                .toList(),
-            onChanged: onChanged,
-            buttonStyleData: ButtonStyleData(
-              height: 48.h,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: Colors.grey[300]!, width: 1),
-              ),
-            ),
-            iconStyleData: IconStyleData(
-              icon: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: Colors.grey[500],
-                size: 24.sp,
-              ),
-            ),
-            dropdownStyleData: DropdownStyleData(
-              maxHeight: 200.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              offset: Offset(0, -4.h),
-              scrollbarTheme: ScrollbarThemeData(
-                radius: Radius.circular(40.r),
-                thickness: WidgetStateProperty.all(6),
-                thumbVisibility: WidgetStateProperty.all(true),
-              ),
-            ),
-            menuItemStyleData: MenuItemStyleData(
-              height: 44.h,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildButtonsRow() {
+  Widget _buildActionButtons() {
     return Row(
       children: [
-        // Create Staff Button
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              // Handle create staff
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Staff created successfully!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              if (_formKey.currentState?.validate() ?? false) {
+                // TODO: Implement treatment creation logic via ViewModel
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Treatment creation triggered')),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(vertical: 20.h),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.r),
               ),
-              elevation: 0,
             ),
-            child: Text(
-              'Create Staff',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
-            ),
+            child: Text('Create Treatment', style: CustomFonts.white14w500),
           ),
         ),
         SizedBox(width: 16.w),
-        // Cancel Button
         Expanded(
           child: OutlinedButton(
-            onPressed: () {
-              // Handle cancel
-              Navigator.pop(context);
-            },
+            onPressed: () => context.pop(),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.black,
               padding: EdgeInsets.symmetric(vertical: 20.h),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.r),
               ),
-              side: BorderSide(color: Colors.grey[300]!, width: 1),
+              side: BorderSide(color: Colors.grey[300]!),
             ),
-            child: Text(
-              'Cancel',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
-            ),
+            child: Text('Cancel', style: CustomFonts.black18w500),
           ),
         ),
       ],
+    );
+  }
+
+  void _showAddSideAreaDialog() {
+    final sideAreaFormKey = GlobalKey<FormState>();
+    final nameController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: CustomColors.whiteColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        child: Container(
+          width: 400.w,
+          padding: EdgeInsets.all(24.w),
+          child: Form(
+            key: sideAreaFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Add Side Area', style: CustomFonts.black22w600),
+                    IconButton(
+                      onPressed: () => context.pop(),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24.h),
+                Text("Area Image", style: CustomFonts.black14w500),
+                SizedBox(height: 8.h),
+                Container(
+                  height: 150.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    border: Border.all(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: const Center(child: Icon(Icons.image_outlined, size: 40)),
+                ),
+                SizedBox(height: 24.h),
+                BuildTextField(
+                  prefixIcon: Icon(
+                    Icons.face,
+                    color: CustomColors.blueColor,
+                    size: 20.sp,
+                  ),
+                  controller: nameController,
+                  validator: Validators.empty,
+                  label: 'Side Area Name',
+                  hintText: 'e.g. Chin',
+                ),
+                SizedBox(height: 32.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (sideAreaFormKey.currentState!.validate()) {
+                            final updatedSideAreas = [
+                              ...?_treatment.value.sideAreas,
+                              SideAreaModel(
+                                id: Random().nextInt(10000),
+                                name: nameController.text,
+                              ),
+                            ];
+                            _treatment.value = _treatment.value.copyWith(
+                              sideAreas: updatedSideAreas,
+                            );
+                            context.pop();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                        ),
+                        child: Text('Add', style: CustomFonts.white14w500),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => context.pop(),
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                        ),
+                        child: Text('Cancel', style: CustomFonts.black14w500),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
-// Custom Painter for Dotted Circle Border
+class PositionDetector extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  const PositionDetector({super.key, required this.child, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: child,
+    );
+  }
+}
