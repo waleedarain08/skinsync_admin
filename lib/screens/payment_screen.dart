@@ -36,11 +36,11 @@ class PaymentScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Payment Management", style: CustomFonts.black30w600),
+        Text("Payment Management", style: CustomFonts.textMain32w700),
         SizedBox(height: 8.h),
         Text(
           "Manage financial flows, transaction disputes, and clinic payouts.",
-          style: CustomFonts.grey18w400,
+          style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
         ),
       ],
     );
@@ -68,15 +68,15 @@ class PaymentScreen extends StatelessWidget {
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12.r)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12.r)),
               child: Icon(icon, color: color, size: 24.sp),
             ),
             SizedBox(width: 16.w),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.black22w600),
-                Text(title, style: CustomFonts.grey18w400.copyWith(fontSize: 12.sp)),
+                Text(value, style: CustomFonts.textMain20w600),
+                Text(title, style: CustomFonts.textMuted12w400),
               ],
             ),
           ],
@@ -96,8 +96,8 @@ class PaymentScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Pending Payout Releases", style: CustomFonts.black20w600),
-                Text("8 Actions Required", style: TextStyle(color: CustomColors.warningOrange, fontWeight: FontWeight.bold, fontSize: 12.sp)),
+                Text("Pending Payout Releases", style: CustomFonts.textMain20w600),
+                Text("8 Actions Required", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.warning)),
               ],
             ),
           ),
@@ -166,7 +166,7 @@ class PaymentScreen extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text("Payout History", style: CustomFonts.black20w600),
+            child: Text("Payout History", style: CustomFonts.textMain20w600),
           ),
           SizedBox(
             height: 400.h,

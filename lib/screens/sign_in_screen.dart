@@ -9,9 +9,11 @@ import 'package:pinput/pinput.dart';
 
 import '../models/requests/auth_req_models.dart';
 import '../utils/color_constant.dart';
+import '../utils/custom_fonts.dart';
 import '../utils/enums.dart';
 import '../utils/validators.dart';
 import '../view_models/auth_view_model.dart';
+import 'bottom_nav_screens/dashboard_screen.dart';
 import 'bottom_nav_screens/user_management.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
@@ -136,10 +138,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           SizedBox(height: 9.h),
           Text(
             "SkinSync AI",
-            style: TextStyle(
-              fontSize: 33.sp,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF6B7BA8),
+            style: CustomFonts.textMain32w700.copyWith(
+              color: const Color(0xFF6B7BA8),
               letterSpacing: 4,
             ),
           ),
@@ -154,7 +154,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withValues(alpha: 0.15),
                     blurRadius: 8,
                   ),
                 ],
@@ -186,20 +186,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       children: [
         Text(
           "Login",
-          style: TextStyle(
-            fontSize: 30.sp,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
+          style: CustomFonts.textMain32w700,
         ),
         SizedBox(height: 8.h),
         Text(
           "Enter your details to login your account",
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey.shade600,
-          ),
+          style: CustomFonts.textMuted14w400,
         ),
         SizedBox(height: 40.h),
         _buildTextField(
@@ -239,8 +231,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   ),
                 );
 
-            if (success && context.mounted) {
-              context.goNamed(UserManagement.routeName);
+            if (success && mounted) {
+              context.go(DashboardScreen.routeName);
             }
           },
           child: _button("Login"),
@@ -258,20 +250,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 8.h),
         Text(
           "Forgot Password",
-          style: TextStyle(
-            fontSize: 30.sp,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
+          style: CustomFonts.textMain32w700,
         ),
         SizedBox(height: 8.h),
         Text(
           "Enter your Email to receive OTP for password reset",
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey.shade600,
-          ),
+          style: CustomFonts.textMuted14w400,
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 40.h),
@@ -309,20 +293,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 8.h),
         Text(
           "Verify OTP",
-          style: TextStyle(
-            fontSize: 30.sp,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
+          style: CustomFonts.textMain32w700,
         ),
         SizedBox(height: 8.h),
         Text(
           "Enter your Email to receive OTP for password reset",
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey.shade600,
-          ),
+          style: CustomFonts.textMuted14w400,
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 40.h),
@@ -427,12 +403,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         RichText(
           text: TextSpan(
             text: label,
-            style: TextStyle(
-              fontSize: 14.sp,
-              height: 0,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
+            style: CustomFonts.textMain14w600,
             children: [
               if (isRequired)
                 TextSpan(
@@ -474,12 +445,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         RichText(
           text: TextSpan(
             text: label,
-            style: TextStyle(
-              fontSize: 14.sp,
-              height: 0,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
+            style: CustomFonts.textMain14w600,
             children: [
               TextSpan(
                 text: "*",
@@ -543,7 +509,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         color: Colors.black,
         borderRadius: BorderRadius.circular(30.r),
       ),
-      child: Text(text, style: const TextStyle(color: Colors.white)),
+      child: Text(text, style: CustomFonts.textMain14w600.copyWith(color: Colors.white)),
     );
   }
 

@@ -87,10 +87,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     SizedBox(height: 30.h),
                     Text(
                       "SkinSync AI",
-                      style: TextStyle(
-                        fontSize: 48.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF6B7BA8),
+                      style: CustomFonts.textMain48w700.copyWith(
+                        color: const Color(0xFF6B7BA8),
                         letterSpacing: 4,
                       ),
                     ),
@@ -135,20 +133,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       children: [
                         Text(
                           "Sign Up",
-                          style: TextStyle(
-                            fontSize: 32.sp,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                          ),
+                          style: CustomFonts.textMain32w700,
                         ),
                         SizedBox(height: 8.h),
                         Text(
                           "Create an account to continue",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade600,
-                          ),
+                          style: CustomFonts.textMuted14w400,
                         ),
                         SizedBox(height: 40.h),
 
@@ -174,7 +164,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           children: [
                             Text(
                               'Phone Number',
-                              style: CustomFonts.black14w500,
+                              style: CustomFonts.textMain14w600,
                             ),
                             SizedBox(height: 8.h),
                             PhoneWidget(controller: _phoneController),
@@ -250,11 +240,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               children: [
                                 Text(
                                   "Create Account",
-                                  style: TextStyle(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
+                                  style: CustomFonts.textMain18w600.copyWith(color: Colors.white),
                                 ),
                                 SizedBox(width: 8.w),
                                 Icon(
@@ -274,10 +260,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           children: [
                             Text(
                               "Have an account already? ",
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: Colors.black87,
-                              ),
+                              style: CustomFonts.textMain14w400,
                             ),
                             GestureDetector(
                               onTap: () {
@@ -285,10 +268,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               },
                               child: Text(
                                 "Sign In",
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Color(0xFF5B9FD8),
-                                  fontWeight: FontWeight.w600,
+                                style: CustomFonts.textMain14w600.copyWith(
+                                  color: const Color(0xFF5B9FD8),
                                 ),
                               ),
                             ),
@@ -319,17 +300,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         RichText(
           text: TextSpan(
             text: label,
-            style: TextStyle(
-              fontSize: 14.sp,
-              height: 0,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
+            style: CustomFonts.textMain14w600,
             children: [
               if (isRequired)
-                TextSpan(
+                const TextSpan(
                   text: "*",
-                  style: TextStyle(height: 0, color: Colors.red),
+                  style: TextStyle(color: Colors.red),
                 ),
             ],
           ),
@@ -378,14 +354,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         RichText(
           text: TextSpan(
             text: label,
-            style: TextStyle(
-              fontSize: 14.sp,
-              height: 0,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
+            style: CustomFonts.textMain14w600,
             children: [
-              TextSpan(
+              const TextSpan(
                 text: "*",
                 style: TextStyle(color: Colors.red),
               ),

@@ -31,12 +31,12 @@ class BuildTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.black14w500),
+        Text(label, style: CustomFonts.textMain14w600),
         SizedBox(height: 10.h),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
-          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+          style: CustomFonts.textMain14w400,
           keyboardType: keyboardType,
           validator: validator,
           inputFormatters: [
@@ -48,7 +48,7 @@ class BuildTextField extends StatelessWidget {
           decoration: InputDecoration(
             prefixIcon: prefixIcon,
             hintText: hintText,
-            hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey[400]),
+            hintStyle: CustomFonts.textMuted14w400,
             filled: true,
             fillColor: Colors.white,
             contentPadding: EdgeInsets.symmetric(

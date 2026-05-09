@@ -51,11 +51,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Clinic Management", style: CustomFonts.black30w600),
+            Text("Clinic Management", style: CustomFonts.textMain32w700),
             SizedBox(height: 8.h),
             Text(
               "Manage, monitor, and scale your MedSpa network effortlessly.",
-              style: CustomFonts.grey18w400,
+              style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
             ),
           ],
         ),
@@ -168,7 +168,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
         children: [
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text("Clinic Directory", style: CustomFonts.black20w600),
+            child: Text("Clinic Directory", style: CustomFonts.textMain20w600),
           ),
           Consumer(
             builder: (context, ref, _) {

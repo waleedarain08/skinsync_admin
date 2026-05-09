@@ -36,11 +36,11 @@ class DisputeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Dispute Management", style: CustomFonts.black30w600),
+        Text("Dispute Management", style: CustomFonts.textMain32w700),
         SizedBox(height: 8.h),
         Text(
           "Review, mediate, and resolve patient-clinic disputes.",
-          style: CustomFonts.grey18w400,
+          style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
         ),
       ],
     );
@@ -71,8 +71,8 @@ class DisputeScreen extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.black20w600),
-                Text(title, style: CustomFonts.grey18w400.copyWith(fontSize: 12.sp)),
+                Text(value, style: CustomFonts.textMain20w600),
+                Text(title, style: CustomFonts.textMuted12w400),
               ],
             ),
           ],
@@ -89,7 +89,7 @@ class DisputeScreen extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text("Pending Action", style: CustomFonts.black20w600),
+            child: Text("Pending Action", style: CustomFonts.textMain20w600),
           ),
           SizedBox(
             height: 300.h,
@@ -153,7 +153,7 @@ class DisputeScreen extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text("Resolution History", style: CustomFonts.black20w600),
+            child: Text("Resolution History", style: CustomFonts.textMain20w600),
           ),
           SizedBox(
             height: 300.h,

@@ -37,11 +37,11 @@ class _PatientManagementState extends State<PatientManagement> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Patient Directory", style: CustomFonts.black30w600.copyWith(color: CustomColors.textMain)),
+        Text("Patient Directory", style: CustomFonts.textMain32w700),
         SizedBox(height: 4.h),
         Text(
           "Unified view of all patients across your clinic network.",
-          style: TextStyle(color: CustomColors.textMuted, fontSize: 14.sp),
+          style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
         ),
       ],
     );
@@ -141,7 +141,7 @@ class _PatientManagementState extends State<PatientManagement> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Patient Records", style: CustomFonts.black20w600),
+                Text("Patient Records", style: CustomFonts.textMain20w600),
                 OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.file_download_outlined, size: 18),

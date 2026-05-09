@@ -65,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
             left: _animate ? screenWidth : -200.r,
             child: CircleAvatar(
               radius: 300.r,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              backgroundColor: Colors.white.withOpacity(0.2),
             ),
           ),
 
@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
             right: _animate ? screenWidth : -200.r,
             child: CircleAvatar(
               radius: 300.r,
-              backgroundColor: Colors.white.withValues(alpha: 0.1),
+              backgroundColor: Colors.white.withOpacity(0.1),
             ),
           ),
         ],

@@ -1,99 +1,155 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
-import 'package:skinsync_admin/widgets/dailogbox/payment_dailog_box.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/user_management_dailog_box.dart';
 
-class UserManagement extends StatelessWidget {
+class UserManagement extends StatefulWidget {
   static const String routeName = '/user-management';
   const UserManagement({super.key});
 
   @override
+  State<UserManagement> createState() => _UserManagementState();
+}
+
+class _UserManagementState extends State<UserManagement> {
+  int _selectedTab = 0; // 0 for Patients, 1 for Clinics
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 40.h),
-              Text("User Management", style: CustomFonts.black30w600),
-              SizedBox(height: 10.h),
-              Text(
-                "Manage all registered users including patients and clinics",
-                style: CustomFonts.grey18w400,
-              ),
-              SizedBox(height: 20.h),
-              Divider(color: Colors.grey.shade300),
-              SizedBox(height: 50.h),
-              Container(
-                padding: EdgeInsets.all(20.w),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: Column(
-                  crossAxisAlignment: .start,
-                  children: [
-                    CupertinoSearchTextField(
-                      backgroundColor: Color(0xFFF3F3F5),
-                    ),
-                    SizedBox(height: 30.h),
-                    Container(
-                      padding: EdgeInsets.all(5.w),
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(),
+          SizedBox(height: 32.h),
+          _buildQuickMetrics(),
+          SizedBox(height: 32.h),
+          _buildTabSwitcher(),
+          SizedBox(height: 24.h),
+          _buildUsersTable(),
+        ],
+      ),
+    );
+  }
 
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(50.r),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 7.w,
-                              horizontal: 50.w,
-                            ),
-
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(50.r),
-                            ),
-                            child: Text(
-                              "Patients",
-                              style: CustomFonts.black16w600,
-                            ),
-                          ),
-
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 7.w,
-                              horizontal: 50.w,
-                            ),
-
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(50.r),
-                            ),
-                            child: Text(
-                              "Clinics",
-                              style: CustomFonts.black16w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-
-                    UserDataTable(),
-                  ],
-                ),
-              ),
-            ],
-          ),
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("User Management", style: CustomFonts.textMain32w700),
+        SizedBox(height: 4.h),
+        Text(
+          "Manage system access, roles, and status for all participants.",
+          style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
         ),
+      ],
+    );
+  }
+
+  Widget _buildQuickMetrics() {
+    return Row(
+      children: [
+        _buildMetricCard("Total Users", "15,240", Icons.group_rounded, CustomColors.brandPrimary),
+        SizedBox(width: 16.w),
+        _buildMetricCard("Active Staff", "84", Icons.admin_panel_settings_rounded, CustomColors.success),
+        SizedBox(width: 16.w),
+        _buildMetricCard("New Signups", "+120", Icons.person_add_rounded, CustomColors.brandPurple),
+        SizedBox(width: 16.w),
+        _buildMetricCard("Reported", "3", Icons.report_problem_rounded, CustomColors.error),
+      ],
+    );
+  }
+
+  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: BorderdContainerWidget(
+        padding: EdgeInsets.all(24.w),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)),
+              child: Icon(icon, color: color, size: 24.sp),
+            ),
+            SizedBox(width: 16.w),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(value, style: CustomFonts.textMain20w600),
+                Text(title, style: CustomFonts.textMuted12w400),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabSwitcher() {
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        color: CustomColors.surfaceGhost,
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _tabItem("Patients", 0),
+          _tabItem("Clinics", 1),
+        ],
+      ),
+    );
+  }
+
+  Widget _tabItem(String label, int index) {
+    final bool isSelected = _selectedTab == index;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedTab = index),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(10.r),
+          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))] : null,
+        ),
+        child: Text(
+          label,
+          style: isSelected ? CustomFonts.textMain14w600 : CustomFonts.textMuted13w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUsersTable() {
+    return BorderdContainerWidget(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Row(
+              children: [
+                Text(_selectedTab == 0 ? "Patient Users" : "Clinic Admins", style: CustomFonts.textMain20w600),
+                const Spacer(),
+                SizedBox(
+                  width: 300.w,
+                  child: CupertinoSearchTextField(
+                    backgroundColor: CustomColors.surfaceGhost,
+                    placeholder: "Search by name or email...",
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const UserDataTable(),
+        ],
       ),
     );
   }
@@ -104,194 +160,58 @@ class UserDataTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minWidth: constraints.maxWidth),
-              child: DataTable(
-                headingRowColor: MaterialStateProperty.all(
-                  Colors.grey.shade100,
-                ),
-                headingRowHeight: 50.h,
-                dataRowHeight: 60.h,
-                columnSpacing: 40.w,
-                border: TableBorder(
-                  horizontalInside: BorderSide(
-                    color: Colors.grey.shade300,
-                    width: 1,
-                  ),
-                  verticalInside: BorderSide(
-                    color: Colors.grey.shade300,
-                    width: 1,
-                  ),
-                ),
-                columns: [
-                  DataColumn(
-                    label: Text('Name', style: CustomFonts.black16w600),
-                  ),
-                  DataColumn(
-                    label: Text('Email', style: CustomFonts.black16w600),
-                  ),
-                  DataColumn(
-                    label: Text('Mobile', style: CustomFonts.black16w600),
-                  ),
-                  DataColumn(
-                    label: Text('State', style: CustomFonts.black16w600),
-                  ),
-                  DataColumn(
-                    label: Text('Status', style: CustomFonts.black16w600),
-                  ),
-                  DataColumn(
-                    label: Text('Actions', style: CustomFonts.black16w600),
-                  ),
-                ],
-                rows: [
-                  _buildDataRow(
-                    'Emma Johnson',
-                    'emma.johnson@email.com',
-                    '+1 (555) 123-4567',
-                    'California',
-                    true,
-                    true,
-                  ),
-                  _buildDataRow(
-                    'Michael Chen',
-                    'emma.johnson@email.com',
-                    '+1 (555) 234-5678',
-                    'New York',
-                    true,
-                    false,
-                  ),
-                  _buildDataRow(
-                    'Sarah Williams',
-                    'sarah.williams@email.com',
-                    '+1 (555) 345-6789',
-                    'Texas',
-                    false,
-                    false,
-                  ),
-                  _buildDataRow(
-                    'David Martinez',
-                    'david.martinez@email.com',
-                    '+1 (555) 456-7890',
-                    'Florida',
-                    true,
-                    false,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+    return DataTable(
+      headingRowColor: WidgetStateProperty.all(CustomColors.surfaceGhost),
+      headingTextStyle: TextStyle(color: CustomColors.textMuted, fontSize: 12.sp, fontWeight: FontWeight.bold),
+      columnSpacing: 40.w,
+      columns: const [
+        DataColumn(label: Text('User')),
+        DataColumn(label: Text('Email')),
+        DataColumn(label: Text('Joined Date')),
+        DataColumn(label: Text('Status')),
+        DataColumn(label: Text('Actions')),
+      ],
+      rows: List.generate(5, (index) => _buildUserRow(context, index)),
     );
   }
 
-  DataRow _buildDataRow(
-    String name,
-    String email,
-    String mobile,
-    String state,
-    bool isActive,
-    bool showActions,
-  ) {
+  DataRow _buildUserRow(BuildContext context, int index) {
     return DataRow(
       cells: [
-        DataCell(Text(name, style: CustomFonts.black14w400)),
-        DataCell(Text(email, style: CustomFonts.black14w400)),
-        DataCell(Text(mobile, style: CustomFonts.black14w400)),
-        DataCell(Text(state, style: CustomFonts.black14w400)),
+        DataCell(
+          Row(
+            children: [
+              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.brandPrimary)),
+              SizedBox(width: 12.w),
+              Text("Courtney Henry", style: CustomFonts.textMain14w600),
+            ],
+          ),
+        ),
+        const DataCell(Text("courtney.h@example.com")),
+        const DataCell(Text("Oct 24, 2023")),
         DataCell(
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: isActive ? Colors.black : Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            child: Text(
-              isActive ? 'Active' : 'Inactive',
-              style: TextStyle(
-                color: isActive ? Colors.white : Colors.black87,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Degular',
-              ),
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            decoration: BoxDecoration(color: CustomColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
+            child: Text("Active", style: TextStyle(color: CustomColors.success, fontSize: 10.sp, fontWeight: FontWeight.bold)),
           ),
         ),
         DataCell(
-          PopupMenuButton(
-            padding: EdgeInsetsGeometry.all(0),
-
-            borderRadius: BorderRadius.circular(15.r),
-            color: Colors.white,
-
-            icon: Icon(Icons.more_vert, size: 20.sp),
-
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 1,
-                onTap: () {
-                  showDialog<bool>(
-                    context: context,
-                    builder: (context) => UserManagementDailogBox(
-                      transactionId: "TXN-2025-10-001",
-                      patientName: "Emma Johnson",
-                      clinicName: "Radiant Skin Clinic",
-                      serviceName: "Botox Treatment",
-                      amount: "\$450",
-                      feedbackMessage:
-                          "The treatment was rushed and did not meet the promised duration. I felt the service quality was below expectations.",
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.all(10.w),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.r),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.visibility, size: 16.sp, color: Colors.black),
-                      SizedBox(width: 10.w),
-                      Text("View Details", style: CustomFonts.black14w400),
-                    ],
-                  ),
+          IconButton(
+            icon: const Icon(Icons.more_vert_rounded),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => UserManagementDialogBox(
+                  transactionId: "TXN-2025-10-001",
+                  patientName: "Emma Johnson",
+                  clinicName: "Radiant Skin Clinic",
+                  serviceName: "Botox Treatment",
+                  amount: "\$450",
+                  feedbackMessage: "The treatment was rushed and did not meet the promised duration.",
                 ),
-              ),
-              PopupMenuItem(
-                value: 2,
-                child: Container(
-                  padding: EdgeInsets.all(10.w),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.r),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.person_remove,
-                        size: 16.sp,
-                        color: Colors.black,
-                      ),
-                      SizedBox(width: 10.w),
-                      Text("Deactivate", style: CustomFonts.black14w400),
-                    ],
-                  ),
-                ),
-              ),
-              // PopupMenuItem(value: 3, child: Text('Export', style: TextStyle(fontSize: 14.sp))),
-            ],
+              );
+            },
           ),
         ),
       ],

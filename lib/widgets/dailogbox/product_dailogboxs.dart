@@ -71,7 +71,7 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(isEdit ? 'Edit Product' : 'Add New Product', style: CustomFonts.black22w600),
+                  Text(isEdit ? 'Edit Product' : 'Add New Product', style: CustomFonts.textMain24w700),
                   IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.close)),
                 ],
               ),
@@ -195,17 +195,17 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Product Image", style: CustomFonts.black14w500),
+        Text("Product Image", style: CustomFonts.textMain14w600),
         SizedBox(height: 12.h),
         Container(
           height: 160.h,
           width: 160.h,
           decoration: BoxDecoration(
-            color: CustomColors.softChampagne,
+            color: CustomColors.surfaceGhost,
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: CustomColors.greyColor, style: BorderStyle.solid),
+            border: Border.all(color: CustomColors.textMuted.withValues(alpha: 0.1)),
           ),
-          child: const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.textLight)),
+          child: const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.textMuted)),
         ),
       ],
     );

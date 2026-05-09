@@ -22,11 +22,11 @@ class DashboardScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Good Morning, Alex", style: CustomFonts.black30w600.copyWith(color: CustomColors.textMain)),
+                  Text("Good Morning, Alex", style: CustomFonts.textMain32w700),
                   SizedBox(height: 4.h),
                   Text(
                     "Here's a summary of your MedSpa network performance.",
-                    style: CustomFonts.grey18w400.copyWith(color: CustomColors.textMuted, fontSize: 14.sp),
+                    style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
                   ),
                 ],
               ),
@@ -64,7 +64,7 @@ class DashboardScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: CustomColors.textMuted.withValues(alpha: 0.1)),
+        border: Border.all(color: CustomColors.textMuted.withOpacity(0.1)),
       ),
       child: Row(
         children: [
@@ -99,9 +99,9 @@ class DashboardScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: CustomColors.textMuted.withValues(alpha: 0.05)),
+          border: Border.all(color: CustomColors.textMuted.withOpacity(0.05)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
           ],
         ),
         child: Column(
@@ -112,12 +112,12 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Container(
                   padding: EdgeInsets.all(10.w),
-                  decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)),
+                  decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10.r)),
                   child: Icon(icon, color: color, size: 20.sp),
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  decoration: BoxDecoration(color: CustomColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
+                  decoration: BoxDecoration(color: CustomColors.success.withOpacity(0.1), borderRadius: BorderRadius.circular(20.r)),
                   child: Text(growth, style: TextStyle(color: CustomColors.success, fontWeight: FontWeight.bold, fontSize: 10.sp)),
                 ),
               ],
@@ -141,8 +141,8 @@ class DashboardScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Revenue Overview", style: CustomFonts.black20w600),
-              Text("Target: \$1.5M", style: TextStyle(color: CustomColors.textMuted, fontSize: 12.sp)),
+              Text("Revenue Overview", style: CustomFonts.textMain20w600),
+              Text("Target: \$1.5M", style: CustomFonts.textMuted12w400),
             ],
           ),
           SizedBox(height: 32.h),
@@ -150,7 +150,7 @@ class DashboardScreen extends StatelessWidget {
             height: 280.h,
             child: LineChart(
               LineChartData(
-                gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (v) => FlLine(color: CustomColors.textMuted.withValues(alpha: 0.05), strokeWidth: 1)),
+                gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (v) => FlLine(color: CustomColors.textMuted.withOpacity(0.05), strokeWidth: 1)),
                 titlesData: FlTitlesData(show: false),
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
@@ -165,7 +165,7 @@ class DashboardScreen extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [CustomColors.brandPrimary.withValues(alpha: 0.2), CustomColors.brandPrimary.withValues(alpha: 0)],
+                        colors: [CustomColors.brandPrimary.withOpacity(0.2), CustomColors.brandPrimary.withOpacity(0)],
                       ),
                     ),
                   ),
@@ -184,7 +184,7 @@ class DashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Top Clinics", style: CustomFonts.black20w600),
+          Text("Top Clinics", style: CustomFonts.textMain20w600),
           SizedBox(height: 24.h),
           ...List.generate(5, (index) => _buildClinicItem(index)),
         ],
@@ -199,7 +199,7 @@ class DashboardScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18.r,
-            backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
+            backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
             child: Text("${index + 1}", style: const TextStyle(color: CustomColors.brandPrimary, fontWeight: FontWeight.bold)),
           ),
           SizedBox(width: 12.w),
@@ -227,8 +227,8 @@ class DashboardScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Recent Activity", style: CustomFonts.black20w600),
-              TextButton(onPressed: () {}, child: const Text("View Report")),
+              Text("Recent Activity", style: CustomFonts.textMain20w600),
+              TextButton(onPressed: () {}, child: Text("View Report", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary))),
             ],
           ),
           SizedBox(height: 16.h),
@@ -279,7 +279,7 @@ class DashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Treatments Distribution", style: CustomFonts.black20w600),
+          Text("Treatments Distribution", style: CustomFonts.textMain20w600),
           SizedBox(height: 24.h),
           SizedBox(
             height: 200.h,

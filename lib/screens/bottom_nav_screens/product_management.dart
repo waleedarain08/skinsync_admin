@@ -41,11 +41,11 @@ class _ProductManagementState extends State<ProductManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Inventory & Products", style: CustomFonts.black30w600),
+            Text("Inventory & Products", style: CustomFonts.textMain32w700),
             SizedBox(height: 8.h),
             Text(
               "Manage retail products and professional supplies across all clinics.",
-              style: CustomFonts.grey18w400,
+              style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
             ),
           ],
         ),
@@ -97,8 +97,8 @@ class _ProductManagementState extends State<ProductManagement> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.black20w600),
-                Text(title, style: CustomFonts.grey18w400.copyWith(fontSize: 12.sp)),
+                Text(value, style: CustomFonts.textMain20w600),
+                Text(title, style: CustomFonts.textMuted12w400),
               ],
             ),
           ],

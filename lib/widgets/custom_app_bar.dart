@@ -5,6 +5,7 @@ import '../screens/sign_in_screen.dart';
 import '../services/locator.dart';
 import '../services/storage_service.dart';
 import '../utils/color_constant.dart';
+import '../utils/custom_fonts.dart';
 import '../utils/responsive.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -80,8 +81,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text('Alex MedSpa', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: CustomColors.textMain)),
-            Text('Super Admin', style: TextStyle(fontSize: 11.sp, color: CustomColors.textMuted, fontWeight: FontWeight.w500)),
+            Text('Alex MedSpa', style: CustomFonts.textMain14w600),
+            Text('Super Admin', style: CustomFonts.textMuted12w400),
           ],
         ),
         SizedBox(width: 12.w),

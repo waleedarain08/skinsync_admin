@@ -36,7 +36,7 @@ class ReleasePaymentDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Release Payment", style: CustomFonts.black22w600),
+                Text("Release Payment", style: CustomFonts.textMain24w700),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: Icon(Icons.close, size: 20.sp),
@@ -46,7 +46,7 @@ class ReleasePaymentDialog extends StatelessWidget {
             SizedBox(height: 12.h),
             Text(
               "Please review the transaction details before releasing the funds to the clinic's wallet.",
-              style: CustomFonts.grey18w400.copyWith(fontSize: 14.sp),
+              style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
             ),
             SizedBox(height: 32.h),
             Container(
@@ -66,8 +66,8 @@ class ReleasePaymentDialog extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Total Amount", style: CustomFonts.black16w600),
-                      Text(amount, style: CustomFonts.black22w600.copyWith(color: CustomColors.successGreen)),
+                      Text("Total Amount", style: CustomFonts.textMain16w600),
+                      Text(amount, style: CustomFonts.textMain24w700.copyWith(color: CustomColors.successGreen)),
                     ],
                   ),
                 ],
@@ -75,7 +75,7 @@ class ReleasePaymentDialog extends StatelessWidget {
             ),
             if (feedbackMessage != null) ...[
               SizedBox(height: 24.h),
-              Text("Patient Feedback", style: CustomFonts.black14w600),
+              Text("Patient Feedback", style: CustomFonts.textMain16w600),
               SizedBox(height: 8.h),
               Text(
                 feedbackMessage!,
@@ -122,7 +122,7 @@ class ReleasePaymentDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(color: CustomColors.textLight, fontSize: 13.sp)),
-          Text(value, style: CustomFonts.black14w600),
+          Text(value, style: CustomFonts.textMain14w600),
         ],
       ),
     );

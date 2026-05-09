@@ -57,11 +57,11 @@ class _TreatmentManagementScreenState extends State<TreatmentManagementScreen> w
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Treatment Master List", style: CustomFonts.black30w600),
+            Text("Treatment Master List", style: CustomFonts.textMain32w700),
             SizedBox(height: 8.h),
             Text(
               "Define master treatments and hierarchical structures for all clinics.",
-              style: CustomFonts.grey18w400,
+              style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
             ),
           ],
         ),
@@ -128,7 +128,7 @@ class _TreatmentManagementScreenState extends State<TreatmentManagementScreen> w
         children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-            child: Text("Sub-Categories", style: CustomFonts.black16w600.copyWith(color: CustomColors.textLight)),
+            child: Text("Sub-Categories", style: CustomFonts.textMain16w600.copyWith(color: CustomColors.textMuted)),
           ),
           ...subCats.map((sub) => _buildSubCatItem(sub, sub == subCats[0])).toList(),
           const Spacer(),

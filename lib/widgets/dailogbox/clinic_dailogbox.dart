@@ -66,7 +66,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Register New Clinic', style: CustomFonts.black22w600),
+                  Text('Register New Clinic', style: CustomFonts.textMain24w700),
                   IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.close)),
                 ],
               ),
@@ -101,7 +101,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Phone Number", style: CustomFonts.black14w500),
+                        Text("Phone Number", style: CustomFonts.textMain14w600),
                         SizedBox(height: 8.h),
                         PhoneWidget(controller: _clinicPhoneController),
                       ],

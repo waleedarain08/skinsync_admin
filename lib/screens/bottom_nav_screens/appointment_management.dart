@@ -46,11 +46,11 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Appointment Scheduler", style: CustomFonts.black30w600),
+            Text("Appointment Scheduler", style: CustomFonts.textMain32w700),
             SizedBox(height: 8.h),
             Text(
               "Centralized booking management and real-time clinic capacity tracking.",
-              style: CustomFonts.grey18w400,
+              style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
             ),
           ],
         ),
@@ -93,8 +93,8 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.black20w600),
-                Text(title, style: CustomFonts.grey18w400.copyWith(fontSize: 12.sp)),
+                Text(value, style: CustomFonts.textMain20w600),
+                Text(title, style: CustomFonts.textMuted12w400),
               ],
             ),
           ],
@@ -113,12 +113,12 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Clinic Calendar", style: CustomFonts.black20w600),
+              Text("Clinic Calendar", style: CustomFonts.textMain20w600),
               Row(
                 children: [
                   _calendarAction(Icons.chevron_left),
                   SizedBox(width: 8.w),
-                  Text("October 2023", style: CustomFonts.black16w600),
+                  Text("October 2023", style: CustomFonts.textMain16w600),
                   SizedBox(width: 8.w),
                   _calendarAction(Icons.chevron_right),
                 ],
@@ -138,7 +138,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
                 final day = index - 2;
                 final isCurrentMonth = day > 0 && day <= 31;
                 return Container(
-                  decoration: BoxDecoration(border: Border.all(color: CustomColors.greyColor.withValues(alpha: 0.3))),
+                  decoration: BoxDecoration(border: Border.all(color: CustomColors.greyColor.withOpacity(0.3))),
                   padding: EdgeInsets.all(8.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +146,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
                       Text(
                         isCurrentMonth ? day.toString() : "",
                         style: TextStyle(
-                          color: isCurrentMonth ? CustomColors.textDark : CustomColors.textLight.withValues(alpha: 0.3),
+                          color: isCurrentMonth ? CustomColors.textDark : CustomColors.textLight.withOpacity(0.3),
                           fontWeight: day == 15 ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
@@ -183,7 +183,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Today's Queue", style: CustomFonts.black20w600),
+          Text("Today's Queue", style: CustomFonts.textMain20w600),
           SizedBox(height: 16.h),
           Expanded(
             child: ListView.separated(
@@ -200,7 +200,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
   Widget _appointmentQueueItem(int index) {
     return Container(
       padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(color: CustomColors.softChampagne.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(10.r)),
+      decoration: BoxDecoration(color: CustomColors.softChampagne.withOpacity(0.5), borderRadius: BorderRadius.circular(10.r)),
       child: Row(
         children: [
           Container(
@@ -233,13 +233,13 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
         children: [
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text("All Appointments", style: CustomFonts.black20w600),
+            child: Text("All Appointments", style: CustomFonts.textMain20w600),
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
               columnSpacing: 40.w,
-              headingRowColor: WidgetStateProperty.all(CustomColors.softChampagne.withValues(alpha: 0.5)),
+              headingRowColor: WidgetStateProperty.all(CustomColors.softChampagne.withOpacity(0.5)),
               columns: const [
                 DataColumn(label: Text('Patient')),
                 DataColumn(label: Text('Clinic')),
@@ -267,7 +267,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.successGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
+            decoration: BoxDecoration(color: CustomColors.successGreen.withOpacity(0.1), borderRadius: BorderRadius.circular(20.r)),
             child: Text("Confirmed", style: TextStyle(color: CustomColors.successGreen, fontSize: 11.sp, fontWeight: FontWeight.bold)),
           ),
         ),

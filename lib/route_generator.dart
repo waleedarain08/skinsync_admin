@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
@@ -25,17 +26,17 @@ class RouteGenerator {
       GoRoute(
         name: SplashScreen.routeName,
         path: SplashScreen.routeName,
-        builder: (_, _) => SplashScreen(),
+        builder: (_, _) => const SplashScreen(),
       ),
       GoRoute(
         name: SignUpScreen.routeName,
         path: SignUpScreen.routeName,
-        builder: (context, state) => const SignUpScreen(),
+        builder: (_, _) => const SignUpScreen(),
       ),
       GoRoute(
         name: SignInScreen.routeName,
         path: SignInScreen.routeName,
-        builder: (context, state) => const SignInScreen(),
+        builder: (_, _) => const SignInScreen(),
       ),
       ShellRoute(
         builder: (_, _, child) {
@@ -55,52 +56,52 @@ class RouteGenerator {
           GoRoute(
             name: UserManagement.routeName,
             path: UserManagement.routeName,
-            builder: (_, _) => UserManagement(),
+            builder: (_, _) => const UserManagement(),
           ),
           GoRoute(
             name: PatientManagement.routeName,
             path: PatientManagement.routeName,
-            builder: (_, _) => PatientManagement(),
+            builder: (_, _) => const PatientManagement(),
           ),
           GoRoute(
             name: ClinicManagement.routeName,
             path: ClinicManagement.routeName,
-            builder: (_, _) => ClinicManagement(),
+            builder: (_, _) => const ClinicManagement(),
           ),
           GoRoute(
             name: DisputeScreen.routeName,
             path: DisputeScreen.routeName,
-            builder: (_, _) => DisputeScreen(),
+            builder: (_, _) => const DisputeScreen(),
           ),
           GoRoute(
             name: TreatmentManagementScreen.routeName,
             path: TreatmentManagementScreen.routeName,
-            builder: (_, _) => TreatmentManagementScreen(),
+            builder: (_, _) => const TreatmentManagementScreen(),
           ),
           GoRoute(
             name: CreateTreatmentScreen.routeName,
             path: CreateTreatmentScreen.routeName,
-            builder: (_, _) => CreateTreatmentScreen(),
+            builder: (_, _) => const CreateTreatmentScreen(),
           ),
           GoRoute(
             name: PaymentScreen.routeName,
             path: PaymentScreen.routeName,
-            builder: (_, _) => PaymentScreen(),
+            builder: (_, _) => const PaymentScreen(),
           ),
           GoRoute(
             name: PushNotificationScreen.routeName,
             path: PushNotificationScreen.routeName,
-            builder: (_, _) => PushNotificationScreen(),
+            builder: (_, _) => const PushNotificationScreen(),
           ),
           GoRoute(
             name: ProductManagement.routeName,
             path: ProductManagement.routeName,
-            builder: (_, _) => ProductManagement(),
+            builder: (_, _) => const ProductManagement(),
           ),
           GoRoute(
             name: SettingScreen.routeName,
             path: SettingScreen.routeName,
-            builder: (_, _) => SettingScreen(),
+            builder: (_, _) => const SettingScreen(),
           ),
         ],
       ),
