@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../utils/custom_fonts.dart';
 
 class TwoFactorAuthScreen extends StatefulWidget {
   const TwoFactorAuthScreen({super.key});
@@ -49,11 +50,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
         SizedBox(width: 12.w),
         Text(
           'Two-Factor Authentication',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: CustomFonts.textMain18w600,
         ),
       ],
     );
@@ -68,7 +65,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -119,16 +116,12 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
           children: [
             Text(
               'Business Information',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+              style: CustomFonts.textMain14w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Update clinic details and contact info',
-              style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
+              style: CustomFonts.textMuted12w400,
             ),
           ],
         ),
@@ -153,16 +146,12 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
             children: [
               Text(
                 'Enable Two-Factor Authentication',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
+                style: CustomFonts.textMain14w600,
               ),
               SizedBox(height: 4.h),
               Text(
                 'Require a verification code when signing in',
-                style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
+                style: CustomFonts.textMuted12w400,
               ),
             ],
           ),
@@ -191,11 +180,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
       children: [
         Text(
           'Verification Method',
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: CustomFonts.textMain16w600,
         ),
         SizedBox(height: 16.h),
         // SMS Verification Option
@@ -247,7 +232,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
               : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -261,7 +246,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
               height: 40.w,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Colors.white.withOpacity(0.2)
+                    ? Colors.white.withValues(alpha: 0.2)
                     : const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(8.r),
               ),
@@ -280,16 +265,12 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
+                  style: CustomFonts.textMain14w600,
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
+                  style: CustomFonts.textMuted12w400,
                 ),
               ],
             ),

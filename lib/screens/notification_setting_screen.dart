@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../utils/custom_fonts.dart';
+import '../utils/color_constant.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -50,11 +52,7 @@ class _NotificationSettingsScreenState
         SizedBox(width: 12.w),
         Text(
           'Notification Settings',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: CustomFonts.textMain18w600,
         ),
       ],
     );
@@ -70,7 +68,7 @@ class _NotificationSettingsScreenState
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

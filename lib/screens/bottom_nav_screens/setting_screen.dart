@@ -48,93 +48,96 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 20.h),
-          Text("Settings", style: CustomFonts.black30w600),
-          SizedBox(height: 10.h),
-          Text(
-            "Manage application versions for Customer and Clinic apps.",
-            style: CustomFonts.grey18w400,
-          ),
-          SizedBox(height: 30.h),
-          Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-              title: Text("Customer App", style: CustomFonts.black20w500),
-              childrenPadding: EdgeInsets.all(15.w),
-              collapsedBackgroundColor: CustomColors.whiteColor,
-              backgroundColor: CustomColors.whiteColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.r),
-                side: BorderSide(color: CustomColors.borderColor),
-              ),
-              collapsedShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.r),
-                side: BorderSide(color: CustomColors.borderColor),
-              ),
-              children: [
-                _buildVersionSection(
-                  title: "Android",
-                  formKey: _customerAndroidFormKey,
-                  versionController: _customerAndroidVersionCtrl,
-                  buildController: _customerAndroidBuildCtrl,
-                  type: "android",
-                  isCustomer: true,
-                ),
-                SizedBox(height: 20.h),
-                _buildVersionSection(
-                  title: "IOS",
-                  formKey: _customerIosFormKey,
-                  versionController: _customerIosVersionCtrl,
-                  buildController: _customerIosBuildCtrl,
-                  type: "ios",
-                  isCustomer: true,
-                ),
-              ],
+    return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 20.h),
+            Text("Settings", style: CustomFonts.black30w600),
+            SizedBox(height: 10.h),
+            Text(
+              "Manage application versions for Customer and Clinic apps.",
+              style: CustomFonts.grey18w400,
             ),
-          ),
-          SizedBox(height: 20.h),
-          Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-              title: Text("Clinic App", style: CustomFonts.black20w500),
-              childrenPadding: EdgeInsets.all(15.w),
-              collapsedBackgroundColor: CustomColors.whiteColor,
-              backgroundColor: CustomColors.whiteColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.r),
-                side: BorderSide(color: CustomColors.borderColor),
-              ),
-              collapsedShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.r),
-                side: BorderSide(color: CustomColors.borderColor),
-              ),
-              children: [
-                _buildVersionSection(
-                  title: "Android",
-                  formKey: _clinicAndroidFormKey,
-                  versionController: _clinicAndroidVersionCtrl,
-                  buildController: _clinicAndroidBuildCtrl,
-                  type: "android",
-                  isCustomer: false,
+            SizedBox(height: 30.h),
+            Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                title: Text("Customer App", style: CustomFonts.black20w500),
+                childrenPadding: EdgeInsets.all(15.w),
+                collapsedBackgroundColor: CustomColors.whiteColor,
+                backgroundColor: CustomColors.whiteColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                  side: BorderSide(color: CustomColors.borderColor),
                 ),
-                SizedBox(height: 20.h),
-                _buildVersionSection(
-                  title: "IOS",
-                  formKey: _clinicIosFormKey,
-                  versionController: _clinicIosVersionCtrl,
-                  buildController: _clinicIosBuildCtrl,
-                  type: "ios",
-                  isCustomer: false,
+                collapsedShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                  side: BorderSide(color: CustomColors.borderColor),
                 ),
-              ],
+                children: [
+                  _buildVersionSection(
+                    title: "Android",
+                    formKey: _customerAndroidFormKey,
+                    versionController: _customerAndroidVersionCtrl,
+                    buildController: _customerAndroidBuildCtrl,
+                    type: "android",
+                    isCustomer: true,
+                  ),
+                  SizedBox(height: 20.h),
+                  _buildVersionSection(
+                    title: "IOS",
+                    formKey: _customerIosFormKey,
+                    versionController: _customerIosVersionCtrl,
+                    buildController: _customerIosBuildCtrl,
+                    type: "ios",
+                    isCustomer: true,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 20.h),
+            Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                title: Text("Clinic App", style: CustomFonts.black20w500),
+                childrenPadding: EdgeInsets.all(15.w),
+                collapsedBackgroundColor: CustomColors.whiteColor,
+                backgroundColor: CustomColors.whiteColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                  side: BorderSide(color: CustomColors.borderColor),
+                ),
+                collapsedShape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                  side: BorderSide(color: CustomColors.borderColor),
+                ),
+                children: [
+                  _buildVersionSection(
+                    title: "Android",
+                    formKey: _clinicAndroidFormKey,
+                    versionController: _clinicAndroidVersionCtrl,
+                    buildController: _clinicAndroidBuildCtrl,
+                    type: "android",
+                    isCustomer: false,
+                  ),
+                  SizedBox(height: 20.h),
+                  _buildVersionSection(
+                    title: "IOS",
+                    formKey: _clinicIosFormKey,
+                    versionController: _clinicIosVersionCtrl,
+                    buildController: _clinicIosBuildCtrl,
+                    type: "ios",
+                    isCustomer: false,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

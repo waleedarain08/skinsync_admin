@@ -8,6 +8,7 @@ class RegisterClinicReqModel {
   String? clinicLogo;
   String? ownerName;
   String? ownerEmail;
+  List<AvailabilityModel>? availability;
 
   RegisterClinicReqModel({
     this.clinicName,
@@ -19,17 +20,8 @@ class RegisterClinicReqModel {
     this.clinicLogo = "https://example.com/logo.png",
     this.ownerName,
     this.ownerEmail,
+    this.availability,
   });
-
-  // RegisterClinicReqModel.fromJson(Map<String, dynamic> json) {
-  //   clinicName = json['clinic_name'];
-  //   clinicEmail = json['clinic_email'];
-  //   clinicPhone = json['clinic_phone'];
-  //   clinicAddress = json['clinic_address'];
-  //   clinicLogo = json['clinic_logo'];
-  //   ownerName = json['owner_name'];
-  //   ownerEmail = json['owner_email'];
-  // }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -42,6 +34,25 @@ class RegisterClinicReqModel {
     data['clinic_logo'] = clinicLogo;
     data['owner_name'] = ownerName;
     data['owner_email'] = ownerEmail;
+    if (availability != null) {
+      data['availability'] = availability!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class AvailabilityModel {
+  String? openTime;
+  String? closeTime;
+  List<String>? days;
+
+  AvailabilityModel({this.openTime, this.closeTime, this.days});
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['open_time'] = openTime;
+    data['close_time'] = closeTime;
+    data['days'] = days;
     return data;
   }
 }

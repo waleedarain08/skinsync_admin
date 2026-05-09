@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
+import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
@@ -31,12 +32,12 @@ class RouteGenerator {
       GoRoute(
         name: SignUpScreen.routeName,
         path: SignUpScreen.routeName,
-        builder: (_, _) => const SignUpScreen(),
+        builder: (context, state) => const SignUpScreen(),
       ),
       GoRoute(
         name: SignInScreen.routeName,
         path: SignInScreen.routeName,
-        builder: (_, _) => const SignInScreen(),
+        builder: (context, state) => const SignInScreen(),
       ),
       ShellRoute(
         builder: (_, _, child) {
@@ -67,6 +68,11 @@ class RouteGenerator {
             name: ClinicManagement.routeName,
             path: ClinicManagement.routeName,
             builder: (_, _) => const ClinicManagement(),
+          ),
+          GoRoute(
+            name: AddNewClinicScreen.routeName,
+            path: AddNewClinicScreen.routeName,
+            builder: (_, _) => const AddNewClinicScreen(),
           ),
           GoRoute(
             name: DisputeScreen.routeName,

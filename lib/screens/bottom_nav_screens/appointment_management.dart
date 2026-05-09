@@ -15,26 +15,29 @@ class AppointmentManagement extends StatefulWidget {
 class _AppointmentManagementState extends State<AppointmentManagement> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          SizedBox(height: 32.h),
-          _buildAppointmentMetrics(),
-          SizedBox(height: 32.h),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(flex: 2, child: _buildCalendarView()),
-              SizedBox(width: 24.w),
-              Expanded(flex: 1, child: _buildUpcomingAppointments()),
-            ],
-          ),
-          SizedBox(height: 32.h),
-          _buildAppointmentTable(),
-        ],
+    return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            SizedBox(height: 32.h),
+            _buildAppointmentMetrics(),
+            SizedBox(height: 32.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 2, child: _buildCalendarView()),
+                SizedBox(width: 24.w),
+                Expanded(flex: 1, child: _buildUpcomingAppointments()),
+              ],
+            ),
+            SizedBox(height: 32.h),
+            _buildAppointmentTable(),
+          ],
+        ),
       ),
     );
   }

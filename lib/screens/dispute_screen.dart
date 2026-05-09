@@ -13,7 +13,7 @@ class DisputeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.dashboardBackgroundColor,
+      backgroundColor: CustomColors.backgroundLight,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(

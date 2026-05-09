@@ -1,0 +1,549 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
+import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/validators.dart';
+import 'package:skinsync_admin/view_models/auth_view_model.dart';
+import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/phone_widget.dart';
+
+class AddNewClinicScreen extends ConsumerStatefulWidget {
+  static const String routeName = '/add-new-clinic';
+  const AddNewClinicScreen({super.key});
+
+  @override
+  ConsumerState<AddNewClinicScreen> createState() => _AddNewClinicScreenState();
+}
+
+class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _clinicNameController = TextEditingController();
+  final TextEditingController _clinicEmailController = TextEditingController();
+  final TextEditingController _clinicPhoneController = TextEditingController();
+  final TextEditingController _clinicAddressController = TextEditingController();
+  final TextEditingController _ownerNameController = TextEditingController();
+  final TextEditingController _ownerEmailController = TextEditingController();
+
+  final ImagePicker _imagePicker = ImagePicker();
+  XFile? _selectedLogo;
+
+  final List<AvailabilityEntry> _availabilityEntries = [
+    AvailabilityEntry(),
+  ];
+
+  @override
+  void dispose() {
+    _clinicNameController.dispose();
+    _clinicEmailController.dispose();
+    _clinicPhoneController.dispose();
+    _clinicAddressController.dispose();
+    _ownerNameController.dispose();
+    _ownerEmailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickLogo() async {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Select Clinic Logo', style: CustomFonts.textMain20w600),
+              SizedBox(height: 20.h),
+              ListTile(
+                leading: Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: const Icon(Icons.photo_library_outlined, color: Colors.blue),
+                ),
+                title: Text('Choose from Gallery', style: CustomFonts.textMain14w600),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+                  if (image != null) setState(() => _selectedLogo = image);
+                },
+              ),
+              SizedBox(height: 8.h),
+              ListTile(
+                leading: Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: const Icon(Icons.camera_alt_outlined, color: Colors.green),
+                ),
+                title: Text('Take a Photo', style: CustomFonts.textMain14w600),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
+                  if (image != null) setState(() => _selectedLogo = image);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _addAvailability() {
+    setState(() {
+      _availabilityEntries.add(AvailabilityEntry());
+    });
+  }
+
+  void _removeAvailability(int index) {
+    if (_availabilityEntries.length > 1) {
+      setState(() {
+        _availabilityEntries.removeAt(index);
+      });
+    }
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final selectedCountry = ref.read(authViewModelProvider).country;
+    if (selectedCountry == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a country in the phone field")),
+      );
+      return;
+    }
+
+    final List<AvailabilityModel> availability = _availabilityEntries.map((e) {
+      String formatTimeOfDay(TimeOfDay? tod) {
+        if (tod == null) return "00:00";
+        final hour = tod.hour.toString().padLeft(2, '0');
+        final minute = tod.minute.toString().padLeft(2, '0');
+        return "$hour:$minute";
+      }
+
+      return AvailabilityModel(
+        openTime: formatTimeOfDay(e.openTime),
+        closeTime: formatTimeOfDay(e.closeTime),
+        days: e.selectedDays.toList(),
+      );
+    }).toList();
+
+    final req = RegisterClinicReqModel(
+      clinicName: _clinicNameController.text.trim(),
+      clinicEmail: _clinicEmailController.text.trim(),
+      clinicPhone: _clinicPhoneController.text.trim(),
+      clinicAddress: _clinicAddressController.text.trim(),
+      clinicLogo: _selectedLogo?.path ?? "https://example.com/logo.png", // In a real app, you'd upload this first
+      ownerName: _ownerNameController.text.trim(),
+      ownerEmail: _ownerEmailController.text.trim(),
+      cc: selectedCountry.dialCode ?? "+1",
+      country: selectedCountry.code ?? "US",
+      availability: availability,
+    );
+
+    final success = await ref.read(clinicViewModelProvider.notifier).registerClinic(req);
+    if (success && mounted) {
+      context.pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
+      appBar: AppBar(
+        title: Text("Add New Clinic", style: CustomFonts.textMain20w600),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 1000.w),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionCard(
+                    title: "Clinic Logo",
+                    children: [
+                      _buildLogoPicker(),
+                    ],
+                  ),
+                  SizedBox(height: 32.h),
+                  _buildSectionCard(
+                    title: "Clinic Details",
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: BuildTextField(
+                              label: "Clinic Name",
+                              controller: _clinicNameController,
+                              hintText: "e.g. ABC Skin Clinic",
+                              validator: Validators.empty,
+                            ),
+                          ),
+                          SizedBox(width: 24.w),
+                          Expanded(
+                            child: BuildTextField(
+                              label: "Clinic Email",
+                              controller: _clinicEmailController,
+                              hintText: "clinic@example.com",
+                              validator: Validators.email,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 24.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Phone Number (Selection sets Country & CC)", style: CustomFonts.textMain14w600),
+                                SizedBox(height: 10.h),
+                                PhoneWidget(
+                                  controller: _clinicPhoneController,
+                                  filled: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 24.w),
+                          const Spacer(), // Replaced Country/CC fields with spacer
+                        ],
+                      ),
+                      SizedBox(height: 24.h),
+                      BuildTextField(
+                        label: "Clinic Address",
+                        controller: _clinicAddressController,
+                        hintText: "123 Main Street, New York, NY 10001",
+                        validator: Validators.empty,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 32.h),
+                  _buildSectionCard(
+                    title: "Owner Information",
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: BuildTextField(
+                              label: "Owner Name",
+                              controller: _ownerNameController,
+                              hintText: "e.g. Waleed Ahmed",
+                              validator: Validators.empty,
+                            ),
+                          ),
+                          SizedBox(width: 24.w),
+                          Expanded(
+                            child: BuildTextField(
+                              label: "Owner Email",
+                              controller: _ownerEmailController,
+                              hintText: "owner@example.com",
+                              validator: Validators.email,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 32.h),
+                  _buildAvailabilitySection(),
+                  SizedBox(height: 48.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        width: 160.w,
+                        child: OutlinedButton(
+                          onPressed: () => context.pop(),
+                          child: const Text("Cancel"),
+                        ),
+                      ),
+                      SizedBox(width: 24.w),
+                      SizedBox(
+                        width: 220.w,
+                        child: ElevatedButton(
+                          onPressed: _submit,
+                          child: const Text("Register Clinic"),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 60.h),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoPicker() {
+    return Center(
+      child: GestureDetector(
+        onTap: _pickLogo,
+        child: Column(
+          children: [
+            Container(
+              width: 120.w,
+              height: 120.w,
+              decoration: BoxDecoration(
+                color: CustomColors.surfaceGhost,
+                shape: BoxShape.circle,
+                border: Border.all(color: CustomColors.brandCyan.withOpacity(0.5), width: 2),
+                image: _selectedLogo != null
+                    ? DecorationImage(
+                        image: kIsWeb 
+                          ? NetworkImage(_selectedLogo!.path) 
+                          : FileImage(File(_selectedLogo!.path)) as ImageProvider,
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: _selectedLogo == null
+                  ? Icon(Icons.add_a_photo_outlined, size: 40.sp, color: CustomColors.brandPrimary)
+                  : null,
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              _selectedLogo == null ? "Tap to upload logo" : "Change Logo",
+              style: CustomFonts.textMuted13w500,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({required String title, required List<Widget> children}) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(32.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: CustomFonts.textMain20w600),
+          SizedBox(height: 32.h),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvailabilitySection() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(32.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Clinic Availability", style: CustomFonts.textMain20w600),
+              ElevatedButton.icon(
+                onPressed: _addAvailability,
+                icon: const Icon(Icons.add_circle_outline, size: 20),
+                label: const Text("Add Timing Slot"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
+                  foregroundColor: CustomColors.brandPrimary,
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _availabilityEntries.length,
+            separatorBuilder: (_, __) => Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: Divider(color: CustomColors.textMuted.withOpacity(0.1)),
+            ),
+            itemBuilder: (context, index) {
+              return _buildAvailabilityRow(index);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvailabilityRow(int index) {
+    final entry = _availabilityEntries[index];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Timing Slot ${index + 1}", style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+            if (_availabilityEntries.length > 1)
+              TextButton.icon(
+                onPressed: () => _removeAvailability(index),
+                icon: const Icon(Icons.delete_sweep_outlined, size: 18),
+                label: const Text("Remove"),
+                style: TextButton.styleFrom(foregroundColor: CustomColors.error),
+              ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        Row(
+          children: [
+            Expanded(
+              child: _buildTimePicker(
+                label: "Open Time",
+                time: entry.openTime,
+                onChanged: (time) => setState(() => entry.openTime = time),
+              ),
+            ),
+            SizedBox(width: 24.w),
+            Expanded(
+              child: _buildTimePicker(
+                label: "Close Time",
+                time: entry.closeTime,
+                onChanged: (time) => setState(() => entry.closeTime = time),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 24.h),
+        Text("Active Days", style: CustomFonts.textMain14w600),
+        SizedBox(height: 16.h),
+        Wrap(
+          spacing: 12.w,
+          runSpacing: 12.h,
+          children: [
+            "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+          ].map((day) {
+            final isSelected = entry.selectedDays.contains(day);
+            return FilterChip(
+              label: Text(day),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  if (selected) {
+                    entry.selectedDays.add(day);
+                  } else {
+                    entry.selectedDays.remove(day);
+                  }
+                });
+              },
+              backgroundColor: Colors.white,
+              selectedColor: CustomColors.brandPrimary.withOpacity(0.1),
+              checkmarkColor: CustomColors.brandPrimary,
+              labelStyle: TextStyle(
+                color: isSelected ? CustomColors.brandPrimary : CustomColors.textMuted,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 13.sp,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+                side: BorderSide(
+                  color: isSelected ? CustomColors.brandPrimary : CustomColors.textMuted.withOpacity(0.3),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimePicker({
+    required String label,
+    required TimeOfDay? time,
+    required Function(TimeOfDay) onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: CustomFonts.textMuted13w500),
+        SizedBox(height: 10.h),
+        InkWell(
+          onTap: () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: time ?? const TimeOfDay(hour: 9, minute: 0),
+            );
+            if (picked != null) onChanged(picked);
+          },
+          child: Container(
+            height: 56.h,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            decoration: BoxDecoration(
+              color: CustomColors.surfaceGhost,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: CustomColors.textMuted.withOpacity(0.1)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(time?.format(context) ?? "Select Time", style: CustomFonts.textMain14w400),
+                const Icon(Icons.access_time_rounded, size: 20, color: CustomColors.brandPrimary),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class AvailabilityEntry {
+  TimeOfDay? openTime = const TimeOfDay(hour: 9, minute: 0);
+  TimeOfDay? closeTime = const TimeOfDay(hour: 17, minute: 0);
+  Set<String> selectedDays = {};
+}

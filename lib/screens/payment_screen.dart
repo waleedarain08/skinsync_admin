@@ -13,7 +13,7 @@ class PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.dashboardBackgroundColor,
+      backgroundColor: CustomColors.backgroundLight,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
@@ -68,7 +68,7 @@ class PaymentScreen extends StatelessWidget {
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12.r)),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12.r)),
               child: Icon(icon, color: color, size: 24.sp),
             ),
             SizedBox(width: 16.w),

@@ -19,19 +19,22 @@ class _UserManagementState extends State<UserManagement> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          SizedBox(height: 32.h),
-          _buildQuickMetrics(),
-          SizedBox(height: 32.h),
-          _buildTabSwitcher(),
-          SizedBox(height: 24.h),
-          _buildUsersTable(),
-        ],
+    return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            SizedBox(height: 32.h),
+            _buildQuickMetrics(),
+            SizedBox(height: 32.h),
+            _buildTabSwitcher(),
+            SizedBox(height: 24.h),
+            _buildUsersTable(),
+          ],
+        ),
       ),
     );
   }
@@ -72,7 +75,7 @@ class _UserManagementState extends State<UserManagement> {
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10.r)),
               child: Icon(icon, color: color, size: 24.sp),
             ),
             SizedBox(width: 16.w),
@@ -115,7 +118,7 @@ class _UserManagementState extends State<UserManagement> {
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10.r),
-          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))] : null,
+          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))] : null,
         ),
         child: Text(
           label,
@@ -181,7 +184,7 @@ class UserDataTable extends StatelessWidget {
         DataCell(
           Row(
             children: [
-              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.brandPrimary)),
+              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.brandCyan.withOpacity(0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.brandPrimary)),
               SizedBox(width: 12.w),
               Text("Courtney Henry", style: CustomFonts.textMain14w600),
             ],
@@ -192,7 +195,7 @@ class UserDataTable extends StatelessWidget {
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
+            decoration: BoxDecoration(color: CustomColors.success.withOpacity(0.1), borderRadius: BorderRadius.circular(20.r)),
             child: Text("Active", style: TextStyle(color: CustomColors.success, fontSize: 10.sp, fontWeight: FontWeight.bold)),
           ),
         ),

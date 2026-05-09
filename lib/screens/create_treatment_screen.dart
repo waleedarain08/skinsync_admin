@@ -49,7 +49,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: CustomColors.backgroundLight,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -88,7 +88,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         SizedBox(width: 16.w),
         Text(
           'Create Treatment',
-          style: CustomFonts.black22w600,
+          style: CustomFonts.textMain24w700,
         ),
       ],
     );
@@ -116,7 +116,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           children: [
             Text(
               'Treatment Details',
-              style: CustomFonts.black18w600,
+              style: CustomFonts.textMain18w600,
             ),
             SizedBox(height: 32.h),
             BuildTextField(

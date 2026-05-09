@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../utils/custom_fonts.dart';
+import '../utils/color_constant.dart';
 
 class StaticContentScreen extends StatefulWidget {
   const StaticContentScreen({super.key});
@@ -51,7 +53,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
             /// Screen Title
             Text(
               'Static Content',
-              style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600),
+              style: CustomFonts.textMain24w700,
             ),
 
             SizedBox(height: 12.h),
@@ -92,12 +94,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                               child: Text(
                                 tabs[index],
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: isActive
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                ),
+                                style: isActive ? CustomFonts.textMain14w600 : CustomFonts.textMuted14w400,
                               ),
                             ),
                           ),
@@ -111,10 +108,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                   /// Section Title
                   Text(
                     titles[selectedIndex]!,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: CustomFonts.textMain16w600,
                   ),
 
                   SizedBox(height: 12.h),

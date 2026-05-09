@@ -32,11 +32,11 @@ class CustomDropdown extends StatelessWidget {
           contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide(color: CustomColors.textMuted.withValues(alpha: 0.2)),
+            borderSide: BorderSide(color: CustomColors.textMuted.withOpacity(0.2)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide(color: CustomColors.textMuted.withValues(alpha: 0.2)),
+            borderSide: BorderSide(color: CustomColors.textMuted.withOpacity(0.2)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),

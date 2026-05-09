@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import '../../widgets/dailogbox/clinic_dailogbox.dart';
@@ -27,19 +29,22 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          SizedBox(height: 32.h),
-          _buildStatsSummary(),
-          SizedBox(height: 32.h),
-          _buildFiltersAndSearch(),
-          SizedBox(height: 24.h),
-          _buildClinicsTable(),
-        ],
+    return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            SizedBox(height: 32.h),
+            _buildStatsSummary(),
+            SizedBox(height: 32.h),
+            _buildFiltersAndSearch(),
+            SizedBox(height: 24.h),
+            _buildClinicsTable(),
+          ],
+        ),
       ),
     );
   }
@@ -61,10 +66,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
         ),
         ElevatedButton.icon(
           onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => const RegisterClinicDialogBox(),
-            );
+            context.push(AddNewClinicScreen.routeName);
           },
           icon: const Icon(Icons.add, color: Colors.white),
           label: Text('Add New Clinic', style: CustomFonts.white14w500),
@@ -101,7 +103,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
+                color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10.r),
               ),
               child: Icon(icon, color: color, size: 24.sp),
@@ -130,7 +132,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
             child: CupertinoSearchTextField(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               placeholder: "Search clinics by name, email or location...",
-              backgroundColor: CustomColors.softChampagne.withValues(alpha: 0.5),
+              backgroundColor: CustomColors.softChampagne.withOpacity(0.5),
               borderRadius: BorderRadius.circular(10.r),
             ),
           ),
@@ -179,7 +181,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
                   columnSpacing: 40.w,
-                  headingRowColor: WidgetStateProperty.all(CustomColors.softChampagne.withValues(alpha: 0.5)),
+                  headingRowColor: WidgetStateProperty.all(CustomColors.softChampagne.withOpacity(0.5)),
                   headingTextStyle: CustomFonts.black16w600.copyWith(fontSize: 14.sp),
                   rows: List.generate(
                     state.clinics?.length ?? 0,
@@ -211,7 +213,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
             children: [
               CircleAvatar(
                 radius: 16.r,
-                backgroundColor: CustomColors.primaryGold.withValues(alpha: 0.1),
+                backgroundColor: CustomColors.primaryGold.withOpacity(0.1),
                 child: Text(clinic.name?[0] ?? "C", style: TextStyle(color: CustomColors.primaryGold, fontSize: 12.sp, fontWeight: FontWeight.bold)),
               ),
               SizedBox(width: 12.w),
@@ -233,7 +235,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.primaryGold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6.r)),
+            decoration: BoxDecoration(color: CustomColors.primaryGold.withOpacity(0.1), borderRadius: BorderRadius.circular(6.r)),
             child: Text("Premium", style: TextStyle(color: CustomColors.primaryGold, fontSize: 11.sp, fontWeight: FontWeight.bold)),
           ),
         ),
@@ -279,7 +281,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: isActive ? CustomColors.successGreen.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+        color: isActive ? CustomColors.successGreen.withOpacity(0.1) : Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(

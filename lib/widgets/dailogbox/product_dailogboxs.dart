@@ -203,7 +203,7 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
           decoration: BoxDecoration(
             color: CustomColors.surfaceGhost,
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: CustomColors.textMuted.withValues(alpha: 0.1)),
+            border: Border.all(color: CustomColors.textMuted.withOpacity(0.1)),
           ),
           child: const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.textMuted)),
         ),

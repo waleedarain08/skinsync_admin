@@ -12,6 +12,7 @@ class PushNotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30.w),
         child: SingleChildScrollView(
@@ -19,11 +20,11 @@ class PushNotificationScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 40.h),
-              Text("Push Notifications", style: CustomFonts.black30w600),
+              Text("Push Notifications", style: CustomFonts.textMain32w700),
               SizedBox(height: 10.h),
               Text(
                 "Send push notifications to app users about updates, offers, and alerts",
-                style: CustomFonts.grey18w400,
+                style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
               ),
               SizedBox(height: 20.h),
               Divider(color: CustomColors.greyColor),
@@ -47,12 +48,12 @@ class PushNotificationScreen extends StatelessWidget {
                         SizedBox(width: 20.w),
                         Text(
                           "Send New Notification",
-                          style: CustomFonts.black20w600,
+                          style: CustomFonts.textMain20w600,
                         ),
                       ],
                     ),
                     SizedBox(height: 40.h),
-                    Text("Notification Title", style: CustomFonts.black16w600),
+                    Text("Notification Title", style: CustomFonts.textMain16w600),
                     SizedBox(height: 10.h),
                     TextField(
                       decoration: InputDecoration(
@@ -201,7 +202,7 @@ class PushNotificationScreen extends StatelessWidget {
                   children: [
                     Text(
                       "Notification History",
-                      style: CustomFonts.black20w600,
+                      style: CustomFonts.textMain20w600,
                     ),
                     SizedBox(height: 20.h),
                     PushNotificationTable(),
@@ -223,7 +224,7 @@ class PushNotificationScreen extends StatelessWidget {
                   children: [
                     Text(
                       "Best Practices for Push Notifications:",
-                      style: CustomFonts.black20w600,
+                      style: CustomFonts.textMain20w600,
                     ),
                     SizedBox(height: 5.h),
                     Text(

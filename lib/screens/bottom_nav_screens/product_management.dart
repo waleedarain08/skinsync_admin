@@ -17,19 +17,22 @@ class ProductManagement extends StatefulWidget {
 class _ProductManagementState extends State<ProductManagement> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          SizedBox(height: 32.h),
-          _buildInventoryOverview(),
-          SizedBox(height: 32.h),
-          _buildFilters(),
-          SizedBox(height: 24.h),
-          _buildProductsGrid(),
-        ],
+    return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            SizedBox(height: 32.h),
+            _buildInventoryOverview(),
+            SizedBox(height: 32.h),
+            _buildFilters(),
+            SizedBox(height: 24.h),
+            _buildProductsGrid(),
+          ],
+        ),
       ),
     );
   }

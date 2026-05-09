@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../utils/custom_fonts.dart';
+import '../utils/color_constant.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -59,11 +61,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         SizedBox(width: 12.w),
         Text(
           'Password & Security',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: CustomFonts.textMain18w600,
         ),
       ],
     );

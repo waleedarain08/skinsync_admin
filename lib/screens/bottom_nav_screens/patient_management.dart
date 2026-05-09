@@ -16,19 +16,22 @@ class PatientManagement extends StatefulWidget {
 class _PatientManagementState extends State<PatientManagement> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          SizedBox(height: 32.h),
-          _buildQuickMetrics(),
-          SizedBox(height: 32.h),
-          _buildFilters(),
-          SizedBox(height: 24.h),
-          _buildPatientsTable(),
-        ],
+    return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            SizedBox(height: 32.h),
+            _buildQuickMetrics(),
+            SizedBox(height: 32.h),
+            _buildFilters(),
+            SizedBox(height: 24.h),
+            _buildPatientsTable(),
+          ],
+        ),
       ),
     );
   }
@@ -68,14 +71,14 @@ class _PatientManagementState extends State<PatientManagement> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: CustomColors.textMuted.withValues(alpha: 0.05)),
+          border: Border.all(color: CustomColors.textMuted.withOpacity(0.05)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
               child: Icon(icon, color: color, size: 20.sp),
             ),
             SizedBox(height: 16.h),
@@ -117,7 +120,7 @@ class _PatientManagementState extends State<PatientManagement> {
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: CustomColors.textMuted.withValues(alpha: 0.1)),
+        border: Border.all(color: CustomColors.textMuted.withOpacity(0.1)),
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
@@ -176,7 +179,7 @@ class _PatientManagementState extends State<PatientManagement> {
         DataCell(
           Row(
             children: [
-              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.brandPrimary)),
+              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.brandCyan.withOpacity(0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.brandPrimary)),
               SizedBox(width: 12.w),
               Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text("Bessie Cooper", style: TextStyle(color: CustomColors.textMain, fontSize: 13.sp, fontWeight: FontWeight.w600)),
@@ -190,7 +193,7 @@ class _PatientManagementState extends State<PatientManagement> {
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.brandPrimary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6.r)),
+            decoration: BoxDecoration(color: CustomColors.brandPrimary.withOpacity(0.1), borderRadius: BorderRadius.circular(6.r)),
             child: const Text("Mobile App", style: TextStyle(color: CustomColors.brandPrimary, fontSize: 10, fontWeight: FontWeight.bold)),
           ),
         ),

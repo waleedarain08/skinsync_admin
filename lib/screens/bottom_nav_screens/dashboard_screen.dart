@@ -11,49 +11,52 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Good Morning, Alex", style: CustomFonts.textMain32w700),
-                  SizedBox(height: 4.h),
-                  Text(
-                    "Here's a summary of your MedSpa network performance.",
-                    style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
-                  ),
-                ],
-              ),
-              _buildDateFilter(),
-            ],
-          ),
-          SizedBox(height: 32.h),
-          _buildQuickStats(),
-          SizedBox(height: 32.h),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(flex: 2, child: _buildRevenueChart()),
-              SizedBox(width: 24.w),
-              Expanded(flex: 1, child: _buildTopClinics()),
-            ],
-          ),
-          SizedBox(height: 32.h),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: _buildRecentAppointments()),
-              SizedBox(width: 24.w),
-              Expanded(child: _buildTreatmentAnalytics()),
-            ],
-          ),
-        ],
+    return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Good Morning, Alex", style: CustomFonts.textMain32w700),
+                    SizedBox(height: 4.h),
+                    Text(
+                      "Here's a summary of your MedSpa network performance.",
+                      style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
+                    ),
+                  ],
+                ),
+                _buildDateFilter(),
+              ],
+            ),
+            SizedBox(height: 32.h),
+            _buildQuickStats(),
+            SizedBox(height: 32.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 2, child: _buildRevenueChart()),
+                SizedBox(width: 24.w),
+                Expanded(flex: 1, child: _buildTopClinics()),
+              ],
+            ),
+            SizedBox(height: 32.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _buildRecentAppointments()),
+                SizedBox(width: 24.w),
+                Expanded(child: _buildTreatmentAnalytics()),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
