@@ -1,5 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/home_page.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
@@ -11,10 +14,8 @@ import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/signup_screen.dart';
 import 'package:skinsync_admin/screens/treatment_management_screen.dart';
-
-import 'screens/bottom_nav_screens/clinic_management.dart';
-import 'screens/payment_screen.dart';
-import 'screens/splash_screen.dart';
+import 'package:skinsync_admin/screens/payment_screen.dart';
+import 'package:skinsync_admin/screens/splash_screen.dart';
 
 class RouteGenerator {
   static final GoRouter router = GoRouter(
@@ -34,13 +35,23 @@ class RouteGenerator {
       GoRoute(
         name: SignInScreen.routeName,
         path: SignInScreen.routeName,
-        builder: (context, state) => const SignInScreen(), // Create this screen
+        builder: (context, state) => const SignInScreen(),
       ),
       ShellRoute(
         builder: (_, _, child) {
           return HomePage(child: child);
         },
         routes: [
+          GoRoute(
+            name: DashboardScreen.routeName,
+            path: DashboardScreen.routeName,
+            builder: (_, _) => const DashboardScreen(),
+          ),
+          GoRoute(
+            name: AppointmentManagement.routeName,
+            path: AppointmentManagement.routeName,
+            builder: (_, _) => const AppointmentManagement(),
+          ),
           GoRoute(
             name: UserManagement.routeName,
             path: UserManagement.routeName,

@@ -5,7 +5,14 @@ class ClinicModel {
   String? phone;
   String? address;
   String? logo;
-  String? status;
+  String? description;
+  String? workingHours;
+  String? status; // Active/Inactive
+  String? subscriptionPlan;
+  int? totalTreatments;
+  int? totalAppointments;
+  double? totalRevenue;
+  double? rating;
   String? createdAt;
   String? updatedAt;
 
@@ -16,7 +23,14 @@ class ClinicModel {
     this.phone,
     this.address,
     this.logo,
+    this.description,
+    this.workingHours,
     this.status,
+    this.subscriptionPlan,
+    this.totalTreatments,
+    this.totalAppointments,
+    this.totalRevenue,
+    this.rating,
     this.createdAt,
     this.updatedAt,
   });
@@ -28,7 +42,14 @@ class ClinicModel {
     phone = json['phone'];
     address = json['address'];
     logo = json['logo'];
+    description = json['description'];
+    workingHours = json['working_hours'];
     status = json['status'];
+    subscriptionPlan = json['subscription_plan'];
+    totalTreatments = json['total_treatments'];
+    totalAppointments = json['total_appointments'];
+    totalRevenue = json['total_revenue']?.toDouble();
+    rating = json['rating']?.toDouble();
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -41,7 +62,14 @@ class ClinicModel {
     data['phone'] = phone;
     data['address'] = address;
     data['logo'] = logo;
+    data['description'] = description;
+    data['working_hours'] = workingHours;
     data['status'] = status;
+    data['subscription_plan'] = subscriptionPlan;
+    data['total_treatments'] = totalTreatments;
+    data['total_appointments'] = totalAppointments;
+    data['total_revenue'] = totalRevenue;
+    data['rating'] = rating;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     return data;

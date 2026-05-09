@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
+import 'package:skinsync_admin/utils/custom_fonts.dart';
 
 class DisputeDetailsDialog extends StatelessWidget {
   const DisputeDetailsDialog({super.key});
@@ -10,110 +12,70 @@ class DisputeDetailsDialog extends StatelessWidget {
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Container(
-        width: 560.w,
-        padding: EdgeInsets.all(24.w),
+        width: 600.w,
+        padding: EdgeInsets.all(32.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Dispute Details',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
+                Text('Dispute Details', style: CustomFonts.black22w600),
+                IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
+              ],
+            ),
+            SizedBox(height: 32.h),
+            Row(
+              children: [
+                Expanded(child: _detailItem('Dispute ID', '#DSP-2025-001')),
+                Expanded(child: _detailItem('Date Filed', 'Oct 28, 2023')),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            Row(
+              children: [
+                Expanded(child: _detailItem('Patient', 'Emma Johnson')),
+                Expanded(child: _detailItem('Clinic', 'Radiant Skin NY')),
+              ],
+            ),
+            SizedBox(height: 32.h),
+            const Divider(),
+            SizedBox(height: 24.h),
+            _detailItem('Subject/Reason', 'Service Quality Mismatch', isBoldValue: true),
+            SizedBox(height: 16.h),
+            _detailItem(
+              'Detailed Description',
+              'The treatment was rushed and did not meet the promised duration. The patient claims the results were not as discussed during consultation.',
+            ),
+            SizedBox(height: 40.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                OutlinedButton(
                   onPressed: () => Navigator.pop(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                  style: OutlinedButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h)),
+                  child: const Text("Close"),
                 ),
-              ],
-            ),
-
-            SizedBox(height: 24.h),
-
-            /// Grid (2 columns)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: _infoBlock('Dispute ID', 'DSP-2025-001')),
-                Expanded(child: _infoBlock('Date Filed', '10/28/2025')),
-              ],
-            ),
-            SizedBox(height: 20.h),
-
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: _infoBlock('Patient Name', 'Emma Johnson')),
-                Expanded(child: _infoBlock('Clinic Name', 'Clinic Name')),
-              ],
-            ),
-            SizedBox(height: 20.h),
-
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: _infoBlock('Disputed Amount', '\$250')),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _label('Status'),
-                      SizedBox(height: 6.h),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 14.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        child: Text(
-                          'Pending',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
+                SizedBox(width: 16.w),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CustomColors.errorRed,
+                    padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
                   ),
+                  child: const Text("Escalate Dispute"),
+                ),
+                SizedBox(width: 12.w),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CustomColors.successGreen,
+                    padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
+                  ),
+                  child: const Text("Resolve Dispute"),
                 ),
               ],
-            ),
-
-            SizedBox(height: 24.h),
-
-            /// Reason
-            _label('Reason'),
-            SizedBox(height: 6.h),
-            Text(
-              'Service not provided as agreed',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
-            ),
-
-            SizedBox(height: 24.h),
-
-            /// Description
-            _label('Description'),
-            SizedBox(height: 6.h),
-            Text(
-              'The treatment was rushed and did not meet the promised duration. '
-              'I felt the service quality was below expectations.',
-              style: TextStyle(
-                fontSize: 14.sp,
-                height: 1.5,
-                color: Colors.black87,
-              ),
             ),
           ],
         ),
@@ -121,32 +83,15 @@ class DisputeDetailsDialog extends StatelessWidget {
     );
   }
 
-  /// Label text
-  Widget _label(String text) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 12.sp,
-        color: Colors.grey.shade600,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-
-  /// Info block
-  Widget _infoBlock(String title, String value) {
+  Widget _detailItem(String label, String value, {bool isBoldValue = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _label(title),
-        SizedBox(height: 6.h),
+        Text(label, style: TextStyle(color: CustomColors.textLight, fontSize: 12.sp, fontWeight: FontWeight.bold)),
+        SizedBox(height: 4.h),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
+          style: isBoldValue ? CustomFonts.black16w600 : CustomFonts.black14w400,
         ),
       ],
     );

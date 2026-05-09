@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-
 import '../screens/sign_in_screen.dart';
 import '../services/locator.dart';
 import '../services/storage_service.dart';
-import '../utils/assets.dart';
 import '../utils/color_constant.dart';
 import '../utils/responsive.dart';
 
@@ -15,101 +13,108 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 101.h,
+      height: 80.h,
       width: double.infinity,
-      constraints: BoxConstraints(minHeight: 101.h),
-      padding: EdgeInsets.symmetric(
-        horizontal: Responsive.when(
-          defaultValue: 20.w,
-          // desktop: () => 20.w,
-          // tablet: () => 30.w,
-          // mobile: () => 20.w,
-        ),
-        vertical: 24.h,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: CustomColors.textMuted.withOpacity(0.1), width: 1)),
       ),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Row(
         children: [
           Responsive.when(
-            defaultValue: SizedBox.shrink(),
-            mobile: () => _buildMobileActions(context),
-            tablet: () => _buildMobileActions(context),
-          ),
-          Spacer(),
-          Column(
-            mainAxisAlignment: .center,
-            children: [
-              Text(
-                'Admin Portal',
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                  height: 0,
-                ),
-              ),
-              Text(
-                'Super Administrator',
-                style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontSize: 10.sp,
-                  height: 0,
-                ),
-              ),
-            ],
-          ),
-          PopupMenuButton(
-            padding: EdgeInsets.zero,
-            offset: Offset(0, 40.h),
-            icon: Icon(
-              Icons.arrow_drop_down_circle_outlined,
-              size: 18.sp,
-              color: CustomColors.blackColor,
+            defaultValue: const SizedBox.shrink(),
+            mobile: () => IconButton(
+              onPressed: () => Scaffold.of(context).openDrawer(),
+              icon: const Icon(Icons.menu_rounded),
             ),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                height: 40.h,
-                onTap: () async {
-                  final _secureStorage = locator<SecureStorageService>();
-                  await _secureStorage.clearToken();
-                  if (!context.mounted) return;
-                  context.goNamed(SignInScreen.routeName);
-                },
-
-                child: Row(
-                  children: [
-                    Icon(Icons.logout_rounded, color: Colors.red, size: 18.sp),
-                    SizedBox(width: 8.w),
-                    Text(
-                      'Logout',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            tablet: () => IconButton(
+              onPressed: () => Scaffold.of(context).openDrawer(),
+              icon: const Icon(Icons.menu_rounded),
+            ),
           ),
+          const Spacer(),
+          _buildActionButton(Icons.search_rounded),
+          SizedBox(width: 16.w),
+          _buildActionButton(Icons.notifications_none_rounded, hasBadge: true),
+          SizedBox(width: 24.w),
+          _buildUserProfile(context),
         ],
       ),
     );
   }
 
-  Widget _buildMobileActions(BuildContext context) {
+  Widget _buildActionButton(IconData icon, {bool hasBadge = false}) {
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.all(8.w),
+          decoration: BoxDecoration(
+            color: CustomColors.surfaceGhost,
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          child: Icon(icon, color: CustomColors.textMuted, size: 22.sp),
+        ),
+        if (hasBadge)
+          Positioned(
+            right: 8,
+            top: 8,
+            child: Container(
+              width: 8.w,
+              height: 8.w,
+              decoration: BoxDecoration(
+                color: CustomColors.brandPrimary,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildUserProfile(BuildContext context) {
     return Row(
       children: [
-        IconButton(
-          onPressed: () => Scaffold.of(context).openDrawer(),
-          icon: Icon(Icons.menu),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text('Alex MedSpa', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: CustomColors.textMain)),
+            Text('Super Admin', style: TextStyle(fontSize: 11.sp, color: CustomColors.textMuted, fontWeight: FontWeight.w500)),
+          ],
         ),
-        SizedBox(width: 10.w),
-        Image.asset(PngAssets.splashLogo, width: 48.w, height: 48.w),
-        Image.asset(PngAssets.logo),
+        SizedBox(width: 12.w),
+        PopupMenuButton(
+          offset: Offset(0, 50.h),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+          child: CircleAvatar(
+            radius: 20.r,
+            backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
+            child: Icon(Icons.person_rounded, size: 20.sp, color: CustomColors.brandPrimary),
+          ),
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              onTap: () async {
+                final secureStorage = locator<SecureStorageService>();
+                await secureStorage.clearToken();
+                if (!context.mounted) return;
+                context.goNamed(SignInScreen.routeName);
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.logout_rounded, color: CustomColors.error, size: 18),
+                  SizedBox(width: 12.w),
+                  const Text('Logout', style: TextStyle(color: CustomColors.error, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
 
   @override
-  Size get preferredSize => Size(double.infinity, 101.h);
+  Size get preferredSize => Size(double.infinity, 80.h);
 }

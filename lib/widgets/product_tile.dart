@@ -19,7 +19,7 @@ class ProductTile extends ConsumerWidget {
       onTap: () {
         showDialog(
           context: context,
-          builder: (context) => EditProductDailogBox(product: product),
+          builder: (context) => ProductDialogBox(product: product),
         );
       },
       onDoubleTap: () {

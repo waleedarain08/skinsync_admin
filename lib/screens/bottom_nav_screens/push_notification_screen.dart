@@ -281,11 +281,12 @@ class PushNotificationTable extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: constraints.maxWidth),
               child: DataTable(
-                headingRowColor: MaterialStateProperty.all(
+                headingRowColor: WidgetStateProperty.all(
                   Colors.grey.shade100,
                 ),
                 headingRowHeight: 50.h,
-                dataRowHeight: 60.h,
+                dataRowMinHeight: 60.h,
+                dataRowMaxHeight: 60.h,
                 columnSpacing: 40.w,
                 border: TableBorder(
                   horizontalInside: BorderSide(

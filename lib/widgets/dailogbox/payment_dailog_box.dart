@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
+import 'package:skinsync_admin/utils/custom_fonts.dart';
 
 class ReleasePaymentDialog extends StatelessWidget {
   final String transactionId;
@@ -26,156 +28,83 @@ class ReleasePaymentDialog extends StatelessWidget {
       backgroundColor: Colors.white,
       child: Container(
         width: 500.w,
-        padding: EdgeInsets.all(24.w),
+        padding: EdgeInsets.all(32.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with close button
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Release Payment to Clinic",
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
+                Text("Release Payment", style: CustomFonts.black22w600),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: Icon(Icons.close, size: 20.sp),
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(),
                 ),
               ],
             ),
             SizedBox(height: 12.h),
-
-            // Subtitle
             Text(
-              "Confirm that you want to release this payment to the clinic's wallet.",
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w400,
-                color: Colors.black87,
-                height: 1.5,
-              ),
+              "Please review the transaction details before releasing the funds to the clinic's wallet.",
+              style: CustomFonts.grey18w400.copyWith(fontSize: 14.sp),
             ),
-            SizedBox(height: 24.h),
-
-            // Transaction Details
+            SizedBox(height: 32.h),
             Container(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
-                color: Color(0xFFFAFAFA),
-                borderRadius: BorderRadius.circular(8.r),
+                color: CustomColors.softChampagne.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: CustomColors.greyColor),
               ),
               child: Column(
                 children: [
-                  _buildDetailRow("Transaction ID:", transactionId),
-                  SizedBox(height: 12.h),
-                  _buildDetailRow("Patient:", patientName),
-                  SizedBox(height: 12.h),
-                  _buildDetailRow("Clinic:", clinicName),
-                  SizedBox(height: 12.h),
-                  _buildDetailRow("Service:", serviceName),
-                  SizedBox(height: 12.h),
-                  Divider(color: Color(0xFFD4D5D6), thickness: 2.h),
-                  SizedBox(height: 12.h),
-
-                  // Amount to Release
+                  _buildDetailRow("Transaction ID", transactionId),
+                  _buildDetailRow("Patient", patientName),
+                  _buildDetailRow("Clinic", clinicName),
+                  _buildDetailRow("Service", serviceName),
+                  const Divider(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Amount to Release:",
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Text(
-                        amount,
-                        style: TextStyle(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
+                      Text("Total Amount", style: CustomFonts.black16w600),
+                      Text(amount, style: CustomFonts.black22w600.copyWith(color: CustomColors.successGreen)),
                     ],
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 24.h),
-
-            // Feedback Message (if provided)
-            if (feedbackMessage != null && feedbackMessage!.isNotEmpty) ...[
-              Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  // color: Color(0xFFFAFAFA),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Text(
-                  feedbackMessage!,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black87,
-                    height: 1.5,
-                  ),
-                ),
-              ),
+            if (feedbackMessage != null) ...[
               SizedBox(height: 24.h),
+              Text("Patient Feedback", style: CustomFonts.black14w600),
+              SizedBox(height: 8.h),
+              Text(
+                feedbackMessage!,
+                style: TextStyle(fontSize: 13.sp, color: CustomColors.textLight, fontStyle: FontStyle.italic),
+              ),
             ],
-
-            // Action Buttons
+            SizedBox(height: 40.h),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context, false),
+                    onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.r),
-                      ),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
-                    child: Text(
-                      "Cancel",
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    child: const Text("Cancel"),
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 16.w),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context, true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF00A63E),
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.r),
-                      ),
-                      elevation: 0,
+                      backgroundColor: CustomColors.successGreen,
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
-                    child: Text(
-                      "Confirm Release",
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: const Text("Confirm Release"),
                   ),
                 ),
               ],
@@ -187,31 +116,15 @@ class ReleasePaymentDialog extends StatelessWidget {
   }
 
   Widget _buildDetailRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
-        ),
-        SizedBox(width: 16.w),
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w400,
-              color: Colors.black87,
-            ),
-            textAlign: TextAlign.right,
-          ),
-        ),
-      ],
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: CustomColors.textLight, fontSize: 13.sp)),
+          Text(value, style: CustomFonts.black14w600),
+        ],
+      ),
     );
   }
 }

@@ -4,13 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-import 'package:skinsync_admin/widgets/patient_management_mini_tile_widget.dart';
-import 'package:skinsync_admin/widgets/revenue_trend_widget.dart';
-
-import '../../utils/color_constant.dart';
-import '../../utils/custom_fonts.dart';
-import '../../utils/responsive.dart';
-import '../../widgets/custom_dropdown_widget.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
+import 'package:skinsync_admin/utils/custom_fonts.dart';
 import '../../widgets/dailogbox/clinic_dailogbox.dart';
 
 class ClinicManagement extends ConsumerStatefulWidget {
@@ -30,313 +25,270 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
     });
   }
 
-  List<ClientManamentMiniTileModel> get tiles => [
-    ClientManamentMiniTileModel(
-      title: "Total Clinics",
-      subTitle: "48",
-      icon: Icons.business,
-      iconBgColor: Colors.blueAccent,
-    ),
-    ClientManamentMiniTileModel(
-      title: "Active Clinic",
-      subTitle: "1,250",
-      icon: Icons.stacked_line_chart_rounded,
-      iconBgColor: Colors.green,
-    ),
-    ClientManamentMiniTileModel(
-      title: "Total Revenue",
-      subTitle: "\$2458K",
-      icon: Icons.monetization_on_outlined,
-      iconBgColor: Colors.purple,
-    ),
-    ClientManamentMiniTileModel(
-      title: "Avg Rating",
-      subTitle: "4.7",
-      icon: Icons.star_border_outlined,
-      iconBgColor: Colors.amber,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Column(
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(),
+          SizedBox(height: 32.h),
+          _buildStatsSummary(),
+          SizedBox(height: 32.h),
+          _buildFiltersAndSearch(),
+          SizedBox(height: 24.h),
+          _buildClinicsTable(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 40.h),
-            Row(
-              children: [
-                Text("Clinic Management", style: CustomFonts.black30w600),
-                Spacer(),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle create staff
-                    // ref
-                    //     .read(treatmentViewModelProvider.notifier)
-                    //     .getTreatments();
-                    // context.push(AddTreatmentScreen.routeName);
-                    showDialog(
-                      context: context,
-                      builder: (context) => const RegisterClinicDailogbox(),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Row(
-                    children: [
-                      Center(
-                        child: Icon(Icons.add, color: Colors.white, size: 20.r),
-                      ),
-                      SizedBox(width: 10.w),
-                      Text('Add Clinic', style: CustomFonts.white14w500),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.h),
+            Text("Clinic Management", style: CustomFonts.black30w600),
+            SizedBox(height: 8.h),
             Text(
-              "Analyze Clinic data, treatment trends, and engagement metrics across all clinics",
+              "Manage, monitor, and scale your MedSpa network effortlessly.",
               style: CustomFonts.grey18w400,
             ),
-            SizedBox(height: 20.h),
-            Divider(color: CustomColors.greyColor),
-            SizedBox(height: 50.h),
-            _buildStatsTile(),
+          ],
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => const RegisterClinicDialogBox(),
+            );
+          },
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: Text('Add New Clinic', style: CustomFonts.white14w500),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: CustomColors.deepNavy,
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+          ),
+        ),
+      ],
+    );
+  }
 
-            RevenueTrendWidget(),
-            BorderdContainerWidget(
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: CupertinoSearchTextField(
-                      backgroundColor: Color(0xFFF3F3F5),
-                    ),
-                  ),
-                  SizedBox(width: 20.w),
-                  Expanded(
-                    child: CustomDropdown(
-                      hint: "All Regions",
-                      value: "All Regions",
-                      items: [
-                        "All Regions",
-                        "Region 1",
-                        "Region 2",
-                        "Region 3",
-                      ],
-                      onChanged: (_) {},
-                    ),
-                  ),
-                ],
+  Widget _buildStatsSummary() {
+    return Row(
+      children: [
+        _buildMiniStat("Total Clinics", "48", Icons.business, CustomColors.primaryGold),
+        SizedBox(width: 16.w),
+        _buildMiniStat("Active Now", "42", Icons.bolt, CustomColors.successGreen),
+        SizedBox(width: 16.w),
+        _buildMiniStat("Subscription Revenue", "\$245K", Icons.payments_outlined, CustomColors.deepNavy),
+        SizedBox(width: 16.w),
+        _buildMiniStat("Avg Clinic Rating", "4.8", Icons.star_outline, Colors.amber),
+      ],
+    );
+  }
+
+  Widget _buildMiniStat(String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: BorderdContainerWidget(
+        padding: EdgeInsets.all(20.w),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10.r),
               ),
+              child: Icon(icon, color: color, size: 24.sp),
             ),
-            SizedBox(height: 20.h),
-            RegisteredClinicsTable(),
+            SizedBox(width: 16.w),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(value, style: CustomFonts.black20w600),
+                Text(title, style: CustomFonts.grey18w400.copyWith(fontSize: 12.sp)),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatsTile() {
-    return AdaptiveLayoutRowColumn(
-      expandedWidget: true,
-      children: List.generate(
-        4,
-        (index) => PatientManagementMiniTileWidget(data: tiles[index]),
+  Widget _buildFiltersAndSearch() {
+    return BorderdContainerWidget(
+      padding: EdgeInsets.all(16.w),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: CupertinoSearchTextField(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              placeholder: "Search clinics by name, email or location...",
+              backgroundColor: CustomColors.softChampagne.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+          ),
+          SizedBox(width: 16.w),
+          _buildFilterDropdown("Region", ["All Regions", "East Coast", "West Coast"]),
+          SizedBox(width: 12.w),
+          _buildFilterDropdown("Status", ["All Status", "Active", "Inactive"]),
+        ],
       ),
     );
   }
-}
 
-class ClientManamentMiniTileModel {
-  final String title;
-  final String subTitle;
-  final IconData icon;
-  final Color iconBgColor;
+  Widget _buildFilterDropdown(String label, List<String> items) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        border: Border.all(color: CustomColors.greyColor),
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      child: Row(
+        children: [
+          Text("$label: ", style: TextStyle(color: CustomColors.textLight, fontSize: 13.sp)),
+          Text(items[0], style: TextStyle(color: CustomColors.textDark, fontWeight: FontWeight.w600, fontSize: 13.sp)),
+          Icon(Icons.keyboard_arrow_down, size: 18.sp),
+        ],
+      ),
+    );
+  }
 
-  ClientManamentMiniTileModel({
-    required this.title,
-    required this.subTitle,
-    required this.icon,
-    required this.iconBgColor,
-  });
-}
-
-class RegisteredClinicsTable extends StatelessWidget {
-  const RegisteredClinicsTable({super.key});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildClinicsTable() {
     return BorderdContainerWidget(
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title
-          Text("Registered Clinics", style: CustomFonts.black20w600),
-          SizedBox(height: 20.h),
-
-          // Table
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Consumer(
-              builder: (context, ref, _) {
-                final state = ref.watch(clinicViewModelProvider);
-                return DataTable(
-                  headingRowColor: WidgetStateProperty.all(Color(0xFFF3F3F5)),
-
-                  border: TableBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    horizontalInside: BorderSide(
-                      color: Color(0xFFF3F3F5),
-                      width: 1,
-                    ),
-                    right: BorderSide(color: Color(0xFFF3F3F5), width: 1),
-                    left: BorderSide(color: Color(0xFFF3F3F5), width: 1),
-                    verticalInside: BorderSide(
-                      color: Color(0xFFF3F3F5),
-                      width: 1,
-                    ),
+          Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Text("Clinic Directory", style: CustomFonts.black20w600),
+          ),
+          Consumer(
+            builder: (context, ref, _) {
+              final state = ref.watch(clinicViewModelProvider);
+              if (state.loading) return const Center(child: CircularProgressIndicator());
+              
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columnSpacing: 40.w,
+                  headingRowColor: WidgetStateProperty.all(CustomColors.softChampagne.withValues(alpha: 0.5)),
+                  headingTextStyle: CustomFonts.black16w600.copyWith(fontSize: 14.sp),
+                  rows: List.generate(
+                    state.clinics?.length ?? 0,
+                    (index) => _buildDataRow(state.clinics![index]),
                   ),
-                  headingRowHeight: 50.h,
-                  dataRowHeight: 50.h,
-                  headingTextStyle: CustomFonts.black16w600,
                   columns: const [
-                    DataColumn(label: Text('Business Name')),
+                    DataColumn(label: Text('Clinic Name')),
+                    DataColumn(label: Text('Contact')),
                     DataColumn(label: Text('Location')),
-                    DataColumn(label: Text('Active Users')),
-                    DataColumn(label: Text('Appointments')),
-                    DataColumn(label: Text('Revenue')),
-                    DataColumn(label: Text('Rating')),
+                    DataColumn(label: Text('Plan')),
+                    DataColumn(label: Text('Stats')),
                     DataColumn(label: Text('Status')),
                     DataColumn(label: Text('Actions')),
                   ],
-                  rows: state.loading
-                      ? []
-                      : List.generate(
-                          state.clinics!.length,
-                          (index) => DataRow(
-                            cells: [
-                              DataCell(
-                                Text(
-                                  state.clinics![index].name ?? 'N/A',
-                                  style: CustomFonts.black14w400,
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  state.clinics![index].address ?? 'N/A',
-                                  style: CustomFonts.black14w400,
-                                ),
-                              ),
-                              DataCell(
-                                Text('320', style: CustomFonts.black14w400),
-                              ),
-                              DataCell(
-                                Text('1250', style: CustomFonts.black14w400),
-                              ),
-                              DataCell(
-                                Text(
-                                  '\$125,000',
-                                  style: CustomFonts.black14w400,
-                                ),
-                              ),
-                              DataCell(
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                      size: 16.sp,
-                                    ),
-                                    SizedBox(width: 4.w),
-                                    Text('4.8', style: CustomFonts.black14w400),
-                                  ],
-                                ),
-                              ),
-
-                              DataCell(
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8.w,
-                                    vertical: 4.h,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: CustomColors.blackColor,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(20.r),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    state.clinics![index].status ?? 'N/A',
-                                    style: CustomFonts.white16w400,
-                                  ),
-                                ),
-                              ),
-                              DataCell(
-                                Row(
-                                  children: [
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.visibility_outlined,
-                                          color: CustomColors.blackColor,
-                                          size: 16.sp,
-                                        ),
-                                        SizedBox(width: 4.w),
-                                        Text(
-                                          'View',
-                                          style: CustomFonts.black14w500,
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(width: 20.w),
-                                    InkWell(
-                                      onTap: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) =>
-                                              const EditClinicDailogBox(),
-                                        );
-                                      },
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.edit_outlined,
-                                            color: CustomColors.blackColor,
-                                            size: 16.sp,
-                                          ),
-                                          SizedBox(width: 4.w),
-                                          Text(
-                                            'Edit',
-                                            style: CustomFonts.black14w500,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ],
+      ),
+    );
+  }
+
+  DataRow _buildDataRow(dynamic clinic) {
+    return DataRow(
+      cells: [
+        DataCell(
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 16.r,
+                backgroundColor: CustomColors.primaryGold.withValues(alpha: 0.1),
+                child: Text(clinic.name?[0] ?? "C", style: TextStyle(color: CustomColors.primaryGold, fontSize: 12.sp, fontWeight: FontWeight.bold)),
+              ),
+              SizedBox(width: 12.w),
+              Text(clinic.name ?? 'N/A', style: CustomFonts.black14w600),
+            ],
+          ),
+        ),
+        DataCell(
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(clinic.email ?? 'N/A', style: CustomFonts.black14w400),
+              Text(clinic.phone ?? '', style: TextStyle(color: CustomColors.textLight, fontSize: 12.sp)),
+            ],
+          ),
+        ),
+        DataCell(Text(clinic.address ?? 'N/A', style: CustomFonts.black14w400)),
+        DataCell(
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+            decoration: BoxDecoration(color: CustomColors.primaryGold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6.r)),
+            child: Text("Premium", style: TextStyle(color: CustomColors.primaryGold, fontSize: 11.sp, fontWeight: FontWeight.bold)),
+          ),
+        ),
+        DataCell(
+          Row(
+            children: [
+              _miniIconStat(Icons.people, "120"),
+              SizedBox(width: 8.w),
+              _miniIconStat(Icons.calendar_month, "450"),
+            ],
+          ),
+        ),
+        DataCell(_statusBadge(clinic.status ?? 'Active')),
+        DataCell(
+          Row(
+            children: [
+              IconButton(icon: const Icon(Icons.visibility_outlined, size: 20), onPressed: () {}),
+              IconButton(icon: const Icon(Icons.edit_outlined, size: 20), onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const EditClinicDialogBox(),
+                );
+              }),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _miniIconStat(IconData icon, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 14.sp, color: CustomColors.textLight),
+        SizedBox(width: 4.w),
+        Text(value, style: TextStyle(color: CustomColors.textDark, fontSize: 12.sp)),
+      ],
+    );
+  }
+
+  Widget _statusBadge(String status) {
+    final bool isActive = status.toLowerCase() == 'active';
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: isActive ? CustomColors.successGreen.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(
+          color: isActive ? CustomColors.successGreen : Colors.red,
+          fontSize: 11.sp,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

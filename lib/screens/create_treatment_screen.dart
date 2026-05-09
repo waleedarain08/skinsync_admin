@@ -254,15 +254,15 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   ),
                 ),
               ),
-              PositionDetector(
-                onTap: () {
-                  final updatedSideAreas = List<SideAreaModel>.from(_treatment.value.sideAreas!);
-                  updatedSideAreas.removeAt(index);
-                  _treatment.value = _treatment.value.copyWith(sideAreas: updatedSideAreas);
-                },
-                child: Positioned(
-                  top: 8.r,
-                  right: 8.r,
+              Positioned(
+                top: 8.r,
+                right: 8.r,
+                child: GestureDetector(
+                  onTap: () {
+                    final updatedSideAreas = List<SideAreaModel>.from(_treatment.value.sideAreas!);
+                    updatedSideAreas.removeAt(index);
+                    _treatment.value = _treatment.value.copyWith(sideAreas: updatedSideAreas);
+                  },
                   child: CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 14.r,
@@ -428,16 +428,3 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 }
 
-class PositionDetector extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onTap;
-  const PositionDetector({super.key, required this.child, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: child,
-    );
-  }
-}

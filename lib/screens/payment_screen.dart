@@ -1,11 +1,9 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:skinsync_admin/utils/assets.dart';
-
-import '../utils/responsive.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
+import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import '../widgets/dailogbox/payment_dailog_box.dart';
 
 class PaymentScreen extends StatelessWidget {
@@ -15,469 +13,198 @@ class PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF3F3F5),
+      backgroundColor: CustomColors.dashboardBackgroundColor,
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            Text(
-              'Payment Management',
-              style: TextStyle(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'Manage financial transactions and release payments to clinics',
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
-            ),
-            SizedBox(height: 16.h),
-            const Divider(),
-            SizedBox(height: 24.h),
-
-            // Stats Row
-            _buildPendingPaymentStatsTile(),
+            _buildHeader(),
             SizedBox(height: 32.h),
-
-            // Pending Disputes Table
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 8,
-                  ),
-                ],
-                border: Border.all(color: Colors.grey.withOpacity(0.2)),
-              ),
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: .start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Pending Payment Releases',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          height: 0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Spacer(),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 5.h,
-                          horizontal: 10.w,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey.withOpacity(0.3),
-                            width: 1.w,
-                          ),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Iconsax.clock,
-                              size: 16.sp,
-                              color: Colors.black,
-                            ),
-                            SizedBox(width: 10.w),
-                            Text(
-                              '2 Pending',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                height: 0,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildDisputesTable(
-                    isPending: true,
-                    rows: [
-                      const DataRow2(
-                        cells: [
-                          const DataCell(Text('TXN-2025-10-001')),
-                          const DataCell(Text('Sarah Williams')),
-                          const DataCell(Text('Radiant Skin Clinic')),
-                          const DataCell(Text('Botox Treatment')),
-                          const DataCell(Text('\$180')),
-                          const DataCell(Text('10/25/2025')),
-                          const DataCell(Text('Credit Card')),
-                          DataCell(
-                            _StatusBadge(
-                              text: 'Release Payment',
-                              image: SvgAssets.money,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const DataRow2(
-                        cells: [
-                          const DataCell(Text('TXN-2025-10-001')),
-                          const DataCell(Text('Sarah Williams')),
-                          const DataCell(Text('Radiant Skin Clinic')),
-                          const DataCell(Text('Botox Treatment')),
-                          const DataCell(Text('\$180')),
-                          const DataCell(Text('10/25/2025')),
-                          const DataCell(Text('Cash')),
-                          DataCell(
-                            _StatusBadge(
-                              text: 'Release Payment',
-                              image: SvgAssets.money,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
+            _buildFinancialOverview(),
             SizedBox(height: 32.h),
-
-            // Resolved Disputes Table
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 8,
-                  ),
-                ],
-                border: Border.all(color: Colors.grey.withOpacity(0.2)),
-              ),
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: .start,
-                children: [
-                  Text(
-                    'Recently Released Payments',
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildResolvedTable(),
-                ],
-              ),
-            ),
+            _buildPendingReleasesTable(context),
+            SizedBox(height: 32.h),
+            _buildPaymentHistoryTable(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPendingPaymentStatsTile() {
-    return AdaptiveLayoutRowColumn(
-      expandedWidget: true,
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildStatCard(
-          title: 'Pending Payments',
-          count: '\$620',
-          subtitle: "2 transactions",
-          icon: Iconsax.clock,
-          color: const Color(0xFFFF4C4C),
-          bgColor: const Color(0xFFFFF0F0),
-        ),
-        SizedBox(width: 16.w),
-        _buildStatCard(
-          title: 'Pending',
-          count: '10',
-          subtitle: "2 transactions",
-          icon: Iconsax.tick_circle,
-          color: const Color(0xFFFDB528),
-          bgColor: const Color(0xFFFFF8E5),
-        ),
-        SizedBox(width: 16.w),
-        _buildStatCard(
-          title: 'Resolved',
-          count: '5',
-          icon: Iconsax.card,
-          color: const Color(0xFF155DFC),
-          bgColor: const Color(0xFFE8FAF0),
+        Text("Payment Management", style: CustomFonts.black30w600),
+        SizedBox(height: 8.h),
+        Text(
+          "Manage financial flows, transaction disputes, and clinic payouts.",
+          style: CustomFonts.grey18w400,
         ),
       ],
     );
   }
 
-  Widget _buildStatCard({
-    required String title,
-    required String count,
-    String? subtitle,
-    required IconData icon,
-    required Color color,
-    required Color bgColor,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  height: 0,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              SizedBox(height: 5.h),
-              Text(
-                count,
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  height: 0,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-              SizedBox(height: 5.h),
+  Widget _buildFinancialOverview() {
+    return Row(
+      children: [
+        _buildFinancialStat("Total Revenue", "\$1,245,000", Icons.payments_outlined, CustomColors.primaryGold),
+        SizedBox(width: 16.w),
+        _buildFinancialStat("Pending Payouts", "\$12,450", Icons.hourglass_empty, CustomColors.warningOrange),
+        SizedBox(width: 16.w),
+        _buildFinancialStat("Successful Payouts", "\$845,000", Icons.check_circle_outline, CustomColors.successGreen),
+        SizedBox(width: 16.w),
+        _buildFinancialStat("Active Disputes", "4", Icons.gavel_outlined, CustomColors.errorRed),
+      ],
+    );
+  }
 
-              Text(
-                subtitle ?? '',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  height: 0,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: EdgeInsets.all(10.w),
-            decoration: BoxDecoration(
-              color: bgColor, //bgColor,
-              shape: BoxShape.circle,
+  Widget _buildFinancialStat(String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: BorderdContainerWidget(
+        padding: EdgeInsets.all(24.w),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12.r)),
+              child: Icon(icon, color: color, size: 24.sp),
             ),
-            child: Icon(icon, color: color, size: 24.sp),
+            SizedBox(width: 16.w),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(value, style: CustomFonts.black22w600),
+                Text(title, style: CustomFonts.grey18w400.copyWith(fontSize: 12.sp)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPendingReleasesTable(BuildContext context) {
+    return BorderdContainerWidget(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Pending Payout Releases", style: CustomFonts.black20w600),
+                Text("8 Actions Required", style: TextStyle(color: CustomColors.warningOrange, fontWeight: FontWeight.bold, fontSize: 12.sp)),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 300.h,
+            child: DataTable2(
+              columnSpacing: 24,
+              horizontalMargin: 20,
+              minWidth: 1000,
+              headingRowColor: WidgetStateProperty.all(CustomColors.softChampagne.withOpacity(0.5)),
+              columns: const [
+                DataColumn2(label: Text('Transaction ID'), size: ColumnSize.L),
+                DataColumn2(label: Text('Clinic'), size: ColumnSize.L),
+                DataColumn2(label: Text('Patient'), size: ColumnSize.L),
+                DataColumn2(label: Text('Amount'), size: ColumnSize.M),
+                DataColumn2(label: Text('Date'), size: ColumnSize.M),
+                DataColumn2(label: Text('Action'), size: ColumnSize.M),
+              ],
+              rows: List.generate(3, (index) => _pendingPayoutRow(context)),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDisputesTable({
-    required bool isPending,
-    required List<DataRow> rows,
-  }) {
-    // Calculate height based on rows: Heading(56) + Rows * 60 + Padding(32) + BorderCorrection(2)
-    // Using 60 as a comfortable row height
-    double rowHeight = 60.h;
-    double headingHeight = 56.h;
-    double totalHeight = headingHeight + (rows.length * rowHeight) + 35.h;
-
-    return Container(
-      height: totalHeight,
-      // decoration: BoxDecoration(
-      //   color: Colors.white,
-      //   borderRadius: BorderRadius.circular(12.r),
-      //   // Remove container border if DataTable handles it, or keep for outer rounding if TableBorder is rectangular
-      //   border: Border.all(color: Colors.grey.withOpacity(0.2)),
-      // ),
-      // padding: EdgeInsets.all(16.w),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
-        child: DataTable2(
-          columnSpacing: 12,
-          horizontalMargin: 12,
-          minWidth: 900, // Ensure horizontal scrolling on small screens
-          dataRowHeight: rowHeight,
-          headingRowHeight: headingHeight,
-          headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
-          columnResizingParameters: ColumnResizingParameters(
-            desktopMode: true,
-            realTime: true,
-          ),
-          headingTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-            fontSize: 14.sp,
-          ),
-          // Add Grid Borders
-          border: TableBorder(
-            // top: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            // bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            // left: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            // right: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            verticalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            horizontalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
-          ),
-          columns: const [
-            DataColumn2(label: Text('Transaction ID'), size: ColumnSize.L),
-            DataColumn2(label: Text('Patient'), size: ColumnSize.L),
-            DataColumn2(label: Text('Clinic'), size: ColumnSize.L),
-            DataColumn2(label: Text('Service'), size: ColumnSize.L),
-            DataColumn2(label: Text('Amount'), size: ColumnSize.M),
-            DataColumn2(label: Text('Date'), size: ColumnSize.M),
-            DataColumn2(label: Text('Payment Method'), size: ColumnSize.M),
-            DataColumn2(label: Text('Actions'), size: ColumnSize.M),
-          ],
-          rows: rows,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildResolvedTable() {
-    // Defines rows locally for now or passed in.
-    // Since the original code had hardcoded rows inside the widget, we'll keep it correct.
-    // We need to extract the rows to a list to count them properly for height calculation.
-
-    List<DataRow> rows = [
-      DataRow2(
-        cells: [
-          const DataCell(Text('TXN-2025-10-001')),
-          const DataCell(Text('Sarah Williams')),
-          const DataCell(Text('Radiant Skin Clinic')),
-          const DataCell(Text('Botox Treatment')),
-          const DataCell(Text('\$180')),
-          const DataCell(Text('10/25/2025')),
-          const DataCell(Text('Credit Card')),
-          DataCell(_StatusBadge(text: 'Released', image: SvgAssets.circleTick)),
-        ],
-      ),
-    ];
-
-    double rowHeight = 60.h;
-    double headingHeight = 56.h;
-    double totalHeight = headingHeight + (rows.length * rowHeight) + 35.h;
-
-    return Container(
-      height: totalHeight,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-      ),
-      // padding: EdgeInsets.all(16.w),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
-        child: DataTable2(
-          columnSpacing: 12,
-          horizontalMargin: 12,
-          minWidth: 800,
-          dataRowHeight: rowHeight,
-          headingRowHeight: headingHeight,
-          headingRowColor: MaterialStateProperty.all(const Color(0xFFF9FAFB)),
-          headingTextStyle: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-            fontSize: 14.sp,
-          ),
-          border: TableBorder(
-            // top: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            //bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            // left: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            // right: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            verticalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            horizontalInside: BorderSide(color: Colors.grey.withOpacity(0.2)),
-          ),
-          columns: const [
-            DataColumn2(label: Text('Transaction ID'), size: ColumnSize.L),
-            DataColumn2(label: Text('Patient'), size: ColumnSize.L),
-            DataColumn2(label: Text('Clinic'), size: ColumnSize.L),
-            DataColumn2(label: Text('Service'), size: ColumnSize.L),
-            DataColumn2(label: Text('Amount'), size: ColumnSize.M),
-            DataColumn2(label: Text('Date'), size: ColumnSize.M),
-            DataColumn2(label: Text('Payment Method'), size: ColumnSize.M),
-            DataColumn2(label: Text('Actions'), size: ColumnSize.S),
-          ],
-          rows: rows,
-        ),
-      ),
-    );
-  }
-}
-
-class _StatusBadge extends StatelessWidget {
-  final String text;
-  final String image;
-  const _StatusBadge({required this.text, required this.image});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        showDialog<bool>(
-          context: context,
-          builder: (context) => ReleasePaymentDialog(
-            transactionId: "TXN-2025-10-001",
-            patientName: "Emma Johnson",
-            clinicName: "Radiant Skin Clinic",
-            serviceName: "Botox Treatment",
-            amount: "\$450",
-            feedbackMessage:
-                "The treatment was rushed and did not meet the promised duration. I felt the service quality was below expectations.",
-          ),
-        );
-      },
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Color(0xFF00A63E),
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 6.w),
-          child: Row(
-            children: [
-              SvgPicture.asset(image),
-              SizedBox(width: 6.w),
-              Expanded(
-                child: Text(
-                  text,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+  DataRow _pendingPayoutRow(BuildContext context) {
+    return DataRow(
+      cells: [
+        const DataCell(Text('TXN-82910')),
+        const DataCell(Text('Glow MedSpa NY')),
+        const DataCell(Text('Sarah Jenkins')),
+        DataCell(Text('\$450.00', style: CustomFonts.black14w600.copyWith(color: CustomColors.successGreen))),
+        const DataCell(Text('Oct 28, 2023')),
+        DataCell(
+          ElevatedButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const ReleasePaymentDialog(
+                  transactionId: "TXN-82910",
+                  patientName: "Sarah Jenkins",
+                  clinicName: "Glow MedSpa NY",
+                  serviceName: "Dermal Fillers",
+                  amount: "\$450.00",
                 ),
-              ),
-            ],
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: CustomColors.deepNavy,
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              minimumSize: Size(0, 36.h),
+            ),
+            child: const Text("Release", style: TextStyle(fontSize: 12)),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentHistoryTable() {
+    return BorderdContainerWidget(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Text("Payout History", style: CustomFonts.black20w600),
+          ),
+          SizedBox(
+            height: 400.h,
+            child: DataTable2(
+              columnSpacing: 24,
+              horizontalMargin: 20,
+              minWidth: 1000,
+              headingRowColor: WidgetStateProperty.all(CustomColors.softChampagne.withOpacity(0.5)),
+              columns: const [
+                DataColumn2(label: Text('Ref ID'), size: ColumnSize.L),
+                DataColumn2(label: Text('Clinic'), size: ColumnSize.L),
+                DataColumn2(label: Text('Amount'), size: ColumnSize.M),
+                DataColumn2(label: Text('Released On'), size: ColumnSize.M),
+                DataColumn2(label: Text('Status'), size: ColumnSize.M),
+              ],
+              rows: List.generate(5, (index) => _payoutHistoryRow()),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  DataRow _payoutHistoryRow() {
+    return DataRow(
+      cells: [
+        const DataCell(Text('REF-001928')),
+        const DataCell(Text('Radiance Beauty')),
+        const DataCell(Text('\$2,800.00')),
+        const DataCell(Text('Oct 24, 2023')),
+        DataCell(
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            decoration: BoxDecoration(color: CustomColors.successGreen.withOpacity(0.1), borderRadius: BorderRadius.circular(20.r)),
+            child: Text("Released", style: TextStyle(color: CustomColors.successGreen, fontSize: 11.sp, fontWeight: FontWeight.bold)),
+          ),
+        ),
+      ],
     );
   }
 }

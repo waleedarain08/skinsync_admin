@@ -1,131 +1,103 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'color_constant.dart';
-import 'custom_fonts.dart';
 
 class AppTheme {
-  // Light Theme
   static ThemeData get lightTheme {
-    return ThemeData.from(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: CustomColors.lightPurpleColor,
-        brightness: Brightness.light,
-      ),
-    ).copyWith(
+    return ThemeData(
+      useMaterial3: true,
       brightness: Brightness.light,
-
-      scaffoldBackgroundColor: Colors.white,
+      primaryColor: CustomColors.brandPrimary,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: CustomColors.brandPrimary,
+        primary: CustomColors.brandPrimary,
+        secondary: CustomColors.brandCyan,
+        tertiary: CustomColors.brandPurple,
+        surface: CustomColors.surfaceWhite,
+        background: CustomColors.backgroundLight,
+      ),
+      scaffoldBackgroundColor: CustomColors.backgroundLight,
+      fontFamily: 'Degular',
+      
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.white,
+        backgroundColor: CustomColors.surfaceWhite,
+        elevation: 0,
+        centerTitle: false,
+        iconTheme: IconThemeData(color: CustomColors.textMain, size: 24.sp),
         titleTextStyle: TextStyle(
           fontFamily: 'Degular',
-          color: CustomColors.blackColor,
-          fontSize: 16.sp,
+          color: CustomColors.textMain,
+          fontSize: 18.sp,
+          fontWeight: FontWeight.w600,
         ),
-        elevation: 0,
-        // centerTitle: true,
       ),
-      textTheme: const TextTheme().apply(fontFamily: 'Degular'),
-      // Text Selection Theme for cursor color
-      textSelectionTheme: TextSelectionThemeData(
-        cursorColor: CustomColors.lightPurpleColor, // Cursor color
-      ),
-
-      iconTheme: const IconThemeData(color: Colors.black54),
-      checkboxTheme: CheckboxThemeData(
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
-        checkColor: WidgetStatePropertyAll(Colors.white),
-        fillColor: WidgetStateProperty.resolveWith<Color?>((
-          Set<WidgetState> states,
-        ) {
-          if (states.contains(WidgetState.selected)) {
-            return CustomColors.lightPurpleColor;
-          }
-          return null;
-        }),
-      ),
-
+      
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 19.h, horizontal: 24.w),
-          textStyle: CustomFonts.white22w600,
-          backgroundColor: Colors.black,
+          backgroundColor: CustomColors.brandPrimary,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50.r),
+          elevation: 0,
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+          textStyle: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
         ),
       ),
-      inputDecorationTheme: InputDecorationTheme(
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 15.h),
-        errorStyle: TextStyle(fontSize: 11.sp, overflow: TextOverflow.visible),
-        errorMaxLines: 2,
-
-        hintStyle: CustomFonts.grey18w400,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: BorderSide(color: Color(0xffB5B5B5)),
+      
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: CustomColors.brandPrimary,
+          side: BorderSide(color: CustomColors.brandPrimary.withValues(alpha: 0.5)),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: BorderSide(color: Color(0xffB5B5B5)),
+      ),
+      
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(color: CustomColors.textMuted.withValues(alpha: 0.2)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: BorderSide(color: Color(0xffB5B5B5)),
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(color: CustomColors.textMuted.withValues(alpha: 0.2)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: BorderSide(color: CustomColors.brandPrimary, width: 1.5),
+        ),
+        hintStyle: TextStyle(color: CustomColors.textMuted, fontSize: 14.sp),
+      ),
+      
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+          side: BorderSide(color: CustomColors.textMuted.withValues(alpha: 0.1)),
         ),
       ),
     );
   }
 
-  // Dark Theme
   static ThemeData get darkTheme {
     return ThemeData(
+      useMaterial3: true,
       brightness: Brightness.dark,
+      primaryColor: CustomColors.brandCyan,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: CustomColors.brandCyan,
+        brightness: Brightness.dark,
+        primary: CustomColors.brandCyan,
+        surface: CustomColors.deepSlate,
+      ),
       fontFamily: 'Degular',
-      primarySwatch: Colors.blue,
-      primaryColor: Colors.blue[400],
-      scaffoldBackgroundColor: const Color(0xFF121212),
-      appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFF1E1E1E),
-        foregroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: true,
-        titleTextStyle: const TextStyle(
-          fontFamily: 'Degular',
-          color: Colors.white,
-        ),
-      ),
-      textTheme: const TextTheme(
-        headlineLarge: TextStyle(
-          fontFamily: 'Degular',
-          color: Colors.white,
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-        ),
-        bodyLarge: TextStyle(
-          fontFamily: 'Degular',
-          color: Colors.white,
-          fontSize: 16,
-        ),
-        bodyMedium: TextStyle(
-          fontFamily: 'Degular',
-          color: Colors.white70,
-          fontSize: 14,
-        ),
-      ),
-      iconTheme: const IconThemeData(color: Colors.white70),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue[400],
-          foregroundColor: Colors.white,
-          textStyle: const TextStyle(fontFamily: 'Degular'),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      ),
     );
   }
 }
