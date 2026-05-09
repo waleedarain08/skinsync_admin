@@ -14,7 +14,6 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
-import 'package:skinsync_admin/screens/signup_screen.dart';
 import 'package:skinsync_admin/screens/treatment_management_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
@@ -28,11 +27,6 @@ class RouteGenerator {
         name: SplashScreen.routeName,
         path: SplashScreen.routeName,
         builder: (_, _) => const SplashScreen(),
-      ),
-      GoRoute(
-        name: SignUpScreen.routeName,
-        path: SignUpScreen.routeName,
-        builder: (context, state) => const SignUpScreen(),
       ),
       GoRoute(
         name: SignInScreen.routeName,

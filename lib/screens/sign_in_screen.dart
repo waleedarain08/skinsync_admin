@@ -3,7 +3,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/screens/signup_screen.dart';
 import 'package:skinsync_admin/services/url_launcher_services.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:pinput/pinput.dart';
@@ -39,7 +38,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   AuthScreen _currentScreen = AuthScreen.login;
   String? _otp;
-  bool _acceptTerms = false;
+  bool _keepMeSignedIn = false;
 
   void setCurrentScreen(AuthScreen screen) {
     setState(() {
@@ -110,10 +109,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   _buildBranding(),
                   SizedBox(height: 40.h),
                   _buildAuthCard(),
-                  if (_currentScreen == AuthScreen.login) ...[
-                    SizedBox(height: 32.h),
-                    _buildFooterLink(),
-                  ],
                 ],
               ),
             ),
@@ -392,8 +387,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           width: 24.w,
           height: 24.w,
           child: Checkbox(
-            value: _acceptTerms,
-            onChanged: (v) => setState(() => _acceptTerms = v ?? false),
+            value: _keepMeSignedIn,
+            onChanged: (v) => setState(() => _keepMeSignedIn = v ?? false),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.r)),
           ),
         ),
@@ -413,19 +408,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         ),
         child: Text(label),
       ),
-    );
-  }
-
-  Widget _buildFooterLink() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text("Don't have an account? ", style: CustomFonts.textMuted14w400),
-        GestureDetector(
-          onTap: () => context.go(SignUpScreen.routeName),
-          child: Text("Register Clinic", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
-        ),
-      ],
     );
   }
 

@@ -31,6 +31,8 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
   final TextEditingController _clinicAddressController = TextEditingController();
   final TextEditingController _ownerNameController = TextEditingController();
   final TextEditingController _ownerEmailController = TextEditingController();
+  final TextEditingController _latController = TextEditingController();
+  final TextEditingController _longController = TextEditingController();
 
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _selectedLogo;
@@ -47,6 +49,8 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     _clinicAddressController.dispose();
     _ownerNameController.dispose();
     _ownerEmailController.dispose();
+    _latController.dispose();
+    _longController.dispose();
     super.dispose();
   }
 
@@ -155,6 +159,8 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       ownerEmail: _ownerEmailController.text.trim(),
       cc: selectedCountry.dialCode ?? "+1",
       country: selectedCountry.code ?? "US",
+      lat: _latController.text.trim(),
+      long: _longController.text.trim(),
       availability: availability,
     );
 
@@ -234,7 +240,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                             ),
                           ),
                           SizedBox(width: 24.w),
-                          const Spacer(), // Replaced Country/CC fields with spacer
+                          const Spacer(),
                         ],
                       ),
                       SizedBox(height: 24.h),
@@ -243,6 +249,32 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                         controller: _clinicAddressController,
                         hintText: "123 Main Street, New York, NY 10001",
                         validator: Validators.empty,
+                      ),
+                      SizedBox(height: 24.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: BuildTextField(
+                              label: "Latitude",
+                              controller: _latController,
+                              hintText: "e.g. 40.7128",
+                              validator: Validators.empty,
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              prefixIcon: const Icon(Icons.location_on_outlined, color: CustomColors.textMuted),
+                            ),
+                          ),
+                          SizedBox(width: 24.w),
+                          Expanded(
+                            child: BuildTextField(
+                              label: "Longitude",
+                              controller: _longController,
+                              hintText: "e.g. -74.0060",
+                              validator: Validators.empty,
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              prefixIcon: const Icon(Icons.location_on_outlined, color: CustomColors.textMuted),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

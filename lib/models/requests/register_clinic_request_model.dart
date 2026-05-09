@@ -8,6 +8,8 @@ class RegisterClinicReqModel {
   String? clinicLogo;
   String? ownerName;
   String? ownerEmail;
+  String? lat;
+  String? long;
   List<AvailabilityModel>? availability;
 
   RegisterClinicReqModel({
@@ -20,6 +22,8 @@ class RegisterClinicReqModel {
     this.clinicLogo = "https://example.com/logo.png",
     this.ownerName,
     this.ownerEmail,
+    this.lat,
+    this.long,
     this.availability,
   });
 
@@ -34,6 +38,8 @@ class RegisterClinicReqModel {
     data['clinic_logo'] = clinicLogo;
     data['owner_name'] = ownerName;
     data['owner_email'] = ownerEmail;
+    data['lat'] = lat;
+    data['long'] = long;
     if (availability != null) {
       data['availability'] = availability!.map((v) => v.toJson()).toList();
     }
