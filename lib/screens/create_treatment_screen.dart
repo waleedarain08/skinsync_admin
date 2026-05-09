@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/widgets/autocomplete_search_field.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
@@ -32,27 +34,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   XFile? _treatmentImage;
   XFile? _treatmentIcon;
 
-  // Step 2 Data
-  String _selectedCategory = "";
-  String _selectedSubcategory = "";
-  final List<String> _categories = ["Injectables", "Skin Treatments", "Laser & Energy"];
-  final Map<String, List<String>> _subcategories = {
-    "Injectables": ["Neurotoxins", "Dermal Fillers"],
-    "Skin Treatments": ["Facials", "Chemical Peels"],
-    "Laser & Energy": ["Resurfacing", "Tightening"],
-  };
+  // Step 2 Controllers
+  final _categoryController = TextEditingController();
+  final _subcategoryController = TextEditingController();
 
   // Step 3 Data
   final List<AreaEntry> _areas = [AreaEntry()];
-  final List<String> _suggestedAreas = [
-    "Upper Face", "Mid Face", "Lower Face", "Neck", "Abdomen", "Arms", "Thighs", "Flanks"
-  ];
-  final Map<String, List<String>> _suggestedSubAreas = {
-    "Upper Face": ["Forehead", "Glabella (Frown Lines)", "Crow's Feet"],
-    "Mid Face": ["Cheeks", "Under Eye (Tear Trough)", "Nose"],
-    "Lower Face": ["Lips", "Chin", "Jawline", "Marionette Lines"],
-    "Neck": ["Neck Bands"],
-  };
 
   final ImagePicker _picker = ImagePicker();
 
@@ -62,6 +49,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     _displayNameController.dispose();
     _fullDescriptionController.dispose();
     _shortDescriptionController.dispose();
+    _categoryController.dispose();
+    _subcategoryController.dispose();
+    for (var area in _areas) {
+      area.dispose();
+    }
     super.dispose();
   }
 
@@ -108,7 +100,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                         _buildCurrentStepContent(),
                         SizedBox(height: 48.h),
                         _buildActionButtons(),
-                        SizedBox(height: 100.h), // Extra space for autocomplete overlays
                       ],
                     ),
                   ),
@@ -238,14 +229,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         BuildTextField(
           label: "Short Description",
           controller: _shortDescriptionController,
-          hintText: "Brief summary for listing (e.g. Smooth fine lines and wrinkles)...",
+          hintText: "Brief summary for listing...",
           maxLines: 2,
         ),
         SizedBox(height: 24.h),
         BuildTextField(
           label: "Full Description",
           controller: _fullDescriptionController,
-          hintText: "Detailed medical and process information for patient education...",
+          hintText: "Detailed medical and process information...",
           maxLines: 5,
         ),
       ],
@@ -261,17 +252,25 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         Text("Organize treatments to help patients find them easily.", style: CustomFonts.textMuted14w400),
         SizedBox(height: 32.h),
         AutocompleteSearchField(
+          controller: _categoryController,
           label: "Treatment Category",
-          hintText: "Select or type a category (e.g. Injectables)",
-          suggestions: _categories,
-          onSelected: (val) => setState(() => _selectedCategory = val),
+          hintText: "Select or type a category",
+          suggestions: TreatmentData.categories,
+          onSelected: (val) {
+            setState(() {
+              _subcategoryController.clear();
+            });
+          },
         ),
         SizedBox(height: 32.h),
         AutocompleteSearchField(
+          controller: _subcategoryController,
           label: "Treatment Subcategory",
-          hintText: "Select or type a subcategory (e.g. Neurotoxins)",
-          suggestions: _subcategories[_selectedCategory] ?? [],
-          onSelected: (val) => setState(() => _selectedSubcategory = val),
+          hintText: "Select or type a subcategory",
+          suggestions: TreatmentData.getSubcategories(_categoryController.text),
+          onSelected: (val) {
+            setState(() {});
+          },
         ),
       ],
     );
@@ -284,20 +283,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _sectionTitle("Treatment Areas"),
-                SizedBox(height: 4.h),
-                Text("Specify which parts of the body this treatment applies to.", style: CustomFonts.textMuted14w400),
-              ],
-            ),
+            _sectionTitle("Treatment Areas"),
             ElevatedButton.icon(
               onPressed: () => setState(() => _areas.add(AreaEntry())),
               icon: const Icon(Icons.add_location_alt_outlined, size: 18),
               label: const Text("Add New Area"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
+                backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
                 foregroundColor: CustomColors.brandPrimary,
               ),
             ),
@@ -325,9 +317,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: Colors.grey[200]!),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,17 +326,26 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             children: [
               Expanded(
                 child: AutocompleteSearchField(
+                  controller: entry.areaController,
                   label: "Area Name",
                   hintText: "e.g. Upper Face",
-                  suggestions: _suggestedAreas,
-                  onSelected: (val) => setState(() => entry.area = val),
+                  suggestions: TreatmentData.suggestedAreas,
+                  onSelected: (val) {
+                    setState(() {
+                      entry.subAreaController.clear();
+                      entry.subAreas.clear();
+                    });
+                  },
                 ),
               ),
               if (_areas.length > 1)
                 Padding(
                   padding: EdgeInsets.only(top: 32.h, left: 16.w),
                   child: IconButton(
-                    onPressed: () => setState(() => _areas.removeAt(index)),
+                    onPressed: () => setState(() {
+                      _areas[index].dispose();
+                      _areas.removeAt(index);
+                    }),
                     icon: const Icon(Icons.delete_outline, color: CustomColors.error),
                   ),
                 ),
@@ -365,12 +363,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AutocompleteSearchField(
+          controller: entry.subAreaController,
           label: "Sub Areas (Optional)",
-          hintText: "Select or type to add sub areas (e.g. Forehead)",
-          suggestions: _suggestedSubAreas[entry.area] ?? [],
+          hintText: "Select or type to add sub areas",
+          suggestions: TreatmentData.getSubAreas(entry.areaController.text),
           onSelected: (val) {
             if (val.isNotEmpty && !entry.subAreas.contains(val)) {
-              setState(() => entry.subAreas.add(val));
+              setState(() {
+                entry.subAreas.add(val);
+                entry.subAreaController.clear();
+              });
             }
           },
         ),
@@ -381,13 +383,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             runSpacing: 12.h,
             children: entry.subAreas.map((sub) {
               return Chip(
-                label: Text(sub, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500)),
+                label: Text(sub),
                 onDeleted: () => setState(() => entry.subAreas.remove(sub)),
-                deleteIcon: const Icon(Icons.close, size: 16),
-                backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
-                side: BorderSide(color: CustomColors.brandCyan.withValues(alpha: 0.2)),
-                labelStyle: const TextStyle(color: CustomColors.brandPrimary),
-                deleteIconColor: CustomColors.brandPrimary,
+                backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
+                side: BorderSide(color: CustomColors.brandCyan.withOpacity(0.2)),
               );
             }).toList(),
           ),
@@ -431,19 +430,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                       Text("Tap to upload", style: CustomFonts.textMuted13w500),
                     ],
                   )
-                : Stack(
-                    children: [
-                      Positioned(
-                        right: 8.r,
-                        top: 8.r,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.black.withValues(alpha: 0.5),
-                          radius: 14.r,
-                          child: const Icon(Icons.edit, color: Colors.white, size: 14),
-                        ),
-                      ),
-                    ],
-                  ),
+                : null,
           ),
         ),
       ],
@@ -484,18 +471,17 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 
   void _submit() {
-    // Collect data and send to ViewModel
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Treatment created successfully!"),
-        backgroundColor: CustomColors.success,
-      ),
-    );
     context.pop();
   }
 }
 
 class AreaEntry {
-  String area = "";
+  final areaController = TextEditingController();
+  final subAreaController = TextEditingController();
   List<String> subAreas = [];
+
+  void dispose() {
+    areaController.dispose();
+    subAreaController.dispose();
+  }
 }

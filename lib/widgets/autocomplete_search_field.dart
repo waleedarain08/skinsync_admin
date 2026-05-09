@@ -8,7 +8,7 @@ class AutocompleteSearchField extends StatefulWidget {
   final String hintText;
   final List<String> suggestions;
   final Function(String) onSelected;
-  final TextEditingController? controller;
+  final TextEditingController controller;
   final String? Function(String?)? validator;
 
   const AutocompleteSearchField({
@@ -17,7 +17,7 @@ class AutocompleteSearchField extends StatefulWidget {
     required this.hintText,
     required this.suggestions,
     required this.onSelected,
-    this.controller,
+    required this.controller,
     this.validator,
   });
 
@@ -26,36 +26,37 @@ class AutocompleteSearchField extends StatefulWidget {
 }
 
 class _AutocompleteSearchFieldState extends State<AutocompleteSearchField> {
-  late TextEditingController _controller;
   final FocusNode _focusNode = FocusNode();
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
-  List<String> _filteredSuggestions = [];
 
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller ?? TextEditingController();
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        _showOverlay();
-      } else {
-        _hideOverlay();
-      }
-    });
+    _focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
+    _hideOverlay();
     _focusNode.dispose();
-    if (widget.controller == null) _controller.dispose();
     super.dispose();
   }
 
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      _showOverlay();
+    } else {
+      _hideOverlay();
+    }
+  }
+
   void _showOverlay() {
-    _updateFilteredSuggestions(_controller.text);
+    if (!mounted) return;
     _overlayEntry = _createOverlayEntry();
-    Overlay.of(context).insert(_overlayEntry!);
+    if (_overlayEntry != null) {
+      Overlay.of(context).insert(_overlayEntry!);
+    }
   }
 
   void _hideOverlay() {
@@ -63,22 +64,12 @@ class _AutocompleteSearchFieldState extends State<AutocompleteSearchField> {
     _overlayEntry = null;
   }
 
-  void _updateFilteredSuggestions(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredSuggestions = widget.suggestions;
-      } else {
-        _filteredSuggestions = widget.suggestions
-            .where((s) => s.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
-    _overlayEntry?.markNeedsBuild();
-  }
-
-  OverlayEntry _createOverlayEntry() {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
-    var size = renderBox.size;
+  OverlayEntry? _createOverlayEntry() {
+    if (!mounted) return null;
+    final RenderObject? renderObject = context.findRenderObject();
+    if (renderObject == null || !(renderObject as RenderBox).hasSize) return null;
+    
+    final size = renderObject.size;
 
     return OverlayEntry(
       builder: (context) => Positioned(
@@ -92,47 +83,50 @@ class _AutocompleteSearchFieldState extends State<AutocompleteSearchField> {
             borderRadius: BorderRadius.circular(12.r),
             color: Colors.white,
             child: Container(
-              constraints: BoxConstraints(maxHeight: 200.h),
+              constraints: BoxConstraints(maxHeight: 250.h),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(color: Colors.grey[200]!),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
-              child: _filteredSuggestions.isEmpty
-                  ? Padding(
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: widget.controller,
+                builder: (context, value, child) {
+                  final query = value.text.toLowerCase();
+                  final filteredList = query.isEmpty 
+                      ? widget.suggestions 
+                      : widget.suggestions.where((s) => s.toLowerCase().contains(query)).toList();
+
+                  if (filteredList.isEmpty) {
+                    return Padding(
                       padding: EdgeInsets.all(16.w),
-                      child: Text(
-                        'No matches found. Typing will create a new entry.',
-                        style: CustomFonts.textMuted12w400,
-                      ),
-                    )
-                  : ListView.separated(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      itemCount: _filteredSuggestions.length,
-                      separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey[100]),
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          dense: true,
-                          hoverColor: CustomColors.brandCyan.withValues(alpha: 0.05),
-                          title: Text(
-                            _filteredSuggestions[index],
-                            style: CustomFonts.textMain14w400,
-                          ),
-                          onTap: () {
-                            _controller.text = _filteredSuggestions[index];
-                            widget.onSelected(_filteredSuggestions[index]);
-                            _focusNode.unfocus();
-                          },
-                        );
-                      },
-                    ),
+                      child: Text('No results found.', style: CustomFonts.textMuted12w400),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    itemCount: filteredList.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final item = filteredList[index];
+                      return ListTile(
+                        dense: true,
+                        title: Text(item, style: CustomFonts.textMain14w400),
+                        onTap: () {
+                          // Update text and move cursor to end
+                          widget.controller.text = item;
+                          widget.controller.selection = TextSelection.fromPosition(
+                            TextPosition(offset: item.length),
+                          );
+                          _focusNode.unfocus();
+                          widget.onSelected(item);
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -150,34 +144,28 @@ class _AutocompleteSearchFieldState extends State<AutocompleteSearchField> {
         CompositedTransformTarget(
           link: _layerLink,
           child: TextFormField(
-            controller: _controller,
+            controller: widget.controller,
             focusNode: _focusNode,
             style: CustomFonts.textMain14w400,
             validator: widget.validator,
-            onChanged: (value) {
-              _updateFilteredSuggestions(value);
-              widget.onSelected(value);
-            },
+            onChanged: (val) => widget.onSelected(val),
             decoration: InputDecoration(
               hintText: widget.hintText,
               hintStyle: CustomFonts.textMuted14w400,
               filled: true,
               fillColor: Colors.white,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16.w,
-                vertical: 14.h,
-              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
+                borderSide: BorderSide(color: Colors.grey[300]!),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
+                borderSide: BorderSide(color: Colors.grey[300]!),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.r),
-                borderSide: const BorderSide(color: CustomColors.brandPrimary, width: 1),
+                borderSide: const BorderSide(color: CustomColors.brandPrimary),
               ),
               suffixIcon: const Icon(Icons.search, color: CustomColors.textMuted, size: 20),
             ),
