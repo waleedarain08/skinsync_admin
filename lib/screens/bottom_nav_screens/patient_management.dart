@@ -1,10 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
-import 'package:skinsync_admin/utils/responsive.dart';
-import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
-import 'package:skinsync_admin/widgets/patient_mangement_graph.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
 class PatientManagement extends StatefulWidget {
   static const String routeName = '/patient-management';
@@ -15,307 +14,209 @@ class PatientManagement extends StatefulWidget {
 }
 
 class _PatientManagementState extends State<PatientManagement> {
-  String? selectedClinic;
-  String? selectedDateRange;
-  String? selectedTreatment;
-
-  final List<String> clinicItems = [
-    "All Clinics",
-    "SkinSync Clinic ",
-    "SkinSync Clinic ",
-    "SkinSync Clinic ",
-  ];
-
-  final List<String> dateRangeItems = [
-    "Today",
-    "Last 7 Days",
-    "Last 30 Days",
-    "This Month",
-    "Custom Range",
-  ];
-
-  final List<String> treatmentItems = [
-    "All Treatments",
-    "Laser Therapy",
-    "Facial Treatment",
-    "Skin Consultation",
-    "Acne Treatment",
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 40.h),
-              Text("Patient Management", style: CustomFonts.black30w600),
-              SizedBox(height: 10.h),
-              Text(
-                "Analyze patient data, treatment trends, and engagement metrics across all clinics",
-                style: CustomFonts.grey18w400,
-              ),
-              SizedBox(height: 20.h),
-              Divider(color: CustomColors.greyColor),
-              SizedBox(height: 50.h),
-              Container(
-                padding: EdgeInsets.all(20.w),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: CustomColors.greyColor),
-                ),
-                child: _buildFiltersDropDown(),
-              ),
-              SizedBox(height: 20.h),
-              _buildPatientsTile(),
-
-              SizedBox(height: 20.h),
-              Container(
-                padding: EdgeInsets.all(20.w),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: CustomColors.greyColor),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Top Treatments by Volume",
-                      style: CustomFonts.black20w600,
-                    ),
-                    SizedBox(height: 17.h),
-                    TopTreatmentsChart(),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20.h),
-              Row(
-                children: [
-                  Expanded(child: buildProgressContainer()),
-                  SizedBox(width: 20.w),
-                  Expanded(child: buildPatientDemographics()),
-                ],
-              ),
-
-              SizedBox(height: 40.h),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildProgressContainer() {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: CustomColors.greyColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Common Skin Concerns", style: CustomFonts.black20w600),
-          SizedBox(height: 21.h),
-          buildProgressBar(title: "Fine lines", progress: "85", value: 0.85),
-          SizedBox(height: 16.h),
-          buildProgressBar(title: "Acne scars", progress: "75", value: 0.75),
-          SizedBox(height: 16.h),
-          buildProgressBar(title: "Pigmentation", progress: "65", value: 0.65),
-          SizedBox(height: 16.h),
-          buildProgressBar(title: "Dry skin", progress: "55", value: 0.55),
-          SizedBox(height: 16.h),
-          buildProgressBar(title: "Large pores", progress: "45", value: 0.45),
-          SizedBox(height: 20.h),
-        ],
-      ),
-    );
-  }
-
-  Widget buildPatientDemographics() {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: CustomColors.greyColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Patient Demographics", style: CustomFonts.black20w600),
-          SizedBox(height: 21.h),
-          Text("Age Distribution", style: CustomFonts.black16w400),
-
-          SizedBox(height: 7.h),
-          buildTextRowOfProgess(title: '18-30 years', progress: '28'),
-          SizedBox(height: 7.h),
-          buildTextRowOfProgess(title: '31-45 years', progress: '42'),
-          SizedBox(height: 7.h),
-          buildTextRowOfProgess(title: '46-60 years', progress: '22'),
-          SizedBox(height: 7.h),
-          buildTextRowOfProgess(title: '60+ years', progress: '8'),
-          SizedBox(height: 16.h),
-          Divider(color: CustomColors.greyColor),
-          SizedBox(height: 16.h),
-          Text("Gender Distribution", style: CustomFonts.black16w400),
-
-          SizedBox(height: 7.h),
-          buildTextRowOfProgess(title: 'Female', progress: '72'),
-
-          SizedBox(height: 7.h),
-          buildTextRowOfProgess(title: 'Male', progress: '26'),
-
-          SizedBox(height: 7.h),
-          buildTextRowOfProgess(title: 'Others', progress: '2'),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTextRowOfProgess({
-    required String title,
-    required String progress,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: CustomFonts.black16w400),
-        Text("$progress%", style: CustomFonts.black16w400),
-      ],
-    );
-  }
-
-  Widget buildProgressBar({
-    required String title,
-    required String progress,
-    required double value,
-  }) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: CustomFonts.black16w400),
-            Text("$progress%", style: CustomFonts.black16w400),
+            _buildHeader(),
+            SizedBox(height: 32.h),
+            _buildQuickMetrics(),
+            SizedBox(height: 32.h),
+            _buildFilters(),
+            SizedBox(height: 24.h),
+            _buildPatientsTable(),
           ],
         ),
-        SizedBox(height: 20.h),
-        LinearProgressIndicator(
-          value: value,
-          color: CustomColors.drakPurpleColor,
-          minHeight: 8.h,
-          borderRadius: BorderRadius.circular(20.r),
-          backgroundColor: CustomColors.greyColor,
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildFiltersDropDown() {
-    return AdaptiveLayoutRowColumn(
-      expandedWidget: true,
-      children: [
-        // Clinic Dropdown
-        buildDropdown(
-          label: "Filter by Clinic",
-          value: selectedClinic,
-          items: clinicItems,
-          onChanged: (v) => setState(() => selectedClinic = v),
-        ),
-        SizedBox(width: 15.w),
-
-        // Date Range Dropdown
-        buildDropdown(
-          label: "Date Range",
-          value: selectedDateRange,
-          items: dateRangeItems,
-          onChanged: (v) => setState(() => selectedDateRange = v),
-        ),
-        SizedBox(width: 15.w),
-
-        // Treatment Dropdown
-        buildDropdown(
-          label: "Treatment Type",
-          value: selectedTreatment,
-          items: treatmentItems,
-          onChanged: (v) => setState(() => selectedTreatment = v),
-        ),
-      ],
-    );
-  }
-
-  /// Reusable dropdown builder
-  Widget buildDropdown({
-    required String label,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
+  Widget _buildHeader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.black20w600),
-        SizedBox(height: 15.h),
-        CustomDropdown(
-          hint: label,
-          value: value,
-          items: items,
-          onChanged: onChanged,
+        Text("Patient Directory", style: CustomFonts.textMain32w700),
+        SizedBox(height: 4.h),
+        Text(
+          "Unified view of all patients across your clinic network.",
+          style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
         ),
       ],
     );
   }
-}
 
-Widget _buildPatientsTile() {
-  return AdaptiveLayoutRowColumn(
-    expandedWidget: true,
-    children: List.generate(
-      4,
-      (index) => Container(
+  Widget _buildQuickMetrics() {
+    return Row(
+      children: [
+        _buildMetricCard("Total Patients", "12,840", Icons.people_rounded, CustomColors.brandPrimary),
+        SizedBox(width: 16.w),
+        _buildMetricCard("Verified", "8,200", Icons.verified_user_rounded, CustomColors.success),
+        SizedBox(width: 16.w),
+        _buildMetricCard("Mobile Users", "9,450", Icons.smartphone_rounded, CustomColors.info),
+        SizedBox(width: 16.w),
+        _buildMetricCard("Walk-ins", "3,390", Icons.directions_walk_rounded, CustomColors.brandPurple),
+      ],
+    );
+  }
+
+  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: Container(
         padding: EdgeInsets.all(20.w),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(color: CustomColors.greyColor),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: CustomColors.textMuted.withOpacity(0.05)),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Total Patients", style: CustomFonts.black16w600),
-                  SizedBox(height: 5.h),
-                  Text("1,247", style: CustomFonts.black16w600),
-                  SizedBox(height: 10.h),
-                  Text(
-                    "+12.5% from last period",
-                    overflow: TextOverflow.ellipsis,
-                    style: CustomFonts.green16w400,
-                  ),
-                ],
-              ),
-            ),
             Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.r),
-                color: CustomColors.drakPurpleColor.withValues(alpha: 0.1),
-              ),
-              child: Icon(
-                Icons.people_alt_outlined,
-                size: 24.sp,
-                color: CustomColors.drakPurpleColor,
-              ),
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+              child: Icon(icon, color: color, size: 20.sp),
             ),
+            SizedBox(height: 16.h),
+            Text(value, style: TextStyle(color: CustomColors.textMain, fontSize: 24.sp, fontWeight: FontWeight.bold)),
+            Text(title, style: TextStyle(color: CustomColors.textMuted, fontSize: 12.sp, fontWeight: FontWeight.w500)),
           ],
         ),
       ),
-    ),
-  );
+    );
+  }
+
+  Widget _buildFilters() {
+    return BorderdContainerWidget(
+      padding: EdgeInsets.all(12.w),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: CupertinoSearchTextField(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              placeholder: "Search patients...",
+              backgroundColor: CustomColors.surfaceGhost,
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+          ),
+          SizedBox(width: 16.w),
+          _filterBadge("Clinic: All"),
+          SizedBox(width: 8.w),
+          _filterBadge("Source: All"),
+          const Spacer(),
+          TextButton.icon(onPressed: () {}, icon: const Icon(Icons.tune_rounded, size: 18), label: const Text("Advanced Filters")),
+        ],
+      ),
+    );
+  }
+
+  Widget _filterBadge(String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: CustomColors.textMuted.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        children: [
+          Text(text, style: TextStyle(color: CustomColors.textMain, fontSize: 12.sp, fontWeight: FontWeight.w600)),
+          SizedBox(width: 8.w),
+          const Icon(Icons.keyboard_arrow_down_rounded, size: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPatientsTable() {
+    return BorderdContainerWidget(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Patient Records", style: CustomFonts.textMain20w600),
+                OutlinedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.file_download_outlined, size: 18),
+                  label: const Text("Export CSV"),
+                  style: OutlinedButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h), minimumSize: const Size(0, 40)),
+                ),
+              ],
+            ),
+          ),
+          DataTable(
+            columnSpacing: 40.w,
+            headingRowColor: WidgetStateProperty.all(CustomColors.surfaceGhost),
+            headingTextStyle: TextStyle(color: CustomColors.textMuted, fontSize: 12.sp, fontWeight: FontWeight.bold),
+            columns: const [
+              DataColumn(label: Text('Patient')),
+              DataColumn(label: Text('Registration')),
+              DataColumn(label: Text('Clinic')),
+              DataColumn(label: Text('Source')),
+              DataColumn(label: Text('Status')),
+              DataColumn(label: Text('Actions')),
+            ],
+            rows: List.generate(5, (index) => _buildPatientRow(index)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  DataRow _buildPatientRow(int index) {
+    return DataRow(
+      cells: [
+        DataCell(
+          Row(
+            children: [
+              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.brandCyan.withOpacity(0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.brandPrimary)),
+              SizedBox(width: 12.w),
+              Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text("Bessie Cooper", style: TextStyle(color: CustomColors.textMain, fontSize: 13.sp, fontWeight: FontWeight.w600)),
+                Text("bessie.c@example.com", style: TextStyle(color: CustomColors.textMuted, fontSize: 11.sp)),
+              ]),
+            ],
+          ),
+        ),
+        const DataCell(Text("Oct 28, 2023")),
+        const DataCell(Text("Glow MedSpa NY")),
+        DataCell(
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            decoration: BoxDecoration(color: CustomColors.brandPrimary.withOpacity(0.1), borderRadius: BorderRadius.circular(6.r)),
+            child: const Text("Mobile App", style: TextStyle(color: CustomColors.brandPrimary, fontSize: 10, fontWeight: FontWeight.bold)),
+          ),
+        ),
+        DataCell(_statusBadge("Active")),
+        DataCell(
+          Row(
+            children: [
+              IconButton(icon: const Icon(Icons.visibility_outlined, size: 18), onPressed: () {}),
+              IconButton(icon: const Icon(Icons.more_horiz_rounded, size: 18), onPressed: () {}),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _statusBadge(String status) {
+    return Row(
+      children: [
+        Container(width: 6, height: 6, decoration: const BoxDecoration(color: CustomColors.success, shape: BoxShape.circle)),
+        SizedBox(width: 8.w),
+        Text(status, style: TextStyle(color: CustomColors.textMain, fontSize: 12.sp, fontWeight: FontWeight.w500)),
+      ],
+    );
+  }
 }

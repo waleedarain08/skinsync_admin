@@ -1,131 +1,157 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'color_constant.dart';
 import 'custom_fonts.dart';
 
 class AppTheme {
-  // Light Theme
   static ThemeData get lightTheme {
-    return ThemeData.from(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: CustomColors.lightPurpleColor,
-        brightness: Brightness.light,
-      ),
-    ).copyWith(
+    return ThemeData(
+      useMaterial3: true,
       brightness: Brightness.light,
+      primaryColor: CustomColors.deepSlate,
+      
+      colorScheme: const ColorScheme.light(
+        primary: CustomColors.deepSlate,
+        onPrimary: CustomColors.surfaceWhite,
+        secondary: CustomColors.brandPurple,
+        onSecondary: CustomColors.deepSlate,
+        tertiary: CustomColors.brandCyan,
+        onTertiary: CustomColors.deepSlate,
+        surface: CustomColors.surfaceWhite,
+        onSurface: CustomColors.deepSlate,
+        background: CustomColors.backgroundLight,
+        onBackground: CustomColors.deepSlate,
+        error: CustomColors.error,
+        onError: CustomColors.surfaceWhite,
+        outline: CustomColors.borderLight,
+      ),
 
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: CustomColors.backgroundLight,
+      fontFamily: 'Degular',
+      
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.white,
-        titleTextStyle: TextStyle(
-          fontFamily: 'Degular',
-          color: CustomColors.blackColor,
-          fontSize: 16.sp,
-        ),
+        backgroundColor: CustomColors.surfaceWhite,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
-        // centerTitle: true,
+        centerTitle: false,
+        iconTheme: IconThemeData(color: CustomColors.deepSlate, size: 24.sp),
+        titleTextStyle: CustomFonts.headlineSmall,
+        shape: Border(
+          bottom: BorderSide(color: CustomColors.borderLight, width: 1),
+        ),
       ),
-      textTheme: const TextTheme().apply(fontFamily: 'Degular'),
-      // Text Selection Theme for cursor color
-      textSelectionTheme: TextSelectionThemeData(
-        cursorColor: CustomColors.lightPurpleColor, // Cursor color
-      ),
-
-      iconTheme: const IconThemeData(color: Colors.black54),
-      checkboxTheme: CheckboxThemeData(
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
-        checkColor: WidgetStatePropertyAll(Colors.white),
-        fillColor: WidgetStateProperty.resolveWith<Color?>((
-          Set<WidgetState> states,
-        ) {
-          if (states.contains(WidgetState.selected)) {
-            return CustomColors.lightPurpleColor;
-          }
-          return null;
-        }),
+      
+      textTheme: TextTheme(
+        headlineLarge: CustomFonts.headlineLarge,
+        headlineMedium: CustomFonts.headlineMedium,
+        headlineSmall: CustomFonts.headlineSmall,
+        titleLarge: CustomFonts.bodyLarge,
+        titleMedium: CustomFonts.bodyMedium,
+        bodyLarge: CustomFonts.bodyLarge,
+        bodyMedium: CustomFonts.bodyMedium,
+        bodySmall: CustomFonts.bodySmall,
+        labelLarge: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 19.h, horizontal: 24.w),
-          textStyle: CustomFonts.white22w600,
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50.r),
-          ),
+          backgroundColor: CustomColors.deepSlate,
+          foregroundColor: CustomColors.surfaceWhite,
+          elevation: 0,
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+          textStyle: CustomFonts.bodyLarge.copyWith(color: CustomColors.surfaceWhite),
         ),
       ),
-      inputDecorationTheme: InputDecorationTheme(
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 15.h),
-        errorStyle: TextStyle(fontSize: 11.sp, overflow: TextOverflow.visible),
-        errorMaxLines: 2,
-
-        hintStyle: CustomFonts.grey18w400,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: BorderSide(color: Color(0xffB5B5B5)),
+      
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: CustomColors.deepSlate,
+          side: const BorderSide(color: CustomColors.deepSlate),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+          textStyle: CustomFonts.bodyLarge,
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: BorderSide(color: Color(0xffB5B5B5)),
+      ),
+
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: CustomColors.deepSlate,
+          textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
+      ),
+      
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: CustomColors.surfaceWhite,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: CustomColors.borderLight),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: BorderSide(color: Color(0xffB5B5B5)),
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: CustomColors.borderLight),
         ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: CustomColors.brandCyan, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: CustomColors.error),
+        ),
+        hintStyle: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
+        labelStyle: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
+      ),
+      
+      cardTheme: CardThemeData(
+        color: CustomColors.surfaceWhite,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+          side: const BorderSide(color: CustomColors.borderLight),
+        ),
+      ),
+
+      dialogTheme: DialogThemeData(
+        backgroundColor: CustomColors.surfaceWhite,
+        surfaceTintColor: Colors.transparent,
+        elevation: 12,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        titleTextStyle: CustomFonts.headlineMedium,
+        contentTextStyle: CustomFonts.bodyMedium,
+      ),
+
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: CustomColors.surfaceWhite,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        ),
+      ),
+
+      dividerTheme: const DividerThemeData(
+        color: CustomColors.borderLight,
+        thickness: 1,
+        space: 1,
+      ),
+
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: CustomColors.deepSlate,
+        selectedIconTheme: const IconThemeData(color: CustomColors.brandCyan),
+        unselectedIconTheme: const IconThemeData(color: Colors.white60),
+        selectedLabelTextStyle: CustomFonts.bodySmall.copyWith(color: CustomColors.brandCyan),
+        unselectedLabelTextStyle: CustomFonts.bodySmall.copyWith(color: Colors.white60),
+      ),
+
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: CustomColors.deepSlate,
+        elevation: 0,
       ),
     );
   }
 
-  // Dark Theme
-  static ThemeData get darkTheme {
-    return ThemeData(
-      brightness: Brightness.dark,
-      fontFamily: 'Degular',
-      primarySwatch: Colors.blue,
-      primaryColor: Colors.blue[400],
-      scaffoldBackgroundColor: const Color(0xFF121212),
-      appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFF1E1E1E),
-        foregroundColor: Colors.white,
-        elevation: 1,
-        centerTitle: true,
-        titleTextStyle: const TextStyle(
-          fontFamily: 'Degular',
-          color: Colors.white,
-        ),
-      ),
-      textTheme: const TextTheme(
-        headlineLarge: TextStyle(
-          fontFamily: 'Degular',
-          color: Colors.white,
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-        ),
-        bodyLarge: TextStyle(
-          fontFamily: 'Degular',
-          color: Colors.white,
-          fontSize: 16,
-        ),
-        bodyMedium: TextStyle(
-          fontFamily: 'Degular',
-          color: Colors.white70,
-          fontSize: 14,
-        ),
-      ),
-      iconTheme: const IconThemeData(color: Colors.white70),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue[400],
-          foregroundColor: Colors.white,
-          textStyle: const TextStyle(fontFamily: 'Degular'),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      ),
-    );
-  }
+  static ThemeData get darkTheme => lightTheme; // For this project, we prioritize the redesigned light theme as the main admin style
 }

@@ -1,204 +1,101 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'standard_dialog.dart';
 
-class UserManagementDailogBox extends StatelessWidget {
-  final String transactionId;
-  final String patientName;
-  final String clinicName;
-  final String serviceName;
-  final String amount;
-  final String? feedbackMessage;
-
-  const UserManagementDailogBox({
-    super.key,
-    required this.transactionId,
-    required this.patientName,
-    required this.clinicName,
-    required this.serviceName,
-    required this.amount,
-    this.feedbackMessage,
-  });
+class UserManagementDialogBox extends StatelessWidget {
+  const UserManagementDialogBox({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-      backgroundColor: Colors.white,
-      child: Container(
-        width: 500.w,
-        padding: EdgeInsets.all(20.w),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with close button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Release Payment to Clinic",
-                    style: CustomFonts.black22w600,
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.close, size: 20.sp),
-                    padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12.h),
-          
-              // Subtitle
-              Text(
-                "Confirm that you want to release this payment to the clinic's wallet.",
-                style: CustomFonts.black16w400,
-              ),
-              SizedBox(height: 20.h),
-              Text("Personal Information", style: CustomFonts.black18w600),
-              SizedBox(height: 10.w),
-              // Transaction Details
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDetailRow(
-                    "First Name",
-                    "Last Name",
-                    CustomFonts.black16w400,
-                  ),
-                  SizedBox(height: 10.h),
-                  _buildDetailRow("Emma", "Johnson", CustomFonts.black16w500),
-                  SizedBox(height: 20.h),
-                  _buildDetailRow("Email", 'Mobile', CustomFonts.black16w400),
-                  SizedBox(height: 10.h),
-                  _buildDetailRow(
-                    "Email",
-                    "+1 (555) 123-4567",
-                    CustomFonts.black16w500,
-                  ),
-                  SizedBox(height: 20.h),
-                  _buildDetailRow("State", 'Skin Tone', CustomFonts.black16w400),
-                  SizedBox(height: 10.h),
-                  _buildDetailRow("State", "Fair", CustomFonts.black16w500),
-                  SizedBox(height: 20.h),
-                  Text("Skin Goals", style: CustomFonts.black18w600),
-                  SizedBox(height: 10.h),
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 10.h,
-                          horizontal: 20.w,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.r),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: Text("Anti-aging", style: CustomFonts.black14w400),
-                      ),
-                      SizedBox(width: 10.w),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 10.h,
-                          horizontal: 20.w,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.r),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: Text("Hydration", style: CustomFonts.black14w400),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
-                  Text("Primary Concerns", style: CustomFonts.black18w600),
-                  SizedBox(height: 10.h),
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 10.h,
-                          horizontal: 20.w,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.r),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: Text("Fine lines", style: CustomFonts.black14w400),
-                      ),
-                      SizedBox(width: 10.w),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 10.h,
-                          horizontal: 20.w,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.r),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: Text("Dryness", style: CustomFonts.black14w400),
-                      ),
-                      SizedBox(width: 10.w),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 10.h,
-                          horizontal: 20.w,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15.r),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: Text("Dark spots", style: CustomFonts.black14w400),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
-                  Text("Bio", style: CustomFonts.black22w600),
-                  SizedBox(height: 10.h),
-                  Text(
-                    "Looking to improve skin texture and reduce signs of aging.",
-                    style: CustomFonts.black16w400,
-                  ),
-                  SizedBox(height: 20.h),
-                  Text("Loyalty Points", style: CustomFonts.black22w600),
-                  SizedBox(height: 10.h),
-                  Text("1250 points", style: CustomFonts.black16w400),
-                  SizedBox(height: 20.h),
-                  Text("Medical History", style: CustomFonts.black22w600),
-                  SizedBox(height: 10.h),
-                  Text(
-                    "No known allergies. Previous treatments include chemical peels.",
-                    style: CustomFonts.black16w400,
-                  ),
-                  SizedBox(height: 20.h),
-          
-                  // Amount to Release
-                ],
-              ),
-          
-              // Feedback Message (if provided)
-            ],
-          ),
+    return StandardDialog(
+      title: "User Profile Details",
+      width: 700.w,
+      content: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle("Personal Information"),
+            SizedBox(height: 20.h),
+            Row(
+              children: [
+                Expanded(child: _infoBlock("First Name", "Emma")),
+                SizedBox(width: 24.w),
+                Expanded(child: _infoBlock("Last Name", "Johnson")),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            Row(
+              children: [
+                Expanded(child: _infoBlock("Email", "emma.j@example.com")),
+                SizedBox(width: 24.w),
+                Expanded(child: _infoBlock("Mobile", "+1 (555) 123-4567")),
+              ],
+            ),
+            SizedBox(height: 32.h),
+            _buildSectionTitle("Skin Analysis & Goals"),
+            SizedBox(height: 20.h),
+            _buildTagSection("Skin Goals", ["Anti-aging", "Hydration"]),
+            SizedBox(height: 20.h),
+            _buildTagSection("Primary Concerns", ["Fine lines", "Dryness", "Dark spots"]),
+            SizedBox(height: 32.h),
+            _buildSectionTitle("Bio & History"),
+            SizedBox(height: 16.h),
+            _infoBlock("Bio", "Looking to improve skin texture and reduce signs of aging."),
+            SizedBox(height: 16.h),
+            _infoBlock("Medical History", "No known allergies. Previous treatments include chemical peels."),
+          ],
         ),
       ),
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Close Profile"),
+        ),
+      ],
     );
   }
 
-  Widget _buildDetailRow(String label, String value, TextStyle? style) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildSectionTitle(String title) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: Text(label, style: style ?? CustomFonts.black16w400)),
+        Text(title, style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+        const Divider(),
+      ],
+    );
+  }
 
-        Expanded(
-          child: Text(
-            value,
-            style: style ?? CustomFonts.black16w400,
-            textAlign: TextAlign.left,
-          ),
+  Widget _infoBlock(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: CustomFonts.textMuted13w500),
+        SizedBox(height: 4.h),
+        Text(value, style: CustomFonts.textMain16w600),
+      ],
+    );
+  }
+
+  Widget _buildTagSection(String label, List<String> tags) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: CustomFonts.textMuted13w500),
+        SizedBox(height: 12.h),
+        Wrap(
+          spacing: 12.w,
+          runSpacing: 12.h,
+          children: tags.map((tag) => Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: CustomColors.brandCyan.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: CustomColors.brandCyan.withOpacity(0.2)),
+            ),
+            child: Text(tag, style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary, fontSize: 11.sp)),
+          )).toList(),
         ),
       ],
     );

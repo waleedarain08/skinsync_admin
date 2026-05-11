@@ -19,7 +19,7 @@ class ProductTile extends ConsumerWidget {
       onTap: () {
         showDialog(
           context: context,
-          builder: (context) => EditProductDailogBox(product: product),
+          builder: (context) => ProductDialogBox(product: product),
         );
       },
       onDoubleTap: () {
@@ -31,12 +31,12 @@ class ProductTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(15.r),
           boxShadow: [
             BoxShadow(
-              color: CustomColors.lightBlueColor.withValues(alpha: 0.2),
+              color: CustomColors.lightBlueColor.withOpacity(0.2),
               blurRadius: 8.r,
               offset: Offset(0, 2.h),
             ),
             BoxShadow(
-              color: CustomColors.lightPurpleColor.withValues(alpha: 0.1),
+              color: CustomColors.lightPurpleColor.withOpacity(0.1),
               blurRadius: 10.r,
               offset: Offset(2.h, 0),
             ),
@@ -57,26 +57,6 @@ class ProductTile extends ConsumerWidget {
                         imageUrl: product.image,
                       ),
                     ),
-                    // Positioned(
-                    //   top: 10.h,
-                    //   right: 10.w,
-                    //   child: Container(
-                    //     padding: EdgeInsets.symmetric(
-                    //       horizontal: 8.w,
-                    //       vertical: 4.h,
-                    //     ),
-                    //     decoration: BoxDecoration(
-                    //       color: Colors.white.withValues(alpha: 0.9),
-                    //       borderRadius: BorderRadius.circular(20.r),
-                    //     ),
-                    //     child: Text(
-                    //       'Units: ${item.units}',
-                    //       style: CustomFonts.black12w600.copyWith(
-                    //         color: item.quantity < 20 ? Colors.red : Colors.green,
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),

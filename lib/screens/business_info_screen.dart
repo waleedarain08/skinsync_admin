@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../utils/color_constant.dart';
+import '../utils/custom_fonts.dart';
+
 class BusinessInformationScreen extends StatefulWidget {
   const BusinessInformationScreen({super.key});
 
@@ -77,10 +80,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
                 ),
                 title: Text(
                   'Choose from Gallery',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: CustomFonts.textMain14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -103,10 +103,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
                 ),
                 title: Text(
                   'Take a Photo',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: CustomFonts.textMain14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -130,11 +127,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
                   ),
                   title: Text(
                     'Remove Photo',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.red,
-                    ),
+                    style: CustomFonts.textMain14w600.copyWith(color: Colors.red),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -191,7 +184,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: CustomColors.backgroundLight,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
@@ -220,11 +213,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
         SizedBox(width: 12.w),
         Text(
           'Business Information',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: CustomFonts.textMain18w600,
         ),
       ],
     );
@@ -397,16 +386,12 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
           children: [
             Text(
               'Profile Picture',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+              style: CustomFonts.textMain14w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Upload your profile picture',
-              style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
+              style: CustomFonts.textMuted12w400,
             ),
           ],
         ),
@@ -425,20 +410,16 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
+          style: CustomFonts.textMain14w600,
         ),
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
-          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+          style: CustomFonts.textMain14w400,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey[400]),
+            hintStyle: CustomFonts.textMuted14w400,
             filled: true,
             fillColor: Colors.white,
             contentPadding: EdgeInsets.symmetric(

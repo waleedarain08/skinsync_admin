@@ -38,7 +38,6 @@ class $AssetsPngGen {
   final AssetGenImage notification = const AssetGenImage(
     'assets/png/notification.png',
   );
-  final AssetGenImage signup = const AssetGenImage('assets/png/signup.png');
   final AssetGenImage signupVector = const AssetGenImage(
     'assets/png/signup_vector.png',
   );

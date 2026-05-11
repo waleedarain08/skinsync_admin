@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 
+import '../utils/color_constant.dart';
+import '../utils/custom_fonts.dart';
 import 'business_info_screen.dart';
 
 class CreateStaffScreen extends StatefulWidget {
@@ -68,7 +68,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             children: [
               Text(
                 'Select Image',
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600),
+                style: CustomFonts.textMain20w600,
               ),
               SizedBox(height: 20.h),
               ListTile(
@@ -86,10 +86,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 ),
                 title: Text(
                   'Choose from Gallery',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: CustomFonts.textMain14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -112,10 +109,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 ),
                 title: Text(
                   'Take a Photo',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: CustomFonts.textMain14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -139,11 +133,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                   ),
                   title: Text(
                     'Remove Photo',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.red,
-                    ),
+                    style: CustomFonts.textMain14w600.copyWith(color: Colors.red),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -200,7 +190,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: CustomColors.backgroundLight,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
@@ -229,11 +219,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
         SizedBox(width: 12.w),
         Text(
           'Create Staff',
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: CustomFonts.textMain18w600,
         ),
       ],
     );
@@ -283,7 +269,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
           // Subcategory Dropdown
           _buildDropdownField(
             label: 'Subcategory',
-            hintText: 'Select category',
+            hintText: 'Select subcategory',
             value: _selectedSubcategory,
             items: _subcategories,
             onChanged: (value) {
@@ -316,7 +302,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
           onTap: _pickImage,
           child: CustomPaint(
             painter: DottedCircleBorderPainter(
-              color: Colors.black87!,
+              color: Colors.black87,
               strokeWidth: 1.5,
               dashLength: 6,
               gapLength: 4,
@@ -364,16 +350,12 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
           children: [
             Text(
               'Profile Picture',
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+              style: CustomFonts.textMain14w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Upload your profile picture',
-              style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
+              style: CustomFonts.textMuted12w400,
             ),
           ],
         ),
@@ -392,20 +374,16 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
+          style: CustomFonts.textMain14w600,
         ),
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
-          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+          style: CustomFonts.textMain14w400,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey[400]),
+            hintStyle: CustomFonts.textMuted14w400,
             filled: true,
             fillColor: Colors.white,
             contentPadding: EdgeInsets.symmetric(
@@ -442,72 +420,48 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
+          style: CustomFonts.textMain14w600,
         ),
         SizedBox(height: 8.h),
-        DropdownButtonHideUnderline(
-          child: DropdownButton2<String>(
-            isExpanded: true,
-            hint: Text(
-              hintText,
-              style: TextStyle(fontSize: 14.sp, color: Colors.grey[400]),
-            ),
-            value: value,
-            items: items
-                .map(
-                  (item) => DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(
-                      item,
-                      style: TextStyle(fontSize: 14.sp, color: Colors.black87),
-                    ),
+        DropdownButtonFormField<String>(
+          isExpanded: true,
+          hint: Text(
+            hintText,
+            style: CustomFonts.textMuted14w400,
+          ),
+          initialValue: value,
+          items: items
+              .map(
+                (item) => DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(
+                    item,
+                    style: CustomFonts.textMain14w400,
                   ),
-                )
-                .toList(),
-            onChanged: onChanged,
-            buttonStyleData: ButtonStyleData(
-              height: 48.h,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: Colors.grey[300]!, width: 1),
-              ),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.grey[500],
+            size: 24.sp,
+          ),
+          dropdownColor: Colors.white,
+          borderRadius: BorderRadius.circular(8.r),
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
             ),
-            iconStyleData: IconStyleData(
-              icon: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: Colors.grey[500],
-                size: 24.sp,
-              ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
             ),
-            dropdownStyleData: DropdownStyleData(
-              maxHeight: 200.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              offset: Offset(0, -4.h),
-              scrollbarTheme: ScrollbarThemeData(
-                radius: Radius.circular(40.r),
-                thickness: WidgetStateProperty.all(6),
-                thumbVisibility: WidgetStateProperty.all(true),
-              ),
-            ),
-            menuItemStyleData: MenuItemStyleData(
-              height: 44.h,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.r),
+              borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
             ),
           ),
         ),
@@ -571,5 +525,3 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
     );
   }
 }
-
-// Custom Painter for Dotted Circle Border

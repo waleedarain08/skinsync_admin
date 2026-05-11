@@ -1,27 +1,65 @@
 import 'package:flutter/material.dart';
 
 class CustomColors {
-  static const Color lightBlueColor = Color(0xff88E3FB);
-  static const Color lightPurpleColor = Color(0xffE7C6E8);
-  static const Color bottomNavText = Color(0xff636363);
-  static const Color purpleColor = Color(0xffEEA1F0);
-  static const Color blackColor = Color(0xff000000);
-  static const Color borderColor = Color(0x1010101A);
-  static const Color whiteColor = Color(0xffffffff);
-  static const Color dashboardBackgroundColor = Color(0xffF9FAFB);
-  static const Color silverColor = Color(0xff657296);
-  static const Color greyColor = Color(0xffE9E9E9);
-  static const Color iconColor = Color(0xffF2F2F2);
-  static const Color textGreyColor = Color(0xff494949);
-  static const Color textFeildBoaderColor = Color(0xff939393);
-  static const Color blueColor = Color(0xFF1763E0);
-  static const Color fillColor = Color(0xffF3F3F5);
-  static const Color greenColor = Color(0Xff00A63E);
-  static const Color drakPurpleColor = Color(0xFF4F39F6);
+  // Brand Core Palette (Strictly following user request)
+  static const Color brandPurple = Color(0xffE7C6E8);
+  static const Color brandCyan = Color(0xff88E3FB);
+  static const Color backgroundLight = Color(0xFFF8FAFC);
+  static const Color deepSlate = Color(0xFF1E293B);
 
-  static const LinearGradient purpleBlueGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [Color(0xff92FBFD), Color(0xffA595B9)],
+  // Surface & Hierarchy
+  static const Color surfaceWhite = Color(0xFFFFFFFF);
+  static const Color borderLight = Color(0xFFE2E8F0); // Derived from Slate palette for separation
+  
+  // Typography Hierarchy
+  static const Color textPrimary = deepSlate;
+  static const Color textSecondary = Color(0xFF64748B); // Slate 500 for muted text
+  
+  // Status Colors (Subtle versions for Premium feel)
+  static const Color success = Color(0xFF10B981);
+  static const Color error = Color(0xFFEF4444);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color info = brandCyan;
+
+  // Gradients
+  static const LinearGradient primaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [brandCyan, brandPurple],
   );
+
+  // Legacy compatibility (Mapped to new palette where possible to avoid breakages)
+  static const Color brandPrimary = deepSlate;
+  static const Color lightBlueColor = brandCyan;
+  static const Color lightPurpleColor = brandPurple;
+  static const Color bottomNavText = textSecondary;
+  static const Color blackColor = deepSlate;
+  static const Color whiteColor = surfaceWhite;
+  static const Color dashboardBackgroundColor = backgroundLight;
+  static const Color greyColor = borderLight;
+  static const Color iconColor = deepSlate;
+  static const Color textGreyColor = textSecondary;
+  static const Color blueColor = deepSlate;
+  static const Color greenColor = success;
+  static const Color drakPurpleColor = brandPurple;
+  static const Color textMain = deepSlate;
+  static const Color textMuted = textSecondary;
+  
+  // Additional missing getters identified in analysis
+  static const Color surfaceGhost = backgroundLight;
+  static const Color deepNavy = deepSlate;
+  static const Color successGreen = success;
+  static const Color errorRed = error;
+  static const Color warningOrange = warning;
+  static const Color textDark = textPrimary;
+  static const Color textLight = surfaceWhite;
+  static const Color softChampagne = backgroundLight;
+  static const Color primaryGold = brandCyan;
+  static const Color fillColor = surfaceWhite;
+  static const Color borderColor = borderLight;
+  static const Color textFeildBoaderColor = borderLight;
+  static const Color purpleColor = brandPurple;
+  static const LinearGradient brandGradient = primaryGradient;
+  static const LinearGradient surfaceGradient = primaryGradient;
+  static const Color silverColor = borderLight;
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../utils/custom_fonts.dart';
+import '../utils/color_constant.dart';
 
 class StaticContentScreen extends StatefulWidget {
   const StaticContentScreen({super.key});
@@ -139,17 +141,13 @@ For any inquiries, please reach out to our support team.
               // Title
               Text(
                 'Static Content',
-                style: TextStyle(
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+                style: CustomFonts.textMain24w700,
               ),
               SizedBox(height: 8.h),
               // Subtitle
               Text(
                 'Manage financial transactions and release payments to clinics',
-                style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                style: CustomFonts.textMuted14w400,
               ),
               SizedBox(height: 16.h),
               // Divider
@@ -200,11 +198,7 @@ For any inquiries, please reach out to our support team.
                               SizedBox(width: 8.w),
                               Text(
                                 _tabs[_selectedTab],
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
+                                style: CustomFonts.textMain16w600,
                               ),
                             ],
                           ),

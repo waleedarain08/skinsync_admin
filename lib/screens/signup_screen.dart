@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const String routeName = '/sign-up-screen';
 
-  const SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -15,12 +18,11 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -37,9 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void _validatePassword() {
     setState(() {
       _hasLowercase = _passwordController.text.contains(RegExp(r'[a-z]'));
-      _hasUniqueChar = _passwordController.text.contains(
-        RegExp(r'[!@#$%^&*(),.?":{}|<>]'),
-      );
+      _hasUniqueChar = _passwordController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
     });
   }
 
@@ -56,245 +56,157 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.red,
+      backgroundColor: Colors.white,
       body: Row(
         children: [
-          // Left Side - Branding
+          // Left Side: Modern Branding Panel
           Expanded(
+            flex: 4,
             child: Container(
-              color: Colors.white,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 200.w,
-                      height: 200.h,
+              decoration: const BoxDecoration(
+                gradient: CustomColors.surfaceGradient,
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: -100,
+                    left: -100,
+                    child: Container(
+                      width: 400,
+                      height: 400,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [Color(0xFF9BA7D4), Color(0xFF7DD3D3)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: Image.asset(
-                        PngAssets.splashLogo,
-                        height: 100.w,
-                        width: 100.w,
+                        color: CustomColors.brandCyan.withOpacity(0.05),
                       ),
                     ),
-                    SizedBox(height: 30.h),
-                    Text(
-                      "SkinSync AI",
-                      style: TextStyle(
-                        fontSize: 48.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF6B7BA8),
-                        letterSpacing: 4,
+                  ),
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(48.w),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(16.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            child: Image.asset(PngAssets.splashLogo, height: 60.w),
+                          ),
+                          SizedBox(height: 40.h),
+                          Text(
+                            "Join the Future of\nMedSpa Management",
+                            style: CustomFonts.textMain32w700.copyWith(
+                              color: Colors.white,
+                              fontSize: 40.sp,
+                              height: 1.2,
+                            ),
+                          ),
+                          SizedBox(height: 24.h),
+                          Text(
+                            "Scale your clinic operations with our advanced AI-powered administrative tools.",
+                            style: CustomFonts.textMuted16w500.copyWith(
+                              color: Colors.white.withOpacity(0.7),
+                              height: 1.5,
+                            ),
+                          ),
+                          SizedBox(height: 60.h),
+                          _buildFeatureRow(Icons.check_circle_outline_rounded, "Multi-Clinic Oversight"),
+                          SizedBox(height: 16.h),
+                          _buildFeatureRow(Icons.check_circle_outline_rounded, "Advanced Patient Analytics"),
+                          SizedBox(height: 16.h),
+                          _buildFeatureRow(Icons.check_circle_outline_rounded, "Automated Payout Systems"),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
 
-          // Vertical Divider
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 100.h),
-            child: Container(width: 1.w, color: Colors.grey.shade300),
-          ),
-
-          // Right Side - Sign Up Form
+          // Right Side: Registration Form
           Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: 140.w, right: 50, top: 50),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(12.r)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 8,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
+            flex: 5,
+            child: Container(
+              color: CustomColors.backgroundLight,
+              child: Center(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 60.w,
-                    vertical: 40.h,
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Sign Up",
-                          style: TextStyle(
-                            fontSize: 32.sp,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                  padding: EdgeInsets.symmetric(horizontal: 80.w, vertical: 48.h),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: 500.w),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Create Admin Account", style: CustomFonts.textMain32w700),
+                          SizedBox(height: 8.h),
+                          Text("Register your MedSpa network to get started.", style: CustomFonts.textMuted16w500),
+                          SizedBox(height: 40.h),
+                          
+                          _buildInputField(
+                            label: "Full Name",
+                            hint: "Enter your full name",
+                            controller: _fullNameController,
+                            icon: Icons.person_outline_rounded,
                           ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          "Create an account to continue",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade600,
+                          SizedBox(height: 24.h),
+                          _buildInputField(
+                            label: "Email Address",
+                            hint: "name@company.com",
+                            controller: _emailController,
+                            icon: Icons.alternate_email_rounded,
+                            keyboardType: TextInputType.emailAddress,
                           ),
-                        ),
-                        SizedBox(height: 40.h),
-
-                        // Full Name Field
-                        _buildTextField(
-                          label: "Full Name",
-                          hintText: "Enter full name",
-                          controller: _fullNameController,
-                          isRequired: true,
-                        ),
-                        SizedBox(height: 20.h),
-                        // Email Field
-                        _buildTextField(
-                          label: "Email Address",
-                          hintText: "Enter Your Email Address",
-                          controller: _emailController,
-                          isRequired: true,
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        SizedBox(height: 20.h),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Phone Number',
-                              style: CustomFonts.black14w500,
+                          SizedBox(height: 24.h),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Phone Number", style: CustomFonts.textMain14w600),
+                              SizedBox(height: 10.h),
+                              PhoneWidget(controller: _phoneController, filled: true),
+                            ],
+                          ),
+                          SizedBox(height: 24.h),
+                          _buildInputField(
+                            label: "Password",
+                            hint: "Create a strong password",
+                            controller: _passwordController,
+                            icon: Icons.lock_outline_rounded,
+                            isPassword: true,
+                            obscureText: _obscurePassword,
+                            onTogglePassword: () => setState(() => _obscurePassword = !_obscurePassword),
+                          ),
+                          SizedBox(height: 16.h),
+                          _buildRequirementRow("Lowercase letter included", _hasLowercase),
+                          _buildRequirementRow("Unique character included", _hasUniqueChar),
+                          SizedBox(height: 32.h),
+                          _buildTermsCheckbox(),
+                          SizedBox(height: 40.h),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 20.h)),
+                              child: const Text("Register & Continue"),
                             ),
-                            SizedBox(height: 8.h),
-                            PhoneWidget(controller: _phoneController),
-                          ],
-                        ),
-                        // Phone Number Field
-                        // _buildTextField(
-                        //   label: "Phone Number",
-                        //   hintText: "+1 (555) 123-4567",
-                        //   controller: _phoneController,
-                        //   isRequired: true,
-                        //   keyboardType: TextInputType.phone,
-                        // ),
-                        SizedBox(height: 20.h),
-
-                        // Password Field
-                        _buildPasswordField(
-                          label: "Password",
-                          hintText: "Enter your password",
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          onToggle: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
                           ),
-                        ),
-                        SizedBox(height: 20.h),
-
-                        // Confirm Password Field
-                        _buildPasswordField(
-                          label: "Confirm Password",
-                          hintText: "Confirm your password",
-                          controller: _confirmPasswordController,
-                          obscureText: _obscureConfirmPassword,
-                          onToggle: () => setState(
-                            () => _obscureConfirmPassword =
-                                !_obscureConfirmPassword,
-                          ),
-                        ),
-                        SizedBox(height: 16.h),
-
-                        // Password Requirements
-                        _buildPasswordRequirement(
-                          text: "At least one lowercase letter",
-                          isValid: _hasLowercase,
-                        ),
-                        SizedBox(height: 8.h),
-                        _buildPasswordRequirement(
-                          text: "At least one unique character",
-                          isValid: _hasUniqueChar,
-                        ),
-
-                        SizedBox(height: 24.h),
-                        _rowWidget(),
-                        SizedBox(height: 30.h),
-
-                        // Create Account Button
-                        GestureDetector(
-                          child: Container(
-                            width: 215.w,
-                            // height: 50.h,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20.w,
-                              vertical: 14.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(30.r),
+                          SizedBox(height: 32.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Already have an account? ", style: CustomFonts.textMuted14w400),
+                              GestureDetector(
+                                onTap: () => context.go(SignInScreen.routeName),
+                                child: Text("Sign In", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
                               ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Create Account",
-                                  style: TextStyle(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                SizedBox(width: 8.w),
-                                Icon(
-                                  Icons.arrow_forward,
-                                  color: Colors.white,
-                                  size: 20.sp,
-                                ),
-                              ],
-                            ),
+                            ],
                           ),
-                        ),
-                        SizedBox(height: 20.h),
-
-                        // Sign In Link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Have an account already? ",
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                // Navigate to sign in
-                              },
-                              child: Text(
-                                "Sign In",
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Color(0xFF5B9FD8),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -306,211 +218,100 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildFeatureRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, color: CustomColors.brandCyan, size: 22.sp),
+        SizedBox(width: 12.w),
+        Text(text, style: CustomFonts.textMain16w600.copyWith(color: Colors.white.withOpacity(0.9))),
+      ],
+    );
+  }
+
+  Widget _buildInputField({
     required String label,
-    required String hintText,
+    required String hint,
     required TextEditingController controller,
-    bool isRequired = false,
+    required IconData icon,
+    bool isPassword = false,
+    bool? obscureText,
+    VoidCallback? onTogglePassword,
     TextInputType? keyboardType,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(
-            text: label,
-            style: TextStyle(
-              fontSize: 14.sp,
-              height: 0,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-            children: [
-              if (isRequired)
-                TextSpan(
-                  text: "*",
-                  style: TextStyle(height: 0, color: Colors.red),
-                ),
-            ],
-          ),
-        ),
-        SizedBox(height: 8.h),
+        Text(label, style: CustomFonts.textMain14w600),
+        SizedBox(height: 10.h),
         TextFormField(
           controller: controller,
+          obscureText: obscureText ?? false,
           keyboardType: keyboardType,
+          style: CustomFonts.textMain14w400,
           decoration: InputDecoration(
-            hintText: hintText,
-            // hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey.shade400),
-            // filled: true,
-            // fillColor: Colors.white,
-            // border: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(8.r),
-            //   borderSide: BorderSide(color: Colors.grey.shade300),
-            // ),
-            // enabledBorder: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(8.r),
-            //   borderSide: BorderSide(color: Colors.grey.shade300),
-            // ),
-            // focusedBorder: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(8.r),
-            //   borderSide: BorderSide(color: Colors.blue, width: 1.5),
-            // ),
-            // contentPadding: EdgeInsets.symmetric(
-            //   horizontal: 16.w,
-            //   vertical: 14.h,
-            // ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPasswordField({
-    required String label,
-    required String hintText,
-    required TextEditingController controller,
-    required bool obscureText,
-    required VoidCallback onToggle,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            text: label,
-            style: TextStyle(
-              fontSize: 14.sp,
-              height: 0,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-            children: [
-              TextSpan(
-                text: "*",
-                style: TextStyle(color: Colors.red),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              height: 0,
-
-              fontSize: 14.sp,
-              color: Colors.grey.shade400,
-            ),
-            // filled: true,
-            // fillColor: Colors.white,
-            // border: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(8.r),
-            //   borderSide: BorderSide(color: Colors.grey.shade300),
-            // ),
-            // enabledBorder: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(8.r),
-            //   borderSide: BorderSide(color: Colors.grey.shade300),
-            // ),
-            // focusedBorder: OutlineInputBorder(
-            //   borderRadius: BorderRadius.circular(8.r),
-            //   borderSide: BorderSide(color: Colors.blue, width: 1.5),
-            // ),
-            // contentPadding: EdgeInsets.symmetric(
-            //   horizontal: 16.w,
-            //   vertical: 14.h,
-            // ),
-            suffixIcon: IconButton(
+            prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.textMuted),
+            hintText: hint,
+            suffixIcon: isPassword ? IconButton(
+              onPressed: onTogglePassword,
               icon: Icon(
-                obscureText
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                color: Colors.grey.shade600,
+                obscureText! ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                 size: 20.sp,
+                color: CustomColors.textMuted,
               ),
-              onPressed: onToggle,
-            ),
+            ) : null,
           ),
         ),
       ],
     );
   }
 
-  Widget _rowWidget() {
+  Widget _buildRequirementRow(String text, bool isValid) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.h),
+      child: Row(
+        children: [
+          Icon(
+            isValid ? Icons.check_circle_rounded : Icons.circle_outlined,
+            size: 16.sp,
+            color: isValid ? CustomColors.success : CustomColors.textMuted.withOpacity(0.4),
+          ),
+          SizedBox(width: 8.w),
+          Text(text, style: CustomFonts.textMuted12w400.copyWith(color: isValid ? CustomColors.success : CustomColors.textMuted)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTermsCheckbox() {
     return Row(
-      crossAxisAlignment: .center,
-      mainAxisAlignment: .center,
       children: [
         SizedBox(
-          width: 20.w,
-          height: 20.h,
+          width: 24.w,
+          height: 24.w,
           child: Checkbox(
             value: _acceptTerms,
-            onChanged: (value) {
-              setState(() {
-                _acceptTerms = value ?? false;
-              });
-            },
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4.r),
-            ),
+            onChanged: (v) => setState(() => _acceptTerms = v ?? false),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.r)),
           ),
         ),
-        SizedBox(width: 10.w),
-        Column(
-          crossAxisAlignment: .center,
-
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RichText(
-              text: TextSpan(
-                text: "I accept the ",
-                style: TextStyle(fontSize: 13.sp, color: Colors.black87),
-                children: [
-                  TextSpan(
-                    text: "Terms & Conditions",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: CustomFonts.textMuted12w400,
+              children: [
+                const TextSpan(text: "I agree to the "),
+                TextSpan(
+                  text: "Terms of Service",
+                  style: TextStyle(color: CustomColors.brandPrimary, fontWeight: FontWeight.bold),
+                ),
+                const TextSpan(text: " and "),
+                TextSpan(
+                  text: "Privacy Policy",
+                  style: TextStyle(color: CustomColors.brandPrimary, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-            SizedBox(height: 2.h),
-            Text(
-              "Secured with Profile Verification API",
-              style: TextStyle(fontSize: 11.sp, color: Colors.grey.shade500),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPasswordRequirement({
-    required String text,
-    required bool isValid,
-  }) {
-    return Row(
-      crossAxisAlignment: .center,
-      mainAxisAlignment: .center,
-      children: [
-        Icon(
-          isValid ? Icons.check_circle : Icons.radio_button_unchecked,
-          size: 18.sp,
-          color: isValid ? Colors.green : Colors.grey.shade400,
-        ),
-        SizedBox(width: 8.w),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 13.sp,
-            height: 0,
-
-            color: isValid ? Colors.green : Colors.grey.shade600,
           ),
         ),
       ],
