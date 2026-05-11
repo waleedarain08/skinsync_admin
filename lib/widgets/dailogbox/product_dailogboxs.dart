@@ -7,8 +7,8 @@ import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import '../../utils/color_constant.dart';
 import '../../utils/custom_fonts.dart';
-import '../../utils/responsive.dart';
 import '../build_textfield.dart';
+import 'standard_dialog.dart';
 
 class ProductDialogBox extends StatefulWidget {
   const ProductDialogBox({super.key, this.product});
@@ -54,28 +54,15 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
   Widget build(BuildContext context) {
     final bool isEdit = widget.product != null;
 
-    return Dialog(
-      backgroundColor: CustomColors.whiteColor,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: Responsive.when(defaultValue: 120.w, mobile: () => 16.w, tablet: () => 20.w),
-        vertical: 50.h,
-      ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-      child: SingleChildScrollView(
-        padding: EdgeInsets.all(32.w),
-        child: Form(
-          key: _formKey,
+    return StandardDialog(
+      title: isEdit ? 'Edit Product' : 'Add New Product',
+      width: 700.w,
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(isEdit ? 'Edit Product' : 'Add New Product', style: CustomFonts.textMain24w700),
-                  IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.close)),
-                ],
-              ),
-              SizedBox(height: 32.h),
               _buildImagePicker(),
               SizedBox(height: 24.h),
               Row(
@@ -139,55 +126,46 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                 hintText: 'Product details and usage instructions...',
                 validator: Validators.empty,
               ),
-              SizedBox(height: 40.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  OutlinedButton(
-                    onPressed: () => context.pop(),
-                    style: OutlinedButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h)),
-                    child: const Text('Cancel'),
-                  ),
-                  SizedBox(width: 16.w),
-                  Consumer(
-                    builder: (context, ref, _) {
-                      final state = ref.watch(productViewModelProvider);
-                      return ElevatedButton(
-                        onPressed: () {
-                          if (!_formKey.currentState!.validate() || state.loading) return;
-                          final product = ProductModel(
-                            id: widget.product?.id,
-                            name: _nameController.text,
-                            image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop",
-                            unit: _unitController.text,
-                            description: _descriptionController.text,
-                            sku: _skuController.text,
-                            category: _categoryController.text,
-                            quantity: int.tryParse(_quantityController.text) ?? 0,
-                            status: "Active",
-                          );
-                          
-                          final notifier = ref.read(productViewModelProvider.notifier);
-                          final Future<bool> action = isEdit ? notifier.updateProduct(product) : notifier.addProduct(product);
-                          
-                          action.then((success) {
-                            if (success && context.mounted) context.pop();
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: CustomColors.deepNavy,
-                          padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
-                        ),
-                        child: Text(state.loading ? 'Saving...' : 'Save Product'),
-                      );
-                    },
-                  ),
-                ],
-              ),
             ],
           ),
         ),
       ),
+      actions: [
+        TextButton(onPressed: () => context.pop(), child: const Text("Cancel")),
+        Consumer(
+          builder: (context, ref, _) {
+            final state = ref.watch(productViewModelProvider);
+            return ElevatedButton(
+              onPressed: () {
+                if (!_formKey.currentState!.validate() || state.loading) return;
+                final product = ProductModel(
+                  id: widget.product?.id,
+                  name: _nameController.text,
+                  image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop",
+                  unit: _unitController.text,
+                  description: _descriptionController.text,
+                  sku: _skuController.text,
+                  category: _categoryController.text,
+                  quantity: int.tryParse(_quantityController.text) ?? 0,
+                  status: "Active",
+                );
+                
+                final notifier = ref.read(productViewModelProvider.notifier);
+                final Future<bool> action = isEdit ? notifier.updateProduct(product) : notifier.addProduct(product);
+                
+                action.then((success) {
+                  if (success && context.mounted) context.pop();
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: CustomColors.deepNavy,
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+              ),
+              child: Text(state.loading ? 'Saving...' : 'Save Product'),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -198,8 +176,8 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
         Text("Product Image", style: CustomFonts.textMain14w600),
         SizedBox(height: 12.h),
         Container(
-          height: 160.h,
-          width: 160.h,
+          height: 140.h,
+          width: 140.h,
           decoration: BoxDecoration(
             color: CustomColors.surfaceGhost,
             borderRadius: BorderRadius.circular(12.r),

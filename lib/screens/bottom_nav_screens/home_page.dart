@@ -58,8 +58,8 @@ class HomePage extends StatelessWidget {
         color: CustomColors.deepSlate,
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
+            color: Colors.black26,
+            blurRadius: 15,
             offset: Offset(5, 0),
           ),
         ],
@@ -133,7 +133,10 @@ class HomePage extends StatelessWidget {
                   icon: Icons.notifications_active_rounded,
                   routeName: PushNotificationScreen.routeName,
                 ),
-                const Divider(color: Colors.white10),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  child: Divider(color: CustomColors.surfaceWhite.withOpacity(0.1)),
+                ),
                 _buildSidebarItem(
                   context: context,
                   title: 'Settings',
@@ -157,7 +160,7 @@ class HomePage extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
-              gradient: CustomColors.brandGradient,
+              gradient: CustomColors.primaryGradient,
               borderRadius: BorderRadius.circular(12.r),
               boxShadow: [
                 BoxShadow(
@@ -176,7 +179,7 @@ class HomePage extends StatelessWidget {
               Text(
                 "SKINSYNC",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: CustomColors.surfaceWhite,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
@@ -204,7 +207,7 @@ class HomePage extends StatelessWidget {
       child: Text(
         title,
         style: TextStyle(
-          color: Colors.white24,
+          color: CustomColors.surfaceWhite.withOpacity(0.3),
           fontSize: 11.sp,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
@@ -234,21 +237,21 @@ class HomePage extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white.withOpacity(0.08) : Colors.transparent,
+            color: isSelected ? CustomColors.surfaceWhite.withOpacity(0.1) : Colors.transparent,
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Row(
             children: [
               Icon(
                 icon,
-                color: isSelected ? CustomColors.brandCyan : Colors.white60,
+                color: isSelected ? CustomColors.brandCyan : CustomColors.surfaceWhite.withOpacity(0.6),
                 size: 20.sp,
               ),
               SizedBox(width: 16.w),
               Text(
                 title,
                 style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.white60,
+                  color: isSelected ? CustomColors.surfaceWhite : CustomColors.surfaceWhite.withOpacity(0.6),
                   fontSize: 14.sp,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
@@ -273,8 +276,8 @@ class HomePage extends StatelessWidget {
   Widget _buildSidebarFooter() {
     return Container(
       padding: EdgeInsets.all(24.w),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.white10)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: CustomColors.surfaceWhite.withOpacity(0.1))),
       ),
       child: Row(
         children: [
@@ -290,18 +293,18 @@ class HomePage extends StatelessWidget {
               children: [
                 Text(
                   "Alex MedSpa",
-                  style: TextStyle(color: Colors.white, fontSize: 13.sp, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: CustomColors.surfaceWhite, fontSize: 13.sp, fontWeight: FontWeight.w600),
                 ),
                 Text(
                   "Super Admin",
-                  style: TextStyle(color: Colors.white38, fontSize: 11.sp),
+                  style: TextStyle(color: CustomColors.surfaceWhite.withOpacity(0.4), fontSize: 11.sp),
                 ),
               ],
             ),
           ),
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.logout_rounded, color: Colors.white38, size: 18),
+            icon: Icon(Icons.logout_rounded, color: CustomColors.surfaceWhite.withOpacity(0.4), size: 18),
           ),
         ],
       ),

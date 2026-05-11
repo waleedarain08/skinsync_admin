@@ -3,385 +3,272 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'color_constant.dart';
 
 class CustomFonts {
-  // Brand Typography Hierarchy (Following Project Naming Convention)
-  static TextStyle textMain32w700 = TextStyle(
+  static const String _fontFamily = 'Degular';
+
+  // Heading Styles
+  static TextStyle headlineLarge = TextStyle(
     fontSize: 32.sp,
     fontWeight: FontWeight.w700,
-    color: CustomColors.textMain,
-    fontFamily: 'Degular',
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
   );
 
-  static TextStyle textMain24w700 = TextStyle(
+  static TextStyle headlineMedium = TextStyle(
     fontSize: 24.sp,
     fontWeight: FontWeight.w700,
-    color: CustomColors.textMain,
-    fontFamily: 'Degular',
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
   );
 
-  static TextStyle textMain20w600 = TextStyle(
+  static TextStyle headlineSmall = TextStyle(
     fontSize: 20.sp,
     fontWeight: FontWeight.w600,
-    color: CustomColors.textMain,
-    fontFamily: 'Degular',
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
   );
 
-  static TextStyle textMain16w600 = TextStyle(
+  // Body Styles
+  static TextStyle bodyLarge = TextStyle(
     fontSize: 16.sp,
     fontWeight: FontWeight.w600,
-    color: CustomColors.textMain,
-    fontFamily: 'Degular',
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
   );
 
-  static TextStyle textMuted16w500 = TextStyle(
-    fontSize: 16.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.textMuted,
-    fontFamily: 'Degular',
+  static TextStyle bodyMedium = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w400,
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
   );
 
+  static TextStyle bodySmall = TextStyle(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+    color: CustomColors.textSecondary,
+    fontFamily: _fontFamily,
+  );
+
+  // Legacy compatibility styles
+  static TextStyle textMain32w700 = headlineLarge;
+  static TextStyle textMain24w700 = headlineMedium;
+  static TextStyle textMain20w600 = headlineSmall;
+  static TextStyle textMain16w600 = bodyLarge;
   static TextStyle textMain16w400 = TextStyle(
     fontSize: 16.sp,
     fontWeight: FontWeight.w400,
-    color: CustomColors.textMain,
-    fontFamily: 'Degular',
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
   );
-
-  static TextStyle textMain14w400 = TextStyle(
-    fontSize: 14.sp,
-    fontWeight: FontWeight.w400,
-    color: CustomColors.textMain,
-    fontFamily: 'Degular',
-  );
-
-  static TextStyle textMuted12w400 = TextStyle(
-    fontSize: 12.sp,
-    fontWeight: FontWeight.w400,
-    color: CustomColors.textMuted,
-    fontFamily: 'Degular',
-  );
-
+  static TextStyle textMain14w400 = bodyMedium;
   static TextStyle textMain14w600 = TextStyle(
     fontSize: 14.sp,
     fontWeight: FontWeight.w600,
-    color: CustomColors.textMain,
-    fontFamily: 'Degular',
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
   );
-
+  static TextStyle textMuted12w400 = bodySmall;
   static TextStyle textMuted13w500 = TextStyle(
     fontSize: 13.sp,
     fontWeight: FontWeight.w500,
-    color: CustomColors.textMuted,
-    fontFamily: 'Degular',
+    color: CustomColors.textSecondary,
+    fontFamily: _fontFamily,
   );
-
-  static TextStyle textMain18w600 = TextStyle(
-    fontSize: 18.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.textMain,
-    fontFamily: 'Degular',
-  );
-
   static TextStyle textMuted14w400 = TextStyle(
     fontSize: 14.sp,
     fontWeight: FontWeight.w400,
-    color: CustomColors.textMuted,
-    fontFamily: 'Degular',
+    color: CustomColors.textSecondary,
+    fontFamily: _fontFamily,
+  );
+  static TextStyle textMain18w600 = TextStyle(
+    fontSize: 18.sp,
+    fontWeight: FontWeight.w600,
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
+  );
+  
+  static TextStyle textMain12w600 = TextStyle(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w600,
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
+  );
+
+  static TextStyle textMain18w400 = TextStyle(
+    fontSize: 18.sp,
+    fontWeight: FontWeight.w400,
+    color: CustomColors.textPrimary,
+    fontFamily: _fontFamily,
   );
 
   static TextStyle textMuted11w400 = TextStyle(
     fontSize: 11.sp,
     fontWeight: FontWeight.w400,
-    color: CustomColors.textMuted,
-    fontFamily: 'Degular',
+    color: CustomColors.textSecondary,
+    fontFamily: _fontFamily,
   );
 
-  static TextStyle textMain48w700 = TextStyle(
-    fontSize: 48.sp,
-    fontWeight: FontWeight.w700,
-    color: CustomColors.textMain,
-    fontFamily: 'Degular',
-  );
-
-  // Existing compatibility styles (kept for legacy support)
-  static TextStyle black50w600 = TextStyle(
-    fontSize: 50.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle white50w600 = TextStyle(
-    fontSize: 50.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle grey20w500 = TextStyle(
-    fontSize: 20.sp,
+  static TextStyle textMuted16w500 = TextStyle(
+    fontSize: 16.sp,
     fontWeight: FontWeight.w500,
-    color: CustomColors.silverColor,
-    fontFamily: 'Degular',
+    color: CustomColors.textSecondary,
+    fontFamily: _fontFamily,
   );
-  static TextStyle white22w600 = TextStyle(
-    fontSize: 22.sp,
+
+  // Full legacy support
+  static TextStyle white50w600 = TextStyle(fontSize: 50.sp, fontWeight: FontWeight.w600, color: Colors.white, fontFamily: _fontFamily);
+  static TextStyle grey20w500 = TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w500, color: CustomColors.textSecondary, fontFamily: _fontFamily);
+  static TextStyle white22w600 = TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600, color: Colors.white, fontFamily: _fontFamily);
+  static TextStyle white20w400 = TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w400, color: Colors.white, fontFamily: _fontFamily);
+  static TextStyle white20w700 = TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: _fontFamily);
+  static TextStyle white18w600 = TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: Colors.white, fontFamily: _fontFamily);
+  static TextStyle white12w600 = TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: Colors.white, fontFamily: _fontFamily);
+  static TextStyle white17w500 = TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, color: Colors.white, fontFamily: _fontFamily);
+  static TextStyle black18w400 = TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w400, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle black18w500 = TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle black10w600 = TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle black12w400 = TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle black20w400 = TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w400, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle black20w600Underlined = TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600, color: CustomColors.deepSlate, fontFamily: _fontFamily, decoration: TextDecoration.underline);
+  static TextStyle black26w600 = TextStyle(fontSize: 26.sp, fontWeight: FontWeight.w600, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle black24w600 = TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w600, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle black22w500 = TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w500, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle black17w500 = TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle black28w600 = TextStyle(fontSize: 28.sp, fontWeight: FontWeight.w600, color: CustomColors.deepSlate, fontFamily: _fontFamily);
+  static TextStyle pinkunderlined20w600 = TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600, color: CustomColors.brandPurple, fontFamily: _fontFamily, decoration: TextDecoration.underline);
+  static TextStyle green16w400 = TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400, color: CustomColors.success, fontFamily: _fontFamily);
+  static TextStyle textMain48w700 = TextStyle(fontSize: 48.sp, fontWeight: FontWeight.w700, color: CustomColors.textPrimary, fontFamily: _fontFamily);
+
+  // Generic color-based styles
+  static TextStyle black18w600 = TextStyle(
+    fontSize: 18.sp,
     fontWeight: FontWeight.w600,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle white20w400 = TextStyle(
-    fontSize: 20.sp,
-    fontWeight: FontWeight.w400,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle white20w700 = TextStyle(
-    fontSize: 20.sp,
-    fontWeight: FontWeight.w700,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle white18w600 = TextStyle(
-    fontSize: 22.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle white12w600 = TextStyle(
-    fontSize: 12.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
   );
   static TextStyle white14w600 = TextStyle(
     fontSize: 14.sp,
     fontWeight: FontWeight.w600,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
+    color: CustomColors.surfaceWhite,
+    fontFamily: _fontFamily,
   );
+  
   static TextStyle white14w500 = TextStyle(
     fontSize: 14.sp,
     fontWeight: FontWeight.w500,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
+    color: CustomColors.surfaceWhite,
+    fontFamily: _fontFamily,
   );
-  static TextStyle white16w400 = TextStyle(
-    fontSize: 16.sp,
-    fontWeight: FontWeight.w400,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle white17w500 = TextStyle(
-    fontSize: 17.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.whiteColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black18w600 = TextStyle(
-    fontSize: 18.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black14w400 = TextStyle(
-    fontSize: 14.sp,
-    fontWeight: FontWeight.w400,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black14w600 = TextStyle(
-    fontSize: 14.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black12w600 = TextStyle(
-    fontSize: 12.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black14w500 = TextStyle(
-    fontSize: 14.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black30w600 = TextStyle(
-    fontSize: 30.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle grey18w400 = TextStyle(
-    fontSize: 18.sp,
-    fontWeight: FontWeight.w400,
-    color: CustomColors.textGreyColor,
-    fontFamily: 'Degular',
-  );
+
   static TextStyle grey14w400 = TextStyle(
     fontSize: 14.sp,
     fontWeight: FontWeight.w400,
-    color: CustomColors.textGreyColor,
-    fontFamily: 'Degular',
+    color: CustomColors.textSecondary,
+    fontFamily: _fontFamily,
   );
-  static TextStyle grey14w400LineThrough = TextStyle(
-    fontSize: 14.sp,
-    fontWeight: FontWeight.w400,
-    color: CustomColors.textGreyColor,
-    fontFamily: 'Degular',
-    decoration: TextDecoration.lineThrough,
-    decorationColor: CustomColors.textGreyColor,
-    decorationThickness: 1.0,
-  );
+  
   static TextStyle grey16w400 = TextStyle(
     fontSize: 16.sp,
     fontWeight: FontWeight.w400,
-    color: CustomColors.textGreyColor,
-    fontFamily: 'Degular',
+    color: CustomColors.textSecondary,
+    fontFamily: _fontFamily,
   );
-  static TextStyle grey16w500 = TextStyle(
-    fontSize: 16.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.textGreyColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle grey18w500 = TextStyle(
-    fontSize: 18.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.textGreyColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle grey22w500 = TextStyle(
-    fontSize: 22.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.textGreyColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle grey22w600 = TextStyle(
-    fontSize: 22.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.textGreyColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black18w400 = TextStyle(
+
+  static TextStyle grey18w400 = TextStyle(
     fontSize: 18.sp,
     fontWeight: FontWeight.w400,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
+    color: CustomColors.textSecondary,
+    fontFamily: _fontFamily,
   );
-  static TextStyle black18w500 = TextStyle(
-    fontSize: 18.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black10w600 = TextStyle(
-    fontSize: 10.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black12w400 = TextStyle(
-    fontSize: 12.sp,
-    fontWeight: FontWeight.w400,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black13w400 = TextStyle(
-    fontSize: 13.sp,
-    fontWeight: FontWeight.w400,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black20w600 = TextStyle(
-    fontSize: 20.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black20w500 = TextStyle(
-    fontSize: 20.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black20w400 = TextStyle(
-    fontSize: 20.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black20w600Underlined = TextStyle(
-    fontSize: 20.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black26w600 = TextStyle(
-    fontSize: 26.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black22w600 = TextStyle(
-    fontSize: 22.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black24w600 = TextStyle(
-    fontSize: 24.sp,
-    fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black22w500 = TextStyle(
-    fontSize: 22.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black16w400 = TextStyle(
+
+  static TextStyle white16w400 = TextStyle(
     fontSize: 16.sp,
     fontWeight: FontWeight.w400,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
+    color: CustomColors.surfaceWhite,
+    fontFamily: _fontFamily,
   );
-  static TextStyle black16w500 = TextStyle(
-    fontSize: 16.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
+  
+  static TextStyle black14w600 = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w600,
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
   );
+
   static TextStyle black16w600 = TextStyle(
     fontSize: 16.sp,
     fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
   );
-  static TextStyle black17w500 = TextStyle(
-    fontSize: 17.sp,
-    fontWeight: FontWeight.w500,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle black28w600 = TextStyle(
-    fontSize: 28.sp,
+  
+  static TextStyle black12w600 = TextStyle(
+    fontSize: 12.sp,
     fontWeight: FontWeight.w600,
-    color: CustomColors.blackColor,
-    fontFamily: 'Degular',
-  );
-  static TextStyle pinkunderlined20w600 = TextStyle(
-    fontSize: 20.sp,
-    fontWeight: FontWeight.w600,
-    decoration: TextDecoration.underline,
-    color: CustomColors.drakPurpleColor,
-    fontFamily: 'Degular',
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
   );
 
-  static TextStyle green16w400 = TextStyle(
+  static TextStyle black14w500 = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w500,
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
+  );
+
+  static TextStyle black14w400 = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w400,
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
+  );
+
+  static TextStyle black16w400 = TextStyle(
     fontSize: 16.sp,
     fontWeight: FontWeight.w400,
-    color: CustomColors.greenColor,
-    fontFamily: 'Degular',
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
+  );
+
+  static TextStyle black16w500 = TextStyle(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w500,
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
+  );
+
+  static TextStyle black20w600 = TextStyle(
+    fontSize: 20.sp,
+    fontWeight: FontWeight.w600,
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
+  );
+
+  static TextStyle black20w500 = TextStyle(
+    fontSize: 20.sp,
+    fontWeight: FontWeight.w500,
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
+  );
+
+  static TextStyle black22w600 = TextStyle(
+    fontSize: 22.sp,
+    fontWeight: FontWeight.w600,
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
+  );
+
+  static TextStyle black30w600 = TextStyle(
+    fontSize: 30.sp,
+    fontWeight: FontWeight.w600,
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
+  );
+
+  static TextStyle black13w400 = TextStyle(
+    fontSize: 13.sp,
+    fontWeight: FontWeight.w400,
+    color: CustomColors.deepSlate,
+    fontFamily: _fontFamily,
   );
 }

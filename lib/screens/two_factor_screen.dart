@@ -65,7 +65,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -232,7 +232,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
               : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -246,7 +246,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
               height: 40.w,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Colors.white.withValues(alpha: 0.2)
+                    ? Colors.white.withOpacity(0.2)
                     : const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(8.r),
               ),

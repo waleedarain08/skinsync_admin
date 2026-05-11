@@ -75,8 +75,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    CustomColors.brandCyan.withValues(alpha: 0.2),
-                    CustomColors.brandCyan.withValues(alpha: 0),
+                    CustomColors.brandCyan.withOpacity(0.2),
+                    CustomColors.brandCyan.withOpacity(0),
                   ],
                 ),
               ),
@@ -92,8 +92,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    CustomColors.brandPurple.withValues(alpha: 0.15),
-                    CustomColors.brandPurple.withValues(alpha: 0),
+                    CustomColors.brandPurple.withOpacity(0.15),
+                    CustomColors.brandPurple.withOpacity(0),
                   ],
                 ),
               ),
@@ -128,7 +128,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withOpacity(0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -161,7 +161,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),

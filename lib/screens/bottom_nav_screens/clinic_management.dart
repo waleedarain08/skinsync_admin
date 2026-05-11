@@ -256,7 +256,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> {
               IconButton(icon: const Icon(Icons.edit_outlined, size: 20), onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => const EditClinicDialogBox(),
+                  builder: (context) => EditClinicDialogBox(clinic: clinic),
                 );
               }),
             ],

@@ -205,14 +205,7 @@ class UserDataTable extends StatelessWidget {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (_) => UserManagementDialogBox(
-                  transactionId: "TXN-2025-10-001",
-                  patientName: "Emma Johnson",
-                  clinicName: "Radiant Skin Clinic",
-                  serviceName: "Botox Treatment",
-                  amount: "\$450",
-                  feedbackMessage: "The treatment was rushed and did not meet the promised duration.",
-                ),
+                builder: (_) => const UserManagementDialogBox(),
               );
             },
           ),

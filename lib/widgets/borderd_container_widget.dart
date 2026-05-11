@@ -12,18 +12,20 @@ class BorderdContainerWidget extends StatelessWidget {
   final double borderWidth;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
+  final List<BoxShadow>? boxShadow;
 
   const BorderdContainerWidget({
     super.key,
     required this.child,
-    this.borderRadius = 10,
-    this.borderColor = CustomColors.borderColor,
-    this.backgroundColor = CustomColors.whiteColor,
+    this.borderRadius = 16,
+    this.borderColor = CustomColors.borderLight,
+    this.backgroundColor = CustomColors.surfaceWhite,
     this.height,
     this.width,
     this.borderWidth = 1,
     this.padding,
     this.margin,
+    this.boxShadow,
   });
 
   @override
@@ -35,8 +37,9 @@ class BorderdContainerWidget extends StatelessWidget {
       margin: margin,
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: BorderRadius.circular(borderRadius.r),
         border: Border.all(color: borderColor, width: borderWidth),
+        boxShadow: boxShadow,
       ),
       child: child,
     );

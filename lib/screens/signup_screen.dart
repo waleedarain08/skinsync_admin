@@ -76,7 +76,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       height: 400,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: CustomColors.brandCyan.withValues(alpha: 0.05),
+                        color: CustomColors.brandCyan.withOpacity(0.05),
                       ),
                     ),
                   ),
@@ -90,7 +90,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Container(
                             padding: EdgeInsets.all(16.w),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.1),
+                              color: Colors.white.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(20.r),
                             ),
                             child: Image.asset(PngAssets.splashLogo, height: 60.w),
@@ -108,7 +108,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Text(
                             "Scale your clinic operations with our advanced AI-powered administrative tools.",
                             style: CustomFonts.textMuted16w500.copyWith(
-                              color: Colors.white.withValues(alpha: 0.7),
+                              color: Colors.white.withOpacity(0.7),
                               height: 1.5,
                             ),
                           ),
@@ -223,7 +223,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       children: [
         Icon(icon, color: CustomColors.brandCyan, size: 22.sp),
         SizedBox(width: 12.w),
-        Text(text, style: CustomFonts.textMain16w600.copyWith(color: Colors.white.withValues(alpha: 0.9))),
+        Text(text, style: CustomFonts.textMain16w600.copyWith(color: Colors.white.withOpacity(0.9))),
       ],
     );
   }
@@ -273,7 +273,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Icon(
             isValid ? Icons.check_circle_rounded : Icons.circle_outlined,
             size: 16.sp,
-            color: isValid ? CustomColors.success : CustomColors.textMuted.withValues(alpha: 0.4),
+            color: isValid ? CustomColors.success : CustomColors.textMuted.withOpacity(0.4),
           ),
           SizedBox(width: 8.w),
           Text(text, style: CustomFonts.textMuted12w400.copyWith(color: isValid ? CustomColors.success : CustomColors.textMuted)),

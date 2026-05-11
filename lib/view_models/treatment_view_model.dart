@@ -1,161 +1,429 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/requests/add_treatment_req_model.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/treatment_model.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
+import '../utils/dummy_data.dart';
 import 'base_view_model.dart';
 
-final treatmentViewModelProvider = NotifierProvider(
-  () => TreamententViewModel._(),
+final treatmentViewModelProvider = NotifierProvider<TreatmentViewModel, TreatmentState>(
+  () => TreatmentViewModel._(),
 );
 
-class TreamententViewModel extends BaseViewModel<TreatmentState> {
-  TreamententViewModel._() : super(TreatmentState());
+class TreatmentViewModel extends BaseViewModel<TreatmentState> {
+  TreatmentViewModel._() : super(TreatmentState());
 
-  final TreatmentRepository _treatmentRepository =
-      locator<TreatmentRepository>();
+  final TreatmentRepository _treatmentRepository = locator<TreatmentRepository>();
 
-  // @override
-  // void init() {
-  //   super.init();
-  //   _loadTreatments();
-  // }
+  // Step 1 Controllers
+  final internalNameController = TextEditingController();
+  final displayNameController = TextEditingController();
+  final fullDescriptionController = TextEditingController();
+  final shortDescriptionController = TextEditingController();
 
-  // Future<void> _loadTreatments() async {
-  //   await getTreatments();
-  // }
+  // Step 2 Controllers
+  final categoryController = TextEditingController();
+  final subcategoryController = TextEditingController();
 
-  // Future<bool> getTreatments() async {
-  //   return await runSafely<bool?>(showLoading: false, () async {
-  //         state = state.copyWith(loading: true);
-  //         // final authState = ref.read(authViewModelProvider);
-  //         // final clinicId = authState.user?.clinicId;
-  //         // if (clinicId == null) {
-  //         //   throw BadRequestException("Clinic ID not found");
-  //         // }
-  //         final response = await _treatmentRepository.getClinicTreatments();
+  // Step 4 Controllers
+  final materialNameController = TextEditingController();
+  final maxMaterialQuantityController = TextEditingController(text: '0');
+  final combinableSearchController = TextEditingController();
 
-  //         state = state.copyWith(treatments: response, loading: false);
+  // Filter Controllers
+  final searchController = TextEditingController();
+  final filterCategoryController = TextEditingController();
+  final filterSubcategoryController = TextEditingController();
+  final filterAreaController = TextEditingController();
+  final filterSubAreaController = TextEditingController();
+  final filterMaterialController = TextEditingController();
+  final filterStatusController = TextEditingController();
 
-  //         return true;
-  //       }) ??
-  //       false;
-  // }
+  final ImagePicker _picker = ImagePicker();
 
-  // Future<List<TreatmentModel>> getAdminTreatments() async {
-  //   return await runSafely<List<TreatmentModel>?>(showLoading: false, () async {
-  //         // state = state.copyWith(loading: true);
-  //         // final authState = ref.read(authViewModelProvider);
-  //         // final clinicId = authState.user?.clinicId;
-  //         // if (clinicId == null) {
-  //         //   throw BadRequestException("Clinic ID not found");
-  //         // }
-  //         final response = await _treatmentRepository.getAdminTreatments();
+  @override
+  void dispose() {
+    internalNameController.dispose();
+    displayNameController.dispose();
+    fullDescriptionController.dispose();
+    shortDescriptionController.dispose();
+    categoryController.dispose();
+    subcategoryController.dispose();
+    materialNameController.dispose();
+    maxMaterialQuantityController.dispose();
+    combinableSearchController.dispose();
+    
+    searchController.dispose();
+    filterCategoryController.dispose();
+    filterSubcategoryController.dispose();
+    filterAreaController.dispose();
+    filterSubAreaController.dispose();
+    filterMaterialController.dispose();
+    filterStatusController.dispose();
 
-  //         // state = state.copyWith(treatments: response, loading: false);
+    for (var area in state.areas) {
+      area.dispose();
+    }
+    super.dispose();
+  }
 
-  //         return response;
-  //       }) ??
-  //       [];
-  // }
+  Future<void> initialize() async {
+    await getTreatments();
+  }
 
-  // Future<List<SideAreaModel>> getTreatmentsSideAreas({
-  //   required int treatmentId,
-  // }) async {
-  //   return await runSafely<List<SideAreaModel>?>(showLoading: true, () async {
-  //         // state = state.copyWith(loading: true);
-  //         // final authState = ref.read(authViewModelProvider);
-  //         // final clinicId = authState.user?.clinicId;
-  //         // if (clinicId == null) {
-  //         //   throw BadRequestException("Clinic ID not found");
-  //         // }
-  //         final response = await _treatmentRepository.getTreatmentsSideArea(
-  //           treatmentId,
-  //         );
+  Future<bool> getTreatments() async {
+    return await runSafely<bool?>(showLoading: false, () async {
+          state = state.copyWith(loading: true);
+          // Using dummy data for now
+          await Future.delayed(const Duration(milliseconds: 500));
+          state = state.copyWith(
+            treatments: TreatmentData.dummyTreatments, 
+            filteredTreatments: TreatmentData.dummyTreatments,
+            loading: false,
+          );
+          return true;
+        }) ??
+        false;
+  }
 
-  //         // state = state.copyWith(treatments: response, loading: false);
+  void resetForm() {
+    internalNameController.clear();
+    displayNameController.clear();
+    fullDescriptionController.clear();
+    shortDescriptionController.clear();
+    categoryController.clear();
+    subcategoryController.clear();
+    materialNameController.clear();
+    maxMaterialQuantityController.text = '0';
+    combinableSearchController.clear();
+    
+    for (var area in state.areas) {
+      area.dispose();
+    }
 
-  //         return response;
-  //       }) ??
-  //       [];
-  // }
+    state = state.copyWith(
+      currentStep: 0,
+      treatmentImage: null,
+      treatmentIcon: null,
+      areas: [AreaViewModelEntry()],
+      selectedTreatment: null,
+      useInAiSimulator: false,
+      combinableTreatments: [],
+    );
+  }
 
-  // Future<bool> addClinicTreatment({
-  //   required AddTreatmentReqModel treatment,
-  // }) async {
-  //   return await runSafely<bool?>(showLoading: true, () async {
-  //         final response = await _treatmentRepository.addTreatment(treatment);
-  //         state = state.copyWith(treatments: state.treatments..add(response));
-  //         return true;
-  //       }) ??
-  //       false;
-  // }
+  void selectTreatment(TreatmentModel treatment) {
+    state = state.copyWith(selectedTreatment: treatment);
+    
+    // Populate controllers for editing
+    internalNameController.text = treatment.name ?? '';
+    displayNameController.text = treatment.patientDisplayName ?? '';
+    fullDescriptionController.text = treatment.description ?? '';
+    shortDescriptionController.text = treatment.shortDescription ?? '';
+    categoryController.text = treatment.category ?? '';
+    subcategoryController.text = treatment.subcategory ?? '';
+    materialNameController.text = treatment.materialName ?? '';
+    maxMaterialQuantityController.text = treatment.maxMaterialQuantity.toString();
+    
+    // Clear and re-populate areas
+    for (var area in state.areas) {
+      area.dispose();
+    }
+    
+    final List<AreaViewModelEntry> newAreas = [];
+    if (treatment.sideAreas != null && treatment.sideAreas!.isNotEmpty) {
+      for (var area in treatment.sideAreas!) {
+        final entry = AreaViewModelEntry();
+        entry.areaController.text = area.name ?? '';
+        newAreas.add(entry);
+      }
+    } else {
+      newAreas.add(AreaViewModelEntry());
+    }
+    
+    // Combinable treatments lookup
+    final List<TreatmentModel> combinable = [];
+    if (treatment.combinableTreatmentIds != null) {
+      for (var id in treatment.combinableTreatmentIds!) {
+        final match = state.treatments.firstWhere((t) => t.id == id, orElse: () => TreatmentModel(id: id, name: "Unknown ID: $id"));
+        combinable.add(match);
+      }
+    }
 
-  // Future<bool> editClinicTreatment({
-  //   required AddTreatmentReqModel treatment,
-  // }) async {
-  //   return await runSafely<bool?>(showLoading: true, () async {
-  //         final response = await _treatmentRepository.editTreatment(treatment);
+    state = state.copyWith(
+      areas: newAreas,
+      treatmentImage: null, 
+      treatmentIcon: null,
+      useInAiSimulator: treatment.useInAiSimulator,
+      combinableTreatments: combinable,
+    );
+  }
 
-  //         final updatedList = [...state.treatments];
+  void setStep(int step) {
+    state = state.copyWith(currentStep: step);
+  }
 
-  //         final index = updatedList.indexWhere((e) => e.id == response.id);
+  Future<void> pickImage(bool isIcon) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      if (isIcon) {
+        state = state.copyWith(treatmentIcon: image);
+      } else {
+        state = state.copyWith(treatmentImage: image);
+      }
+    }
+  }
 
-  //         if (index != -1) {
-  //           updatedList[index] = response;
-  //         }
+  void onCategorySelected(String val) {
+    subcategoryController.clear();
+    state = state.copyWith(); 
+  }
 
-  //         // Update state
-  //         state = state.copyWith(treatments: updatedList);
+  void onAreaSelected(int index, String val) {
+    state.areas[index].subAreaController.clear();
+    final updatedAreas = [...state.areas];
+    updatedAreas[index].subAreas = [];
+    state = state.copyWith(areas: updatedAreas);
+  }
 
-  //         return true;
-  //       }) ??
-  //       false;
-  // }
+  void addArea() {
+    state = state.copyWith(areas: [...state.areas, AreaViewModelEntry()]);
+  }
 
-  // Future<bool> deleteTreatment({required int treatmentId}) async {
-  //   return await runSafely<bool?>(showLoading: true, () async {
-  //         final _ = await _treatmentRepository.deleteTreatment(treatmentId);
+  void removeArea(int index) {
+    final updatedAreas = [...state.areas];
+    updatedAreas[index].dispose();
+    updatedAreas.removeAt(index);
+    state = state.copyWith(areas: updatedAreas);
+  }
 
-  //         final updatedList = [...state.treatments];
+  void addSubArea(int areaIndex, String val) {
+    if (val.isNotEmpty && !state.areas[areaIndex].subAreas.contains(val)) {
+      final updatedAreas = [...state.areas];
+      updatedAreas[areaIndex].subAreas = [...updatedAreas[areaIndex].subAreas, val];
+      updatedAreas[areaIndex].subAreaController.clear();
+      state = state.copyWith(areas: updatedAreas);
+    }
+  }
 
-  //         final index = updatedList.indexWhere((e) => e.id == treatmentId);
+  void removeSubArea(int areaIndex, String subArea) {
+    final updatedAreas = [...state.areas];
+    updatedAreas[areaIndex].subAreas = 
+        updatedAreas[areaIndex].subAreas.where((s) => s != subArea).toList();
+    state = state.copyWith(areas: updatedAreas);
+  }
 
-  //         updatedList.removeAt(index);
+  // Step 4 Actions
+  void toggleAiSimulator(bool? value) {
+    state = state.copyWith(useInAiSimulator: value ?? false);
+  }
 
-  //         // Update state
-  //         state = state.copyWith(treatments: updatedList);
+  void addCombinableTreatment(TreatmentModel treatment) {
+    if (!state.combinableTreatments.any((t) => t.id == treatment.id)) {
+      state = state.copyWith(
+        combinableTreatments: [...state.combinableTreatments, treatment],
+      );
+    }
+    combinableSearchController.clear();
+  }
 
-  //         return true;
-  //       }) ??
-  //       false;
-  // }
+  void removeCombinableTreatment(int treatmentId) {
+    state = state.copyWith(
+      combinableTreatments: state.combinableTreatments.where((t) => t.id != treatmentId).toList(),
+    );
+  }
 
-  // void setTreatment(int treatmentId) {
-  //   state = state.copyWith(selectedTreatmentId: treatmentId);
-  // }
+  // Filter Logic
+  void _applyFilters() {
+    final query = searchController.text.toLowerCase();
+    final category = filterCategoryController.text.toLowerCase();
+    final subcategory = filterSubcategoryController.text.toLowerCase();
+    final area = filterAreaController.text.toLowerCase();
+    final status = filterStatusController.text.toLowerCase();
+    
+    state = state.copyWith(
+      filteredTreatments: state.treatments.where((t) {
+        final matchesQuery = query.isEmpty || 
+            (t.name?.toLowerCase().contains(query) ?? false) ||
+            (t.description?.toLowerCase().contains(query) ?? false);
+            
+        final matchesCategory = category.isEmpty || 
+            (t.category?.toLowerCase() == category);
+
+        final matchesSubcategory = subcategory.isEmpty || 
+            (t.subcategory?.toLowerCase() == subcategory);
+
+        final matchesArea = area.isEmpty || 
+            (t.sideAreas?.any((a) => a.name?.toLowerCase() == area) ?? false);
+
+        final matchesStatus = status.isEmpty || 
+            (status == 'active' && t.isActive) ||
+            (status == 'inactive' && !t.isActive);
+
+        return matchesQuery && matchesCategory && matchesSubcategory && matchesArea && matchesStatus;
+      }).toList(),
+    );
+  }
+
+  void onSearchChanged(String val) {
+    _applyFilters();
+  }
+
+  void onFilterCategorySelected(String val) {
+    filterSubcategoryController.clear();
+    _applyFilters();
+  }
+
+  void onFilterAreaSelected(String val) {
+    filterSubAreaController.clear();
+    _applyFilters();
+  }
+
+  void onFilterChanged() {
+    _applyFilters();
+  }
+
+  void clearFilters() {
+    searchController.clear();
+    filterCategoryController.clear();
+    filterSubcategoryController.clear();
+    filterAreaController.clear();
+    filterSubAreaController.clear();
+    filterMaterialController.clear();
+    filterStatusController.clear();
+    _applyFilters();
+  }
+
+  void toggleTreatmentStatus(int treatmentId) {
+    final updatedList = state.treatments.map((t) {
+      if (t.id == treatmentId) {
+        return t.copyWith(isActive: !t.isActive);
+      }
+      return t;
+    }).toList();
+    
+    state = state.copyWith(
+      treatments: updatedList,
+      filteredTreatments: _getFilteredList(updatedList),
+    );
+  }
+
+  void deleteTreatment(int treatmentId) {
+    final updatedList = state.treatments.where((t) => t.id != treatmentId).toList();
+    state = state.copyWith(
+      treatments: updatedList,
+      filteredTreatments: _getFilteredList(updatedList),
+    );
+  }
+
+  List<TreatmentModel> _getFilteredList(List<TreatmentModel> source) {
+    final query = searchController.text.toLowerCase();
+    final category = filterCategoryController.text.toLowerCase();
+    final subcategory = filterSubcategoryController.text.toLowerCase();
+    final area = filterAreaController.text.toLowerCase();
+    final status = filterStatusController.text.toLowerCase();
+
+    return source.where((t) {
+      final matchesQuery = query.isEmpty ||
+          (t.name?.toLowerCase().contains(query) ?? false) ||
+          (t.description?.toLowerCase().contains(query) ?? false);
+
+      final matchesCategory = category.isEmpty || (t.category?.toLowerCase() == category);
+
+      final matchesSubcategory = subcategory.isEmpty || (t.subcategory?.toLowerCase() == subcategory);
+
+      final matchesArea = area.isEmpty || (t.sideAreas?.any((a) => a.name?.toLowerCase() == area) ?? false);
+
+      final matchesStatus = status.isEmpty ||
+          (status == 'active' && t.isActive) ||
+          (status == 'inactive' && !t.isActive);
+
+      return matchesQuery && matchesCategory && matchesSubcategory && matchesArea && matchesStatus;
+    }).toList();
+  }
+
+  Future<void> submitTreatment(BuildContext context) async {
+    return await runSafely<void>(showLoading: true, () async {
+      await Future.delayed(const Duration(seconds: 1));
+      resetForm();
+    });
+  }
+
+  Future<void> updateTreatment(BuildContext context) async {
+    return await runSafely<void>(showLoading: true, () async {
+      // Logic for updating the treatment
+      await Future.delayed(const Duration(seconds: 1));
+      await getTreatments();
+    });
+  }
 }
 
 class TreatmentState {
   final List<TreatmentModel> treatments;
+  final List<TreatmentModel> filteredTreatments;
+  final TreatmentModel? selectedTreatment;
   final int? selectedTreatmentId;
   final bool loading;
+  final int currentStep;
+  final XFile? treatmentImage;
+  final XFile? treatmentIcon;
+  final List<AreaViewModelEntry> areas;
+  
+  // Step 4 fields
+  final bool useInAiSimulator;
+  final List<TreatmentModel> combinableTreatments;
 
   TreatmentState({
     this.treatments = const [],
+    this.filteredTreatments = const [],
+    this.selectedTreatment,
     this.loading = false,
     this.selectedTreatmentId,
-  });
+    this.currentStep = 0,
+    this.treatmentImage,
+    this.treatmentIcon,
+    this.useInAiSimulator = false,
+    this.combinableTreatments = const [],
+    List<AreaViewModelEntry>? areas,
+  }) : areas = areas ?? [AreaViewModelEntry()];
 
   TreatmentState copyWith({
     bool? loading,
     List<TreatmentModel>? treatments,
+    List<TreatmentModel>? filteredTreatments,
+    TreatmentModel? selectedTreatment,
     int? selectedTreatmentId,
+    int? currentStep,
+    XFile? treatmentImage,
+    XFile? treatmentIcon,
+    List<AreaViewModelEntry>? areas,
+    bool? useInAiSimulator,
+    List<TreatmentModel>? combinableTreatments,
   }) {
     return TreatmentState(
       loading: loading ?? this.loading,
       treatments: treatments ?? this.treatments,
+      filteredTreatments: filteredTreatments ?? this.filteredTreatments,
+      selectedTreatment: selectedTreatment ?? this.selectedTreatment,
       selectedTreatmentId: selectedTreatmentId ?? this.selectedTreatmentId,
+      currentStep: currentStep ?? this.currentStep,
+      treatmentImage: treatmentImage ?? this.treatmentImage,
+      treatmentIcon: treatmentIcon ?? this.treatmentIcon,
+      areas: areas ?? this.areas,
+      useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
+      combinableTreatments: combinableTreatments ?? this.combinableTreatments,
     );
+  }
+}
+
+class AreaViewModelEntry {
+  final areaController = TextEditingController();
+  final subAreaController = TextEditingController();
+  List<String> subAreas = [];
+
+  void dispose() {
+    areaController.dispose();
+    subAreaController.dispose();
   }
 }

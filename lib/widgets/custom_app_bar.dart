@@ -16,9 +16,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       height: 80.h,
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: CustomColors.textMuted.withOpacity(0.1), width: 1)),
+      decoration: const BoxDecoration(
+        color: CustomColors.surfaceWhite,
+        border: Border(bottom: BorderSide(color: CustomColors.borderLight, width: 1)),
       ),
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Row(
@@ -27,11 +27,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             defaultValue: const SizedBox.shrink(),
             mobile: () => IconButton(
               onPressed: () => Scaffold.of(context).openDrawer(),
-              icon: const Icon(Icons.menu_rounded),
+              icon: const Icon(Icons.menu_rounded, color: CustomColors.deepSlate),
             ),
             tablet: () => IconButton(
               onPressed: () => Scaffold.of(context).openDrawer(),
-              icon: const Icon(Icons.menu_rounded),
+              icon: const Icon(Icons.menu_rounded, color: CustomColors.deepSlate),
             ),
           ),
           const Spacer(),
@@ -51,10 +51,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         Container(
           padding: EdgeInsets.all(8.w),
           decoration: BoxDecoration(
-            color: CustomColors.surfaceGhost,
+            color: CustomColors.backgroundLight,
             borderRadius: BorderRadius.circular(10.r),
           ),
-          child: Icon(icon, color: CustomColors.textMuted, size: 22.sp),
+          child: Icon(icon, color: CustomColors.textSecondary, size: 22.sp),
         ),
         if (hasBadge)
           Positioned(
@@ -64,9 +64,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               width: 8.w,
               height: 8.w,
               decoration: BoxDecoration(
-                color: CustomColors.brandPrimary,
+                color: CustomColors.brandPurple,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1.5),
+                border: Border.all(color: CustomColors.surfaceWhite, width: 1.5),
               ),
             ),
           ),
@@ -81,18 +81,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text('Alex MedSpa', style: CustomFonts.textMain14w600),
-            Text('Super Admin', style: CustomFonts.textMuted12w400),
+            Text('Alex MedSpa', style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+            Text('Super Admin', style: CustomFonts.bodySmall),
           ],
         ),
         SizedBox(width: 12.w),
         PopupMenuButton(
           offset: Offset(0, 50.h),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r), side: const BorderSide(color: CustomColors.borderLight)),
           child: CircleAvatar(
             radius: 20.r,
-            backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
-            child: Icon(Icons.person_rounded, size: 20.sp, color: CustomColors.brandPrimary),
+            backgroundColor: CustomColors.brandCyan.withOpacity(0.2),
+            child: Icon(Icons.person_rounded, size: 20.sp, color: CustomColors.deepSlate),
           ),
           itemBuilder: (context) => [
             PopupMenuItem(
@@ -106,7 +107,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   const Icon(Icons.logout_rounded, color: CustomColors.error, size: 18),
                   SizedBox(width: 12.w),
-                  const Text('Logout', style: TextStyle(color: CustomColors.error, fontWeight: FontWeight.w600)),
+                  Text('Logout', style: TextStyle(color: CustomColors.error, fontWeight: FontWeight.w600, fontSize: 14.sp)),
                 ],
               ),
             ),

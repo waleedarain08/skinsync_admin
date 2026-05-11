@@ -2,104 +2,78 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'standard_dialog.dart';
 
 class UserManagementDialogBox extends StatelessWidget {
-  final String transactionId;
-  final String patientName;
-  final String clinicName;
-  final String serviceName;
-  final String amount;
-  final String? feedbackMessage;
-
-  const UserManagementDialogBox({
-    super.key,
-    required this.transactionId,
-    required this.patientName,
-    required this.clinicName,
-    required this.serviceName,
-    required this.amount,
-    this.feedbackMessage,
-  });
+  const UserManagementDialogBox({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-      backgroundColor: Colors.white,
-      child: Container(
-        width: 600.w,
-        padding: EdgeInsets.all(32.w),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("User Profile Details", style: CustomFonts.textMain24w700),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.close, size: 24.sp),
-                  ),
-                ],
-              ),
-              SizedBox(height: 32.h),
-              Text("Personal Information", style: CustomFonts.textMain20w600),
-              SizedBox(height: 20.h),
-              Row(
-                children: [
-                  Expanded(child: _infoBlock("First Name", "Emma")),
-                  Expanded(child: _infoBlock("Last Name", "Johnson")),
-                ],
-              ),
-              SizedBox(height: 16.h),
-              Row(
-                children: [
-                  Expanded(child: _infoBlock("Email", "emma.j@example.com")),
-                  Expanded(child: _infoBlock("Mobile", "+1 (555) 123-4567")),
-                ],
-              ),
-              SizedBox(height: 32.h),
-              const Divider(),
-              SizedBox(height: 32.h),
-              Text("Skin Analysis & Goals", style: CustomFonts.textMain20w600),
-              SizedBox(height: 20.h),
-              _buildTagSection("Skin Goals", ["Anti-aging", "Hydration"]),
-              SizedBox(height: 20.h),
-              _buildTagSection("Primary Concerns", ["Fine lines", "Dryness", "Dark spots"]),
-              SizedBox(height: 32.h),
-              const Divider(),
-              SizedBox(height: 32.h),
-              Text("Bio & History", style: CustomFonts.textMain20w600),
-              SizedBox(height: 16.h),
-              _infoBlock("Bio", "Looking to improve skin texture and reduce signs of aging.", isFullWidth: true),
-              SizedBox(height: 16.h),
-              _infoBlock("Medical History", "No known allergies. Previous treatments include chemical peels.", isFullWidth: true),
-              SizedBox(height: 40.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Close Profile"),
-                  ),
-                ],
-              ),
-            ],
-          ),
+    return StandardDialog(
+      title: "User Profile Details",
+      width: 700.w,
+      content: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle("Personal Information"),
+            SizedBox(height: 20.h),
+            Row(
+              children: [
+                Expanded(child: _infoBlock("First Name", "Emma")),
+                SizedBox(width: 24.w),
+                Expanded(child: _infoBlock("Last Name", "Johnson")),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            Row(
+              children: [
+                Expanded(child: _infoBlock("Email", "emma.j@example.com")),
+                SizedBox(width: 24.w),
+                Expanded(child: _infoBlock("Mobile", "+1 (555) 123-4567")),
+              ],
+            ),
+            SizedBox(height: 32.h),
+            _buildSectionTitle("Skin Analysis & Goals"),
+            SizedBox(height: 20.h),
+            _buildTagSection("Skin Goals", ["Anti-aging", "Hydration"]),
+            SizedBox(height: 20.h),
+            _buildTagSection("Primary Concerns", ["Fine lines", "Dryness", "Dark spots"]),
+            SizedBox(height: 32.h),
+            _buildSectionTitle("Bio & History"),
+            SizedBox(height: 16.h),
+            _infoBlock("Bio", "Looking to improve skin texture and reduce signs of aging."),
+            SizedBox(height: 16.h),
+            _infoBlock("Medical History", "No known allergies. Previous treatments include chemical peels."),
+          ],
         ),
       ),
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Close Profile"),
+        ),
+      ],
     );
   }
 
-  Widget _infoBlock(String label, String value, {bool isFullWidth = false}) {
+  Widget _buildSectionTitle(String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+        const Divider(),
+      ],
+    );
+  }
+
+  Widget _infoBlock(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: CustomFonts.textMuted13w500),
         SizedBox(height: 4.h),
-        Text(value, style: CustomFonts.textMain16w400.copyWith(fontWeight: FontWeight.w600)),
+        Text(value, style: CustomFonts.textMain16w600),
       ],
     );
   }
@@ -120,7 +94,7 @@ class UserManagementDialogBox extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.r),
               border: Border.all(color: CustomColors.brandCyan.withOpacity(0.2)),
             ),
-            child: Text(tag, style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary, fontSize: 12.sp)),
+            child: Text(tag, style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary, fontSize: 11.sp)),
           )).toList(),
         ),
       ],

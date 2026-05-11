@@ -12,9 +12,12 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_scre
 import 'package:skinsync_admin/screens/bottom_nav_screens/setting_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
+import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/treatment_management_screen.dart';
+import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
+import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
 
@@ -82,6 +85,21 @@ class RouteGenerator {
             name: CreateTreatmentScreen.routeName,
             path: CreateTreatmentScreen.routeName,
             builder: (_, _) => const CreateTreatmentScreen(),
+          ),
+          GoRoute(
+            name: TreatmentDetailScreen.routeName,
+            path: TreatmentDetailScreen.routeName,
+            builder: (_, _) => const TreatmentDetailScreen(),
+          ),
+          GoRoute(
+            name: EditTreatmentScreen.routeName,
+            path: EditTreatmentScreen.routeName,
+            builder: (_, _) => const EditTreatmentScreen(),
+          ),
+          GoRoute(
+            name: ManageTreatmentDataScreen.routeName,
+            path: ManageTreatmentDataScreen.routeName,
+            builder: (_, _) => const ManageTreatmentDataScreen(),
           ),
           GoRoute(
             name: PaymentScreen.routeName,

@@ -8,115 +8,150 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      primaryColor: CustomColors.brandPrimary,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: CustomColors.brandPrimary,
-        primary: CustomColors.brandPrimary,
-        secondary: CustomColors.brandCyan,
-        tertiary: CustomColors.brandPurple,
+      primaryColor: CustomColors.deepSlate,
+      
+      colorScheme: const ColorScheme.light(
+        primary: CustomColors.deepSlate,
+        onPrimary: CustomColors.surfaceWhite,
+        secondary: CustomColors.brandPurple,
+        onSecondary: CustomColors.deepSlate,
+        tertiary: CustomColors.brandCyan,
+        onTertiary: CustomColors.deepSlate,
         surface: CustomColors.surfaceWhite,
-        error: CustomColors.error,
+        onSurface: CustomColors.deepSlate,
         background: CustomColors.backgroundLight,
+        onBackground: CustomColors.deepSlate,
+        error: CustomColors.error,
+        onError: CustomColors.surfaceWhite,
+        outline: CustomColors.borderLight,
       ),
+
       scaffoldBackgroundColor: CustomColors.backgroundLight,
       fontFamily: 'Degular',
       
       appBarTheme: AppBarTheme(
         backgroundColor: CustomColors.surfaceWhite,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        iconTheme: IconThemeData(color: CustomColors.textMain, size: 24.sp),
-        titleTextStyle: CustomFonts.textMain20w600,
+        iconTheme: IconThemeData(color: CustomColors.deepSlate, size: 24.sp),
+        titleTextStyle: CustomFonts.headlineSmall,
+        shape: Border(
+          bottom: BorderSide(color: CustomColors.borderLight, width: 1),
+        ),
       ),
       
       textTheme: TextTheme(
-        headlineLarge: CustomFonts.textMain32w700,
-        headlineMedium: CustomFonts.textMain24w700,
-        headlineSmall: CustomFonts.textMain20w600,
-        titleMedium: CustomFonts.textMain16w600,
-        bodyLarge: CustomFonts.textMain16w400,
-        bodyMedium: CustomFonts.textMain14w400,
-        bodySmall: CustomFonts.textMuted12w400,
-        labelLarge: CustomFonts.textMain14w600,
+        headlineLarge: CustomFonts.headlineLarge,
+        headlineMedium: CustomFonts.headlineMedium,
+        headlineSmall: CustomFonts.headlineSmall,
+        titleLarge: CustomFonts.bodyLarge,
+        titleMedium: CustomFonts.bodyMedium,
+        bodyLarge: CustomFonts.bodyLarge,
+        bodyMedium: CustomFonts.bodyMedium,
+        bodySmall: CustomFonts.bodySmall,
+        labelLarge: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: CustomColors.brandPrimary,
-          foregroundColor: Colors.white,
+          backgroundColor: CustomColors.deepSlate,
+          foregroundColor: CustomColors.surfaceWhite,
           elevation: 0,
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          textStyle: CustomFonts.textMain14w600.copyWith(color: Colors.white),
+          textStyle: CustomFonts.bodyLarge.copyWith(color: CustomColors.surfaceWhite),
         ),
       ),
       
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: CustomColors.brandPrimary,
-          side: BorderSide(color: CustomColors.brandPrimary.withOpacity(0.5)),
+          foregroundColor: CustomColors.deepSlate,
+          side: const BorderSide(color: CustomColors.deepSlate),
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          textStyle: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary),
+          textStyle: CustomFonts.bodyLarge,
+        ),
+      ),
+
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: CustomColors.deepSlate,
+          textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
       ),
       
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: CustomColors.surfaceWhite,
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: CustomColors.textMuted.withOpacity(0.2)),
+          borderSide: const BorderSide(color: CustomColors.borderLight),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: CustomColors.textMuted.withOpacity(0.2)),
+          borderSide: const BorderSide(color: CustomColors.borderLight),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: CustomColors.brandPrimary, width: 1.5),
+          borderSide: const BorderSide(color: CustomColors.brandCyan, width: 1.5),
         ),
-        hintStyle: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
-        labelStyle: CustomFonts.textMuted13w500,
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: CustomColors.error),
+        ),
+        hintStyle: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
+        labelStyle: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
       ),
       
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: CustomColors.surfaceWhite,
         elevation: 0,
+        margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
-          side: BorderSide(color: CustomColors.textMuted.withOpacity(0.1)),
+          side: const BorderSide(color: CustomColors.borderLight),
         ),
       ),
 
       dialogTheme: DialogThemeData(
-        backgroundColor: Colors.white,
-        elevation: 8,
+        backgroundColor: CustomColors.surfaceWhite,
+        surfaceTintColor: Colors.transparent,
+        elevation: 12,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-        titleTextStyle: CustomFonts.textMain24w700,
-        contentTextStyle: CustomFonts.textMain14w400,
+        titleTextStyle: CustomFonts.headlineMedium,
+        contentTextStyle: CustomFonts.bodyMedium,
       ),
 
-      dividerTheme: DividerThemeData(
-        color: CustomColors.textMuted.withOpacity(0.1),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: CustomColors.surfaceWhite,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        ),
+      ),
+
+      dividerTheme: const DividerThemeData(
+        color: CustomColors.borderLight,
         thickness: 1,
+        space: 1,
+      ),
+
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: CustomColors.deepSlate,
+        selectedIconTheme: const IconThemeData(color: CustomColors.brandCyan),
+        unselectedIconTheme: const IconThemeData(color: Colors.white60),
+        selectedLabelTextStyle: CustomFonts.bodySmall.copyWith(color: CustomColors.brandCyan),
+        unselectedLabelTextStyle: CustomFonts.bodySmall.copyWith(color: Colors.white60),
+      ),
+
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: CustomColors.deepSlate,
+        elevation: 0,
       ),
     );
   }
 
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      primaryColor: CustomColors.brandCyan,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: CustomColors.brandCyan,
-        brightness: Brightness.dark,
-        primary: CustomColors.brandCyan,
-        surface: CustomColors.deepSlate,
-      ),
-      fontFamily: 'Degular',
-    );
-  }
+  static ThemeData get darkTheme => lightTheme; // For this project, we prioritize the redesigned light theme as the main admin style
 }

@@ -1,0 +1,315 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/models/treatment_model.dart';
+import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
+import 'package:skinsync_admin/utils/color_constant.dart';
+import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+
+class TreatmentDetailScreen extends ConsumerWidget {
+  const TreatmentDetailScreen({super.key});
+
+  static const String routeName = '/treatment-detail';
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(treatmentViewModelProvider);
+    final treatment = state.selectedTreatment;
+
+    if (treatment == null) {
+      return const Scaffold(body: Center(child: Text("No Treatment Selected")));
+    }
+
+    return Scaffold(
+      backgroundColor: CustomColors.backgroundLight,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        title: Text("Treatment Overview", style: CustomFonts.textMain20w600),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: CustomColors.textMain),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          ElevatedButton.icon(
+            onPressed: () => context.push(EditTreatmentScreen.routeName),
+            icon: const Icon(Icons.edit_outlined, size: 18),
+            label: const Text("Edit Treatment"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: CustomColors.brandPrimary,
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            ),
+          ),
+          SizedBox(width: 24.w),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 1000.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeaderSection(treatment),
+                SizedBox(height: 32.h),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 3, child: _buildMainContent(treatment)),
+                    SizedBox(width: 32.w),
+                    Expanded(flex: 2, child: _buildSideContent(treatment)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderSection(TreatmentModel treatment) {
+    return BorderdContainerWidget(
+      padding: EdgeInsets.all(32.w),
+      child: Row(
+        children: [
+          Container(
+            width: 120.w,
+            height: 120.w,
+            decoration: BoxDecoration(
+              color: CustomColors.surfaceGhost,
+              borderRadius: BorderRadius.circular(20.r),
+              image: (treatment.image != null && treatment.image!.isNotEmpty)
+                  ? DecorationImage(image: NetworkImage(treatment.image!), fit: BoxFit.cover)
+                  : null,
+            ),
+            child: (treatment.image == null || treatment.image!.isEmpty)
+                ? Icon(Icons.medical_services_outlined, size: 48.sp, color: CustomColors.brandPrimary)
+                : null,
+          ),
+          SizedBox(width: 32.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(treatment.name ?? "N/A", style: CustomFonts.textMain32w700),
+                    SizedBox(width: 16.w),
+                    _statusBadge(treatment.isActive),
+                  ],
+                ),
+                SizedBox(height: 8.h),
+                Text(treatment.patientDisplayName ?? "No Display Name", style: CustomFonts.textMain18w400.copyWith(color: CustomColors.textMuted)),
+                SizedBox(height: 16.h),
+                Row(
+                  children: [
+                    _categoryChip(treatment.category ?? "General"),
+                    SizedBox(width: 12.w),
+                    _categoryChip(treatment.subcategory ?? "N/A", isSub: true),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainContent(TreatmentModel treatment) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _infoCard("Description", treatment.description ?? "No description available.", icon: Icons.description_outlined),
+        SizedBox(height: 24.h),
+        _buildAreasList(treatment),
+      ],
+    );
+  }
+
+  Widget _buildSideContent(TreatmentModel treatment) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _infoCard("Logic & Compatibility", null, icon: Icons.psychology_outlined, child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _booleanRow("AI Simulator Ready", treatment.useInAiSimulator),
+            SizedBox(height: 24.h),
+            Text("Combinable With:", style: CustomFonts.textMain14w600),
+            SizedBox(height: 12.h),
+            if (treatment.combinableTreatmentIds == null || treatment.combinableTreatmentIds!.isEmpty)
+              Text("No specific combinations defined.", style: CustomFonts.textMuted12w400)
+            else
+              Wrap(
+                spacing: 8.w,
+                runSpacing: 8.h,
+                children: treatment.combinableTreatmentIds!.map((id) => Chip(
+                  label: Text("Treatment ID: $id", style: TextStyle(fontSize: 11.sp)),
+                  backgroundColor: CustomColors.brandPurple.withOpacity(0.05),
+                )).toList(),
+              ),
+          ],
+        )),
+        SizedBox(height: 24.h),
+        _infoCard("Consumables", null, icon: Icons.inventory_2_outlined, child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Material Name:", style: CustomFonts.textMuted13w500),
+                Text(treatment.materialName ?? "N/A", style: CustomFonts.textMain14w600),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Max Quantity:", style: CustomFonts.textMuted13w500),
+                Text("${treatment.maxMaterialQuantity}", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
+              ],
+            ),
+          ],
+        )),
+      ],
+    );
+  }
+
+  Widget _infoCard(String title, String? text, {required IconData icon, Widget? child}) {
+    return BorderdContainerWidget(
+      padding: EdgeInsets.all(24.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20.sp, color: CustomColors.brandPrimary),
+              SizedBox(width: 12.w),
+              Text(title, style: CustomFonts.textMain18w600),
+            ],
+          ),
+          if (text != null || child != null) ...[
+            SizedBox(height: 16.h),
+            if (text != null) Text(text, style: CustomFonts.textMain14w400.copyWith(height: 1.6)),
+            if (child != null) child,
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAreasList(TreatmentModel treatment) {
+    return BorderdContainerWidget(
+      padding: EdgeInsets.all(24.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.location_on_outlined, size: 20.sp, color: CustomColors.brandPrimary),
+              SizedBox(width: 12.w),
+              Text("Target Body Areas", style: CustomFonts.textMain18w600),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          if (treatment.sideAreas == null || treatment.sideAreas!.isEmpty)
+            Text("No areas defined for this treatment.", style: CustomFonts.textMuted14w400)
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: treatment.sideAreas!.length,
+              separatorBuilder: (_, __) => Padding(padding: EdgeInsets.symmetric(vertical: 12.h), child: const Divider()),
+              itemBuilder: (context, index) {
+                final area = treatment.sideAreas![index];
+                return Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(10.r),
+                      decoration: BoxDecoration(color: CustomColors.brandCyan.withOpacity(0.1), shape: BoxShape.circle),
+                      child: Icon(Icons.location_on_outlined, size: 18.sp, color: CustomColors.brandPrimary),
+                    ),
+                    SizedBox(width: 16.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(area.name ?? "N/A", style: CustomFonts.textMain16w600),
+                        if (area.maxUnits != null)
+                          Text("Safety Limit: ${area.maxUnits} units", style: CustomFonts.textMuted11w400),
+                      ],
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      decoration: BoxDecoration(color: CustomColors.surfaceGhost, borderRadius: BorderRadius.circular(20.r)),
+                      child: Text("Target Area", style: CustomFonts.textMain12w600.copyWith(color: CustomColors.brandPrimary)),
+                    ),
+                  ],
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _booleanRow(String label, bool value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: CustomFonts.textMain14w400),
+        Icon(
+          value ? Icons.check_circle_rounded : Icons.cancel_rounded,
+          color: value ? CustomColors.success : CustomColors.error,
+          size: 20.sp,
+        ),
+      ],
+    );
+  }
+
+  Widget _statusBadge(bool isActive) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: (isActive ? CustomColors.success : CustomColors.textMuted).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Text(
+        isActive ? "ACTIVE" : "INACTIVE",
+        style: TextStyle(
+          color: isActive ? CustomColors.success : CustomColors.textMuted,
+          fontSize: 10.sp,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1,
+        ),
+      ),
+    );
+  }
+
+  Widget _categoryChip(String label, {bool isSub = false}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: isSub ? CustomColors.brandPurple.withOpacity(0.05) : CustomColors.brandCyan.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: (isSub ? CustomColors.brandPurple : CustomColors.brandCyan).withOpacity(0.1)),
+      ),
+      child: Text(
+        label,
+        style: CustomFonts.textMain14w600.copyWith(
+          color: isSub ? CustomColors.brandPurple : CustomColors.brandPrimary,
+          fontSize: 12.sp,
+        ),
+      ),
+    );
+  }
+}

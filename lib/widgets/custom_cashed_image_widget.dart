@@ -39,8 +39,8 @@ class _CustomCachedImageState extends State<CustomCachedImage> {
 
   Widget _buildShimmer() {
     return Shimmer.fromColors(
-      baseColor: CustomColors.lightBlueColor.withValues(alpha: 0.2),
-      highlightColor: CustomColors.lightPurpleColor.withValues(alpha: 0.1),
+      baseColor: CustomColors.lightBlueColor.withOpacity(0.2),
+      highlightColor: CustomColors.lightPurpleColor.withOpacity(0.1),
       child: Container(
         height: widget.height,
         width: widget.width,
