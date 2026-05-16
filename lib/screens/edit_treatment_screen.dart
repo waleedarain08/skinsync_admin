@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
-import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
@@ -36,17 +34,20 @@ class EditTreatmentScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: Text("Edit Treatment", style: CustomFonts.textMain20w600),
+        title: Text("Edit Treatment", style: CustomFonts.headlineSmall),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CustomColors.textMain),
+          icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
           onPressed: () => context.pop(),
         ),
         actions: [
           TextButton(
-            onPressed: () => viewModel.updateTreatment(context).then((_) {
-              if (context.mounted) context.pop();
-            }),
-            child: Text("Save Changes", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
+            onPressed: () {
+              if (!_validateForm(context, state)) return;
+              viewModel.updateTreatment(context).then((_) {
+                if (context.mounted) context.pop();
+              });
+            },
+            child: Text("Save Changes", style: CustomFonts.bodyLarge.copyWith(color: CustomColors.deepSlate)),
           ),
           SizedBox(width: 16.w),
         ],
@@ -75,13 +76,28 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
+  bool _validateForm(BuildContext context, TreatmentState state) {
+    for (var area in state.areas) {
+      if (area.subAreas.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Each area must have at least one sub-area: ${area.areaController.text}"),
+            backgroundColor: CustomColors.error,
+          ),
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
   Widget _buildBasicDetailsSection(TreatmentState state, TreatmentViewModel viewModel) {
     return BorderdContainerWidget(
       padding: EdgeInsets.all(24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Basic Information", style: CustomFonts.textMain18w600),
+          Text("Basic Information", style: CustomFonts.headlineSmall),
           SizedBox(height: 24.h),
           Row(
             children: [
@@ -103,6 +119,14 @@ class EditTreatmentScreen extends ConsumerWidget {
                 ),
               ),
             ],
+          ),
+          SizedBox(height: 24.h),
+          BuildTextField(
+            label: "Treatment Base Price (\$)",
+            controller: viewModel.basePriceController,
+            hintText: "0",
+            keyboardType: TextInputType.number,
+            validator: Validators.empty,
           ),
           SizedBox(height: 24.h),
           Row(
@@ -137,7 +161,7 @@ class EditTreatmentScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Categorization", style: CustomFonts.textMain18w600),
+          Text("Categorization", style: CustomFonts.headlineSmall),
           SizedBox(height: 24.h),
           Row(
             children: [
@@ -183,7 +207,7 @@ class EditTreatmentScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Body Areas", style: CustomFonts.textMain18w600),
+              Text("Body Areas", style: CustomFonts.headlineSmall),
               TextButton.icon(
                 onPressed: () => viewModel.addArea(),
                 icon: const Icon(Icons.add),
@@ -230,12 +254,11 @@ class EditTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildSubAreaSection(int areaIndex, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
-    final areaItem = dataState.areas.firstWhere((a) => a.name == entry.areaController.text, orElse: () => dataState.areas.first);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSearchField(
-          label: "Sub Areas",
+          label: "Sub Areas (Mandatory)",
           hint: "Add sub area",
           controller: entry.subAreaController,
           suggestions: dataState.areas.isEmpty
@@ -254,8 +277,8 @@ class EditTreatmentScreen extends ConsumerWidget {
             spacing: 8.w,
             runSpacing: 8.h,
             children: entry.subAreas.map((sub) => Chip(
-              label: Text(sub, style: TextStyle(fontSize: 12.sp)),
-              onDeleted: () => viewModel.removeSubArea(areaIndex, sub),
+              label: Text(sub.name, style: CustomFonts.bodySmall),
+              onDeleted: () => viewModel.removeSubArea(areaIndex, sub.name),
               backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
               side: BorderSide(color: CustomColors.brandCyan.withOpacity(0.2)),
             )).toList(),
@@ -266,12 +289,14 @@ class EditTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildMaterialsAndLogicSection(TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+
     return BorderdContainerWidget(
       padding: EdgeInsets.all(24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Materials & Simulator Logic", style: CustomFonts.textMain18w600),
+          Text("Materials & Configuration", style: CustomFonts.headlineSmall),
           SizedBox(height: 24.h),
           Row(
             children: [
@@ -296,6 +321,21 @@ class EditTreatmentScreen extends ConsumerWidget {
               ),
             ],
           ),
+          if (allSubAreas.isNotEmpty) ...[
+            SizedBox(height: 32.h),
+            Text("Configuration Per Sub-Area", style: CustomFonts.bodyLarge),
+            SizedBox(height: 16.h),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: allSubAreas.length,
+              separatorBuilder: (_, __) => SizedBox(height: 12.h),
+              itemBuilder: (context, index) {
+                final subArea = allSubAreas[index];
+                return _buildSubAreaConfigCard(subArea);
+              },
+            ),
+          ],
           SizedBox(height: 32.h),
           const Divider(),
           SizedBox(height: 24.h),
@@ -311,13 +351,13 @@ class EditTreatmentScreen extends ConsumerWidget {
                 ),
               ),
               SizedBox(width: 12.w),
-              Text("Use in AI Simulator", style: CustomFonts.textMain16w600),
+              Text("Use in AI Simulator", style: CustomFonts.bodyLarge),
             ],
           ),
           SizedBox(height: 32.h),
-          Text("Combinable Treatments", style: CustomFonts.textMain14w600),
+          Text("Combinable Treatments", style: CustomFonts.bodyLarge),
           SizedBox(height: 8.h),
-          Text("Select treatments that can be performed alongside this one.", style: CustomFonts.textMuted12w400),
+          Text("Select treatments that can be performed alongside this one.", style: CustomFonts.bodySmall),
           SizedBox(height: 16.h),
           _buildSearchField(
             label: "Search Treatments",
@@ -339,11 +379,50 @@ class EditTreatmentScreen extends ConsumerWidget {
                 onDeleted: () => viewModel.removeCombinableTreatment(t.id ?? 0),
                 backgroundColor: CustomColors.brandPurple.withOpacity(0.1),
                 side: BorderSide(color: CustomColors.brandPurple.withOpacity(0.2)),
-                labelStyle: const TextStyle(color: CustomColors.brandPrimary),
-                deleteIconColor: CustomColors.brandPrimary,
+                labelStyle: TextStyle(color: CustomColors.deepSlate, fontSize: 12.sp),
+                deleteIconColor: CustomColors.deepSlate,
               )).toList(),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubAreaConfigCard(SubAreaConfig subArea) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: CustomColors.backgroundLight,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: CustomColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(subArea.name, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+          SizedBox(height: 12.h),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: "Max Qty",
+                  controller: subArea.maxQuantityController,
+                  hintText: "0",
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: BuildTextField(
+                  label: "Base Price (\$)",
+                  controller: subArea.basePriceController,
+                  hintText: "0",
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -353,7 +432,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.textMain14w600),
+        Text(label, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
         SizedBox(height: 10.h),
         GestureDetector(
           onTap: onTap,
@@ -361,14 +440,14 @@ class EditTreatmentScreen extends ConsumerWidget {
             height: 120.h,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: CustomColors.surfaceGhost,
+              color: CustomColors.backgroundLight,
               borderRadius: BorderRadius.circular(12.r),
               image: file != null ? DecorationImage(
                 image: kIsWeb ? NetworkImage(file.path) : FileImage(File(file.path)) as ImageProvider,
                 fit: BoxFit.cover,
               ) : null,
             ),
-            child: file == null ? const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.textMuted)) : null,
+            child: file == null ? const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.textSecondary)) : null,
           ),
         ),
       ],
@@ -385,7 +464,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.textMain14w600),
+        Text(label, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
         SizedBox(height: 10.h),
         SearchAnchor(
           viewHintText: hint,
@@ -401,21 +480,21 @@ class EditTreatmentScreen extends ConsumerWidget {
             return TextFormField(
               controller: controller,
               readOnly: true,
-              style: CustomFonts.textMain14w400,
+              style: CustomFonts.bodyMedium,
               onTap: () {
                 searchController.text = controller.text;
                 searchController.openView();
               },
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: CustomFonts.textMuted14w400,
+                hintStyle: CustomFonts.bodySmall,
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey[300]!)),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey[300]!)),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.brandPrimary)),
-                suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.textMuted),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.borderLight)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.borderLight)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.brandCyan)),
+                suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.textSecondary),
               ),
             );
           },
@@ -426,7 +505,7 @@ class EditTreatmentScreen extends ConsumerWidget {
             return [
               if (searchController.text.isNotEmpty && !suggestions.contains(searchController.text))
                 ListTile(
-                  title: Text('Use "${searchController.text}"', style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
+                  title: Text('Use "${searchController.text}"', style: CustomFonts.bodyMedium.copyWith(color: CustomColors.deepSlate, fontWeight: FontWeight.bold)),
                   onTap: () {
                     controller.text = searchController.text;
                     onSelected(searchController.text);
@@ -437,10 +516,10 @@ class EditTreatmentScreen extends ConsumerWidget {
                 leading: Container(
                   width: 32.w,
                   height: 32.w,
-                  decoration: BoxDecoration(color: CustomColors.surfaceGhost, borderRadius: BorderRadius.circular(6.r)),
-                  child: const Icon(Icons.circle_outlined, size: 14, color: CustomColors.textMuted),
+                  decoration: BoxDecoration(color: CustomColors.backgroundLight, borderRadius: BorderRadius.circular(6.r)),
+                  child: const Icon(Icons.circle_outlined, size: 14, color: CustomColors.textSecondary),
                 ),
-                title: Text(item, style: CustomFonts.textMain14w400),
+                title: Text(item, style: CustomFonts.bodyMedium),
                 onTap: () {
                   controller.text = item;
                   onSelected(item);

@@ -21,6 +21,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final displayNameController = TextEditingController();
   final fullDescriptionController = TextEditingController();
   final shortDescriptionController = TextEditingController();
+  final basePriceController = TextEditingController();
 
   // Step 2 Controllers
   final categoryController = TextEditingController();
@@ -48,6 +49,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     displayNameController.dispose();
     fullDescriptionController.dispose();
     shortDescriptionController.dispose();
+    basePriceController.dispose();
     categoryController.dispose();
     subcategoryController.dispose();
     materialNameController.dispose();
@@ -92,6 +94,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     displayNameController.clear();
     fullDescriptionController.clear();
     shortDescriptionController.clear();
+    basePriceController.clear();
     categoryController.clear();
     subcategoryController.clear();
     materialNameController.clear();
@@ -121,6 +124,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     displayNameController.text = treatment.patientDisplayName ?? '';
     fullDescriptionController.text = treatment.description ?? '';
     shortDescriptionController.text = treatment.shortDescription ?? '';
+    basePriceController.text = treatment.basePrice?.toString() ?? '';
     categoryController.text = treatment.category ?? '';
     subcategoryController.text = treatment.subcategory ?? '';
     materialNameController.text = treatment.materialName ?? '';
@@ -136,6 +140,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       for (var area in treatment.sideAreas!) {
         final entry = AreaViewModelEntry();
         entry.areaController.text = area.name ?? '';
+        if (area.subAreas != null) {
+          entry.subAreas = area.subAreas!.map((s) => SubAreaConfig(
+            name: s.name ?? '',
+            maxQty: s.maxMaterialQuantity?.toString(),
+            basePrice: s.basePrice?.toString(),
+          )).toList();
+        }
         newAreas.add(entry);
       }
     } else {
@@ -183,6 +194,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   void onAreaSelected(int index, String val) {
     state.areas[index].subAreaController.clear();
     final updatedAreas = [...state.areas];
+    for (var sub in updatedAreas[index].subAreas) {
+      sub.dispose();
+    }
     updatedAreas[index].subAreas = [];
     state = state.copyWith(areas: updatedAreas);
   }
@@ -199,18 +213,20 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   }
 
   void addSubArea(int areaIndex, String val) {
-    if (val.isNotEmpty && !state.areas[areaIndex].subAreas.contains(val)) {
+    if (val.isNotEmpty && !state.areas[areaIndex].subAreas.any((s) => s.name == val)) {
       final updatedAreas = [...state.areas];
-      updatedAreas[areaIndex].subAreas = [...updatedAreas[areaIndex].subAreas, val];
+      updatedAreas[areaIndex].subAreas = [...updatedAreas[areaIndex].subAreas, SubAreaConfig(name: val)];
       updatedAreas[areaIndex].subAreaController.clear();
       state = state.copyWith(areas: updatedAreas);
     }
   }
 
-  void removeSubArea(int areaIndex, String subArea) {
+  void removeSubArea(int areaIndex, String subAreaName) {
     final updatedAreas = [...state.areas];
+    final subAreaToRemove = updatedAreas[areaIndex].subAreas.firstWhere((s) => s.name == subAreaName);
+    subAreaToRemove.dispose();
     updatedAreas[areaIndex].subAreas = 
-        updatedAreas[areaIndex].subAreas.where((s) => s != subArea).toList();
+        updatedAreas[areaIndex].subAreas.where((s) => s.name != subAreaName).toList();
     state = state.copyWith(areas: updatedAreas);
   }
 
@@ -345,6 +361,31 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   Future<void> submitTreatment(BuildContext context) async {
     return await runSafely<void>(showLoading: true, () async {
+      final treatment = TreatmentModel(
+        name: internalNameController.text,
+        patientDisplayName: displayNameController.text,
+        description: fullDescriptionController.text,
+        shortDescription: shortDescriptionController.text,
+        basePrice: double.tryParse(basePriceController.text),
+        category: categoryController.text,
+        subcategory: subcategoryController.text,
+        materialName: materialNameController.text,
+        maxMaterialQuantity: int.tryParse(maxMaterialQuantityController.text) ?? 0,
+        useInAiSimulator: state.useInAiSimulator,
+        combinableTreatmentIds: state.combinableTreatments.map((t) => t.id!).toList(),
+        sideAreas: state.areas.map((a) => SideAreaModel(
+          name: a.areaController.text,
+          subAreas: a.subAreas.map((s) => SubAreaModel(
+            name: s.name,
+            maxMaterialQuantity: int.tryParse(s.maxQuantityController.text),
+            basePrice: double.tryParse(s.basePriceController.text),
+          )).toList(),
+        )).toList(),
+      );
+
+      // Perform API call using treatment.toRequest()
+      // await _treatmentRepository.createTreatment(treatment.toRequest());
+
       await Future.delayed(const Duration(seconds: 1));
       resetForm();
     });
@@ -420,10 +461,29 @@ class TreatmentState {
 class AreaViewModelEntry {
   final areaController = TextEditingController();
   final subAreaController = TextEditingController();
-  List<String> subAreas = [];
+  List<SubAreaConfig> subAreas = [];
 
   void dispose() {
     areaController.dispose();
     subAreaController.dispose();
+    for (var sub in subAreas) {
+      sub.dispose();
+    }
+  }
+}
+
+class SubAreaConfig {
+  final String name;
+  final maxQuantityController = TextEditingController(text: '0');
+  final basePriceController = TextEditingController(text: '0');
+
+  SubAreaConfig({required this.name, String? maxQty, String? basePrice}) {
+    if (maxQty != null) maxQuantityController.text = maxQty;
+    if (basePrice != null) basePriceController.text = basePrice;
+  }
+
+  void dispose() {
+    maxQuantityController.dispose();
+    basePriceController.dispose();
   }
 }

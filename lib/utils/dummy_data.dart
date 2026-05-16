@@ -47,6 +47,7 @@ class TreatmentData {
       patientDisplayName: "Wrinkle Relaxer",
       description: "Smooth fine lines and wrinkles in the upper face.",
       shortDescription: "Anti-aging injectable treatment.",
+      basePrice: 150.0,
       image: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=1000&auto=format&fit=crop",
       category: "Injectables",
       subcategory: "Neurotoxins",
@@ -54,8 +55,13 @@ class TreatmentData {
       maxMaterialQuantity: 50,
       isActive: true,
       sideAreas: [
-        SideAreaModel(name: "Forehead", maxUnits: 50),
-        SideAreaModel(name: "Crow's Feet", maxUnits: 24),
+        SideAreaModel(
+          name: "Upper Face",
+          subAreas: [
+            SubAreaModel(name: "Forehead", maxMaterialQuantity: 50, basePrice: 12.0),
+            SubAreaModel(name: "Crow's Feet", maxMaterialQuantity: 24, basePrice: 12.0),
+          ],
+        ),
       ],
     ),
     TreatmentModel(
@@ -64,6 +70,7 @@ class TreatmentData {
       patientDisplayName: "Cheek Filler",
       description: "Dermal filler for cheek augmentation.",
       shortDescription: "Volumizing dermal filler.",
+      basePrice: 800.0,
       image: "https://images.unsplash.com/photo-1620331311520-246422ff83f9?q=80&w=1000&auto=format&fit=crop",
       category: "Injectables",
       subcategory: "Dermal Fillers",
@@ -71,7 +78,12 @@ class TreatmentData {
       maxMaterialQuantity: 2,
       isActive: true,
       sideAreas: [
-        SideAreaModel(name: "Cheeks", maxUnits: 2),
+        SideAreaModel(
+          name: "Mid Face",
+          subAreas: [
+            SubAreaModel(name: "Cheeks", maxMaterialQuantity: 2, basePrice: 800.0),
+          ],
+        ),
       ],
     ),
     TreatmentModel(
@@ -80,6 +92,7 @@ class TreatmentData {
       patientDisplayName: "Deep Cleansing Facial",
       description: "Cleanse, extract, and hydrate the skin.",
       shortDescription: "Refreshing skin treatment.",
+      basePrice: 199.0,
       image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop",
       category: "Skin Treatments",
       subcategory: "Facials",
@@ -91,13 +104,19 @@ class TreatmentData {
       patientDisplayName: "Permanent Hair Reduction",
       description: "Permanent hair reduction for smooth skin.",
       shortDescription: "Long-term hair removal.",
+      basePrice: 250.0,
       image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc2069?q=80&w=1000&auto=format&fit=crop",
       category: "Laser & Energy",
       subcategory: "Resurfacing",
       isActive: true,
       sideAreas: [
-        SideAreaModel(name: "Arms"),
-        SideAreaModel(name: "Thighs"),
+        SideAreaModel(
+          name: "Body",
+          subAreas: [
+            SubAreaModel(name: "Arms", maxMaterialQuantity: 1, basePrice: 150.0),
+            SubAreaModel(name: "Thighs", maxMaterialQuantity: 1, basePrice: 200.0),
+          ],
+        ),
       ],
     ),
     TreatmentModel(
@@ -106,6 +125,7 @@ class TreatmentData {
       patientDisplayName: "Skin Resurfacing",
       description: "Exfoliate and improve skin texture.",
       shortDescription: "Chemical exfoliation treatment.",
+      basePrice: 125.0,
       image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc2069?q=80&w=1000&auto=format&fit=crop",
       category: "Skin Treatments",
       subcategory: "Chemical Peels",
@@ -117,12 +137,18 @@ class TreatmentData {
       patientDisplayName: "Collagen Induction Therapy",
       description: "Stimulate collagen production for rejuvenation.",
       shortDescription: "Skin rejuvenation treatment.",
+      basePrice: 350.0,
       image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=1000&auto=format&fit=crop",
       category: "Skin Treatments",
       subcategory: "Facials",
       isActive: true,
       sideAreas: [
-        SideAreaModel(name: "Full Face"),
+        SideAreaModel(
+          name: "Face",
+          subAreas: [
+            SubAreaModel(name: "Full Face", maxMaterialQuantity: 1, basePrice: 350.0),
+          ],
+        ),
       ],
     ),
   ];

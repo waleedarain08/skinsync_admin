@@ -8,6 +8,7 @@ class TreatmentModel {
   String? subcategory;
   String? icon;
   String? image;
+  double? basePrice;
   String? materialName;
   int maxMaterialQuantity;
   bool? isArea;
@@ -26,6 +27,7 @@ class TreatmentModel {
     this.subcategory,
     this.icon,
     this.image,
+    this.basePrice,
     this.materialName,
     this.maxMaterialQuantity = 0,
     this.isArea,
@@ -48,6 +50,7 @@ class TreatmentModel {
     subcategory = json['subcategory'];
     icon = json['icon'];
     image = json['image'];
+    basePrice = json['base_price']?.toDouble();
     materialName = json['material_name'];
     isArea = json['is_area'];
     sideAreas = json['side_areas'] != null
@@ -70,6 +73,7 @@ class TreatmentModel {
     String? subcategory,
     String? icon,
     String? image,
+    double? basePrice,
     String? materialName,
     int? maxMaterialQuantity,
     bool? isArea,
@@ -88,6 +92,7 @@ class TreatmentModel {
       subcategory: subcategory ?? this.subcategory,
       icon: icon ?? this.icon,
       image: image ?? this.image,
+      basePrice: basePrice ?? this.basePrice,
       materialName: materialName ?? this.materialName,
       maxMaterialQuantity: maxMaterialQuantity ?? this.maxMaterialQuantity,
       isArea: isArea ?? this.isArea,
@@ -109,9 +114,10 @@ class TreatmentModel {
       'subcategory': subcategory,
       'icon': icon,
       'image': image,
+      'base_price': basePrice,
       'material_name': materialName,
       'max_material_quantity': maxMaterialQuantity,
-      'treatments_sub_sec_id': sideAreas?.map((sideArea) => sideArea.id).toList(),
+      'side_areas': sideAreas?.map((sideArea) => sideArea.toJson()).toList(),
       'is_active': isActive,
       'use_in_ai_simulator': useInAiSimulator,
       'combinable_treatment_ids': combinableTreatmentIds,
@@ -122,20 +128,49 @@ class TreatmentModel {
 class SideAreaModel {
   int? id;
   String? name;
-  int? maxUnits;
+  List<SubAreaModel>? subAreas;
 
-  SideAreaModel({this.id, this.name, this.maxUnits});
+  SideAreaModel({this.id, this.name, this.subAreas});
 
   SideAreaModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    maxUnits = json['max_units'];
+    subAreas = json['sub_areas'] != null
+        ? (json['sub_areas'] as List)
+            .map((e) => SubAreaModel.fromJson(e))
+            .toList()
+        : null;
   }
   Map<String, dynamic> toJson() {
     return {
       "id": id,
       "name": name,
-      "max_units": maxUnits,
+      "sub_areas": subAreas?.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class SubAreaModel {
+  int? id;
+  String? name;
+  int? maxMaterialQuantity;
+  double? basePrice;
+
+  SubAreaModel({this.id, this.name, this.maxMaterialQuantity, this.basePrice});
+
+  SubAreaModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    maxMaterialQuantity = json['max_material_quantity'];
+    basePrice = json['base_price']?.toDouble();
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "max_material_quantity": maxMaterialQuantity,
+      "base_price": basePrice,
     };
   }
 }
