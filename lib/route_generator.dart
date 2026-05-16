@@ -18,6 +18,7 @@ import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/treatment_management_screen.dart';
 import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
+import 'package:skinsync_admin/screens/invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
 
@@ -35,6 +36,11 @@ class RouteGenerator {
         name: SignInScreen.routeName,
         path: SignInScreen.routeName,
         builder: (context, state) => const SignInScreen(),
+      ),
+      GoRoute(
+        name: InviteClinicDetailScreen.routeName,
+        path: InviteClinicDetailScreen.routeName,
+        builder: (context, state) => const InviteClinicDetailScreen(),
       ),
       ShellRoute(
         builder: (_, _, child) {
