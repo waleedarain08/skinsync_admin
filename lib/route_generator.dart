@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
@@ -12,15 +10,16 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_scre
 import 'package:skinsync_admin/screens/bottom_nav_screens/setting_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
+import 'package:skinsync_admin/screens/invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/treatment_management_screen.dart';
 import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
-import 'package:skinsync_admin/screens/invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class RouteGenerator {
   static final GoRouter router = GoRouter(
@@ -36,11 +35,6 @@ class RouteGenerator {
         name: SignInScreen.routeName,
         path: SignInScreen.routeName,
         builder: (context, state) => const SignInScreen(),
-      ),
-      GoRoute(
-        name: InviteClinicDetailScreen.routeName,
-        path: InviteClinicDetailScreen.routeName,
-        builder: (context, state) => const InviteClinicDetailScreen(),
       ),
       ShellRoute(
         builder: (_, _, child) {
@@ -71,6 +65,11 @@ class RouteGenerator {
             name: ClinicManagement.routeName,
             path: ClinicManagement.routeName,
             builder: (_, _) => const ClinicManagement(),
+          ),
+          GoRoute(
+            name: InviteClinicDetailScreen.routeName,
+            path: InviteClinicDetailScreen.routeName,
+            builder: (context, state) => const InviteClinicDetailScreen(),
           ),
           GoRoute(
             name: AddNewClinicScreen.routeName,

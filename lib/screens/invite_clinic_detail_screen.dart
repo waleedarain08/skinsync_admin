@@ -26,7 +26,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: Text("Invitation Details", style: CustomFonts.headlineSmall),
+        title: Text("Prospect Clinic Detail", style: CustomFonts.headlineSmall),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
           onPressed: () => context.pop(),
@@ -45,7 +45,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 3, child: _buildMainInfo(clinic)),
+                    Expanded(flex: 3, child: _buildMainContent(clinic)),
                     SizedBox(width: 32.w),
                     Expanded(flex: 2, child: _buildActionSidebar(clinic)),
                   ],
@@ -94,9 +94,9 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                 SizedBox(height: 16.h),
                 Row(
                   children: [
-                    _infoChip(Icons.calendar_today_outlined, "Identified: ${clinic.invitedDate}"),
+                    _infoChip(Icons.calendar_today_outlined, "Identified on: ${clinic.invitedDate}"),
                     SizedBox(width: 12.w),
-                    _infoChip(Icons.people_outline, "${clinic.interestedPatientsCount} Potential Patients"),
+                    _infoChip(Icons.trending_up_rounded, "${clinic.interestedPatientsCount} Potential Patients"),
                   ],
                 ),
               ],
@@ -107,23 +107,22 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMainInfo(InviteClinicModel clinic) {
+  Widget _buildMainContent(InviteClinicModel clinic) {
     return Column(
       children: [
-        _infoSection("Contact Information", [
+        _infoSection("Contact Details", [
           _infoRow(Icons.email_outlined, "Email Address", clinic.email),
           _infoRow(Icons.phone_outlined, "Phone Number", clinic.phone),
           _infoRow(Icons.location_on_outlined, "Full Address", clinic.address),
         ]),
         SizedBox(height: 24.h),
         _infoSection("Pipeline Metrics", [
-          _infoRow(Icons.trending_up_rounded, "Interested Patients", "${clinic.interestedPatientsCount} Patients"),
+          _infoRow(Icons.people_outline, "Interested Patients", "${clinic.interestedPatientsCount} Patients"),
           _infoRow(Icons.event_note_rounded, "Pending Appointments", "${clinic.pendingAppointmentsCount} In Queue"),
-          _infoRow(Icons.history_rounded, "Last Activity", clinic.invitedDate),
         ]),
-        if (clinic.notes != null) ...[
+        if (clinic.notes != null && clinic.notes!.isNotEmpty) ...[
           SizedBox(height: 24.h),
-          _infoSection("Admin Notes", [
+          _infoSection("Administrative Notes", [
             Text(clinic.notes!, style: CustomFonts.bodyMedium.copyWith(height: 1.6)),
           ]),
         ],
@@ -134,52 +133,46 @@ class InviteClinicDetailScreen extends ConsumerWidget {
   Widget _buildActionSidebar(InviteClinicModel clinic) {
     return Column(
       children: [
-        BorderdContainerWidget(
-          padding: EdgeInsets.all(24.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text("Invitation Control", style: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
-              SizedBox(height: 24.h),
-              _actionButton(
-                "Invite Clinic", 
-                Icons.mail_outline_rounded, 
-                CustomColors.brandCyan, 
-                CustomColors.deepSlate,
-                () {},
-              ),
-              SizedBox(height: 16.h),
-              _actionButton(
-                "Resend Invite", 
-                Icons.refresh_rounded, 
-                Colors.white, 
-                CustomColors.brandCyan,
-                () {},
-                isOutlined: true,
-              ),
-              SizedBox(height: 16.h),
-              _actionButton(
-                "Start Onboarding", 
-                Icons.rocket_launch_outlined, 
-                CustomColors.success, 
-                Colors.white,
-                () {},
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Divider(),
-              ),
-              _actionButton(
-                "Mark as Unqualified", 
-                Icons.block_flipped, 
-                Colors.white, 
-                CustomColors.error,
-                () {},
-                isOutlined: true,
-              ),
-            ],
+        _infoSection("Invitation Control", [
+          Text("Manage the outreach and onboarding workflow for this prospect.", style: CustomFonts.bodySmall),
+          SizedBox(height: 24.h),
+          _actionButton(
+            "Invite Clinic Now", 
+            Icons.mail_outline_rounded, 
+            CustomColors.brandCyan, 
+            CustomColors.deepSlate,
+            () {},
           ),
-        ),
+          SizedBox(height: 16.h),
+          _actionButton(
+            "Resend Invitation", 
+            Icons.refresh_rounded, 
+            Colors.white, 
+            CustomColors.brandCyan,
+            () {},
+            isOutlined: true,
+          ),
+          SizedBox(height: 16.h),
+          _actionButton(
+            "Start Onboarding", 
+            Icons.rocket_launch_outlined, 
+            CustomColors.success, 
+            Colors.white,
+            () {},
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Divider(),
+          ),
+          _actionButton(
+            "Archive Prospect", 
+            Icons.block_flipped, 
+            Colors.white, 
+            CustomColors.error,
+            () {},
+            isOutlined: true,
+          ),
+        ]),
       ],
     );
   }
@@ -190,7 +183,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: CustomFonts.headlineSmall.copyWith(fontSize: 18.sp)),
+          Text(title, style: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(height: 24.h),
           ...children,
         ],
