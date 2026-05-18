@@ -1,4 +1,5 @@
 import 'package:skinsync_admin/app_init.dart';
+import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
@@ -9,6 +10,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dar
 import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/setting_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
+import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/screens/invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
@@ -72,9 +74,14 @@ class RouteGenerator {
             builder: (context, state) => const InviteClinicDetailScreen(),
           ),
           GoRoute(
+            name: ClinicDetailScreen.routeName,
+            path: ClinicDetailScreen.routeName,
+            builder: (context, state) => const ClinicDetailScreen(),
+          ),
+          GoRoute(
             name: AddNewClinicScreen.routeName,
             path: AddNewClinicScreen.routeName,
-            builder: (_, _) => const AddNewClinicScreen(),
+            builder: (context, state) => AddNewClinicScreen(invitedClinic: state.extra as InviteClinicModel?),
           ),
           GoRoute(
             name: DisputeScreen.routeName,

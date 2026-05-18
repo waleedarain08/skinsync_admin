@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
+import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
@@ -47,7 +48,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                   children: [
                     Expanded(flex: 3, child: _buildMainContent(clinic)),
                     SizedBox(width: 32.w),
-                    Expanded(flex: 2, child: _buildActionSidebar(clinic)),
+                    Expanded(flex: 2, child: _buildActionSidebar(context, clinic)),
                   ],
                 ),
               ],
@@ -130,7 +131,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionSidebar(InviteClinicModel clinic) {
+  Widget _buildActionSidebar(BuildContext context, InviteClinicModel clinic) {
     return Column(
       children: [
         _infoSection("Invitation Control", [
@@ -159,7 +160,9 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             Icons.rocket_launch_outlined, 
             CustomColors.success, 
             Colors.white,
-            () {},
+            () {
+              context.push(AddNewClinicScreen.routeName, extra: clinic);
+            },
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 32.h),

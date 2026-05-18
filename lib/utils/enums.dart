@@ -29,6 +29,7 @@ enum Endpoint {
   //clinics
   getClinics('clinics'),
   registerClinic('admin/clinic/register'),
+  updateClinic('admin/clinic/update/{id}'),
   updateCustomerAppVersion('admin/app-version/customer'),
   updateClinicAppVersion('admin/app-version/clinicapp');
 

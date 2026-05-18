@@ -13,6 +13,7 @@ class BuildTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final Function(String?)? onChanged;
   final Widget? prefixIcon;
+  final bool readOnly;
 
   const BuildTextField({
     super.key,
@@ -24,6 +25,7 @@ class BuildTextField extends StatelessWidget {
     this.keyboardType,
     this.onChanged,
     this.prefixIcon,
+    this.readOnly = false,
   });
 
   @override
@@ -39,6 +41,7 @@ class BuildTextField extends StatelessWidget {
           style: CustomFonts.textMain14w400,
           keyboardType: keyboardType,
           validator: validator,
+          readOnly: readOnly,
           inputFormatters: [
             if (keyboardType == TextInputType.phone ||
                 keyboardType == TextInputType.number)

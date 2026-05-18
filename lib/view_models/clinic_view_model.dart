@@ -47,6 +47,29 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     state = state.copyWith(selectedInviteClinic: clinic);
   }
 
+  void selectClinic(ClinicModel clinic) {
+    state = state.copyWith(selectedClinic: clinic);
+  }
+
+  Future<bool> updateClinic(int id, RegisterClinicReqModel req) async {
+    final success = await runSafely<bool?>(
+          showLoading: false,
+          onLoadingChange: (loading) {
+            state = state.copyWith(loading: loading);
+          },
+          () async {
+            final updatedClinic = await _clinicRepository.updateClinic(id: id, req: req);
+            final currentList = state.clinics ?? [];
+            final newList = currentList.map((c) => c.id == id ? updatedClinic : c).toList();
+            state = state.copyWith(clinics: newList, selectedClinic: updatedClinic);
+            return true;
+          },
+        ) ??
+        false;
+
+    return success;
+  }
+
   Future<bool> registerClinic(RegisterClinicReqModel req) async {
     final success =
         await runSafely<bool?>(
@@ -71,12 +94,14 @@ class ClinicState extends BaseStateModel {
   final List<ClinicModel>? clinics;
   final List<InviteClinicModel>? inviteClinics;
   final InviteClinicModel? selectedInviteClinic;
+  final ClinicModel? selectedClinic;
 
   ClinicState({
     super.loading,
     this.clinics = const [],
     this.inviteClinics = const [],
     this.selectedInviteClinic,
+    this.selectedClinic,
   });
 
   ClinicState copyWith({
@@ -84,12 +109,14 @@ class ClinicState extends BaseStateModel {
     List<ClinicModel>? clinics,
     List<InviteClinicModel>? inviteClinics,
     InviteClinicModel? selectedInviteClinic,
+    ClinicModel? selectedClinic,
   }) {
     return ClinicState(
       loading: loading ?? this.loading,
       clinics: clinics ?? this.clinics,
       inviteClinics: inviteClinics ?? this.inviteClinics,
       selectedInviteClinic: selectedInviteClinic ?? this.selectedInviteClinic,
+      selectedClinic: selectedClinic ?? this.selectedClinic,
     );
   }
 }

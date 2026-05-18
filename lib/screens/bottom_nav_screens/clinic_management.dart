@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +9,9 @@ import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
 import '../../widgets/dailogbox/clinic_dailogbox.dart';
+import '../../widgets/dailogbox/standard_dialog.dart';
 import '../invite_clinic_detail_screen.dart';
 
 class ClinicManagement extends ConsumerStatefulWidget {
@@ -25,6 +26,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   late TabController _tabController;
   late ScrollController _activeScrollController;
   late ScrollController _inviteScrollController;
+  late TextEditingController _activeSearchController;
+  late TextEditingController _inviteSearchController;
 
   @override
   void initState() {
@@ -32,6 +35,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     _tabController = TabController(length: 2, vsync: this);
     _activeScrollController = ScrollController();
     _inviteScrollController = ScrollController();
+    _activeSearchController = TextEditingController();
+    _inviteSearchController = TextEditingController();
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(clinicViewModelProvider.notifier).initialize();
@@ -43,6 +48,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     _tabController.dispose();
     _activeScrollController.dispose();
     _inviteScrollController.dispose();
+    _activeSearchController.dispose();
+    _inviteSearchController.dispose();
     super.dispose();
   }
 
@@ -59,8 +66,6 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             SizedBox(height: 32.h),
             _buildStatsSummary(),
             SizedBox(height: 32.h),
-            _buildFiltersAndSearch(),
-            SizedBox(height: 24.h),
             _buildTabs(),
             SizedBox(height: 24.h),
             Expanded(
@@ -151,45 +156,6 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     );
   }
 
-  Widget _buildFiltersAndSearch() {
-    return BorderdContainerWidget(
-      padding: EdgeInsets.all(16.w),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: CupertinoSearchTextField(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              placeholder: "Search clinics by name, email or location...",
-              backgroundColor: CustomColors.backgroundLight,
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-          ),
-          SizedBox(width: 16.w),
-          _buildFilterDropdown("Region", ["All Regions", "East Coast", "West Coast"]),
-          SizedBox(width: 12.w),
-          _buildFilterDropdown("Status", ["All Status", "Active", "Inactive"]),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterDropdown(String label, List<String> items) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      decoration: BoxDecoration(
-        border: Border.all(color: CustomColors.borderLight),
-        borderRadius: BorderRadius.circular(10.r),
-      ),
-      child: Row(
-        children: [
-          Text("$label: ", style: CustomFonts.bodySmall),
-          Text(items[0], style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-          const Icon(Icons.keyboard_arrow_down, size: 18),
-        ],
-      ),
-    );
-  }
 
   Widget _buildTabs() {
     return Container(
@@ -215,41 +181,194 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _buildActiveClinicsTab() {
     final state = ref.watch(clinicViewModelProvider);
     final clinics = state.clinics ?? [];
-    return _buildUnifiedTable<ClinicModel>(
-      title: "Active Clinic Directory",
-      items: clinics,
-      isLoading: state.loading,
-      controller: _activeScrollController,
-      columns: const [
-        DataColumn(label: Text('Clinic Name')),
-        DataColumn(label: Text('Contact')),
-        DataColumn(label: Text('Location')),
-        DataColumn(label: Text('Plan/Type')),
-        DataColumn(label: Text('Stats')),
-        DataColumn(label: Text('Status')),
-        DataColumn(label: Text('Actions')),
+    return Column(
+      children: [
+        _buildSearchAndFilterBar(_activeSearchController, "Search active clinics by name, email or location..."),
+        SizedBox(height: 24.h),
+        Expanded(
+          child: _buildUnifiedTable<ClinicModel>(
+            title: "Active Clinic Directory",
+            items: clinics,
+            isLoading: state.loading,
+            controller: _activeScrollController,
+            columns: const [
+              DataColumn(label: Text('Clinic Name')),
+              DataColumn(label: Text('Contact')),
+              DataColumn(label: Text('Location')),
+              DataColumn(label: Text('Plan/Type')),
+              DataColumn(label: Text('Stats')),
+              DataColumn(label: Text('Status')),
+              DataColumn(label: Text('Actions')),
+            ],
+            rowBuilder: (item) => _buildActiveClinicRow(item),
+          ),
+        ),
       ],
-      rowBuilder: (item) => _buildActiveClinicRow(item),
     );
   }
 
   Widget _buildPendingInvitationsTab() {
     final state = ref.watch(clinicViewModelProvider);
     final inviteClinics = state.inviteClinics ?? [];
-    return _buildUnifiedTable<InviteClinicModel>(
-      title: "Prospect Clinic Pipeline",
-      items: inviteClinics,
-      isLoading: state.loading,
-      controller: _inviteScrollController,
-      columns: const [
-        DataColumn(label: Text('Clinic Name')),
-        DataColumn(label: Text('Contact')),
-        DataColumn(label: Text('Location')),
-        DataColumn(label: Text('Plan/Type')),
-        DataColumn(label: Text('Status')),
-        DataColumn(label: Text('Actions')),
+    return Column(
+      children: [
+        _buildSearchAndFilterBar(_inviteSearchController, "Search prospect clinics by name or email..."),
+        SizedBox(height: 24.h),
+        Expanded(
+          child: _buildUnifiedTable<InviteClinicModel>(
+            title: "Prospect Clinic Pipeline",
+            items: inviteClinics,
+            isLoading: state.loading,
+            controller: _inviteScrollController,
+            columns: const [
+              DataColumn(label: Text('Clinic Name')),
+              DataColumn(label: Text('Contact')),
+              DataColumn(label: Text('Location')),
+              DataColumn(label: Text('Status')),
+              DataColumn(label: Text('Actions')),
+            ],
+            rowBuilder: (item) => _buildInviteClinicRow(item),
+          ),
+        ),
       ],
-      rowBuilder: (item) => _buildInviteClinicRow(item),
+    );
+  }
+
+  Widget _buildSearchAndFilterBar(TextEditingController controller, String hint) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 54.h,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: Colors.grey[200]!),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: TextField(
+              controller: controller,
+              onChanged: (val) {
+                setState(() {});
+                // Logic for filtering can be added here or in ViewModel
+              },
+              style: CustomFonts.bodyMedium,
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
+                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.textSecondary, size: 20),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 15.h),
+                suffixIcon: controller.text.isNotEmpty 
+                    ? IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 18),
+                        onPressed: () {
+                          controller.clear();
+                          setState(() {});
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 16.w),
+        _buildFilterButton(),
+      ],
+    );
+  }
+
+  Widget _buildFilterButton() {
+    return ElevatedButton.icon(
+      onPressed: () => _showFiltersModal(),
+      icon: const Icon(Icons.filter_list_rounded, size: 20, color: Colors.white),
+      label: Text("Filters", style: CustomFonts.bodyMedium.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: CustomColors.deepSlate,
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 18.h),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      ),
+    );
+  }
+
+  void _showFiltersModal() {
+    showDialog(
+      context: context,
+      builder: (context) => StandardDialog(
+        title: "Filter Clinics",
+        width: 600.w,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _buildModalSearchField(
+                    label: "Region",
+                    hint: "All Regions",
+                    suggestions: ["East Coast", "West Coast", "Midwest", "South"],
+                  ),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: _buildModalSearchField(
+                    label: "Status",
+                    hint: "All Status",
+                    suggestions: ["Active", "Inactive", "Pending"],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            _buildModalSearchField(
+              label: "Subscription Plan",
+              hint: "All Plans",
+              suggestions: ["Basic", "Standard", "Premium", "Enterprise"],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Reset All"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Apply Filters"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModalSearchField({
+    required String label,
+    required String hint,
+    required List<String> suggestions,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
+        SizedBox(height: 10.h),
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: CustomColors.backgroundLight,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+          ),
+          items: suggestions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+          onChanged: (val) {},
+        ),
+      ],
     );
   }
 
@@ -262,12 +381,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     required DataRow Function(T) rowBuilder,
   }) {
     return BorderdContainerWidget(
-      width: double.infinity,
+      padding: EdgeInsets.zero,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: EdgeInsets.all(20.w),
+            padding: EdgeInsets.all(24.w),
             child: Text(title, style: CustomFonts.headlineSmall),
           ),
           Expanded(
@@ -285,18 +404,26 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                         thumbVisibility: true,
                         child: SingleChildScrollView(
                           controller: controller,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: DataTable(
-                              columnSpacing: 40.w,
-                              headingRowColor: WidgetStateProperty.all(CustomColors.backgroundLight),
-                              headingTextStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
-                              rows: List.generate(
-                                items.length,
-                                (index) => rowBuilder(items[index]),
-                              ),
-                              columns: columns,
-                            ),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                  child: DataTable(
+                                    columnSpacing: 40.w,
+                                    horizontalMargin: 24.w,
+                                    headingRowColor: WidgetStateProperty.all(CustomColors.backgroundLight),
+                                    headingTextStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                                    rows: List.generate(
+                                      items.length,
+                                      (index) => rowBuilder(items[index]),
+                                    ),
+                                    columns: columns,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -318,13 +445,22 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         DataCell(
           Row(
             children: [
-              IconButton(icon: const Icon(Icons.visibility_outlined, size: 20), onPressed: () {}),
-              IconButton(icon: const Icon(Icons.edit_outlined, size: 20), onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => EditClinicDialogBox(clinic: clinic),
-                );
-              }),
+              IconButton(
+                icon: const Icon(Icons.visibility_outlined, size: 20),
+                onPressed: () {
+                  ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
+                  context.push(ClinicDetailScreen.routeName);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 20),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => EditClinicDialogBox(clinic: clinic),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -338,20 +474,14 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         DataCell(_buildNameCell(clinic.name, clinic.logo)),
         DataCell(_buildContactCell(clinic.email, clinic.phone)),
         DataCell(Text(clinic.address, style: CustomFonts.bodyMedium)),
-        DataCell(_buildPlanBadge("Pipeline", isPipeline: true)),
         DataCell(_invitationStatusBadge(clinic.invitationStatus)),
         DataCell(
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.visibility_outlined, size: 20),
-                onPressed: () {
-                  ref.read(clinicViewModelProvider.notifier).selectInviteClinic(clinic);
-                  context.push(InviteClinicDetailScreen.routeName);
-                },
-              ),
-              _buildContextualIconButton(clinic),
-            ],
+          IconButton(
+            icon: const Icon(Icons.visibility_outlined, size: 20),
+            onPressed: () {
+              ref.read(clinicViewModelProvider.notifier).selectInviteClinic(clinic);
+              context.push(InviteClinicDetailScreen.routeName);
+            },
           ),
         ),
       ],
@@ -386,7 +516,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     );
   }
 
-  Widget _buildPlanBadge(String plan, {bool isPipeline = false}) {
+  Widget _buildPlanBadge(String plan) {
     final color = CustomColors.brandPurple;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
@@ -456,16 +586,5 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         style: TextStyle(color: color, fontSize: 10.sp, fontWeight: FontWeight.bold),
       ),
     );
-  }
-
-  Widget _buildContextualIconButton(InviteClinicModel clinic) {
-    final status = clinic.invitationStatus.toLowerCase();
-    if (status == 'invitation sent' || status == 'awaiting response' || status == 'invited') {
-      return IconButton(icon: const Icon(Icons.refresh_rounded, size: 20, color: CustomColors.brandCyan), onPressed: () {});
-    } else if (status == 'pending onboarding' || status == 'interested') {
-      return IconButton(icon: const Icon(Icons.rocket_launch_outlined, size: 20, color: CustomColors.success), onPressed: () {});
-    } else {
-      return IconButton(icon: const Icon(Icons.mail_outline_rounded, size: 20, color: CustomColors.brandCyan), onPressed: () {});
-    }
   }
 }

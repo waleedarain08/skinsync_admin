@@ -10,6 +10,12 @@ class InviteClinicModel {
   final int pendingAppointmentsCount;
   final String invitedDate;
   final String? notes;
+  final String? lat;
+  final String? long;
+  final String? ownerName;
+  final String? ownerEmail;
+  final String? website;
+  final String? description;
 
   InviteClinicModel({
     required this.id,
@@ -23,6 +29,12 @@ class InviteClinicModel {
     required this.pendingAppointmentsCount,
     required this.invitedDate,
     this.notes,
+    this.lat,
+    this.long,
+    this.ownerName,
+    this.ownerEmail,
+    this.website,
+    this.description,
   });
 
   factory InviteClinicModel.fromJson(Map<String, dynamic> json) {
@@ -38,6 +50,12 @@ class InviteClinicModel {
       pendingAppointmentsCount: json['pending_appointments_count'],
       invitedDate: json['invited_date'],
       notes: json['notes'],
+      lat: json['lat'],
+      long: json['long'],
+      ownerName: json['owner_name'],
+      ownerEmail: json['owner_email'],
+      website: json['website'],
+      description: json['description'],
     );
   }
 
@@ -54,6 +72,12 @@ class InviteClinicModel {
       'pending_appointments_count': pendingAppointmentsCount,
       'invited_date': invitedDate,
       'notes': notes,
+      'lat': lat,
+      'long': long,
+      'owner_name': ownerName,
+      'owner_email': ownerEmail,
+      'website': website,
+      'description': description,
     };
   }
 }
