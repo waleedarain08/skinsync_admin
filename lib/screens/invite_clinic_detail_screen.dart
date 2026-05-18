@@ -134,8 +134,9 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     return Column(
       children: [
         _infoSection("Invitation Control", [
-          Text("Manage the outreach and onboarding workflow for this prospect.", style: CustomFonts.bodySmall),
-          SizedBox(height: 24.h),
+          Text("Manage the outreach and onboarding workflow for this prospect.", 
+            style: CustomFonts.bodySmall.copyWith(color: CustomColors.textSecondary, height: 1.5)),
+          SizedBox(height: 28.h),
           _actionButton(
             "Invite Clinic Now", 
             Icons.mail_outline_rounded, 
@@ -143,7 +144,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             CustomColors.deepSlate,
             () {},
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
           _actionButton(
             "Resend Invitation", 
             Icons.refresh_rounded, 
@@ -152,7 +153,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             () {},
             isOutlined: true,
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
           _actionButton(
             "Start Onboarding", 
             Icons.rocket_launch_outlined, 
@@ -160,9 +161,9 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             Colors.white,
             () {},
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 24),
-            child: Divider(),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 32.h),
+            child: Divider(color: CustomColors.borderLight.withOpacity(0.6)),
           ),
           _actionButton(
             "Archive Prospect", 
@@ -215,30 +216,43 @@ class InviteClinicDetailScreen extends ConsumerWidget {
   }
 
   Widget _actionButton(String label, IconData icon, Color bg, Color text, VoidCallback onTap, {bool isOutlined = false}) {
-    if (isOutlined) {
-      return OutlinedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, size: 18),
-        label: Text(label),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: text,
-          side: BorderSide(color: text),
-          padding: EdgeInsets.symmetric(vertical: 16.h),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        ),
-      );
-    }
-    return ElevatedButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: bg,
-        foregroundColor: text,
-        padding: EdgeInsets.symmetric(vertical: 16.h),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        elevation: 0,
-      ),
+    final style = isOutlined
+        ? OutlinedButton.styleFrom(
+            foregroundColor: text,
+            side: BorderSide(color: text.withOpacity(0.5), width: 1.2),
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+            textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.3),
+          ).copyWith(
+            overlayColor: MaterialStateProperty.all(text.withOpacity(0.05)),
+          )
+        : ElevatedButton.styleFrom(
+            backgroundColor: bg,
+            foregroundColor: text,
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+            elevation: bg == CustomColors.brandCyan ? 4 : 0,
+            shadowColor: bg.withOpacity(0.4),
+            textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold, letterSpacing: 0.3),
+          ).copyWith(
+            overlayColor: MaterialStateProperty.all(text.withOpacity(0.1)),
+          );
+
+    return SizedBox(
+      width: double.infinity,
+      child: isOutlined
+          ? OutlinedButton.icon(
+              onPressed: onTap,
+              icon: Icon(icon, size: 20.sp),
+              label: Text(label),
+              style: style,
+            )
+          : ElevatedButton.icon(
+              onPressed: onTap,
+              icon: Icon(icon, size: 20.sp),
+              label: Text(label),
+              style: style,
+            ),
     );
   }
 

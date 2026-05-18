@@ -313,16 +313,32 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                     children: [
                       SizedBox(
                         width: 160.w,
+                        height: 56.h,
                         child: OutlinedButton(
                           onPressed: () => context.pop(),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: CustomColors.textSecondary,
+                            side: BorderSide(color: CustomColors.borderLight, width: 1.5),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                            textStyle: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+                          ),
                           child: const Text("Cancel"),
                         ),
                       ),
                       SizedBox(width: 24.w),
                       SizedBox(
-                        width: 220.w,
+                        width: 240.w,
+                        height: 56.h,
                         child: ElevatedButton(
                           onPressed: _submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: CustomColors.deepSlate,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                            elevation: 4,
+                            shadowColor: CustomColors.deepSlate.withOpacity(0.3),
+                            textStyle: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                          ),
                           child: const Text("Register Clinic"),
                         ),
                       ),
@@ -425,12 +441,17 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
               Text("Clinic Availability", style: CustomFonts.textMain20w600),
               ElevatedButton.icon(
                 onPressed: _addAvailability,
-                icon: const Icon(Icons.add_circle_outline, size: 20),
+                icon: Icon(Icons.add_circle_outline, size: 18.sp),
                 label: const Text("Add Timing Slot"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
-                  foregroundColor: CustomColors.brandPrimary,
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                  backgroundColor: CustomColors.brandCyan.withOpacity(0.12),
+                  foregroundColor: CustomColors.deepSlate,
+                  elevation: 0,
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                  textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                ).copyWith(
+                  overlayColor: MaterialStateProperty.all(CustomColors.brandCyan.withOpacity(0.2)),
                 ),
               ),
             ],
