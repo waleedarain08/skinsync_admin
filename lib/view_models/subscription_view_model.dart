@@ -41,7 +41,30 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
           () async {
             final newPlan = await _subscriptionRepository.createSubscriptionPlan(plan);
             final currentList = state.plans ?? [];
-            state = state.copyWith(plans: [...currentList, newPlan]);
+            
+            // If it's an update, replace the existing one, otherwise add it
+            if (plan.id != null) {
+               state = state.copyWith(
+                 plans: currentList.map((p) => p.id == plan.id ? newPlan : p).toList()
+               );
+            } else {
+              state = state.copyWith(plans: [...currentList, newPlan]);
+            }
+            return true;
+          },
+        ) ??
+        false;
+
+    return success;
+  }
+
+  Future<bool> deleteSubscriptionPlan(int id) async {
+    final success = await runSafely<bool?>(
+          showLoading: true,
+          () async {
+            // final success = await _subscriptionRepository.deleteSubscriptionPlan(id);
+            final currentList = state.plans ?? [];
+            state = state.copyWith(plans: currentList.where((p) => p.id != id).toList());
             return true;
           },
         ) ??

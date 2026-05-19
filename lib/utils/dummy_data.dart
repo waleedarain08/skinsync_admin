@@ -277,6 +277,25 @@ class TreatmentData {
 
   static final List<SubscriptionPlanModel> dummySubscriptionPlans = [
     SubscriptionPlanModel(
+      id: 0,
+      name: "Free System Plan",
+      basePrice: 0.00,
+      doctorSeats: 2,
+      unlimitedDoctors: false,
+      staffSeats: 5,
+      unlimitedStaff: false,
+      standardBookingCommissionPercent: 12,
+      dynamicBookingCommissionPercent: 18,
+      technologyFeePerTreatment: 8,
+      isActive: true,
+      isSystemPlan: true,
+      durationMonths: 2,
+      benefits: [
+        PlanBenefit(title: "Initial free access", enabled: true),
+        PlanBenefit(title: "Basic patient records", enabled: true),
+      ],
+    ),
+    SubscriptionPlanModel(
       id: 1,
       name: "Basic Plan",
       basePrice: 49.99,

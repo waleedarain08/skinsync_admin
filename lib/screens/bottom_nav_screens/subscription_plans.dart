@@ -86,6 +86,14 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
       );
     }
 
+    // Ensure system plans are at the top
+    final sortedPlans = [...plans];
+    sortedPlans.sort((a, b) {
+      if (a.isSystemPlan && !b.isSystemPlan) return -1;
+      if (!a.isSystemPlan && b.isSystemPlan) return 1;
+      return 0;
+    });
+
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: MediaQuery.of(context).size.width > 1200 ? 3 : 2,
@@ -93,8 +101,8 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
         mainAxisSpacing: 24.h,
         childAspectRatio: 0.6,
       ),
-      itemCount: plans.length,
-      itemBuilder: (context, index) => _buildPlanCard(plans[index]),
+      itemCount: sortedPlans.length,
+      itemBuilder: (context, index) => _buildPlanCard(sortedPlans[index]),
     );
   }
 
@@ -110,7 +118,10 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(plan.name ?? "N/A", style: CustomFonts.headlineSmall),
-              _statusBadge(plan.isActive),
+              if (plan.isSystemPlan)
+                _systemBadge()
+              else
+                _statusBadge(plan.isActive),
             ],
           ),
           SizedBox(height: 16.h),
@@ -123,6 +134,10 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
               Text(" / month", style: CustomFonts.bodySmall),
             ],
           ),
+          if (plan.isSystemPlan && plan.durationMonths != null) ...[
+             SizedBox(height: 8.h),
+             Text("Default Duration: ${plan.durationMonths} Months", style: CustomFonts.bodySmall.copyWith(color: CustomColors.brandPurple, fontWeight: FontWeight.bold)),
+          ],
           SizedBox(height: 24.h),
           const Divider(),
           SizedBox(height: 24.h),
@@ -174,18 +189,46 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             ),
           ),
           SizedBox(height: 24.h),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () {
-                context.push(CreateSubscriptionPlanScreen.routeName, extra: plan);
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 14.h),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    context.push(CreateSubscriptionPlanScreen.routeName, extra: plan);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                  ),
+                  child: const Text("Edit Plan Details"),
+                ),
               ),
-              child: const Text("Edit Plan Details"),
-            ),
+              if (!plan.isSystemPlan) ...[
+                SizedBox(width: 12.w),
+                IconButton(
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Delete Plan"),
+                        content: Text("Are you sure you want to delete the '${plan.name}' plan?"),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Delete", style: TextStyle(color: CustomColors.error))),
+                        ],
+                      ),
+                    );
+                    if (confirm == true && plan.id != null) {
+                      await ref.read(subscriptionViewModelProvider.notifier).deleteSubscriptionPlan(plan.id!);
+                    }
+                  },
+                  icon: const Icon(Icons.delete_outline, color: CustomColors.error),
+                  style: IconButton.styleFrom(
+                    backgroundColor: CustomColors.error.withOpacity(0.1),
+                  ),
+                ),
+              ],
+            ],
           ),
         ],
       ),
@@ -217,6 +260,26 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           color: isActive ? CustomColors.success : CustomColors.error,
           fontSize: 11.sp,
           fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _systemBadge() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: CustomColors.brandPurple.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: CustomColors.brandPurple.withOpacity(0.3)),
+      ),
+      child: Text(
+        "SYSTEM PLAN",
+        style: TextStyle(
+          color: CustomColors.brandPurple,
+          fontSize: 10.sp,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
         ),
       ),
     );
