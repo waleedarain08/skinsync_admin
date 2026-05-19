@@ -176,6 +176,42 @@ class CreateTreatmentScreen extends ConsumerWidget {
           keyboardType: TextInputType.number,
           validator: Validators.empty,
         ),
+        SizedBox(height: 24.h),
+        Text("Base Duration", style: CustomFonts.textMain14w600),
+        SizedBox(height: 10.h),
+        Row(
+          children: [
+            Expanded(
+              child: BuildTextField(
+                label: "Hours",
+                controller: viewModel.durationHoursController,
+                hintText: "0",
+                keyboardType: TextInputType.number,
+                validator: (val) {
+                  if (val == null || val.isEmpty) return null;
+                  final hours = int.tryParse(val);
+                  if (hours == null || hours < 0) return "Invalid";
+                  return null;
+                },
+              ),
+            ),
+            SizedBox(width: 24.w),
+            Expanded(
+              child: BuildTextField(
+                label: "Minutes",
+                controller: viewModel.durationMinutesController,
+                hintText: "0",
+                keyboardType: TextInputType.number,
+                validator: (val) {
+                  if (val == null || val.isEmpty) return null;
+                  final minutes = int.tryParse(val);
+                  if (minutes == null || minutes < 0 || minutes > 59) return "0-59";
+                  return null;
+                },
+              ),
+            ),
+          ],
+        ),
         SizedBox(height: 32.h),
         _sectionTitle("Visuals"),
         SizedBox(height: 24.h),
@@ -701,6 +737,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
           flex: 2,
           child: ElevatedButton(
             onPressed: () {
+              if (state.currentStep == 0) {
+                if (!_validateStep1(context, viewModel)) return;
+              }
               if (state.currentStep == 2) {
                 if (!_validateSubAreas(context, state)) return;
               }
@@ -718,6 +757,36 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  bool _validateStep1(BuildContext context, TreatmentViewModel viewModel) {
+    if (viewModel.internalNameController.text.isEmpty ||
+        viewModel.displayNameController.text.isEmpty ||
+        viewModel.basePriceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.error),
+      );
+      return false;
+    }
+
+    final hours = int.tryParse(viewModel.durationHoursController.text) ?? 0;
+    final minutes = int.tryParse(viewModel.durationMinutesController.text) ?? 0;
+
+    if (hours <= 0 && minutes <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a valid treatment duration"), backgroundColor: CustomColors.error),
+      );
+      return false;
+    }
+
+    if (minutes > 59) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Minutes must be between 0 and 59"), backgroundColor: CustomColors.error),
+      );
+      return false;
+    }
+
+    return true;
   }
 
   bool _validateSubAreas(BuildContext context, TreatmentState state) {

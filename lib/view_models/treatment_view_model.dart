@@ -22,6 +22,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final fullDescriptionController = TextEditingController();
   final shortDescriptionController = TextEditingController();
   final basePriceController = TextEditingController();
+  final durationHoursController = TextEditingController();
+  final durationMinutesController = TextEditingController();
 
   // Step 2 Controllers
   final categoryController = TextEditingController();
@@ -50,6 +52,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     fullDescriptionController.dispose();
     shortDescriptionController.dispose();
     basePriceController.dispose();
+    durationHoursController.dispose();
+    durationMinutesController.dispose();
     categoryController.dispose();
     subcategoryController.dispose();
     materialNameController.dispose();
@@ -95,6 +99,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     fullDescriptionController.clear();
     shortDescriptionController.clear();
     basePriceController.clear();
+    durationHoursController.clear();
+    durationMinutesController.clear();
     categoryController.clear();
     subcategoryController.clear();
     materialNameController.clear();
@@ -125,6 +131,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     fullDescriptionController.text = treatment.description ?? '';
     shortDescriptionController.text = treatment.shortDescription ?? '';
     basePriceController.text = treatment.basePrice?.toString() ?? '';
+    durationHoursController.text = treatment.baseDurationHours?.toString() ?? '';
+    durationMinutesController.text = treatment.baseDurationMinutes?.toString() ?? '';
     categoryController.text = treatment.category ?? '';
     subcategoryController.text = treatment.subcategory ?? '';
     materialNameController.text = treatment.materialName ?? '';
@@ -367,6 +375,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         description: fullDescriptionController.text,
         shortDescription: shortDescriptionController.text,
         basePrice: double.tryParse(basePriceController.text),
+        baseDurationHours: int.tryParse(durationHoursController.text),
+        baseDurationMinutes: int.tryParse(durationMinutesController.text),
         category: categoryController.text,
         subcategory: subcategoryController.text,
         materialName: materialNameController.text,

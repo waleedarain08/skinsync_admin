@@ -42,7 +42,7 @@ class EditTreatmentScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () {
-              if (!_validateForm(context, state)) return;
+              if (!_validateForm(context, viewModel, state)) return;
               viewModel.updateTreatment(context).then((_) {
                 if (context.mounted) context.pop();
               });
@@ -76,7 +76,33 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  bool _validateForm(BuildContext context, TreatmentState state) {
+  bool _validateForm(BuildContext context, TreatmentViewModel viewModel, TreatmentState state) {
+    if (viewModel.internalNameController.text.isEmpty ||
+        viewModel.displayNameController.text.isEmpty ||
+        viewModel.basePriceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.error),
+      );
+      return false;
+    }
+
+    final hours = int.tryParse(viewModel.durationHoursController.text) ?? 0;
+    final minutes = int.tryParse(viewModel.durationMinutesController.text) ?? 0;
+
+    if (hours <= 0 && minutes <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a valid treatment duration"), backgroundColor: CustomColors.error),
+      );
+      return false;
+    }
+
+    if (minutes > 59) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Minutes must be between 0 and 59"), backgroundColor: CustomColors.error),
+      );
+      return false;
+    }
+
     for (var area in state.areas) {
       if (area.subAreas.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -127,6 +153,30 @@ class EditTreatmentScreen extends ConsumerWidget {
             hintText: "0",
             keyboardType: TextInputType.number,
             validator: Validators.empty,
+          ),
+          SizedBox(height: 24.h),
+          Text("Base Duration", style: CustomFonts.textMain14w600),
+          SizedBox(height: 10.h),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: "Hours",
+                  controller: viewModel.durationHoursController,
+                  hintText: "0",
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(width: 24.w),
+              Expanded(
+                child: BuildTextField(
+                  label: "Minutes",
+                  controller: viewModel.durationMinutesController,
+                  hintText: "0",
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 24.h),
           Row(

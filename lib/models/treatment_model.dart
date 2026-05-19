@@ -16,6 +16,8 @@ class TreatmentModel {
   bool isActive;
   bool useInAiSimulator;
   List<int>? combinableTreatmentIds;
+  int? baseDurationHours;
+  int? baseDurationMinutes;
 
   TreatmentModel({
     this.id,
@@ -35,6 +37,8 @@ class TreatmentModel {
     this.isActive = true,
     this.useInAiSimulator = false,
     this.combinableTreatmentIds,
+    this.baseDurationHours,
+    this.baseDurationMinutes,
   });
 
   TreatmentModel.fromJson(Map<String, dynamic> json)
@@ -61,6 +65,8 @@ class TreatmentModel {
     combinableTreatmentIds = json['combinable_treatment_ids'] != null
         ? List<int>.from(json['combinable_treatment_ids'])
         : null;
+    baseDurationHours = json['base_duration_hours'];
+    baseDurationMinutes = json['base_duration_minutes'];
   }
 
   TreatmentModel copyWith({
@@ -81,6 +87,8 @@ class TreatmentModel {
     bool? isActive,
     bool? useInAiSimulator,
     List<int>? combinableTreatmentIds,
+    int? baseDurationHours,
+    int? baseDurationMinutes,
   }) {
     return TreatmentModel(
       id: id ?? this.id,
@@ -100,6 +108,8 @@ class TreatmentModel {
       isActive: isActive ?? this.isActive,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
       combinableTreatmentIds: combinableTreatmentIds ?? this.combinableTreatmentIds,
+      baseDurationHours: baseDurationHours ?? this.baseDurationHours,
+      baseDurationMinutes: baseDurationMinutes ?? this.baseDurationMinutes,
     );
   }
 
@@ -121,6 +131,8 @@ class TreatmentModel {
       'is_active': isActive,
       'use_in_ai_simulator': useInAiSimulator,
       'combinable_treatment_ids': combinableTreatmentIds,
+      'base_duration_hours': baseDurationHours,
+      'base_duration_minutes': baseDurationMinutes,
     };
   }
 }

@@ -114,6 +114,10 @@ class TreatmentDetailScreen extends ConsumerWidget {
                     _categoryChip(treatment.category ?? "General"),
                     SizedBox(width: 12.w),
                     _categoryChip(treatment.subcategory ?? "N/A", isSub: true),
+                    if (treatment.baseDurationHours != null || treatment.baseDurationMinutes != null) ...[
+                      SizedBox(width: 12.w),
+                      _durationChip(treatment.baseDurationHours ?? 0, treatment.baseDurationMinutes ?? 0),
+                    ],
                   ],
                 ),
               ],
@@ -337,6 +341,36 @@ class TreatmentDetailScreen extends ConsumerWidget {
           fontWeight: FontWeight.w800,
           letterSpacing: 1,
         ),
+      ),
+    );
+  }
+
+  Widget _durationChip(int hours, int minutes) {
+    String label = "";
+    if (hours > 0) label += "$hours hr ";
+    if (minutes > 0) label += "$minutes min";
+    if (label.isEmpty) label = "N/A";
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: CustomColors.success.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: CustomColors.success.withOpacity(0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.access_time_rounded, size: 14.sp, color: CustomColors.success),
+          SizedBox(width: 6.w),
+          Text(
+            label.trim(),
+            style: CustomFonts.bodySmall.copyWith(
+              color: CustomColors.success,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
