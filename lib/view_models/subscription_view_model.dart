@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/subscription_plan_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
+import '../utils/dummy_data.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 
@@ -25,8 +26,8 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
             state = state.copyWith(loading: loading);
           },
           () async {
-            // Using dummy data if API fails or for initial design
-            final plans = await _subscriptionRepository.getSubscriptionPlans();
+            // Using dummy data for initial design as requested
+            final plans = TreatmentData.dummySubscriptionPlans;
             state = state.copyWith(plans: plans);
             return true;
           },
