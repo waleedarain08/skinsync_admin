@@ -1,5 +1,6 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
+import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 
 class TreatmentData {
@@ -271,6 +272,41 @@ class TreatmentData {
       interestedPatientsCount: 3,
       pendingAppointmentsCount: 1,
       invitedDate: "2023-10-14",
+    ),
+  ];
+
+  static final List<SubscriptionPlanModel> dummySubscriptionPlans = [
+    SubscriptionPlanModel(
+      id: 1,
+      name: "Basic Plan",
+      basePrice: 49.99,
+      isActive: true,
+      benefits: [
+        PlanBenefit(title: "Up to 5 injectors", description: "Standard access"),
+        PlanBenefit(title: "First time join offer", freeMonths: 1),
+      ],
+    ),
+    SubscriptionPlanModel(
+      id: 2,
+      name: "Premium Plan",
+      basePrice: 149.99,
+      isActive: true,
+      benefits: [
+        PlanBenefit(title: "Unlimited injectors", description: "Full access"),
+        PlanBenefit(title: "Priority support", description: "24/7"),
+        PlanBenefit(title: "First time join offer", freeMonths: 3),
+      ],
+    ),
+    SubscriptionPlanModel(
+      id: 3,
+      name: "Gold Plan",
+      basePrice: 299.99,
+      isActive: true,
+      benefits: [
+        PlanBenefit(title: "Custom branding", description: "White label"),
+        PlanBenefit(title: "AI Simulator analytics", description: "Advanced insights"),
+        PlanBenefit(title: "First time join offer", freeMonths: 6),
+      ],
     ),
   ];
 }

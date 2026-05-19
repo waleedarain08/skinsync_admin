@@ -31,7 +31,8 @@ enum Endpoint {
   registerClinic('admin/clinic/register'),
   updateClinic('admin/clinic/update/{id}'),
   updateCustomerAppVersion('admin/app-version/customer'),
-  updateClinicAppVersion('admin/app-version/clinicapp');
+  updateClinicAppVersion('admin/app-version/clinicapp'),
+  subscriptionPlans('admin/subscription-plans');
 
   final String path;
   const Endpoint(this.path);

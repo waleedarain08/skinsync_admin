@@ -9,6 +9,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dar
 import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/setting_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/subscription_plans.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
@@ -127,6 +128,11 @@ class RouteGenerator {
             name: ProductManagement.routeName,
             path: ProductManagement.routeName,
             builder: (_, _) => const ProductManagement(),
+          ),
+          GoRoute(
+            name: SubscriptionPlansTab.routeName,
+            path: SubscriptionPlansTab.routeName,
+            builder: (_, _) => const SubscriptionPlansTab(),
           ),
           GoRoute(
             name: SettingScreen.routeName,
