@@ -3,13 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
+import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
-import 'package:skinsync_admin/utils/validators.dart';
-import 'package:skinsync_admin/widgets/build_textfield.dart';
 
 class SubscriptionPlansTab extends ConsumerStatefulWidget {
   static const String routeName = '/subscription-plans';
@@ -62,13 +60,13 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             Text("Subscription Plans", style: CustomFonts.headlineLarge),
             SizedBox(height: 8.h),
             Text(
-              "Manage pricing tiers and benefits for your clinic network.",
+              "Manage pricing tiers, commissions, and capacity limits for your clinic network.",
               style: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
             ),
           ],
         ),
         ElevatedButton.icon(
-          onPressed: () => _showCreatePlanDialog(),
+          onPressed: () => context.push(CreateSubscriptionPlanScreen.routeName),
           icon: const Icon(Icons.add, color: Colors.white),
           label: Text('Create New Plan', style: CustomFonts.white14w600),
           style: ElevatedButton.styleFrom(
@@ -93,7 +91,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
         crossAxisCount: MediaQuery.of(context).size.width > 1200 ? 3 : 2,
         crossAxisSpacing: 24.w,
         mainAxisSpacing: 24.h,
-        childAspectRatio: 0.85,
+        childAspectRatio: 0.6,
       ),
       itemCount: plans.length,
       itemBuilder: (context, index) => _buildPlanCard(plans[index]),
@@ -101,6 +99,8 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
   }
 
   Widget _buildPlanCard(SubscriptionPlanModel plan) {
+    final activeBenefits = plan.benefits?.where((b) => b.enabled).toList() ?? [];
+
     return BorderdContainerWidget(
       padding: EdgeInsets.all(32.w),
       child: Column(
@@ -123,17 +123,39 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
               Text(" / month", style: CustomFonts.bodySmall),
             ],
           ),
-          SizedBox(height: 32.h),
+          SizedBox(height: 24.h),
           const Divider(),
+          SizedBox(height: 24.h),
+          Text("CAPACITY LIMITS", style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+          SizedBox(height: 12.h),
+          _limitRow(
+            Icons.person_pin_rounded, 
+            "Doctor/Injector Seats:", 
+            plan.unlimitedDoctors ? "Unlimited" : "${plan.doctorSeats}"
+          ),
+          SizedBox(height: 8.h),
+          _limitRow(
+            Icons.people_alt_rounded, 
+            "Staff Member Seats:", 
+            plan.unlimitedStaff ? "Unlimited" : "${plan.staffSeats}"
+          ),
+          SizedBox(height: 24.h),
+          Text("COMMISSION & FEES", style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+          SizedBox(height: 12.h),
+          _limitRow(Icons.percent_rounded, "Standard Commission:", "${plan.standardBookingCommissionPercent}%"),
+          SizedBox(height: 8.h),
+          _limitRow(Icons.auto_graph_rounded, "Dynamic Commission:", "${plan.dynamicBookingCommissionPercent}%"),
+          SizedBox(height: 8.h),
+          _limitRow(Icons.terminal_rounded, "Tech Fee / Treatment:", "\$${plan.technologyFeePerTreatment}"),
           SizedBox(height: 24.h),
           Text("PLAN BENEFITS", style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
           SizedBox(height: 16.h),
           Expanded(
             child: ListView.separated(
-              itemCount: plan.benefits?.length ?? 0,
+              itemCount: activeBenefits.length,
               separatorBuilder: (_, __) => SizedBox(height: 12.h),
               itemBuilder: (context, i) {
-                final benefit = plan.benefits![i];
+                final benefit = activeBenefits[i];
                 return Row(
                   children: [
                     const Icon(Icons.check_circle_outline, color: CustomColors.success, size: 18),
@@ -155,7 +177,9 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: () {},
+              onPressed: () {
+                context.push(CreateSubscriptionPlanScreen.routeName, extra: plan);
+              },
               style: OutlinedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 14.h),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
@@ -165,6 +189,18 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _limitRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 16.sp, color: CustomColors.textSecondary),
+        SizedBox(width: 8.w),
+        Text(label, style: CustomFonts.bodySmall),
+        const Spacer(),
+        Text(value, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: CustomColors.deepSlate)),
+      ],
     );
   }
 
@@ -183,129 +219,6 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           fontWeight: FontWeight.bold,
         ),
       ),
-    );
-  }
-
-  void _showCreatePlanDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => const CreatePlanDialog(),
-    );
-  }
-}
-
-class CreatePlanDialog extends StatefulWidget {
-  const CreatePlanDialog({super.key});
-
-  @override
-  State<CreatePlanDialog> createState() => _CreatePlanDialogState();
-}
-
-class _CreatePlanDialogState extends State<CreatePlanDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _freeMonthsController = TextEditingController(text: "1");
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _priceController.dispose();
-    _freeMonthsController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return StandardDialog(
-      title: "Create New Subscription Plan",
-      width: 600.w,
-      content: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BuildTextField(
-              label: "Plan Name",
-              controller: _nameController,
-              hintText: "e.g. Premium Plan",
-              validator: Validators.empty,
-            ),
-            SizedBox(height: 24.h),
-            BuildTextField(
-              label: "Base Price (\$)",
-              controller: _priceController,
-              hintText: "0.00",
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              validator: Validators.empty,
-            ),
-            SizedBox(height: 32.h),
-            Text("Plan Benefits / Included Points", style: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
-            SizedBox(height: 16.h),
-            Container(
-              padding: EdgeInsets.all(20.w),
-              decoration: BoxDecoration(
-                color: CustomColors.backgroundLight,
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: CustomColors.borderLight),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.info_outline, color: CustomColors.brandCyan),
-                      SizedBox(width: 12.w),
-                      const Expanded(
-                        child: Text("First time if a clinic joins, \$0 charges will apply"),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20.h),
-                  BuildTextField(
-                    label: "Number of Months",
-                    controller: _freeMonthsController,
-                    hintText: "e.g. 3",
-                    keyboardType: TextInputType.number,
-                    validator: Validators.empty,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-        Consumer(
-          builder: (context, ref, _) {
-            return ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  final plan = SubscriptionPlanModel(
-                    name: _nameController.text,
-                    basePrice: double.tryParse(_priceController.text),
-                    benefits: [
-                      PlanBenefit(
-                        title: "First time join offer",
-                        freeMonths: int.tryParse(_freeMonthsController.text),
-                      ),
-                    ],
-                  );
-                  final success = await ref.read(subscriptionViewModelProvider.notifier).createSubscriptionPlan(plan);
-                  if (success && context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Subscription plan created successfully")),
-                    );
-                  }
-                }
-              },
-              child: const Text("Create Plan"),
-            );
-          },
-        ),
-      ],
     );
   }
 }

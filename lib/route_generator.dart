@@ -1,5 +1,6 @@
 import 'package:skinsync_admin/app_init.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
+import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
@@ -12,6 +13,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/setting_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/subscription_plans.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
+import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/screens/invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
@@ -113,6 +115,11 @@ class RouteGenerator {
             name: ManageTreatmentDataScreen.routeName,
             path: ManageTreatmentDataScreen.routeName,
             builder: (_, _) => const ManageTreatmentDataScreen(),
+          ),
+          GoRoute(
+            name: CreateSubscriptionPlanScreen.routeName,
+            path: CreateSubscriptionPlanScreen.routeName,
+            builder: (context, state) => CreateSubscriptionPlanScreen(planToEdit: state.extra as SubscriptionPlanModel?),
           ),
           GoRoute(
             name: PaymentScreen.routeName,
