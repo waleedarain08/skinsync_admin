@@ -16,5 +16,6 @@ Future<void> main() async {
   await ScreenUtil.ensureScreenSize();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await initializeServices();
+
   runApp(ProviderScope(child: AppInit()));
 }
