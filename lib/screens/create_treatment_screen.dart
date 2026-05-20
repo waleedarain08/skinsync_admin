@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/validators.dart';
@@ -302,7 +301,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: state.areas.length,
-          separatorBuilder: (_, __) => SizedBox(height: 24.h),
+          separatorBuilder: (_, _) => SizedBox(height: 24.h),
           itemBuilder: (context, index) {
             return _buildAreaRow(index, state.areas[index], viewModel, dataState);
           },
@@ -336,7 +335,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: allSubAreas.length,
-            separatorBuilder: (_, __) => SizedBox(height: 16.h),
+            separatorBuilder: (_, _) => SizedBox(height: 16.h),
             itemBuilder: (context, index) {
               final subArea = allSubAreas[index];
               return _buildSubAreaMaterialConfig(subArea);
@@ -363,8 +362,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
             Text("Use in AI Simulator", style: CustomFonts.bodyLarge),
           ],
         ),
-        SizedBox(height: 40.h),
-        _buildCombinableTreatmentsField(state, viewModel),
       ],
     );
   }
@@ -414,42 +411,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCombinableTreatmentsField(TreatmentState state, TreatmentViewModel viewModel) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _sectionTitle("Combinable Treatments"),
-        SizedBox(height: 8.h),
-        Text("Select treatments that can be performed alongside this one.", style: CustomFonts.bodySmall),
-        SizedBox(height: 16.h),
-        _buildSearchField(
-          label: "Search Treatments",
-          hint: "e.g. Botox, Chemical Peel",
-          controller: viewModel.combinableSearchController,
-          suggestions: state.treatments.map((t) => t.name ?? '').toList(),
-          onSelected: (val) {
-            final treatment = state.treatments.firstWhere((t) => t.name == val, orElse: () => TreatmentModel(name: val));
-            viewModel.addCombinableTreatment(treatment);
-          },
-        ),
-        if (state.combinableTreatments.isNotEmpty) ...[
-          SizedBox(height: 16.h),
-          Wrap(
-            spacing: 12.w,
-            runSpacing: 12.h,
-            children: state.combinableTreatments.map((t) => Chip(
-              label: Text(t.name ?? "N/A"),
-              onDeleted: () => viewModel.removeCombinableTreatment(t.id ?? 0),
-              backgroundColor: CustomColors.brandPurple.withOpacity(0.1),
-              side: BorderSide(color: CustomColors.brandPurple.withOpacity(0.2)),
-              labelStyle: TextStyle(color: CustomColors.deepSlate, fontSize: 12.sp),
-              deleteIconColor: CustomColors.deepSlate,
-            )).toList(),
-          ),
-        ],
-      ],
-    );
-  }
 
   Widget _buildAreaRow(int index, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Container(

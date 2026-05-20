@@ -64,8 +64,9 @@ class AdaptiveLayoutRowColumn extends StatelessWidget {
       final rowChildren = <Widget>[];
       for (var i = 0; i < children.length; i++) {
         if (i > 0) rowChildren.add(SizedBox(width: widthBetween ?? 20.w));
-        if (expandedWidget == true)
+        if (expandedWidget == true) {
           rowChildren.add(Expanded(child: children[i]));
+        }
       }
       return Row(
         mainAxisAlignment: alignment ?? MainAxisAlignment.start,

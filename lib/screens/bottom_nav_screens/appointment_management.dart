@@ -191,7 +191,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
           Expanded(
             child: ListView.separated(
               itemCount: 6,
-              separatorBuilder: (_, __) => SizedBox(height: 12.h),
+              separatorBuilder: (_, _) => SizedBox(height: 12.h),
               itemBuilder: (context, index) => _appointmentQueueItem(index),
             ),
           ),

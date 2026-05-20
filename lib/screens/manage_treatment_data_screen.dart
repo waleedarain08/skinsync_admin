@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
@@ -77,7 +76,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.categories.length,
-            separatorBuilder: (_, __) => SizedBox(height: 16.h),
+            separatorBuilder: (_, _) => SizedBox(height: 16.h),
             itemBuilder: (context, index) {
               final category = state.categories[index];
               return _buildHierarchicalItem(
@@ -118,7 +117,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.areas.length,
-            separatorBuilder: (_, __) => SizedBox(height: 16.h),
+            separatorBuilder: (_, _) => SizedBox(height: 16.h),
             itemBuilder: (context, index) {
               final area = state.areas[index];
               return _buildHierarchicalItem(
@@ -194,7 +193,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.combinationGroups.length,
-            separatorBuilder: (_, __) => SizedBox(height: 16.h),
+            separatorBuilder: (_, _) => SizedBox(height: 16.h),
             itemBuilder: (context, index) {
               final group = state.combinationGroups[index];
               return BorderdContainerWidget(
@@ -303,7 +302,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
           height: 40.w,
           decoration: BoxDecoration(color: CustomColors.surfaceGhost, borderRadius: BorderRadius.circular(8.r)),
           child: icon != null 
-              ? Image.network(icon, errorBuilder: (_, __, ___) => const Icon(Icons.category_outlined)) 
+              ? Image.network(icon, errorBuilder: (_, _, _) => const Icon(Icons.category_outlined)) 
               : const Icon(Icons.category_outlined, color: CustomColors.brandPrimary),
         ),
         title: Text(name, style: CustomFonts.textMain16w600),
@@ -340,7 +339,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                     height: 32.w,
                     decoration: BoxDecoration(color: CustomColors.surfaceGhost, borderRadius: BorderRadius.circular(6.r)),
                     child: child.icon != null 
-                        ? Image.network(child.icon!, errorBuilder: (_, __, ___) => const Icon(Icons.subdirectory_arrow_right, size: 16)) 
+                        ? Image.network(child.icon!, errorBuilder: (_, _, _) => const Icon(Icons.subdirectory_arrow_right, size: 16)) 
                         : const Icon(Icons.subdirectory_arrow_right, size: 16, color: CustomColors.textMuted),
                   ),
                   title: Text(child.name, style: CustomFonts.textMain14w400),

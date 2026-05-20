@@ -154,20 +154,6 @@ class TreatmentDetailScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _booleanRow("AI Simulator Ready", treatment.useInAiSimulator),
-            SizedBox(height: 24.h),
-            Text("Combinable With:", style: CustomFonts.bodyLarge),
-            SizedBox(height: 12.h),
-            if (treatment.combinableTreatmentIds == null || treatment.combinableTreatmentIds!.isEmpty)
-              Text("No specific combinations defined.", style: CustomFonts.bodySmall)
-            else
-              Wrap(
-                spacing: 8.w,
-                runSpacing: 8.h,
-                children: treatment.combinableTreatmentIds!.map((id) => Chip(
-                  label: Text("Treatment ID: $id", style: TextStyle(fontSize: 11.sp)),
-                  backgroundColor: CustomColors.brandPurple.withOpacity(0.05),
-                )).toList(),
-              ),
           ],
         )),
         SizedBox(height: 24.h),
@@ -239,7 +225,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: treatment.sideAreas!.length,
-              separatorBuilder: (_, __) => Padding(padding: EdgeInsets.symmetric(vertical: 12.h), child: const Divider()),
+              separatorBuilder: (_, _) => Padding(padding: EdgeInsets.symmetric(vertical: 12.h), child: const Divider()),
               itemBuilder: (context, index) {
                 final area = treatment.sideAreas![index];
                 return Column(

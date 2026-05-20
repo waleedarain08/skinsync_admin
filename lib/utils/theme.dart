@@ -19,8 +19,6 @@ class AppTheme {
         onTertiary: CustomColors.deepSlate,
         surface: CustomColors.surfaceWhite,
         onSurface: CustomColors.deepSlate,
-        background: CustomColors.backgroundLight,
-        onBackground: CustomColors.deepSlate,
         error: CustomColors.error,
         onError: CustomColors.surfaceWhite,
         outline: CustomColors.borderLight,

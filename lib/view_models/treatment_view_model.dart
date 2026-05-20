@@ -32,7 +32,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   // Step 4 Controllers
   final materialNameController = TextEditingController();
   final maxMaterialQuantityController = TextEditingController(text: '0');
-  final combinableSearchController = TextEditingController();
 
   // Filter Controllers
   final searchController = TextEditingController();
@@ -58,7 +57,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     subcategoryController.dispose();
     materialNameController.dispose();
     maxMaterialQuantityController.dispose();
-    combinableSearchController.dispose();
     
     searchController.dispose();
     filterCategoryController.dispose();
@@ -105,7 +103,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     subcategoryController.clear();
     materialNameController.clear();
     maxMaterialQuantityController.text = '0';
-    combinableSearchController.clear();
     
     for (var area in state.areas) {
       area.dispose();
@@ -118,7 +115,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       areas: [AreaViewModelEntry()],
       selectedTreatment: null,
       useInAiSimulator: false,
-      combinableTreatments: [],
     );
   }
 
@@ -160,22 +156,12 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     } else {
       newAreas.add(AreaViewModelEntry());
     }
-    
-    // Combinable treatments lookup
-    final List<TreatmentModel> combinable = [];
-    if (treatment.combinableTreatmentIds != null) {
-      for (var id in treatment.combinableTreatmentIds!) {
-        final match = state.treatments.firstWhere((t) => t.id == id, orElse: () => TreatmentModel(id: id, name: "Unknown ID: $id"));
-        combinable.add(match);
-      }
-    }
 
     state = state.copyWith(
       areas: newAreas,
       treatmentImage: null, 
       treatmentIcon: null,
       useInAiSimulator: treatment.useInAiSimulator,
-      combinableTreatments: combinable,
     );
   }
 
@@ -241,21 +227,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   // Step 4 Actions
   void toggleAiSimulator(bool? value) {
     state = state.copyWith(useInAiSimulator: value ?? false);
-  }
-
-  void addCombinableTreatment(TreatmentModel treatment) {
-    if (!state.combinableTreatments.any((t) => t.id == treatment.id)) {
-      state = state.copyWith(
-        combinableTreatments: [...state.combinableTreatments, treatment],
-      );
-    }
-    combinableSearchController.clear();
-  }
-
-  void removeCombinableTreatment(int treatmentId) {
-    state = state.copyWith(
-      combinableTreatments: state.combinableTreatments.where((t) => t.id != treatmentId).toList(),
-    );
   }
 
   // Filter Logic
@@ -382,7 +353,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         materialName: materialNameController.text,
         maxMaterialQuantity: int.tryParse(maxMaterialQuantityController.text) ?? 0,
         useInAiSimulator: state.useInAiSimulator,
-        combinableTreatmentIds: state.combinableTreatments.map((t) => t.id!).toList(),
         sideAreas: state.areas.map((a) => SideAreaModel(
           name: a.areaController.text,
           subAreas: a.subAreas.map((s) => SubAreaModel(
@@ -423,7 +393,6 @@ class TreatmentState {
   
   // Step 4 fields
   final bool useInAiSimulator;
-  final List<TreatmentModel> combinableTreatments;
 
   TreatmentState({
     this.treatments = const [],
@@ -435,7 +404,6 @@ class TreatmentState {
     this.treatmentImage,
     this.treatmentIcon,
     this.useInAiSimulator = false,
-    this.combinableTreatments = const [],
     List<AreaViewModelEntry>? areas,
   }) : areas = areas ?? [AreaViewModelEntry()];
 
@@ -450,7 +418,6 @@ class TreatmentState {
     XFile? treatmentIcon,
     List<AreaViewModelEntry>? areas,
     bool? useInAiSimulator,
-    List<TreatmentModel>? combinableTreatments,
   }) {
     return TreatmentState(
       loading: loading ?? this.loading,
@@ -463,7 +430,6 @@ class TreatmentState {
       treatmentIcon: treatmentIcon ?? this.treatmentIcon,
       areas: areas ?? this.areas,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
-      combinableTreatments: combinableTreatments ?? this.combinableTreatments,
     );
   }
 }

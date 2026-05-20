@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
-import '../utils/color_constant.dart';
 import '../view_models/auth_view_model.dart';
 
 class PhoneWidget extends StatelessWidget {
@@ -76,10 +75,8 @@ class PhoneWidget extends StatelessWidget {
               absorbing: readOnly,
               child: CountryCodePicker(
                 onChanged: (country) {
-                  if (country != null) {
-                    authNotifier.setCountry(country);
-                  }
-                },
+                  authNotifier.setCountry(country);
+                                },
                 dialogSize: Size(400.w, 500.h),
                 textStyle: CustomFonts.textMain14w400,
                 initialSelection: authState.country?.code ?? "US",

@@ -188,7 +188,7 @@ class _ProductManagementState extends State<ProductManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("SKU-9283${index}", style: TextStyle(color: CustomColors.primaryGold, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                Text("SKU-9283$index", style: TextStyle(color: CustomColors.primaryGold, fontSize: 10.sp, fontWeight: FontWeight.bold)),
                 SizedBox(height: 4.h),
                 Text("Advanced Night Repair", style: CustomFonts.black16w600, maxLines: 1, overflow: TextOverflow.ellipsis),
                 SizedBox(height: 4.h),

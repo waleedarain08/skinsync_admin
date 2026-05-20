@@ -28,7 +28,7 @@ class UserModel {
     email = json['email'];
     name = json['name'];
     roleId = json['role_id'];
-    role = json['role'] != null ? new RoleModel.fromJson(json['role']) : null;
+    role = json['role'] != null ? RoleModel.fromJson(json['role']) : null;
     status = json['status'];
     lastLogin = json['last_login'];
     createdAt = json['created_at'];
@@ -36,18 +36,18 @@ class UserModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['email'] = this.email;
-    data['name'] = this.name;
-    data['role_id'] = this.roleId;
-    if (this.role != null) {
-      data['role'] = this.role!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['email'] = email;
+    data['name'] = name;
+    data['role_id'] = roleId;
+    if (role != null) {
+      data['role'] = role!.toJson();
     }
-    data['status'] = this.status;
-    data['last_login'] = this.lastLogin;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
+    data['status'] = status;
+    data['last_login'] = lastLogin;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }

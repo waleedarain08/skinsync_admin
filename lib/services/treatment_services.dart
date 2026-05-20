@@ -1,9 +1,4 @@
-import 'dart:async';
-import '../models/responses/base_response_model.dart';
-import '../models/treatment_model.dart';
 import '../repositories/treatment_repository.dart';
-import '../utils/enums.dart';
-import '../utils/exception.dart';
 import 'api_base_helper.dart';
 
 class TreatmentServices implements TreatmentRepository {

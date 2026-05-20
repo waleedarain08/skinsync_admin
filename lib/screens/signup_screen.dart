@@ -25,7 +25,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _confirmPasswordController = TextEditingController();
 
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+  final bool _obscureConfirmPassword = true;
   bool _hasLowercase = false;
   bool _hasUniqueChar = false;
   bool _acceptTerms = false;
