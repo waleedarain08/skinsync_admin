@@ -1,4 +1,5 @@
 import 'package:skinsync_admin/app_init.dart';
+import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
@@ -119,7 +120,12 @@ class RouteGenerator {
           GoRoute(
             name: CreateSubscriptionPlanScreen.routeName,
             path: CreateSubscriptionPlanScreen.routeName,
-            builder: (context, state) => CreateSubscriptionPlanScreen(planToEdit: state.extra as SubscriptionPlanModel?),
+            builder: (context, state) {
+              if (state.extra is FreeSystemPlanModel) {
+                return CreateSubscriptionPlanScreen(freePlanToEdit: state.extra as FreeSystemPlanModel);
+              }
+              return CreateSubscriptionPlanScreen(planToEdit: state.extra as SubscriptionPlanModel?);
+            },
           ),
           GoRoute(
             name: PaymentScreen.routeName,

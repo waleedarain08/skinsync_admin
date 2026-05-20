@@ -1,4 +1,5 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
+import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
@@ -275,26 +276,22 @@ class TreatmentData {
     ),
   ];
 
+  static final FreeSystemPlanModel dummyFreeSystemPlan = FreeSystemPlanModel(
+    id: 0,
+    name: "Free System Plan",
+    durationMonths: 2,
+    doctorSeats: 2,
+    staffSeats: 5,
+    standardBookingCommissionPercent: 12,
+    dynamicBookingCommissionPercent: 18,
+    technologyFeePerTreatment: 8,
+    benefits: [
+      PlanBenefit(title: "Initial free access", enabled: true),
+      PlanBenefit(title: "Basic patient records", enabled: true),
+    ],
+  );
+
   static final List<SubscriptionPlanModel> dummySubscriptionPlans = [
-    SubscriptionPlanModel(
-      id: 0,
-      name: "Free System Plan",
-      basePrice: 0.00,
-      doctorSeats: 2,
-      unlimitedDoctors: false,
-      staffSeats: 5,
-      unlimitedStaff: false,
-      standardBookingCommissionPercent: 12,
-      dynamicBookingCommissionPercent: 18,
-      technologyFeePerTreatment: 8,
-      isActive: true,
-      isSystemPlan: true,
-      durationMonths: 2,
-      benefits: [
-        PlanBenefit(title: "Initial free access", enabled: true),
-        PlanBenefit(title: "Basic patient records", enabled: true),
-      ],
-    ),
     SubscriptionPlanModel(
       id: 1,
       name: "Basic Plan",
@@ -308,7 +305,6 @@ class TreatmentData {
       technologyFeePerTreatment: 5,
       isActive: true,
       benefits: [
-        PlanBenefit(title: "First time join offer", freeMonths: 1, enabled: true),
         PlanBenefit(title: "Patient records and treatment history", enabled: true),
         PlanBenefit(title: "Automated invoices", enabled: true),
       ],
@@ -326,7 +322,6 @@ class TreatmentData {
       technologyFeePerTreatment: 3,
       isActive: true,
       benefits: [
-        PlanBenefit(title: "First time join offer", freeMonths: 3, enabled: true),
         PlanBenefit(title: "AI consultation and treatment recommendation tools", enabled: true),
         PlanBenefit(title: "Before/after simulations", enabled: true),
         PlanBenefit(title: "Dynamic pricing system", enabled: true),
@@ -345,7 +340,6 @@ class TreatmentData {
       technologyFeePerTreatment: 2,
       isActive: true,
       benefits: [
-        PlanBenefit(title: "First time join offer", freeMonths: 6, enabled: true),
         PlanBenefit(title: "Multi-user clinic access", enabled: true),
         PlanBenefit(title: "Priority onboarding and support", enabled: true),
         PlanBenefit(title: "Custom branding", enabled: true),

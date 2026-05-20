@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/subscription_plan_model.dart';
+import '../models/free_system_plan_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
 import '../utils/dummy_data.dart';
@@ -26,9 +27,10 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
             state = state.copyWith(loading: loading);
           },
           () async {
-            // Using dummy data for initial design as requested
+            // Using dummy data for initial design
             final plans = TreatmentData.dummySubscriptionPlans;
-            state = state.copyWith(plans: plans);
+            final freeSystemPlan = TreatmentData.dummyFreeSystemPlan;
+            state = state.copyWith(plans: plans, freeSystemPlan: freeSystemPlan);
             return true;
           },
         ) ??
@@ -42,7 +44,6 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
             final newPlan = await _subscriptionRepository.createSubscriptionPlan(plan);
             final currentList = state.plans ?? [];
             
-            // If it's an update, replace the existing one, otherwise add it
             if (plan.id != null) {
                state = state.copyWith(
                  plans: currentList.map((p) => p.id == plan.id ? newPlan : p).toList()
@@ -76,19 +77,23 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
 
 class SubscriptionState extends BaseStateModel {
   final List<SubscriptionPlanModel>? plans;
+  final FreeSystemPlanModel? freeSystemPlan;
 
   SubscriptionState({
     super.loading,
     this.plans = const [],
+    this.freeSystemPlan,
   });
 
   SubscriptionState copyWith({
     bool? loading,
     List<SubscriptionPlanModel>? plans,
+    FreeSystemPlanModel? freeSystemPlan,
   }) {
     return SubscriptionState(
       loading: loading ?? this.loading,
       plans: plans ?? this.plans,
+      freeSystemPlan: freeSystemPlan ?? this.freeSystemPlan,
     );
   }
 }

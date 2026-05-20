@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
+import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
@@ -42,7 +43,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             Expanded(
               child: state.loading 
                 ? const Center(child: CircularProgressIndicator())
-                : _buildPlansGrid(state.plans ?? []),
+                : _buildContent(state),
             ),
           ],
         ),
@@ -79,34 +80,131 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     );
   }
 
-  Widget _buildPlansGrid(List<SubscriptionPlanModel> plans) {
-    if (plans.isEmpty) {
-      return Center(
-        child: Text("No subscription plans found.", style: CustomFonts.bodyLarge),
-      );
-    }
+  Widget _buildContent(SubscriptionState state) {
+    final freePlan = state.freeSystemPlan;
+    final paidPlans = state.plans ?? [];
 
-    // Ensure system plans are at the top
-    final sortedPlans = [...plans];
-    sortedPlans.sort((a, b) {
-      if (a.isSystemPlan && !b.isSystemPlan) return -1;
-      if (!a.isSystemPlan && b.isSystemPlan) return 1;
-      return 0;
-    });
-
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: MediaQuery.of(context).size.width > 1200 ? 3 : 2,
-        crossAxisSpacing: 24.w,
-        mainAxisSpacing: 24.h,
-        childAspectRatio: 0.6,
-      ),
-      itemCount: sortedPlans.length,
-      itemBuilder: (context, index) => _buildPlanCard(sortedPlans[index]),
+    return ListView(
+      children: [
+        if (freePlan != null) ...[
+          Text("System Default Tier", style: CustomFonts.bodyLarge.copyWith(color: CustomColors.brandPurple, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16.h),
+          _buildFreePlanCard(freePlan),
+          SizedBox(height: 48.h),
+        ],
+        Text("Paid Subscription Tiers", style: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+        SizedBox(height: 16.h),
+        if (paidPlans.isEmpty)
+          Center(child: Padding(padding: EdgeInsets.all(40.w), child: const Text("No custom plans created yet.")))
+        else
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: MediaQuery.of(context).size.width > 1200 ? 3 : 2,
+              crossAxisSpacing: 24.w,
+              mainAxisSpacing: 24.h,
+              childAspectRatio: 0.6,
+            ),
+            itemCount: paidPlans.length,
+            itemBuilder: (context, index) => _buildPaidPlanCard(paidPlans[index]),
+          ),
+      ],
     );
   }
 
-  Widget _buildPlanCard(SubscriptionPlanModel plan) {
+  Widget _buildFreePlanCard(FreeSystemPlanModel plan) {
+    final activeBenefits = plan.benefits?.where((b) => b.enabled).toList() ?? [];
+
+    return BorderdContainerWidget(
+      padding: EdgeInsets.all(32.w),
+      backgroundColor: CustomColors.brandPurple.withOpacity(0.02),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(plan.name, style: CustomFonts.headlineSmall),
+              _systemBadge(),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text("\$0.00", style: CustomFonts.headlineLarge.copyWith(color: CustomColors.deepSlate)),
+              Text(" / ${plan.durationMonths} months", style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          const Divider(),
+          SizedBox(height: 24.h),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("CAPACITY LIMITS", style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                    SizedBox(height: 12.h),
+                    _limitRow(Icons.person_pin_rounded, "Doctor Seats:", plan.unlimitedDoctors ? "Unlimited" : "${plan.doctorSeats}"),
+                    SizedBox(height: 8.h),
+                    _limitRow(Icons.people_alt_rounded, "Staff Seats:", plan.unlimitedStaff ? "Unlimited" : "${plan.staffSeats}"),
+                  ],
+                ),
+              ),
+              SizedBox(width: 48.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("COMMISSION & FEES", style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                    SizedBox(height: 12.h),
+                    _limitRow(Icons.percent_rounded, "Std. Commission:", "${plan.standardBookingCommissionPercent}%"),
+                    SizedBox(height: 8.h),
+                    _limitRow(Icons.terminal_rounded, "Tech Fee:", "\$${plan.technologyFeePerTreatment}"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          Text("PLAN BENEFITS", style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+          SizedBox(height: 16.h),
+          Wrap(
+            spacing: 24.w,
+            runSpacing: 12.h,
+            children: activeBenefits.map((benefit) => SizedBox(
+              width: 300.w,
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline, color: CustomColors.success, size: 18),
+                  SizedBox(width: 12.w),
+                  Expanded(child: Text(benefit.title ?? "", style: CustomFonts.bodyMedium)),
+                ],
+              ),
+            )).toList(),
+          ),
+          SizedBox(height: 32.h),
+          OutlinedButton.icon(
+            onPressed: () {
+              context.push(CreateSubscriptionPlanScreen.routeName, extra: plan);
+            },
+            icon: const Icon(Icons.settings_outlined, size: 18),
+            label: const Text("Edit System Configuration"),
+            style: OutlinedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaidPlanCard(SubscriptionPlanModel plan) {
     final activeBenefits = plan.benefits?.where((b) => b.enabled).toList() ?? [];
 
     return BorderdContainerWidget(
@@ -118,10 +216,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(plan.name ?? "N/A", style: CustomFonts.headlineSmall),
-              if (plan.isSystemPlan)
-                _systemBadge()
-              else
-                _statusBadge(plan.isActive),
+              _statusBadge(plan.isActive),
             ],
           ),
           SizedBox(height: 16.h),
@@ -134,10 +229,6 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
               Text(" / month", style: CustomFonts.bodySmall),
             ],
           ),
-          if (plan.isSystemPlan && plan.durationMonths != null) ...[
-             SizedBox(height: 8.h),
-             Text("Default Duration: ${plan.durationMonths} Months", style: CustomFonts.bodySmall.copyWith(color: CustomColors.brandPurple, fontWeight: FontWeight.bold)),
-          ],
           SizedBox(height: 24.h),
           const Divider(),
           SizedBox(height: 24.h),
@@ -175,14 +266,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                   children: [
                     const Icon(Icons.check_circle_outline, color: CustomColors.success, size: 18),
                     SizedBox(width: 12.w),
-                    Expanded(
-                      child: Text(
-                        benefit.freeMonths != null 
-                          ? "First ${benefit.freeMonths} months free for new clinics"
-                          : benefit.title ?? "",
-                        style: CustomFonts.bodyMedium,
-                      ),
-                    ),
+                    Expanded(child: Text(benefit.title ?? "", style: CustomFonts.bodyMedium)),
                   ],
                 );
               },
@@ -203,31 +287,29 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                   child: const Text("Edit Plan Details"),
                 ),
               ),
-              if (!plan.isSystemPlan) ...[
-                SizedBox(width: 12.w),
-                IconButton(
-                  onPressed: () async {
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Delete Plan"),
-                        content: Text("Are you sure you want to delete the '${plan.name}' plan?"),
-                        actions: [
-                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
-                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Delete", style: TextStyle(color: CustomColors.error))),
-                        ],
-                      ),
-                    );
-                    if (confirm == true && plan.id != null) {
-                      await ref.read(subscriptionViewModelProvider.notifier).deleteSubscriptionPlan(plan.id!);
-                    }
-                  },
-                  icon: const Icon(Icons.delete_outline, color: CustomColors.error),
-                  style: IconButton.styleFrom(
-                    backgroundColor: CustomColors.error.withOpacity(0.1),
-                  ),
+              SizedBox(width: 12.w),
+              IconButton(
+                onPressed: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Delete Plan"),
+                      content: Text("Are you sure you want to delete the '${plan.name}' plan?"),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+                        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Delete", style: TextStyle(color: CustomColors.error))),
+                      ],
+                    ),
+                  );
+                  if (confirm == true && plan.id != null) {
+                    await ref.read(subscriptionViewModelProvider.notifier).deleteSubscriptionPlan(plan.id!);
+                  }
+                },
+                icon: const Icon(Icons.delete_outline, color: CustomColors.error),
+                style: IconButton.styleFrom(
+                  backgroundColor: CustomColors.error.withOpacity(0.1),
                 ),
-              ],
+              ),
             ],
           ),
         ],
@@ -274,7 +356,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
         border: Border.all(color: CustomColors.brandPurple.withOpacity(0.3)),
       ),
       child: Text(
-        "SYSTEM PLAN",
+        "SYSTEM DEFAULT",
         style: TextStyle(
           color: CustomColors.brandPurple,
           fontSize: 10.sp,
