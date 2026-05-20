@@ -121,10 +121,11 @@ class RouteGenerator {
             name: CreateSubscriptionPlanScreen.routeName,
             path: CreateSubscriptionPlanScreen.routeName,
             builder: (context, state) {
-              if (state.extra is FreeSystemPlanModel) {
-                return CreateSubscriptionPlanScreen(freePlanToEdit: state.extra as FreeSystemPlanModel);
+              final extra = state.extra;
+              if (extra is FreeSystemPlanModel) {
+                return CreateSubscriptionPlanScreen(freePlanToEdit: extra);
               }
-              return CreateSubscriptionPlanScreen(planToEdit: state.extra as SubscriptionPlanModel?);
+              return CreateSubscriptionPlanScreen(planToEdit: extra as SubscriptionPlanModel?);
             },
           ),
           GoRoute(
