@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
-import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
@@ -16,9 +15,8 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 class CreateSubscriptionPlanScreen extends ConsumerStatefulWidget {
   static const String routeName = '/create-subscription-plan';
   final SubscriptionPlanModel? planToEdit;
-  final FreeSystemPlanModel? freePlanToEdit;
 
-  const CreateSubscriptionPlanScreen({super.key, this.planToEdit, this.freePlanToEdit});
+  const CreateSubscriptionPlanScreen({super.key, this.planToEdit});
 
   @override
   ConsumerState<CreateSubscriptionPlanScreen> createState() => _CreateSubscriptionPlanScreenState();
@@ -34,6 +32,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
   late final TextEditingController _standardCommissionController;
   late final TextEditingController _dynamicCommissionController;
   late final TextEditingController _techFeeController;
+  late final TextEditingController _freeMonthsController;
   late final TextEditingController _durationController;
   final TextEditingController _customBenefitController = TextEditingController();
   final TextEditingController _clinicSearchController = TextEditingController();
@@ -58,18 +57,40 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
 
   List<PlanBenefit> _planBenefits = [];
 
-  bool get isEditMode => widget.planToEdit != null || widget.freePlanToEdit != null;
-  bool get isSystemPlan => widget.freePlanToEdit != null;
+  bool get isEditMode => widget.planToEdit != null;
+  bool get isSystemPlan => widget.planToEdit?.isSystemPlan ?? false;
 
   @override
   void initState() {
     super.initState();
+    final plan = widget.planToEdit;
     
-    if (widget.freePlanToEdit != null) {
-      _initFromFreePlan(widget.freePlanToEdit!);
-    } else {
-      _initFromNormalPlan(widget.planToEdit);
+    _nameController = TextEditingController(text: plan?.name);
+    _priceController = TextEditingController(text: plan?.basePrice?.toString());
+    _doctorSeatsController = TextEditingController(text: plan?.doctorSeats.toString() ?? "0");
+    _staffSeatsController = TextEditingController(text: plan?.staffSeats.toString() ?? "0");
+    _standardCommissionController = TextEditingController(text: plan?.standardBookingCommissionPercent.toString() ?? "0");
+    _dynamicCommissionController = TextEditingController(text: plan?.dynamicBookingCommissionPercent.toString() ?? "0");
+    _techFeeController = TextEditingController(text: plan?.technologyFeePerTreatment.toString() ?? "0");
+    _durationController = TextEditingController(text: plan?.durationMonths?.toString() ?? "1");
+    
+    int? freeMonths;
+    if (plan?.benefits != null) {
+      for (var benefit in plan!.benefits!) {
+        if (benefit.freeMonths != null) {
+          freeMonths = benefit.freeMonths;
+          break;
+        }
+      }
     }
+    _freeMonthsController = TextEditingController(text: (freeMonths ?? 1).toString());
+    
+    _unlimitedDoctors = plan?.unlimitedDoctors ?? false;
+    _unlimitedStaff = plan?.unlimitedStaff ?? false;
+    _isActive = plan?.isActive ?? true;
+
+    _selectedClinics = plan?.assignedClinics ?? [];
+    _visibilityType = _selectedClinics.isEmpty ? "All Clinics" : "Specific Clinics";
 
     _initializeBenefits();
     
@@ -78,43 +99,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     });
   }
 
-  void _initFromFreePlan(FreeSystemPlanModel plan) {
-    _nameController = TextEditingController(text: plan.name);
-    _priceController = TextEditingController(text: "0.00");
-    _doctorSeatsController = TextEditingController(text: plan.doctorSeats.toString());
-    _staffSeatsController = TextEditingController(text: plan.staffSeats.toString());
-    _standardCommissionController = TextEditingController(text: plan.standardBookingCommissionPercent.toString());
-    _dynamicCommissionController = TextEditingController(text: plan.dynamicBookingCommissionPercent.toString());
-    _techFeeController = TextEditingController(text: plan.technologyFeePerTreatment.toString());
-    _durationController = TextEditingController(text: plan.durationMonths.toString());
-    
-    _unlimitedDoctors = plan.unlimitedDoctors;
-    _unlimitedStaff = plan.unlimitedStaff;
-    _isActive = true;
-    _visibilityType = "All Clinics"; // System plans usually for all
-    _selectedClinics = [];
-  }
-
-  void _initFromNormalPlan(SubscriptionPlanModel? plan) {
-    _nameController = TextEditingController(text: plan?.name);
-    _priceController = TextEditingController(text: plan?.basePrice?.toString());
-    _doctorSeatsController = TextEditingController(text: plan?.doctorSeats.toString() ?? "0");
-    _staffSeatsController = TextEditingController(text: plan?.staffSeats.toString() ?? "0");
-    _standardCommissionController = TextEditingController(text: plan?.standardBookingCommissionPercent.toString() ?? "0");
-    _dynamicCommissionController = TextEditingController(text: plan?.dynamicBookingCommissionPercent.toString() ?? "0");
-    _techFeeController = TextEditingController(text: plan?.technologyFeePerTreatment.toString() ?? "0");
-    _durationController = TextEditingController(text: "1");
-    
-    _unlimitedDoctors = plan?.unlimitedDoctors ?? false;
-    _unlimitedStaff = plan?.unlimitedStaff ?? false;
-    _isActive = plan?.isActive ?? true;
-
-    _selectedClinics = plan?.assignedClinics ?? [];
-    _visibilityType = _selectedClinics.isEmpty ? "All Clinics" : "Specific Clinics";
-  }
-
   void _initializeBenefits() {
-    final existingBenefits = widget.freePlanToEdit?.benefits ?? widget.planToEdit?.benefits ?? [];
+    final existingBenefits = widget.planToEdit?.benefits ?? [];
     
     _planBenefits = _predefinedFeatures.map((title) {
       final existing = existingBenefits.firstWhere(
@@ -125,7 +111,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     }).toList();
 
     for (var benefit in existingBenefits) {
-      if (!_predefinedFeatures.contains(benefit.title)) {
+      if (!_predefinedFeatures.contains(benefit.title) && benefit.freeMonths == null) {
         _planBenefits.add(PlanBenefit(title: benefit.title, enabled: benefit.enabled));
       }
     }
@@ -140,6 +126,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     _standardCommissionController.dispose();
     _dynamicCommissionController.dispose();
     _techFeeController.dispose();
+    _freeMonthsController.dispose();
     _durationController.dispose();
     _customBenefitController.dispose();
     _clinicSearchController.dispose();
@@ -158,50 +145,40 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
-      if (isSystemPlan) {
-        final plan = FreeSystemPlanModel(
-          id: widget.freePlanToEdit?.id,
-          name: _nameController.text,
-          durationMonths: int.tryParse(_durationController.text) ?? 1,
-          doctorSeats: _unlimitedDoctors ? 0 : (int.tryParse(_doctorSeatsController.text) ?? 0),
-          unlimitedDoctors: _unlimitedDoctors,
-          staffSeats: _unlimitedStaff ? 0 : (int.tryParse(_staffSeatsController.text) ?? 0),
-          unlimitedStaff: _unlimitedStaff,
-          standardBookingCommissionPercent: double.tryParse(_standardCommissionController.text) ?? 0.0,
-          dynamicBookingCommissionPercent: double.tryParse(_dynamicCommissionController.text) ?? 0.0,
-          technologyFeePerTreatment: double.tryParse(_techFeeController.text) ?? 0.0,
-          benefits: _planBenefits,
-        );
-        // Specialized update logic for system plan
-        // final success = await ref.read(subscriptionViewModelProvider.notifier).updateFreeSystemPlan(plan);
-        // Mock success for design
-        context.pop();
-      } else {
-        final plan = SubscriptionPlanModel(
-          id: widget.planToEdit?.id,
-          name: _nameController.text,
-          basePrice: double.tryParse(_priceController.text),
-          doctorSeats: _unlimitedDoctors ? 0 : (int.tryParse(_doctorSeatsController.text) ?? 0),
-          unlimitedDoctors: _unlimitedDoctors,
-          staffSeats: _unlimitedStaff ? 0 : (int.tryParse(_staffSeatsController.text) ?? 0),
-          unlimitedStaff: _unlimitedStaff,
-          standardBookingCommissionPercent: double.tryParse(_standardCommissionController.text) ?? 0.0,
-          dynamicBookingCommissionPercent: double.tryParse(_dynamicCommissionController.text) ?? 0.0,
-          technologyFeePerTreatment: double.tryParse(_techFeeController.text) ?? 0.0,
-          benefits: _planBenefits,
-          assignedClinics: _visibilityType == "All Clinics" ? [] : _selectedClinics,
-          isActive: _isActive,
-        );
+      final benefitsToSave = [
+        PlanBenefit(
+          title: "First time join offer",
+          freeMonths: int.tryParse(_freeMonthsController.text),
+          enabled: true,
+        ),
+        ..._planBenefits,
+      ];
 
-        final success = await ref.read(subscriptionViewModelProvider.notifier).createSubscriptionPlan(plan);
-        if (success && mounted) {
-          context.pop();
-        }
-      }
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(isEditMode ? "Plan updated successfully" : "Plan created successfully")),
+      final plan = SubscriptionPlanModel(
+        id: widget.planToEdit?.id,
+        name: _nameController.text,
+        basePrice: double.tryParse(_priceController.text),
+        doctorSeats: _unlimitedDoctors ? 0 : (int.tryParse(_doctorSeatsController.text) ?? 0),
+        unlimitedDoctors: _unlimitedDoctors,
+        staffSeats: _unlimitedStaff ? 0 : (int.tryParse(_staffSeatsController.text) ?? 0),
+        unlimitedStaff: _unlimitedStaff,
+        standardBookingCommissionPercent: double.tryParse(_standardCommissionController.text) ?? 0.0,
+        dynamicBookingCommissionPercent: double.tryParse(_dynamicCommissionController.text) ?? 0.0,
+        technologyFeePerTreatment: double.tryParse(_techFeeController.text) ?? 0.0,
+        benefits: benefitsToSave,
+        assignedClinics: _visibilityType == "All Clinics" ? [] : _selectedClinics,
+        isActive: isSystemPlan ? true : _isActive,
+        isSystemPlan: isSystemPlan,
+        durationMonths: int.tryParse(_durationController.text),
       );
+
+      final success = await ref.read(subscriptionViewModelProvider.notifier).createSubscriptionPlan(plan);
+      if (success && mounted) {
+        context.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(isEditMode ? "Plan updated successfully" : "Plan created successfully")),
+        );
+      }
     }
   }
 
@@ -210,9 +187,9 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     return Scaffold(
       backgroundColor: CustomColors.backgroundLight,
       appBar: AppBar(
-        title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.headlineSmall),
+        title: Text(isEditMode ? (isSystemPlan ? "Edit System Plan" : "Edit Subscription Plan") : "Create Subscription Plan", style: CustomFonts.headlineSmall),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
+          icon: Icon(Icons.arrow_back, color: CustomColors.deepSlate),
           onPressed: () => context.pop(),
         ),
         centerTitle: true,
@@ -228,15 +205,15 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (isSystemPlan) ...[
-                    _sectionHeader("System Onboarding Settings"),
+                    _sectionHeader("System Plan Configuration"),
                     _formContainer(
                       backgroundColor: CustomColors.brandPurple.withOpacity(0.05),
                       child: Column(
                         children: [
-                          Text("Configure the default free tier duration for newly onboarded clinics.", style: CustomFonts.bodyMedium),
+                          Text("This is a system-generated plan for onboarding. It cannot be deleted or deactivated.", style: CustomFonts.bodyMedium),
                           SizedBox(height: 20.h),
                           BuildTextField(
-                            label: "Trial Duration (Months)",
+                            label: "Default Plan Duration (Months)",
                             controller: _durationController,
                             hintText: "e.g. 2",
                             keyboardType: TextInputType.number,
@@ -246,12 +223,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       ),
                     ),
                     SizedBox(height: 32.h),
-                  ] else ...[
-                    _sectionHeader("Plan Visibility"),
-                    _buildVisibilitySection(),
-                    SizedBox(height: 32.h),
                   ],
-                  
+                  _sectionHeader("Plan Visibility"),
+                  _buildVisibilitySection(),
+                  SizedBox(height: 32.h),
                   _sectionHeader("Basic Information"),
                   _formContainer(
                     child: Column(
@@ -264,7 +239,6 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                                 controller: _nameController,
                                 hintText: "e.g. Premium Plan",
                                 validator: Validators.empty,
-                                readOnly: isSystemPlan,
                               ),
                             ),
                             SizedBox(width: 24.w),
@@ -275,7 +249,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                                 hintText: "0.00",
                                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                 validator: Validators.empty,
-                                readOnly: isSystemPlan,
+                                readOnly: isSystemPlan, // System plan is usually free
                               ),
                             ),
                           ],
@@ -464,6 +438,33 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       ],
                     ),
                   ),
+                  SizedBox(height: 32.h),
+                  _sectionHeader("Incentives & Offers"),
+                  _formContainer(
+                    backgroundColor: CustomColors.surfaceGhost,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.info_outline, color: CustomColors.brandCyan),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: Text("First time if a clinic joins, \$0 charges will apply", style: CustomFonts.bodyMedium),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20.h),
+                        BuildTextField(
+                          label: "Number of Months",
+                          controller: _freeMonthsController,
+                          hintText: "e.g. 3",
+                          keyboardType: TextInputType.number,
+                          validator: Validators.empty,
+                        ),
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 48.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -567,7 +568,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
               return Chip(
                 label: Text(clinic.name ?? email, style: CustomFonts.bodySmall.copyWith(color: CustomColors.deepSlate)),
                 backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
-                deleteIcon: const Icon(Icons.close, size: 14),
+                deleteIcon: Icon(Icons.close, size: 14),
                 onDeleted: () => setState(() => _selectedClinics.remove(email)),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r), side: BorderSide.none),
               );
@@ -587,7 +588,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: filteredClinics.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, _) => Divider(height: 1),
                     itemBuilder: (context, index) {
                       final clinic = filteredClinics[index];
                       final isSelected = _selectedClinics.contains(clinic.email);
