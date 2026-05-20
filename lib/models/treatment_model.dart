@@ -15,7 +15,6 @@ class TreatmentModel {
   List<SideAreaModel>? sideAreas;
   bool isActive;
   bool useInAiSimulator;
-  List<int>? combinableTreatmentIds;
   int? baseDurationHours;
   int? baseDurationMinutes;
 
@@ -36,7 +35,6 @@ class TreatmentModel {
     this.sideAreas,
     this.isActive = true,
     this.useInAiSimulator = false,
-    this.combinableTreatmentIds,
     this.baseDurationHours,
     this.baseDurationMinutes,
   });
@@ -62,9 +60,6 @@ class TreatmentModel {
             .map((e) => SideAreaModel.fromJson(e))
             .toList()
         : null;
-    combinableTreatmentIds = json['combinable_treatment_ids'] != null
-        ? List<int>.from(json['combinable_treatment_ids'])
-        : null;
     baseDurationHours = json['base_duration_hours'];
     baseDurationMinutes = json['base_duration_minutes'];
   }
@@ -86,7 +81,6 @@ class TreatmentModel {
     List<SideAreaModel>? sideAreas,
     bool? isActive,
     bool? useInAiSimulator,
-    List<int>? combinableTreatmentIds,
     int? baseDurationHours,
     int? baseDurationMinutes,
   }) {
@@ -107,7 +101,6 @@ class TreatmentModel {
       sideAreas: sideAreas ?? this.sideAreas,
       isActive: isActive ?? this.isActive,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
-      combinableTreatmentIds: combinableTreatmentIds ?? this.combinableTreatmentIds,
       baseDurationHours: baseDurationHours ?? this.baseDurationHours,
       baseDurationMinutes: baseDurationMinutes ?? this.baseDurationMinutes,
     );
@@ -130,7 +123,6 @@ class TreatmentModel {
       'side_areas': sideAreas?.map((sideArea) => sideArea.toJson()).toList(),
       'is_active': isActive,
       'use_in_ai_simulator': useInAiSimulator,
-      'combinable_treatment_ids': combinableTreatmentIds,
       'base_duration_hours': baseDurationHours,
       'base_duration_minutes': baseDurationMinutes,
     };

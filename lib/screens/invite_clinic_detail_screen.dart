@@ -227,7 +227,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
             textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.3),
           ).copyWith(
-            overlayColor: MaterialStateProperty.all(text.withOpacity(0.05)),
+            overlayColor: WidgetStateProperty.all(text.withOpacity(0.05)),
           )
         : ElevatedButton.styleFrom(
             backgroundColor: bg,
@@ -238,7 +238,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             shadowColor: bg.withOpacity(0.4),
             textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold, letterSpacing: 0.3),
           ).copyWith(
-            overlayColor: MaterialStateProperty.all(text.withOpacity(0.1)),
+            overlayColor: WidgetStateProperty.all(text.withOpacity(0.1)),
           );
 
     return SizedBox(

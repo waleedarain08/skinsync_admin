@@ -3,7 +3,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/services/url_launcher_services.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:pinput/pinput.dart';
 
@@ -313,7 +312,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 32.h),
         ValueListenableBuilder(
           valueListenable: _obscureNewPassword,
-          builder: (_, val, __) => _buildInputField(
+          builder: (_, val, _) => _buildInputField(
             label: "New Password",
             hint: "••••••••",
             controller: _newPasswordController,
@@ -326,7 +325,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 24.h),
         ValueListenableBuilder(
           valueListenable: _obscureConfirmPassword,
-          builder: (_, val, __) => _buildInputField(
+          builder: (_, val, _) => _buildInputField(
             label: "Confirm Password",
             hint: "••••••••",
             controller: _confirmPasswordController,

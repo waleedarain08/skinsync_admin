@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/custom_fonts.dart';
-import '../utils/color_constant.dart';
 
 class StaticContentScreen extends StatefulWidget {
   const StaticContentScreen({super.key});
@@ -11,12 +10,12 @@ class StaticContentScreen extends StatefulWidget {
 }
 
 class _StaticContentScreenState extends State<StaticContentScreen> {
-  String _aboutContent =
+  final String _aboutContent =
       'Welcome to our premier healthcare and wellness platform connecting patients...';
 
-  String _termsContent = 'These terms govern your use of our platform...';
+  final String _termsContent = 'These terms govern your use of our platform...';
 
-  String _privacyContent = 'Your privacy is important to us...';
+  final String _privacyContent = 'Your privacy is important to us...';
   int selectedIndex = 2;
 
   final List<String> tabs = ['Terms & Conditions', 'Privacy Policy', 'About'];

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/custom_fonts.dart';
-import '../utils/color_constant.dart';
 
 class StaticContentScreen extends StatefulWidget {
   const StaticContentScreen({super.key});

@@ -588,7 +588,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: filteredClinics.length,
-                    separatorBuilder: (_, __) => Divider(height: 1),
+                    separatorBuilder: (_, _) => Divider(height: 1),
                     itemBuilder: (context, index) {
                       final clinic = filteredClinics[index];
                       final isSelected = _selectedClinics.contains(clinic.email);

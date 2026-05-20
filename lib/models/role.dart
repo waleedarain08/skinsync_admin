@@ -2,8 +2,8 @@ class RoleModel {
   int? iD;
   String? name;
   String? description;
-  Null? permissions;
-  Null? users;
+  Null permissions;
+  Null users;
 
   RoleModel({
     this.iD,
@@ -22,12 +22,12 @@ class RoleModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['ID'] = this.iD;
-    data['Name'] = this.name;
-    data['Description'] = this.description;
-    data['Permissions'] = this.permissions;
-    data['Users'] = this.users;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['ID'] = iD;
+    data['Name'] = name;
+    data['Description'] = description;
+    data['Permissions'] = permissions;
+    data['Users'] = users;
     return data;
   }
 }

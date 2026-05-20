@@ -498,7 +498,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
                   textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
                 ).copyWith(
-                  overlayColor: MaterialStateProperty.all(CustomColors.brandCyan.withOpacity(0.2)),
+                  overlayColor: WidgetStateProperty.all(CustomColors.brandCyan.withOpacity(0.2)),
                 ),
               ),
             ],
@@ -508,7 +508,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _availabilityEntries.length,
-            separatorBuilder: (_, __) => Padding(
+            separatorBuilder: (_, _) => Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
               child: Divider(color: CustomColors.textMuted.withOpacity(0.1)),
             ),

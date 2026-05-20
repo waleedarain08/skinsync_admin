@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/validators.dart';
@@ -270,7 +269,7 @@ class EditTreatmentScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.areas.length,
-            separatorBuilder: (_, __) => const Divider(height: 32),
+            separatorBuilder: (_, _) => const Divider(height: 32),
             itemBuilder: (context, index) {
               final entry = state.areas[index];
               return Column(
@@ -379,7 +378,7 @@ class EditTreatmentScreen extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: allSubAreas.length,
-              separatorBuilder: (_, __) => SizedBox(height: 12.h),
+              separatorBuilder: (_, _) => SizedBox(height: 12.h),
               itemBuilder: (context, index) {
                 final subArea = allSubAreas[index];
                 return _buildSubAreaConfigCard(subArea);
@@ -404,36 +403,6 @@ class EditTreatmentScreen extends ConsumerWidget {
               Text("Use in AI Simulator", style: CustomFonts.bodyLarge),
             ],
           ),
-          SizedBox(height: 32.h),
-          Text("Combinable Treatments", style: CustomFonts.bodyLarge),
-          SizedBox(height: 8.h),
-          Text("Select treatments that can be performed alongside this one.", style: CustomFonts.bodySmall),
-          SizedBox(height: 16.h),
-          _buildSearchField(
-            label: "Search Treatments",
-            hint: "Search to add...",
-            controller: viewModel.combinableSearchController,
-            suggestions: state.treatments.map((t) => t.name ?? '').toList(),
-            onSelected: (val) {
-              final treatment = state.treatments.firstWhere((t) => t.name == val, orElse: () => TreatmentModel(name: val));
-              viewModel.addCombinableTreatment(treatment);
-            },
-          ),
-          if (state.combinableTreatments.isNotEmpty) ...[
-            SizedBox(height: 16.h),
-            Wrap(
-              spacing: 12.w,
-              runSpacing: 12.h,
-              children: state.combinableTreatments.map((t) => Chip(
-                label: Text(t.name ?? "N/A"),
-                onDeleted: () => viewModel.removeCombinableTreatment(t.id ?? 0),
-                backgroundColor: CustomColors.brandPurple.withOpacity(0.1),
-                side: BorderSide(color: CustomColors.brandPurple.withOpacity(0.2)),
-                labelStyle: TextStyle(color: CustomColors.deepSlate, fontSize: 12.sp),
-                deleteIconColor: CustomColors.deepSlate,
-              )).toList(),
-            ),
-          ],
         ],
       ),
     );
