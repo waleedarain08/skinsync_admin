@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
+import 'package:skinsync_admin/models/invite_clinic_model.dart';
+import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
@@ -10,8 +10,12 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dar
 import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/setting_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/subscription_plans.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
+import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
+import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
+import 'package:skinsync_admin/screens/invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
@@ -20,6 +24,7 @@ import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class RouteGenerator {
   static final GoRouter router = GoRouter(
@@ -67,9 +72,19 @@ class RouteGenerator {
             builder: (_, _) => const ClinicManagement(),
           ),
           GoRoute(
+            name: InviteClinicDetailScreen.routeName,
+            path: InviteClinicDetailScreen.routeName,
+            builder: (context, state) => const InviteClinicDetailScreen(),
+          ),
+          GoRoute(
+            name: ClinicDetailScreen.routeName,
+            path: ClinicDetailScreen.routeName,
+            builder: (context, state) => const ClinicDetailScreen(),
+          ),
+          GoRoute(
             name: AddNewClinicScreen.routeName,
             path: AddNewClinicScreen.routeName,
-            builder: (_, _) => const AddNewClinicScreen(),
+            builder: (context, state) => AddNewClinicScreen(invitedClinic: state.extra as InviteClinicModel?),
           ),
           GoRoute(
             name: DisputeScreen.routeName,
@@ -102,6 +117,11 @@ class RouteGenerator {
             builder: (_, _) => const ManageTreatmentDataScreen(),
           ),
           GoRoute(
+            name: CreateSubscriptionPlanScreen.routeName,
+            path: CreateSubscriptionPlanScreen.routeName,
+            builder: (context, state) => CreateSubscriptionPlanScreen(planToEdit: state.extra as SubscriptionPlanModel?),
+          ),
+          GoRoute(
             name: PaymentScreen.routeName,
             path: PaymentScreen.routeName,
             builder: (_, _) => const PaymentScreen(),
@@ -115,6 +135,11 @@ class RouteGenerator {
             name: ProductManagement.routeName,
             path: ProductManagement.routeName,
             builder: (_, _) => const ProductManagement(),
+          ),
+          GoRoute(
+            name: SubscriptionPlansTab.routeName,
+            path: SubscriptionPlansTab.routeName,
+            builder: (_, _) => const SubscriptionPlansTab(),
           ),
           GoRoute(
             name: SettingScreen.routeName,

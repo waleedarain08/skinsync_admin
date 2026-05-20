@@ -34,6 +34,27 @@ class ClinicService implements ClinicRepository {
   }
 
   @override
+  Future<ClinicModel> updateClinic({
+    required int id,
+    required RegisterClinicReqModel req,
+  }) async {
+    final jsonResponse = await _api.put(
+      Endpoint.updateClinic,
+      pathParams: {'id': id.toString()},
+      body: req.toJson(),
+    );
+    final response = BaseApiResponseModel<ClinicModel>.fromJson(
+      jsonResponse,
+      (json) => ClinicModel.fromJson(json as Map<String, dynamic>),
+    );
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response.data!;
+  }
+
+  @override
   Future<List<ClinicModel>> getClinics() async {
     final jsonResponse = await _api.get(Endpoint.getClinics);
     final response = BaseApiResponseModel<List<ClinicModel>>.fromJson(

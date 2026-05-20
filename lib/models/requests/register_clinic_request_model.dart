@@ -10,6 +10,8 @@ class RegisterClinicReqModel {
   String? ownerEmail;
   String? lat;
   String? long;
+  String? website;
+  String? description;
   List<AvailabilityModel>? availability;
 
   RegisterClinicReqModel({
@@ -24,6 +26,8 @@ class RegisterClinicReqModel {
     this.ownerEmail,
     this.lat,
     this.long,
+    this.website,
+    this.description,
     this.availability,
   });
 
@@ -40,6 +44,8 @@ class RegisterClinicReqModel {
     data['owner_email'] = ownerEmail;
     data['lat'] = lat;
     data['long'] = long;
+    data['website'] = website;
+    data['description'] = description;
     if (availability != null) {
       data['availability'] = availability!.map((v) => v.toJson()).toList();
     }

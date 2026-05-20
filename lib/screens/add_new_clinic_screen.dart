@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
@@ -16,7 +17,8 @@ import 'package:skinsync_admin/widgets/phone_widget.dart';
 
 class AddNewClinicScreen extends ConsumerStatefulWidget {
   static const String routeName = '/add-new-clinic';
-  const AddNewClinicScreen({super.key});
+  final InviteClinicModel? invitedClinic;
+  const AddNewClinicScreen({super.key, this.invitedClinic});
 
   @override
   ConsumerState<AddNewClinicScreen> createState() => _AddNewClinicScreenState();
@@ -33,6 +35,8 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
   final TextEditingController _ownerEmailController = TextEditingController();
   final TextEditingController _latController = TextEditingController();
   final TextEditingController _longController = TextEditingController();
+  final TextEditingController _websiteController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _selectedLogo;
@@ -40,6 +44,27 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
   final List<AvailabilityEntry> _availabilityEntries = [
     AvailabilityEntry(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.invitedClinic != null) {
+      _prefillData(widget.invitedClinic!);
+    }
+  }
+
+  void _prefillData(InviteClinicModel clinic) {
+    _clinicNameController.text = clinic.name;
+    _clinicEmailController.text = clinic.email;
+    _clinicPhoneController.text = clinic.phone;
+    _clinicAddressController.text = clinic.address;
+    _latController.text = clinic.lat ?? '';
+    _longController.text = clinic.long ?? '';
+    _ownerNameController.text = clinic.ownerName ?? '';
+    _ownerEmailController.text = clinic.ownerEmail ?? '';
+    _websiteController.text = clinic.website ?? '';
+    _descriptionController.text = clinic.description ?? clinic.notes ?? '';
+  }
 
   @override
   void dispose() {
@@ -51,6 +76,8 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     _ownerEmailController.dispose();
     _latController.dispose();
     _longController.dispose();
+    _websiteController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -154,13 +181,15 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       clinicEmail: _clinicEmailController.text.trim(),
       clinicPhone: _clinicPhoneController.text.trim(),
       clinicAddress: _clinicAddressController.text.trim(),
-      clinicLogo: _selectedLogo?.path ?? "https://example.com/logo.png", // In a real app, you'd upload this first
+      clinicLogo: _selectedLogo?.path ?? widget.invitedClinic?.logo ?? "https://example.com/logo.png", // Use prefilled logo if no new one selected
       ownerName: _ownerNameController.text.trim(),
       ownerEmail: _ownerEmailController.text.trim(),
       cc: selectedCountry.dialCode ?? "+1",
       country: selectedCountry.code ?? "US",
       lat: _latController.text.trim(),
       long: _longController.text.trim(),
+      website: _websiteController.text.trim(),
+      description: _descriptionController.text.trim(),
       availability: availability,
     );
 
@@ -251,6 +280,19 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                         validator: Validators.empty,
                       ),
                       SizedBox(height: 24.h),
+                      BuildTextField(
+                        label: "Website",
+                        controller: _websiteController,
+                        hintText: "https://example.com",
+                      ),
+                      SizedBox(height: 24.h),
+                      BuildTextField(
+                        label: "Description",
+                        controller: _descriptionController,
+                        hintText: "Brief description of the clinic",
+                        maxLines: 3,
+                      ),
+                      SizedBox(height: 24.h),
                       Row(
                         children: [
                           Expanded(
@@ -313,16 +355,32 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                     children: [
                       SizedBox(
                         width: 160.w,
+                        height: 56.h,
                         child: OutlinedButton(
                           onPressed: () => context.pop(),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: CustomColors.textSecondary,
+                            side: BorderSide(color: CustomColors.borderLight, width: 1.5),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                            textStyle: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+                          ),
                           child: const Text("Cancel"),
                         ),
                       ),
                       SizedBox(width: 24.w),
                       SizedBox(
-                        width: 220.w,
+                        width: 240.w,
+                        height: 56.h,
                         child: ElevatedButton(
                           onPressed: _submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: CustomColors.deepSlate,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                            elevation: 4,
+                            shadowColor: CustomColors.deepSlate.withOpacity(0.3),
+                            textStyle: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                          ),
                           child: const Text("Register Clinic"),
                         ),
                       ),
@@ -358,9 +416,14 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                           : FileImage(File(_selectedLogo!.path)) as ImageProvider,
                         fit: BoxFit.cover,
                       )
-                    : null,
+                    : (widget.invitedClinic?.logo != null && widget.invitedClinic!.logo!.isNotEmpty)
+                        ? DecorationImage(
+                            image: NetworkImage(widget.invitedClinic!.logo!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
               ),
-              child: _selectedLogo == null
+              child: (_selectedLogo == null && (widget.invitedClinic?.logo == null || widget.invitedClinic!.logo!.isEmpty))
                   ? Icon(Icons.add_a_photo_outlined, size: 40.sp, color: CustomColors.brandPrimary)
                   : null,
             ),
@@ -425,12 +488,17 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
               Text("Clinic Availability", style: CustomFonts.textMain20w600),
               ElevatedButton.icon(
                 onPressed: _addAvailability,
-                icon: const Icon(Icons.add_circle_outline, size: 20),
+                icon: Icon(Icons.add_circle_outline, size: 18.sp),
                 label: const Text("Add Timing Slot"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
-                  foregroundColor: CustomColors.brandPrimary,
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                  backgroundColor: CustomColors.brandCyan.withOpacity(0.12),
+                  foregroundColor: CustomColors.deepSlate,
+                  elevation: 0,
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                  textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                ).copyWith(
+                  overlayColor: MaterialStateProperty.all(CustomColors.brandCyan.withOpacity(0.2)),
                 ),
               ),
             ],

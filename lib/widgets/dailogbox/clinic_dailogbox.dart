@@ -127,34 +127,52 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => context.pop(), child: const Text("Cancel")),
+        SizedBox(
+          height: 48.h,
+          child: TextButton(
+            onPressed: () => context.pop(),
+            style: TextButton.styleFrom(
+              foregroundColor: CustomColors.textSecondary,
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            ),
+            child: const Text("Cancel"),
+          ),
+        ),
         Consumer(
           builder: (context, ref, _) {
             final state = ref.watch(clinicViewModelProvider);
-            return ElevatedButton(
-              onPressed: () {
-                if (!_formKey.currentState!.validate() || state.loading) return;
-                final selectedCountry = ref.read(authViewModelProvider).country;
-                ref.read(clinicViewModelProvider.notifier).registerClinic(
-                  RegisterClinicReqModel(
-                    clinicName: _clinicNameController.text,
-                    clinicPhone: _clinicPhoneController.text,
-                    clinicEmail: _clinicEmailController.text,
-                    clinicAddress: _clinicAddressController.text,
-                    ownerName: _clinicOwnerNameController.text,
-                    ownerEmail: _clinicOwnerEmailController.text,
-                    cc: selectedCountry?.dialCode ?? '',
-                    country: selectedCountry?.name ?? '',
-                  ),
-                ).then((success) {
-                  if (success && context.mounted) context.pop();
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CustomColors.deepNavy,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+            return SizedBox(
+              height: 48.h,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (!_formKey.currentState!.validate() || state.loading) return;
+                  final selectedCountry = ref.read(authViewModelProvider).country;
+                  ref.read(clinicViewModelProvider.notifier).registerClinic(
+                    RegisterClinicReqModel(
+                      clinicName: _clinicNameController.text,
+                      clinicPhone: _clinicPhoneController.text,
+                      clinicEmail: _clinicEmailController.text,
+                      clinicAddress: _clinicAddressController.text,
+                      ownerName: _clinicOwnerNameController.text,
+                      ownerEmail: _clinicOwnerEmailController.text,
+                      cc: selectedCountry?.dialCode ?? '',
+                      country: selectedCountry?.name ?? '',
+                    ),
+                  ).then((success) {
+                    if (success && context.mounted) context.pop();
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CustomColors.deepSlate,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: EdgeInsets.symmetric(horizontal: 32.w),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                  textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                ),
+                child: Text(state.loading ? 'Registering...' : 'Register Clinic'),
               ),
-              child: Text(state.loading ? 'Registering...' : 'Register Clinic'),
             );
           },
         ),
@@ -270,21 +288,39 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => context.pop(), child: const Text("Cancel")),
+        SizedBox(
+          height: 48.h,
+          child: TextButton(
+            onPressed: () => context.pop(),
+            style: TextButton.styleFrom(
+              foregroundColor: CustomColors.textSecondary,
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+            ),
+            child: const Text("Cancel"),
+          ),
+        ),
         Consumer(
           builder: (context, ref, _) {
             final state = ref.watch(clinicViewModelProvider);
-            return ElevatedButton(
-              onPressed: () {
-                if (!_formKey.currentState!.validate() || state.loading) return;
-                // Update clinic logic here
-                context.pop();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CustomColors.brandPrimary,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+            return SizedBox(
+              height: 48.h,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (!_formKey.currentState!.validate() || state.loading) return;
+                  // Update clinic logic here
+                  context.pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CustomColors.deepSlate,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: EdgeInsets.symmetric(horizontal: 32.w),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                  textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                ),
+                child: Text(state.loading ? 'Saving...' : 'Save Changes'),
               ),
-              child: Text(state.loading ? 'Saving...' : 'Save Changes'),
             );
           },
         ),

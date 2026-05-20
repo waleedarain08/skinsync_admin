@@ -11,20 +11,20 @@ class PhoneWidget extends StatelessWidget {
   final TextEditingController controller;
   final ValueSetter<String>? onChanged;
   final bool filled;
-  final bool isEditable;
+  final bool readOnly;
 
   const PhoneWidget({
     super.key,
     required this.controller,
     this.onChanged,
-    this.isEditable = false,
+    this.readOnly = false,
     this.filled = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      readOnly: isEditable,
+      readOnly: readOnly,
       controller: controller,
       onChanged: onChanged,
       inputFormatters: [
@@ -72,19 +72,22 @@ class PhoneWidget extends StatelessWidget {
           builder: (context, ref, _) {
             final authState = ref.watch(authViewModelProvider);
             final authNotifier = ref.read(authViewModelProvider.notifier);
-            return CountryCodePicker(
-              onChanged: (country) {
-                if (country != null) {
-                  authNotifier.setCountry(country);
-                }
-              },
-              dialogSize: Size(400.w, 500.h),
-              textStyle: CustomFonts.textMain14w400,
-              initialSelection: authState.country?.code ?? "US",
-              showCountryOnly: false,
-              showOnlyCountryWhenClosed: false,
-              alignLeft: false,
-              padding: EdgeInsets.zero,
+            return AbsorbPointer(
+              absorbing: readOnly,
+              child: CountryCodePicker(
+                onChanged: (country) {
+                  if (country != null) {
+                    authNotifier.setCountry(country);
+                  }
+                },
+                dialogSize: Size(400.w, 500.h),
+                textStyle: CustomFonts.textMain14w400,
+                initialSelection: authState.country?.code ?? "US",
+                showCountryOnly: false,
+                showOnlyCountryWhenClosed: false,
+                alignLeft: false,
+                padding: EdgeInsets.zero,
+              ),
             );
           },
         ),

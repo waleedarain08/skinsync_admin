@@ -5,6 +5,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/subscription_plans.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/treatment_management_screen.dart';
@@ -107,6 +108,12 @@ class HomePage extends StatelessWidget {
                   title: 'Inventory',
                   icon: Icons.inventory_2_rounded,
                   routeName: ProductManagement.routeName,
+                ),
+                _buildSidebarItem(
+                  context: context,
+                  title: 'Subscriptions',
+                  icon: Icons.card_membership_rounded,
+                  routeName: SubscriptionPlansTab.routeName,
                 ),
                 _buildSidebarSection("ADMINISTRATION"),
                 _buildSidebarItem(

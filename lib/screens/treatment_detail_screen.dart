@@ -84,7 +84,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
             width: 120.w,
             height: 120.w,
             decoration: BoxDecoration(
-              color: CustomColors.surfaceGhost,
+              color: CustomColors.backgroundLight,
               borderRadius: BorderRadius.circular(20.r),
               image: (treatment.image != null && treatment.image!.isNotEmpty)
                   ? DecorationImage(image: NetworkImage(treatment.image!), fit: BoxFit.cover)
@@ -101,23 +101,34 @@ class TreatmentDetailScreen extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Text(treatment.name ?? "N/A", style: CustomFonts.textMain32w700),
+                    Text(treatment.name ?? "N/A", style: CustomFonts.headlineLarge),
                     SizedBox(width: 16.w),
                     _statusBadge(treatment.isActive),
                   ],
                 ),
                 SizedBox(height: 8.h),
-                Text(treatment.patientDisplayName ?? "No Display Name", style: CustomFonts.textMain18w400.copyWith(color: CustomColors.textMuted)),
+                Text(treatment.patientDisplayName ?? "No Display Name", style: CustomFonts.bodyLarge.copyWith(color: CustomColors.textSecondary)),
                 SizedBox(height: 16.h),
                 Row(
                   children: [
                     _categoryChip(treatment.category ?? "General"),
                     SizedBox(width: 12.w),
                     _categoryChip(treatment.subcategory ?? "N/A", isSub: true),
+                    if (treatment.baseDurationHours != null || treatment.baseDurationMinutes != null) ...[
+                      SizedBox(width: 12.w),
+                      _durationChip(treatment.baseDurationHours ?? 0, treatment.baseDurationMinutes ?? 0),
+                    ],
                   ],
                 ),
               ],
             ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text("Base Price", style: CustomFonts.bodySmall),
+              Text("\$${treatment.basePrice ?? 0}", style: CustomFonts.headlineMedium.copyWith(color: CustomColors.success)),
+            ],
           ),
         ],
       ),
@@ -144,10 +155,10 @@ class TreatmentDetailScreen extends ConsumerWidget {
           children: [
             _booleanRow("AI Simulator Ready", treatment.useInAiSimulator),
             SizedBox(height: 24.h),
-            Text("Combinable With:", style: CustomFonts.textMain14w600),
+            Text("Combinable With:", style: CustomFonts.bodyLarge),
             SizedBox(height: 12.h),
             if (treatment.combinableTreatmentIds == null || treatment.combinableTreatmentIds!.isEmpty)
-              Text("No specific combinations defined.", style: CustomFonts.textMuted12w400)
+              Text("No specific combinations defined.", style: CustomFonts.bodySmall)
             else
               Wrap(
                 spacing: 8.w,
@@ -166,16 +177,16 @@ class TreatmentDetailScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Material Name:", style: CustomFonts.textMuted13w500),
-                Text(treatment.materialName ?? "N/A", style: CustomFonts.textMain14w600),
+                Text("Material Name:", style: CustomFonts.bodySmall),
+                Text(treatment.materialName ?? "N/A", style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
               ],
             ),
             SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Max Quantity:", style: CustomFonts.textMuted13w500),
-                Text("${treatment.maxMaterialQuantity}", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
+                Text("Total Max Quantity:", style: CustomFonts.bodySmall),
+                Text("${treatment.maxMaterialQuantity}", style: CustomFonts.bodyMedium.copyWith(color: CustomColors.brandPrimary, fontWeight: FontWeight.w600)),
               ],
             ),
           ],
@@ -194,12 +205,12 @@ class TreatmentDetailScreen extends ConsumerWidget {
             children: [
               Icon(icon, size: 20.sp, color: CustomColors.brandPrimary),
               SizedBox(width: 12.w),
-              Text(title, style: CustomFonts.textMain18w600),
+              Text(title, style: CustomFonts.headlineSmall),
             ],
           ),
           if (text != null || child != null) ...[
             SizedBox(height: 16.h),
-            if (text != null) Text(text, style: CustomFonts.textMain14w400.copyWith(height: 1.6)),
+            if (text != null) Text(text, style: CustomFonts.bodyMedium.copyWith(height: 1.6)),
             if (child != null) child,
           ],
         ],
@@ -217,12 +228,12 @@ class TreatmentDetailScreen extends ConsumerWidget {
             children: [
               Icon(Icons.location_on_outlined, size: 20.sp, color: CustomColors.brandPrimary),
               SizedBox(width: 12.w),
-              Text("Target Body Areas", style: CustomFonts.textMain18w600),
+              Text("Target Body Areas & Configuration", style: CustomFonts.headlineSmall),
             ],
           ),
           SizedBox(height: 24.h),
           if (treatment.sideAreas == null || treatment.sideAreas!.isEmpty)
-            Text("No areas defined for this treatment.", style: CustomFonts.textMuted14w400)
+            Text("No areas defined for this treatment.", style: CustomFonts.bodyMedium)
           else
             ListView.separated(
               shrinkWrap: true,
@@ -231,28 +242,35 @@ class TreatmentDetailScreen extends ConsumerWidget {
               separatorBuilder: (_, __) => Padding(padding: EdgeInsets.symmetric(vertical: 12.h), child: const Divider()),
               itemBuilder: (context, index) {
                 final area = treatment.sideAreas![index];
-                return Row(
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(10.r),
-                      decoration: BoxDecoration(color: CustomColors.brandCyan.withOpacity(0.1), shape: BoxShape.circle),
-                      child: Icon(Icons.location_on_outlined, size: 18.sp, color: CustomColors.brandPrimary),
-                    ),
-                    SizedBox(width: 16.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(area.name ?? "N/A", style: CustomFonts.textMain16w600),
-                        if (area.maxUnits != null)
-                          Text("Safety Limit: ${area.maxUnits} units", style: CustomFonts.textMuted11w400),
+                        Container(
+                          padding: EdgeInsets.all(10.r),
+                          decoration: BoxDecoration(color: CustomColors.brandCyan.withOpacity(0.1), shape: BoxShape.circle),
+                          child: Icon(Icons.location_on_outlined, size: 18.sp, color: CustomColors.brandPrimary),
+                        ),
+                        SizedBox(width: 16.w),
+                        Text(area.name ?? "N/A", style: CustomFonts.bodyLarge),
+                        const Spacer(),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                          decoration: BoxDecoration(color: CustomColors.backgroundLight, borderRadius: BorderRadius.circular(20.r)),
+                          child: Text("Area", style: CustomFonts.bodySmall.copyWith(color: CustomColors.brandPrimary, fontWeight: FontWeight.w600)),
+                        ),
                       ],
                     ),
-                    const Spacer(),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                      decoration: BoxDecoration(color: CustomColors.surfaceGhost, borderRadius: BorderRadius.circular(20.r)),
-                      child: Text("Target Area", style: CustomFonts.textMain12w600.copyWith(color: CustomColors.brandPrimary)),
-                    ),
+                    if (area.subAreas != null && area.subAreas!.isNotEmpty) ...[
+                      SizedBox(height: 16.h),
+                      Padding(
+                        padding: EdgeInsets.only(left: 52.w),
+                        child: Column(
+                          children: area.subAreas!.map((sub) => _buildSubAreaDetailRow(sub)).toList(),
+                        ),
+                      ),
+                    ],
                   ],
                 );
               },
@@ -262,11 +280,43 @@ class TreatmentDetailScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildSubAreaDetailRow(SubAreaModel sub) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: Row(
+        children: [
+          Icon(Icons.subdirectory_arrow_right, size: 16, color: CustomColors.textSecondary),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: Text(sub.name ?? "N/A", style: CustomFonts.bodyMedium),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: CustomColors.brandPurple.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6.r),
+            ),
+            child: Text("Max Qty: ${sub.maxMaterialQuantity ?? 0}", style: CustomFonts.bodySmall.copyWith(color: CustomColors.brandPrimary)),
+          ),
+          SizedBox(width: 12.w),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            decoration: BoxDecoration(
+              color: CustomColors.success.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6.r),
+            ),
+            child: Text("\$${sub.basePrice ?? 0}", style: CustomFonts.bodySmall.copyWith(color: CustomColors.success, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _booleanRow(String label, bool value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: CustomFonts.textMain14w400),
+        Text(label, style: CustomFonts.bodyMedium),
         Icon(
           value ? Icons.check_circle_rounded : Icons.cancel_rounded,
           color: value ? CustomColors.success : CustomColors.error,
@@ -280,17 +330,47 @@ class TreatmentDetailScreen extends ConsumerWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: (isActive ? CustomColors.success : CustomColors.textMuted).withOpacity(0.1),
+        color: (isActive ? CustomColors.success : CustomColors.textSecondary).withOpacity(0.1),
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Text(
         isActive ? "ACTIVE" : "INACTIVE",
         style: TextStyle(
-          color: isActive ? CustomColors.success : CustomColors.textMuted,
+          color: isActive ? CustomColors.success : CustomColors.textSecondary,
           fontSize: 10.sp,
           fontWeight: FontWeight.w800,
           letterSpacing: 1,
         ),
+      ),
+    );
+  }
+
+  Widget _durationChip(int hours, int minutes) {
+    String label = "";
+    if (hours > 0) label += "$hours hr ";
+    if (minutes > 0) label += "$minutes min";
+    if (label.isEmpty) label = "N/A";
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: CustomColors.success.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: CustomColors.success.withOpacity(0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.access_time_rounded, size: 14.sp, color: CustomColors.success),
+          SizedBox(width: 6.w),
+          Text(
+            label.trim(),
+            style: CustomFonts.bodySmall.copyWith(
+              color: CustomColors.success,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -305,9 +385,9 @@ class TreatmentDetailScreen extends ConsumerWidget {
       ),
       child: Text(
         label,
-        style: CustomFonts.textMain14w600.copyWith(
+        style: CustomFonts.bodySmall.copyWith(
           color: isSub ? CustomColors.brandPurple : CustomColors.brandPrimary,
-          fontSize: 12.sp,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
