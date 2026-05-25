@@ -11,17 +11,19 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 class AppInit extends StatelessWidget {
   const AppInit({super.key});
+
   void configLoading() {
     EasyLoading.instance
       ..displayDuration = const Duration(milliseconds: 2000)
       ..loadingStyle = EasyLoadingStyle.custom
       ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-      ..indicatorSize = 45.0
-      ..radius = 10.0
-      ..progressColor = Colors.white
-      ..backgroundColor = CustomColors.blackColor
-      ..indicatorColor = Colors.white
-      ..textColor = Colors.white
+      ..indicatorSize = 40.0
+      ..radius = 12.0
+      ..progressColor = CustomColors.surfaceWhite
+      ..backgroundColor = CustomColors.sidebar
+      ..indicatorColor = CustomColors.secondary
+      ..textColor = CustomColors.textOnDark
+      ..maskColor = CustomColors.textPrimary.withValues(alpha: 0.4)
       ..userInteractions = true
       ..dismissOnTap = false;
   }
@@ -29,7 +31,6 @@ class AppInit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     configLoading();
-    final ThemeMode themeMode = ThemeMode.light;
     return ScreenUtilInit(
       designSize: getDesignSize(context: context),
       ensureScreenSize: true,
@@ -40,11 +41,9 @@ class AppInit extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'SkinSync Admin',
           routerConfig: RouteGenerator.router,
-          // home: PaymentScreen(),
-          themeMode: themeMode,
+          themeMode: ThemeMode.light,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-
           builder: EasyLoading.init(
             builder: (context, child) {
               return ResponsiveBreakpoints.builder(

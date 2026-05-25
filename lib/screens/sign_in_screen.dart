@@ -3,16 +3,15 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/services/url_launcher_services.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:pinput/pinput.dart';
 
 import '../models/requests/auth_req_models.dart';
-import '../utils/color_constant.dart';
-import '../utils/custom_fonts.dart';
+import '../utils/theme.dart';
 import '../utils/enums.dart';
 import '../utils/validators.dart';
 import '../view_models/auth_view_model.dart';
+import '../widgets/app_gradient_button.dart';
 import 'bottom_nav_screens/dashboard_screen.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
@@ -64,7 +63,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       backgroundColor: CustomColors.backgroundLight,
       body: Stack(
         children: [
-          // Background Gradient Element
           Positioned(
             top: -100.h,
             right: -100.w,
@@ -75,8 +73,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    CustomColors.brandCyan.withOpacity(0.2),
-                    CustomColors.brandCyan.withOpacity(0),
+                    CustomColors.secondary.withValues(alpha: 0.15),
+                    Colors.transparent,
                   ],
                 ),
               ),
@@ -92,8 +90,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    CustomColors.brandPurple.withOpacity(0.15),
-                    CustomColors.brandPurple.withOpacity(0),
+                    CustomColors.primary.withValues(alpha: 0.12),
+                    Colors.transparent,
                   ],
                 ),
               ),
@@ -124,29 +122,20 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         Container(
           padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            gradient: CustomColors.brandGradientDiagonal,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            boxShadow: AppShadows.md,
           ),
           child: Image.asset(PngAssets.splashLogo, height: 80.w, width: 80.w),
         ),
         SizedBox(height: 24.h),
         Text(
           "SkinSync AI",
-          style: CustomFonts.textMain32w700.copyWith(
-            letterSpacing: 2,
-            color: CustomColors.deepSlate,
-          ),
+          style: CustomFonts.h1.copyWith(letterSpacing: 1.5),
         ),
         Text(
           "Centralized MedSpa Administration",
-          style: CustomFonts.textMuted14w400.copyWith(letterSpacing: 1),
+          style: CustomFonts.bodySm.copyWith(letterSpacing: 1),
         ),
       ],
     );
@@ -157,15 +146,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       width: 450.w,
       padding: EdgeInsets.all(40.w),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
+        color: CustomColors.surfaceWhite,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: CustomColors.borderLight),
+        boxShadow: AppShadows.lg,
       ),
       child: Form(
         key: _formKey,
@@ -191,9 +175,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       key: const ValueKey('login'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Welcome Back", style: CustomFonts.textMain24w700),
+        Text("Welcome Back", style: CustomFonts.h2),
         SizedBox(height: 8.h),
-        Text("Enter your credentials to access the admin panel.", style: CustomFonts.textMuted14w400),
+        Text("Enter your credentials to access the admin panel.", style: CustomFonts.bodySm),
         SizedBox(height: 32.h),
         _buildInputField(
           label: "Email Address",
@@ -220,7 +204,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             _buildCheckbox(),
             TextButton(
               onPressed: () => setCurrentScreen(AuthScreen.forgetPassword),
-              child: Text("Forgot Password?", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
+              child: Text("Forgot Password?", style: CustomFonts.label.copyWith(color: CustomColors.primary)),
             ),
           ],
         ),
@@ -238,12 +222,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         IconButton(
           onPressed: () => setCurrentScreen(AuthScreen.login),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          style: IconButton.styleFrom(backgroundColor: CustomColors.surfaceGhost),
+          style: IconButton.styleFrom(backgroundColor: CustomColors.surfaceMuted),
         ),
         SizedBox(height: 24.h),
-        Text("Reset Password", style: CustomFonts.textMain24w700),
+        Text("Reset Password", style: CustomFonts.h2),
         SizedBox(height: 8.h),
-        Text("Enter your email and we'll send you an OTP code.", style: CustomFonts.textMuted14w400),
+        Text("Enter your email and we'll send you an OTP code.", style: CustomFonts.bodySm),
         SizedBox(height: 32.h),
         _buildInputField(
           label: "Registered Email",
@@ -263,9 +247,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       key: const ValueKey('otp'),
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text("Verify Identity", style: CustomFonts.textMain24w700),
+        Text("Verify Identity", style: CustomFonts.h2),
         SizedBox(height: 8.h),
-        Text("We've sent a 6-digit code to your email.", style: CustomFonts.textMuted14w400),
+        Text("We've sent a 6-digit code to your email.", style: CustomFonts.bodySm),
         SizedBox(height: 32.h),
         Pinput(
           controller: _otpController,
@@ -273,9 +257,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           defaultPinTheme: PinTheme(
             width: 56.w,
             height: 56.w,
-            textStyle: CustomFonts.textMain20w600,
+            textStyle: CustomFonts.h3,
             decoration: BoxDecoration(
-              color: CustomColors.surfaceGhost,
+              color: CustomColors.surfaceMuted,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: Colors.transparent),
             ),
@@ -283,11 +267,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           focusedPinTheme: PinTheme(
             width: 56.w,
             height: 56.w,
-            textStyle: CustomFonts.textMain20w600,
+            textStyle: CustomFonts.h3,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: CustomColors.brandPrimary, width: 2),
+              border: Border.all(color: CustomColors.primary, width: 2),
             ),
           ),
         ),
@@ -296,7 +280,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 16.h),
         TextButton(
           onPressed: _handleForgotPassword,
-          child: Text("Didn't receive code? Resend", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
+          child: Text("Didn't receive code? Resend", style: CustomFonts.label.copyWith(color: CustomColors.primary)),
         ),
       ],
     );
@@ -307,9 +291,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       key: const ValueKey('reset'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Create New Password", style: CustomFonts.textMain24w700),
+        Text("Create New Password", style: CustomFonts.h2),
         SizedBox(height: 8.h),
-        Text("Your new password must be different from previous ones.", style: CustomFonts.textMuted14w400),
+        Text("Your new password must be different from previous ones.", style: CustomFonts.bodySm),
         SizedBox(height: 32.h),
         ValueListenableBuilder(
           valueListenable: _obscureNewPassword,
@@ -355,22 +339,22 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.textMain14w600),
+        Text(label, style: CustomFonts.label),
         SizedBox(height: 10.h),
         TextFormField(
           controller: controller,
           obscureText: obscureText ?? false,
           validator: validator,
-          style: CustomFonts.textMain14w400,
+          style: CustomFonts.body,
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.textMuted),
+            prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.textTertiary),
             hintText: hint,
             suffixIcon: isPassword ? IconButton(
               onPressed: onTogglePassword,
               icon: Icon(
                 obscureText! ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                 size: 20.sp,
-                color: CustomColors.textMuted,
+                color: CustomColors.textTertiary,
               ),
             ) : null,
           ),
@@ -393,21 +377,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           ),
         ),
         SizedBox(width: 8.w),
-        Text("Keep me signed in", style: CustomFonts.textMain14w400),
+        Text("Keep me signed in", style: CustomFonts.body),
       ],
     );
   }
 
   Widget _buildSubmitButton(String label, VoidCallback onPressed) {
-    return SizedBox(
+    return AppGradientButton(
+      label: label,
+      onPressed: onPressed,
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 18.h),
-        ),
-        child: Text(label),
-      ),
     );
   }
 

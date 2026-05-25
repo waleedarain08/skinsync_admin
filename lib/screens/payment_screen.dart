@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -107,7 +108,7 @@ class PaymentScreen extends StatelessWidget {
               columnSpacing: 24,
               horizontalMargin: 20,
               minWidth: 1000,
-              headingRowColor: WidgetStateProperty.all(CustomColors.softChampagne.withOpacity(0.5)),
+              headingRowColor: WidgetStateProperty.all(CustomColors.surfaceMuted),
               columns: const [
                 DataColumn2(label: Text('Transaction ID'), size: ColumnSize.L),
                 DataColumn2(label: Text('Clinic'), size: ColumnSize.L),
@@ -174,7 +175,7 @@ class PaymentScreen extends StatelessWidget {
               columnSpacing: 24,
               horizontalMargin: 20,
               minWidth: 1000,
-              headingRowColor: WidgetStateProperty.all(CustomColors.softChampagne.withOpacity(0.5)),
+              headingRowColor: WidgetStateProperty.all(CustomColors.surfaceMuted),
               columns: const [
                 DataColumn2(label: Text('Ref ID'), size: ColumnSize.L),
                 DataColumn2(label: Text('Clinic'), size: ColumnSize.L),

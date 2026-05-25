@@ -3,155 +3,198 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'color_constant.dart';
 import 'custom_fonts.dart';
 
+export 'color_constant.dart';
+export 'custom_fonts.dart';
+
 class AppTheme {
-  static ThemeData get lightTheme {
+  static ThemeData get calmWellnessTheme => _buildTheme();
+
+  // Legacy Aliases
+  static ThemeData get lightTheme => calmWellnessTheme;
+  static ThemeData get darkTheme => calmWellnessTheme;
+
+  static ThemeData _buildTheme() {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      primaryColor: CustomColors.deepSlate,
+      scaffoldBackgroundColor: CustomColors.backgroundStart,
+      primaryColor: CustomColors.primary,
+      splashColor: CustomColors.primary.withOpacity(0.05),
       
       colorScheme: const ColorScheme.light(
-        primary: CustomColors.deepSlate,
-        onPrimary: CustomColors.surfaceWhite,
-        secondary: CustomColors.brandPurple,
-        onSecondary: CustomColors.deepSlate,
-        tertiary: CustomColors.brandCyan,
-        onTertiary: CustomColors.deepSlate,
-        surface: CustomColors.surfaceWhite,
-        onSurface: CustomColors.deepSlate,
-        background: CustomColors.backgroundLight,
-        onBackground: CustomColors.deepSlate,
-        error: CustomColors.error,
-        onError: CustomColors.surfaceWhite,
+        primary: CustomColors.primary,
+        onPrimary: Colors.white,
+        secondary: CustomColors.secondary,
+        onSecondary: Colors.white,
+        surface: CustomColors.backgroundStart,
+        onSurface: CustomColors.textPrimary,
+        error: Colors.redAccent,
         outline: CustomColors.borderLight,
       ),
 
-      scaffoldBackgroundColor: CustomColors.backgroundLight,
-      fontFamily: 'Degular',
-      
       appBarTheme: AppBarTheme(
-        backgroundColor: CustomColors.surfaceWhite,
+        backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        iconTheme: IconThemeData(color: CustomColors.deepSlate, size: 24.sp),
-        titleTextStyle: CustomFonts.headlineSmall,
-        shape: Border(
-          bottom: BorderSide(color: CustomColors.borderLight, width: 1),
+        iconTheme: IconThemeData(color: CustomColors.textPrimary, size: 22.sp),
+        titleTextStyle: CustomFonts.h3,
+      ),
+
+      textTheme: TextTheme(
+        headlineLarge: CustomFonts.h1,
+        headlineMedium: CustomFonts.h2,
+        headlineSmall: CustomFonts.h3,
+        bodyLarge: CustomFonts.bodyLg,
+        bodyMedium: CustomFonts.body,
+        bodySmall: CustomFonts.bodySm,
+      ),
+
+      cardTheme: CardThemeData(
+        color: CustomColors.card,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
         ),
       ),
-      
-      textTheme: TextTheme(
-        headlineLarge: CustomFonts.headlineLarge,
-        headlineMedium: CustomFonts.headlineMedium,
-        headlineSmall: CustomFonts.headlineSmall,
-        titleLarge: CustomFonts.bodyLarge,
-        titleMedium: CustomFonts.bodyMedium,
-        bodyLarge: CustomFonts.bodyLarge,
-        bodyMedium: CustomFonts.bodyMedium,
-        bodySmall: CustomFonts.bodySmall,
-        labelLarge: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: CustomColors.sidebar,
+        elevation: 0,
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: CustomColors.deepSlate,
-          foregroundColor: CustomColors.surfaceWhite,
+          backgroundColor: CustomColors.primary,
+          foregroundColor: Colors.white,
           elevation: 0,
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          textStyle: CustomFonts.bodyLarge.copyWith(color: CustomColors.surfaceWhite),
-        ),
-      ),
-      
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: CustomColors.deepSlate,
-          side: const BorderSide(color: CustomColors.deepSlate),
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          textStyle: CustomFonts.bodyLarge,
+          minimumSize: Size(0, 48.h),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+          textStyle: CustomFonts.button,
         ),
       ),
 
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: CustomColors.deepSlate,
-          textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
-        ),
+      dataTableTheme: DataTableThemeData(
+        headingRowColor: WidgetStateProperty.all(CustomColors.sidebar),
+        dataRowColor: WidgetStateProperty.all(CustomColors.card),
+        headingTextStyle: CustomFonts.label.copyWith(color: CustomColors.textSecondary, fontSize: 12.sp),
+        dataTextStyle: CustomFonts.body.copyWith(color: CustomColors.textPrimary),
+        horizontalMargin: 24.0,
       ),
-      
+
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: CustomColors.surfaceWhite,
+        fillColor: CustomColors.card,
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        hintStyle: CustomFonts.caption,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: CustomColors.borderLight),
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: const BorderSide(color: CustomColors.sidebarBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: CustomColors.borderLight),
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: const BorderSide(color: CustomColors.sidebarBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: CustomColors.brandCyan, width: 1.5),
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: const BorderSide(color: CustomColors.primary, width: 1.5),
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: CustomColors.error),
-        ),
-        hintStyle: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
-        labelStyle: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
-      ),
-      
-      cardTheme: CardThemeData(
-        color: CustomColors.surfaceWhite,
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.r),
-          side: const BorderSide(color: CustomColors.borderLight),
-        ),
-      ),
-
-      dialogTheme: DialogThemeData(
-        backgroundColor: CustomColors.surfaceWhite,
-        surfaceTintColor: Colors.transparent,
-        elevation: 12,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-        titleTextStyle: CustomFonts.headlineMedium,
-        contentTextStyle: CustomFonts.bodyMedium,
-      ),
-
-      bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: CustomColors.surfaceWhite,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-        ),
-      ),
-
-      dividerTheme: const DividerThemeData(
-        color: CustomColors.borderLight,
-        thickness: 1,
-        space: 1,
-      ),
-
-      navigationRailTheme: NavigationRailThemeData(
-        backgroundColor: CustomColors.deepSlate,
-        selectedIconTheme: const IconThemeData(color: CustomColors.brandCyan),
-        unselectedIconTheme: const IconThemeData(color: Colors.white60),
-        selectedLabelTextStyle: CustomFonts.bodySmall.copyWith(color: CustomColors.brandCyan),
-        unselectedLabelTextStyle: CustomFonts.bodySmall.copyWith(color: Colors.white60),
-      ),
-
-      drawerTheme: const DrawerThemeData(
-        backgroundColor: CustomColors.deepSlate,
-        elevation: 0,
       ),
     );
   }
+}
 
-  static ThemeData get darkTheme => lightTheme; // For this project, we prioritize the redesigned light theme as the main admin style
+class AppDecorations {
+  static BoxDecoration card = BoxDecoration(
+    color: CustomColors.card,
+    borderRadius: BorderRadius.circular(12.r),
+    border: Border.all(color: CustomColors.sidebarBorder),
+  );
+
+  static BoxDecoration sidebarItem = BoxDecoration(
+    borderRadius: BorderRadius.circular(8.r),
+  );
+
+  static InputDecoration input({
+    String? hint,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+  }) =>
+      InputDecoration(
+        hintText: hint,
+        hintStyle: CustomFonts.caption,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: CustomColors.card,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: const BorderSide(color: CustomColors.sidebarBorder),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: const BorderSide(color: CustomColors.sidebarBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: const BorderSide(color: CustomColors.primary, width: 1.5),
+        ),
+      );
+}
+
+class AppSpacing {
+  static double get xs => 8.w;
+  static double get sm => 12.w;
+  static double get md => 16.w;
+  static double get lg => 20.w;
+  static double get xl => 24.w;
+  static double get xxl => 32.w;
+  static double get xxxl => 40.w;
+  static double get pagePaddingH => 28.w;
+  static double get pagePaddingV => 28.h;
+  static double get topBarHeight => 72.h;
+  static double get sidebarWidth => 280.w;
+  static double get cardPadding => 24.w;
+}
+
+class AppRadius {
+  static double get xs => 6.r;
+  static double get sm => 8.r;
+  static double get md => 12.r;
+  static double get lg => 16.r;
+  static double get xl => 20.r;
+  static double get xxl => 24.r;
+  static double get full => 999.r;
+}
+
+class AppShadows {
+  static List<BoxShadow> get card => [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 10.r,
+          offset: Offset(0, 4.h),
+        ),
+      ];
+
+  static List<BoxShadow> get cardHover => [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.1),
+          blurRadius: 20.r,
+          offset: Offset(0, 8.h),
+        ),
+      ];
+
+  static List<BoxShadow> get lg => [
+    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 30, offset: const Offset(0, 10))
+  ];
+  static List<BoxShadow> get md => [
+    BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 5))
+  ];
+  static List<BoxShadow> get sm => [
+    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))
+  ];
+  static List<BoxShadow> get xs => sm;
 }

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-
-import '../utils/color_constant.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../utils/theme.dart';
 
 class ComingSoonWidget extends StatefulWidget {
   const ComingSoonWidget({super.key});
@@ -10,17 +10,13 @@ class ComingSoonWidget extends StatefulWidget {
   State<ComingSoonWidget> createState() => _ComingSoonWidgetState();
 }
 
-class _ComingSoonWidgetState extends State<ComingSoonWidget>
-    with SingleTickerProviderStateMixin {
+class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 6),
-    )..repeat();
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 5))..repeat();
   }
 
   @override
@@ -34,17 +30,7 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget>
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            CustomColors.lightBlueColor,
-            CustomColors.lightPurpleColor,
-            // Color(0xFF203A43),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+      color: CustomColors.backgroundLight,
       child: Center(
         child: AnimatedBuilder(
           animation: _controller,
@@ -55,60 +41,42 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget>
             );
           },
           child: Container(
-            padding: const EdgeInsets.all(40),
+            padding: EdgeInsets.all(40.w),
+            margin: EdgeInsets.symmetric(horizontal: 24.w),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withOpacity(0.15)),
-              boxShadow: [
-                BoxShadow(
-                  color: CustomColors.drakPurpleColor.withOpacity(0.25),
-                  blurRadius: 30,
-                  offset: const Offset(0, 20),
-                ),
-              ],
+              color: CustomColors.surfaceWhite,
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(color: CustomColors.borderLight),
+              boxShadow: AppShadows.lg,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.auto_awesome, size: 64, color: Colors.white),
-                const SizedBox(height: 24),
-                const Text(
-                  'Coming Soon',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'We’re crafting something beautiful for you.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white.withOpacity(0.85),
-                  ),
-                ),
-                const SizedBox(height: 28),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
+                  padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(20),
+                    gradient: CustomColors.medicalGradient,
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
-                  child: const Text(
-                    '✨ Stay Tuned ✨',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.8,
-                    ),
+                  child: Icon(Icons.auto_awesome_rounded, size: 48.sp, color: CustomColors.surfaceWhite),
+                ),
+                SizedBox(height: 32.h),
+                Text('Coming Soon', style: CustomFonts.h1),
+                SizedBox(height: 12.h),
+                Text(
+                  "We're crafting an elegant experience for this module.\nStay tuned for the unveiling.",
+                  textAlign: TextAlign.center,
+                  style: CustomFonts.bodyLg.copyWith(color: CustomColors.textSecondary),
+                ),
+                SizedBox(height: 32.h),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
+                  decoration: BoxDecoration(
+                    color: CustomColors.primarySoft,
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    border: Border.all(color: CustomColors.secondary.withValues(alpha: 0.1)),
                   ),
+                  child: Text('PREMIUM ACCESS', style: CustomFonts.label.copyWith(color: CustomColors.secondary, fontSize: 11.sp)),
                 ),
               ],
             ),

@@ -1,0 +1,38 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../utils/theme.dart';
+
+class AppPageHeader extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final List<Widget>? actions;
+
+  const AppPageHeader({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.actions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: CustomFonts.h1),
+              if (subtitle != null) ...[
+                SizedBox(height: 6.h),
+                Text(subtitle!, style: CustomFonts.bodySm),
+              ],
+            ],
+          ),
+        ),
+        if (actions != null) ...actions!,
+      ],
+    );
+  }
+}

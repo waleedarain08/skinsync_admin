@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import '../utils/theme.dart';
 
 class CustomDropdown extends StatelessWidget {
   final String hint;
@@ -21,41 +20,20 @@ class CustomDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     final dropdownItems = items ?? [];
     return SizedBox(
-      height: 55.h,
+      height: 48.h,
       child: DropdownButtonFormField<String>(
         isExpanded: true,
-        initialValue: value,
-        style: CustomFonts.textMain14w400,
-        decoration: InputDecoration(
-          fillColor: Colors.white,
-          filled: true,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide(color: CustomColors.textMuted.withOpacity(0.2)),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide(color: CustomColors.textMuted.withOpacity(0.2)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.r),
-            borderSide: const BorderSide(color: CustomColors.brandPrimary, width: 1.5),
-          ),
-        ),
-        hint: Text(hint, style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted)),
+        value: value,
+        style: CustomFonts.body,
+        decoration: AppDecorations.input(hint: hint),
+        hint: Text(hint, style: CustomFonts.bodySm),
         items: dropdownItems
-            .map(
-              (item) => DropdownMenuItem<String>(
-                value: item,
-                child: Text(item, style: CustomFonts.textMain14w400),
-              ),
-            )
+            .map((item) => DropdownMenuItem<String>(value: item, child: Text(item, style: CustomFonts.body)))
             .toList(),
         onChanged: onChanged,
-        icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.textMuted, size: 24.sp),
-        dropdownColor: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.textTertiary, size: 22.sp),
+        dropdownColor: CustomColors.surfaceWhite,
+        borderRadius: BorderRadius.circular(AppRadius.md),
       ),
     );
   }

@@ -9,7 +9,9 @@ import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
+import 'package:skinsync_admin/widgets/app_badge.dart';
 import '../../widgets/dailogbox/clinic_dailogbox.dart';
 import '../../widgets/dailogbox/standard_dialog.dart';
 import '../invite_clinic_detail_screen.dart';
@@ -58,16 +60,19 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     return Scaffold(
       backgroundColor: CustomColors.backgroundLight,
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.pagePaddingH,
+          vertical: AppSpacing.pagePaddingV,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(),
-            SizedBox(height: 32.h),
+            SizedBox(height: AppSpacing.xxl),
             _buildStatsSummary(),
-            SizedBox(height: 32.h),
+            SizedBox(height: AppSpacing.xxl),
             _buildTabs(),
-            SizedBox(height: 24.h),
+            SizedBox(height: AppSpacing.xl),
             Expanded(
               child: TabBarView(
                 controller: _tabController,
@@ -90,25 +95,18 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Clinic Management", style: CustomFonts.headlineLarge),
-            SizedBox(height: 8.h),
+            Text("Clinic Partners", style: CustomFonts.h1),
+            SizedBox(height: 6.h),
             Text(
-              "Manage, monitor, and scale your MedSpa network effortlessly.",
-              style: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
+              "Manage and monitor your MedSpa network performance.",
+              style: CustomFonts.bodySm,
             ),
           ],
         ),
         ElevatedButton.icon(
-          onPressed: () {
-            context.push(AddNewClinicScreen.routeName);
-          },
-          icon: const Icon(Icons.add, color: Colors.white),
-          label: Text('Add New Clinic', style: CustomFonts.white14w600),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: CustomColors.deepSlate,
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          ),
+          onPressed: () => context.push(AddNewClinicScreen.routeName),
+          icon: const Icon(Icons.add_rounded, color: Colors.white),
+          label: const Text('Add New Clinic'),
         ),
       ],
     );
@@ -117,13 +115,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _buildStatsSummary() {
     return Row(
       children: [
-        _buildMiniStat("Total Clinics", "48", Icons.business, CustomColors.brandCyan),
-        SizedBox(width: 16.w),
-        _buildMiniStat("Active Now", "42", Icons.bolt, CustomColors.success),
-        SizedBox(width: 16.w),
-        _buildMiniStat("Subscription Revenue", "\$245K", Icons.payments_outlined, CustomColors.brandPurple),
-        SizedBox(width: 16.w),
-        _buildMiniStat("Avg Clinic Rating", "4.8", Icons.star_outline, Colors.amber),
+        _buildMiniStat("Total Clinics", "48", Icons.business_rounded, CustomColors.primary),
+        SizedBox(width: AppSpacing.md),
+        _buildMiniStat("Active Partners", "42", Icons.bolt_rounded, CustomColors.success),
+        SizedBox(width: AppSpacing.md),
+        _buildMiniStat("Network Revenue", "\$245K", Icons.payments_rounded, CustomColors.secondary),
+        SizedBox(width: AppSpacing.md),
+        _buildMiniStat("Avg Patient Rating", "4.8", Icons.star_rounded, Colors.amber),
       ],
     );
   }
@@ -131,23 +129,23 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _buildMiniStat(String title, String value, IconData icon, Color color) {
     return Expanded(
       child: BorderdContainerWidget(
-        padding: EdgeInsets.all(20.w),
+        padding: EdgeInsets.all(AppSpacing.lg),
         child: Row(
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10.r),
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
-              child: Icon(icon, color: color, size: 24.sp),
+              child: Icon(icon, color: color, size: 22.sp),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: AppSpacing.md),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.headlineSmall),
-                Text(title, style: CustomFonts.bodySmall),
+                Text(value, style: CustomFonts.h3),
+                Text(title, style: CustomFonts.caption),
               ],
             ),
           ],
@@ -156,23 +154,17 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     );
   }
 
-
   Widget _buildTabs() {
     return Container(
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: CustomColors.borderLight)),
+        border: Border(bottom: BorderSide(color: CustomColors.sidebarBorder)),
       ),
       child: TabBar(
         controller: _tabController,
         isScrollable: true,
-        labelColor: CustomColors.deepSlate,
-        unselectedLabelColor: CustomColors.textSecondary,
-        indicatorColor: CustomColors.brandCyan,
-        indicatorWeight: 3,
-        labelStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         tabs: const [
           Tab(text: "Active Clinics"),
-          Tab(text: "Clinics to Invite"),
+          Tab(text: "Pending Invitations"),
         ],
       ),
     );
@@ -183,22 +175,22 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     final clinics = state.clinics ?? [];
     return Column(
       children: [
-        _buildSearchAndFilterBar(_activeSearchController, "Search active clinics by name, email or location..."),
-        SizedBox(height: 24.h),
+        _buildSearchAndFilterBar(_activeSearchController, "Search by name, email or location..."),
+        SizedBox(height: AppSpacing.md),
         Expanded(
           child: _buildUnifiedTable<ClinicModel>(
-            title: "Active Clinic Directory",
+            title: "Partner Directory",
             items: clinics,
             isLoading: state.loading,
             controller: _activeScrollController,
             columns: const [
-              DataColumn(label: Text('Clinic Name')),
-              DataColumn(label: Text('Contact')),
-              DataColumn(label: Text('Location')),
-              DataColumn(label: Text('Plan/Type')),
-              DataColumn(label: Text('Stats')),
-              DataColumn(label: Text('Status')),
-              DataColumn(label: Text('Actions')),
+              DataColumn(label: Text('CLINIC')),
+              DataColumn(label: Text('CONTACT')),
+              DataColumn(label: Text('LOCATION')),
+              DataColumn(label: Text('PACKAGE')),
+              DataColumn(label: Text('STATS')),
+              DataColumn(label: Text('STATUS')),
+              DataColumn(label: Text('ACTIONS')),
             ],
             rowBuilder: (item) => _buildActiveClinicRow(item),
           ),
@@ -212,20 +204,20 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     final inviteClinics = state.inviteClinics ?? [];
     return Column(
       children: [
-        _buildSearchAndFilterBar(_inviteSearchController, "Search prospect clinics by name or email..."),
-        SizedBox(height: 24.h),
+        _buildSearchAndFilterBar(_inviteSearchController, "Search prospect clinics..."),
+        SizedBox(height: AppSpacing.md),
         Expanded(
           child: _buildUnifiedTable<InviteClinicModel>(
-            title: "Prospect Clinic Pipeline",
+            title: "Prospect Pipeline",
             items: inviteClinics,
             isLoading: state.loading,
             controller: _inviteScrollController,
             columns: const [
-              DataColumn(label: Text('Clinic Name')),
-              DataColumn(label: Text('Contact')),
-              DataColumn(label: Text('Location')),
-              DataColumn(label: Text('Status')),
-              DataColumn(label: Text('Actions')),
+              DataColumn(label: Text('PROSPECT')),
+              DataColumn(label: Text('CONTACT')),
+              DataColumn(label: Text('LOCATION')),
+              DataColumn(label: Text('STATUS')),
+              DataColumn(label: Text('ACTIONS')),
             ],
             rowBuilder: (item) => _buildInviteClinicRow(item),
           ),
@@ -239,32 +231,25 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       children: [
         Expanded(
           child: Container(
-            height: 54.h,
+            height: 52.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: Colors.grey[200]!),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: CustomColors.borderLight),
+              boxShadow: AppShadows.xs,
             ),
             child: TextField(
               controller: controller,
-              onChanged: (val) {
-                setState(() {});
-                // Logic for filtering can be added here or in ViewModel
-              },
-              style: CustomFonts.bodyMedium,
+              onChanged: (val) => setState(() {}),
+              style: CustomFonts.body,
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary),
-                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.textSecondary, size: 20),
+                hintStyle: CustomFonts.bodySm,
+                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.textTertiary, size: 20),
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 15.h),
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 14.h),
                 suffixIcon: controller.text.isNotEmpty 
                     ? IconButton(
                         icon: const Icon(Icons.close_rounded, size: 18),
@@ -278,22 +263,17 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             ),
           ),
         ),
-        SizedBox(width: 16.w),
-        _buildFilterButton(),
+        SizedBox(width: AppSpacing.md),
+        OutlinedButton.icon(
+          onPressed: () => _showFiltersModal(),
+          icon: const Icon(Icons.filter_list_rounded, size: 20),
+          label: const Text("Filters"),
+          style: OutlinedButton.styleFrom(
+            backgroundColor: Colors.white,
+            minimumSize: Size(0, 52.h),
+          ),
+        ),
       ],
-    );
-  }
-
-  Widget _buildFilterButton() {
-    return ElevatedButton.icon(
-      onPressed: () => _showFiltersModal(),
-      icon: const Icon(Icons.filter_list_rounded, size: 20, color: Colors.white),
-      label: Text("Filters", style: CustomFonts.bodyMedium.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: CustomColors.deepSlate,
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 18.h),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      ),
     );
   }
 
@@ -315,7 +295,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                     suggestions: ["East Coast", "West Coast", "Midwest", "South"],
                   ),
                 ),
-                SizedBox(width: 16.w),
+                SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: _buildModalSearchField(
                     label: "Status",
@@ -325,7 +305,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                 ),
               ],
             ),
-            SizedBox(height: 24.h),
+            SizedBox(height: AppSpacing.xl),
             _buildModalSearchField(
               label: "Subscription Plan",
               hint: "All Plans",
@@ -355,17 +335,17 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold)),
-        SizedBox(height: 10.h),
+        Text(label, style: CustomFonts.label),
+        SizedBox(height: 8.h),
         DropdownButtonFormField<String>(
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
             fillColor: CustomColors.backgroundLight,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide.none),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           ),
-          items: suggestions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+          items: suggestions.map((s) => DropdownMenuItem(value: s, child: Text(s, style: CustomFonts.body))).toList(),
           onChanged: (val) {},
         ),
       ],
@@ -386,8 +366,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: EdgeInsets.all(24.w),
-            child: Text(title, style: CustomFonts.headlineSmall),
+            padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.md),
+            child: Text(title, style: CustomFonts.h3),
           ),
           Expanded(
             child: isLoading
@@ -395,8 +375,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                 : items.isEmpty
                     ? Center(
                         child: Padding(
-                          padding: EdgeInsets.all(40.w),
-                          child: Text("No data found", style: CustomFonts.bodyLarge.copyWith(color: CustomColors.textSecondary)),
+                          padding: EdgeInsets.all(AppSpacing.xxl),
+                          child: Text("No entries found", style: CustomFonts.bodySm),
                         ),
                       )
                     : Scrollbar(
@@ -411,10 +391,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                                 child: ConstrainedBox(
                                   constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                   child: DataTable(
-                                    columnSpacing: 40.w,
-                                    horizontalMargin: 24.w,
                                     headingRowColor: WidgetStateProperty.all(CustomColors.backgroundLight),
-                                    headingTextStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
                                     rows: List.generate(
                                       items.length,
                                       (index) => rowBuilder(items[index]),
@@ -438,22 +415,24 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       cells: [
         DataCell(_buildNameCell(clinic.name, clinic.logo)),
         DataCell(_buildContactCell(clinic.email, clinic.phone)),
-        DataCell(Text(clinic.address ?? 'N/A', style: CustomFonts.bodyMedium)),
+        DataCell(Text(clinic.address ?? 'N/A', style: CustomFonts.bodySm)),
         DataCell(_buildPlanBadge(clinic.subscriptionPlan ?? "Standard")),
-        DataCell(_buildStatsCell(clinic.totalAppointments?.toString() ?? "0", Icons.people, clinic.rating?.toString() ?? "0", Icons.star)),
+        DataCell(_buildStatsCell(clinic.totalAppointments?.toString() ?? "0", Icons.people_outline_rounded, clinic.rating?.toString() ?? "0", Icons.star_outline_rounded)),
         DataCell(_statusBadge(clinic.status ?? 'Active')),
         DataCell(
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.visibility_outlined, size: 20),
+                tooltip: 'View Details',
+                icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.textSecondary),
                 onPressed: () {
                   ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
                   context.push(ClinicDetailScreen.routeName);
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.edit_outlined, size: 20),
+                tooltip: 'Edit Partner',
+                icon: Icon(Icons.edit_outlined, size: 20.sp, color: CustomColors.textSecondary),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -473,11 +452,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       cells: [
         DataCell(_buildNameCell(clinic.name, clinic.logo)),
         DataCell(_buildContactCell(clinic.email, clinic.phone)),
-        DataCell(Text(clinic.address, style: CustomFonts.bodyMedium)),
+        DataCell(Text(clinic.address, style: CustomFonts.bodySm)),
         DataCell(_invitationStatusBadge(clinic.invitationStatus)),
         DataCell(
           IconButton(
-            icon: const Icon(Icons.visibility_outlined, size: 20),
+            tooltip: 'View Prospect',
+            icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.textSecondary),
             onPressed: () {
               ref.read(clinicViewModelProvider.notifier).selectInviteClinic(clinic);
               context.push(InviteClinicDetailScreen.routeName);
@@ -493,14 +473,14 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       children: [
         CircleAvatar(
           radius: 16.r,
-          backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
+          backgroundColor: CustomColors.primarySoft,
           backgroundImage: (logo != null && logo.isNotEmpty) ? NetworkImage(logo) : null,
           child: (logo == null || logo.isEmpty)
-              ? Text(name?[0] ?? "C", style: TextStyle(color: CustomColors.deepSlate, fontSize: 12.sp, fontWeight: FontWeight.bold))
+              ? Text(name?[0] ?? "C", style: TextStyle(color: CustomColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold))
               : null,
         ),
-        SizedBox(width: 12.w),
-        Text(name ?? 'N/A', style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        SizedBox(width: AppSpacing.sm),
+        Text(name ?? 'N/A', style: CustomFonts.label),
       ],
     );
   }
@@ -510,26 +490,21 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(email ?? 'N/A', style: CustomFonts.bodyMedium),
-        Text(phone ?? '', style: CustomFonts.bodySmall),
+        Text(email ?? 'N/A', style: CustomFonts.bodySm),
+        Text(phone ?? '', style: CustomFonts.caption),
       ],
     );
   }
 
   Widget _buildPlanBadge(String plan) {
-    final color = CustomColors.brandPurple;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(6.r)),
-      child: Text(plan, style: CustomFonts.bodySmall.copyWith(color: color, fontWeight: FontWeight.bold)),
-    );
+    return AppBadge(label: plan, variant: AppBadgeVariant.secondary);
   }
 
   Widget _buildStatsCell(String val1, IconData icon1, String val2, IconData icon2) {
     return Row(
       children: [
         _miniIconStat(icon1, val1),
-        SizedBox(width: 8.w),
+        SizedBox(width: AppSpacing.sm),
         _miniIconStat(icon2, val2),
       ],
     );
@@ -538,53 +513,33 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _miniIconStat(IconData icon, String value) {
     return Row(
       children: [
-        Icon(icon, size: 14.sp, color: CustomColors.textSecondary),
+        Icon(icon, size: 14.sp, color: CustomColors.textTertiary),
         SizedBox(width: 4.w),
-        Text(value, style: CustomFonts.bodySmall),
+        Text(value, style: CustomFonts.caption),
       ],
     );
   }
 
   Widget _statusBadge(String status) {
     final bool isActive = status.toLowerCase() == 'active';
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: isActive ? CustomColors.success.withOpacity(0.1) : CustomColors.error.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Text(
-        status,
-        style: TextStyle(
-          color: isActive ? CustomColors.success : CustomColors.error,
-          fontSize: 11.sp,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+    return AppBadge(
+      label: status,
+      variant: isActive ? AppBadgeVariant.success : AppBadgeVariant.error,
     );
   }
 
   Widget _invitationStatusBadge(String status) {
-    Color color = CustomColors.textSecondary;
+    AppBadgeVariant variant = AppBadgeVariant.info;
     String cleanStatus = status.toLowerCase();
+    
     if (cleanStatus.contains('sent') || cleanStatus.contains('invited') || cleanStatus.contains('awaiting')) {
-      color = CustomColors.brandCyan;
+      variant = AppBadgeVariant.info;
     } else if (cleanStatus.contains('interested') || cleanStatus.contains('pending')) {
-      color = CustomColors.success;
+      variant = AppBadgeVariant.success;
     } else if (cleanStatus.contains('expired')) {
-      color = CustomColors.error;
+      variant = AppBadgeVariant.error;
     }
 
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Text(
-        status.toUpperCase(),
-        style: TextStyle(color: color, fontSize: 10.sp, fontWeight: FontWeight.bold),
-      ),
-    );
+    return AppBadge(label: status, variant: variant);
   }
 }
