@@ -119,23 +119,26 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Widget _buildBranding() {
     return Column(
       children: [
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            gradient: CustomColors.brandGradientDiagonal,
-            shape: BoxShape.circle,
-            boxShadow: AppShadows.md,
-          ),
-          child: Image.asset(PngAssets.splashLogo, height: 80.w, width: 80.w),
-        ),
-        SizedBox(height: 24.h),
+        Image.asset(PngAssets.splashLogo, height: 100.w, width: 100.w, fit: BoxFit.contain),
+        SizedBox(height: 32.h),
         Text(
           "SkinSync AI",
-          style: CustomFonts.h1.copyWith(letterSpacing: 1.5),
+          style: CustomFonts.h1.copyWith(
+            letterSpacing: 2, 
+            fontSize: 40.sp,
+            fontWeight: FontWeight.w900,
+            color: CustomColors.textPrimary,
+          ),
         ),
+        SizedBox(height: 8.h),
         Text(
-          "Centralized MedSpa Administration",
-          style: CustomFonts.bodySm.copyWith(letterSpacing: 1),
+          "ADMIN PANEL",
+          style: CustomFonts.overline.copyWith(
+            letterSpacing: 3, 
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w800,
+            color: CustomColors.primary,
+          ),
         ),
       ],
     );

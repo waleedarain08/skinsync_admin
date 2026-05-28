@@ -53,7 +53,7 @@ class _MenuButton extends StatelessWidget {
       padding: EdgeInsets.only(right: AppSpacing.sm),
       child: IconButton(
         onPressed: () => Scaffold.of(context).openDrawer(),
-        icon: Icon(Icons.menu_rounded, color: CustomColors.textPrimary, size: 22.sp),
+        icon: Icon(Icons.menu_rounded, color: CustomColors.textPrimary, size: 26.sp),
         style: IconButton.styleFrom(
           backgroundColor: CustomColors.backgroundLight,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
@@ -93,7 +93,7 @@ class _TopBarActionState extends State<_TopBarAction> {
           children: [
             IconButton(
               onPressed: () {},
-              icon: Icon(widget.icon, size: 20.sp),
+              icon: Icon(widget.icon, size: 24.sp),
               color: _hovered ? CustomColors.primary : CustomColors.textSecondary,
               style: IconButton.styleFrom(
                 backgroundColor: _hovered ? CustomColors.primarySoft : Colors.transparent,
@@ -154,13 +154,13 @@ class _UserProfile extends StatelessWidget {
             ),
             SizedBox(width: AppSpacing.sm),
             Container(
-              width: 36.w,
-              height: 36.w,
+              width: 40.w,
+              height: 40.w,
               decoration: BoxDecoration(
-                gradient: CustomColors.medicalGradient,
+                color: CustomColors.primary,
                 borderRadius: BorderRadius.circular(8.r),
               ),
-              child: Icon(Icons.person_rounded, size: 18.sp, color: CustomColors.surfaceWhite),
+              child: Icon(Icons.person_rounded, size: 22.sp, color: CustomColors.surfaceWhite),
             ),
             SizedBox(width: 4.w),
             Icon(Icons.keyboard_arrow_down_rounded, size: 16.sp, color: CustomColors.textTertiary),

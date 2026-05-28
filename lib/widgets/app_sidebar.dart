@@ -53,23 +53,23 @@ class AppSidebar extends StatelessWidget {
   final void Function(int index) onItemTap;
 
   static SidebarXTheme get collapsedTheme => SidebarXTheme(
-        width: 72.w,
+        width: 80.w,
         decoration: const BoxDecoration(
           color: CustomColors.sidebar,
           border: Border(right: BorderSide(color: CustomColors.sidebarBorder, width: 1)),
         ),
         padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        iconTheme: IconThemeData(color: CustomColors.textSecondary, size: 20.sp),
-        selectedIconTheme: IconThemeData(color: Colors.white, size: 20.sp),
-        hoverIconTheme: IconThemeData(color: CustomColors.primary, size: 20.sp),
+        iconTheme: IconThemeData(color: CustomColors.textSecondary, size: 24.sp),
+        selectedIconTheme: IconThemeData(color: Colors.white, size: 24.sp),
+        hoverIconTheme: IconThemeData(color: CustomColors.primary, size: 24.sp),
         textStyle: CustomFonts.sidebarItem,
         selectedTextStyle: CustomFonts.sidebarItemActive,
         hoverTextStyle: CustomFonts.sidebarItemActive.copyWith(color: CustomColors.primary),
         hoverColor: CustomColors.hover,
         itemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
         selectedItemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
-        itemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-        selectedItemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+        itemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+        selectedItemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
         itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(8.r)),
         selectedItemDecoration: BoxDecoration(
           color: CustomColors.primary,
@@ -145,8 +145,8 @@ class AppSidebar extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(24.w, 40.h, 24.w, 8.h),
       child: Row(
         children: [
-          const _LogoBadge(size: 36),
-          SizedBox(width: 14.w),
+          const _LogoBadge(size: 56),
+          SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,14 +156,17 @@ class AppSidebar extends StatelessWidget {
                   style: CustomFonts.h3.copyWith(
                     color: CustomColors.textPrimary,
                     letterSpacing: -0.5,
-                    fontSize: 18.sp,
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
                 Text(
-                  'MEDSPA SaaS',
+                  'ADMIN PANEL',
                   style: CustomFonts.overline.copyWith(
-                    color: CustomColors.secondary,
-                    fontSize: 9.sp,
+                    color: CustomColors.primary,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
                   ),
                 ),
               ],
@@ -231,15 +234,10 @@ class _LogoBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      padding: EdgeInsets.all(size * 0.22),
-      decoration: BoxDecoration(
-        gradient: CustomColors.medicalGradient,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: Image.asset(PngAssets.splashLogo, color: Colors.white),
+    return SizedBox(
+      width: size.w,
+      height: size.w,
+      child: Image.asset(PngAssets.splashLogo, fit: BoxFit.contain),
     );
   }
 }
