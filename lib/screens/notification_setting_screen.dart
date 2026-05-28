@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/custom_fonts.dart';
-import '../utils/color_constant.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -34,7 +33,6 @@ class _NotificationSettingsScreenState
               // Main Card Container
               _buildCardContainer(),
               SizedBox(height: 16.h),
-              // Important Note
             ],
           ),
         ),
@@ -52,7 +50,7 @@ class _NotificationSettingsScreenState
         SizedBox(width: 12.w),
         Text(
           'Notification Settings',
-          style: CustomFonts.textMain18w600,
+          style: CustomFonts.black18w600,
         ),
       ],
     );
@@ -68,7 +66,7 @@ class _NotificationSettingsScreenState
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -83,11 +81,7 @@ class _NotificationSettingsScreenState
             padding: EdgeInsets.symmetric(vertical: 16.w),
             child: Text(
               'Manage Notifications',
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+              style: CustomFonts.black16w600,
             ),
           ),
           // Notification Options
@@ -166,16 +160,12 @@ class _NotificationSettingsScreenState
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
+                  style: CustomFonts.black14w600,
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
+                  style: CustomFonts.grey12w400,
                 ),
               ],
             ),
@@ -208,20 +198,16 @@ class _NotificationSettingsScreenState
       ),
       child: RichText(
         text: TextSpan(
-          style: TextStyle(fontSize: 12.sp, color: Colors.black87, height: 1.4),
+          style: CustomFonts.black12w400h14,
           children: [
             TextSpan(
               text: 'Important: ',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12.sp),
+              style: CustomFonts.black12w600,
             ),
             TextSpan(
               text:
                   'You will need to enter a verification code sent to your phone every time you sign in.',
-              style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 12.sp,
-                color: Colors.grey[600],
-              ),
+              style: CustomFonts.grey12w400,
             ),
           ],
         ),

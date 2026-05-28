@@ -59,11 +59,11 @@ class DisputeDetailsDialog extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.textMuted11w400.copyWith(letterSpacing: 0.5)),
+        Text(label, style: CustomFonts.grey11w400.copyWith(letterSpacing: 0.5)),
         SizedBox(height: 4.h),
         Text(
           value,
-          style: isBoldValue ? CustomFonts.textMain16w600 : CustomFonts.textMain14w400,
+          style: isBoldValue ? CustomFonts.black16w600 : CustomFonts.black14w400,
         ),
       ],
     );

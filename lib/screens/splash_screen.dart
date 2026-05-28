@@ -101,15 +101,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     SizedBox(height: AppSpacing.xxl),
                     Text(
                       'SKINSYNC',
-                      style: CustomFonts.display.copyWith(
-                        letterSpacing: 2,
-                        fontSize: 32.sp,
-                      ),
+                      style: CustomFonts.black32w700ls2,
                     ),
                     SizedBox(height: AppSpacing.sm),
                     Text(
                       'PREMIUM MEDSPA SaaS',
-                      style: CustomFonts.overline.copyWith(color: CustomColors.secondary),
+                      style: CustomFonts.secondary9w600,
                     ),
                   ],
                 ),

@@ -43,11 +43,11 @@ class _UserManagementState extends State<UserManagement> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("User Management", style: CustomFonts.textMain32w700),
+        Text("User Management", style: CustomFonts.black32w700),
         SizedBox(height: 4.h),
         Text(
           "Manage system access, roles, and status for all participants.",
-          style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
+          style: CustomFonts.grey14w400,
         ),
       ],
     );
@@ -75,15 +75,15 @@ class _UserManagementState extends State<UserManagement> {
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10.r)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)),
               child: Icon(icon, color: color, size: 24.sp),
             ),
             SizedBox(width: 16.w),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.textMain20w600),
-                Text(title, style: CustomFonts.textMuted12w400),
+                Text(value, style: CustomFonts.black20w600),
+                Text(title, style: CustomFonts.grey12w400),
               ],
             ),
           ],
@@ -118,11 +118,11 @@ class _UserManagementState extends State<UserManagement> {
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10.r),
-          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))] : null,
+          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))] : null,
         ),
         child: Text(
           label,
-          style: isSelected ? CustomFonts.textMain14w600 : CustomFonts.textMuted13w500,
+          style: isSelected ? CustomFonts.black14w600 : CustomFonts.grey13w500,
         ),
       ),
     );
@@ -138,7 +138,7 @@ class _UserManagementState extends State<UserManagement> {
             padding: EdgeInsets.all(20.w),
             child: Row(
               children: [
-                Text(_selectedTab == 0 ? "Patient Users" : "Clinic Admins", style: CustomFonts.textMain20w600),
+                Text(_selectedTab == 0 ? "Patient Users" : "Clinic Admins", style: CustomFonts.black20w600),
                 const Spacer(),
                 SizedBox(
                   width: 300.w,
@@ -165,7 +165,7 @@ class UserDataTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return DataTable(
       headingRowColor: WidgetStateProperty.all(CustomColors.surfaceGhost),
-      headingTextStyle: TextStyle(color: CustomColors.textMuted, fontSize: 12.sp, fontWeight: FontWeight.bold),
+      headingTextStyle: CustomFonts.grey12w700,
       columnSpacing: 40.w,
       columns: const [
         DataColumn(label: Text('User')),
@@ -184,19 +184,19 @@ class UserDataTable extends StatelessWidget {
         DataCell(
           Row(
             children: [
-              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.brandCyan.withOpacity(0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.brandPrimary)),
+              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.brandPrimary)),
               SizedBox(width: 12.w),
-              Text("Courtney Henry", style: CustomFonts.textMain14w600),
+              Text("Courtney Henry", style: CustomFonts.black14w600),
             ],
           ),
         ),
-        const DataCell(Text("courtney.h@example.com")),
-        const DataCell(Text("Oct 24, 2023")),
+        DataCell(Text("courtney.h@example.com", style: CustomFonts.black14w400)),
+        DataCell(Text("Oct 24, 2023", style: CustomFonts.black14w400)),
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.success.withOpacity(0.1), borderRadius: BorderRadius.circular(20.r)),
-            child: Text("Active", style: TextStyle(color: CustomColors.success, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+            decoration: BoxDecoration(color: CustomColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
+            child: Text("Active", style: CustomFonts.success10w700),
           ),
         ),
         DataCell(

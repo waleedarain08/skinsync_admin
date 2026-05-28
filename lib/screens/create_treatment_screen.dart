@@ -29,7 +29,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: Text("Create New Treatment", style: CustomFonts.headlineSmall),
+        title: Text("Create New Treatment", style: CustomFonts.black18w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
           onPressed: () {
@@ -100,21 +100,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 ? const Icon(Icons.check, color: Colors.white, size: 16)
                 : Text(
                     "${step + 1}",
-                    style: TextStyle(
-                      color: isActive ? Colors.white : CustomColors.textSecondary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12.sp,
-                    ),
+                    style: isActive ? CustomFonts.white12w700 : CustomFonts.grey12w700,
                   ),
           ),
         ),
         SizedBox(width: 12.w),
         Text(
           label,
-          style: CustomFonts.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-            color: isActive ? CustomColors.deepSlate : CustomColors.textSecondary,
-          ),
+          style: isActive ? CustomFonts.black14w600 : CustomFonts.grey14w400,
         ),
       ],
     );
@@ -177,7 +170,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
           validator: Validators.empty,
         ),
         SizedBox(height: 24.h),
-        Text("Base Duration", style: CustomFonts.textMain14w600),
+        Text("Base Duration", style: CustomFonts.black14w600),
         SizedBox(height: 10.h),
         Row(
           children: [
@@ -248,7 +241,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       children: [
         _sectionTitle("Categorization"),
         SizedBox(height: 8.h),
-        Text("Organize treatments to help patients find them easily.", style: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary)),
+        Text("Organize treatments to help patients find them easily.", style: CustomFonts.grey14w400),
         SizedBox(height: 32.h),
         _buildSearchField(
           label: "Treatment Category",
@@ -289,14 +282,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
               icon: const Icon(Icons.add_location_alt_outlined, size: 18),
               label: const Text("Add New Area"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
+                backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
                 foregroundColor: CustomColors.deepSlate,
               ),
             ),
           ],
         ),
         SizedBox(height: 8.h),
-        Text("Select areas and mandatory sub-areas for this treatment.", style: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary)),
+        Text("Select areas and mandatory sub-areas for this treatment.", style: CustomFonts.grey14w400),
         SizedBox(height: 32.h),
         ListView.separated(
           shrinkWrap: true,
@@ -319,7 +312,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       children: [
         _sectionTitle("Materials & Configuration"),
         SizedBox(height: 8.h),
-        Text("Define the materials used and specific configuration per sub-area.", style: CustomFonts.bodyMedium.copyWith(color: CustomColors.textSecondary)),
+        Text("Define the materials used and specific configuration per sub-area.", style: CustomFonts.grey14w400),
         SizedBox(height: 32.h),
         _buildSearchField(
           label: "Material / Consumable Name",
@@ -330,7 +323,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ),
         if (allSubAreas.isNotEmpty) ...[
           SizedBox(height: 32.h),
-          Text("Material Configuration Per Sub-Area", style: CustomFonts.bodyLarge),
+          Text("Material Configuration Per Sub-Area", style: CustomFonts.black16w400),
           SizedBox(height: 16.h),
           ListView.separated(
             shrinkWrap: true,
@@ -360,7 +353,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
               ),
             ),
             SizedBox(width: 12.w),
-            Text("Use in AI Simulator", style: CustomFonts.bodyLarge),
+            Text("Use in AI Simulator", style: CustomFonts.black16w400),
           ],
         ),
         SizedBox(height: 40.h),
@@ -384,7 +377,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.subdirectory_arrow_right, size: 18, color: CustomColors.deepSlate),
               SizedBox(width: 8.w),
-              Text(subArea.name, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+              Text(subArea.name, style: CustomFonts.black14w600),
             ],
           ),
           SizedBox(height: 20.h),
@@ -420,7 +413,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       children: [
         _sectionTitle("Combinable Treatments"),
         SizedBox(height: 8.h),
-        Text("Select treatments that can be performed alongside this one.", style: CustomFonts.bodySmall),
+        Text("Select treatments that can be performed alongside this one.", style: CustomFonts.grey13w500),
         SizedBox(height: 16.h),
         _buildSearchField(
           label: "Search Treatments",
@@ -440,9 +433,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
             children: state.combinableTreatments.map((t) => Chip(
               label: Text(t.name ?? "N/A"),
               onDeleted: () => viewModel.removeCombinableTreatment(t.id ?? 0),
-              backgroundColor: CustomColors.brandPurple.withOpacity(0.1),
-              side: BorderSide(color: CustomColors.brandPurple.withOpacity(0.2)),
-              labelStyle: TextStyle(color: CustomColors.deepSlate, fontSize: 12.sp),
+              backgroundColor: CustomColors.brandPurple.withValues(alpha: 0.1),
+              side: BorderSide(color: CustomColors.brandPurple.withValues(alpha: 0.2)),
+              labelStyle: CustomFonts.black12w400,
               deleteIconColor: CustomColors.deepSlate,
             )).toList(),
           ),
@@ -517,10 +510,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
             children: entry.subAreas.map((sub) {
               return Chip(
                 avatar: const Icon(Icons.subdirectory_arrow_right, size: 14),
-                label: Text(sub.name, style: CustomFonts.bodySmall),
+                label: Text(sub.name, style: CustomFonts.grey13w500),
                 onDeleted: () => viewModel.removeSubArea(areaIndex, sub.name),
-                backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
-                side: BorderSide(color: CustomColors.brandCyan.withOpacity(0.2)),
+                backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
+                side: BorderSide(color: CustomColors.brandCyan.withValues(alpha: 0.2)),
               );
             }).toList(),
           ),
@@ -539,7 +532,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        Text(label, style: CustomFonts.black14w600),
         SizedBox(height: 10.h),
         SearchAnchor(
           viewHintText: hint,
@@ -556,14 +549,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
             return TextFormField(
               controller: controller,
               readOnly: true,
-              style: CustomFonts.bodyMedium,
+              style: CustomFonts.grey14w400,
               onTap: () {
                 searchController.text = controller.text;
                 searchController.openView();
               },
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: CustomFonts.bodySmall,
+                hintStyle: CustomFonts.grey13w500,
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
@@ -585,7 +578,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
           },
           suggestionsBuilder: (context, searchController) {
             final query = searchController.text.toLowerCase();
-            final filteredList = suggestions.where((s) => s.toLowerCase().contains(query)).toList();
+            // final filteredList = suggestions.where((s) => s.toLowerCase().contains(query)).toList();
 
             return [
               if (searchController.text.isNotEmpty && !suggestions.contains(searchController.text))
@@ -601,9 +594,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                       decoration: BoxDecoration(
-                        color: CustomColors.brandPrimary.withOpacity(0.05),
+                        color: CustomColors.brandPrimary.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(10.r),
-                        border: Border.all(color: CustomColors.brandPrimary.withOpacity(0.1)),
+                        border: Border.all(color: CustomColors.brandPrimary.withValues(alpha: 0.1)),
                       ),
                       child: Row(
                         children: [
@@ -612,7 +605,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                           Expanded(
                             child: Text(
                               'Create new: "${searchController.text}"',
-                              style: CustomFonts.bodyMedium.copyWith(color: CustomColors.deepSlate, fontWeight: FontWeight.bold),
+                              style: CustomFonts.black14w700,
                             ),
                           ),
                         ],
@@ -634,8 +627,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
                         decoration: BoxDecoration(color: CustomColors.backgroundLight, borderRadius: BorderRadius.circular(6.r)),
                         child: const Icon(Icons.circle_outlined, size: 14, color: CustomColors.textSecondary),
                       ),
-                      title: Text(item, style: CustomFonts.bodyMedium),
-                      hoverColor: CustomColors.brandCyan.withOpacity(0.05),
+                      title: Text(item, style: CustomFonts.grey14w400),
+                      hoverColor: CustomColors.brandCyan.withValues(alpha: 0.05),
                       onTap: () {
                         controller.text = item;
                         onSelected(item);
@@ -657,7 +650,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        Text(label, style: CustomFonts.black14w600),
         SizedBox(height: 10.h),
         GestureDetector(
           onTap: onTap,
@@ -685,7 +678,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                         child: const Icon(Icons.add_a_photo_outlined, color: CustomColors.deepSlate),
                       ),
                       SizedBox(height: 12.h),
-                      Text("Tap to upload", style: CustomFonts.bodySmall),
+                      Text("Tap to upload", style: CustomFonts.grey13w500),
                     ],
                   )
                 : null,
@@ -696,7 +689,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _sectionTitle(String title) {
-    return Text(title, style: CustomFonts.headlineSmall);
+    return Text(title, style: CustomFonts.black18w600);
   }
 
   Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {

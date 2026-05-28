@@ -52,11 +52,11 @@ class _PatientManagementState extends State<PatientManagement> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Client Database", style: CustomFonts.h1),
+        Text("Client Database", style: CustomFonts.black26w700),
         SizedBox(height: 6.h),
         Text(
           "Unified view of all patients across your clinic network.",
-          style: CustomFonts.bodySm,
+          style: CustomFonts.grey13w500,
         ),
       ],
     );
@@ -92,8 +92,8 @@ class _PatientManagementState extends State<PatientManagement> {
               child: Icon(icon, color: color, size: 20.sp),
             ),
             SizedBox(height: AppSpacing.md),
-            Text(value, style: CustomFonts.h2),
-            Text(title, style: CustomFonts.caption),
+            Text(value, style: CustomFonts.black20w600),
+            Text(title, style: CustomFonts.grey12w400),
           ],
         ),
       ),
@@ -116,10 +116,10 @@ class _PatientManagementState extends State<PatientManagement> {
             child: TextField(
               controller: _searchController,
               onChanged: (val) => setState(() {}),
-              style: CustomFonts.body,
+              style: CustomFonts.grey14w400,
               decoration: InputDecoration(
                 hintText: "Search by name, ID, or phone...",
-                hintStyle: CustomFonts.bodySm,
+                hintStyle: CustomFonts.grey13w500,
                 prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.textTertiary, size: 20),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
@@ -162,7 +162,7 @@ class _PatientManagementState extends State<PatientManagement> {
       ),
       child: Row(
         children: [
-          Text(label, style: CustomFonts.label.copyWith(fontSize: 12.sp, fontWeight: FontWeight.w500)),
+          Text(label, style: CustomFonts.black14w600.copyWith(fontSize: 12.sp, fontWeight: FontWeight.w500)),
           SizedBox(width: 8.w),
           const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: CustomColors.textTertiary),
         ],
@@ -181,7 +181,7 @@ class _PatientManagementState extends State<PatientManagement> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Patient Records", style: CustomFonts.h3),
+                Text("Patient Records", style: CustomFonts.black18w600),
                 OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.file_download_outlined, size: 18),
@@ -224,8 +224,8 @@ class _PatientManagementState extends State<PatientManagement> {
                 mainAxisAlignment: MainAxisAlignment.center, 
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: [
-                  Text("Bessie Cooper", style: CustomFonts.label),
-                  Text("bessie.c@example.com", style: CustomFonts.caption),
+                  Text("Bessie Cooper", style: CustomFonts.black14w600),
+                  Text("bessie.c@example.com", style: CustomFonts.grey12w400),
                 ],
               ),
             ],

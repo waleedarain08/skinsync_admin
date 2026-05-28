@@ -54,11 +54,11 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Booking Schedule", style: CustomFonts.h1),
+            Text("Booking Schedule", style: CustomFonts.black26w700),
             SizedBox(height: 6.h),
             Text(
               "Centralized booking management and real-time clinic capacity tracking.",
-              style: CustomFonts.bodySm,
+              style: CustomFonts.grey13w500,
             ),
           ],
         ),
@@ -103,8 +103,8 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.h3),
-                Text(title, style: CustomFonts.caption),
+                Text(value, style: CustomFonts.black18w600),
+                Text(title, style: CustomFonts.grey12w400),
               ],
             ),
           ],
@@ -122,12 +122,12 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Network Calendar", style: CustomFonts.h3),
+              Text("Network Calendar", style: CustomFonts.black18w600),
               Row(
                 children: [
                   _calendarAction(Icons.chevron_left_rounded),
                   SizedBox(width: AppSpacing.md),
-                  Text("October 2023", style: CustomFonts.label),
+                  Text("October 2023", style: CustomFonts.black14w600),
                   SizedBox(width: AppSpacing.md),
                   _calendarAction(Icons.chevron_right_rounded),
                 ],
@@ -163,10 +163,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
                   children: [
                     Text(
                       isCurrentMonth ? day.toString() : "",
-                      style: CustomFonts.caption.copyWith(
-                        color: isCurrentMonth ? CustomColors.textPrimary : CustomColors.textTertiary,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
+                      style: isSelected ? CustomFonts.black14w700 : (isCurrentMonth ? CustomFonts.black12w400 : CustomFonts.grey12w400),
                     ),
                     if (isCurrentMonth && (day == 15 || day == 20))
                       Container(
@@ -206,7 +203,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Today's Queue", style: CustomFonts.h3),
+          Text("Today's Queue", style: CustomFonts.black18w600),
           SizedBox(height: AppSpacing.xl),
           ListView.separated(
             shrinkWrap: true,
@@ -240,7 +237,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
             child: Center(
               child: Text(
                 "10:30", 
-                style: CustomFonts.label.copyWith(color: CustomColors.secondary, fontSize: 11.sp),
+                style: CustomFonts.secondary11w600,
               ),
             ),
           ),
@@ -249,8 +246,8 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Bessie Cooper", style: CustomFonts.label),
-                Text("HydraFacial • Glow NY", style: CustomFonts.caption),
+                Text("Bessie Cooper", style: CustomFonts.black14w600),
+                Text("HydraFacial • Glow NY", style: CustomFonts.grey12w400),
               ],
             ),
           ),
@@ -268,7 +265,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
         children: [
           Padding(
             padding: EdgeInsets.all(AppSpacing.xl),
-            child: Text("Registry Log", style: CustomFonts.h3),
+            child: Text("Registry Log", style: CustomFonts.black18w600),
           ),
           DataTable(
             columnSpacing: 40.w,
@@ -291,11 +288,11 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
   DataRow _appointmentRow(int index) {
     return DataRow(
       cells: [
-        DataCell(Text("Eleanor Pena", style: CustomFonts.label.copyWith(fontSize: 13.sp))),
-        const DataCell(Text("Glow MedSpa NY")),
-        const DataCell(Text("Laser Resurfacing")),
-        const DataCell(Text("Oct 28 • 02:00 PM")),
-        const DataCell(Text("Dr. Sarah Jenkins")),
+        DataCell(Text("Eleanor Pena", style: CustomFonts.black13w600)),
+        DataCell(Text("Glow MedSpa NY", style: CustomFonts.black14w400)),
+        DataCell(Text("Laser Resurfacing", style: CustomFonts.black14w400)),
+        DataCell(Text("Oct 28 • 02:00 PM", style: CustomFonts.black14w400)),
+        DataCell(Text("Dr. Sarah Jenkins", style: CustomFonts.black14w400)),
         DataCell(_statusBadge("Confirmed")),
       ],
     );

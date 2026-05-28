@@ -17,7 +17,7 @@ class RevenueTrendWidget extends StatelessWidget {
           Text("Revenue Trend (Last 6 Months)", style: CustomFonts.black20w600),
           SizedBox(height: 17.h),
           SizedBox(
-            height: 250,
+            height: 250.h,
             child: LineChart(
               LineChartData(
                 gridData: FlGridData(
@@ -26,12 +26,12 @@ class RevenueTrendWidget extends StatelessWidget {
                   getDrawingHorizontalLine: (value) => FlLine(
                     color: Colors.grey.shade300,
                     strokeWidth: 1,
-                    dashArray: [5, 5],
+                    dashArray: const [5, 5],
                   ),
                   getDrawingVerticalLine: (value) => FlLine(
                     color: Colors.grey.shade300,
                     strokeWidth: 1,
-                    dashArray: [5, 5],
+                    dashArray: const [5, 5],
                   ),
                 ),
                 titlesData: FlTitlesData(
@@ -47,7 +47,7 @@ class RevenueTrendWidget extends StatelessWidget {
                             value == 240000) {
                           return Text(
                             value.toInt().toString(),
-                            style: const TextStyle(fontSize: 12),
+                            style: CustomFonts.black12w400,
                           );
                         }
                         return const SizedBox.shrink();

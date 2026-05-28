@@ -44,11 +44,11 @@ class _ProductManagementState extends State<ProductManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Inventory & Products", style: CustomFonts.textMain32w700),
+            Text("Inventory & Products", style: CustomFonts.black32w700),
             SizedBox(height: 8.h),
             Text(
               "Manage retail products and professional supplies across all clinics.",
-              style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
+              style: CustomFonts.grey14w400,
             ),
           ],
         ),
@@ -93,15 +93,15 @@ class _ProductManagementState extends State<ProductManagement> {
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10.r)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)),
               child: Icon(icon, color: color, size: 24.sp),
             ),
             SizedBox(width: 16.w),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.textMain20w600),
-                Text(title, style: CustomFonts.textMuted12w400),
+                Text(value, style: CustomFonts.black20w600),
+                Text(title, style: CustomFonts.grey12w400),
               ],
             ),
           ],
@@ -120,7 +120,7 @@ class _ProductManagementState extends State<ProductManagement> {
             child: CupertinoSearchTextField(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               placeholder: "Search products by name, SKU or brand...",
-              backgroundColor: CustomColors.softChampagne.withOpacity(0.5),
+              backgroundColor: CustomColors.softChampagne.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(10.r),
             ),
           ),
@@ -142,8 +142,8 @@ class _ProductManagementState extends State<ProductManagement> {
       ),
       child: Row(
         children: [
-          Text("$label: ", style: TextStyle(color: CustomColors.textLight, fontSize: 13.sp)),
-          Text(value, style: TextStyle(color: CustomColors.textDark, fontWeight: FontWeight.w600, fontSize: 13.sp)),
+          Text("$label: ", style: CustomFonts.white13w500),
+          Text(value, style: CustomFonts.black13w600),
           Icon(Icons.keyboard_arrow_down, size: 18.sp),
         ],
       ),
@@ -188,11 +188,11 @@ class _ProductManagementState extends State<ProductManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("SKU-9283${index}", style: TextStyle(color: CustomColors.primaryGold, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                Text("SKU-9283${index}", style: CustomFonts.gold10w600),
                 SizedBox(height: 4.h),
                 Text("Advanced Night Repair", style: CustomFonts.black16w600, maxLines: 1, overflow: TextOverflow.ellipsis),
                 SizedBox(height: 4.h),
-                Text("Skincare • 50ml", style: TextStyle(color: CustomColors.textLight, fontSize: 12.sp)),
+                Text("Skincare • 50ml", style: CustomFonts.white12w400),
                 SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -200,7 +200,7 @@ class _ProductManagementState extends State<ProductManagement> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Stock", style: TextStyle(color: CustomColors.textLight, fontSize: 10.sp)),
+                        Text("Stock", style: CustomFonts.white10w600),
                         Text("45 Units", style: CustomFonts.black14w600),
                       ],
                     ),
@@ -220,12 +220,12 @@ class _ProductManagementState extends State<ProductManagement> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: isLow ? CustomColors.errorRed.withOpacity(0.1) : CustomColors.successGreen.withOpacity(0.1),
+        color: isLow ? CustomColors.errorRed.withValues(alpha: 0.1) : CustomColors.successGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4.r),
       ),
       child: Text(
         status,
-        style: TextStyle(color: isLow ? CustomColors.errorRed : CustomColors.successGreen, fontSize: 10.sp, fontWeight: FontWeight.bold),
+        style: isLow ? CustomFonts.red10w600 : CustomFonts.success10w600,
       ),
     );
   }

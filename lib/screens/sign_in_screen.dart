@@ -123,22 +123,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 32.h),
         Text(
           "SkinSync AI",
-          style: CustomFonts.h1.copyWith(
-            letterSpacing: 2, 
-            fontSize: 40.sp,
-            fontWeight: FontWeight.w900,
-            color: CustomColors.textPrimary,
-          ),
+          style: CustomFonts.black40w900ls2,
         ),
         SizedBox(height: 8.h),
         Text(
           "ADMIN PANEL",
-          style: CustomFonts.overline.copyWith(
-            letterSpacing: 3, 
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w800,
-            color: CustomColors.primary,
-          ),
+          style: CustomFonts.primary14w800ls3,
         ),
       ],
     );
@@ -178,9 +168,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       key: const ValueKey('login'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Welcome Back", style: CustomFonts.h2),
+        Text("Welcome Back", style: CustomFonts.black20w600),
         SizedBox(height: 8.h),
-        Text("Enter your credentials to access the admin panel.", style: CustomFonts.bodySm),
+        Text("Enter your credentials to access the admin panel.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
         _buildInputField(
           label: "Email Address",
@@ -207,7 +197,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             _buildCheckbox(),
             TextButton(
               onPressed: () => setCurrentScreen(AuthScreen.forgetPassword),
-              child: Text("Forgot Password?", style: CustomFonts.label.copyWith(color: CustomColors.primary)),
+              child: Text("Forgot Password?", style: CustomFonts.primary14w600),
             ),
           ],
         ),
@@ -228,9 +218,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           style: IconButton.styleFrom(backgroundColor: CustomColors.surfaceMuted),
         ),
         SizedBox(height: 24.h),
-        Text("Reset Password", style: CustomFonts.h2),
+        Text("Reset Password", style: CustomFonts.black20w600),
         SizedBox(height: 8.h),
-        Text("Enter your email and we'll send you an OTP code.", style: CustomFonts.bodySm),
+        Text("Enter your email and we'll send you an OTP code.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
         _buildInputField(
           label: "Registered Email",
@@ -250,9 +240,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       key: const ValueKey('otp'),
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text("Verify Identity", style: CustomFonts.h2),
+        Text("Verify Identity", style: CustomFonts.black20w600),
         SizedBox(height: 8.h),
-        Text("We've sent a 6-digit code to your email.", style: CustomFonts.bodySm),
+        Text("We've sent a 6-digit code to your email.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
         Pinput(
           controller: _otpController,
@@ -260,7 +250,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           defaultPinTheme: PinTheme(
             width: 56.w,
             height: 56.w,
-            textStyle: CustomFonts.h3,
+            textStyle: CustomFonts.black18w600,
             decoration: BoxDecoration(
               color: CustomColors.surfaceMuted,
               borderRadius: BorderRadius.circular(12.r),
@@ -270,7 +260,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           focusedPinTheme: PinTheme(
             width: 56.w,
             height: 56.w,
-            textStyle: CustomFonts.h3,
+            textStyle: CustomFonts.black18w600,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12.r),
@@ -283,7 +273,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 16.h),
         TextButton(
           onPressed: _handleForgotPassword,
-          child: Text("Didn't receive code? Resend", style: CustomFonts.label.copyWith(color: CustomColors.primary)),
+          child: Text("Didn't receive code? Resend", style: CustomFonts.primary14w600),
         ),
       ],
     );
@@ -294,9 +284,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       key: const ValueKey('reset'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Create New Password", style: CustomFonts.h2),
+        Text("Create New Password", style: CustomFonts.black20w600),
         SizedBox(height: 8.h),
-        Text("Your new password must be different from previous ones.", style: CustomFonts.bodySm),
+        Text("Your new password must be different from previous ones.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
         ValueListenableBuilder(
           valueListenable: _obscureNewPassword,
@@ -342,13 +332,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.label),
+        Text(label, style: CustomFonts.black14w600),
         SizedBox(height: 10.h),
         TextFormField(
           controller: controller,
           obscureText: obscureText ?? false,
           validator: validator,
-          style: CustomFonts.body,
+          style: CustomFonts.grey14w400,
           decoration: InputDecoration(
             prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.textTertiary),
             hintText: hint,
@@ -380,7 +370,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           ),
         ),
         SizedBox(width: 8.w),
-        Text("Keep me signed in", style: CustomFonts.body),
+        Text("Keep me signed in", style: CustomFonts.grey14w400),
       ],
     );
   }

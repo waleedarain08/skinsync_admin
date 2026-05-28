@@ -53,7 +53,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
             /// Screen Title
             Text(
               'Static Content',
-              style: CustomFonts.textMain24w700,
+              style: CustomFonts.black24w700,
             ),
 
             SizedBox(height: 12.h),
@@ -94,7 +94,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                               child: Text(
                                 tabs[index],
                                 textAlign: TextAlign.center,
-                                style: isActive ? CustomFonts.textMain14w600 : CustomFonts.textMuted14w400,
+                                style: isActive ? CustomFonts.black14w600 : CustomFonts.grey14w400,
                               ),
                             ),
                           ),
@@ -108,7 +108,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                   /// Section Title
                   Text(
                     titles[selectedIndex]!,
-                    style: CustomFonts.textMain16w600,
+                    style: CustomFonts.black16w600,
                   ),
 
                   SizedBox(height: 12.h),

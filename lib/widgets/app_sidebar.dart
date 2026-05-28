@@ -56,38 +56,32 @@ class AppSidebar extends StatelessWidget {
         width: 80.w,
         decoration: const BoxDecoration(
           color: CustomColors.sidebar,
-          border: Border(right: BorderSide(color: CustomColors.sidebarBorder, width: 1)),
+          border: Border(right: BorderSide(color: CustomColors.borderLight, width: 1)),
         ),
-        padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-        iconTheme: IconThemeData(color: CustomColors.textSecondary, size: 24.sp),
-        selectedIconTheme: IconThemeData(color: Colors.white, size: 24.sp),
-        hoverIconTheme: IconThemeData(color: CustomColors.primary, size: 24.sp),
-        textStyle: CustomFonts.sidebarItem,
-        selectedTextStyle: CustomFonts.sidebarItemActive,
-        hoverTextStyle: CustomFonts.sidebarItemActive.copyWith(color: CustomColors.primary),
-        hoverColor: CustomColors.hover,
-        itemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
-        selectedItemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
+        padding: EdgeInsets.symmetric(vertical: 24.h),
+        iconTheme: IconThemeData(color: CustomColors.textSecondary, size: 20.sp),
+        selectedIconTheme: IconThemeData(color: CustomColors.primary, size: 20.sp),
+        hoverIconTheme: IconThemeData(color: CustomColors.primary, size: 20.sp),
+        textStyle: CustomFonts.sidebarText,
+        selectedTextStyle: CustomFonts.sidebarTextSelected,
+        hoverTextStyle: CustomFonts.sidebarTextSelected,
+        hoverColor: CustomColors.primary.withValues(alpha: 0.05),
+        itemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+        selectedItemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
         itemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
         selectedItemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-        itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(8.r)),
+        itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(12.r)),
         selectedItemDecoration: BoxDecoration(
-          color: CustomColors.primary,
-          borderRadius: BorderRadius.circular(8.r),
-          boxShadow: [
-            BoxShadow(
-              color: CustomColors.primary.withValues(alpha: 0.15),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: CustomColors.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: CustomColors.primary.withValues(alpha: 0.2), width: 1),
         ),
       );
 
   static SidebarXTheme get extendedTheme => collapsedTheme.copyWith(
-        width: 260.w,
-        itemTextPadding: EdgeInsets.only(left: 12.w),
-        selectedItemTextPadding: EdgeInsets.only(left: 12.w),
+        width: 280.w,
+        itemTextPadding: EdgeInsets.only(left: 16.w),
+        selectedItemTextPadding: EdgeInsets.only(left: 16.w),
       );
 
   @override
@@ -96,15 +90,13 @@ class AppSidebar extends StatelessWidget {
       controller: controller,
       theme: collapsedTheme,
       extendedTheme: extendedTheme,
-      animationDuration: const Duration(milliseconds: 250),
-      showToggleButton: false,
-      headerDivider: Padding(
-        padding: EdgeInsets.symmetric(vertical: 24.h),
-        child: const Divider(color: CustomColors.sidebarBorder, height: 1),
-      ),
-      separatorBuilder: _separatorBuilder,
-      headerBuilder: _headerBuilder,
-      footerBuilder: _footerBuilder,
+      animationDuration: const Duration(milliseconds: 300),
+      showToggleButton: true,
+      headerDivider: const SizedBox.shrink(),
+      footerDivider: Divider(color: CustomColors.sidebarBorder, height: 1.h, thickness: 1),
+      separatorBuilder: (context, index) => _separatorBuilder(context, index, controller),
+      headerBuilder: (context, extended) => _headerBuilder(context, extended),
+      toggleButtonBuilder: (context, extended) => _toggleButtonBuilder(context, extended, controller),
       items: _buildItems(),
     );
   }
@@ -126,103 +118,61 @@ class AppSidebar extends StatelessWidget {
     ];
   }
 
-  Widget _separatorBuilder(BuildContext context, int index) {
-    if (index == 0) return const _SectionLabel(title: 'NETWORK');
-    if (index == 3) return const _SectionLabel(title: 'OPERATIONS');
-    if (index == 6) return const _SectionLabel(title: 'FINANCIALS');
-    if (index == 8) return const _SectionLabel(title: 'SYSTEM');
+  Widget _separatorBuilder(BuildContext context, int index, SidebarXController controller) {
+    if (index == 0) return _SectionLabel(title: 'NETWORK', controller: controller);
+    if (index == 3) return _SectionLabel(title: 'OPERATIONS', controller: controller);
+    if (index == 6) return _SectionLabel(title: 'FINANCIALS', controller: controller);
+    if (index == 8) return _SectionLabel(title: 'SYSTEM', controller: controller);
     return SizedBox(height: 2.h);
   }
 
   Widget _headerBuilder(BuildContext context, bool extended) {
-    if (!extended) {
-      return Padding(
-        padding: EdgeInsets.symmetric(vertical: 24.h),
-        child: const _LogoBadge(size: 32),
-      );
-    }
-    return Padding(
-      padding: EdgeInsets.fromLTRB(24.w, 40.h, 24.w, 8.h),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      padding: EdgeInsets.symmetric(
+        vertical: 28.h,
+        horizontal: extended ? 24.w : 12.w,
+      ),
       child: Row(
+        mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
         children: [
-          const _LogoBadge(size: 56),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'SkinSync',
-                  style: CustomFonts.h3.copyWith(
-                    color: CustomColors.textPrimary,
-                    letterSpacing: -0.5,
-                    fontSize: 22.sp,
-                    fontWeight: FontWeight.w900,
+          _LogoBadge(size: extended ? 42 : 30),
+          if (extended) ...[
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'SkinSync',
+                    style: CustomFonts.black18w600lsNeg04,
                   ),
-                ),
-                Text(
-                  'ADMIN PANEL',
-                  style: CustomFonts.overline.copyWith(
-                    color: CustomColors.primary,
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
+                  Text(
+                    'ADMIN PANEL',
+                    style: CustomFonts.primary9w800ls1,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _footerBuilder(BuildContext context, bool extended) {
-    if (!extended) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: 24.h),
-        child: Icon(Icons.person_outline_rounded, color: CustomColors.textTertiary, size: 22.sp),
-      );
-    }
-    return Container(
-      margin: EdgeInsets.all(16.w),
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: CustomColors.backgroundLight,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: CustomColors.sidebarBorder),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 32.w,
-            height: 32.w,
-            decoration: BoxDecoration(
-              gradient: CustomColors.medicalGradient,
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Icon(Icons.person_rounded, color: CustomColors.surfaceWhite, size: 16.sp),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Alex MedSpa',
-                  style: CustomFonts.label.copyWith(fontSize: 12.sp),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  'Super Admin',
-                  style: CustomFonts.caption.copyWith(fontSize: 10.sp),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
+  Widget _toggleButtonBuilder(BuildContext context, bool extended, SidebarXController controller) {
+    return InkWell(
+      onTap: () => controller.toggleExtended(),
+      hoverColor: CustomColors.primary.withValues(alpha: 0.05),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 24.h),
+        child: Icon(
+          extended ? Icons.arrow_back_ios_new_rounded : Icons.arrow_forward_ios_rounded,
+          size: 18.sp,
+          color: CustomColors.textSecondary.withValues(alpha: 0.7),
+        ),
       ),
     );
   }
@@ -244,13 +194,23 @@ class _LogoBadge extends StatelessWidget {
 
 class _SectionLabel extends StatelessWidget {
   final String title;
-  const _SectionLabel({required this.title});
+  final SidebarXController controller;
+  const _SectionLabel({required this.title, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20.w, 20.h, 16.w, 10.h),
-      child: Text(title, style: CustomFonts.sidebarSection),
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        if (!controller.extended) return SizedBox(height: 16.h);
+        return Padding(
+          padding: EdgeInsets.fromLTRB(28.w, 24.h, 16.w, 8.h),
+          child: Text(
+            title,
+            style: CustomFonts.grey11w600ls12,
+          ),
+        );
+      },
     );
   }
 }

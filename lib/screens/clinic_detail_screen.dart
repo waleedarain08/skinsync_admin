@@ -99,7 +99,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final clinic = ref.watch(clinicViewModelProvider).selectedClinic;
 
     if (clinic == null) {
-      return const Scaffold(body: Center(child: Text("No Clinic Data Found")));
+      return Scaffold(body: Center(child: Text("No Clinic Data Found", style: CustomFonts.black16w400)));
     }
 
     final bool isMobile = context.isMobile;
@@ -107,7 +107,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     return Scaffold(
       backgroundColor: CustomColors.backgroundLight,
       appBar: AppBar(
-        title: Text("Clinic Detail", style: CustomFonts.headlineSmall),
+        title: Text("Clinic Detail", style: CustomFonts.black18w600),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
@@ -169,9 +169,9 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                           backgroundColor: CustomColors.deepSlate,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                           elevation: 4,
-                          shadowColor: CustomColors.deepSlate.withOpacity(0.3),
+                          shadowColor: CustomColors.deepSlate.withValues(alpha: 0.3),
                         ),
-                        child: Text("Save Changes", style: CustomFonts.bodyLarge.copyWith(color: Colors.white)),
+                        child: Text("Save Changes", style: CustomFonts.white16w400),
                       ),
                     ),
                   ],
@@ -225,13 +225,13 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                   children: [
                     Row(
                       children: [
-                        Flexible(child: Text(clinic.name ?? 'N/A', style: CustomFonts.headlineLarge, overflow: TextOverflow.ellipsis)),
+                        Flexible(child: Text(clinic.name ?? 'N/A', style: CustomFonts.black26w700, overflow: TextOverflow.ellipsis)),
                         SizedBox(width: 16.w),
                         _statusBadge(clinic.status ?? 'Active'),
                       ],
                     ),
                     SizedBox(height: 8.h),
-                    Text(clinic.address ?? 'N/A', style: CustomFonts.bodyLarge.copyWith(color: CustomColors.textSecondary)),
+                    Text(clinic.address ?? 'N/A', style: CustomFonts.grey16w400),
                     SizedBox(height: 16.h),
                     Wrap(
                       spacing: 12.w,
@@ -288,7 +288,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Phone Number", style: CustomFonts.textMain14w600),
+                  Text("Phone Number", style: CustomFonts.black14w600),
                   SizedBox(height: 10.h),
                   PhoneWidget(controller: _clinicPhoneController, readOnly: !_isEditMode),
                 ],
@@ -342,7 +342,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+          Text(title, style: CustomFonts.black16w700),
           SizedBox(height: 24.h),
           ...children,
         ],
@@ -360,10 +360,10 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             children: [
               Icon(icon, size: 18.sp, color: CustomColors.textSecondary),
               SizedBox(width: 12.w),
-              Text(label, style: CustomFonts.bodySmall),
+              Text(label, style: CustomFonts.grey13w500),
             ],
           ),
-          Flexible(child: Text(value, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis)),
+          Flexible(child: Text(value, style: CustomFonts.grey14w600, overflow: TextOverflow.ellipsis)),
         ],
       ),
     );
@@ -374,12 +374,12 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: isActive ? CustomColors.success.withOpacity(0.1) : CustomColors.error.withOpacity(0.1),
+        color: isActive ? CustomColors.success.withValues(alpha: 0.1) : CustomColors.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
         status.toUpperCase(),
-        style: TextStyle(color: isActive ? CustomColors.success : CustomColors.error, fontSize: 10.sp, fontWeight: FontWeight.bold),
+        style: isActive ? CustomFonts.success10w700 : CustomFonts.error10w700,
       ),
     );
   }
@@ -393,7 +393,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         children: [
           Icon(icon, size: 14.sp, color: CustomColors.textSecondary),
           SizedBox(width: 8.w),
-          Text(label, style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.w500)),
+          Text(label, style: CustomFonts.grey13w500),
         ],
       ),
     );

@@ -71,7 +71,7 @@ class _AppGradientButtonState extends State<AppGradientButton> {
                             Icon(widget.icon, color: CustomColors.surfaceWhite, size: 18.sp),
                             SizedBox(width: 10.w),
                           ],
-                          Text(widget.label, style: CustomFonts.button),
+                          Text(widget.label, style: CustomFonts.white14w600),
                         ],
                       ),
               ),

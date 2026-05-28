@@ -31,12 +31,12 @@ class BuildTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.label),
+        Text(label, style: CustomFonts.black14w600),
         SizedBox(height: 8),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
-          style: CustomFonts.body,
+          style: CustomFonts.grey14w400,
           keyboardType: keyboardType,
           validator: validator,
           readOnly: readOnly,

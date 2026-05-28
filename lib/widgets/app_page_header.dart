@@ -23,10 +23,10 @@ class AppPageHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: CustomFonts.h1),
+              Text(title, style: CustomFonts.black26w700),
               if (subtitle != null) ...[
                 SizedBox(height: 6.h),
-                Text(subtitle!, style: CustomFonts.bodySm),
+                Text(subtitle!, style: CustomFonts.grey13w500),
               ],
             ],
           ),

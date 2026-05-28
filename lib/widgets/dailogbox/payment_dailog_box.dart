@@ -32,7 +32,7 @@ class ReleasePaymentDialog extends StatelessWidget {
         children: [
           Text(
             "Please review the transaction details before releasing the funds to the clinic's wallet.",
-            style: CustomFonts.textMuted14w400,
+            style: CustomFonts.grey14w400,
           ),
           SizedBox(height: 24.h),
           Container(
@@ -52,8 +52,8 @@ class ReleasePaymentDialog extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Total Amount", style: CustomFonts.textMain16w600),
-                    Text(amount, style: CustomFonts.textMain20w600.copyWith(color: CustomColors.success)),
+                    Text("Total Amount", style: CustomFonts.black16w600),
+                    Text(amount, style: CustomFonts.black20w600.copyWith(color: CustomColors.success)),
                   ],
                 ),
               ],
@@ -61,11 +61,11 @@ class ReleasePaymentDialog extends StatelessWidget {
           ),
           if (feedbackMessage != null) ...[
             SizedBox(height: 24.h),
-            Text("Patient Feedback", style: CustomFonts.textMain16w600),
+            Text("Patient Feedback", style: CustomFonts.black16w600),
             SizedBox(height: 8.h),
             Text(
               feedbackMessage!,
-              style: CustomFonts.textMain14w400.copyWith(fontStyle: FontStyle.italic),
+              style: CustomFonts.black14w400.copyWith(fontStyle: FontStyle.italic),
             ),
           ],
         ],
@@ -87,8 +87,8 @@ class ReleasePaymentDialog extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: CustomFonts.textMuted13w500),
-          Text(value, style: CustomFonts.textMain14w600),
+          Text(label, style: CustomFonts.grey13w500),
+          Text(value, style: CustomFonts.black14w600),
         ],
       ),
     );

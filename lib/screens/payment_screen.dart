@@ -2,8 +2,6 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import '../widgets/dailogbox/payment_dailog_box.dart';
 
@@ -37,11 +35,11 @@ class PaymentScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Payment Management", style: CustomFonts.textMain32w700),
+        Text("Payment Management", style: CustomFonts.black26w700),
         SizedBox(height: 8.h),
         Text(
           "Manage financial flows, transaction disputes, and clinic payouts.",
-          style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
+          style: CustomFonts.grey14w400,
         ),
       ],
     );
@@ -69,15 +67,15 @@ class PaymentScreen extends StatelessWidget {
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12.r)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12.r)),
               child: Icon(icon, color: color, size: 24.sp),
             ),
             SizedBox(width: 16.w),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.textMain20w600),
-                Text(title, style: CustomFonts.textMuted12w400),
+                Text(value, style: CustomFonts.black20w600),
+                Text(title, style: CustomFonts.grey12w400),
               ],
             ),
           ],
@@ -97,8 +95,8 @@ class PaymentScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Pending Payout Releases", style: CustomFonts.textMain20w600),
-                Text("8 Actions Required", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.warning)),
+                Text("Pending Payout Releases", style: CustomFonts.black20w600),
+                Text("8 Actions Required", style: CustomFonts.warning14w600),
               ],
             ),
           ),
@@ -128,11 +126,11 @@ class PaymentScreen extends StatelessWidget {
   DataRow _pendingPayoutRow(BuildContext context) {
     return DataRow(
       cells: [
-        const DataCell(Text('TXN-82910')),
-        const DataCell(Text('Glow MedSpa NY')),
-        const DataCell(Text('Sarah Jenkins')),
-        DataCell(Text('\$450.00', style: CustomFonts.black14w600.copyWith(color: CustomColors.successGreen))),
-        const DataCell(Text('Oct 28, 2023')),
+        DataCell(Text('TXN-82910', style: CustomFonts.black14w400)),
+        DataCell(Text('Glow MedSpa NY', style: CustomFonts.black14w400)),
+        DataCell(Text('Sarah Jenkins', style: CustomFonts.black14w400)),
+        DataCell(Text('\$450.00', style: CustomFonts.success14w600)),
+        DataCell(Text('Oct 28, 2023', style: CustomFonts.black14w400)),
         DataCell(
           ElevatedButton(
             onPressed: () {
@@ -152,7 +150,7 @@ class PaymentScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
               minimumSize: Size(0, 36.h),
             ),
-            child: const Text("Release", style: TextStyle(fontSize: 12)),
+            child: Text("Release", style: CustomFonts.white12w600),
           ),
         ),
       ],
@@ -167,7 +165,7 @@ class PaymentScreen extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text("Payout History", style: CustomFonts.textMain20w600),
+            child: Text("Payout History", style: CustomFonts.black20w600),
           ),
           SizedBox(
             height: 400.h,
@@ -194,15 +192,15 @@ class PaymentScreen extends StatelessWidget {
   DataRow _payoutHistoryRow() {
     return DataRow(
       cells: [
-        const DataCell(Text('REF-001928')),
-        const DataCell(Text('Radiance Beauty')),
-        const DataCell(Text('\$2,800.00')),
-        const DataCell(Text('Oct 24, 2023')),
+        DataCell(Text('REF-001928', style: CustomFonts.black14w400)),
+        DataCell(Text('Radiance Beauty', style: CustomFonts.black14w400)),
+        DataCell(Text('\$2,800.00', style: CustomFonts.black14w400)),
+        DataCell(Text('Oct 24, 2023', style: CustomFonts.black14w400)),
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.successGreen.withOpacity(0.1), borderRadius: BorderRadius.circular(20.r)),
-            child: Text("Released", style: TextStyle(color: CustomColors.successGreen, fontSize: 11.sp, fontWeight: FontWeight.bold)),
+            decoration: BoxDecoration(color: CustomColors.successGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
+            child: Text("Released", style: CustomFonts.success14w600), // Updated to a static style
           ),
         ),
       ],

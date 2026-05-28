@@ -61,12 +61,12 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerPr
                   child: Icon(Icons.auto_awesome_rounded, size: 48.sp, color: CustomColors.surfaceWhite),
                 ),
                 SizedBox(height: 32.h),
-                Text('Coming Soon', style: CustomFonts.h1),
+                Text('Coming Soon', style: CustomFonts.black26w700),
                 SizedBox(height: 12.h),
                 Text(
                   "We're crafting an elegant experience for this module.\nStay tuned for the unveiling.",
                   textAlign: TextAlign.center,
-                  style: CustomFonts.bodyLg.copyWith(color: CustomColors.textSecondary),
+                  style: CustomFonts.black16w400.copyWith(color: CustomColors.textSecondary),
                 ),
                 SizedBox(height: 32.h),
                 Container(
@@ -76,7 +76,7 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerPr
                     borderRadius: BorderRadius.circular(AppRadius.full),
                     border: Border.all(color: CustomColors.secondary.withValues(alpha: 0.1)),
                   ),
-                  child: Text('PREMIUM ACCESS', style: CustomFonts.label.copyWith(color: CustomColors.secondary, fontSize: 11.sp)),
+                  child: Text('PREMIUM ACCESS', style: CustomFonts.black14w600.copyWith(color: CustomColors.secondary, fontSize: 11.sp)),
                 ),
               ],
             ),

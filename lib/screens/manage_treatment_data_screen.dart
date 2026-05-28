@@ -28,7 +28,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          title: Text("Manage Network Taxonomy", style: CustomFonts.textMain20w600),
+          title: Text("Manage Network Taxonomy", style: CustomFonts.black20w600),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: CustomColors.textMain),
             onPressed: () => context.pop(),
@@ -163,9 +163,9 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               label: Text(item),
               onDeleted: () => _showDeleteConfirm(context, item, () => viewModel.deleteMaterial(item)),
               deleteIcon: const Icon(Icons.close, size: 16),
-              labelStyle: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary),
-              backgroundColor: CustomColors.brandPrimary.withOpacity(0.05),
-              side: BorderSide(color: CustomColors.brandPrimary.withOpacity(0.1)),
+              labelStyle: CustomFonts.primary14w600,
+              backgroundColor: CustomColors.brandPrimary.withValues(alpha: 0.05),
+              side: BorderSide(color: CustomColors.brandPrimary.withValues(alpha: 0.1)),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
             )).toList(),
           ),
@@ -205,13 +205,13 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                     width: 40.w,
                     height: 40.w,
                     decoration: BoxDecoration(
-                      color: CustomColors.brandPurple.withOpacity(0.1),
+                      color: CustomColors.brandPurple.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: const Icon(Icons.auto_awesome_motion_rounded, color: CustomColors.brandPurple),
                   ),
-                  title: Text(group.name, style: CustomFonts.textMain16w600),
-                  subtitle: Text("${group.treatmentNames.length} combined treatments", style: CustomFonts.textMuted12w400),
+                  title: Text(group.name, style: CustomFonts.black16w600),
+                  subtitle: Text("${group.treatmentNames.length} combined treatments", style: CustomFonts.grey12w400),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -246,7 +246,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                               label: Text(t),
                               backgroundColor: CustomColors.surfaceGhost,
                               side: BorderSide(color: Colors.grey[200]!),
-                              labelStyle: CustomFonts.textMain12w600,
+                              labelStyle: CustomFonts.black12w600,
                             )).toList(),
                           ),
                           SizedBox(height: 8.h),
@@ -267,7 +267,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: CustomFonts.textMain18w600),
+        Text(title, style: CustomFonts.black18w600),
         ElevatedButton.icon(
           onPressed: onAdd,
           icon: const Icon(Icons.add, size: 18),
@@ -306,8 +306,8 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               ? Image.network(icon, errorBuilder: (_, __, ___) => const Icon(Icons.category_outlined)) 
               : const Icon(Icons.category_outlined, color: CustomColors.brandPrimary),
         ),
-        title: Text(name, style: CustomFonts.textMain16w600),
-        subtitle: Text("$childrenCount sub-items", style: CustomFonts.textMuted12w400),
+        title: Text(name, style: CustomFonts.black16w600),
+        subtitle: Text("$childrenCount sub-items", style: CustomFonts.grey12w400),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -343,7 +343,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                         ? Image.network(child.icon!, errorBuilder: (_, __, ___) => const Icon(Icons.subdirectory_arrow_right, size: 16)) 
                         : const Icon(Icons.subdirectory_arrow_right, size: 16, color: CustomColors.textMuted),
                   ),
-                  title: Text(child.name, style: CustomFonts.textMain14w400),
+                  title: Text(child.name, style: CustomFonts.black14w400),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -460,7 +460,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                 hintText: "e.g. Skin Glow Package",
               ),
               SizedBox(height: 24.h),
-              Text("Add Treatments", style: CustomFonts.textMain14w600),
+              Text("Add Treatments", style: CustomFonts.black14w600),
               SizedBox(height: 10.h),
               SearchAnchor(
                 viewHintText: "Search treatments...",
@@ -498,9 +498,9 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                   spacing: 8.w,
                   runSpacing: 8.h,
                   children: selectedTreatments.map((t) => Chip(
-                    label: Text(t, style: TextStyle(fontSize: 11.sp)),
+                    label: Text(t, style: CustomFonts.black11w400),
                     onDeleted: () => setState(() => selectedTreatments.remove(t)),
-                    backgroundColor: CustomColors.brandPrimary.withOpacity(0.05),
+                    backgroundColor: CustomColors.brandPrimary.withValues(alpha: 0.05),
                     deleteIconColor: CustomColors.brandPrimary,
                   )).toList(),
                 ),
@@ -530,7 +530,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
       builder: (context) => StandardDialog(
         title: "Confirm Delete",
         width: 400.w,
-        content: Text("Are you sure you want to delete '$name'? This action is irreversible.", style: CustomFonts.textMain14w400),
+        content: Text("Are you sure you want to delete '$name'? This action is irreversible.", style: CustomFonts.black14w400),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           ElevatedButton(

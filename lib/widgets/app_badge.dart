@@ -18,7 +18,7 @@ class AppBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (bg, fg) = _colors();
+    final (bg, fg, textStyle) = _badgeStyle();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
@@ -35,33 +35,29 @@ class AppBadge extends StatelessWidget {
           ],
           Text(
             label,
-            style: CustomFonts.caption.copyWith(
-              color: fg,
-              fontWeight: FontWeight.w600,
-              fontSize: 11.sp,
-            ),
+            style: textStyle,
           ),
         ],
       ),
     );
   }
 
-  (Color, Color) _colors() {
+  (Color, Color, TextStyle) _badgeStyle() {
     switch (variant) {
       case AppBadgeVariant.success:
-        return (CustomColors.successBg, CustomColors.success);
+        return (CustomColors.successBg, CustomColors.success, CustomFonts.success11w600);
       case AppBadgeVariant.error:
-        return (CustomColors.errorBg, CustomColors.error);
+        return (CustomColors.errorBg, CustomColors.error, CustomFonts.error11w600);
       case AppBadgeVariant.warning:
-        return (CustomColors.warningBg, CustomColors.warning);
+        return (CustomColors.warningBg, CustomColors.warning, CustomFonts.warning11w600);
       case AppBadgeVariant.info:
-        return (CustomColors.infoBg, CustomColors.info);
+        return (CustomColors.infoBg, CustomColors.info, CustomFonts.primary11w600);
       case AppBadgeVariant.brand:
-        return (CustomColors.selected, CustomColors.primary);
+        return (CustomColors.selected, CustomColors.primary, CustomFonts.primary11w600);
       case AppBadgeVariant.secondary:
-        return (CustomColors.primarySoft, CustomColors.secondary);
+        return (CustomColors.primarySoft, CustomColors.secondary, CustomFonts.secondary11w600);
       case AppBadgeVariant.neutral:
-        return (CustomColors.surfaceMuted, CustomColors.textSecondary);
+        return (CustomColors.surfaceMuted, CustomColors.textSecondary, CustomFonts.grey11w600);
     }
   }
 }

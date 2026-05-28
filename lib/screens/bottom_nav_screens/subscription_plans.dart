@@ -64,11 +64,11 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Subscription Models", style: CustomFonts.h1),
+            Text("Subscription Models", style: CustomFonts.black26w700),
             SizedBox(height: 6.h),
             Text(
               "Define tiers, commissions, and capacity limits for your clinic network.",
-              style: CustomFonts.bodySm,
+              style: CustomFonts.grey13w500,
             ),
           ],
         ),
@@ -88,17 +88,17 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     return ListView(
       children: [
         if (freePlan != null) ...[
-          Text("System Default Tier", style: CustomFonts.label.copyWith(color: CustomColors.brandPurple)),
+          Text("System Default Tier", style: CustomFonts.purple14w600),
           SizedBox(height: AppSpacing.md),
           _buildFreePlanCard(freePlan),
           SizedBox(height: AppSpacing.xxxl),
         ],
-        Text("Custom Subscription Tiers", style: CustomFonts.label),
+        Text("Custom Subscription Tiers", style: CustomFonts.black14w600),
         SizedBox(height: AppSpacing.md),
         if (paidPlans.isEmpty)
           BorderdContainerWidget(
             padding: EdgeInsets.all(AppSpacing.xxxl),
-            child: Center(child: Text("No custom tiers configured.", style: CustomFonts.bodySm)),
+            child: Center(child: Text("No custom tiers configured.", style: CustomFonts.grey13w500)),
           )
         else
           GridView.builder(
@@ -130,7 +130,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(plan.name, style: CustomFonts.h3),
+              Text(plan.name, style: CustomFonts.black18w600),
               const AppBadge(label: "SYSTEM DEFAULT", variant: AppBadgeVariant.info),
             ],
           ),
@@ -139,9 +139,9 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text("\$0.00", style: CustomFonts.display.copyWith(color: CustomColors.primary, fontSize: 32.sp)),
+              Text("\$0.00", style: CustomFonts.primary32w700),
               SizedBox(width: 4.w),
-              Text(" / ${plan.durationMonths} months introductory", style: CustomFonts.caption),
+              Text(" / ${plan.durationMonths} months introductory", style: CustomFonts.grey12w400),
             ],
           ),
           SizedBox(height: AppSpacing.xl),
@@ -154,7 +154,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("CAPACITY LIMITS", style: CustomFonts.overline),
+                    Text("CAPACITY LIMITS", style: CustomFonts.secondary9w600),
                     SizedBox(height: 12.h),
                     _limitRow(Icons.person_pin_rounded, "Doctor Seats:", plan.unlimitedDoctors ? "Unlimited" : "${plan.doctorSeats}"),
                     SizedBox(height: 8.h),
@@ -167,7 +167,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("COMMISSION & FEES", style: CustomFonts.overline),
+                    Text("COMMISSION & FEES", style: CustomFonts.secondary9w600),
                     SizedBox(height: 12.h),
                     _limitRow(Icons.percent_rounded, "Standard Comm:", "${plan.standardBookingCommissionPercent}%"),
                     SizedBox(height: 8.h),
@@ -178,7 +178,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             ],
           ),
           SizedBox(height: AppSpacing.xl),
-          Text("INCLUDED FEATURES", style: CustomFonts.overline),
+          Text("INCLUDED FEATURES", style: CustomFonts.secondary9w600),
           SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: 24.w,
@@ -189,7 +189,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                 children: [
                   const Icon(Icons.check_rounded, color: CustomColors.success, size: 16),
                   SizedBox(width: 8.w),
-                  Expanded(child: Text(benefit.title ?? "", style: CustomFonts.bodySm)),
+                  Expanded(child: Text(benefit.title ?? "", style: CustomFonts.grey13w500)),
                 ],
               ),
             )).toList(),
@@ -219,7 +219,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(plan.name ?? "N/A", style: CustomFonts.h3),
+              Text(plan.name ?? "N/A", style: CustomFonts.black18w600),
               _statusBadge(plan.isActive),
             ],
           ),
@@ -229,15 +229,15 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text("\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}", 
-                style: CustomFonts.display.copyWith(color: CustomColors.primary, fontSize: 32.sp)),
+                style: CustomFonts.primary32w700),
               SizedBox(width: 4.w),
-              Text("/ month", style: CustomFonts.caption),
+              Text("/ month", style: CustomFonts.grey12w400),
             ],
           ),
           SizedBox(height: AppSpacing.xl),
           const Divider(),
           SizedBox(height: AppSpacing.xl),
-          Text("CAPACITY & FEES", style: CustomFonts.overline),
+          Text("CAPACITY & FEES", style: CustomFonts.secondary9w600),
           SizedBox(height: 12.h),
           _limitRow(
             Icons.person_pin_rounded, 
@@ -255,7 +255,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           SizedBox(height: 8.h),
           _limitRow(Icons.terminal_rounded, "Tech Fee:", "\$${plan.technologyFeePerTreatment}"),
           SizedBox(height: AppSpacing.xl),
-          Text("INCLUDED FEATURES", style: CustomFonts.overline),
+          Text("INCLUDED FEATURES", style: CustomFonts.secondary9w600),
           SizedBox(height: AppSpacing.md),
           Expanded(
             child: ListView.separated(
@@ -267,7 +267,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                   children: [
                     const Icon(Icons.check_rounded, color: CustomColors.success, size: 16),
                     SizedBox(width: 8.w),
-                    Expanded(child: Text(benefit.title ?? "", style: CustomFonts.bodySm)),
+                    Expanded(child: Text(benefit.title ?? "", style: CustomFonts.grey13w500)),
                   ],
                 );
               },
@@ -305,7 +305,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
       builder: (context) => StandardDialog(
         title: "Remove Tier",
         width: 400.w,
-        content: Text("Are you sure you want to remove the '${plan.name}' tier from your catalog?", style: CustomFonts.body),
+        content: Text("Are you sure you want to remove the '${plan.name}' tier from your catalog?", style: CustomFonts.grey14w400),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
           ElevatedButton(
@@ -326,9 +326,9 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
       children: [
         Icon(icon, size: 14.sp, color: CustomColors.textTertiary),
         SizedBox(width: 8.w),
-        Text(label, style: CustomFonts.caption),
+        Text(label, style: CustomFonts.grey12w400),
         const Spacer(),
-        Text(value, style: CustomFonts.label.copyWith(fontSize: 12.sp)),
+        Text(value, style: CustomFonts.black12w600),
       ],
     );
   }

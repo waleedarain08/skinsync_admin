@@ -61,7 +61,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         SizedBox(width: 12.w),
         Text(
           'Password & Security',
-          style: CustomFonts.textMain18w600,
+          style: CustomFonts.black18w600,
         ),
       ],
     );
@@ -157,16 +157,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           children: [
             Text(
               'Change Password',
-              style: TextStyle(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
+              style: CustomFonts.black16w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Keep your account secure with a strong password',
-              style: TextStyle(fontSize: 12.sp, color: Colors.grey[500]),
+              style: CustomFonts.grey12w400,
             ),
           ],
         ),
@@ -185,17 +181,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
+          style: CustomFonts.black14w500,
         ),
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
           obscureText: obscureText,
-          style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+          style: CustomFonts.black14w400,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
@@ -269,7 +261,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             ),
             child: Text(
               'Update Password',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+              style: CustomFonts.black14w500,
             ),
           ),
         ),
@@ -291,7 +283,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             ),
             child: Text(
               'Cancel',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+              style: CustomFonts.black14w500,
             ),
           ),
         ),

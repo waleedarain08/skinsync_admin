@@ -81,7 +81,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Phone Number", style: CustomFonts.textMain14w600),
+                        Text("Phone Number", style: CustomFonts.black14w600),
                         SizedBox(height: 8.h),
                         PhoneWidget(controller: _clinicPhoneController),
                       ],
@@ -169,7 +169,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
                   elevation: 0,
                   padding: EdgeInsets.symmetric(horizontal: 32.w),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                  textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                  textStyle: CustomFonts.grey14w400.copyWith(fontWeight: FontWeight.bold),
                 ),
                 child: Text(state.loading ? 'Registering...' : 'Register Clinic'),
               ),
@@ -184,7 +184,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.brandPrimary)),
         const Divider(),
       ],
     );
@@ -266,7 +266,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Phone Number", style: CustomFonts.textMain14w600),
+                        Text("Phone Number", style: CustomFonts.black14w600),
                         SizedBox(height: 8.h),
                         PhoneWidget(controller: _clinicPhoneController),
                       ],
@@ -317,7 +317,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
                   elevation: 0,
                   padding: EdgeInsets.symmetric(horizontal: 32.w),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                  textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                  textStyle: CustomFonts.grey14w400.copyWith(fontWeight: FontWeight.bold),
                 ),
                 child: Text(state.loading ? 'Saving...' : 'Save Changes'),
               ),
@@ -332,7 +332,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.brandPrimary)),
         const Divider(),
       ],
     );

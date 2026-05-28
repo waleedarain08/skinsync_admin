@@ -210,7 +210,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     return Scaffold(
       backgroundColor: CustomColors.backgroundLight,
       appBar: AppBar(
-        title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.headlineSmall),
+        title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.black18w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
           onPressed: () => context.pop(),
@@ -230,10 +230,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                   if (isSystemPlan) ...[
                     _sectionHeader("System Onboarding Settings"),
                     _formContainer(
-                      backgroundColor: CustomColors.brandPurple.withOpacity(0.05),
+                      backgroundColor: CustomColors.brandPurple.withValues(alpha: 0.05),
                       child: Column(
                         children: [
-                          Text("Configure the default free tier duration for newly onboarded clinics.", style: CustomFonts.bodyMedium),
+                          Text("Configure the default free tier duration for newly onboarded clinics.", style: CustomFonts.grey14w400),
                           SizedBox(height: 20.h),
                           BuildTextField(
                             label: "Trial Duration (Months)",
@@ -284,13 +284,13 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                            SizedBox(height: 24.h),
                            Row(
                              children: [
-                               Text("Plan Status: ", style: CustomFonts.textMain14w600),
+                               Text("Plan Status: ", style: CustomFonts.black14w600),
                                Switch.adaptive(
                                  value: _isActive, 
                                  onChanged: (val) => setState(() => _isActive = val),
                                  activeColor: CustomColors.success,
                                ),
-                               Text(_isActive ? "Active" : "Inactive", style: CustomFonts.bodySmall.copyWith(color: _isActive ? CustomColors.success : CustomColors.error)),
+                               Text(_isActive ? "Active" : "Inactive", style: _isActive ? CustomFonts.success13w500 : CustomFonts.error13w500),
                              ],
                            ),
                         ],
@@ -424,7 +424,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ..._planBenefits.map((benefit) => CheckboxListTile(
-                          title: Text(benefit.title ?? "", style: CustomFonts.bodyMedium),
+                          title: Text(benefit.title ?? "", style: CustomFonts.grey14w400),
                           value: benefit.enabled,
                           onChanged: (val) {
                             setState(() {
@@ -472,7 +472,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                         width: 160.w,
                         child: OutlinedButton(
                           onPressed: () => context.pop(),
-                          child: Text("Cancel", style: CustomFonts.bodyMedium),
+                          child: Text("Cancel", style: CustomFonts.grey14w400),
                         ),
                       ),
                       SizedBox(width: 24.w),
@@ -500,7 +500,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Target Availability", style: CustomFonts.textMain14w600),
+          Text("Target Availability", style: CustomFonts.black14w600),
           SizedBox(height: 12.h),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -515,7 +515,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                 items: ["All Clinics", "Specific Clinics"].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: CustomFonts.bodyMedium),
+                    child: Text(value, style: CustomFonts.grey14w400),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -529,7 +529,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
           ),
           if (_visibilityType == "Specific Clinics") ...[
             SizedBox(height: 24.h),
-            Text("Assign to Clinics", style: CustomFonts.textMain14w600),
+            Text("Assign to Clinics", style: CustomFonts.black14w600),
             SizedBox(height: 12.h),
             _buildClinicSelector(),
           ],
@@ -565,8 +565,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
             children: _selectedClinics.map((email) {
               final clinic = clinics.firstWhere((c) => c.email == email, orElse: () => clinics.first);
               return Chip(
-                label: Text(clinic.name ?? email, style: CustomFonts.bodySmall.copyWith(color: CustomColors.deepSlate)),
-                backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
+                label: Text(clinic.name ?? email, style: CustomFonts.black13w500),
+                backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
                 deleteIcon: const Icon(Icons.close, size: 14),
                 onDeleted: () => setState(() => _selectedClinics.remove(email)),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r), side: BorderSide.none),
@@ -582,7 +582,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: filteredClinics.isEmpty
-              ? Center(child: Padding(padding: EdgeInsets.all(16.w), child: Text("No clinics found", style: CustomFonts.bodyMedium)))
+              ? Center(child: Padding(padding: EdgeInsets.all(16.w), child: Text("No clinics found", style: CustomFonts.grey14w400)))
               : Scrollbar(
                   child: ListView.separated(
                     shrinkWrap: true,
@@ -592,8 +592,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       final clinic = filteredClinics[index];
                       final isSelected = _selectedClinics.contains(clinic.email);
                       return CheckboxListTile(
-                        title: Text(clinic.name ?? "N/A", style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                        subtitle: Text(clinic.email ?? "N/A", style: CustomFonts.bodySmall),
+                        title: Text(clinic.name ?? "N/A", style: CustomFonts.grey14w600),
+                        subtitle: Text(clinic.email ?? "N/A", style: CustomFonts.grey13w500),
                         value: isSelected,
                         onChanged: (val) {
                           setState(() {
@@ -620,7 +620,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
   Widget _sectionHeader(String title) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
-      child: Text(title, style: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+      child: Text(title, style: CustomFonts.black16w700),
     );
   }
 
@@ -642,7 +642,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
           activeColor: CustomColors.brandCyan,
         ),
         SizedBox(width: 8.w),
-        Text(label, style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+        Text(label, style: CustomFonts.grey13w600),
       ],
     );
   }

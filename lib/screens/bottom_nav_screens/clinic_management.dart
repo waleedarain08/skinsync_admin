@@ -7,8 +7,6 @@ import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
@@ -95,11 +93,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Clinic Partners", style: CustomFonts.h1),
+            Text("Clinic Partners", style: CustomFonts.black26w700),
             SizedBox(height: 6.h),
             Text(
               "Manage and monitor your MedSpa network performance.",
-              style: CustomFonts.bodySm,
+              style: CustomFonts.grey13w500,
             ),
           ],
         ),
@@ -144,8 +142,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.h3),
-                Text(title, style: CustomFonts.caption),
+                Text(value, style: CustomFonts.black18w600),
+                Text(title, style: CustomFonts.grey12w400),
               ],
             ),
           ],
@@ -241,10 +239,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             child: TextField(
               controller: controller,
               onChanged: (val) => setState(() {}),
-              style: CustomFonts.body,
+              style: CustomFonts.grey14w400,
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: CustomFonts.bodySm,
+                hintStyle: CustomFonts.grey13w500,
                 prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.textTertiary, size: 20),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
@@ -292,7 +290,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                   child: _buildModalSearchField(
                     label: "Region",
                     hint: "All Regions",
-                    suggestions: ["East Coast", "West Coast", "Midwest", "South"],
+                    suggestions: const ["East Coast", "West Coast", "Midwest", "South"],
                   ),
                 ),
                 SizedBox(width: AppSpacing.md),
@@ -300,7 +298,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                   child: _buildModalSearchField(
                     label: "Status",
                     hint: "All Status",
-                    suggestions: ["Active", "Inactive", "Pending"],
+                    suggestions: const ["Active", "Inactive", "Pending"],
                   ),
                 ),
               ],
@@ -309,7 +307,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             _buildModalSearchField(
               label: "Subscription Plan",
               hint: "All Plans",
-              suggestions: ["Basic", "Standard", "Premium", "Enterprise"],
+              suggestions: const ["Basic", "Standard", "Premium", "Enterprise"],
             ),
           ],
         ),
@@ -335,7 +333,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.label),
+        Text(label, style: CustomFonts.black14w600),
         SizedBox(height: 8.h),
         DropdownButtonFormField<String>(
           decoration: InputDecoration(
@@ -345,7 +343,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide.none),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           ),
-          items: suggestions.map((s) => DropdownMenuItem(value: s, child: Text(s, style: CustomFonts.body))).toList(),
+          items: suggestions.map((s) => DropdownMenuItem(value: s, child: Text(s, style: CustomFonts.grey14w400))).toList(),
           onChanged: (val) {},
         ),
       ],
@@ -367,7 +365,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.md),
-            child: Text(title, style: CustomFonts.h3),
+            child: Text(title, style: CustomFonts.black18w600),
           ),
           Expanded(
             child: isLoading
@@ -376,7 +374,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                     ? Center(
                         child: Padding(
                           padding: EdgeInsets.all(AppSpacing.xxl),
-                          child: Text("No entries found", style: CustomFonts.bodySm),
+                          child: Text("No entries found", style: CustomFonts.grey13w500),
                         ),
                       )
                     : Scrollbar(
@@ -415,7 +413,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       cells: [
         DataCell(_buildNameCell(clinic.name, clinic.logo)),
         DataCell(_buildContactCell(clinic.email, clinic.phone)),
-        DataCell(Text(clinic.address ?? 'N/A', style: CustomFonts.bodySm)),
+        DataCell(Text(clinic.address ?? 'N/A', style: CustomFonts.grey13w500)),
         DataCell(_buildPlanBadge(clinic.subscriptionPlan ?? "Standard")),
         DataCell(_buildStatsCell(clinic.totalAppointments?.toString() ?? "0", Icons.people_outline_rounded, clinic.rating?.toString() ?? "0", Icons.star_outline_rounded)),
         DataCell(_statusBadge(clinic.status ?? 'Active')),
@@ -452,7 +450,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       cells: [
         DataCell(_buildNameCell(clinic.name, clinic.logo)),
         DataCell(_buildContactCell(clinic.email, clinic.phone)),
-        DataCell(Text(clinic.address, style: CustomFonts.bodySm)),
+        DataCell(Text(clinic.address, style: CustomFonts.grey13w500)),
         DataCell(_invitationStatusBadge(clinic.invitationStatus)),
         DataCell(
           IconButton(
@@ -476,11 +474,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
           backgroundColor: CustomColors.primarySoft,
           backgroundImage: (logo != null && logo.isNotEmpty) ? NetworkImage(logo) : null,
           child: (logo == null || logo.isEmpty)
-              ? Text(name?[0] ?? "C", style: TextStyle(color: CustomColors.primary, fontSize: 12.sp, fontWeight: FontWeight.bold))
+              ? Text(name?[0] ?? "C", style: CustomFonts.primary12w700)
               : null,
         ),
         SizedBox(width: AppSpacing.sm),
-        Text(name ?? 'N/A', style: CustomFonts.label),
+        Text(name ?? 'N/A', style: CustomFonts.black14w600),
       ],
     );
   }
@@ -490,8 +488,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(email ?? 'N/A', style: CustomFonts.bodySm),
-        Text(phone ?? '', style: CustomFonts.caption),
+        Text(email ?? 'N/A', style: CustomFonts.grey13w500),
+        Text(phone ?? '', style: CustomFonts.grey12w400),
       ],
     );
   }
@@ -515,7 +513,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       children: [
         Icon(icon, size: 14.sp, color: CustomColors.textTertiary),
         SizedBox(width: 4.w),
-        Text(value, style: CustomFonts.caption),
+        Text(value, style: CustomFonts.grey12w400),
       ],
     );
   }

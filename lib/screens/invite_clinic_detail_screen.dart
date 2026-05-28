@@ -18,7 +18,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     final clinic = ref.watch(clinicViewModelProvider).selectedInviteClinic;
 
     if (clinic == null) {
-      return const Scaffold(body: Center(child: Text("No Clinic Data Found")));
+      return Scaffold(body: Center(child: Text("No Clinic Data Found", style: CustomFonts.black16w400)));
     }
 
     return Scaffold(
@@ -27,7 +27,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: Text("Prospect Clinic Detail", style: CustomFonts.headlineSmall),
+        title: Text("Prospect Clinic Detail", style: CustomFonts.black18w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
           onPressed: () => context.pop(),
@@ -85,13 +85,13 @@ class InviteClinicDetailScreen extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Text(clinic.name, style: CustomFonts.headlineLarge),
+                    Text(clinic.name, style: CustomFonts.black26w700),
                     SizedBox(width: 16.w),
                     _statusBadge(clinic.invitationStatus),
                   ],
                 ),
                 SizedBox(height: 8.h),
-                Text(clinic.address, style: CustomFonts.bodyLarge.copyWith(color: CustomColors.textSecondary)),
+                Text(clinic.address, style: CustomFonts.grey16w400),
                 SizedBox(height: 16.h),
                 Row(
                   children: [
@@ -124,7 +124,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
         if (clinic.notes != null && clinic.notes!.isNotEmpty) ...[
           SizedBox(height: 24.h),
           _infoSection("Administrative Notes", [
-            Text(clinic.notes!, style: CustomFonts.bodyMedium.copyWith(height: 1.6)),
+            Text(clinic.notes!, style: CustomFonts.grey14w400h16),
           ]),
         ],
       ],
@@ -136,7 +136,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
       children: [
         _infoSection("Invitation Control", [
           Text("Manage the outreach and onboarding workflow for this prospect.", 
-            style: CustomFonts.bodySmall.copyWith(color: CustomColors.textSecondary, height: 1.5)),
+            style: CustomFonts.grey13w500h15),
           SizedBox(height: 28.h),
           _actionButton(
             "Invite Clinic Now", 
@@ -166,7 +166,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 32.h),
-            child: Divider(color: CustomColors.borderLight.withOpacity(0.6)),
+            child: Divider(color: CustomColors.borderLight.withValues(alpha: 0.6)),
           ),
           _actionButton(
             "Archive Prospect", 
@@ -187,7 +187,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+          Text(title, style: CustomFonts.black16w700),
           SizedBox(height: 24.h),
           ...children,
         ],
@@ -209,8 +209,8 @@ class InviteClinicDetailScreen extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: CustomFonts.bodySmall),
-              Text(value, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+              Text(label, style: CustomFonts.grey13w500),
+              Text(value, style: CustomFonts.grey14w600),
             ],
           ),
         ],
@@ -222,12 +222,12 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     final style = isOutlined
         ? OutlinedButton.styleFrom(
             foregroundColor: text,
-            side: BorderSide(color: text.withOpacity(0.5), width: 1.2),
+            side: BorderSide(color: text.withValues(alpha: 0.5), width: 1.2),
             padding: EdgeInsets.symmetric(vertical: 20.h),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-            textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.3),
+            textStyle: CustomFonts.grey14w600ls03,
           ).copyWith(
-            overlayColor: MaterialStateProperty.all(text.withOpacity(0.05)),
+            overlayColor: WidgetStateProperty.all(text.withValues(alpha: 0.05)),
           )
         : ElevatedButton.styleFrom(
             backgroundColor: bg,
@@ -235,10 +235,10 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(vertical: 20.h),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
             elevation: bg == CustomColors.brandCyan ? 4 : 0,
-            shadowColor: bg.withOpacity(0.4),
-            textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold, letterSpacing: 0.3),
+            shadowColor: bg.withValues(alpha: 0.4),
+            textStyle: CustomFonts.grey14w700ls03,
           ).copyWith(
-            overlayColor: MaterialStateProperty.all(text.withOpacity(0.1)),
+            overlayColor: WidgetStateProperty.all(text.withValues(alpha: 0.1)),
           );
 
     return SizedBox(
@@ -261,25 +261,29 @@ class InviteClinicDetailScreen extends ConsumerWidget {
 
   Widget _statusBadge(String status) {
     Color color = CustomColors.textSecondary;
+    TextStyle textStyle = CustomFonts.grey10w700;
     String cleanStatus = status.toLowerCase();
     if (cleanStatus.contains('sent') || cleanStatus.contains('invited') || cleanStatus.contains('awaiting')) {
       color = CustomColors.brandCyan;
+      textStyle = CustomFonts.cyan10w700;
     } else if (cleanStatus.contains('interested') || cleanStatus.contains('pending')) {
       color = CustomColors.success;
+      textStyle = CustomFonts.success10w700;
     } else if (cleanStatus.contains('expired')) {
       color = CustomColors.error;
+      textStyle = CustomFonts.error10w700;
     }
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
         status.toUpperCase(),
-        style: TextStyle(color: color, fontSize: 10.sp, fontWeight: FontWeight.bold),
+        style: textStyle,
       ),
     );
   }
@@ -295,7 +299,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
         children: [
           Icon(icon, size: 14.sp, color: CustomColors.textSecondary),
           SizedBox(width: 8.w),
-          Text(label, style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.w500)),
+          Text(label, style: CustomFonts.grey13w500),
         ],
       ),
     );

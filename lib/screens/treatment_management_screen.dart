@@ -5,8 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
@@ -66,11 +64,11 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Treatment Library", style: CustomFonts.h1),
+            Text("Treatment Library", style: CustomFonts.black26w700),
             SizedBox(height: 6.h),
             Text(
               "Manage medical aesthetic procedures and treatment logic.",
-              style: CustomFonts.bodySm,
+              style: CustomFonts.grey13w500,
             ),
           ],
         ),
@@ -114,10 +112,10 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             child: TextField(
               controller: viewModel.searchController,
               onChanged: (val) => viewModel.onSearchChanged(val),
-              style: CustomFonts.body,
+              style: CustomFonts.grey14w400,
               decoration: InputDecoration(
                 hintText: "Search treatments by keyword, category, or area...",
-                hintStyle: CustomFonts.bodySm,
+                hintStyle: CustomFonts.grey13w500,
                 prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.textTertiary, size: 20),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
@@ -249,7 +247,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.label),
+        Text(label, style: CustomFonts.black14w600),
         SizedBox(height: 8.h),
         SearchAnchor(
           viewHintText: hint,
@@ -261,7 +259,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             return TextFormField(
               controller: controller,
               readOnly: true,
-              style: CustomFonts.body,
+              style: CustomFonts.grey14w400,
               onTap: () {
                 searchController.text = controller.text;
                 searchController.openView();
@@ -279,7 +277,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             final query = searchController.text.toLowerCase();
             return [
               ListTile(
-                title: Text("All $label", style: CustomFonts.label.copyWith(color: CustomColors.primary)),
+                title: Text("All $label", style: CustomFonts.black14w600.copyWith(color: CustomColors.primary)),
                 onTap: () {
                   controller.clear();
                   onSelected("");
@@ -289,7 +287,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               ...suggestions
                   .where((s) => s.toLowerCase().contains(query))
                   .map((item) => ListTile(
-                        title: Text(item, style: CustomFonts.body),
+                        title: Text(item, style: CustomFonts.grey14w400),
                         onTap: () {
                           controller.text = item;
                           onSelected(item);
@@ -314,7 +312,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             children: [
               Icon(Icons.search_off_rounded, size: 48.sp, color: CustomColors.textTertiary),
               SizedBox(height: AppSpacing.md),
-              Text("No matching treatments found.", style: CustomFonts.bodyLg.copyWith(color: CustomColors.textSecondary)),
+              Text("No matching treatments found.", style: CustomFonts.black16w400.copyWith(color: CustomColors.textSecondary)),
             ],
           ),
         ),
@@ -361,7 +359,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               children: [
                 Row(
                   children: [
-                    Text(treatment.name ?? "N/A", style: CustomFonts.label.copyWith(fontSize: 15.sp)),
+                    Text(treatment.name ?? "N/A", style: CustomFonts.black14w600.copyWith(fontSize: 15.sp)),
                     SizedBox(width: AppSpacing.sm),
                     _statusBadge(treatment.isActive),
                   ],
@@ -369,12 +367,12 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                 SizedBox(height: 4.h),
                 Text(
                   "${treatment.category ?? 'General'} • ${treatment.subcategory ?? 'N/A'}",
-                  style: CustomFonts.caption,
+                  style: CustomFonts.grey12w400,
                 ),
                 SizedBox(height: 6.h),
                 Text(
                   treatment.shortDescription ?? treatment.description ?? "No description provided.",
-                  style: CustomFonts.bodySm,
+                  style: CustomFonts.grey13w500,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -396,7 +394,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                 SizedBox(width: 8.w),
                 Text(
                   "${treatment.sideAreas?.length ?? 0} Active Areas",
-                  style: CustomFonts.label.copyWith(fontSize: 11.sp, color: CustomColors.secondary),
+                  style: CustomFonts.black14w600.copyWith(fontSize: 11.sp, color: CustomColors.secondary),
                 ),
               ],
             ),
@@ -482,7 +480,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
       builder: (context) => StandardDialog(
         title: "Archive Treatment",
         width: 400.w,
-        content: Text("Confirm archiving '${treatment.name}'? It will be removed from all active catalogs.", style: CustomFonts.body),
+        content: Text("Confirm archiving '${treatment.name}'? It will be removed from all active catalogs.", style: CustomFonts.grey14w400),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           ElevatedButton(

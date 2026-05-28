@@ -40,7 +40,7 @@ class StandardDialog extends StatelessWidget {
           children: [
             Row(
               children: [
-                Expanded(child: Text(title, style: CustomFonts.h3)),
+                Expanded(child: Text(title, style: CustomFonts.black18w600)),
                 if (showCloseIcon)
                   IconButton(
                     onPressed: () => Navigator.pop(context),

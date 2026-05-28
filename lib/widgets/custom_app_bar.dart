@@ -27,9 +27,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             tablet: () => _MenuButton(context: context),
           ),
           const Spacer(),
-          _TopBarAction(icon: Icons.notifications_none_rounded, tooltip: 'Notifications', hasBadge: true),
+          const _TopBarAction(icon: Icons.notifications_none_rounded, tooltip: 'Notifications', hasBadge: true),
           SizedBox(width: AppSpacing.lg),
-          _TopBarAction(icon: Icons.help_outline_rounded, tooltip: 'Documentation'),
+          const _TopBarAction(icon: Icons.help_outline_rounded, tooltip: 'Documentation'),
           SizedBox(width: AppSpacing.lg),
           const VerticalDivider(width: 1, indent: 20, endIndent: 20),
           SizedBox(width: AppSpacing.lg),
@@ -148,8 +148,8 @@ class _UserProfile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('Alex MedSpa', style: CustomFonts.label.copyWith(fontSize: 12.sp)),
-                Text('Super Admin', style: CustomFonts.caption.copyWith(fontSize: 10.sp)),
+                Text('Alex MedSpa', style: CustomFonts.black12w600),
+                Text('Super Admin', style: CustomFonts.grey10w400),
               ],
             ),
             SizedBox(width: AppSpacing.sm),
@@ -173,8 +173,8 @@ class _UserProfile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Alex MedSpa', style: CustomFonts.label),
-              Text('admin@skinsync.ai', style: CustomFonts.caption),
+              Text('Alex MedSpa', style: CustomFonts.black14w600),
+              Text('admin@skinsync.ai', style: CustomFonts.grey12w400),
             ],
           ),
         ),
@@ -200,7 +200,7 @@ class _UserProfile extends StatelessWidget {
             children: [
               Icon(Icons.logout_rounded, color: CustomColors.error, size: 18.sp),
               SizedBox(width: AppSpacing.md),
-              Text('Logout', style: TextStyle(color: CustomColors.error, fontWeight: FontWeight.w600)),
+              Text('Logout', style: CustomFonts.red14w600),
             ],
           ),
         ),

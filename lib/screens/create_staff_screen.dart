@@ -68,7 +68,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             children: [
               Text(
                 'Select Image',
-                style: CustomFonts.textMain20w600,
+                style: CustomFonts.black20w600,
               ),
               SizedBox(height: 20.h),
               ListTile(
@@ -86,7 +86,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 ),
                 title: Text(
                   'Choose from Gallery',
-                  style: CustomFonts.textMain14w600,
+                  style: CustomFonts.black14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -109,7 +109,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 ),
                 title: Text(
                   'Take a Photo',
-                  style: CustomFonts.textMain14w600,
+                  style: CustomFonts.black14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -133,7 +133,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                   ),
                   title: Text(
                     'Remove Photo',
-                    style: CustomFonts.textMain14w600.copyWith(color: Colors.red),
+                    style: CustomFonts.black14w600.copyWith(color: Colors.red),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -219,7 +219,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
         SizedBox(width: 12.w),
         Text(
           'Create Staff',
-          style: CustomFonts.textMain18w600,
+          style: CustomFonts.black18w600,
         ),
       ],
     );
@@ -350,12 +350,12 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
           children: [
             Text(
               'Profile Picture',
-              style: CustomFonts.textMain14w600,
+              style: CustomFonts.black14w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Upload your profile picture',
-              style: CustomFonts.textMuted12w400,
+              style: CustomFonts.grey12w400,
             ),
           ],
         ),
@@ -374,16 +374,16 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
       children: [
         Text(
           label,
-          style: CustomFonts.textMain14w600,
+          style: CustomFonts.black14w600,
         ),
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
-          style: CustomFonts.textMain14w400,
+          style: CustomFonts.black14w400,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: CustomFonts.textMuted14w400,
+            hintStyle: CustomFonts.grey14w400,
             filled: true,
             fillColor: Colors.white,
             contentPadding: EdgeInsets.symmetric(
@@ -420,14 +420,14 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
       children: [
         Text(
           label,
-          style: CustomFonts.textMain14w600,
+          style: CustomFonts.black14w600,
         ),
         SizedBox(height: 8.h),
         DropdownButtonFormField<String>(
           isExpanded: true,
           hint: Text(
             hintText,
-            style: CustomFonts.textMuted14w400,
+            style: CustomFonts.grey14w400,
           ),
           initialValue: value,
           items: items
@@ -436,7 +436,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                   value: item,
                   child: Text(
                     item,
-                    style: CustomFonts.textMain14w400,
+                    style: CustomFonts.black14w400,
                   ),
                 ),
               )
@@ -495,7 +495,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             ),
             child: Text(
               'Create Staff',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+              style: CustomFonts.black14w500,
             ),
           ),
         ),
@@ -517,7 +517,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             ),
             child: Text(
               'Cancel',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+              style: CustomFonts.black14w500,
             ),
           ),
         ),

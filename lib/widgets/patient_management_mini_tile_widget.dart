@@ -41,7 +41,7 @@ class PatientManagementMiniTileWidget extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: data.iconBgColor.withOpacity(0.2),
+              color: data.iconBgColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Icon(data.icon, color: data.iconBgColor),

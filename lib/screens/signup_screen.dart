@@ -97,19 +97,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           SizedBox(height: 40.h),
                           Text(
                             "Join the Future of\nMedSpa Management",
-                            style: CustomFonts.h1.copyWith(
-                              color: Colors.white,
-                              fontSize: 40.sp,
-                              height: 1.1,
-                            ),
+                            style: CustomFonts.white40w700h11,
                           ),
                           SizedBox(height: 24.h),
                           Text(
                             "Scale your clinic operations with our advanced AI-powered administrative tools.",
-                            style: CustomFonts.bodyLg.copyWith(
-                              color: Colors.white.withValues(alpha: 0.7),
-                              height: 1.5,
-                            ),
+                            style: CustomFonts.white70_16w400h15,
                           ),
                           SizedBox(height: 60.h),
                           _buildFeatureRow(Icons.check_circle_outline_rounded, "Multi-Clinic Oversight"),
@@ -141,9 +134,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Create Admin Account", style: CustomFonts.h1),
+                          Text("Create Admin Account", style: CustomFonts.black26w700),
                           SizedBox(height: 8.h),
-                          Text("Register your MedSpa network to get started.", style: CustomFonts.bodyLg.copyWith(color: CustomColors.textSecondary)),
+                          Text("Register your MedSpa network to get started.", style: CustomFonts.grey16w400),
                           SizedBox(height: 40.h),
                           
                           _buildInputField(
@@ -164,7 +157,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Phone Number", style: CustomFonts.label),
+                              Text("Phone Number", style: CustomFonts.black14w600),
                               SizedBox(height: 10.h),
                               PhoneWidget(controller: _phoneController, filled: true),
                             ],
@@ -196,10 +189,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("Already have an account? ", style: CustomFonts.bodySm),
+                              Text("Already have an account? ", style: CustomFonts.grey13w500),
                               GestureDetector(
                                 onTap: () => context.go(SignInScreen.routeName),
-                                child: Text("Sign In", style: CustomFonts.label.copyWith(color: CustomColors.primary)),
+                                child: Text("Sign In", style: CustomFonts.primary14w600),
                               ),
                             ],
                           ),
@@ -221,7 +214,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       children: [
         Icon(icon, color: CustomColors.secondary, size: 22.sp),
         SizedBox(width: 12.w),
-        Text(text, style: CustomFonts.label.copyWith(color: Colors.white.withValues(alpha: 0.9), fontSize: 16.sp)),
+        Text(text, style: CustomFonts.white90_16w600),
       ],
     );
   }
@@ -239,13 +232,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.label),
+        Text(label, style: CustomFonts.black14w600),
         SizedBox(height: 10.h),
         TextFormField(
           controller: controller,
           obscureText: obscureText ?? false,
           keyboardType: keyboardType,
-          style: CustomFonts.body,
+          style: CustomFonts.grey14w400,
           decoration: InputDecoration(
             prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.textTertiary),
             hintText: hint,
@@ -274,7 +267,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             color: isValid ? CustomColors.success : CustomColors.textTertiary.withValues(alpha: 0.5),
           ),
           SizedBox(width: 8.w),
-          Text(text, style: CustomFonts.caption.copyWith(color: isValid ? CustomColors.success : CustomColors.textSecondary)),
+          Text(text, style: isValid ? CustomFonts.success12w400 : CustomFonts.grey12w400),
         ],
       ),
     );
@@ -296,17 +289,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
         Expanded(
           child: RichText(
             text: TextSpan(
-              style: CustomFonts.bodySm,
+              style: CustomFonts.grey13w500,
               children: [
                 const TextSpan(text: "I agree to the "),
                 TextSpan(
                   text: "Terms of Service",
-                  style: TextStyle(color: CustomColors.primary, fontWeight: FontWeight.bold),
+                  style: CustomFonts.primary14w700,
                 ),
                 const TextSpan(text: " and "),
                 TextSpan(
                   text: "Privacy Policy",
-                  style: TextStyle(color: CustomColors.primary, fontWeight: FontWeight.bold),
+                  style: CustomFonts.primary14w700,
                 ),
               ],
             ),

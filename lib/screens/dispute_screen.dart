@@ -2,8 +2,6 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import '../widgets/dailogbox/on_view_dailog_box.dart';
 
@@ -37,11 +35,11 @@ class DisputeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Dispute Management", style: CustomFonts.textMain32w700),
+        Text("Dispute Management", style: CustomFonts.black26w700),
         SizedBox(height: 8.h),
         Text(
           "Review, mediate, and resolve patient-clinic disputes.",
-          style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
+          style: CustomFonts.grey14w400,
         ),
       ],
     );
@@ -72,8 +70,8 @@ class DisputeScreen extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.textMain20w600),
-                Text(title, style: CustomFonts.textMuted12w400),
+                Text(value, style: CustomFonts.black20w600),
+                Text(title, style: CustomFonts.grey12w400),
               ],
             ),
           ],
@@ -90,7 +88,7 @@ class DisputeScreen extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text("Pending Action", style: CustomFonts.textMain20w600),
+            child: Text("Pending Action", style: CustomFonts.black20w600),
           ),
           SizedBox(
             height: 300.h,
@@ -118,15 +116,15 @@ class DisputeScreen extends StatelessWidget {
   DataRow _disputeRow(BuildContext context) {
     return DataRow(
       cells: [
-        const DataCell(Text('#DSP-421')),
-        const DataCell(Text('Emily Davis')),
-        const DataCell(Text('Pure Skin Care')),
-        const DataCell(Text('Service mismatch')),
+        DataCell(Text('#DSP-421', style: CustomFonts.black14w400)),
+        DataCell(Text('Emily Davis', style: CustomFonts.black14w400)),
+        DataCell(Text('Pure Skin Care', style: CustomFonts.black14w400)),
+        DataCell(Text('Service mismatch', style: CustomFonts.black14w400)),
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.errorRed.withOpacity(0.1), borderRadius: BorderRadius.circular(4.r)),
-            child: const Text("High", style: TextStyle(color: CustomColors.errorRed, fontSize: 10, fontWeight: FontWeight.bold)),
+            decoration: BoxDecoration(color: CustomColors.errorRed.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4.r)),
+            child: Text("High", style: CustomFonts.error10w700), // Updated to static style
           ),
         ),
         DataCell(
@@ -154,7 +152,7 @@ class DisputeScreen extends StatelessWidget {
         children: [
           Padding(
             padding: EdgeInsets.all(20.w),
-            child: Text("Resolution History", style: CustomFonts.textMain20w600),
+            child: Text("Resolution History", style: CustomFonts.black20w600),
           ),
           SizedBox(
             height: 300.h,
@@ -181,11 +179,11 @@ class DisputeScreen extends StatelessWidget {
   DataRow _resolvedDisputeRow() {
     return DataRow(
       cells: [
-        const DataCell(Text('#DSP-390')),
-        const DataCell(Text('Aura Med Spa')),
-        const DataCell(Text('Admin Alex')),
-        const DataCell(Text('Partial Refund Release')),
-        const DataCell(Text('Oct 20, 2023')),
+        DataCell(Text('#DSP-390', style: CustomFonts.black14w400)),
+        DataCell(Text('Aura Med Spa', style: CustomFonts.black14w400)),
+        DataCell(Text('Admin Alex', style: CustomFonts.black14w400)),
+        DataCell(Text('Partial Refund Release', style: CustomFonts.black14w400)),
+        DataCell(Text('Oct 20, 2023', style: CustomFonts.black14w400)),
       ],
     );
   }

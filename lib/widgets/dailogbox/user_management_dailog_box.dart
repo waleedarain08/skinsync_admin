@@ -61,7 +61,7 @@ class UserManagementDialogBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.brandPrimary)),
         const Divider(),
       ],
     );
@@ -71,9 +71,9 @@ class UserManagementDialogBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.textMuted13w500),
+        Text(label, style: CustomFonts.grey13w500),
         SizedBox(height: 4.h),
-        Text(value, style: CustomFonts.textMain16w600),
+        Text(value, style: CustomFonts.black16w600),
       ],
     );
   }
@@ -82,7 +82,7 @@ class UserManagementDialogBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.textMuted13w500),
+        Text(label, style: CustomFonts.grey13w500),
         SizedBox(height: 12.h),
         Wrap(
           spacing: 12.w,
@@ -94,7 +94,7 @@ class UserManagementDialogBox extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.r),
               border: Border.all(color: CustomColors.brandCyan.withOpacity(0.2)),
             ),
-            child: Text(tag, style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary, fontSize: 11.sp)),
+            child: Text(tag, style: CustomFonts.black14w600.copyWith(color: CustomColors.brandPrimary, fontSize: 11.sp)),
           )).toList(),
         ),
       ],

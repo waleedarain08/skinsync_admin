@@ -94,18 +94,18 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Select Clinic Logo', style: CustomFonts.textMain20w600),
+              Text('Select Clinic Logo', style: CustomFonts.black20w600),
               SizedBox(height: 20.h),
               ListTile(
                 leading: Container(
                   padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: const Icon(Icons.photo_library_outlined, color: Colors.blue),
                 ),
-                title: Text('Choose from Gallery', style: CustomFonts.textMain14w600),
+                title: Text('Choose from Gallery', style: CustomFonts.black14w600),
                 onTap: () async {
                   Navigator.pop(context);
                   final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
@@ -117,12 +117,12 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                 leading: Container(
                   padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: const Icon(Icons.camera_alt_outlined, color: Colors.green),
                 ),
-                title: Text('Take a Photo', style: CustomFonts.textMain14w600),
+                title: Text('Take a Photo', style: CustomFonts.black14w600),
                 onTap: () async {
                   Navigator.pop(context);
                   final XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
@@ -204,7 +204,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     return Scaffold(
       backgroundColor: CustomColors.backgroundLight,
       appBar: AppBar(
-        title: Text("Add New Clinic", style: CustomFonts.textMain20w600),
+        title: Text("Add New Clinic", style: CustomFonts.black20w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -259,7 +259,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Phone Number (Selection sets Country & CC)", style: CustomFonts.textMain14w600),
+                                Text("Phone Number (Selection sets Country & CC)", style: CustomFonts.black14w600),
                                 SizedBox(height: 10.h),
                                 PhoneWidget(
                                   controller: _clinicPhoneController,
@@ -360,9 +360,9 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                           onPressed: () => context.pop(),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: CustomColors.textSecondary,
-                            side: BorderSide(color: CustomColors.borderLight, width: 1.5),
+                            side: const BorderSide(color: CustomColors.borderLight, width: 1.5),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                            textStyle: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+                            textStyle: CustomFonts.black16w600,
                           ),
                           child: const Text("Cancel"),
                         ),
@@ -378,8 +378,8 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                             elevation: 4,
-                            shadowColor: CustomColors.deepSlate.withOpacity(0.3),
-                            textStyle: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                            shadowColor: CustomColors.deepSlate.withValues(alpha: 0.3),
+                            textStyle: CustomFonts.black16w700,
                           ),
                           child: const Text("Register Clinic"),
                         ),
@@ -408,7 +408,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
               decoration: BoxDecoration(
                 color: CustomColors.surfaceGhost,
                 shape: BoxShape.circle,
-                border: Border.all(color: CustomColors.brandCyan.withOpacity(0.5), width: 2),
+                border: Border.all(color: CustomColors.brandCyan.withValues(alpha: 0.5), width: 2),
                 image: _selectedLogo != null
                     ? DecorationImage(
                         image: kIsWeb 
@@ -430,7 +430,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
             SizedBox(height: 12.h),
             Text(
               _selectedLogo == null ? "Tap to upload logo" : "Change Logo",
-              style: CustomFonts.textMuted13w500,
+              style: CustomFonts.grey13w500,
             ),
           ],
         ),
@@ -447,7 +447,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -456,7 +456,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: CustomFonts.textMain20w600),
+          Text(title, style: CustomFonts.black20w600),
           SizedBox(height: 32.h),
           ...children,
         ],
@@ -473,7 +473,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -485,20 +485,20 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Clinic Availability", style: CustomFonts.textMain20w600),
+              Text("Clinic Availability", style: CustomFonts.black20w600),
               ElevatedButton.icon(
                 onPressed: _addAvailability,
                 icon: Icon(Icons.add_circle_outline, size: 18.sp),
                 label: const Text("Add Timing Slot"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColors.brandCyan.withOpacity(0.12),
+                  backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.12),
                   foregroundColor: CustomColors.deepSlate,
                   elevation: 0,
                   padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                  textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                  textStyle: CustomFonts.grey14w600,
                 ).copyWith(
-                  overlayColor: MaterialStateProperty.all(CustomColors.brandCyan.withOpacity(0.2)),
+                  overlayColor: WidgetStateProperty.all(CustomColors.brandCyan.withValues(alpha: 0.2)),
                 ),
               ),
             ],
@@ -510,7 +510,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
             itemCount: _availabilityEntries.length,
             separatorBuilder: (_, __) => Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
-              child: Divider(color: CustomColors.textMuted.withOpacity(0.1)),
+              child: Divider(color: CustomColors.textMuted.withValues(alpha: 0.1)),
             ),
             itemBuilder: (context, index) {
               return _buildAvailabilityRow(index);
@@ -529,7 +529,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Timing Slot ${index + 1}", style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+            Text("Timing Slot ${index + 1}", style: CustomFonts.primary16w600),
             if (_availabilityEntries.length > 1)
               TextButton.icon(
                 onPressed: () => _removeAvailability(index),
@@ -560,7 +560,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
           ],
         ),
         SizedBox(height: 24.h),
-        Text("Active Days", style: CustomFonts.textMain14w600),
+        Text("Active Days", style: CustomFonts.black14w600),
         SizedBox(height: 16.h),
         Wrap(
           spacing: 12.w,
@@ -582,17 +582,13 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                 });
               },
               backgroundColor: Colors.white,
-              selectedColor: CustomColors.brandPrimary.withOpacity(0.1),
+              selectedColor: CustomColors.brandPrimary.withValues(alpha: 0.1),
               checkmarkColor: CustomColors.brandPrimary,
-              labelStyle: TextStyle(
-                color: isSelected ? CustomColors.brandPrimary : CustomColors.textMuted,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 13.sp,
-              ),
+              labelStyle: isSelected ? CustomFonts.primary13w700 : CustomFonts.grey13w500,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.r),
                 side: BorderSide(
-                  color: isSelected ? CustomColors.brandPrimary : CustomColors.textMuted.withOpacity(0.3),
+                  color: isSelected ? CustomColors.brandPrimary : CustomColors.textMuted.withValues(alpha: 0.3),
                 ),
               ),
             );
@@ -610,7 +606,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.textMuted13w500),
+        Text(label, style: CustomFonts.grey13w500),
         SizedBox(height: 10.h),
         InkWell(
           onTap: () async {
@@ -626,12 +622,12 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
             decoration: BoxDecoration(
               color: CustomColors.surfaceGhost,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: CustomColors.textMuted.withOpacity(0.1)),
+              border: Border.all(color: CustomColors.textMuted.withValues(alpha: 0.1)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(time?.format(context) ?? "Select Time", style: CustomFonts.textMain14w400),
+                Text(time?.format(context) ?? "Select Time", style: CustomFonts.black14w400),
                 const Icon(Icons.access_time_rounded, size: 20, color: CustomColors.brandPrimary),
               ],
             ),

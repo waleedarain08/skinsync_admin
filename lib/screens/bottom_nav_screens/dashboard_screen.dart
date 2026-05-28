@@ -30,11 +30,11 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Good Morning, Alex', style: CustomFonts.h1),
+                      Text('Good Morning, Alex', style: CustomFonts.black32w700),
                       SizedBox(height: 6.h),
                       Text(
                         "Here's a summary of your MedSpa network performance.",
-                        style: CustomFonts.bodySm,
+                        style: CustomFonts.grey13w500,
                       ),
                     ],
                   ),
@@ -81,7 +81,7 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Icon(Icons.calendar_today_rounded, size: 16.sp, color: CustomColors.primary),
           SizedBox(width: AppSpacing.sm),
-          Text('Oct 2023', style: CustomFonts.label),
+          Text('Oct 2023', style: CustomFonts.black14w600),
           SizedBox(width: AppSpacing.xs),
           Icon(Icons.keyboard_arrow_down_rounded, size: 18.sp, color: CustomColors.textTertiary),
         ],
@@ -126,9 +126,9 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: AppSpacing.md),
-            Text(value, style: CustomFonts.h2),
+            Text(value, style: CustomFonts.black20w600),
             SizedBox(height: 2.h),
-            Text(title, style: CustomFonts.bodySm),
+            Text(title, style: CustomFonts.grey13w500),
           ],
         ),
       ),
@@ -145,8 +145,8 @@ class DashboardScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Revenue Overview', style: CustomFonts.h3),
-              Text('Target: \$1.5M', style: CustomFonts.caption),
+              Text('Revenue Overview', style: CustomFonts.black18w600),
+              Text('Target: \$1.5M', style: CustomFonts.grey12w400),
             ],
           ),
           SizedBox(height: AppSpacing.xl),
@@ -203,7 +203,7 @@ class DashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Top Clinics', style: CustomFonts.h3),
+          Text('Top Clinics', style: CustomFonts.black18w600),
           SizedBox(height: AppSpacing.xl),
           ...List.generate(5, (index) => _buildClinicItem(index)),
         ],
@@ -226,10 +226,7 @@ class DashboardScreen extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               '${index + 1}',
-              style: CustomFonts.caption.copyWith(
-                color: CustomColors.surfaceWhite,
-                fontWeight: FontWeight.w700,
-              ),
+              style: CustomFonts.white12w700,
             ),
           ),
           SizedBox(width: AppSpacing.sm),
@@ -237,12 +234,12 @@ class DashboardScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Glow MedSpa NY', style: CustomFonts.label),
-                Text('450 Active Patients', style: CustomFonts.caption),
+                Text('Glow MedSpa NY', style: CustomFonts.black14w600),
+                Text('450 Active Patients', style: CustomFonts.grey12w400),
               ],
             ),
           ),
-          Text('\$42k', style: CustomFonts.label.copyWith(color: CustomColors.primary)),
+          Text('\$42k', style: CustomFonts.primary14w600),
         ],
       ),
     );
@@ -258,10 +255,10 @@ class DashboardScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Recent Activity', style: CustomFonts.h3),
+              Text('Recent Activity', style: CustomFonts.black18w600),
               TextButton(
                 onPressed: () {},
-                child: Text('View Report', style: CustomFonts.label.copyWith(color: CustomColors.primary)),
+                child: Text('View Report', style: CustomFonts.primary14w600),
               ),
             ],
           ),
@@ -292,16 +289,16 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 RichText(
                   text: TextSpan(
-                    style: CustomFonts.bodySm.copyWith(color: CustomColors.textPrimary),
-                    children: const [
-                      TextSpan(text: 'Jane Cooper ', style: TextStyle(fontWeight: FontWeight.w600)),
-                      TextSpan(text: 'booked '),
-                      TextSpan(text: 'Botox Treatment ', style: TextStyle(fontWeight: FontWeight.w600)),
-                      TextSpan(text: 'at Glow NY'),
+                    style: CustomFonts.black13w500,
+                    children: [
+                      TextSpan(text: 'Jane Cooper ', style: CustomFonts.black13w600),
+                      const TextSpan(text: 'booked '),
+                      TextSpan(text: 'Botox Treatment ', style: CustomFonts.black13w600),
+                      const TextSpan(text: 'at Glow NY'),
                     ],
                   ),
                 ),
-                Text('2 hours ago', style: CustomFonts.caption),
+                Text('2 hours ago', style: CustomFonts.grey12w400),
               ],
             ),
           ),
@@ -317,7 +314,7 @@ class DashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Treatments Distribution', style: CustomFonts.h3),
+          Text('Treatments Distribution', style: CustomFonts.black18w600),
           SizedBox(height: AppSpacing.xl),
           SizedBox(
             height: 200.h,
@@ -329,21 +326,21 @@ class DashboardScreen extends StatelessWidget {
                     color: CustomColors.primary,
                     title: '45%',
                     radius: 40,
-                    titleStyle: CustomFonts.caption.copyWith(color: CustomColors.surfaceWhite),
+                    titleStyle: CustomFonts.white12w400,
                   ),
                   PieChartSectionData(
                     value: 30,
                     color: CustomColors.secondary,
                     title: '30%',
                     radius: 40,
-                    titleStyle: CustomFonts.caption.copyWith(color: CustomColors.textPrimary),
+                    titleStyle: CustomFonts.black12w400,
                   ),
                   PieChartSectionData(
                     value: 25,
                     color: CustomColors.primaryLight,
                     title: '25%',
                     radius: 40,
-                    titleStyle: CustomFonts.caption.copyWith(color: CustomColors.surfaceWhite),
+                    titleStyle: CustomFonts.white12w400,
                   ),
                 ],
               ),
@@ -365,7 +362,7 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           SizedBox(width: AppSpacing.sm),
-          Text(label, style: CustomFonts.body),
+          Text(label, style: CustomFonts.grey14w400),
         ],
       ),
     );
