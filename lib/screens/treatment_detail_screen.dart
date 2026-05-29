@@ -7,7 +7,10 @@ import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class TreatmentDetailScreen extends ConsumerWidget {
   const TreatmentDetailScreen({super.key});
@@ -20,10 +23,10 @@ class TreatmentDetailScreen extends ConsumerWidget {
     final treatment = state.selectedTreatment;
 
     if (treatment == null) {
-      return Scaffold(body: Center(child: Text("No Treatment Selected", style: CustomFonts.black16w400)));
+      return GradientScaffold(body: Center(child: Text("No Treatment Selected", style: CustomFonts.black16w400)));
     }
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -34,16 +37,11 @@ class TreatmentDetailScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         actions: [
-          ElevatedButton.icon(
-            onPressed: () => context.push(EditTreatmentScreen.routeName),
-            icon: const Icon(Icons.edit_outlined, size: 18),
-            label: const Text("Edit Treatment"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: CustomColors.purple,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-            ),
+          CustomPrimaryButton(
+            onTap: () => context.push(EditTreatmentScreen.routeName),
+            icon: Icons.edit_outlined,
+            label: "Edit Treatment",
+            width: 180.w,
           ),
           SizedBox(width: 24.w),
         ],

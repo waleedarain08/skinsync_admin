@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class InviteClinicDetailScreen extends ConsumerWidget {
   static const String routeName = '/invite-clinic-detail';
@@ -18,10 +20,10 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     final clinic = ref.watch(clinicViewModelProvider).selectedInviteClinic;
 
     if (clinic == null) {
-      return Scaffold(body: Center(child: Text("No Clinic Data Found", style: CustomFonts.black16w400)));
+      return GradientScaffold(body: Center(child: Text("No Clinic Data Found", style: CustomFonts.black16w400)));
     }
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -218,8 +220,14 @@ class InviteClinicDetailScreen extends ConsumerWidget {
   }
 
   Widget _actionButton(String label, IconData icon, Color bg, Color text, VoidCallback onTap, {bool isOutlined = false}) {
-    final style = isOutlined
-        ? OutlinedButton.styleFrom(
+    if (isOutlined) {
+      return SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: onTap,
+          icon: Icon(icon, size: 20.sp),
+          label: Text(label),
+          style: OutlinedButton.styleFrom(
             foregroundColor: text,
             side: BorderSide(color: text.withValues(alpha: 0.5), width: 1.2),
             padding: EdgeInsets.symmetric(vertical: 20.h),
@@ -227,34 +235,17 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             textStyle: CustomFonts.grey14w600ls03,
           ).copyWith(
             overlayColor: WidgetStateProperty.all(text.withValues(alpha: 0.05)),
-          )
-        : ElevatedButton.styleFrom(
-            backgroundColor: bg,
-            foregroundColor: text,
-            padding: EdgeInsets.symmetric(vertical: 20.h),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-            elevation: bg == CustomColors.green ? 4 : 0,
-            shadowColor: bg.withValues(alpha: 0.4),
-            textStyle: CustomFonts.grey14w700ls03,
-          ).copyWith(
-            overlayColor: WidgetStateProperty.all(text.withValues(alpha: 0.1)),
-          );
+          ),
+        ),
+      );
+    }
 
-    return SizedBox(
+    return CustomPrimaryButton(
+      label: label,
+      onTap: onTap,
+      icon: icon,
       width: double.infinity,
-      child: isOutlined
-          ? OutlinedButton.icon(
-              onPressed: onTap,
-              icon: Icon(icon, size: 20.sp),
-              label: Text(label),
-              style: style,
-            )
-          : ElevatedButton.icon(
-              onPressed: onTap,
-              icon: Icon(icon, size: 20.sp),
-              label: Text(label),
-              style: style,
-            ),
+      height: 56.h,
     );
   }
 

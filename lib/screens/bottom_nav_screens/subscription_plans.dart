@@ -7,9 +7,12 @@ import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class SubscriptionPlansTab extends ConsumerStatefulWidget {
   static const String routeName = '/subscription-plans';
@@ -32,7 +35,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
   Widget build(BuildContext context) {
     final state = ref.watch(subscriptionViewModelProvider);
 
-    return Scaffold(
+    return GradientScaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -69,10 +72,11 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             ),
           ],
         ),
-        ElevatedButton.icon(
-          onPressed: () => context.push(CreateSubscriptionPlanScreen.routeName),
-          icon: const Icon(Icons.add_rounded, color: Colors.white),
-          label: const Text('Create New Tier'),
+        CustomPrimaryButton(
+          onTap: () => context.push(CreateSubscriptionPlanScreen.routeName),
+          icon: Icons.add_rounded,
+          label: 'Create New Tier',
+          width: 200.w,
         ),
       ],
     );
@@ -305,10 +309,10 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
         content: Text("Are you sure you want to remove the '${plan.name}' tier from your catalog?", style: CustomFonts.grey14w400),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: CustomColors.red),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text("Remove"),
+          CustomPrimaryButton(
+            onTap: () => Navigator.pop(context, true),
+            label: "Remove",
+            width: 120.w,
           ),
         ],
       ),

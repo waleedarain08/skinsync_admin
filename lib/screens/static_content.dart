@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/custom_fonts.dart';
-import '../utils/color_constant.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class StaticContentScreen extends StatefulWidget {
   const StaticContentScreen({super.key});
@@ -44,7 +46,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: Padding(
         padding: EdgeInsets.all(24.w),
         child: Column(
@@ -138,20 +140,11 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                         'Last updated: 11/4/2025',
                         style: CustomFonts.grey12w400,
                       ),
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: CustomColors.black,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20.w,
-                            vertical: 12.h,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.r),
-                          ),
-                        ),
-                        icon: const Icon(Icons.save, size: 16),
-                        label: const Text('Save Changes'),
+                      CustomPrimaryButton(
+                        onTap: () {},
+                        icon: Icons.save,
+                        label: 'Save Changes',
+                        width: 180.w,
                       ),
                     ],
                   ),

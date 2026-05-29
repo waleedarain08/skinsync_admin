@@ -5,13 +5,15 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
 class DashboardScreen extends StatelessWidget {
   static const String routeName = '/dashboard';
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,

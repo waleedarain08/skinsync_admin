@@ -5,6 +5,9 @@ class CustomColors {
   static const Color purple = Color(0xFF6750a4);
   static const Color lightPurple = Color(0xFFeaddff);
   static const Color lightPurple2 = Color(0xFFfcf8ff);
+  static const Color slateBlue = Color(0xff556caf);
+  static const Color slateBlueLight = Color(0xffCED5E8);
+
   static const Color palePurple = Color(0xFFEEF2FF);
   static const Color purpleHover = Color(0x0D6366F1);
 
@@ -33,7 +36,11 @@ class CustomColors {
   static const LinearGradient purpleToLightPurpleGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [purple, lightPurple],
+    colors: [
+      lightPurple2, // Violet 100
+      white,
+      slateBlueLight// Violet 50
+    ],
   );
 
   static const LinearGradient whiteGreyToSoftGreyGradient = LinearGradient(

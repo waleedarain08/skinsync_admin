@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/custom_fonts.dart';
 import '../utils/color_constant.dart';
 
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
 
@@ -20,7 +22,7 @@ class _NotificationSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),

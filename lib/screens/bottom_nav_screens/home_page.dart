@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sidebarx/sidebarx.dart';
-import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/widgets/app_sidebar.dart';
 import 'package:skinsync_admin/widgets/custom_app_bar.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = '/home-page';
@@ -77,8 +78,8 @@ class _HomePageState extends State<HomePage> {
       builder: (context, constraints) {
         final isSmallScreen = context.isMobile || context.isTablet;
 
-        return Scaffold(
-          key: _scaffoldKey,
+        return GradientScaffold(
+          scaffoldKey: _scaffoldKey,
           // Drawer used for both Mobile and Tablet as per requirements
           drawer: isSmallScreen ? Drawer(
             child: AppSidebar(

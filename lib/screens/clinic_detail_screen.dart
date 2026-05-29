@@ -13,9 +13,12 @@ import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class ClinicDetailScreen extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-detail';
@@ -99,12 +102,12 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final clinic = ref.watch(clinicViewModelProvider).selectedClinic;
 
     if (clinic == null) {
-      return Scaffold(body: Center(child: Text("No Clinic Data Found", style: CustomFonts.black16w400)));
+      return GradientScaffold(body: Center(child: Text("No Clinic Data Found", style: CustomFonts.black16w400)));
     }
 
     final bool isMobile = context.isMobile;
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         title: Text("Clinic Detail", style: CustomFonts.black18w600),
         centerTitle: true,
@@ -161,16 +164,10 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                     SizedBox(height: 48.h),
                     SizedBox(
                       width: isMobile ? double.infinity : 240.w,
-                      height: 56.h,
-                      child: ElevatedButton(
-                        onPressed: _updateClinic,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: CustomColors.black,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                          elevation: 4,
-                          shadowColor: CustomColors.black.withValues(alpha: 0.3),
-                        ),
-                        child: Text("Save Changes", style: CustomFonts.white16w400),
+                      child: CustomPrimaryButton(
+                        onTap: _updateClinic,
+                        label: "Save Changes",
+                        height: 56.h,
                       ),
                     ),
                   ],

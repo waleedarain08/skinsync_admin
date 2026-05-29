@@ -5,13 +5,15 @@ import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
 class PushNotificationScreen extends StatelessWidget {
   const PushNotificationScreen({super.key});
   static const String routeName = '/pushNotification-screen';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30.w),
         child: SingleChildScrollView(

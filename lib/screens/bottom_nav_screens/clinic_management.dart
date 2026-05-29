@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
@@ -13,6 +14,8 @@ import 'package:skinsync_admin/widgets/app_badge.dart';
 import '../../widgets/dailogbox/clinic_dailogbox.dart';
 import '../../widgets/dailogbox/standard_dialog.dart';
 import '../invite_clinic_detail_screen.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class ClinicManagement extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-management';
@@ -55,7 +58,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -100,10 +103,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             ),
           ],
         ),
-        ElevatedButton.icon(
-          onPressed: () => context.push(AddNewClinicScreen.routeName),
-          icon: const Icon(Icons.add_rounded, color: Colors.white),
-          label: const Text('Add New Clinic'),
+        CustomPrimaryButton(
+          onTap: () => context.push(AddNewClinicScreen.routeName),
+          icon: Icons.add_rounded,
+          label: 'Add New Clinic',
+          width: 200.w,
         ),
       ],
     );
@@ -315,9 +319,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             onPressed: () => Navigator.pop(context),
             child: const Text("Reset All"),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Apply Filters"),
+          CustomPrimaryButton(
+            onTap: () => Navigator.pop(context),
+            label: "Apply Filters",
+            width: 140.w,
           ),
         ],
       ),

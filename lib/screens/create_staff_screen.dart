@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../utils/color_constant.dart';
-import '../utils/custom_fonts.dart';
+import '../utils/theme.dart';
+import '../widgets/custom_primary_button.dart';
 import 'business_info_screen.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class CreateStaffScreen extends StatefulWidget {
   const CreateStaffScreen({super.key});
@@ -189,7 +191,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
@@ -471,10 +473,9 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
   Widget _buildButtonsRow() {
     return Row(
       children: [
-        // Create Staff Button
         Expanded(
-          child: ElevatedButton(
-            onPressed: () {
+          child: CustomPrimaryButton(
+            onTap: () {
               // Handle create staff
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -483,19 +484,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: 20.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              elevation: 0,
-            ),
-            child: Text(
-              'Create Staff',
-              style: CustomFonts.black14w500,
-            ),
+            label: 'Create Staff',
           ),
         ),
         SizedBox(width: 16.w),

@@ -12,6 +12,8 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
 class EditTreatmentScreen extends ConsumerWidget {
   const EditTreatmentScreen({super.key});
 
@@ -24,10 +26,10 @@ class EditTreatmentScreen extends ConsumerWidget {
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
     if (state.selectedTreatment == null) {
-      return Scaffold(body: Center(child: Text("No Treatment Selected", style: CustomFonts.black16w400)));
+      return GradientScaffold(body: Center(child: Text("No Treatment Selected", style: CustomFonts.black16w400)));
     }
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,

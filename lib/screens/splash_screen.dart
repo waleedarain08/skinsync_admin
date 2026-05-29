@@ -8,6 +8,8 @@ import 'package:skinsync_admin/utils/theme.dart';
 
 import '../services/storage_service.dart';
 
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
   static const String routeName = '/';
@@ -50,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: Stack(
         children: [
           Positioned(

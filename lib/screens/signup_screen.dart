@@ -4,7 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const String routeName = '/sign-up-screen';
@@ -54,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: Row(
         children: [
           // Left Side: Modern Branding Panel
@@ -121,82 +124,77 @@ class _SignUpScreenState extends State<SignUpScreen> {
           // Right Side: Registration Form
           Expanded(
             flex: 5,
-            child: Container(
-              color: CustomColors.whiteGrey,
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 80.w, vertical: 48.h),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 500.w),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Create Admin Account", style: CustomFonts.black26w700),
-                          SizedBox(height: 8.h),
-                          Text("Register your MedSpa network to get started.", style: CustomFonts.grey16w400),
-                          SizedBox(height: 40.h),
-                          
-                          _buildInputField(
-                            label: "Full Name",
-                            hint: "Enter your full name",
-                            controller: _fullNameController,
-                            icon: Icons.person_outline_rounded,
-                          ),
-                          SizedBox(height: 24.h),
-                          _buildInputField(
-                            label: "Email Address",
-                            hint: "name@company.com",
-                            controller: _emailController,
-                            icon: Icons.alternate_email_rounded,
-                            keyboardType: TextInputType.emailAddress,
-                          ),
-                          SizedBox(height: 24.h),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Phone Number", style: CustomFonts.black14w600),
-                              SizedBox(height: 10.h),
-                              PhoneWidget(controller: _phoneController, filled: true),
-                            ],
-                          ),
-                          SizedBox(height: 24.h),
-                          _buildInputField(
-                            label: "Password",
-                            hint: "Create a strong password",
-                            controller: _passwordController,
-                            icon: Icons.lock_outline_rounded,
-                            isPassword: true,
-                            obscureText: _obscurePassword,
-                            onTogglePassword: () => setState(() => _obscurePassword = !_obscurePassword),
-                          ),
-                          SizedBox(height: 16.h),
-                          _buildRequirementRow("Lowercase letter included", _hasLowercase),
-                          _buildRequirementRow("Unique character included", _hasUniqueChar),
-                          SizedBox(height: 32.h),
-                          _buildTermsCheckbox(),
-                          SizedBox(height: 40.h),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              child: const Text("Register & Continue"),
+            child: Center(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 80.w, vertical: 48.h),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 500.w),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Create Admin Account", style: CustomFonts.black26w700),
+                        SizedBox(height: 8.h),
+                        Text("Register your MedSpa network to get started.", style: CustomFonts.grey16w400),
+                        SizedBox(height: 40.h),
+                        
+                        _buildInputField(
+                          label: "Full Name",
+                          hint: "Enter your full name",
+                          controller: _fullNameController,
+                          icon: Icons.person_outline_rounded,
+                        ),
+                        SizedBox(height: 24.h),
+                        _buildInputField(
+                          label: "Email Address",
+                          hint: "name@company.com",
+                          controller: _emailController,
+                          icon: Icons.alternate_email_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        SizedBox(height: 24.h),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Phone Number", style: CustomFonts.black14w600),
+                            SizedBox(height: 10.h),
+                            PhoneWidget(controller: _phoneController, filled: true),
+                          ],
+                        ),
+                        SizedBox(height: 24.h),
+                        _buildInputField(
+                          label: "Password",
+                          hint: "Create a strong password",
+                          controller: _passwordController,
+                          icon: Icons.lock_outline_rounded,
+                          isPassword: true,
+                          obscureText: _obscurePassword,
+                          onTogglePassword: () => setState(() => _obscurePassword = !_obscurePassword),
+                        ),
+                        SizedBox(height: 16.h),
+                        _buildRequirementRow("Lowercase letter included", _hasLowercase),
+                        _buildRequirementRow("Unique character included", _hasUniqueChar),
+                        SizedBox(height: 32.h),
+                        _buildTermsCheckbox(),
+                        SizedBox(height: 40.h),
+                        CustomPrimaryButton(
+                          onTap: () {},
+                          label: "Register & Continue",
+                          width: double.infinity,
+                        ),
+                        SizedBox(height: 32.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Already have an account? ", style: CustomFonts.grey13w500),
+                            GestureDetector(
+                              onTap: () => context.go(SignInScreen.routeName),
+                              child: Text("Sign In", style: CustomFonts.purple14w600),
                             ),
-                          ),
-                          SizedBox(height: 32.h),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Already have an account? ", style: CustomFonts.grey13w500),
-                              GestureDetector(
-                                onTap: () => context.go(SignInScreen.routeName),
-                                child: Text("Sign In", style: CustomFonts.purple14w600),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),

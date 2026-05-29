@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'standard_dialog.dart';
 
 class ReleasePaymentDialog extends StatelessWidget {
@@ -72,10 +72,10 @@ class ReleasePaymentDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context, true),
-          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.green),
-          child: const Text("Confirm Release"),
+        CustomPrimaryButton(
+          onTap: () => Navigator.pop(context, true),
+          label: "Confirm Release",
+          width: 200.w,
         ),
       ],
     );

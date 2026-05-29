@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class ManageTreatmentDataScreen extends ConsumerWidget {
   const ManageTreatmentDataScreen({super.key});
@@ -23,7 +25,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
 
     return DefaultTabController(
       length: 4,
-      child: Scaffold(
+      child: GradientScaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
@@ -267,15 +269,11 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: CustomFonts.black18w600),
-        ElevatedButton.icon(
-          onPressed: onAdd,
-          icon: const Icon(Icons.add, size: 18),
-          label: const Text("Add New"),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: CustomColors.black,
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-          ),
+        CustomPrimaryButton(
+          onTap: onAdd,
+          icon: Icons.add,
+          label: "Add New",
+          width: 140.w,
         ),
       ],
     );
@@ -417,14 +415,15 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          ElevatedButton(
-            onPressed: () {
+          CustomPrimaryButton(
+            onTap: () {
               if (nameController.text.trim().isNotEmpty) {
                 onConfirm(nameController.text.trim(), iconController.text.trim().isEmpty ? null : iconController.text.trim());
                 Navigator.pop(context);
               }
             },
-            child: const Text("Confirm"),
+            label: "Confirm",
+            width: 120.w,
           ),
         ],
       ),
@@ -508,14 +507,15 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-            ElevatedButton(
-              onPressed: () {
+            CustomPrimaryButton(
+              onTap: () {
                 if (nameController.text.trim().isNotEmpty) {
                   onConfirm(nameController.text.trim(), selectedTreatments);
                   Navigator.pop(context);
                 }
               },
-              child: const Text("Save Group"),
+              label: "Save Group",
+              width: 140.w,
             ),
           ],
         ),
@@ -532,13 +532,13 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         content: Text("Are you sure you want to delete '$name'? This action is irreversible.", style: CustomFonts.black14w400),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: CustomColors.red),
-            onPressed: () {
+          CustomPrimaryButton(
+            onTap: () {
               onConfirm();
               Navigator.pop(context);
             },
-            child: const Text("Delete"),
+            label: "Delete",
+            width: 120.w,
           ),
         ],
       ),

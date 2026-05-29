@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/models/requests/app_version_request_model.dart';
 import 'package:skinsync_admin/view_models/setting_view_model.dart';
-import '../../utils/color_constant.dart';
-import '../../utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class SettingScreen extends ConsumerStatefulWidget {
   static const String routeName = '/setting-screen';
@@ -48,7 +50,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         child: Column(
@@ -267,8 +269,8 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             SizedBox(height: 20.h),
             Align(
               alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () {
+              child: CustomPrimaryButton(
+                onTap: () {
                   _submitUpdate(
                     formKey: formKey,
                     versionController: versionController,
@@ -277,7 +279,8 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                     isCustomer: isCustomer,
                   );
                 },
-                child: Text("Submit", style: CustomFonts.white16w400),
+                label: "Submit",
+                width: 140.w,
               ),
             ),
           ],

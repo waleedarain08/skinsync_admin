@@ -6,6 +6,8 @@ import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/user_management_dailog_box.dart';
 
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
 class UserManagement extends StatefulWidget {
   static const String routeName = '/user-management';
   const UserManagement({super.key});
@@ -19,7 +21,7 @@ class _UserManagementState extends State<UserManagement> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(

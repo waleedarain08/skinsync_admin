@@ -8,10 +8,13 @@ import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class TreatmentManagementScreen extends ConsumerStatefulWidget {
   const TreatmentManagementScreen({super.key});
@@ -36,7 +39,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
-    return Scaffold(
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -82,13 +85,14 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               ),
             ),
             SizedBox(width: AppSpacing.md),
-            ElevatedButton.icon(
-              onPressed: () {
+            CustomPrimaryButton(
+              onTap: () {
                 ref.read(treatmentViewModelProvider.notifier).resetForm();
                 context.push(CreateTreatmentScreen.routeName);
               },
-              icon: const Icon(Icons.add_rounded, color: Colors.white),
-              label: const Text('New Treatment'),
+              icon: Icons.add_rounded,
+              label: 'New Treatment',
+              width: 180.w,
             ),
           ],
         ),
@@ -227,9 +231,10 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             },
             child: const Text("Reset Filters"),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Apply Refinements"),
+          CustomPrimaryButton(
+            onTap: () => Navigator.pop(context),
+            label: "Apply Refinements",
+            width: 180.w,
           ),
         ],
       ),
@@ -482,13 +487,13 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
         content: Text("Confirm archiving '${treatment.name}'? It will be removed from all active catalogs.", style: CustomFonts.grey14w400),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: CustomColors.red),
-            onPressed: () {
+          CustomPrimaryButton(
+            onTap: () {
               viewModel.deleteTreatment(treatment.id ?? 0);
               Navigator.pop(context);
             },
-            child: const Text("Archive"),
+            label: "Archive",
+            width: 120.w,
           ),
         ],
       ),

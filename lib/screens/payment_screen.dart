@@ -2,8 +2,11 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import '../widgets/dailogbox/payment_dailog_box.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
@@ -11,7 +14,7 @@ class PaymentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
@@ -131,8 +134,8 @@ class PaymentScreen extends StatelessWidget {
         DataCell(Text('\$450.00', style: CustomFonts.green14w600)),
         DataCell(Text('Oct 28, 2023', style: CustomFonts.black14w400)),
         DataCell(
-          ElevatedButton(
-            onPressed: () {
+          CustomPrimaryButton(
+            onTap: () {
               showDialog(
                 context: context,
                 builder: (context) => const ReleasePaymentDialog(
@@ -144,12 +147,9 @@ class PaymentScreen extends StatelessWidget {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: CustomColors.black,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              minimumSize: Size(0, 36.h),
-            ),
-            child: Text("Release", style: CustomFonts.white12w600),
+            label: "Release",
+            height: 36.h,
+            width: 100.w,
           ),
         ),
       ],

@@ -12,8 +12,11 @@ import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class AddNewClinicScreen extends ConsumerStatefulWidget {
   static const String routeName = '/add-new-clinic';
@@ -201,7 +204,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         title: Text("Add New Clinic", style: CustomFonts.black20w600),
         leading: IconButton(
@@ -369,18 +372,10 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                       SizedBox(width: 24.w),
                       SizedBox(
                         width: 240.w,
-                        height: 56.h,
-                        child: ElevatedButton(
-                          onPressed: _submit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: CustomColors.black,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                            elevation: 4,
-                            shadowColor: CustomColors.black.withValues(alpha: 0.3),
-                            textStyle: CustomFonts.black16w700,
-                          ),
-                          child: const Text("Register Clinic"),
+                        child: CustomPrimaryButton(
+                          onTap: _submit,
+                          label: "Register Clinic",
+                          height: 56.h,
                         ),
                       ),
                     ],
@@ -485,20 +480,11 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Clinic Availability", style: CustomFonts.black20w600),
-              ElevatedButton.icon(
-                onPressed: _addAvailability,
-                icon: Icon(Icons.add_circle_outline, size: 18.sp),
-                label: const Text("Add Timing Slot"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColors.green.withValues(alpha: 0.12),
-                  foregroundColor: CustomColors.black,
-                  elevation: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                  textStyle: CustomFonts.grey14w600,
-                ).copyWith(
-                  overlayColor: WidgetStateProperty.all(CustomColors.green.withValues(alpha: 0.2)),
-                ),
+              CustomPrimaryButton(
+                onTap: _addAvailability,
+                icon: Icons.add_circle_outline,
+                label: "Add Timing Slot",
+                width: 220.w,
               ),
             ],
           ),

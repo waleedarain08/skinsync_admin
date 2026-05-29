@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'standard_dialog.dart';
 
 class UserManagementDialogBox extends StatelessWidget {
@@ -49,9 +49,10 @@ class UserManagementDialogBox extends StatelessWidget {
         ),
       ),
       actions: [
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Close Profile"),
+        CustomPrimaryButton(
+          onTap: () => Navigator.pop(context),
+          label: "Close Profile",
+          width: 160.w,
         ),
       ],
     );

@@ -10,8 +10,11 @@ import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class CreateSubscriptionPlanScreen extends ConsumerStatefulWidget {
   static const String routeName = '/create-subscription-plan';
@@ -207,7 +210,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.black18w600),
         leading: IconButton(
@@ -449,13 +452,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                             SizedBox(width: 16.w),
                             Padding(
                               padding: EdgeInsets.only(top: 28.h),
-                              child: ElevatedButton(
-                                onPressed: _addCustomBenefit,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: CustomColors.black,
-                                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-                                ),
-                                child: Text("Add Feature", style: CustomFonts.white14w600),
+                              child: CustomPrimaryButton(
+                                onTap: _addCustomBenefit,
+                                label: "Add Feature",
+                                width: 160.w,
                               ),
                             ),
                           ],
@@ -477,9 +477,9 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       SizedBox(width: 24.w),
                       SizedBox(
                         width: 240.w,
-                        child: ElevatedButton(
-                          onPressed: _submit,
-                          child: Text(isEditMode ? "Update Plan" : "Create Plan", style: CustomFonts.white14w600),
+                        child: CustomPrimaryButton(
+                          onTap: _submit,
+                          label: isEditMode ? "Update Plan" : "Create Plan",
                         ),
                       ),
                     ],

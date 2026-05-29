@@ -17,7 +17,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: CustomColors.lightPurple2,
+      scaffoldBackgroundColor: Colors.transparent,
       primaryColor: CustomColors.purple,
       splashColor: CustomColors.purple.withValues(alpha: 0.05),
       
@@ -85,7 +85,7 @@ class AppTheme {
           elevation: 0,
           minimumSize: Size(0, 48.h),
           padding: EdgeInsets.symmetric(horizontal: 24.w),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
           textStyle: CustomFonts.white14w600,
         ),
       ),

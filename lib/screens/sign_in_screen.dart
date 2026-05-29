@@ -11,8 +11,10 @@ import '../utils/theme.dart';
 import '../utils/enums.dart';
 import '../utils/validators.dart';
 import '../view_models/auth_view_model.dart';
-import '../widgets/app_gradient_button.dart';
+import '../widgets/custom_primary_button.dart';
 import 'bottom_nav_screens/dashboard_screen.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   static const String routeName = '/sign-in-screen';
@@ -59,7 +61,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: Stack(
         children: [
           Positioned(
@@ -375,9 +377,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   Widget _buildSubmitButton(String label, VoidCallback onPressed) {
-    return AppGradientButton(
+    return CustomPrimaryButton(
       label: label,
-      onPressed: onPressed,
+      onTap: onPressed,
       width: double.infinity,
     );
   }

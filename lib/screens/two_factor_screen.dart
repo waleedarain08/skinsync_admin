@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
 class TwoFactorAuthScreen extends StatefulWidget {
   const TwoFactorAuthScreen({super.key});
 
@@ -15,7 +17,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),

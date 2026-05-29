@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../utils/color_constant.dart';
-import '../utils/custom_fonts.dart';
+import '../utils/theme.dart';
+import '../widgets/custom_primary_button.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class BusinessInformationScreen extends StatefulWidget {
   const BusinessInformationScreen({super.key});
@@ -183,7 +185,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
@@ -446,10 +448,9 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
   Widget _buildButtonsRow() {
     return Row(
       children: [
-        // Save Changes Button
         Expanded(
-          child: ElevatedButton(
-            onPressed: () {
+          child: CustomPrimaryButton(
+            onTap: () {
               // Handle save changes
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -458,19 +459,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: 20.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              elevation: 0,
-            ),
-            child: Text(
-              'Save Changes',
-              style: CustomFonts.black14w500,
-            ),
+            label: 'Save Changes',
           ),
         ),
         SizedBox(width: 16.w),

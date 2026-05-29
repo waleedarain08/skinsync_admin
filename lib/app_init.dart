@@ -43,23 +43,24 @@ class AppInit extends StatelessWidget {
           themeMode: ThemeMode.light,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          builder: EasyLoading.init(
-            builder: (context, child) {
-              return ResponsiveBreakpoints.builder(
-                child: child!,
-                breakpoints: [
-                  const Breakpoint(start: 0, end: 480, name: MOBILE),
-                  const Breakpoint(start: 481, end: 1024, name: TABLET),
-                  const Breakpoint(start: 1025, end: 1920, name: DESKTOP),
-                  const Breakpoint(
-                    start: 1921,
-                    end: double.infinity,
-                    name: '4K',
-                  ),
-                ],
-              );
-            },
-          ),
+          builder: (context, child) {
+            final easyLoadingBuilder = EasyLoading.init();
+            final responsiveBuilder = ResponsiveBreakpoints.builder(
+              child: child!,
+              breakpoints: [
+                const Breakpoint(start: 0, end: 480, name: MOBILE),
+                const Breakpoint(start: 481, end: 1024, name: TABLET),
+                const Breakpoint(start: 1025, end: 1920, name: DESKTOP),
+                const Breakpoint(
+                  start: 1921,
+                  end: double.infinity,
+                  name: '4K',
+                ),
+              ],
+            );
+            
+            return easyLoadingBuilder(context, responsiveBuilder);
+          },
         );
       },
     );

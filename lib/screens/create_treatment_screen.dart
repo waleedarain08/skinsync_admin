@@ -5,12 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class CreateTreatmentScreen extends ConsumerWidget {
   const CreateTreatmentScreen({super.key});
@@ -23,7 +25,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -276,14 +278,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _sectionTitle("Treatment Areas"),
-            ElevatedButton.icon(
-              onPressed: () => viewModel.addArea(),
-              icon: const Icon(Icons.add_location_alt_outlined, size: 18),
-              label: const Text("Add New Area"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CustomColors.green.withValues(alpha: 0.1),
-                foregroundColor: CustomColors.black,
-              ),
+            CustomPrimaryButton(
+              onTap: () => viewModel.addArea(),
+              icon: Icons.add_location_alt_outlined,
+              label: "Add New Area",
+              width: 200.w,
             ),
           ],
         ),
@@ -727,8 +726,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ],
         Expanded(
           flex: 2,
-          child: ElevatedButton(
-            onPressed: () {
+          child: CustomPrimaryButton(
+            onTap: () {
               if (state.currentStep == 0) {
                 if (!_validateStep1(context, viewModel)) return;
               }
@@ -744,7 +743,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 });
               }
             },
-            child: Text(isLastStep ? "Finish & Create Treatment" : (isStep3 ? "Add Materials" : "Next Step")),
+            label: isLastStep ? "Finish & Create Treatment" : (isStep3 ? "Add Materials" : "Next Step"),
           ),
         ),
       ],

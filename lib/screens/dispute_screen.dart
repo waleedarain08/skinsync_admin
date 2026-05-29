@@ -5,13 +5,15 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import '../widgets/dailogbox/on_view_dailog_box.dart';
 
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
 class DisputeScreen extends StatelessWidget {
   const DisputeScreen({super.key});
   static const String routeName = '/dispute-screen';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(

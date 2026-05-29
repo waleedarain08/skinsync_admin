@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/custom_fonts.dart';
-import '../utils/color_constant.dart';
+import '../utils/theme.dart';
+import '../widgets/custom_primary_button.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -31,7 +33,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
@@ -225,10 +227,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget _buildButtonsRow() {
     return Row(
       children: [
-        // Update Password Button
         Expanded(
-          child: ElevatedButton(
-            onPressed: () {
+          child: CustomPrimaryButton(
+            onTap: () {
               // Validate passwords
               if (_newPasswordController.text !=
                   _confirmPasswordController.text) {
@@ -249,19 +250,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: 20.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              elevation: 0,
-            ),
-            child: Text(
-              'Update Password',
-              style: CustomFonts.black14w500,
-            ),
+            label: 'Update Password',
           ),
         ),
         SizedBox(width: 16.w),

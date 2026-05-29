@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class ProductManagement extends StatefulWidget {
   static const String routeName = '/product-management';
@@ -17,7 +19,7 @@ class ProductManagement extends StatefulWidget {
 class _ProductManagementState extends State<ProductManagement> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
@@ -51,20 +53,16 @@ class _ProductManagementState extends State<ProductManagement> {
             ),
           ],
         ),
-        ElevatedButton.icon(
-          onPressed: () {
+        CustomPrimaryButton(
+          onTap: () {
             showDialog(
               context: context,
               builder: (context) => const ProductDialogBox(),
             );
           },
-          icon: const Icon(Icons.add, color: Colors.white),
-          label: Text('Add New Product', style: CustomFonts.white14w500),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: CustomColors.black,
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          ),
+          icon: Icons.add,
+          label: 'Add New Product',
+          width: 220.w,
         ),
       ],
     );
@@ -187,7 +185,7 @@ class _ProductManagementState extends State<ProductManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("SKU-9283${index}", style: CustomFonts.amber10w800ls1),
+                Text("SKU-9283$index", style: CustomFonts.amber10w800ls1),
                 SizedBox(height: 4.h),
                 Text("Advanced Night Repair", style: CustomFonts.black16w600, maxLines: 1, overflow: TextOverflow.ellipsis),
                 SizedBox(height: 4.h),

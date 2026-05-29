@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
-import '../../utils/color_constant.dart';
-import '../../utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import '../build_textfield.dart';
 import 'standard_dialog.dart';
 
@@ -135,8 +135,8 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
         Consumer(
           builder: (context, ref, _) {
             final state = ref.watch(productViewModelProvider);
-            return ElevatedButton(
-              onPressed: () {
+            return CustomPrimaryButton(
+              onTap: () {
                 if (!_formKey.currentState!.validate() || state.loading) return;
                 final product = ProductModel(
                   id: widget.product?.id,
@@ -157,11 +157,8 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                   if (success && context.mounted) context.pop();
                 });
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CustomColors.black,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-              ),
-              child: Text(state.loading ? 'Saving...' : 'Save Product'),
+              label: state.loading ? 'Saving...' : 'Save Product',
+              width: 180.w,
             );
           },
         ),

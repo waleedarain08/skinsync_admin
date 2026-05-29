@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class AppointmentManagement extends StatefulWidget {
   static const String routeName = '/appointment-management';
@@ -15,7 +18,7 @@ class AppointmentManagement extends StatefulWidget {
 class _AppointmentManagementState extends State<AppointmentManagement> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -59,10 +62,10 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
             ),
           ],
         ),
-        ElevatedButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.add_task_rounded, color: Colors.white),
-          label: const Text('Book Appointment'),
+        CustomPrimaryButton(
+          onTap: () {},
+          icon: Icons.add_task_rounded,
+          label: 'Book Appointment',
         ),
       ],
     );

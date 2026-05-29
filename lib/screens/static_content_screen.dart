@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/custom_fonts.dart';
-import '../utils/color_constant.dart';
+import '../utils/theme.dart';
+import '../widgets/custom_primary_button.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class StaticContentScreen extends StatefulWidget {
   const StaticContentScreen({super.key});
@@ -130,7 +132,7 @@ For any inquiries, please reach out to our support team.
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20.w),
@@ -247,31 +249,11 @@ For any inquiries, please reach out to our support team.
                                 style: CustomFonts.grey13w500,
                               ),
                               const Spacer(),
-                              ElevatedButton(
-                                onPressed: _saveChanges,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 24.w,
-                                    vertical: 12.h,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.save_outlined, size: 18.sp),
-                                    SizedBox(width: 8.w),
-                                    Text(
-                                      'Save Changes',
-                                      style: CustomFonts.white14w500,
-                                    ),
-                                  ],
-                                ),
+                              CustomPrimaryButton(
+                                onTap: _saveChanges,
+                                icon: Icons.save_outlined,
+                                label: 'Save Changes',
+                                width: 180.w,
                               ),
                             ],
                           ),

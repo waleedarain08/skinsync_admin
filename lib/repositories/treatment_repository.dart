@@ -1,6 +1,3 @@
-import '../models/requests/add_treatment_req_model.dart';
-import '../models/treatment_model.dart';
-
 abstract class TreatmentRepository {
   // Future<List<TreatmentModel>> getClinicTreatments();
   // Future<List<TreatmentModel>> getAdminTreatments();

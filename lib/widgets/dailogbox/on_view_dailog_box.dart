@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'standard_dialog.dart';
 
 class DisputeDetailsDialog extends StatelessWidget {
@@ -41,15 +41,15 @@ class DisputeDetailsDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text("Close")),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.red),
-          child: const Text("Escalate"),
+        CustomPrimaryButton(
+          onTap: () {},
+          label: "Escalate",
+          width: 120.w,
         ),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.green),
-          child: const Text("Resolve Dispute"),
+        CustomPrimaryButton(
+          onTap: () {},
+          label: "Resolve Dispute",
+          width: 160.w,
         ),
       ],
     );
