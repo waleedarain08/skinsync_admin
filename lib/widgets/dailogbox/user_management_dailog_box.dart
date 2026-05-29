@@ -61,7 +61,7 @@ class UserManagementDialogBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.brandPrimary)),
+        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );
@@ -90,11 +90,11 @@ class UserManagementDialogBox extends StatelessWidget {
           children: tags.map((tag) => Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: CustomColors.brandCyan.withOpacity(0.1),
+              color: CustomColors.green.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: CustomColors.brandCyan.withOpacity(0.2)),
+              border: Border.all(color: CustomColors.green.withValues(alpha: 0.2)),
             ),
-            child: Text(tag, style: CustomFonts.black14w600.copyWith(color: CustomColors.brandPrimary, fontSize: 11.sp)),
+            child: Text(tag, style: CustomFonts.black14w600.copyWith(color: CustomColors.purple, fontSize: 11.sp)),
           )).toList(),
         ),
       ],

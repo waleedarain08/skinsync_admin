@@ -45,19 +45,19 @@ class AppBadge extends StatelessWidget {
   (Color, Color, TextStyle) _badgeStyle() {
     switch (variant) {
       case AppBadgeVariant.success:
-        return (CustomColors.successBg, CustomColors.success, CustomFonts.success11w600);
+        return (CustomColors.paleGreen, CustomColors.green, CustomFonts.green11w600);
       case AppBadgeVariant.error:
-        return (CustomColors.errorBg, CustomColors.error, CustomFonts.error11w600);
+        return (CustomColors.paleRed, CustomColors.red, CustomFonts.red11w600);
       case AppBadgeVariant.warning:
-        return (CustomColors.warningBg, CustomColors.warning, CustomFonts.warning11w600);
+        return (CustomColors.paleAmber, CustomColors.amber, CustomFonts.amber11w600);
       case AppBadgeVariant.info:
-        return (CustomColors.infoBg, CustomColors.info, CustomFonts.primary11w600);
+        return (CustomColors.paleBlue, CustomColors.blue, CustomFonts.purple11w600);
       case AppBadgeVariant.brand:
-        return (CustomColors.selected, CustomColors.primary, CustomFonts.primary11w600);
+        return (CustomColors.palePurple, CustomColors.purple, CustomFonts.purple11w600);
       case AppBadgeVariant.secondary:
-        return (CustomColors.primarySoft, CustomColors.secondary, CustomFonts.secondary11w600);
+        return (CustomColors.palePurple, CustomColors.green, CustomFonts.green11w600);
       case AppBadgeVariant.neutral:
-        return (CustomColors.surfaceMuted, CustomColors.textSecondary, CustomFonts.grey11w600);
+        return (CustomColors.softGrey, CustomColors.grey, CustomFonts.grey11w600);
     }
   }
 }

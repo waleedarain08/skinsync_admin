@@ -63,7 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             flex: 4,
             child: Container(
               decoration: const BoxDecoration(
-                gradient: CustomColors.primaryGradient,
+                gradient: CustomColors.purpleToLightPurpleGradient,
               ),
               child: Stack(
                 children: [
@@ -75,7 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       height: 400,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: CustomColors.secondary.withValues(alpha: 0.1),
+                        color: CustomColors.green.withValues(alpha: 0.1),
                       ),
                     ),
                   ),
@@ -123,7 +123,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Expanded(
             flex: 5,
             child: Container(
-              color: CustomColors.backgroundLight,
+              color: CustomColors.whiteGrey,
               child: Center(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.symmetric(horizontal: 80.w, vertical: 48.h),
@@ -192,7 +192,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Text("Already have an account? ", style: CustomFonts.grey13w500),
                               GestureDetector(
                                 onTap: () => context.go(SignInScreen.routeName),
-                                child: Text("Sign In", style: CustomFonts.primary14w600),
+                                child: Text("Sign In", style: CustomFonts.purple14w600),
                               ),
                             ],
                           ),
@@ -212,7 +212,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildFeatureRow(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, color: CustomColors.secondary, size: 22.sp),
+        Icon(icon, color: CustomColors.green, size: 22.sp),
         SizedBox(width: 12.w),
         Text(text, style: CustomFonts.white90_16w600),
       ],
@@ -240,14 +240,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           keyboardType: keyboardType,
           style: CustomFonts.grey14w400,
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.textTertiary),
+            prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.lightGrey),
             hintText: hint,
             suffixIcon: isPassword ? IconButton(
               onPressed: onTogglePassword,
               icon: Icon(
                 obscureText! ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                 size: 20.sp,
-                color: CustomColors.textTertiary,
+                color: CustomColors.lightGrey,
               ),
             ) : null,
           ),
@@ -264,10 +264,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Icon(
             isValid ? Icons.check_circle_rounded : Icons.circle_outlined,
             size: 16.sp,
-            color: isValid ? CustomColors.success : CustomColors.textTertiary.withValues(alpha: 0.5),
+            color: isValid ? CustomColors.green : CustomColors.lightGrey.withValues(alpha: 0.5),
           ),
           SizedBox(width: 8.w),
-          Text(text, style: isValid ? CustomFonts.success12w400 : CustomFonts.grey12w400),
+          Text(text, style: isValid ? CustomFonts.green12w400 : CustomFonts.grey12w400),
         ],
       ),
     );
@@ -294,12 +294,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const TextSpan(text: "I agree to the "),
                 TextSpan(
                   text: "Terms of Service",
-                  style: CustomFonts.primary14w700,
+                  style: CustomFonts.purple14w700,
                 ),
                 const TextSpan(text: " and "),
                 TextSpan(
                   text: "Privacy Policy",
-                  style: CustomFonts.primary14w700,
+                  style: CustomFonts.purple14w700,
                 ),
               ],
             ),

@@ -28,14 +28,14 @@ class EditTreatmentScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         title: Text("Edit Treatment", style: CustomFonts.black18w600),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
+          icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
         ),
         actions: [
@@ -80,7 +80,7 @@ class EditTreatmentScreen extends ConsumerWidget {
         viewModel.displayNameController.text.isEmpty ||
         viewModel.basePriceController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.error),
+        const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.red),
       );
       return false;
     }
@@ -90,14 +90,14 @@ class EditTreatmentScreen extends ConsumerWidget {
 
     if (hours <= 0 && minutes <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a valid treatment duration"), backgroundColor: CustomColors.error),
+        const SnackBar(content: Text("Please enter a valid treatment duration"), backgroundColor: CustomColors.red),
       );
       return false;
     }
 
     if (minutes > 59) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Minutes must be between 0 and 59"), backgroundColor: CustomColors.error),
+        const SnackBar(content: Text("Minutes must be between 0 and 59"), backgroundColor: CustomColors.red),
       );
       return false;
     }
@@ -107,7 +107,7 @@ class EditTreatmentScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Each area must have at least one sub-area: ${area.areaController.text}"),
-            backgroundColor: CustomColors.error,
+            backgroundColor: CustomColors.red,
           ),
         );
         return false;
@@ -288,7 +288,7 @@ class EditTreatmentScreen extends ConsumerWidget {
                       IconButton(
                         padding: EdgeInsets.only(top: 32.h),
                         onPressed: () => viewModel.removeArea(index),
-                        icon: const Icon(Icons.delete_outline, color: CustomColors.error),
+                        icon: const Icon(Icons.delete_outline, color: CustomColors.red),
                       ),
                   ]),
                   SizedBox(height: 16.h),
@@ -328,8 +328,8 @@ class EditTreatmentScreen extends ConsumerWidget {
             children: entry.subAreas.map((sub) => Chip(
               label: Text(sub.name, style: CustomFonts.grey13w500),
               onDeleted: () => viewModel.removeSubArea(areaIndex, sub.name),
-              backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
-              side: BorderSide(color: CustomColors.brandCyan.withValues(alpha: 0.2)),
+              backgroundColor: CustomColors.green.withValues(alpha: 0.1),
+              side: BorderSide(color: CustomColors.green.withValues(alpha: 0.2)),
             )).toList(),
           ),
         ],
@@ -426,10 +426,10 @@ class EditTreatmentScreen extends ConsumerWidget {
               children: state.combinableTreatments.map((t) => Chip(
                 label: Text(t.name ?? "N/A"),
                 onDeleted: () => viewModel.removeCombinableTreatment(t.id ?? 0),
-                backgroundColor: CustomColors.brandPurple.withValues(alpha: 0.1),
-                side: BorderSide(color: CustomColors.brandPurple.withValues(alpha: 0.2)),
+                backgroundColor: CustomColors.purple.withValues(alpha: 0.1),
+                side: BorderSide(color: CustomColors.purple.withValues(alpha: 0.2)),
                 labelStyle: CustomFonts.black12w400,
-                deleteIconColor: CustomColors.deepSlate,
+                deleteIconColor: CustomColors.black,
               )).toList(),
             ),
           ],
@@ -442,9 +442,9 @@ class EditTreatmentScreen extends ConsumerWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: CustomColors.backgroundLight,
+        color: CustomColors.whiteGrey,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: CustomColors.borderLight),
+        border: Border.all(color: CustomColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,14 +489,14 @@ class EditTreatmentScreen extends ConsumerWidget {
             height: 120.h,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: CustomColors.backgroundLight,
+              color: CustomColors.whiteGrey,
               borderRadius: BorderRadius.circular(12.r),
               image: file != null ? DecorationImage(
                 image: kIsWeb ? NetworkImage(file.path) : FileImage(File(file.path)) as ImageProvider,
                 fit: BoxFit.cover,
               ) : null,
             ),
-            child: file == null ? const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.textSecondary)) : null,
+            child: file == null ? const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.grey)) : null,
           ),
         ),
       ],
@@ -540,10 +540,10 @@ class EditTreatmentScreen extends ConsumerWidget {
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.borderLight)),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.borderLight)),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.brandCyan)),
-                suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.textSecondary),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.border)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.border)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: CustomColors.green)),
+                suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
               ),
             );
           },
@@ -565,8 +565,8 @@ class EditTreatmentScreen extends ConsumerWidget {
                 leading: Container(
                   width: 32.w,
                   height: 32.w,
-                  decoration: BoxDecoration(color: CustomColors.backgroundLight, borderRadius: BorderRadius.circular(6.r)),
-                  child: const Icon(Icons.circle_outlined, size: 14, color: CustomColors.textSecondary),
+                  decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(6.r)),
+                  child: const Icon(Icons.circle_outlined, size: 14, color: CustomColors.grey),
                 ),
                 title: Text(item, style: CustomFonts.grey14w400),
                 onTap: () {

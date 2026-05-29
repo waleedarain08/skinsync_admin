@@ -5,8 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
@@ -35,7 +33,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     final state = ref.watch(subscriptionViewModelProvider);
 
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -123,7 +121,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     return BorderdContainerWidget(
       enableHover: true,
       padding: EdgeInsets.all(AppSpacing.xl),
-      backgroundColor: CustomColors.brandPurple.withValues(alpha: 0.02),
+      backgroundColor: CustomColors.purple.withValues(alpha: 0.02),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -139,7 +137,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text("\$0.00", style: CustomFonts.primary32w700),
+              Text("\$0.00", style: CustomFonts.purple32w700),
               SizedBox(width: 4.w),
               Text(" / ${plan.durationMonths} months introductory", style: CustomFonts.grey12w400),
             ],
@@ -154,7 +152,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("CAPACITY LIMITS", style: CustomFonts.secondary9w600),
+                    Text("CAPACITY LIMITS", style: CustomFonts.green9w600),
                     SizedBox(height: 12.h),
                     _limitRow(Icons.person_pin_rounded, "Doctor Seats:", plan.unlimitedDoctors ? "Unlimited" : "${plan.doctorSeats}"),
                     SizedBox(height: 8.h),
@@ -167,7 +165,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("COMMISSION & FEES", style: CustomFonts.secondary9w600),
+                    Text("COMMISSION & FEES", style: CustomFonts.green9w600),
                     SizedBox(height: 12.h),
                     _limitRow(Icons.percent_rounded, "Standard Comm:", "${plan.standardBookingCommissionPercent}%"),
                     SizedBox(height: 8.h),
@@ -178,7 +176,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             ],
           ),
           SizedBox(height: AppSpacing.xl),
-          Text("INCLUDED FEATURES", style: CustomFonts.secondary9w600),
+          Text("INCLUDED FEATURES", style: CustomFonts.green9w600),
           SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: 24.w,
@@ -187,7 +185,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
               width: 280.w,
               child: Row(
                 children: [
-                  const Icon(Icons.check_rounded, color: CustomColors.success, size: 16),
+                  const Icon(Icons.check_rounded, color: CustomColors.green, size: 16),
                   SizedBox(width: 8.w),
                   Expanded(child: Text(benefit.title ?? "", style: CustomFonts.grey13w500)),
                 ],
@@ -229,7 +227,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text("\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}", 
-                style: CustomFonts.primary32w700),
+                style: CustomFonts.purple32w700),
               SizedBox(width: 4.w),
               Text("/ month", style: CustomFonts.grey12w400),
             ],
@@ -237,7 +235,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           SizedBox(height: AppSpacing.xl),
           const Divider(),
           SizedBox(height: AppSpacing.xl),
-          Text("CAPACITY & FEES", style: CustomFonts.secondary9w600),
+          Text("CAPACITY & FEES", style: CustomFonts.green9w600),
           SizedBox(height: 12.h),
           _limitRow(
             Icons.person_pin_rounded, 
@@ -255,7 +253,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           SizedBox(height: 8.h),
           _limitRow(Icons.terminal_rounded, "Tech Fee:", "\$${plan.technologyFeePerTreatment}"),
           SizedBox(height: AppSpacing.xl),
-          Text("INCLUDED FEATURES", style: CustomFonts.secondary9w600),
+          Text("INCLUDED FEATURES", style: CustomFonts.green9w600),
           SizedBox(height: AppSpacing.md),
           Expanded(
             child: ListView.separated(
@@ -265,7 +263,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                 final benefit = activeBenefits[i];
                 return Row(
                   children: [
-                    const Icon(Icons.check_rounded, color: CustomColors.success, size: 16),
+                    const Icon(Icons.check_rounded, color: CustomColors.green, size: 16),
                     SizedBox(width: 8.w),
                     Expanded(child: Text(benefit.title ?? "", style: CustomFonts.grey13w500)),
                   ],
@@ -287,9 +285,9 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
               SizedBox(width: AppSpacing.sm),
               IconButton(
                 onPressed: () => _confirmDelete(plan),
-                icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.error),
+                icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.red),
                 style: IconButton.styleFrom(
-                  backgroundColor: CustomColors.error.withValues(alpha: 0.05),
+                  backgroundColor: CustomColors.red.withValues(alpha: 0.05),
                 ),
               ),
             ],
@@ -309,7 +307,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: CustomColors.error),
+            style: ElevatedButton.styleFrom(backgroundColor: CustomColors.red),
             onPressed: () => Navigator.pop(context, true),
             child: const Text("Remove"),
           ),
@@ -324,7 +322,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
   Widget _limitRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 14.sp, color: CustomColors.textTertiary),
+        Icon(icon, size: 14.sp, color: CustomColors.lightGrey),
         SizedBox(width: 8.w),
         Text(label, style: CustomFonts.grey12w400),
         const Spacer(),

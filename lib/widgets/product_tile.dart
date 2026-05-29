@@ -31,12 +31,12 @@ class ProductTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(15.r),
           boxShadow: [
             BoxShadow(
-              color: CustomColors.lightBlueColor.withValues(alpha: 0.2),
+              color: CustomColors.purple.withValues(alpha: 0.2),
               blurRadius: 8.r,
               offset: Offset(0, 2.h),
             ),
             BoxShadow(
-              color: CustomColors.lightPurpleColor.withValues(alpha: 0.1),
+              color: CustomColors.purple.withValues(alpha: 0.1),
               blurRadius: 10.r,
               offset: Offset(2.h, 0),
             ),

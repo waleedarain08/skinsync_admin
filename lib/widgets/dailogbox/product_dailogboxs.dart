@@ -158,7 +158,7 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                 });
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: CustomColors.deepNavy,
+                backgroundColor: CustomColors.black,
                 padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
               ),
               child: Text(state.loading ? 'Saving...' : 'Save Product'),
@@ -179,11 +179,11 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
           height: 140.h,
           width: 140.h,
           decoration: BoxDecoration(
-            color: CustomColors.surfaceGhost,
+            color: CustomColors.whiteGrey,
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: CustomColors.textMuted.withOpacity(0.1)),
+            border: Border.all(color: CustomColors.grey.withValues(alpha: 0.1)),
           ),
-          child: const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.textMuted)),
+          child: const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.grey)),
         ),
       ],
     );

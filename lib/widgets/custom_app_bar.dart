@@ -15,8 +15,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       height: AppSpacing.topBarHeight,
       decoration: const BoxDecoration(
-        color: CustomColors.surfaceWhite,
-        border: Border(bottom: BorderSide(color: CustomColors.sidebarBorder, width: 1)),
+        color: CustomColors.white,
+        border: Border(bottom: BorderSide(color: CustomColors.border, width: 1)),
       ),
       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Row(
@@ -53,9 +53,9 @@ class _MenuButton extends StatelessWidget {
       padding: EdgeInsets.only(right: AppSpacing.sm),
       child: IconButton(
         onPressed: () => Scaffold.of(context).openDrawer(),
-        icon: Icon(Icons.menu_rounded, color: CustomColors.textPrimary, size: 26.sp),
+        icon: Icon(Icons.menu_rounded, color: CustomColors.black, size: 26.sp),
         style: IconButton.styleFrom(
-          backgroundColor: CustomColors.backgroundLight,
+          backgroundColor: CustomColors.whiteGrey,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
         ),
       ),
@@ -94,9 +94,9 @@ class _TopBarActionState extends State<_TopBarAction> {
             IconButton(
               onPressed: () {},
               icon: Icon(widget.icon, size: 24.sp),
-              color: _hovered ? CustomColors.primary : CustomColors.textSecondary,
+              color: _hovered ? CustomColors.purple : CustomColors.grey,
               style: IconButton.styleFrom(
-                backgroundColor: _hovered ? CustomColors.primarySoft : Colors.transparent,
+                backgroundColor: _hovered ? CustomColors.palePurple : Colors.transparent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
                 ),
@@ -110,9 +110,9 @@ class _TopBarActionState extends State<_TopBarAction> {
                   width: 7.w,
                   height: 7.w,
                   decoration: BoxDecoration(
-                    color: CustomColors.error,
+                    color: CustomColors.red,
                     shape: BoxShape.circle,
-                    border: Border.all(color: CustomColors.surfaceWhite, width: 1.5),
+                    border: Border.all(color: CustomColors.white, width: 1.5),
                   ),
                 ),
               ),
@@ -135,7 +135,7 @@ class _UserProfile extends StatelessWidget {
       elevation: 8,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.r),
-        side: const BorderSide(color: CustomColors.borderLight),
+        side: const BorderSide(color: CustomColors.border),
       ),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
@@ -157,13 +157,13 @@ class _UserProfile extends StatelessWidget {
               width: 40.w,
               height: 40.w,
               decoration: BoxDecoration(
-                color: CustomColors.primary,
+                color: CustomColors.purple,
                 borderRadius: BorderRadius.circular(8.r),
               ),
-              child: Icon(Icons.person_rounded, size: 22.sp, color: CustomColors.surfaceWhite),
+              child: Icon(Icons.person_rounded, size: 22.sp, color: CustomColors.white),
             ),
             SizedBox(width: 4.w),
-            Icon(Icons.keyboard_arrow_down_rounded, size: 16.sp, color: CustomColors.textTertiary),
+            Icon(Icons.keyboard_arrow_down_rounded, size: 16.sp, color: CustomColors.lightGrey),
           ],
         ),
       ),
@@ -183,7 +183,7 @@ class _UserProfile extends StatelessWidget {
           onTap: () {},
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18.sp, color: CustomColors.textSecondary),
+              Icon(Icons.person_outline_rounded, size: 18.sp, color: CustomColors.grey),
               SizedBox(width: AppSpacing.md),
               const Text('Account Profile'),
             ],
@@ -198,7 +198,7 @@ class _UserProfile extends StatelessWidget {
           },
           child: Row(
             children: [
-              Icon(Icons.logout_rounded, color: CustomColors.error, size: 18.sp),
+              Icon(Icons.logout_rounded, color: CustomColors.red, size: 18.sp),
               SizedBox(width: AppSpacing.md),
               Text('Logout', style: CustomFonts.red14w600),
             ],

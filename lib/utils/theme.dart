@@ -17,71 +17,71 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: CustomColors.backgroundStart,
-      primaryColor: CustomColors.primary,
-      splashColor: CustomColors.primary.withValues(alpha: 0.05),
+      scaffoldBackgroundColor: CustomColors.whiteGrey,
+      primaryColor: CustomColors.purple,
+      splashColor: CustomColors.purple.withValues(alpha: 0.05),
       
-      colorScheme: ColorScheme.light(
-        primary: CustomColors.primary,
-        onPrimary: Colors.white,
-        secondary: CustomColors.secondary,
-        onSecondary: Colors.white,
-        surface: Colors.white,
-        onSurface: CustomColors.textPrimary,
-        error: CustomColors.error,
-        outline: CustomColors.borderLight,
-        surfaceContainerHighest: CustomColors.surfaceMuted,
+      colorScheme: const ColorScheme.light(
+        primary: CustomColors.purple,
+        onPrimary: CustomColors.white,
+        secondary: CustomColors.green,
+        onSecondary: CustomColors.white,
+        surface: CustomColors.white,
+        onSurface: CustomColors.black,
+        error: CustomColors.red,
+        outline: CustomColors.border,
+        surfaceContainerHighest: CustomColors.softGrey,
       ),
 
       iconTheme: IconThemeData(
-        color: CustomColors.textSecondary,
+        color: CustomColors.grey,
         size: 20.sp,
       ),
 
       primaryIconTheme: IconThemeData(
-        color: CustomColors.primary,
+        color: CustomColors.purple,
         size: 20.sp,
       ),
 
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.white,
+        backgroundColor: CustomColors.white,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        iconTheme: IconThemeData(color: CustomColors.textPrimary, size: 22.sp),
-        titleTextStyle: CustomFonts.headingSmall,
+        iconTheme: IconThemeData(color: CustomColors.black, size: 22.sp),
+        titleTextStyle: CustomFonts.black18w600,
       ),
 
       textTheme: TextTheme(
-        headlineLarge: CustomFonts.headingLarge,
-        headlineMedium: CustomFonts.headingMedium,
-        headlineSmall: CustomFonts.headingSmall,
-        bodyLarge: CustomFonts.bodyLarge,
-        bodyMedium: CustomFonts.bodyMedium,
-        bodySmall: CustomFonts.bodySmall,
-        labelMedium: CustomFonts.labelMedium,
+        headlineLarge: CustomFonts.black26w700,
+        headlineMedium: CustomFonts.black20w600,
+        headlineSmall: CustomFonts.black18w600,
+        bodyLarge: CustomFonts.black16w400,
+        bodyMedium: CustomFonts.black14w400,
+        bodySmall: CustomFonts.grey13w500,
+        labelMedium: CustomFonts.grey12w600,
       ),
 
       cardTheme: CardThemeData(
-        color: CustomColors.card,
+        color: CustomColors.white,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
-          side: const BorderSide(color: CustomColors.borderLight, width: 1),
+          side: const BorderSide(color: CustomColors.border, width: 1),
         ),
       ),
 
       drawerTheme: const DrawerThemeData(
-        backgroundColor: CustomColors.sidebar,
+        backgroundColor: CustomColors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: CustomColors.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: CustomColors.purple,
+          foregroundColor: CustomColors.white,
           elevation: 0,
           minimumSize: Size(0, 48.h),
           padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -91,45 +91,45 @@ class AppTheme {
       ),
 
       tabBarTheme: TabBarThemeData(
-        labelColor: CustomColors.primary,
-        unselectedLabelColor: CustomColors.textSecondary,
-        labelStyle: CustomFonts.tabText,
+        labelColor: CustomColors.purple,
+        unselectedLabelColor: CustomColors.grey,
+        labelStyle: CustomFonts.black14w600,
         unselectedLabelStyle: CustomFonts.grey14w500,
         indicatorSize: TabBarIndicatorSize.label,
-        indicatorColor: CustomColors.primary,
-        dividerColor: CustomColors.borderLight,
+        indicatorColor: CustomColors.purple,
+        dividerColor: CustomColors.border,
       ),
 
       dataTableTheme: DataTableThemeData(
-        headingRowColor: WidgetStateProperty.all(CustomColors.surfaceMuted),
-        dataRowColor: WidgetStateProperty.all(Colors.white),
-        headingTextStyle: CustomFonts.labelMedium,
-        dataTextStyle: CustomFonts.bodyMedium,
+        headingRowColor: WidgetStateProperty.all(CustomColors.softGrey),
+        dataRowColor: WidgetStateProperty.all(CustomColors.white),
+        headingTextStyle: CustomFonts.grey12w600,
+        dataTextStyle: CustomFonts.black14w400,
         horizontalMargin: 24.0,
         dividerThickness: 1,
       ),
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: CustomColors.white,
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        hintStyle: CustomFonts.captionText,
-        labelStyle: CustomFonts.bodyMedium,
+        hintStyle: CustomFonts.grey12w400,
+        labelStyle: CustomFonts.black14w400,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.borderLight),
+          borderSide: const BorderSide(color: CustomColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.borderLight),
+          borderSide: const BorderSide(color: CustomColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.primary, width: 1.5),
+          borderSide: const BorderSide(color: CustomColors.purple, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.error),
+          borderSide: const BorderSide(color: CustomColors.red),
         ),
       ),
     );
@@ -138,9 +138,9 @@ class AppTheme {
 
 class AppDecorations {
   static BoxDecoration card = BoxDecoration(
-    color: CustomColors.card,
+    color: CustomColors.white,
     borderRadius: BorderRadius.circular(12.r),
-    border: Border.all(color: CustomColors.sidebarBorder),
+    border: Border.all(color: CustomColors.border),
   );
 
   static BoxDecoration sidebarItem = BoxDecoration(
@@ -158,19 +158,19 @@ class AppDecorations {
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: CustomColors.card,
+        fillColor: CustomColors.white,
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.sidebarBorder),
+          borderSide: const BorderSide(color: CustomColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.sidebarBorder),
+          borderSide: const BorderSide(color: CustomColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.primary, width: 1.5),
+          borderSide: const BorderSide(color: CustomColors.purple, width: 1.5),
         ),
       );
 }
@@ -203,7 +203,7 @@ class AppRadius {
 class AppShadows {
   static List<BoxShadow> get card => [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.05),
+          color: CustomColors.black.withValues(alpha: 0.05),
           blurRadius: 10.r,
           offset: Offset(0, 4.h),
         ),
@@ -211,20 +211,20 @@ class AppShadows {
 
   static List<BoxShadow> get cardHover => [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.1),
+          color: CustomColors.black.withValues(alpha: 0.1),
           blurRadius: 20.r,
           offset: Offset(0, 8.h),
         ),
       ];
 
   static List<BoxShadow> get lg => [
-    BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 30, offset: const Offset(0, 10))
+    BoxShadow(color: CustomColors.black.withValues(alpha: 0.1), blurRadius: 30, offset: const Offset(0, 10))
   ];
   static List<BoxShadow> get md => [
-    BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, 5))
+    BoxShadow(color: CustomColors.black.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, 5))
   ];
   static List<BoxShadow> get sm => [
-    BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 2))
+    BoxShadow(color: CustomColors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 2))
   ];
   static List<BoxShadow> get xs => sm;
 }

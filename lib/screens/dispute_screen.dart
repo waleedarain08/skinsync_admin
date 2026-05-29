@@ -12,7 +12,7 @@ class DisputeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
@@ -48,13 +48,13 @@ class DisputeScreen extends StatelessWidget {
   Widget _buildDisputeMetrics() {
     return Row(
       children: [
-        _buildMetricCard("Active Disputes", "12", Icons.gavel_outlined, CustomColors.errorRed),
+        _buildMetricCard("Active Disputes", "12", Icons.gavel_outlined, CustomColors.red),
         SizedBox(width: 16.w),
-        _buildMetricCard("Pending Review", "8", Icons.hourglass_top, CustomColors.warningOrange),
+        _buildMetricCard("Pending Review", "8", Icons.hourglass_top, CustomColors.amber),
         SizedBox(width: 16.w),
-        _buildMetricCard("Resolved (30d)", "45", Icons.check_circle_outline, CustomColors.successGreen),
+        _buildMetricCard("Resolved (30d)", "45", Icons.check_circle_outline, CustomColors.green),
         SizedBox(width: 16.w),
-        _buildMetricCard("Avg Resolution Time", "2.4 Days", Icons.timer_outlined, CustomColors.deepNavy),
+        _buildMetricCard("Avg Resolution Time", "2.4 Days", Icons.timer_outlined, CustomColors.black),
       ],
     );
   }
@@ -96,7 +96,7 @@ class DisputeScreen extends StatelessWidget {
               columnSpacing: 24,
               horizontalMargin: 20,
               minWidth: 1000,
-              headingRowColor: WidgetStateProperty.all(CustomColors.surfaceMuted),
+              headingRowColor: WidgetStateProperty.all(CustomColors.softGrey),
               columns: const [
                 DataColumn2(label: Text('ID'), size: ColumnSize.S),
                 DataColumn2(label: Text('Patient'), size: ColumnSize.L),
@@ -123,8 +123,8 @@ class DisputeScreen extends StatelessWidget {
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.errorRed.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4.r)),
-            child: Text("High", style: CustomFonts.error10w700), // Updated to static style
+            decoration: BoxDecoration(color: CustomColors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4.r)),
+            child: Text("High", style: CustomFonts.red10w700), // Updated to static style
           ),
         ),
         DataCell(
@@ -136,7 +136,7 @@ class DisputeScreen extends StatelessWidget {
                   showDialog(context: context, builder: (_) => const DisputeDetailsDialog());
                 },
               ),
-              IconButton(icon: const Icon(Icons.check_circle_outline, size: 20, color: CustomColors.successGreen), onPressed: () {}),
+              IconButton(icon: const Icon(Icons.check_circle_outline, size: 20, color: CustomColors.green), onPressed: () {}),
             ],
           ),
         ),
@@ -160,7 +160,7 @@ class DisputeScreen extends StatelessWidget {
               columnSpacing: 24,
               horizontalMargin: 20,
               minWidth: 1000,
-              headingRowColor: WidgetStateProperty.all(CustomColors.surfaceMuted),
+              headingRowColor: WidgetStateProperty.all(CustomColors.softGrey),
               columns: const [
                 DataColumn2(label: Text('ID'), size: ColumnSize.S),
                 DataColumn2(label: Text('Clinic'), size: ColumnSize.L),

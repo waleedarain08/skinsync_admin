@@ -22,14 +22,14 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         title: Text("Prospect Clinic Detail", style: CustomFonts.black18w600),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
+          icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
         ),
       ),
@@ -68,14 +68,14 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             width: 120.w,
             height: 120.w,
             decoration: BoxDecoration(
-              color: CustomColors.backgroundLight,
+              color: CustomColors.whiteGrey,
               borderRadius: BorderRadius.circular(20.r),
               image: (clinic.logo != null && clinic.logo!.isNotEmpty)
                   ? DecorationImage(image: NetworkImage(clinic.logo!), fit: BoxFit.cover)
                   : null,
             ),
             child: (clinic.logo == null || clinic.logo!.isEmpty)
-                ? Icon(Icons.business_outlined, size: 48.sp, color: CustomColors.deepSlate)
+                ? Icon(Icons.business_outlined, size: 48.sp, color: CustomColors.black)
                 : null,
           ),
           SizedBox(width: 32.w),
@@ -141,8 +141,8 @@ class InviteClinicDetailScreen extends ConsumerWidget {
           _actionButton(
             "Invite Clinic Now", 
             Icons.mail_outline_rounded, 
-            CustomColors.brandCyan, 
-            CustomColors.deepSlate,
+            CustomColors.green, 
+            CustomColors.black,
             () {},
           ),
           SizedBox(height: 12.h),
@@ -150,7 +150,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             "Resend Invitation", 
             Icons.refresh_rounded, 
             Colors.white, 
-            CustomColors.brandCyan,
+            CustomColors.green,
             () {},
             isOutlined: true,
           ),
@@ -158,7 +158,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
           _actionButton(
             "Start Onboarding", 
             Icons.rocket_launch_outlined, 
-            CustomColors.success, 
+            CustomColors.green, 
             Colors.white,
             () {
               context.push(AddNewClinicScreen.routeName, extra: clinic);
@@ -166,13 +166,13 @@ class InviteClinicDetailScreen extends ConsumerWidget {
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 32.h),
-            child: Divider(color: CustomColors.borderLight.withValues(alpha: 0.6)),
+            child: Divider(color: CustomColors.border.withValues(alpha: 0.6)),
           ),
           _actionButton(
             "Archive Prospect", 
             Icons.block_flipped, 
             Colors.white, 
-            CustomColors.error,
+            CustomColors.red,
             () {},
             isOutlined: true,
           ),
@@ -202,8 +202,8 @@ class InviteClinicDetailScreen extends ConsumerWidget {
         children: [
           Container(
             padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(color: CustomColors.backgroundLight, borderRadius: BorderRadius.circular(8.r)),
-            child: Icon(icon, size: 18.sp, color: CustomColors.textSecondary),
+            decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(8.r)),
+            child: Icon(icon, size: 18.sp, color: CustomColors.grey),
           ),
           SizedBox(width: 16.w),
           Column(
@@ -234,7 +234,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             foregroundColor: text,
             padding: EdgeInsets.symmetric(vertical: 20.h),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-            elevation: bg == CustomColors.brandCyan ? 4 : 0,
+            elevation: bg == CustomColors.green ? 4 : 0,
             shadowColor: bg.withValues(alpha: 0.4),
             textStyle: CustomFonts.grey14w700ls03,
           ).copyWith(
@@ -260,18 +260,18 @@ class InviteClinicDetailScreen extends ConsumerWidget {
   }
 
   Widget _statusBadge(String status) {
-    Color color = CustomColors.textSecondary;
+    Color color = CustomColors.grey;
     TextStyle textStyle = CustomFonts.grey10w700;
     String cleanStatus = status.toLowerCase();
     if (cleanStatus.contains('sent') || cleanStatus.contains('invited') || cleanStatus.contains('awaiting')) {
-      color = CustomColors.brandCyan;
-      textStyle = CustomFonts.cyan10w700;
+      color = CustomColors.green;
+      textStyle = CustomFonts.green10w700;
     } else if (cleanStatus.contains('interested') || cleanStatus.contains('pending')) {
-      color = CustomColors.success;
-      textStyle = CustomFonts.success10w700;
+      color = CustomColors.green;
+      textStyle = CustomFonts.green10w700;
     } else if (cleanStatus.contains('expired')) {
-      color = CustomColors.error;
-      textStyle = CustomFonts.error10w700;
+      color = CustomColors.red;
+      textStyle = CustomFonts.red10w700;
     }
 
     return Container(
@@ -292,12 +292,12 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: CustomColors.backgroundLight,
+        color: CustomColors.whiteGrey,
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 14.sp, color: CustomColors.textSecondary),
+          Icon(icon, size: 14.sp, color: CustomColors.grey),
           SizedBox(width: 8.w),
           Text(label, style: CustomFonts.grey13w500),
         ],

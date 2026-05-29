@@ -105,17 +105,17 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final bool isMobile = context.isMobile;
 
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         title: Text("Clinic Detail", style: CustomFonts.black18w600),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
+          icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
         ),
         actions: [
           IconButton(
-            icon: Icon(_isEditMode ? Icons.close : Icons.edit_outlined, color: CustomColors.deepSlate),
+            icon: Icon(_isEditMode ? Icons.close : Icons.edit_outlined, color: CustomColors.black),
             onPressed: () {
               setState(() {
                 if (_isEditMode) {
@@ -166,10 +166,10 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                       child: ElevatedButton(
                         onPressed: _updateClinic,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: CustomColors.deepSlate,
+                          backgroundColor: CustomColors.black,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                           elevation: 4,
-                          shadowColor: CustomColors.deepSlate.withValues(alpha: 0.3),
+                          shadowColor: CustomColors.black.withValues(alpha: 0.3),
                         ),
                         child: Text("Save Changes", style: CustomFonts.white16w400),
                       ),
@@ -197,9 +197,9 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                   width: 100.w,
                   height: 100.w,
                   decoration: BoxDecoration(
-                    color: CustomColors.backgroundLight,
+                    color: CustomColors.whiteGrey,
                     borderRadius: BorderRadius.circular(20.r),
-                    border: _isEditMode ? Border.all(color: CustomColors.brandCyan, width: 2) : null,
+                    border: _isEditMode ? Border.all(color: CustomColors.purple, width: 2) : null,
                     image: _selectedLogo != null
                         ? DecorationImage(
                             image: kIsWeb ? NetworkImage(_selectedLogo!.path) : FileImage(File(_selectedLogo!.path)) as ImageProvider,
@@ -209,7 +209,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                             : null,
                   ),
                   child: (_selectedLogo == null && (clinic.logo == null || clinic.logo!.isEmpty))
-                      ? Icon(Icons.business_outlined, size: 40.sp, color: CustomColors.deepSlate)
+                      ? Icon(Icons.business_outlined, size: 40.sp, color: CustomColors.black)
                       : _isEditMode
                           ? Container(
                               decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(20.r)),
@@ -358,7 +358,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 18.sp, color: CustomColors.textSecondary),
+              Icon(icon, size: 18.sp, color: CustomColors.grey),
               SizedBox(width: 12.w),
               Text(label, style: CustomFonts.grey13w500),
             ],
@@ -374,12 +374,12 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: isActive ? CustomColors.success.withValues(alpha: 0.1) : CustomColors.error.withValues(alpha: 0.1),
+        color: isActive ? CustomColors.green.withValues(alpha: 0.1) : CustomColors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
         status.toUpperCase(),
-        style: isActive ? CustomFonts.success10w700 : CustomFonts.error10w700,
+        style: isActive ? CustomFonts.green10w700 : CustomFonts.red10w700,
       ),
     );
   }
@@ -387,11 +387,11 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
   Widget _infoChip(IconData icon, String label) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-      decoration: BoxDecoration(color: CustomColors.backgroundLight, borderRadius: BorderRadius.circular(8.r)),
+      decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(8.r)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14.sp, color: CustomColors.textSecondary),
+          Icon(icon, size: 14.sp, color: CustomColors.grey),
           SizedBox(width: 8.w),
           Text(label, style: CustomFonts.grey13w500),
         ],

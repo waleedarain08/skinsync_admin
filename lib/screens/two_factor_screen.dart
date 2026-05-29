@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 
 class TwoFactorAuthScreen extends StatefulWidget {
   const TwoFactorAuthScreen({super.key});
@@ -163,10 +163,10 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
                 _isTwoFactorEnabled = value;
               });
             },
-            activeColor: Colors.white,
-            activeTrackColor: const Color(0xFF6B5DD3),
-            inactiveThumbColor: Colors.white,
-            inactiveTrackColor: Colors.grey[300],
+            activeThumbColor: CustomColors.white,
+            activeTrackColor: CustomColors.purple,
+            inactiveThumbColor: CustomColors.white,
+            inactiveTrackColor: CustomColors.border,
             trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
           ),
         ],

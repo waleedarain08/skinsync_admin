@@ -34,7 +34,11 @@ class _AppGradientButtonState extends State<AppGradientButton> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
-        transform: Matrix4.identity()..scale(_hovered && enabled ? 1.015 : 1.0),
+        transform: Matrix4.diagonal3Values(
+          _hovered && enabled ? 1.015 : 1.0,
+          _hovered && enabled ? 1.015 : 1.0,
+          1.0,
+        ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -45,13 +49,13 @@ class _AppGradientButtonState extends State<AppGradientButton> {
               height: 48.h,
               decoration: BoxDecoration(
                 gradient: enabled
-                    ? CustomColors.medicalGradient
+                    ? CustomColors.purpleToLightPurpleGradient
                     : LinearGradient(
-                        colors: [CustomColors.textTertiary.withValues(alpha: 0.5), CustomColors.textTertiary.withValues(alpha: 0.5)],
+                        colors: [CustomColors.lightGrey.withValues(alpha: 0.5), CustomColors.lightGrey.withValues(alpha: 0.5)],
                       ),
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 boxShadow: enabled && _hovered 
-                  ? [BoxShadow(color: CustomColors.secondary.withValues(alpha: 0.25), blurRadius: 12, offset: const Offset(0, 4))] 
+                  ? [BoxShadow(color: CustomColors.purple.withValues(alpha: 0.25), blurRadius: 12, offset: const Offset(0, 4))]
                   : [],
               ),
               child: Center(
@@ -61,14 +65,14 @@ class _AppGradientButtonState extends State<AppGradientButton> {
                         height: 20.w,
                         child: const CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: CustomColors.surfaceWhite,
+                          color: CustomColors.white,
                         ),
                       )
                     : Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (widget.icon != null) ...[
-                            Icon(widget.icon, color: CustomColors.surfaceWhite, size: 18.sp),
+                            Icon(widget.icon, color: CustomColors.white, size: 18.sp),
                             SizedBox(width: 10.w),
                           ],
                           Text(widget.label, style: CustomFonts.white14w600),

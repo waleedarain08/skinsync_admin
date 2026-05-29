@@ -43,12 +43,12 @@ class DisputeDetailsDialog extends StatelessWidget {
         TextButton(onPressed: () => Navigator.pop(context), child: const Text("Close")),
         ElevatedButton(
           onPressed: () {},
-          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.error),
+          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.red),
           child: const Text("Escalate"),
         ),
         ElevatedButton(
           onPressed: () {},
-          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.success),
+          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.green),
           child: const Text("Resolve Dispute"),
         ),
       ],

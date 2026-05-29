@@ -24,19 +24,19 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: CustomColors.backgroundLight,
+        backgroundColor: CustomColors.whiteGrey,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
           title: Text("Manage Network Taxonomy", style: CustomFonts.black20w600),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: CustomColors.textMain),
+            icon: const Icon(Icons.arrow_back, color: CustomColors.black),
             onPressed: () => context.pop(),
           ),
           bottom: TabBar(
-            labelColor: CustomColors.brandPrimary,
-            unselectedLabelColor: CustomColors.textMuted,
-            indicatorColor: CustomColors.brandPrimary,
+            labelColor: CustomColors.purple,
+            unselectedLabelColor: CustomColors.grey,
+            indicatorColor: CustomColors.purple,
             indicatorWeight: 3,
             tabs: const [
               Tab(text: "Categories"),
@@ -163,9 +163,9 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               label: Text(item),
               onDeleted: () => _showDeleteConfirm(context, item, () => viewModel.deleteMaterial(item)),
               deleteIcon: const Icon(Icons.close, size: 16),
-              labelStyle: CustomFonts.primary14w600,
-              backgroundColor: CustomColors.brandPrimary.withValues(alpha: 0.05),
-              side: BorderSide(color: CustomColors.brandPrimary.withValues(alpha: 0.1)),
+              labelStyle: CustomFonts.purple14w600,
+              backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
+              side: BorderSide(color: CustomColors.purple.withValues(alpha: 0.1)),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
             )).toList(),
           ),
@@ -205,10 +205,10 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                     width: 40.w,
                     height: 40.w,
                     decoration: BoxDecoration(
-                      color: CustomColors.brandPurple.withValues(alpha: 0.1),
+                      color: CustomColors.purple.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
-                    child: const Icon(Icons.auto_awesome_motion_rounded, color: CustomColors.brandPurple),
+                    child: const Icon(Icons.auto_awesome_motion_rounded, color: CustomColors.purple),
                   ),
                   title: Text(group.name, style: CustomFonts.black16w600),
                   subtitle: Text("${group.treatmentNames.length} combined treatments", style: CustomFonts.grey12w400),
@@ -227,7 +227,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.error),
+                        icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.red),
                         onPressed: () => _showDeleteConfirm(context, group.name, () => viewModel.deleteCombinationGroup(group.id)),
                       ),
                       const Icon(Icons.expand_more),
@@ -244,7 +244,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                             runSpacing: 12.h,
                             children: group.treatmentNames.map((t) => Chip(
                               label: Text(t),
-                              backgroundColor: CustomColors.surfaceGhost,
+                              backgroundColor: CustomColors.whiteGrey,
                               side: BorderSide(color: Colors.grey[200]!),
                               labelStyle: CustomFonts.black12w600,
                             )).toList(),
@@ -273,7 +273,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
           icon: const Icon(Icons.add, size: 18),
           label: const Text("Add New"),
           style: ElevatedButton.styleFrom(
-            backgroundColor: CustomColors.deepNavy,
+            backgroundColor: CustomColors.black,
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
           ),
@@ -301,10 +301,10 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         leading: Container(
           width: 40.w,
           height: 40.w,
-          decoration: BoxDecoration(color: CustomColors.surfaceGhost, borderRadius: BorderRadius.circular(8.r)),
+          decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(8.r)),
           child: icon != null 
               ? Image.network(icon, errorBuilder: (_, __, ___) => const Icon(Icons.category_outlined)) 
-              : const Icon(Icons.category_outlined, color: CustomColors.brandPrimary),
+              : const Icon(Icons.category_outlined, color: CustomColors.purple),
         ),
         title: Text(name, style: CustomFonts.black16w600),
         subtitle: Text("$childrenCount sub-items", style: CustomFonts.grey12w400),
@@ -322,7 +322,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.error),
+              icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.red),
               onPressed: () => _showDeleteConfirm(context, name, onDelete),
             ),
             const Icon(Icons.expand_more),
@@ -338,10 +338,10 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                   leading: Container(
                     width: 32.w,
                     height: 32.w,
-                    decoration: BoxDecoration(color: CustomColors.surfaceGhost, borderRadius: BorderRadius.circular(6.r)),
+                    decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(6.r)),
                     child: child.icon != null 
                         ? Image.network(child.icon!, errorBuilder: (_, __, ___) => const Icon(Icons.subdirectory_arrow_right, size: 16)) 
-                        : const Icon(Icons.subdirectory_arrow_right, size: 16, color: CustomColors.textMuted),
+                        : const Icon(Icons.subdirectory_arrow_right, size: 16, color: CustomColors.grey),
                   ),
                   title: Text(child.name, style: CustomFonts.black14w400),
                   trailing: Row(
@@ -358,7 +358,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, size: 18, color: CustomColors.error),
+                        icon: const Icon(Icons.close, size: 18, color: CustomColors.red),
                         onPressed: () => onDeleteChild(child.name),
                       ),
                     ],
@@ -373,7 +373,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                   ),
                   icon: const Icon(Icons.add, size: 16),
                   label: const Text("Add Sub-item"),
-                  style: TextButton.styleFrom(foregroundColor: CustomColors.brandPrimary),
+                  style: TextButton.styleFrom(foregroundColor: CustomColors.purple),
                 ),
               ],
             ),
@@ -472,7 +472,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                     hintText: "Select treatment to add",
                     suffixIcon: const Icon(Icons.search),
                     filled: true,
-                    fillColor: CustomColors.surfaceGhost,
+                    fillColor: CustomColors.whiteGrey,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
                   ),
                 ),
@@ -500,8 +500,8 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                   children: selectedTreatments.map((t) => Chip(
                     label: Text(t, style: CustomFonts.black11w400),
                     onDeleted: () => setState(() => selectedTreatments.remove(t)),
-                    backgroundColor: CustomColors.brandPrimary.withValues(alpha: 0.05),
-                    deleteIconColor: CustomColors.brandPrimary,
+                    backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
+                    deleteIconColor: CustomColors.purple,
                   )).toList(),
                 ),
               ],
@@ -534,7 +534,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: CustomColors.error),
+            style: ElevatedButton.styleFrom(backgroundColor: CustomColors.red),
             onPressed: () {
               onConfirm();
               Navigator.pop(context);

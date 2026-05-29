@@ -33,18 +33,18 @@ class EmptyWidget extends StatelessWidget {
               width: 120.w,
               height: 120.w,
               decoration: BoxDecoration(
-                color: CustomColors.primarySoft,
+                color: CustomColors.palePurple,
                 borderRadius: BorderRadius.circular(24.r),
-                border: Border.all(color: CustomColors.borderLight),
+                border: Border.all(color: CustomColors.border),
               ),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
                   Opacity(
                     opacity: 0.1,
-                    child: Image.asset(PngAssets.splashLogo, width: 64.w, height: 64.w, color: CustomColors.primary),
+                    child: Image.asset(PngAssets.splashLogo, width: 64.w, height: 64.w, color: CustomColors.purple),
                   ),
-                  Icon(icon, size: 40.sp, color: CustomColors.textTertiary),
+                  Icon(icon, size: 40.sp, color: CustomColors.lightGrey),
                 ],
               ),
             ),

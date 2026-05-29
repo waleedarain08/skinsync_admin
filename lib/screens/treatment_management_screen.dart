@@ -37,7 +37,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -106,7 +106,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: CustomColors.borderLight),
+              border: Border.all(color: CustomColors.border),
               boxShadow: AppShadows.xs,
             ),
             child: TextField(
@@ -116,7 +116,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               decoration: InputDecoration(
                 hintText: "Search treatments by keyword, category, or area...",
                 hintStyle: CustomFonts.grey13w500,
-                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.textTertiary, size: 20),
+                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.lightGrey, size: 20),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -268,7 +268,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                 hintText: hint,
                 suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
                 filled: true,
-                fillColor: CustomColors.backgroundLight,
+                fillColor: CustomColors.whiteGrey,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide.none),
               ),
             );
@@ -277,7 +277,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             final query = searchController.text.toLowerCase();
             return [
               ListTile(
-                title: Text("All $label", style: CustomFonts.black14w600.copyWith(color: CustomColors.primary)),
+                title: Text("All $label", style: CustomFonts.black14w600.copyWith(color: CustomColors.purple)),
                 onTap: () {
                   controller.clear();
                   onSelected("");
@@ -310,9 +310,9 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           padding: EdgeInsets.only(top: 80.h),
           child: Column(
             children: [
-              Icon(Icons.search_off_rounded, size: 48.sp, color: CustomColors.textTertiary),
+              Icon(Icons.search_off_rounded, size: 48.sp, color: CustomColors.lightGrey),
               SizedBox(height: AppSpacing.md),
-              Text("No matching treatments found.", style: CustomFonts.black16w400.copyWith(color: CustomColors.textSecondary)),
+              Text("No matching treatments found.", style: CustomFonts.black16w400.copyWith(color: CustomColors.grey)),
             ],
           ),
         ),
@@ -338,7 +338,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             width: 72.w,
             height: 72.w,
             decoration: BoxDecoration(
-              color: CustomColors.surfaceMuted,
+              color: CustomColors.softGrey,
               borderRadius: BorderRadius.circular(AppRadius.md),
               image: (treatment.image != null && treatment.image!.isNotEmpty)
                   ? DecorationImage(
@@ -348,7 +348,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                   : null,
             ),
             child: (treatment.image == null || treatment.image!.isEmpty)
-                ? Icon(Icons.image_outlined, color: CustomColors.textTertiary, size: 24.sp)
+                ? Icon(Icons.image_outlined, color: CustomColors.lightGrey, size: 24.sp)
                 : null,
           ),
           SizedBox(width: AppSpacing.xl),
@@ -383,18 +383,18 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           Container(
             padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 8.h),
             decoration: BoxDecoration(
-              color: CustomColors.primarySoft,
+              color: CustomColors.palePurple,
               borderRadius: BorderRadius.circular(AppRadius.full),
-              border: Border.all(color: CustomColors.secondary.withValues(alpha: 0.1)),
+              border: Border.all(color: CustomColors.green.withValues(alpha: 0.1)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.layers_outlined, size: 14.sp, color: CustomColors.secondary),
+                Icon(Icons.layers_outlined, size: 14.sp, color: CustomColors.green),
                 SizedBox(width: 8.w),
                 Text(
                   "${treatment.sideAreas?.length ?? 0} Active Areas",
-                  style: CustomFonts.black14w600.copyWith(fontSize: 11.sp, color: CustomColors.secondary),
+                  style: CustomFonts.black14w600.copyWith(fontSize: 11.sp, color: CustomColors.green),
                 ),
               ],
             ),
@@ -430,7 +430,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             break;
         }
       },
-      icon: const Icon(Icons.more_horiz_rounded, size: 24, color: CustomColors.textSecondary),
+      icon: const Icon(Icons.more_horiz_rounded, size: 24, color: CustomColors.grey),
       offset: const Offset(0, 40),
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
@@ -439,7 +439,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           value: 'detail',
           child: Row(
             children: [
-              const Icon(Icons.visibility_outlined, size: 18, color: CustomColors.textSecondary),
+              const Icon(Icons.visibility_outlined, size: 18, color: CustomColors.grey),
               SizedBox(width: AppSpacing.sm),
               const Text("View Profile"),
             ],
@@ -452,7 +452,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               Icon(
                 treatment.isActive ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                 size: 18,
-                color: treatment.isActive ? CustomColors.warning : CustomColors.success,
+                color: treatment.isActive ? CustomColors.amber : CustomColors.green,
               ),
               SizedBox(width: AppSpacing.sm),
               Text(treatment.isActive ? "Deactivate" : "Activate"),
@@ -464,9 +464,9 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           value: 'delete',
           child: Row(
             children: [
-              const Icon(Icons.delete_outline_rounded, size: 18, color: CustomColors.error),
+              const Icon(Icons.delete_outline_rounded, size: 18, color: CustomColors.red),
               SizedBox(width: AppSpacing.sm),
-              Text("Archive Treatment", style: TextStyle(color: CustomColors.error)),
+              Text("Archive Treatment", style: TextStyle(color: CustomColors.red)),
             ],
           ),
         ),
@@ -484,7 +484,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: CustomColors.error),
+            style: ElevatedButton.styleFrom(backgroundColor: CustomColors.red),
             onPressed: () {
               viewModel.deleteTreatment(treatment.id ?? 0);
               Navigator.pop(context);

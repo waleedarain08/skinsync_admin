@@ -3,7 +3,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:skinsync_admin/route_generator.dart';
-import 'utils/color_constant.dart';
 import 'utils/screen_size.dart';
 import 'utils/theme.dart';
 
@@ -19,11 +18,11 @@ class AppInit extends StatelessWidget {
       ..indicatorType = EasyLoadingIndicatorType.fadingCircle
       ..indicatorSize = 40.0
       ..radius = 12.0
-      ..progressColor = CustomColors.surfaceWhite
-      ..backgroundColor = CustomColors.sidebar
-      ..indicatorColor = CustomColors.secondary
-      ..textColor = CustomColors.textOnDark
-      ..maskColor = CustomColors.textPrimary.withValues(alpha: 0.4)
+      ..progressColor = CustomColors.white
+      ..backgroundColor = CustomColors.white
+      ..indicatorColor = CustomColors.green
+      ..textColor = CustomColors.white
+      ..maskColor = CustomColors.black.withValues(alpha: 0.4)
       ..userInteractions = true
       ..dismissOnTap = false;
   }

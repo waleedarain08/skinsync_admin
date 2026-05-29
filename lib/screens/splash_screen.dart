@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.surfaceWhite,
+      backgroundColor: CustomColors.white,
       body: Stack(
         children: [
           Positioned(
@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [CustomColors.secondary.withValues(alpha: 0.1), Colors.transparent],
+                  colors: [CustomColors.green.withValues(alpha: 0.1), Colors.transparent],
                 ),
               ),
             ),
@@ -86,17 +86,17 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     Container(
                       padding: EdgeInsets.all(24.w),
                       decoration: BoxDecoration(
-                        gradient: CustomColors.medicalGradient,
+                        gradient: CustomColors.purpleToLightPurpleGradient,
                         borderRadius: BorderRadius.circular(24.r),
                         boxShadow: [
                           BoxShadow(
-                            color: CustomColors.secondary.withValues(alpha: 0.25),
+                            color: CustomColors.purple.withValues(alpha: 0.25),
                             blurRadius: 32,
                             offset: const Offset(0, 12),
                           ),
                         ],
                       ),
-                      child: Image.asset(PngAssets.splashLogo, height: 80.w, width: 80.w, color: Colors.white),
+                      child: Image.asset(PngAssets.splashLogo, height: 80.w, width: 80.w, color: CustomColors.white),
                     ),
                     SizedBox(height: AppSpacing.xxl),
                     Text(
@@ -106,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     SizedBox(height: AppSpacing.sm),
                     Text(
                       'PREMIUM MEDSPA SaaS',
-                      style: CustomFonts.secondary9w600,
+                      style: CustomFonts.green9w600,
                     ),
                   ],
                 ),

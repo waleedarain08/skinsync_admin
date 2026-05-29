@@ -23,7 +23,7 @@ class CustomDropdown extends StatelessWidget {
       height: 48.h,
       child: DropdownButtonFormField<String>(
         isExpanded: true,
-        value: value,
+        initialValue: value,
         style: CustomFonts.grey14w400,
         decoration: AppDecorations.input(hint: hint),
         hint: Text(hint, style: CustomFonts.grey13w500),
@@ -31,8 +31,8 @@ class CustomDropdown extends StatelessWidget {
             .map((item) => DropdownMenuItem<String>(value: item, child: Text(item, style: CustomFonts.grey14w400)))
             .toList(),
         onChanged: onChanged,
-        icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.textTertiary, size: 22.sp),
-        dropdownColor: CustomColors.surfaceWhite,
+        icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.lightGrey, size: 22.sp),
+        dropdownColor: CustomColors.white,
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
     );

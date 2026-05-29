@@ -55,26 +55,26 @@ class AppSidebar extends StatelessWidget {
   static SidebarXTheme get collapsedTheme => SidebarXTheme(
         width: 80.w,
         decoration: const BoxDecoration(
-          color: CustomColors.sidebar,
-          border: Border(right: BorderSide(color: CustomColors.borderLight, width: 1)),
+          color: CustomColors.white,
+          border: Border(right: BorderSide(color: CustomColors.border, width: 1)),
         ),
         padding: EdgeInsets.symmetric(vertical: 24.h),
-        iconTheme: IconThemeData(color: CustomColors.textSecondary, size: 20.sp),
-        selectedIconTheme: IconThemeData(color: CustomColors.primary, size: 20.sp),
-        hoverIconTheme: IconThemeData(color: CustomColors.primary, size: 20.sp),
-        textStyle: CustomFonts.sidebarText,
-        selectedTextStyle: CustomFonts.sidebarTextSelected,
-        hoverTextStyle: CustomFonts.sidebarTextSelected,
-        hoverColor: CustomColors.primary.withValues(alpha: 0.05),
+        iconTheme: IconThemeData(color: CustomColors.grey, size: 20.sp),
+        selectedIconTheme: IconThemeData(color: CustomColors.purple, size: 20.sp),
+        hoverIconTheme: IconThemeData(color: CustomColors.purple, size: 20.sp),
+        textStyle: CustomFonts.grey14w600,
+        selectedTextStyle: CustomFonts.purple14w600,
+        hoverTextStyle: CustomFonts.purple14w600,
+        hoverColor: CustomColors.purple.withValues(alpha: 0.05),
         itemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
         selectedItemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
         itemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
         selectedItemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
         itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(12.r)),
         selectedItemDecoration: BoxDecoration(
-          color: CustomColors.primary.withValues(alpha: 0.08),
+          color: CustomColors.purple.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: CustomColors.primary.withValues(alpha: 0.2), width: 1),
+          border: Border.all(color: CustomColors.purple.withValues(alpha: 0.2), width: 1),
         ),
       );
 
@@ -93,7 +93,7 @@ class AppSidebar extends StatelessWidget {
       animationDuration: const Duration(milliseconds: 300),
       showToggleButton: true,
       headerDivider: const SizedBox.shrink(),
-      footerDivider: Divider(color: CustomColors.sidebarBorder, height: 1.h, thickness: 1),
+      footerDivider: Divider(color: CustomColors.border, height: 1.h, thickness: 1),
       separatorBuilder: (context, index) => _separatorBuilder(context, index, controller),
       headerBuilder: (context, extended) => _headerBuilder(context, extended),
       toggleButtonBuilder: (context, extended) => _toggleButtonBuilder(context, extended, controller),
@@ -150,7 +150,7 @@ class AppSidebar extends StatelessWidget {
                   ),
                   Text(
                     'ADMIN PANEL',
-                    style: CustomFonts.primary9w800ls1,
+                    style: CustomFonts.purple9w800ls1,
                   ),
                 ],
               ),
@@ -164,14 +164,14 @@ class AppSidebar extends StatelessWidget {
   Widget _toggleButtonBuilder(BuildContext context, bool extended, SidebarXController controller) {
     return InkWell(
       onTap: () => controller.toggleExtended(),
-      hoverColor: CustomColors.primary.withValues(alpha: 0.05),
+      hoverColor: CustomColors.purple.withValues(alpha: 0.05),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 24.h),
         child: Icon(
           extended ? Icons.arrow_back_ios_new_rounded : Icons.arrow_forward_ios_rounded,
           size: 18.sp,
-          color: CustomColors.textSecondary.withValues(alpha: 0.7),
+          color: CustomColors.grey.withValues(alpha: 0.7),
         ),
       ),
     );

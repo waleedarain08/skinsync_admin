@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       drawer: Responsive.when(
         defaultValue: null,
         mobile: () => Drawer(child: sidebar),

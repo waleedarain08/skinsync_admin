@@ -60,7 +60,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: Stack(
         children: [
           Positioned(
@@ -73,7 +73,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    CustomColors.secondary.withValues(alpha: 0.15),
+                    CustomColors.green.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -90,7 +90,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    CustomColors.primary.withValues(alpha: 0.12),
+                    CustomColors.purple.withValues(alpha: 0.12),
                     Colors.transparent,
                   ],
                 ),
@@ -128,7 +128,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 8.h),
         Text(
           "ADMIN PANEL",
-          style: CustomFonts.primary14w800ls3,
+          style: CustomFonts.purple14w800ls3,
         ),
       ],
     );
@@ -139,9 +139,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       width: 450.w,
       padding: EdgeInsets.all(40.w),
       decoration: BoxDecoration(
-        color: CustomColors.surfaceWhite,
+        color: CustomColors.white,
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: CustomColors.borderLight),
+        border: Border.all(color: CustomColors.border),
         boxShadow: AppShadows.lg,
       ),
       child: Form(
@@ -197,7 +197,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             _buildCheckbox(),
             TextButton(
               onPressed: () => setCurrentScreen(AuthScreen.forgetPassword),
-              child: Text("Forgot Password?", style: CustomFonts.primary14w600),
+              child: Text("Forgot Password?", style: CustomFonts.purple14w600),
             ),
           ],
         ),
@@ -215,7 +215,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         IconButton(
           onPressed: () => setCurrentScreen(AuthScreen.login),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          style: IconButton.styleFrom(backgroundColor: CustomColors.surfaceMuted),
+          style: IconButton.styleFrom(backgroundColor: CustomColors.softGrey),
         ),
         SizedBox(height: 24.h),
         Text("Reset Password", style: CustomFonts.black20w600),
@@ -252,7 +252,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             height: 56.w,
             textStyle: CustomFonts.black18w600,
             decoration: BoxDecoration(
-              color: CustomColors.surfaceMuted,
+              color: CustomColors.softGrey,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: Colors.transparent),
             ),
@@ -264,7 +264,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: CustomColors.primary, width: 2),
+              border: Border.all(color: CustomColors.purple, width: 2),
             ),
           ),
         ),
@@ -273,7 +273,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 16.h),
         TextButton(
           onPressed: _handleForgotPassword,
-          child: Text("Didn't receive code? Resend", style: CustomFonts.primary14w600),
+          child: Text("Didn't receive code? Resend", style: CustomFonts.purple14w600),
         ),
       ],
     );
@@ -340,14 +340,14 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           validator: validator,
           style: CustomFonts.grey14w400,
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.textTertiary),
+            prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.lightGrey),
             hintText: hint,
             suffixIcon: isPassword ? IconButton(
               onPressed: onTogglePassword,
               icon: Icon(
                 obscureText! ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                 size: 20.sp,
-                color: CustomColors.textTertiary,
+                color: CustomColors.lightGrey,
               ),
             ) : null,
           ),

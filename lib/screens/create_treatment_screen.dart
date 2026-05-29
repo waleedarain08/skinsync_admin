@@ -24,14 +24,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         title: Text("Create New Treatment", style: CustomFonts.black18w600),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
+          icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () {
             viewModel.resetForm();
             context.pop();
@@ -91,9 +91,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
           width: 32.w,
           height: 32.w,
           decoration: BoxDecoration(
-            color: isCompleted ? CustomColors.success : (isActive ? CustomColors.deepSlate : Colors.white),
+            color: isCompleted ? CustomColors.green : (isActive ? CustomColors.black : Colors.white),
             shape: BoxShape.circle,
-            border: Border.all(color: isActive ? Colors.transparent : CustomColors.borderLight),
+            border: Border.all(color: isActive ? Colors.transparent : CustomColors.border),
           ),
           child: Center(
             child: isCompleted
@@ -119,7 +119,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 16.w),
         height: 2.h,
-        color: isCompleted ? CustomColors.success : CustomColors.borderLight,
+        color: isCompleted ? CustomColors.green : CustomColors.border,
       ),
     );
   }
@@ -282,8 +282,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
               icon: const Icon(Icons.add_location_alt_outlined, size: 18),
               label: const Text("Add New Area"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
-                foregroundColor: CustomColors.deepSlate,
+                backgroundColor: CustomColors.green.withValues(alpha: 0.1),
+                foregroundColor: CustomColors.black,
               ),
             ),
           ],
@@ -368,14 +368,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: CustomColors.borderLight),
+        border: Border.all(color: CustomColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.subdirectory_arrow_right, size: 18, color: CustomColors.deepSlate),
+              const Icon(Icons.subdirectory_arrow_right, size: 18, color: CustomColors.black),
               SizedBox(width: 8.w),
               Text(subArea.name, style: CustomFonts.black14w600),
             ],
@@ -433,10 +433,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
             children: state.combinableTreatments.map((t) => Chip(
               label: Text(t.name ?? "N/A"),
               onDeleted: () => viewModel.removeCombinableTreatment(t.id ?? 0),
-              backgroundColor: CustomColors.brandPurple.withValues(alpha: 0.1),
-              side: BorderSide(color: CustomColors.brandPurple.withValues(alpha: 0.2)),
+              backgroundColor: CustomColors.purple.withValues(alpha: 0.1),
+              side: BorderSide(color: CustomColors.purple.withValues(alpha: 0.2)),
               labelStyle: CustomFonts.black12w400,
-              deleteIconColor: CustomColors.deepSlate,
+              deleteIconColor: CustomColors.black,
             )).toList(),
           ),
         ],
@@ -450,7 +450,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: CustomColors.borderLight),
+        border: Border.all(color: CustomColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -472,7 +472,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                   padding: EdgeInsets.only(top: 32.h, left: 16.w),
                   child: IconButton(
                     onPressed: () => viewModel.removeArea(index),
-                    icon: const Icon(Icons.delete_outline, color: CustomColors.error),
+                    icon: const Icon(Icons.delete_outline, color: CustomColors.red),
                   ),
                 ),
             ],
@@ -512,8 +512,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 avatar: const Icon(Icons.subdirectory_arrow_right, size: 14),
                 label: Text(sub.name, style: CustomFonts.grey13w500),
                 onDeleted: () => viewModel.removeSubArea(areaIndex, sub.name),
-                backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
-                side: BorderSide(color: CustomColors.brandCyan.withValues(alpha: 0.2)),
+                backgroundColor: CustomColors.green.withValues(alpha: 0.1),
+                side: BorderSide(color: CustomColors.green.withValues(alpha: 0.2)),
               );
             }).toList(),
           ),
@@ -562,17 +562,17 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.r),
-                  borderSide: const BorderSide(color: CustomColors.borderLight),
+                  borderSide: const BorderSide(color: CustomColors.border),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.r),
-                  borderSide: const BorderSide(color: CustomColors.borderLight),
+                  borderSide: const BorderSide(color: CustomColors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.r),
-                  borderSide: const BorderSide(color: CustomColors.brandCyan),
+                  borderSide: const BorderSide(color: CustomColors.green),
                 ),
-                suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.textSecondary),
+                suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
               ),
             );
           },
@@ -594,13 +594,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                       decoration: BoxDecoration(
-                        color: CustomColors.brandPrimary.withValues(alpha: 0.05),
+                        color: CustomColors.purple.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(10.r),
-                        border: Border.all(color: CustomColors.brandPrimary.withValues(alpha: 0.1)),
+                        border: Border.all(color: CustomColors.purple.withValues(alpha: 0.1)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.add_circle_outline_rounded, color: CustomColors.deepSlate, size: 20),
+                          const Icon(Icons.add_circle_outline_rounded, color: CustomColors.black, size: 20),
                           SizedBox(width: 12.w),
                           Expanded(
                             child: Text(
@@ -624,18 +624,18 @@ class CreateTreatmentScreen extends ConsumerWidget {
                       leading: Container(
                         width: 32.w,
                         height: 32.w,
-                        decoration: BoxDecoration(color: CustomColors.backgroundLight, borderRadius: BorderRadius.circular(6.r)),
-                        child: const Icon(Icons.circle_outlined, size: 14, color: CustomColors.textSecondary),
+                        decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(6.r)),
+                        child: const Icon(Icons.circle_outlined, size: 14, color: CustomColors.grey),
                       ),
                       title: Text(item, style: CustomFonts.grey14w400),
-                      hoverColor: CustomColors.brandCyan.withValues(alpha: 0.05),
+                      hoverColor: CustomColors.green.withValues(alpha: 0.05),
                       onTap: () {
                         controller.text = item;
                         onSelected(item);
                         searchController.closeView(item);
                       },
                     ),
-                    const Divider(height: 1, indent: 24, endIndent: 24, color: CustomColors.borderLight),
+                    const Divider(height: 1, indent: 24, endIndent: 24, color: CustomColors.border),
                   ],
                 );
               }),
@@ -660,7 +660,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: CustomColors.borderLight, width: 2),
+              border: Border.all(color: CustomColors.border, width: 2),
               image: file != null
                   ? DecorationImage(
                       image: kIsWeb ? NetworkImage(file.path) : FileImage(File(file.path)) as ImageProvider,
@@ -674,8 +674,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
                     children: [
                       Container(
                         padding: EdgeInsets.all(12.r),
-                        decoration: BoxDecoration(color: CustomColors.backgroundLight, shape: BoxShape.circle),
-                        child: const Icon(Icons.add_a_photo_outlined, color: CustomColors.deepSlate),
+                        decoration: BoxDecoration(color: CustomColors.whiteGrey, shape: BoxShape.circle),
+                        child: const Icon(Icons.add_a_photo_outlined, color: CustomColors.black),
                       ),
                       SizedBox(height: 12.h),
                       Text("Tap to upload", style: CustomFonts.grey13w500),
@@ -718,8 +718,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 });
               },
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: CustomColors.deepSlate),
-                foregroundColor: CustomColors.deepSlate,
+                side: const BorderSide(color: CustomColors.black),
+                foregroundColor: CustomColors.black,
               ),
               child: const Text("Finish & Create Now"),
             ),
@@ -757,7 +757,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
         viewModel.displayNameController.text.isEmpty ||
         viewModel.basePriceController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.error),
+        const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.red),
       );
       return false;
     }
@@ -767,14 +767,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     if (hours <= 0 && minutes <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a valid treatment duration"), backgroundColor: CustomColors.error),
+        const SnackBar(content: Text("Please enter a valid treatment duration"), backgroundColor: CustomColors.red),
       );
       return false;
     }
 
     if (minutes > 59) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Minutes must be between 0 and 59"), backgroundColor: CustomColors.error),
+        const SnackBar(content: Text("Minutes must be between 0 and 59"), backgroundColor: CustomColors.red),
       );
       return false;
     }
@@ -788,7 +788,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Please select at least one sub-area for '${area.areaController.text}'"),
-            backgroundColor: CustomColors.error,
+            backgroundColor: CustomColors.red,
           ),
         );
         return false;

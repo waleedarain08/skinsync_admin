@@ -30,7 +30,7 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerPr
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: CustomColors.backgroundLight,
+      color: CustomColors.whiteGrey,
       child: Center(
         child: AnimatedBuilder(
           animation: _controller,
@@ -44,9 +44,9 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerPr
             padding: EdgeInsets.all(40.w),
             margin: EdgeInsets.symmetric(horizontal: 24.w),
             decoration: BoxDecoration(
-              color: CustomColors.surfaceWhite,
+              color: CustomColors.white,
               borderRadius: BorderRadius.circular(24.r),
-              border: Border.all(color: CustomColors.borderLight),
+              border: Border.all(color: CustomColors.border),
               boxShadow: AppShadows.lg,
             ),
             child: Column(
@@ -55,10 +55,10 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerPr
                 Container(
                   padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
-                    gradient: CustomColors.medicalGradient,
+                    gradient: CustomColors.purpleToLightPurpleGradient,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
-                  child: Icon(Icons.auto_awesome_rounded, size: 48.sp, color: CustomColors.surfaceWhite),
+                  child: Icon(Icons.auto_awesome_rounded, size: 48.sp, color: CustomColors.white),
                 ),
                 SizedBox(height: 32.h),
                 Text('Coming Soon', style: CustomFonts.black26w700),
@@ -66,17 +66,17 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerPr
                 Text(
                   "We're crafting an elegant experience for this module.\nStay tuned for the unveiling.",
                   textAlign: TextAlign.center,
-                  style: CustomFonts.black16w400.copyWith(color: CustomColors.textSecondary),
+                  style: CustomFonts.grey16w400,
                 ),
                 SizedBox(height: 32.h),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
                   decoration: BoxDecoration(
-                    color: CustomColors.primarySoft,
+                    color: CustomColors.palePurple,
                     borderRadius: BorderRadius.circular(AppRadius.full),
-                    border: Border.all(color: CustomColors.secondary.withValues(alpha: 0.1)),
+                    border: Border.all(color: CustomColors.purple.withValues(alpha: 0.1)),
                   ),
-                  child: Text('PREMIUM ACCESS', style: CustomFonts.black14w600.copyWith(color: CustomColors.secondary, fontSize: 11.sp)),
+                  child: Text('PREMIUM ACCESS', style: CustomFonts.purple11w600),
                 ),
               ],
             ),

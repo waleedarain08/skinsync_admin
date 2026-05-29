@@ -20,7 +20,7 @@ class _UserManagementState extends State<UserManagement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
@@ -56,13 +56,13 @@ class _UserManagementState extends State<UserManagement> {
   Widget _buildQuickMetrics() {
     return Row(
       children: [
-        _buildMetricCard("Total Users", "15,240", Icons.group_rounded, CustomColors.brandPrimary),
+        _buildMetricCard("Total Users", "15,240", Icons.group_rounded, CustomColors.purple),
         SizedBox(width: 16.w),
-        _buildMetricCard("Active Staff", "84", Icons.admin_panel_settings_rounded, CustomColors.success),
+        _buildMetricCard("Active Staff", "84", Icons.admin_panel_settings_rounded, CustomColors.green),
         SizedBox(width: 16.w),
-        _buildMetricCard("New Signups", "+120", Icons.person_add_rounded, CustomColors.brandPurple),
+        _buildMetricCard("New Signups", "+120", Icons.person_add_rounded, CustomColors.purple),
         SizedBox(width: 16.w),
-        _buildMetricCard("Reported", "3", Icons.report_problem_rounded, CustomColors.error),
+        _buildMetricCard("Reported", "3", Icons.report_problem_rounded, CustomColors.red),
       ],
     );
   }
@@ -96,7 +96,7 @@ class _UserManagementState extends State<UserManagement> {
     return Container(
       padding: EdgeInsets.all(4.w),
       decoration: BoxDecoration(
-        color: CustomColors.surfaceGhost,
+        color: CustomColors.whiteGrey,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
@@ -143,7 +143,7 @@ class _UserManagementState extends State<UserManagement> {
                 SizedBox(
                   width: 300.w,
                   child: CupertinoSearchTextField(
-                    backgroundColor: CustomColors.surfaceGhost,
+                    backgroundColor: CustomColors.whiteGrey,
                     placeholder: "Search by name or email...",
                     borderRadius: BorderRadius.circular(10.r),
                   ),
@@ -164,7 +164,7 @@ class UserDataTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DataTable(
-      headingRowColor: WidgetStateProperty.all(CustomColors.surfaceGhost),
+      headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
       headingTextStyle: CustomFonts.grey12w700,
       columnSpacing: 40.w,
       columns: const [
@@ -184,7 +184,7 @@ class UserDataTable extends StatelessWidget {
         DataCell(
           Row(
             children: [
-              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.brandPrimary)),
+              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.green.withValues(alpha: 0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.purple)),
               SizedBox(width: 12.w),
               Text("Courtney Henry", style: CustomFonts.black14w600),
             ],
@@ -195,8 +195,8 @@ class UserDataTable extends StatelessWidget {
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
-            child: Text("Active", style: CustomFonts.success10w700),
+            decoration: BoxDecoration(color: CustomColors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
+            child: Text("Active", style: CustomFonts.green10w700),
           ),
         ),
         DataCell(

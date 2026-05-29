@@ -1,8 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -14,7 +12,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -72,18 +70,18 @@ class DashboardScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 10.h),
       decoration: BoxDecoration(
-        color: CustomColors.surfaceWhite,
+        color: CustomColors.white,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: CustomColors.borderLight),
+        border: Border.all(color: CustomColors.border),
         boxShadow: AppShadows.xs,
       ),
       child: Row(
         children: [
-          Icon(Icons.calendar_today_rounded, size: 16.sp, color: CustomColors.primary),
+          Icon(Icons.calendar_today_rounded, size: 16.sp, color: CustomColors.purple),
           SizedBox(width: AppSpacing.sm),
           Text('Oct 2023', style: CustomFonts.black14w600),
           SizedBox(width: AppSpacing.xs),
-          Icon(Icons.keyboard_arrow_down_rounded, size: 18.sp, color: CustomColors.textTertiary),
+          Icon(Icons.keyboard_arrow_down_rounded, size: 18.sp, color: CustomColors.lightGrey),
         ],
       ),
     );
@@ -92,13 +90,13 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildQuickStats() {
     return Row(
       children: [
-        _buildStatCard('Total Clinics', '54', '+12%', Icons.domain_rounded, CustomColors.primary),
+        _buildStatCard('Total Clinics', '54', '+12%', Icons.domain_rounded, CustomColors.purple),
         SizedBox(width: AppSpacing.md),
-        _buildStatCard('Active Patients', '12,450', '+5.2%', Icons.people_rounded, CustomColors.secondary),
+        _buildStatCard('Active Patients', '12,450', '+5.2%', Icons.people_rounded, CustomColors.green),
         SizedBox(width: AppSpacing.md),
-        _buildStatCard('New Appointments', '3,820', '+18%', Icons.event_available_rounded, CustomColors.primaryLight),
+        _buildStatCard('New Appointments', '3,820', '+18%', Icons.event_available_rounded, CustomColors.lightPurple),
         SizedBox(width: AppSpacing.md),
-        _buildStatCard('Total Revenue', '\$1.2M', '+24%', Icons.payments_rounded, CustomColors.success),
+        _buildStatCard('Total Revenue', '\$1.2M', '+24%', Icons.payments_rounded, CustomColors.green),
       ],
     );
   }
@@ -157,7 +155,7 @@ class DashboardScreen extends StatelessWidget {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
-                  getDrawingHorizontalLine: (v) => FlLine(color: CustomColors.borderLight, strokeWidth: 1),
+                  getDrawingHorizontalLine: (v) => FlLine(color: CustomColors.border, strokeWidth: 1),
                 ),
                 titlesData: const FlTitlesData(show: false),
                 borderData: FlBorderData(show: false),
@@ -172,7 +170,7 @@ class DashboardScreen extends StatelessWidget {
                       FlSpot(5, 6),
                     ],
                     isCurved: true,
-                    color: CustomColors.primary,
+                    color: CustomColors.purple,
                     barWidth: 3,
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
@@ -181,8 +179,8 @@ class DashboardScreen extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          CustomColors.primary.withValues(alpha: 0.2),
-                          CustomColors.primary.withValues(alpha: 0),
+                          CustomColors.purple.withValues(alpha: 0.2),
+                          CustomColors.purple.withValues(alpha: 0),
                         ],
                       ),
                     ),
@@ -220,7 +218,7 @@ class DashboardScreen extends StatelessWidget {
             width: 36.w,
             height: 36.w,
             decoration: BoxDecoration(
-              gradient: CustomColors.brandGradientDiagonal,
+              gradient: CustomColors.purpleToLightPurpleGradient,
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             alignment: Alignment.center,
@@ -239,7 +237,7 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          Text('\$42k', style: CustomFonts.primary14w600),
+          Text('\$42k', style: CustomFonts.purple14w600),
         ],
       ),
     );
@@ -258,7 +256,7 @@ class DashboardScreen extends StatelessWidget {
               Text('Recent Activity', style: CustomFonts.black18w600),
               TextButton(
                 onPressed: () {},
-                child: Text('View Report', style: CustomFonts.primary14w600),
+                child: Text('View Report', style: CustomFonts.purple14w600),
               ),
             ],
           ),
@@ -277,10 +275,10 @@ class DashboardScreen extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
-              color: CustomColors.surfaceMuted,
+              color: CustomColors.softGrey,
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
-            child: Icon(Icons.history_edu_rounded, color: CustomColors.textSecondary, size: 18.sp),
+            child: Icon(Icons.history_edu_rounded, color: CustomColors.grey, size: 18.sp),
           ),
           SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -323,21 +321,21 @@ class DashboardScreen extends StatelessWidget {
                 sections: [
                   PieChartSectionData(
                     value: 45,
-                    color: CustomColors.primary,
+                    color: CustomColors.purple,
                     title: '45%',
                     radius: 40,
                     titleStyle: CustomFonts.white12w400,
                   ),
                   PieChartSectionData(
                     value: 30,
-                    color: CustomColors.secondary,
+                    color: CustomColors.green,
                     title: '30%',
                     radius: 40,
                     titleStyle: CustomFonts.black12w400,
                   ),
                   PieChartSectionData(
                     value: 25,
-                    color: CustomColors.primaryLight,
+                    color: CustomColors.lightPurple,
                     title: '25%',
                     radius: 40,
                     titleStyle: CustomFonts.white12w400,
@@ -347,9 +345,9 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: AppSpacing.xl),
-          _legendItem('Injectables', CustomColors.primary),
-          _legendItem('Skin Treatments', CustomColors.secondary),
-          _legendItem('Laser & Energy', CustomColors.primaryLight),
+          _legendItem('Injectables', CustomColors.purple),
+          _legendItem('Skin Treatments', CustomColors.green),
+          _legendItem('Laser & Energy', CustomColors.lightPurple),
         ],
       ),
     );

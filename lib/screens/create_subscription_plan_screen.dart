@@ -208,11 +208,11 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.black18w600),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
+          icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
         ),
         centerTitle: true,
@@ -230,7 +230,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                   if (isSystemPlan) ...[
                     _sectionHeader("System Onboarding Settings"),
                     _formContainer(
-                      backgroundColor: CustomColors.brandPurple.withValues(alpha: 0.05),
+                      backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
                       child: Column(
                         children: [
                           Text("Configure the default free tier duration for newly onboarded clinics.", style: CustomFonts.grey14w400),
@@ -288,9 +288,9 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                                Switch.adaptive(
                                  value: _isActive, 
                                  onChanged: (val) => setState(() => _isActive = val),
-                                 activeColor: CustomColors.success,
+                                 activeTrackColor: CustomColors.green,
                                ),
-                               Text(_isActive ? "Active" : "Inactive", style: _isActive ? CustomFonts.success13w500 : CustomFonts.error13w500),
+                               Text(_isActive ? "Active" : "Inactive", style: _isActive ? CustomFonts.green13w500 : CustomFonts.red13w500),
                              ],
                            ),
                         ],
@@ -431,8 +431,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                               benefit.enabled = val ?? false;
                             });
                           },
-                          activeColor: CustomColors.brandCyan,
-                          checkColor: CustomColors.deepSlate,
+                          activeColor: CustomColors.green,
+                          checkColor: CustomColors.black,
                           controlAffinity: ListTileControlAffinity.leading,
                           contentPadding: EdgeInsets.zero,
                           dense: true,
@@ -453,7 +453,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                               child: ElevatedButton(
                                 onPressed: _addCustomBenefit,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: CustomColors.deepSlate,
+                                  backgroundColor: CustomColors.black,
                                   padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
                                 ),
                                 child: Text("Add Feature", style: CustomFonts.white14w600),
@@ -505,7 +505,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             decoration: BoxDecoration(
-              border: Border.all(color: CustomColors.borderLight),
+              border: Border.all(color: CustomColors.border),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: DropdownButtonHideUnderline(
@@ -566,7 +566,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
               final clinic = clinics.firstWhere((c) => c.email == email, orElse: () => clinics.first);
               return Chip(
                 label: Text(clinic.name ?? email, style: CustomFonts.black13w500),
-                backgroundColor: CustomColors.brandCyan.withValues(alpha: 0.1),
+                backgroundColor: CustomColors.green.withValues(alpha: 0.1),
                 deleteIcon: const Icon(Icons.close, size: 14),
                 onDeleted: () => setState(() => _selectedClinics.remove(email)),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r), side: BorderSide.none),
@@ -578,7 +578,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
         Container(
           constraints: BoxConstraints(maxHeight: 250.h),
           decoration: BoxDecoration(
-            border: Border.all(color: CustomColors.borderLight),
+            border: Border.all(color: CustomColors.border),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: filteredClinics.isEmpty
@@ -604,8 +604,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                             }
                           });
                         },
-                        activeColor: CustomColors.brandCyan,
-                        checkColor: CustomColors.deepSlate,
+                        activeColor: CustomColors.green,
+                        checkColor: CustomColors.black,
                         controlAffinity: ListTileControlAffinity.leading,
                         contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
                       );
@@ -639,7 +639,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
         Switch.adaptive(
           value: value, 
           onChanged: onChanged,
-          activeColor: CustomColors.brandCyan,
+          activeTrackColor: CustomColors.green,
         ),
         SizedBox(width: 8.w),
         Text(label, style: CustomFonts.grey13w600),

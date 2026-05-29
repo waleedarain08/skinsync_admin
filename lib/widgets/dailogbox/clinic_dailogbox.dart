@@ -132,7 +132,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
           child: TextButton(
             onPressed: () => context.pop(),
             style: TextButton.styleFrom(
-              foregroundColor: CustomColors.textSecondary,
+              foregroundColor: CustomColors.grey,
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             ),
@@ -164,12 +164,12 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColors.deepSlate,
+                  backgroundColor: CustomColors.black,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   padding: EdgeInsets.symmetric(horizontal: 32.w),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                  textStyle: CustomFonts.grey14w400.copyWith(fontWeight: FontWeight.bold),
+                  textStyle: CustomFonts.grey14w700,
                 ),
                 child: Text(state.loading ? 'Registering...' : 'Register Clinic'),
               ),
@@ -184,7 +184,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.brandPrimary)),
+        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );
@@ -293,7 +293,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
           child: TextButton(
             onPressed: () => context.pop(),
             style: TextButton.styleFrom(
-              foregroundColor: CustomColors.textSecondary,
+              foregroundColor: CustomColors.grey,
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             ),
@@ -312,12 +312,12 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
                   context.pop();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColors.deepSlate,
+                  backgroundColor: CustomColors.black,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   padding: EdgeInsets.symmetric(horizontal: 32.w),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                  textStyle: CustomFonts.grey14w400.copyWith(fontWeight: FontWeight.bold),
+                  textStyle: CustomFonts.grey14w700,
                 ),
                 child: Text(state.loading ? 'Saving...' : 'Save Changes'),
               ),
@@ -332,7 +332,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.brandPrimary)),
+        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );

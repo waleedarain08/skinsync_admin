@@ -12,7 +12,7 @@ class PaymentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
@@ -48,13 +48,13 @@ class PaymentScreen extends StatelessWidget {
   Widget _buildFinancialOverview() {
     return Row(
       children: [
-        _buildFinancialStat("Total Revenue", "\$1,245,000", Icons.payments_outlined, CustomColors.primaryGold),
+        _buildFinancialStat("Total Revenue", "\$1,245,000", Icons.payments_outlined, CustomColors.amber),
         SizedBox(width: 16.w),
-        _buildFinancialStat("Pending Payouts", "\$12,450", Icons.hourglass_empty, CustomColors.warningOrange),
+        _buildFinancialStat("Pending Payouts", "\$12,450", Icons.hourglass_empty, CustomColors.amber),
         SizedBox(width: 16.w),
-        _buildFinancialStat("Successful Payouts", "\$845,000", Icons.check_circle_outline, CustomColors.successGreen),
+        _buildFinancialStat("Successful Payouts", "\$845,000", Icons.check_circle_outline, CustomColors.green),
         SizedBox(width: 16.w),
-        _buildFinancialStat("Active Disputes", "4", Icons.gavel_outlined, CustomColors.errorRed),
+        _buildFinancialStat("Active Disputes", "4", Icons.gavel_outlined, CustomColors.red),
       ],
     );
   }
@@ -96,7 +96,7 @@ class PaymentScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Pending Payout Releases", style: CustomFonts.black20w600),
-                Text("8 Actions Required", style: CustomFonts.warning14w600),
+                Text("8 Actions Required", style: CustomFonts.amber14w600),
               ],
             ),
           ),
@@ -106,7 +106,7 @@ class PaymentScreen extends StatelessWidget {
               columnSpacing: 24,
               horizontalMargin: 20,
               minWidth: 1000,
-              headingRowColor: WidgetStateProperty.all(CustomColors.surfaceMuted),
+              headingRowColor: WidgetStateProperty.all(CustomColors.softGrey),
               columns: const [
                 DataColumn2(label: Text('Transaction ID'), size: ColumnSize.L),
                 DataColumn2(label: Text('Clinic'), size: ColumnSize.L),
@@ -129,7 +129,7 @@ class PaymentScreen extends StatelessWidget {
         DataCell(Text('TXN-82910', style: CustomFonts.black14w400)),
         DataCell(Text('Glow MedSpa NY', style: CustomFonts.black14w400)),
         DataCell(Text('Sarah Jenkins', style: CustomFonts.black14w400)),
-        DataCell(Text('\$450.00', style: CustomFonts.success14w600)),
+        DataCell(Text('\$450.00', style: CustomFonts.green14w600)),
         DataCell(Text('Oct 28, 2023', style: CustomFonts.black14w400)),
         DataCell(
           ElevatedButton(
@@ -146,7 +146,7 @@ class PaymentScreen extends StatelessWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: CustomColors.deepNavy,
+              backgroundColor: CustomColors.black,
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
               minimumSize: Size(0, 36.h),
             ),
@@ -173,7 +173,7 @@ class PaymentScreen extends StatelessWidget {
               columnSpacing: 24,
               horizontalMargin: 20,
               minWidth: 1000,
-              headingRowColor: WidgetStateProperty.all(CustomColors.surfaceMuted),
+              headingRowColor: WidgetStateProperty.all(CustomColors.softGrey),
               columns: const [
                 DataColumn2(label: Text('Ref ID'), size: ColumnSize.L),
                 DataColumn2(label: Text('Clinic'), size: ColumnSize.L),
@@ -199,8 +199,8 @@ class PaymentScreen extends StatelessWidget {
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.successGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
-            child: Text("Released", style: CustomFonts.success14w600), // Updated to a static style
+            decoration: BoxDecoration(color: CustomColors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
+            child: Text("Released", style: CustomFonts.green14w600), // Updated to a static style
           ),
         ),
       ],

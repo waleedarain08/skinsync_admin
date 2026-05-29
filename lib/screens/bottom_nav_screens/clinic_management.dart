@@ -56,7 +56,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -113,11 +113,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _buildStatsSummary() {
     return Row(
       children: [
-        _buildMiniStat("Total Clinics", "48", Icons.business_rounded, CustomColors.primary),
+        _buildMiniStat("Total Clinics", "48", Icons.business_rounded, CustomColors.purple),
         SizedBox(width: AppSpacing.md),
-        _buildMiniStat("Active Partners", "42", Icons.bolt_rounded, CustomColors.success),
+        _buildMiniStat("Active Partners", "42", Icons.bolt_rounded, CustomColors.green),
         SizedBox(width: AppSpacing.md),
-        _buildMiniStat("Network Revenue", "\$245K", Icons.payments_rounded, CustomColors.secondary),
+        _buildMiniStat("Network Revenue", "\$245K", Icons.payments_rounded, CustomColors.green),
         SizedBox(width: AppSpacing.md),
         _buildMiniStat("Avg Patient Rating", "4.8", Icons.star_rounded, Colors.amber),
       ],
@@ -155,7 +155,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _buildTabs() {
     return Container(
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: CustomColors.sidebarBorder)),
+        border: Border(bottom: BorderSide(color: CustomColors.border)),
       ),
       child: TabBar(
         controller: _tabController,
@@ -233,7 +233,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: CustomColors.borderLight),
+              border: Border.all(color: CustomColors.border),
               boxShadow: AppShadows.xs,
             ),
             child: TextField(
@@ -243,7 +243,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
               decoration: InputDecoration(
                 hintText: hint,
                 hintStyle: CustomFonts.grey13w500,
-                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.textTertiary, size: 20),
+                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.lightGrey, size: 20),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -339,7 +339,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
-            fillColor: CustomColors.backgroundLight,
+            fillColor: CustomColors.whiteGrey,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide.none),
             contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           ),
@@ -389,7 +389,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                                 child: ConstrainedBox(
                                   constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                   child: DataTable(
-                                    headingRowColor: WidgetStateProperty.all(CustomColors.backgroundLight),
+                                    headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
                                     rows: List.generate(
                                       items.length,
                                       (index) => rowBuilder(items[index]),
@@ -422,7 +422,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             children: [
               IconButton(
                 tooltip: 'View Details',
-                icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.textSecondary),
+                icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.grey),
                 onPressed: () {
                   ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
                   context.push(ClinicDetailScreen.routeName);
@@ -430,7 +430,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
               ),
               IconButton(
                 tooltip: 'Edit Partner',
-                icon: Icon(Icons.edit_outlined, size: 20.sp, color: CustomColors.textSecondary),
+                icon: Icon(Icons.edit_outlined, size: 20.sp, color: CustomColors.grey),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -455,7 +455,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         DataCell(
           IconButton(
             tooltip: 'View Prospect',
-            icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.textSecondary),
+            icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.grey),
             onPressed: () {
               ref.read(clinicViewModelProvider.notifier).selectInviteClinic(clinic);
               context.push(InviteClinicDetailScreen.routeName);
@@ -471,10 +471,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       children: [
         CircleAvatar(
           radius: 16.r,
-          backgroundColor: CustomColors.primarySoft,
+          backgroundColor: CustomColors.palePurple,
           backgroundImage: (logo != null && logo.isNotEmpty) ? NetworkImage(logo) : null,
           child: (logo == null || logo.isEmpty)
-              ? Text(name?[0] ?? "C", style: CustomFonts.primary12w700)
+              ? Text(name?[0] ?? "C", style: CustomFonts.purple12w700)
               : null,
         ),
         SizedBox(width: AppSpacing.sm),
@@ -511,7 +511,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _miniIconStat(IconData icon, String value) {
     return Row(
       children: [
-        Icon(icon, size: 14.sp, color: CustomColors.textTertiary),
+        Icon(icon, size: 14.sp, color: CustomColors.lightGrey),
         SizedBox(width: 4.w),
         Text(value, style: CustomFonts.grey12w400),
       ],

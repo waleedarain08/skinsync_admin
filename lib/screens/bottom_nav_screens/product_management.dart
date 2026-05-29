@@ -18,7 +18,7 @@ class _ProductManagementState extends State<ProductManagement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
@@ -62,7 +62,7 @@ class _ProductManagementState extends State<ProductManagement> {
           icon: const Icon(Icons.add, color: Colors.white),
           label: Text('Add New Product', style: CustomFonts.white14w500),
           style: ElevatedButton.styleFrom(
-            backgroundColor: CustomColors.deepNavy,
+            backgroundColor: CustomColors.black,
             padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
           ),
@@ -74,13 +74,13 @@ class _ProductManagementState extends State<ProductManagement> {
   Widget _buildInventoryOverview() {
     return Row(
       children: [
-        _buildInventoryStat("Total SKU", "124", Icons.inventory_2_outlined, CustomColors.primaryGold),
+        _buildInventoryStat("Total SKU", "124", Icons.inventory_2_outlined, CustomColors.amber),
         SizedBox(width: 16.w),
-        _buildInventoryStat("Low Stock Items", "12", Icons.warning_amber_rounded, CustomColors.errorRed),
+        _buildInventoryStat("Low Stock Items", "12", Icons.warning_amber_rounded, CustomColors.red),
         SizedBox(width: 16.w),
-        _buildInventoryStat("Total Stock Value", "\$84,200", Icons.monetization_on_outlined, CustomColors.successGreen),
+        _buildInventoryStat("Total Stock Value", "\$84,200", Icons.monetization_on_outlined, CustomColors.green),
         SizedBox(width: 16.w),
-        _buildInventoryStat("Categories", "8", Icons.category_outlined, CustomColors.deepNavy),
+        _buildInventoryStat("Categories", "8", Icons.category_outlined, CustomColors.black),
       ],
     );
   }
@@ -120,7 +120,7 @@ class _ProductManagementState extends State<ProductManagement> {
             child: CupertinoSearchTextField(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               placeholder: "Search products by name, SKU or brand...",
-              backgroundColor: CustomColors.softChampagne.withValues(alpha: 0.5),
+              backgroundColor: CustomColors.whiteGrey,
               borderRadius: BorderRadius.circular(10.r),
             ),
           ),
@@ -137,7 +137,7 @@ class _ProductManagementState extends State<ProductManagement> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       decoration: BoxDecoration(
-        border: Border.all(color: CustomColors.greyColor),
+        border: Border.all(color: CustomColors.lightGrey),
         borderRadius: BorderRadius.circular(10.r),
       ),
       child: Row(
@@ -174,7 +174,7 @@ class _ProductManagementState extends State<ProductManagement> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: CustomColors.softChampagne,
+                color: CustomColors.whiteGrey,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
                 image: const DecorationImage(
                   image: NetworkImage("https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop"),
@@ -188,7 +188,7 @@ class _ProductManagementState extends State<ProductManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("SKU-9283${index}", style: CustomFonts.gold10w600),
+                Text("SKU-9283${index}", style: CustomFonts.amber10w800ls1),
                 SizedBox(height: 4.h),
                 Text("Advanced Night Repair", style: CustomFonts.black16w600, maxLines: 1, overflow: TextOverflow.ellipsis),
                 SizedBox(height: 4.h),
@@ -220,12 +220,12 @@ class _ProductManagementState extends State<ProductManagement> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: isLow ? CustomColors.errorRed.withValues(alpha: 0.1) : CustomColors.successGreen.withValues(alpha: 0.1),
+        color: isLow ? CustomColors.red.withValues(alpha: 0.1) : CustomColors.green.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4.r),
       ),
       child: Text(
         status,
-        style: isLow ? CustomFonts.red10w600 : CustomFonts.success10w600,
+        style: isLow ? CustomFonts.red10w600 : CustomFonts.green10w600,
       ),
     );
   }

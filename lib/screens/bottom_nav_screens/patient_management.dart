@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -26,7 +24,7 @@ class _PatientManagementState extends State<PatientManagement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -65,13 +63,13 @@ class _PatientManagementState extends State<PatientManagement> {
   Widget _buildQuickMetrics() {
     return Row(
       children: [
-        _buildMetricCard("Total Patients", "12,840", Icons.people_rounded, CustomColors.primary),
+        _buildMetricCard("Total Patients", "12,840", Icons.people_rounded, CustomColors.purple),
         SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Verified Profiles", "8,200", Icons.verified_user_rounded, CustomColors.success),
+        _buildMetricCard("Verified Profiles", "8,200", Icons.verified_user_rounded, CustomColors.green),
         SizedBox(width: AppSpacing.md),
-        _buildMetricCard("App Users", "9,450", Icons.smartphone_rounded, CustomColors.secondary),
+        _buildMetricCard("App Users", "9,450", Icons.smartphone_rounded, CustomColors.green),
         SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Active Network", "3,390", Icons.hub_rounded, CustomColors.brandPurple),
+        _buildMetricCard("Active Network", "3,390", Icons.hub_rounded, CustomColors.purple),
       ],
     );
   }
@@ -110,7 +108,7 @@ class _PatientManagementState extends State<PatientManagement> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: CustomColors.borderLight),
+              border: Border.all(color: CustomColors.border),
               boxShadow: AppShadows.xs,
             ),
             child: TextField(
@@ -120,7 +118,7 @@ class _PatientManagementState extends State<PatientManagement> {
               decoration: InputDecoration(
                 hintText: "Search by name, ID, or phone...",
                 hintStyle: CustomFonts.grey13w500,
-                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.textTertiary, size: 20),
+                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.lightGrey, size: 20),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -157,14 +155,14 @@ class _PatientManagementState extends State<PatientManagement> {
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: CustomColors.borderLight),
+        border: Border.all(color: CustomColors.border),
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
         children: [
           Text(label, style: CustomFonts.black14w600.copyWith(fontSize: 12.sp, fontWeight: FontWeight.w500)),
           SizedBox(width: 8.w),
-          const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: CustomColors.textTertiary),
+          const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: CustomColors.lightGrey),
         ],
       ),
     );
@@ -192,7 +190,7 @@ class _PatientManagementState extends State<PatientManagement> {
           ),
           DataTable(
             columnSpacing: 40.w,
-            headingRowColor: WidgetStateProperty.all(CustomColors.backgroundLight),
+            headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
             columns: const [
               DataColumn(label: Text('PATIENT')),
               DataColumn(label: Text('JOINED DATE')),
@@ -216,8 +214,8 @@ class _PatientManagementState extends State<PatientManagement> {
             children: [
               CircleAvatar(
                 radius: 16.r, 
-                backgroundColor: CustomColors.primarySoft, 
-                child: Icon(Icons.person_rounded, size: 18.sp, color: CustomColors.primary),
+                backgroundColor: CustomColors.palePurple, 
+                child: Icon(Icons.person_rounded, size: 18.sp, color: CustomColors.purple),
               ),
               SizedBox(width: AppSpacing.sm),
               Column(
@@ -240,8 +238,8 @@ class _PatientManagementState extends State<PatientManagement> {
         DataCell(
           Row(
             children: [
-              IconButton(icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.textSecondary), onPressed: () {}),
-              IconButton(icon: Icon(Icons.more_horiz_rounded, size: 20.sp, color: CustomColors.textSecondary), onPressed: () {}),
+              IconButton(icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.grey), onPressed: () {}),
+              IconButton(icon: Icon(Icons.more_horiz_rounded, size: 20.sp, color: CustomColors.grey), onPressed: () {}),
             ],
           ),
         ),

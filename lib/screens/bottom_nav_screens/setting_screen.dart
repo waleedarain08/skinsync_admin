@@ -49,7 +49,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         child: Column(
@@ -68,15 +68,15 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               child: ExpansionTile(
                 title: Text("Customer App", style: CustomFonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
-                collapsedBackgroundColor: CustomColors.whiteColor,
-                backgroundColor: CustomColors.whiteColor,
+                collapsedBackgroundColor: CustomColors.white,
+                backgroundColor: CustomColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
-                  side: BorderSide(color: CustomColors.borderColor),
+                  side: const BorderSide(color: CustomColors.border),
                 ),
                 collapsedShape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
-                  side: BorderSide(color: CustomColors.borderColor),
+                  side: const BorderSide(color: CustomColors.border),
                 ),
                 children: [
                   _buildVersionSection(
@@ -105,15 +105,15 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               child: ExpansionTile(
                 title: Text("Clinic App", style: CustomFonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
-                collapsedBackgroundColor: CustomColors.whiteColor,
-                backgroundColor: CustomColors.whiteColor,
+                collapsedBackgroundColor: CustomColors.white,
+                backgroundColor: CustomColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
-                  side: BorderSide(color: CustomColors.borderColor),
+                  side: const BorderSide(color: CustomColors.border),
                 ),
                 collapsedShape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
-                  side: BorderSide(color: CustomColors.borderColor),
+                  side: const BorderSide(color: CustomColors.border),
                 ),
                 children: [
                   _buildVersionSection(
@@ -153,9 +153,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: CustomColors.dashboardBackgroundColor,
+        color: CustomColors.whiteGrey,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: CustomColors.borderColor),
+        border: Border.all(color: CustomColors.border),
       ),
       child: Form(
         key: formKey,
@@ -183,7 +183,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                         },
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: CustomColors.whiteColor,
+                          fillColor: CustomColors.white,
                           hintText: "e.g. 1.2.0",
                           hintStyle: CustomFonts.grey14w400,
                           contentPadding: EdgeInsets.symmetric(
@@ -192,20 +192,20 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.textFeildBoaderColor,
+                            borderSide: const BorderSide(
+                              color: CustomColors.border,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.borderColor,
+                            borderSide: const BorderSide(
+                              color: CustomColors.border,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.blueColor,
+                            borderSide: const BorderSide(
+                              color: CustomColors.purple,
                               width: 1.5,
                             ),
                           ),
@@ -232,7 +232,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                         },
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: CustomColors.whiteColor,
+                          fillColor: CustomColors.white,
                           hintText: "e.g. 5",
                           hintStyle: CustomFonts.grey14w400,
                           contentPadding: EdgeInsets.symmetric(
@@ -241,20 +241,20 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.textFeildBoaderColor,
+                            borderSide: const BorderSide(
+                              color: CustomColors.border,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.borderColor,
+                            borderSide: const BorderSide(
+                              color: CustomColors.border,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.blueColor,
+                            borderSide: const BorderSide(
+                              color: CustomColors.purple,
                               width: 1.5,
                             ),
                           ),
@@ -278,13 +278,6 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                     isCustomer: isCustomer,
                   );
                 },
-                // style: ElevatedButton.styleFrom(
-                //   backgroundColor: CustomColors.blackColor,
-                //   padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 14.h),
-                //   shape: RoundedRectangleBorder(
-                //     borderRadius: BorderRadius.circular(30.r),
-                //   ),
-                // ),
                 child: Text("Submit", style: CustomFonts.white16w400),
               ),
             ),

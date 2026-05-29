@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
@@ -18,7 +16,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,
@@ -74,13 +72,13 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
   Widget _buildAppointmentMetrics() {
     return Row(
       children: [
-        _buildMetricCard("Upcoming", "1,240", Icons.event_available_rounded, CustomColors.secondary),
+        _buildMetricCard("Upcoming", "1,240", Icons.event_available_rounded, CustomColors.green),
         SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Completed", "8,450", Icons.check_circle_outline_rounded, CustomColors.success),
+        _buildMetricCard("Completed", "8,450", Icons.check_circle_outline_rounded, CustomColors.green),
         SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Cancelled", "120", Icons.cancel_outlined, CustomColors.error),
+        _buildMetricCard("Cancelled", "120", Icons.cancel_outlined, CustomColors.red),
         SizedBox(width: AppSpacing.md),
-        _buildMetricCard("No Shows", "45", Icons.person_off_outlined, CustomColors.warning),
+        _buildMetricCard("No Shows", "45", Icons.person_off_outlined, CustomColors.amber),
       ],
     );
   }
@@ -151,10 +149,10 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
               final isSelected = day == 15;
               return Container(
                 decoration: BoxDecoration(
-                  color: isSelected ? CustomColors.primarySoft : Colors.transparent,
+                  color: isSelected ? CustomColors.palePurple : Colors.transparent,
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
-                    color: isSelected ? CustomColors.secondary.withValues(alpha: 0.3) : CustomColors.borderLight.withValues(alpha: 0.5),
+                    color: isSelected ? CustomColors.green.withValues(alpha: 0.3) : CustomColors.border.withValues(alpha: 0.5),
                   ),
                 ),
                 padding: EdgeInsets.all(8.w),
@@ -171,7 +169,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
                         height: 3.h,
                         width: 12.w,
                         decoration: BoxDecoration(
-                          color: CustomColors.secondary,
+                          color: CustomColors.green,
                           borderRadius: BorderRadius.circular(AppRadius.full),
                         ),
                       ),
@@ -190,10 +188,10 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
       padding: EdgeInsets.all(6.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: CustomColors.borderLight),
+        border: Border.all(color: CustomColors.border),
         borderRadius: BorderRadius.circular(8.r),
       ),
-      child: Icon(icon, size: 18, color: CustomColors.textSecondary),
+      child: Icon(icon, size: 18, color: CustomColors.grey),
     );
   }
 
@@ -221,9 +219,9 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: CustomColors.backgroundLight,
+        color: CustomColors.whiteGrey,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: CustomColors.borderLight.withValues(alpha: 0.5)),
+        border: Border.all(color: CustomColors.border.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -231,13 +229,13 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
             width: 44.w,
             height: 44.w,
             decoration: BoxDecoration(
-              color: CustomColors.primarySoft,
+              color: CustomColors.palePurple,
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Center(
               child: Text(
                 "10:30", 
-                style: CustomFonts.secondary11w600,
+                style: CustomFonts.green11w600,
               ),
             ),
           ),
@@ -251,7 +249,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
               ],
             ),
           ),
-          Icon(Icons.more_vert_rounded, size: 18, color: CustomColors.textTertiary),
+          Icon(Icons.more_vert_rounded, size: 18, color: CustomColors.lightGrey),
         ],
       ),
     );
@@ -269,7 +267,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
           ),
           DataTable(
             columnSpacing: 40.w,
-            headingRowColor: WidgetStateProperty.all(CustomColors.backgroundLight),
+            headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
             columns: const [
               DataColumn(label: Text('PATIENT')),
               DataColumn(label: Text('CLINIC')),

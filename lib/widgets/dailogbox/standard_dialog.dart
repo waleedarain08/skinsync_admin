@@ -29,9 +29,9 @@ class StandardDialog extends StatelessWidget {
         width: width ?? 520.w,
         padding: EdgeInsets.all(24.w),
         decoration: BoxDecoration(
-          color: CustomColors.surfaceWhite,
+          color: CustomColors.white,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: CustomColors.borderLight),
+          border: Border.all(color: CustomColors.border),
           boxShadow: AppShadows.lg,
         ),
         child: Column(
@@ -44,9 +44,9 @@ class StandardDialog extends StatelessWidget {
                 if (showCloseIcon)
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.close_rounded, size: 20.sp, color: CustomColors.textTertiary),
+                    icon: Icon(Icons.close_rounded, size: 20.sp, color: CustomColors.lightGrey),
                     style: IconButton.styleFrom(
-                      backgroundColor: CustomColors.backgroundLight,
+                      backgroundColor: CustomColors.whiteGrey,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),

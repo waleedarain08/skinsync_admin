@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/custom_fonts.dart';
+import '../utils/color_constant.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -20,7 +21,7 @@ class _NotificationSettingsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: CustomColors.whiteGrey,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
@@ -176,10 +177,10 @@ class _NotificationSettingsScreenState
             child: Switch(
               value: value,
               onChanged: onChanged,
-              activeColor: Colors.white,
-              activeTrackColor: const Color(0xFF1F1F1F),
-              inactiveThumbColor: Colors.white,
-              inactiveTrackColor: Colors.grey[300],
+              activeTrackColor: CustomColors.purple,
+              activeThumbColor: CustomColors.white,
+              inactiveThumbColor: CustomColors.white,
+              inactiveTrackColor: CustomColors.border,
               trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
             ),
           ),
@@ -193,7 +194,7 @@ class _NotificationSettingsScreenState
       width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFEEF4FF),
+        color: CustomColors.palePurple,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: RichText(

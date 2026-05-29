@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/color_constant.dart';
-import '../utils/theme.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 
 class BorderdContainerWidget extends StatefulWidget {
   final Widget child;
@@ -20,8 +19,8 @@ class BorderdContainerWidget extends StatefulWidget {
     super.key,
     required this.child,
     this.borderRadius = 16,
-    this.borderColor = CustomColors.borderLight,
-    this.backgroundColor = CustomColors.surfaceWhite,
+    this.borderColor = CustomColors.border,
+    this.backgroundColor = CustomColors.white,
     this.height,
     this.width,
     this.borderWidth = 1,
@@ -54,7 +53,7 @@ class _BorderdContainerWidgetState extends State<BorderdContainerWidget> {
           color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(widget.borderRadius.r),
           border: Border.all(
-            color: _hovered ? CustomColors.borderFocus.withValues(alpha: 0.3) : widget.borderColor,
+            color: _hovered ? CustomColors.purple.withValues(alpha: 0.3) : widget.borderColor,
             width: widget.borderWidth,
           ),
           boxShadow: widget.boxShadow ?? (_hovered && widget.enableHover ? AppShadows.cardHover : AppShadows.card),

@@ -38,7 +38,7 @@ class ReleasePaymentDialog extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(20.w),
             decoration: BoxDecoration(
-              color: CustomColors.surfaceGhost,
+              color: CustomColors.whiteGrey,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: Colors.grey[200]!),
             ),
@@ -53,7 +53,7 @@ class ReleasePaymentDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("Total Amount", style: CustomFonts.black16w600),
-                    Text(amount, style: CustomFonts.black20w600.copyWith(color: CustomColors.success)),
+                    Text(amount, style: CustomFonts.black20w600.copyWith(color: CustomColors.green)),
                   ],
                 ),
               ],
@@ -74,7 +74,7 @@ class ReleasePaymentDialog extends StatelessWidget {
         TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
         ElevatedButton(
           onPressed: () => Navigator.pop(context, true),
-          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.success),
+          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.green),
           child: const Text("Confirm Release"),
         ),
       ],
