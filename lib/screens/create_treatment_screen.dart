@@ -24,7 +24,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
     return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,

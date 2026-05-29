@@ -56,7 +56,6 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,

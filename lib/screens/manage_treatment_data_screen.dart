@@ -24,7 +24,6 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: CustomColors.whiteGrey,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,

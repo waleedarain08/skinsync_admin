@@ -105,7 +105,6 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final bool isMobile = context.isMobile;
 
     return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         title: Text("Clinic Detail", style: CustomFonts.black18w600),
         centerTitle: true,

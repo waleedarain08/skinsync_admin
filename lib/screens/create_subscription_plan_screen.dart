@@ -208,7 +208,6 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.black18w600),
         leading: IconButton(

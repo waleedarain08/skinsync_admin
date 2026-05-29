@@ -79,7 +79,6 @@ class _HomePageState extends State<HomePage> {
 
         return Scaffold(
           key: _scaffoldKey,
-          backgroundColor: CustomColors.whiteGrey,
           // Drawer used for both Mobile and Tablet as per requirements
           drawer: isSmallScreen ? Drawer(
             child: AppSidebar(

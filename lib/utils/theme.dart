@@ -17,7 +17,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: CustomColors.purple,
+      scaffoldBackgroundColor: CustomColors.lightPurple2,
       primaryColor: CustomColors.purple,
       splashColor: CustomColors.purple.withValues(alpha: 0.05),
       

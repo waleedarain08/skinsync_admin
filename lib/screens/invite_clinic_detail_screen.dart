@@ -22,7 +22,6 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,

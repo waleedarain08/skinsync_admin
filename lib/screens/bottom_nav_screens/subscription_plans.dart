@@ -33,7 +33,6 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     final state = ref.watch(subscriptionViewModelProvider);
 
     return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,

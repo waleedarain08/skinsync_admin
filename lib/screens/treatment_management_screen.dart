@@ -37,7 +37,6 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
     return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.pagePaddingH,

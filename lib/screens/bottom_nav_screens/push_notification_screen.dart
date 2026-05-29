@@ -12,7 +12,6 @@ class PushNotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30.w),
         child: SingleChildScrollView(

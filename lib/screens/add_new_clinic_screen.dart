@@ -202,7 +202,6 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
       appBar: AppBar(
         title: Text("Add New Clinic", style: CustomFonts.black20w600),
         leading: IconButton(

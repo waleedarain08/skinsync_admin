@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class CustomColors {
   // Brand Colors
-  static const Color purple = Color(0xFF7d4897);
-  static const Color lightPurple = Color(0xFFA5B4FC);
+  static const Color purple = Color(0xFF6750a4);
+  static const Color lightPurple = Color(0xFFeaddff);
+  static const Color lightPurple2 = Color(0xFFfcf8ff);
   static const Color palePurple = Color(0xFFEEF2FF);
   static const Color purpleHover = Color(0x0D6366F1);
 
