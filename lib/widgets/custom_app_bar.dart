@@ -24,7 +24,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           Responsive.when(
             defaultValue: const SizedBox.shrink(),
             mobile: () => _MenuButton(context: context),
-            tablet: () => _MenuButton(context: context),
+            tablet: () => _MenuButton(context: context), // Show hamburger on tablet too
           ),
           const Spacer(),
           const _TopBarAction(icon: Icons.notifications_none_rounded, tooltip: 'Notifications', hasBadge: true),
@@ -200,7 +200,7 @@ class _UserProfile extends StatelessWidget {
             children: [
               Icon(Icons.logout_rounded, color: CustomColors.red, size: 18.sp),
               SizedBox(width: AppSpacing.md),
-              Text('Logout', style: CustomFonts.red14w600),
+              const Text('Logout', style: TextStyle(color: CustomColors.red, fontWeight: FontWeight.w600)),
             ],
           ),
         ),

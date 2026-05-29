@@ -18,20 +18,20 @@ abstract class Responsive {
       return mobile?.call() ?? defaultValue;
     } else if (breakpoint.name == TABLET) {
       return tablet?.call() ?? defaultValue;
-    } else {
+    } else if (breakpoint.name == DESKTOP || breakpoint.name == '4K') {
       return desktop?.call() ?? defaultValue;
+    } else {
+      return defaultValue;
     }
   }
 }
 
 extension ResponsiveExtension on BuildContext {
-  bool get isMobile => MediaQuery.of(this).size.width < 600;
+  bool get isMobile => ResponsiveBreakpoints.of(this).isMobile;
 
-  bool get isTablet =>
-      MediaQuery.of(this).size.width >= 600 &&
-      MediaQuery.of(this).size.width < 1024;
+  bool get isTablet => ResponsiveBreakpoints.of(this).isTablet;
 
-  bool get isDesktop => MediaQuery.of(this).size.width >= 1024;
+  bool get isDesktop => ResponsiveBreakpoints.of(this).breakpoint.name == DESKTOP || ResponsiveBreakpoints.of(this).breakpoint.name == '4K';
 
   bool get isLandscape =>
       MediaQuery.of(this).orientation == Orientation.landscape;
@@ -64,8 +64,9 @@ class AdaptiveLayoutRowColumn extends StatelessWidget {
       final rowChildren = <Widget>[];
       for (var i = 0; i < children.length; i++) {
         if (i > 0) rowChildren.add(SizedBox(width: widthBetween ?? 20.w));
-        if (expandedWidget == true)
+        if (expandedWidget == true) {
           rowChildren.add(Expanded(child: children[i]));
+        }
       }
       return Row(
         mainAxisAlignment: alignment ?? MainAxisAlignment.start,

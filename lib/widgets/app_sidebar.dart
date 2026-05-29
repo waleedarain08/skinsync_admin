@@ -47,57 +47,63 @@ class AppSidebar extends StatelessWidget {
     super.key,
     required this.controller,
     required this.onItemTap,
+    this.showToggleButton = true,
   });
 
   final SidebarXController controller;
   final void Function(int index) onItemTap;
-
-  static SidebarXTheme get collapsedTheme => SidebarXTheme(
-        width: 80.w,
-        decoration: const BoxDecoration(
-          color: CustomColors.white,
-          border: Border(right: BorderSide(color: CustomColors.border, width: 1)),
-        ),
-        padding: EdgeInsets.symmetric(vertical: 24.h),
-        iconTheme: IconThemeData(color: CustomColors.grey, size: 20.sp),
-        selectedIconTheme: IconThemeData(color: CustomColors.purple, size: 20.sp),
-        hoverIconTheme: IconThemeData(color: CustomColors.purple, size: 20.sp),
-        textStyle: CustomFonts.grey14w600,
-        selectedTextStyle: CustomFonts.purple14w600,
-        hoverTextStyle: CustomFonts.purple14w600,
-        hoverColor: CustomColors.purple.withValues(alpha: 0.05),
-        itemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-        selectedItemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-        itemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-        selectedItemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-        itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(12.r)),
-        selectedItemDecoration: BoxDecoration(
-          color: CustomColors.purple.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: CustomColors.purple.withValues(alpha: 0.2), width: 1),
-        ),
-      );
-
-  static SidebarXTheme get extendedTheme => collapsedTheme.copyWith(
-        width: 280.w,
-        itemTextPadding: EdgeInsets.only(left: 16.w),
-        selectedItemTextPadding: EdgeInsets.only(left: 16.w),
-      );
+  final bool showToggleButton;
 
   @override
   Widget build(BuildContext context) {
     return SidebarX(
       controller: controller,
-      theme: collapsedTheme,
-      extendedTheme: extendedTheme,
+      theme: _buildTheme(),
+      extendedTheme: _buildExtendedTheme(),
       animationDuration: const Duration(milliseconds: 300),
-      showToggleButton: true,
+      showToggleButton: showToggleButton,
+      toggleButtonBuilder: (context, extended) => _buildToggleButton(context, extended),
       headerDivider: const SizedBox.shrink(),
       footerDivider: Divider(color: CustomColors.border, height: 1.h, thickness: 1),
       separatorBuilder: (context, index) => _separatorBuilder(context, index, controller),
       headerBuilder: (context, extended) => _headerBuilder(context, extended),
-      toggleButtonBuilder: (context, extended) => _toggleButtonBuilder(context, extended, controller),
       items: _buildItems(),
+    );
+  }
+
+  SidebarXTheme _buildTheme() {
+    return SidebarXTheme(
+      width: 80.w,
+      decoration: const BoxDecoration(
+        color: CustomColors.white,
+        border: Border(right: BorderSide(color: CustomColors.border, width: 1)),
+      ),
+      padding: EdgeInsets.symmetric(vertical: 24.h),
+      iconTheme: IconThemeData(color: CustomColors.grey, size: 20.sp),
+      selectedIconTheme: IconThemeData(color: CustomColors.purple, size: 20.sp),
+      hoverIconTheme: IconThemeData(color: CustomColors.purple, size: 20.sp),
+      textStyle: CustomFonts.grey14w600,
+      selectedTextStyle: CustomFonts.purple14w600,
+      hoverTextStyle: CustomFonts.purple14w600,
+      hoverColor: CustomColors.purple.withValues(alpha: 0.05),
+      itemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+      selectedItemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+      itemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+      selectedItemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+      itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(12.r)),
+      selectedItemDecoration: BoxDecoration(
+        color: CustomColors.purple.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: CustomColors.purple.withValues(alpha: 0.2), width: 1),
+      ),
+    );
+  }
+
+  SidebarXTheme _buildExtendedTheme() {
+    return _buildTheme().copyWith(
+      width: 280.w,
+      itemTextPadding: EdgeInsets.only(left: 16.w),
+      selectedItemTextPadding: EdgeInsets.only(left: 16.w),
     );
   }
 
@@ -136,7 +142,11 @@ class AppSidebar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
         children: [
-          _LogoBadge(size: extended ? 42 : 30),
+          SizedBox(
+            width: (extended ? 42 : 30).w,
+            height: (extended ? 42 : 30).w,
+            child: Image.asset(PngAssets.splashLogo, fit: BoxFit.contain),
+          ),
           if (extended) ...[
             SizedBox(width: 14.w),
             Expanded(
@@ -144,14 +154,8 @@ class AppSidebar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'SkinSync',
-                    style: CustomFonts.black18w600lsNeg04,
-                  ),
-                  Text(
-                    'ADMIN PANEL',
-                    style: CustomFonts.purple9w800ls1,
-                  ),
+                  Text('SkinSync', style: CustomFonts.black18w600lsNeg04),
+                  Text('ADMIN PANEL', style: CustomFonts.purple9w800ls1),
                 ],
               ),
             ),
@@ -161,33 +165,19 @@ class AppSidebar extends StatelessWidget {
     );
   }
 
-  Widget _toggleButtonBuilder(BuildContext context, bool extended, SidebarXController controller) {
+  Widget _buildToggleButton(BuildContext context, bool extended) {
     return InkWell(
       onTap: () => controller.toggleExtended(),
       hoverColor: CustomColors.purple.withValues(alpha: 0.05),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 24.h),
+        padding: EdgeInsets.symmetric(vertical: 16.h),
         child: Icon(
           extended ? Icons.arrow_back_ios_new_rounded : Icons.arrow_forward_ios_rounded,
-          size: 18.sp,
+          size: 16.sp,
           color: CustomColors.grey.withValues(alpha: 0.7),
         ),
       ),
-    );
-  }
-}
-
-class _LogoBadge extends StatelessWidget {
-  final double size;
-  const _LogoBadge({required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size.w,
-      height: size.w,
-      child: Image.asset(PngAssets.splashLogo, fit: BoxFit.contain),
     );
   }
 }
@@ -202,13 +192,15 @@ class _SectionLabel extends StatelessWidget {
     return AnimatedBuilder(
       animation: controller,
       builder: (context, child) {
-        if (!controller.extended) return SizedBox(height: 16.h);
+        if (!controller.extended) {
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.h),
+            child: Divider(color: CustomColors.border, indent: 20.w, endIndent: 20.w),
+          );
+        }
         return Padding(
           padding: EdgeInsets.fromLTRB(28.w, 24.h, 16.w, 8.h),
-          child: Text(
-            title,
-            style: CustomFonts.grey11w600ls12,
-          ),
+          child: Text(title, style: CustomFonts.grey11w600ls12),
         );
       },
     );

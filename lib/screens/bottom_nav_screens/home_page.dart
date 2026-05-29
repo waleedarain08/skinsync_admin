@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sidebarx/sidebarx.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/widgets/app_sidebar.dart';
 import 'package:skinsync_admin/widgets/custom_app_bar.dart';
@@ -17,6 +17,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final SidebarXController _sidebarController;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool? _isSmallScreen;
 
   @override
   void initState() {
@@ -28,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _syncSidebarIndex();
+    _handleResponsiveSidebar();
   }
 
   void _syncSidebarIndex() {
@@ -38,11 +41,27 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _handleResponsiveSidebar() {
+    // Determine if screen is mobile or tablet (where we use drawer)
+    final isSmall = context.isMobile || context.isTablet;
+    
+    // Only set initial expansion once per screen-type change
+    if (_isSmallScreen != isSmall) {
+      _isSmallScreen = isSmall;
+      // On small screens (Drawer) and Desktop, we prefer extended. 
+      // Manual toggling is preserved because we only force it on screen-type transition.
+      _sidebarController.setExtended(true);
+    }
+  }
+
   void _onSidebarItemTap(int index) {
     if (index < 0 || index >= AppSidebarRoutes.routes.length) return;
+    
     context.go(AppSidebarRoutes.routes[index]);
-    if (Scaffold.maybeOf(context)?.hasDrawer ?? false) {
-      Navigator.of(context).pop();
+    
+    // Close drawer if open (Mobile/Tablet)
+    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+      _scaffoldKey.currentState?.closeDrawer();
     }
   }
 
@@ -54,44 +73,51 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final sidebar = AppSidebar(
-      controller: _sidebarController,
-      onItemTap: _onSidebarItemTap,
-    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = context.isMobile || context.isTablet;
 
-    return Scaffold(
-      backgroundColor: CustomColors.whiteGrey,
-      drawer: Responsive.when(
-        defaultValue: null,
-        mobile: () => Drawer(child: sidebar),
-        tablet: () => Drawer(child: sidebar),
-      ),
-      body: Row(
-        children: [
-          Responsive.when(
-            defaultValue: const SizedBox.shrink(),
-            desktop: () => sidebar,
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                const CustomAppBar(),
-                Expanded(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    child: KeyedSubtree(
-                      key: ValueKey(GoRouterState.of(context).matchedLocation),
-                      child: widget.child,
-                    ),
-                  ),
-                ),
-              ],
+        return Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: CustomColors.whiteGrey,
+          // Drawer used for both Mobile and Tablet as per requirements
+          drawer: isSmallScreen ? Drawer(
+            child: AppSidebar(
+              controller: _sidebarController,
+              onItemTap: _onSidebarItemTap,
+              showToggleButton: false, // Drawer is always expanded
             ),
+          ) : null,
+          body: Row(
+            children: [
+              if (!isSmallScreen)
+                AppSidebar(
+                  controller: _sidebarController,
+                  onItemTap: _onSidebarItemTap,
+                  showToggleButton: true, // Allow collapse/expand on Desktop
+                ),
+              Expanded(
+                child: Column(
+                  children: [
+                    const CustomAppBar(),
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        child: KeyedSubtree(
+                          key: ValueKey(GoRouterState.of(context).matchedLocation),
+                          child: widget.child,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
