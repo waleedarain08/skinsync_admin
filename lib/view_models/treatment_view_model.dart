@@ -14,6 +14,7 @@ final treatmentViewModelProvider = NotifierProvider<TreatmentViewModel, Treatmen
 class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   TreatmentViewModel._() : super(TreatmentState());
 
+  // ignore: unused_field
   final TreatmentRepository _treatmentRepository = locator<TreatmentRepository>();
 
   // Step 1 Controllers
@@ -340,6 +341,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   Future<void> submitTreatment(BuildContext context) async {
     return await runSafely<void>(showLoading: true, () async {
+      // ignore: unused_local_variable
       final treatment = TreatmentModel(
         name: internalNameController.text,
         patientDisplayName: displayNameController.text,

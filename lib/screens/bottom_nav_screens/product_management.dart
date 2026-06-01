@@ -1,10 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
+import '../../widgets/custom_dropdown_widget.dart';
 
 class ProductManagement extends StatefulWidget {
   static const String routeName = '/product-management';
@@ -15,10 +19,17 @@ class ProductManagement extends StatefulWidget {
 }
 
 class _ProductManagementState extends State<ProductManagement> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
@@ -44,28 +55,24 @@ class _ProductManagementState extends State<ProductManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Inventory & Products", style: CustomFonts.textMain32w700),
+            Text("Inventory & Products", style: CustomFonts.black32w700),
             SizedBox(height: 8.h),
             Text(
               "Manage retail products and professional supplies across all clinics.",
-              style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
+              style: CustomFonts.grey14w400,
             ),
           ],
         ),
-        ElevatedButton.icon(
-          onPressed: () {
+        CustomPrimaryButton(
+          onTap: () {
             showDialog(
               context: context,
               builder: (context) => const ProductDialogBox(),
             );
           },
-          icon: const Icon(Icons.add, color: Colors.white),
-          label: Text('Add New Product', style: CustomFonts.white14w500),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: CustomColors.deepNavy,
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-          ),
+          icon: Icons.add,
+          label: 'Add New Product',
+          width: 220.w,
         ),
       ],
     );
@@ -74,13 +81,13 @@ class _ProductManagementState extends State<ProductManagement> {
   Widget _buildInventoryOverview() {
     return Row(
       children: [
-        _buildInventoryStat("Total SKU", "124", Icons.inventory_2_outlined, CustomColors.primaryGold),
+        _buildInventoryStat("Total SKU", "124", Icons.inventory_2_outlined, CustomColors.amber),
         SizedBox(width: 16.w),
-        _buildInventoryStat("Low Stock Items", "12", Icons.warning_amber_rounded, CustomColors.errorRed),
+        _buildInventoryStat("Low Stock Items", "12", Icons.warning_amber_rounded, CustomColors.red),
         SizedBox(width: 16.w),
-        _buildInventoryStat("Total Stock Value", "\$84,200", Icons.monetization_on_outlined, CustomColors.successGreen),
+        _buildInventoryStat("Total Stock Value", "\$84,200", Icons.monetization_on_outlined, CustomColors.green),
         SizedBox(width: 16.w),
-        _buildInventoryStat("Categories", "8", Icons.category_outlined, CustomColors.deepNavy),
+        _buildInventoryStat("Categories", "8", Icons.category_outlined, CustomColors.black),
       ],
     );
   }
@@ -93,15 +100,15 @@ class _ProductManagementState extends State<ProductManagement> {
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10.r)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)),
               child: Icon(icon, color: color, size: 24.sp),
             ),
             SizedBox(width: 16.w),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.textMain20w600),
-                Text(title, style: CustomFonts.textMuted12w400),
+                Text(value, style: CustomFonts.black20w600),
+                Text(title, style: CustomFonts.grey12w400),
               ],
             ),
           ],
@@ -117,34 +124,34 @@ class _ProductManagementState extends State<ProductManagement> {
         children: [
           Expanded(
             flex: 3,
-            child: CupertinoSearchTextField(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              placeholder: "Search products by name, SKU or brand...",
-              backgroundColor: CustomColors.softChampagne.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(10.r),
+            child: AppSearchField(
+              controller: _searchController,
+              hintText: "Search products by name, SKU or brand...",
+              onChanged: (val) => setState(() {}),
             ),
           ),
           SizedBox(width: 16.w),
-          _filterDropdown("Category", "All Categories"),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: "Category",
+              hintText: "All Categories",
+              items: const ["All Categories", "Skincare", "Supplies"]
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (val) {},
+            ),
+          ),
           SizedBox(width: 12.w),
-          _filterDropdown("Status", "In Stock"),
-        ],
-      ),
-    );
-  }
-
-  Widget _filterDropdown(String label, String value) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        border: Border.all(color: CustomColors.greyColor),
-        borderRadius: BorderRadius.circular(10.r),
-      ),
-      child: Row(
-        children: [
-          Text("$label: ", style: TextStyle(color: CustomColors.textLight, fontSize: 13.sp)),
-          Text(value, style: TextStyle(color: CustomColors.textDark, fontWeight: FontWeight.w600, fontSize: 13.sp)),
-          Icon(Icons.keyboard_arrow_down, size: 18.sp),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: "Status",
+              hintText: "In Stock",
+              items: const ["In Stock", "Out of Stock", "Low Stock"]
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (val) {},
+            ),
+          ),
         ],
       ),
     );
@@ -174,7 +181,7 @@ class _ProductManagementState extends State<ProductManagement> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: CustomColors.softChampagne,
+                color: CustomColors.whiteGrey,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
                 image: const DecorationImage(
                   image: NetworkImage("https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop"),
@@ -188,11 +195,11 @@ class _ProductManagementState extends State<ProductManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("SKU-9283$index", style: TextStyle(color: CustomColors.primaryGold, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                Text("SKU-9283$index", style: CustomFonts.amber10w800ls1),
                 SizedBox(height: 4.h),
                 Text("Advanced Night Repair", style: CustomFonts.black16w600, maxLines: 1, overflow: TextOverflow.ellipsis),
                 SizedBox(height: 4.h),
-                Text("Skincare • 50ml", style: TextStyle(color: CustomColors.textLight, fontSize: 12.sp)),
+                Text("Skincare • 50ml", style: CustomFonts.white12w400),
                 SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -200,7 +207,7 @@ class _ProductManagementState extends State<ProductManagement> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Stock", style: TextStyle(color: CustomColors.textLight, fontSize: 10.sp)),
+                        Text("Stock", style: CustomFonts.white10w600),
                         Text("45 Units", style: CustomFonts.black14w600),
                       ],
                     ),
@@ -220,12 +227,12 @@ class _ProductManagementState extends State<ProductManagement> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: isLow ? CustomColors.errorRed.withOpacity(0.1) : CustomColors.successGreen.withOpacity(0.1),
+        color: isLow ? CustomColors.red.withValues(alpha: 0.1) : CustomColors.green.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4.r),
       ),
       child: Text(
         status,
-        style: TextStyle(color: isLow ? CustomColors.errorRed : CustomColors.successGreen, fontSize: 10.sp, fontWeight: FontWeight.bold),
+        style: isLow ? CustomFonts.red10w600 : CustomFonts.green10w600,
       ),
     );
   }

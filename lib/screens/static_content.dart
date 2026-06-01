@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class StaticContentScreen extends StatefulWidget {
   const StaticContentScreen({super.key});
@@ -43,7 +46,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       body: Padding(
         padding: EdgeInsets.all(24.w),
         child: Column(
@@ -52,11 +55,11 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
             /// Screen Title
             Text(
               'Static Content',
-              style: CustomFonts.textMain24w700,
+              style: CustomFonts.black24w700,
             ),
 
             SizedBox(height: 12.h),
-            Divider(color: Colors.grey.shade300),
+            const Divider(color: CustomColors.border),
             SizedBox(height: 20.h),
 
             /// Main Container
@@ -73,7 +76,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                   Container(
                     padding: EdgeInsets.all(4.w),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F1F3),
+                      color: CustomColors.whiteGrey,
                       borderRadius: BorderRadius.circular(30.r),
                     ),
                     child: Row(
@@ -93,7 +96,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                               child: Text(
                                 tabs[index],
                                 textAlign: TextAlign.center,
-                                style: isActive ? CustomFonts.textMain14w600 : CustomFonts.textMuted14w400,
+                                style: isActive ? CustomFonts.black14w600 : CustomFonts.grey14w400,
                               ),
                             ),
                           ),
@@ -107,7 +110,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                   /// Section Title
                   Text(
                     titles[selectedIndex]!,
-                    style: CustomFonts.textMain16w600,
+                    style: CustomFonts.black16w600,
                   ),
 
                   SizedBox(height: 12.h),
@@ -118,7 +121,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                     maxLines: 10,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFFF7F7F8),
+                      fillColor: CustomColors.whiteGrey,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide.none,
@@ -135,28 +138,13 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                     children: [
                       Text(
                         'Last updated: 11/4/2025',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Colors.grey.shade600,
-                        ),
+                        style: CustomFonts.grey12w400,
                       ),
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20.w,
-                            vertical: 12.h,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.r),
-                          ),
-                        ),
-                        icon: const Icon(Icons.save, size: 16),
-                        label: Text(
-                          'Save Changes',
-                          style: TextStyle(fontSize: 14.sp),
-                        ),
+                      CustomPrimaryButton(
+                        onTap: () {},
+                        icon: Icons.save,
+                        label: 'Save Changes',
+                        width: 180.w,
                       ),
                     ],
                   ),
@@ -170,20 +158,20 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF8E5),
+                color: CustomColors.paleAmber,
                 borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: const Color(0xFFFFE2A8)),
+                border: Border.all(color: CustomColors.amber),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.info_outline, color: Colors.orange),
+                  const Icon(Icons.info_outline, color: CustomColors.amber),
                   SizedBox(width: 12.w),
                   Expanded(
                     child: Text(
                       'Changes to static content will be immediately reflected on both the website and mobile application. '
                       'Please review carefully before saving.',
-                      style: TextStyle(fontSize: 13.sp),
+                      style: CustomFonts.black13w400,
                     ),
                   ),
                 ],

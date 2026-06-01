@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class TwoFactorAuthScreen extends StatefulWidget {
   const TwoFactorAuthScreen({super.key});
@@ -15,8 +17,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+    return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
@@ -50,7 +51,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
         SizedBox(width: 12.w),
         Text(
           'Two-Factor Authentication',
-          style: CustomFonts.textMain18w600,
+          style: CustomFonts.black18w600,
         ),
       ],
     );
@@ -65,7 +66,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -116,12 +117,12 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
           children: [
             Text(
               'Business Information',
-              style: CustomFonts.textMain14w600,
+              style: CustomFonts.black14w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Update clinic details and contact info',
-              style: CustomFonts.textMuted12w400,
+              style: CustomFonts.grey12w400,
             ),
           ],
         ),
@@ -146,12 +147,12 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
             children: [
               Text(
                 'Enable Two-Factor Authentication',
-                style: CustomFonts.textMain14w600,
+                style: CustomFonts.black14w600,
               ),
               SizedBox(height: 4.h),
               Text(
                 'Require a verification code when signing in',
-                style: CustomFonts.textMuted12w400,
+                style: CustomFonts.grey12w400,
               ),
             ],
           ),
@@ -163,10 +164,10 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
                 _isTwoFactorEnabled = value;
               });
             },
-            activeThumbColor: Colors.white,
-            activeTrackColor: const Color(0xFF6B5DD3),
-            inactiveThumbColor: Colors.white,
-            inactiveTrackColor: Colors.grey[300],
+            activeThumbColor: CustomColors.white,
+            activeTrackColor: CustomColors.purple,
+            inactiveThumbColor: CustomColors.white,
+            inactiveTrackColor: CustomColors.border,
             trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
           ),
         ],
@@ -180,7 +181,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
       children: [
         Text(
           'Verification Method',
-          style: CustomFonts.textMain16w600,
+          style: CustomFonts.black16w600,
         ),
         SizedBox(height: 16.h),
         // SMS Verification Option
@@ -228,11 +229,11 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
           color: isSelected ? const Color(0xFFD2CEF1) : Colors.white,
           borderRadius: BorderRadius.circular(12.r),
           border: isSelected
-              ? Border.all(color: Color(0xFF6B5DD3), width: 1)
+              ? Border.all(color: const Color(0xFF6B5DD3), width: 1)
               : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -246,7 +247,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
               height: 40.w,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Colors.white.withOpacity(0.2)
+                    ? Colors.white.withValues(alpha: 0.2)
                     : const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(8.r),
               ),
@@ -254,7 +255,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
                 child: Icon(
                   icon,
                   size: 20.sp,
-                  color: isSelected ? Color(0xFF6B5DD3) : Colors.grey[600],
+                  color: isSelected ? const Color(0xFF6B5DD3) : Colors.grey[600],
                 ),
               ),
             ),
@@ -265,12 +266,12 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
               children: [
                 Text(
                   title,
-                  style: CustomFonts.textMain14w600,
+                  style: CustomFonts.black14w600,
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   subtitle,
-                  style: CustomFonts.textMuted12w400,
+                  style: CustomFonts.grey12w400,
                 ),
               ],
             ),
@@ -290,20 +291,16 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
       ),
       child: RichText(
         text: TextSpan(
-          style: TextStyle(fontSize: 12.sp, color: Colors.black87, height: 1.4),
+          style: CustomFonts.black12w400h14,
           children: [
             TextSpan(
               text: 'Important: ',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12.sp),
+              style: CustomFonts.black12w600,
             ),
             TextSpan(
               text:
                   'You will need to enter a verification code sent to your phone every time you sign in.',
-              style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 12.sp,
-                color: Colors.grey[600],
-              ),
+              style: CustomFonts.grey12w400,
             ),
           ],
         ),

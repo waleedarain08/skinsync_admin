@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'standard_dialog.dart';
 
 class UserManagementDialogBox extends StatelessWidget {
@@ -49,9 +49,10 @@ class UserManagementDialogBox extends StatelessWidget {
         ),
       ),
       actions: [
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Close Profile"),
+        CustomPrimaryButton(
+          onTap: () => Navigator.pop(context),
+          label: "Close Profile",
+          width: 160.w,
         ),
       ],
     );
@@ -61,7 +62,7 @@ class UserManagementDialogBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );
@@ -71,9 +72,9 @@ class UserManagementDialogBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.textMuted13w500),
+        Text(label, style: CustomFonts.grey13w500),
         SizedBox(height: 4.h),
-        Text(value, style: CustomFonts.textMain16w600),
+        Text(value, style: CustomFonts.black16w600),
       ],
     );
   }
@@ -82,7 +83,7 @@ class UserManagementDialogBox extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.textMuted13w500),
+        Text(label, style: CustomFonts.grey13w500),
         SizedBox(height: 12.h),
         Wrap(
           spacing: 12.w,
@@ -90,11 +91,11 @@ class UserManagementDialogBox extends StatelessWidget {
           children: tags.map((tag) => Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: CustomColors.brandCyan.withOpacity(0.1),
+              color: CustomColors.green.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: CustomColors.brandCyan.withOpacity(0.2)),
+              border: Border.all(color: CustomColors.green.withValues(alpha: 0.2)),
             ),
-            child: Text(tag, style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary, fontSize: 11.sp)),
+            child: Text(tag, style: CustomFonts.black14w600.copyWith(color: CustomColors.purple, fontSize: 11.sp)),
           )).toList(),
         ),
       ],

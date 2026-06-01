@@ -2,6 +2,7 @@ import '../repositories/treatment_repository.dart';
 import 'api_base_helper.dart';
 
 class TreatmentServices implements TreatmentRepository {
+  // ignore: unused_field
   final ApiBaseHelper _api;
 
   TreatmentServices({required ApiBaseHelper api}) : _api = api;

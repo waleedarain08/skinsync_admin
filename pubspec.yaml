@@ -64,6 +64,7 @@ dependencies:
   url_launcher: ^6.3.2
   country_code_picker: ^3.4.1
   cached_network_image: ^3.4.1
+  sidebarx: ^0.17.2
 
 dev_dependencies:
   flutter_test:

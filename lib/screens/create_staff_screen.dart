@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../utils/color_constant.dart';
-import '../utils/custom_fonts.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'business_info_screen.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class CreateStaffScreen extends StatefulWidget {
   const CreateStaffScreen({super.key});
@@ -68,14 +71,14 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             children: [
               Text(
                 'Select Image',
-                style: CustomFonts.textMain20w600,
+                style: CustomFonts.black20w600,
               ),
               SizedBox(height: 20.h),
               ListTile(
                 leading: Container(
                   padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(
@@ -86,7 +89,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 ),
                 title: Text(
                   'Choose from Gallery',
-                  style: CustomFonts.textMain14w600,
+                  style: CustomFonts.black14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -98,7 +101,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 leading: Container(
                   padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(
@@ -109,7 +112,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 ),
                 title: Text(
                   'Take a Photo',
-                  style: CustomFonts.textMain14w600,
+                  style: CustomFonts.black14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -122,7 +125,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                   leading: Container(
                     padding: EdgeInsets.all(10.w),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Icon(
@@ -133,7 +136,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                   ),
                   title: Text(
                     'Remove Photo',
-                    style: CustomFonts.textMain14w600.copyWith(color: Colors.red),
+                    style: CustomFonts.black14w600.copyWith(color: Colors.red),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -189,8 +192,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+    return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
@@ -219,7 +221,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
         SizedBox(width: 12.w),
         Text(
           'Create Staff',
-          style: CustomFonts.textMain18w600,
+          style: CustomFonts.black18w600,
         ),
       ],
     );
@@ -234,7 +236,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -247,7 +249,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
           _buildProfilePictureSection(),
           SizedBox(height: 24.h),
           // Treatment Name
-          _buildTextField(
+          BuildTextField(
             label: 'Treatment Name',
             controller: _treatmentNameController,
             hintText: 'e.g., Botox, Dermal Fillers',
@@ -280,7 +282,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
           ),
           SizedBox(height: 20.h),
           // Description
-          _buildTextField(
+          BuildTextField(
             label: 'Description',
             controller: _descriptionController,
             hintText: 'Describe the treatment and its benefits',
@@ -350,59 +352,14 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
           children: [
             Text(
               'Profile Picture',
-              style: CustomFonts.textMain14w600,
+              style: CustomFonts.black14w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Upload your profile picture',
-              style: CustomFonts.textMuted12w400,
+              style: CustomFonts.grey12w400,
             ),
           ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    required String hintText,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: CustomFonts.textMain14w600,
-        ),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          style: CustomFonts.textMain14w400,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: CustomFonts.textMuted14w400,
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 14.h,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
-            ),
-          ),
         ),
       ],
     );
@@ -420,14 +377,14 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
       children: [
         Text(
           label,
-          style: CustomFonts.textMain14w600,
+          style: CustomFonts.black14w600,
         ),
         SizedBox(height: 8.h),
         DropdownButtonFormField<String>(
           isExpanded: true,
           hint: Text(
             hintText,
-            style: CustomFonts.textMuted14w400,
+            style: CustomFonts.grey14w400,
           ),
           initialValue: value,
           items: items
@@ -436,7 +393,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                   value: item,
                   child: Text(
                     item,
-                    style: CustomFonts.textMain14w400,
+                    style: CustomFonts.black14w400,
                   ),
                 ),
               )
@@ -448,22 +405,8 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             size: 24.sp,
           ),
           dropdownColor: Colors.white,
-          borderRadius: BorderRadius.circular(8.r),
-          decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
-            ),
-          ),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          decoration: AppDecorations.input(hint: hintText),
         ),
       ],
     );
@@ -472,10 +415,9 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
   Widget _buildButtonsRow() {
     return Row(
       children: [
-        // Create Staff Button
         Expanded(
-          child: ElevatedButton(
-            onPressed: () {
+          child: CustomPrimaryButton(
+            onTap: () {
               // Handle create staff
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -484,19 +426,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: 20.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              elevation: 0,
-            ),
-            child: Text(
-              'Create Staff',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
-            ),
+            label: 'Create Staff',
           ),
         ),
         SizedBox(width: 16.w),
@@ -517,7 +447,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             ),
             child: Text(
               'Cancel',
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+              style: CustomFonts.black14w500,
             ),
           ),
         ),

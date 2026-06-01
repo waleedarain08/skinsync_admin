@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'standard_dialog.dart';
 
 class ReleasePaymentDialog extends StatelessWidget {
@@ -32,13 +32,13 @@ class ReleasePaymentDialog extends StatelessWidget {
         children: [
           Text(
             "Please review the transaction details before releasing the funds to the clinic's wallet.",
-            style: CustomFonts.textMuted14w400,
+            style: CustomFonts.grey14w400,
           ),
           SizedBox(height: 24.h),
           Container(
             padding: EdgeInsets.all(20.w),
             decoration: BoxDecoration(
-              color: CustomColors.surfaceGhost,
+              color: CustomColors.whiteGrey,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: Colors.grey[200]!),
             ),
@@ -52,8 +52,8 @@ class ReleasePaymentDialog extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Total Amount", style: CustomFonts.textMain16w600),
-                    Text(amount, style: CustomFonts.textMain20w600.copyWith(color: CustomColors.success)),
+                    Text("Total Amount", style: CustomFonts.black16w600),
+                    Text(amount, style: CustomFonts.black20w600.copyWith(color: CustomColors.green)),
                   ],
                 ),
               ],
@@ -61,21 +61,21 @@ class ReleasePaymentDialog extends StatelessWidget {
           ),
           if (feedbackMessage != null) ...[
             SizedBox(height: 24.h),
-            Text("Patient Feedback", style: CustomFonts.textMain16w600),
+            Text("Patient Feedback", style: CustomFonts.black16w600),
             SizedBox(height: 8.h),
             Text(
               feedbackMessage!,
-              style: CustomFonts.textMain14w400.copyWith(fontStyle: FontStyle.italic),
+              style: CustomFonts.black14w400.copyWith(fontStyle: FontStyle.italic),
             ),
           ],
         ],
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context, true),
-          style: ElevatedButton.styleFrom(backgroundColor: CustomColors.success),
-          child: const Text("Confirm Release"),
+        CustomPrimaryButton(
+          onTap: () => Navigator.pop(context, true),
+          label: "Confirm Release",
+          width: 200.w,
         ),
       ],
     );
@@ -87,8 +87,8 @@ class ReleasePaymentDialog extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: CustomFonts.textMuted13w500),
-          Text(value, style: CustomFonts.textMain14w600),
+          Text(label, style: CustomFonts.grey13w500),
+          Text(value, style: CustomFonts.black14w600),
         ],
       ),
     );

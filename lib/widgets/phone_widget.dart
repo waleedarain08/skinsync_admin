@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import '../view_models/auth_view_model.dart';
 
 class PhoneWidget extends StatelessWidget {
@@ -38,26 +38,26 @@ class PhoneWidget extends StatelessWidget {
         }
         return null;
       },
-      style: CustomFonts.textMain14w400,
+      style: CustomFonts.black14w400,
       keyboardType: TextInputType.phone,
       decoration: InputDecoration(
         filled: filled,
-        fillColor: Colors.white,
+        fillColor: CustomColors.white,
         hintText: 'Enter phone number',
-        hintStyle: CustomFonts.textMuted14w400,
+        hintStyle: CustomFonts.grey14w400,
         prefixIcon: _buildPhoneNumberPicker(context: context),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
+          borderSide: const BorderSide(color: CustomColors.border, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
+          borderSide: const BorderSide(color: CustomColors.border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
+          borderSide: const BorderSide(color: CustomColors.purple, width: 1),
         ),
       ),
     );
@@ -76,9 +76,9 @@ class PhoneWidget extends StatelessWidget {
               child: CountryCodePicker(
                 onChanged: (country) {
                   authNotifier.setCountry(country);
-                                },
+                },
                 dialogSize: Size(400.w, 500.h),
-                textStyle: CustomFonts.textMain14w400,
+                textStyle: CustomFonts.black14w400,
                 initialSelection: authState.country?.code ?? "US",
                 showCountryOnly: false,
                 showOnlyCountryWhenClosed: false,
@@ -91,7 +91,7 @@ class PhoneWidget extends StatelessWidget {
         Container(
           height: 24.h,
           width: 1.w,
-          color: Colors.grey[300],
+          color: CustomColors.border,
           margin: EdgeInsets.symmetric(horizontal: 8.w),
         ),
       ],

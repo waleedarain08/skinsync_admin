@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/custom_fonts.dart';
+import '../utils/theme.dart';
+import '../widgets/custom_primary_button.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class StaticContentScreen extends StatefulWidget {
   const StaticContentScreen({super.key});
@@ -129,8 +132,7 @@ For any inquiries, please reach out to our support team.
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+    return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20.w),
@@ -140,13 +142,13 @@ For any inquiries, please reach out to our support team.
               // Title
               Text(
                 'Static Content',
-                style: CustomFonts.textMain24w700,
+                style: CustomFonts.black24w700,
               ),
               SizedBox(height: 8.h),
               // Subtitle
               Text(
                 'Manage financial transactions and release payments to clinics',
-                style: CustomFonts.textMuted14w400,
+                style: CustomFonts.grey14w400,
               ),
               SizedBox(height: 16.h),
               // Divider
@@ -160,7 +162,7 @@ For any inquiries, please reach out to our support team.
                   borderRadius: BorderRadius.circular(12.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -197,27 +199,20 @@ For any inquiries, please reach out to our support team.
                               SizedBox(width: 8.w),
                               Text(
                                 _tabs[_selectedTab],
-                                style: CustomFonts.textMain16w600,
+                                style: CustomFonts.black16w600,
                               ),
                             ],
                           ),
                           SizedBox(height: 4.h),
                           Text(
                             _tabDescriptions[_selectedTab],
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: Colors.grey[500],
-                            ),
+                            style: CustomFonts.grey13w500,
                           ),
                           SizedBox(height: 16.h),
                           // Content Label
                           Text(
                             'Content',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                            ),
+                            style: CustomFonts.black14w500,
                           ),
                           SizedBox(height: 12.h),
                           // Quill Editor Container
@@ -251,40 +246,14 @@ For any inquiries, please reach out to our support team.
                             children: [
                               Text(
                                 'Last updated: ${_lastUpdatedDates[_selectedTab]}',
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: Colors.grey[500],
-                                ),
+                                style: CustomFonts.grey13w500,
                               ),
                               const Spacer(),
-                              ElevatedButton(
-                                onPressed: _saveChanges,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 24.w,
-                                    vertical: 12.h,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.save_outlined, size: 18.sp),
-                                    SizedBox(width: 8.w),
-                                    Text(
-                                      'Save Changes',
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              CustomPrimaryButton(
+                                onTap: _saveChanges,
+                                icon: Icons.save_outlined,
+                                label: 'Save Changes',
+                                width: 180.w,
                               ),
                             ],
                           ),
@@ -321,11 +290,7 @@ For any inquiries, please reach out to our support team.
         child: Center(
           child: Text(
             _tabs[index],
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: isSelected ? Colors.black : Colors.grey[600],
-            ),
+            style: isSelected ? CustomFonts.black13w600 : CustomFonts.grey13w500,
             textAlign: TextAlign.center,
           ),
         ),
@@ -360,20 +325,12 @@ For any inquiries, please reach out to our support team.
               children: [
                 Text(
                   'Important Note',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
+                  style: CustomFonts.black14w600,
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   'Changes to static content will be immediately reflected on both the website and mobile application. Please review carefully before saving. Consider consulting with legal counsel before making changes to Terms & Conditions or Privacy Policy.',
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    color: Colors.grey[700],
-                    height: 1.4,
-                  ),
+                  style: CustomFonts.grey13w500h14,
                 ),
               ],
             ),

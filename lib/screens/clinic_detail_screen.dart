@@ -7,15 +7,17 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class ClinicDetailScreen extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-detail';
@@ -99,23 +101,23 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final clinic = ref.watch(clinicViewModelProvider).selectedClinic;
 
     if (clinic == null) {
-      return const Scaffold(body: Center(child: Text("No Clinic Data Found")));
+      return GradientScaffold(body: Center(child: Text("No Clinic Data Found", style: CustomFonts.black16w400)));
     }
 
     final bool isMobile = context.isMobile;
 
-    return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+    return GradientScaffold(
       appBar: AppBar(
-        title: Text("Clinic Detail", style: CustomFonts.headlineSmall),
+        flexibleSpace: AppDecorations.appBarGradient,
+        title: Text("Clinic Detail", style: CustomFonts.black18w600),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CustomColors.deepSlate),
+          icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
         ),
         actions: [
           IconButton(
-            icon: Icon(_isEditMode ? Icons.close : Icons.edit_outlined, color: CustomColors.deepSlate),
+            icon: Icon(_isEditMode ? Icons.close : Icons.edit_outlined, color: CustomColors.black),
             onPressed: () {
               setState(() {
                 if (_isEditMode) {
@@ -162,16 +164,10 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                     SizedBox(height: 48.h),
                     SizedBox(
                       width: isMobile ? double.infinity : 240.w,
-                      height: 56.h,
-                      child: ElevatedButton(
-                        onPressed: _updateClinic,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: CustomColors.deepSlate,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                          elevation: 4,
-                          shadowColor: CustomColors.deepSlate.withOpacity(0.3),
-                        ),
-                        child: Text("Save Changes", style: CustomFonts.bodyLarge.copyWith(color: Colors.white)),
+                      child: CustomPrimaryButton(
+                        onTap: _updateClinic,
+                        label: "Save Changes",
+                        height: 56.h,
                       ),
                     ),
                   ],
@@ -197,9 +193,9 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                   width: 100.w,
                   height: 100.w,
                   decoration: BoxDecoration(
-                    color: CustomColors.backgroundLight,
+                    color: CustomColors.whiteGrey,
                     borderRadius: BorderRadius.circular(20.r),
-                    border: _isEditMode ? Border.all(color: CustomColors.brandCyan, width: 2) : null,
+                    border: _isEditMode ? Border.all(color: CustomColors.purple, width: 2) : null,
                     image: _selectedLogo != null
                         ? DecorationImage(
                             image: kIsWeb ? NetworkImage(_selectedLogo!.path) : FileImage(File(_selectedLogo!.path)) as ImageProvider,
@@ -209,7 +205,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                             : null,
                   ),
                   child: (_selectedLogo == null && (clinic.logo == null || clinic.logo!.isEmpty))
-                      ? Icon(Icons.business_outlined, size: 40.sp, color: CustomColors.deepSlate)
+                      ? Icon(Icons.business_outlined, size: 40.sp, color: CustomColors.black)
                       : _isEditMode
                           ? Container(
                               decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(20.r)),
@@ -225,13 +221,13 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                   children: [
                     Row(
                       children: [
-                        Flexible(child: Text(clinic.name ?? 'N/A', style: CustomFonts.headlineLarge, overflow: TextOverflow.ellipsis)),
+                        Flexible(child: Text(clinic.name ?? 'N/A', style: CustomFonts.black26w700, overflow: TextOverflow.ellipsis)),
                         SizedBox(width: 16.w),
                         _statusBadge(clinic.status ?? 'Active'),
                       ],
                     ),
                     SizedBox(height: 8.h),
-                    Text(clinic.address ?? 'N/A', style: CustomFonts.bodyLarge.copyWith(color: CustomColors.textSecondary)),
+                    Text(clinic.address ?? 'N/A', style: CustomFonts.grey16w400),
                     SizedBox(height: 16.h),
                     Wrap(
                       spacing: 12.w,
@@ -288,7 +284,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Phone Number", style: CustomFonts.textMain14w600),
+                  Text("Phone Number", style: CustomFonts.black14w600),
                   SizedBox(height: 10.h),
                   PhoneWidget(controller: _clinicPhoneController, readOnly: !_isEditMode),
                 ],
@@ -342,7 +338,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+          Text(title, style: CustomFonts.black16w700),
           SizedBox(height: 24.h),
           ...children,
         ],
@@ -358,12 +354,12 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, size: 18.sp, color: CustomColors.textSecondary),
+              Icon(icon, size: 18.sp, color: CustomColors.grey),
               SizedBox(width: 12.w),
-              Text(label, style: CustomFonts.bodySmall),
+              Text(label, style: CustomFonts.grey13w500),
             ],
           ),
-          Flexible(child: Text(value, style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis)),
+          Flexible(child: Text(value, style: CustomFonts.grey14w600, overflow: TextOverflow.ellipsis)),
         ],
       ),
     );
@@ -374,12 +370,12 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: isActive ? CustomColors.success.withOpacity(0.1) : CustomColors.error.withOpacity(0.1),
+        color: isActive ? CustomColors.green.withValues(alpha: 0.1) : CustomColors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
         status.toUpperCase(),
-        style: TextStyle(color: isActive ? CustomColors.success : CustomColors.error, fontSize: 10.sp, fontWeight: FontWeight.bold),
+        style: isActive ? CustomFonts.green10w700 : CustomFonts.red10w700,
       ),
     );
   }
@@ -387,13 +383,13 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
   Widget _infoChip(IconData icon, String label) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-      decoration: BoxDecoration(color: CustomColors.backgroundLight, borderRadius: BorderRadius.circular(8.r)),
+      decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(8.r)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14.sp, color: CustomColors.textSecondary),
+          Icon(icon, size: 14.sp, color: CustomColors.grey),
           SizedBox(width: 8.w),
-          Text(label, style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.w500)),
+          Text(label, style: CustomFonts.grey13w500),
         ],
       ),
     );

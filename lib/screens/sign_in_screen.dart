@@ -7,12 +7,15 @@ import 'package:skinsync_admin/utils/assets.dart';
 import 'package:pinput/pinput.dart';
 
 import '../models/requests/auth_req_models.dart';
-import '../utils/color_constant.dart';
-import '../utils/custom_fonts.dart';
+import '../utils/theme.dart';
 import '../utils/enums.dart';
 import '../utils/validators.dart';
 import '../view_models/auth_view_model.dart';
+import '../widgets/custom_primary_button.dart';
+import '../widgets/build_textfield.dart';
 import 'bottom_nav_screens/dashboard_screen.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   static const String routeName = '/sign-in-screen';
@@ -59,11 +62,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+    return GradientScaffold(
       body: Stack(
         children: [
-          // Background Gradient Element
           Positioned(
             top: -100.h,
             right: -100.w,
@@ -74,8 +75,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    CustomColors.brandCyan.withOpacity(0.2),
-                    CustomColors.brandCyan.withOpacity(0),
+                    CustomColors.green.withValues(alpha: 0.15),
+                    Colors.transparent,
                   ],
                 ),
               ),
@@ -91,8 +92,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    CustomColors.brandPurple.withOpacity(0.15),
-                    CustomColors.brandPurple.withOpacity(0),
+                    CustomColors.purple.withValues(alpha: 0.12),
+                    Colors.transparent,
                   ],
                 ),
               ),
@@ -120,32 +121,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Widget _buildBranding() {
     return Column(
       children: [
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Image.asset(PngAssets.splashLogo, height: 80.w, width: 80.w),
-        ),
-        SizedBox(height: 24.h),
+        Image.asset(PngAssets.splashLogo, height: 100.w, width: 100.w, fit: BoxFit.contain),
+        SizedBox(height: 32.h),
         Text(
           "SkinSync AI",
-          style: CustomFonts.textMain32w700.copyWith(
-            letterSpacing: 2,
-            color: CustomColors.deepSlate,
-          ),
+          style: CustomFonts.black40w700,
         ),
+        SizedBox(height: 2.h),
         Text(
-          "Centralized MedSpa Administration",
-          style: CustomFonts.textMuted14w400.copyWith(letterSpacing: 1),
+          "ADMIN PANEL",
+          style: CustomFonts.purple14w800ls3,
         ),
       ],
     );
@@ -156,15 +141,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       width: 450.w,
       padding: EdgeInsets.all(40.w),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
+        color: CustomColors.white,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: CustomColors.border),
+        boxShadow: AppShadows.lg,
       ),
       child: Form(
         key: _formKey,
@@ -190,27 +170,33 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       key: const ValueKey('login'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Welcome Back", style: CustomFonts.textMain24w700),
+        Text("Welcome Back", style: CustomFonts.black20w600),
         SizedBox(height: 8.h),
-        Text("Enter your credentials to access the admin panel.", style: CustomFonts.textMuted14w400),
+        Text("Enter your credentials to access the admin panel.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
-        _buildInputField(
+        BuildTextField(
           label: "Email Address",
-          hint: "admin@skinsync.com",
+          hintText: "admin@skinsync.com",
           controller: _emailController,
           validator: Validators.email,
-          icon: Icons.alternate_email_rounded,
+          prefixIcon: Icon(Icons.alternate_email_rounded, size: 20.sp, color: CustomColors.lightGrey),
         ),
         SizedBox(height: 24.h),
-        _buildInputField(
+        BuildTextField(
           label: "Password",
-          hint: "••••••••",
+          hintText: "••••••••",
           controller: _passwordController,
-          isPassword: true,
           obscureText: _obscurePassword,
-          onTogglePassword: () => setState(() => _obscurePassword = !_obscurePassword),
           validator: Validators.password,
-          icon: Icons.lock_outline_rounded,
+          prefixIcon: Icon(Icons.lock_outline_rounded, size: 20.sp, color: CustomColors.lightGrey),
+          suffixIcon: IconButton(
+            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+            icon: Icon(
+              _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              size: 20.sp,
+              color: CustomColors.lightGrey,
+            ),
+          ),
         ),
         SizedBox(height: 16.h),
         Row(
@@ -219,7 +205,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             _buildCheckbox(),
             TextButton(
               onPressed: () => setCurrentScreen(AuthScreen.forgetPassword),
-              child: Text("Forgot Password?", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
+              child: Text("Forgot Password?", style: CustomFonts.purple14w600),
             ),
           ],
         ),
@@ -237,19 +223,19 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         IconButton(
           onPressed: () => setCurrentScreen(AuthScreen.login),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          style: IconButton.styleFrom(backgroundColor: CustomColors.surfaceGhost),
+          style: IconButton.styleFrom(backgroundColor: CustomColors.softGrey),
         ),
         SizedBox(height: 24.h),
-        Text("Reset Password", style: CustomFonts.textMain24w700),
+        Text("Reset Password", style: CustomFonts.black20w600),
         SizedBox(height: 8.h),
-        Text("Enter your email and we'll send you an OTP code.", style: CustomFonts.textMuted14w400),
+        Text("Enter your email and we'll send you an OTP code.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
-        _buildInputField(
+        BuildTextField(
           label: "Registered Email",
-          hint: "Enter your email",
+          hintText: "Enter your email",
           controller: _emailController,
           validator: Validators.email,
-          icon: Icons.alternate_email_rounded,
+          prefixIcon: Icon(Icons.alternate_email_rounded, size: 20.sp, color: CustomColors.lightGrey),
         ),
         SizedBox(height: 32.h),
         _buildSubmitButton("Send Reset Code", _handleForgotPassword),
@@ -262,9 +248,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       key: const ValueKey('otp'),
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text("Verify Identity", style: CustomFonts.textMain24w700),
+        Text("Verify Identity", style: CustomFonts.black20w600),
         SizedBox(height: 8.h),
-        Text("We've sent a 6-digit code to your email.", style: CustomFonts.textMuted14w400),
+        Text("We've sent a 6-digit code to your email.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
         Pinput(
           controller: _otpController,
@@ -272,9 +258,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           defaultPinTheme: PinTheme(
             width: 56.w,
             height: 56.w,
-            textStyle: CustomFonts.textMain20w600,
+            textStyle: CustomFonts.black18w600,
             decoration: BoxDecoration(
-              color: CustomColors.surfaceGhost,
+              color: CustomColors.softGrey,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: Colors.transparent),
             ),
@@ -282,11 +268,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           focusedPinTheme: PinTheme(
             width: 56.w,
             height: 56.w,
-            textStyle: CustomFonts.textMain20w600,
+            textStyle: CustomFonts.black18w600,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: CustomColors.brandPrimary, width: 2),
+              border: Border.all(color: CustomColors.purple, width: 2),
             ),
           ),
         ),
@@ -295,7 +281,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 16.h),
         TextButton(
           onPressed: _handleForgotPassword,
-          child: Text("Didn't receive code? Resend", style: CustomFonts.textMain14w600.copyWith(color: CustomColors.brandPrimary)),
+          child: Text("Didn't receive code? Resend", style: CustomFonts.purple14w600),
         ),
       ],
     );
@@ -306,74 +292,49 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       key: const ValueKey('reset'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Create New Password", style: CustomFonts.textMain24w700),
+        Text("Create New Password", style: CustomFonts.black20w600),
         SizedBox(height: 8.h),
-        Text("Your new password must be different from previous ones.", style: CustomFonts.textMuted14w400),
+        Text("Your new password must be different from previous ones.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
         ValueListenableBuilder(
           valueListenable: _obscureNewPassword,
-          builder: (_, val, _) => _buildInputField(
+          builder: (_, val, __) => BuildTextField(
             label: "New Password",
-            hint: "••••••••",
+            hintText: "••••••••",
             controller: _newPasswordController,
-            isPassword: true,
             obscureText: val,
-            onTogglePassword: () => _obscureNewPassword.value = !val,
-            icon: Icons.lock_outline_rounded,
+            prefixIcon: Icon(Icons.lock_outline_rounded, size: 20.sp, color: CustomColors.lightGrey),
+            suffixIcon: IconButton(
+              onPressed: () => _obscureNewPassword.value = !val,
+              icon: Icon(
+                val ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                size: 20.sp,
+                color: CustomColors.lightGrey,
+              ),
+            ),
           ),
         ),
         SizedBox(height: 24.h),
         ValueListenableBuilder(
           valueListenable: _obscureConfirmPassword,
-          builder: (_, val, _) => _buildInputField(
+          builder: (_, val, __) => BuildTextField(
             label: "Confirm Password",
-            hint: "••••••••",
+            hintText: "••••••••",
             controller: _confirmPasswordController,
-            isPassword: true,
             obscureText: val,
-            onTogglePassword: () => _obscureConfirmPassword.value = !val,
-            icon: Icons.lock_reset_rounded,
+            prefixIcon: Icon(Icons.lock_reset_rounded, size: 20.sp, color: CustomColors.lightGrey),
+            suffixIcon: IconButton(
+              onPressed: () => _obscureConfirmPassword.value = !val,
+              icon: Icon(
+                val ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                size: 20.sp,
+                color: CustomColors.lightGrey,
+              ),
+            ),
           ),
         ),
         SizedBox(height: 32.h),
         _buildSubmitButton("Update Password", _handleResetPassword),
-      ],
-    );
-  }
-
-  Widget _buildInputField({
-    required String label,
-    required String hint,
-    required TextEditingController controller,
-    required IconData icon,
-    bool isPassword = false,
-    bool? obscureText,
-    VoidCallback? onTogglePassword,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: CustomFonts.textMain14w600),
-        SizedBox(height: 10.h),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText ?? false,
-          validator: validator,
-          style: CustomFonts.textMain14w400,
-          decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.textMuted),
-            hintText: hint,
-            suffixIcon: isPassword ? IconButton(
-              onPressed: onTogglePassword,
-              icon: Icon(
-                obscureText! ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                size: 20.sp,
-                color: CustomColors.textMuted,
-              ),
-            ) : null,
-          ),
-        ),
       ],
     );
   }
@@ -392,21 +353,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           ),
         ),
         SizedBox(width: 8.w),
-        Text("Keep me signed in", style: CustomFonts.textMain14w400),
+        Text("Keep me signed in", style: CustomFonts.grey14w400),
       ],
     );
   }
 
   Widget _buildSubmitButton(String label, VoidCallback onPressed) {
-    return SizedBox(
+    return CustomPrimaryButton(
+      label: label,
+      onTap: onPressed,
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 18.h),
-        ),
-        child: Text(label),
-      ),
     );
   }
 

@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import '../build_textfield.dart';
 import '../phone_widget.dart';
 import 'standard_dialog.dart';
@@ -81,7 +81,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Phone Number", style: CustomFonts.textMain14w600),
+                        Text("Phone Number", style: CustomFonts.black14w600),
                         SizedBox(height: 8.h),
                         PhoneWidget(controller: _clinicPhoneController),
                       ],
@@ -132,7 +132,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
           child: TextButton(
             onPressed: () => context.pop(),
             style: TextButton.styleFrom(
-              foregroundColor: CustomColors.textSecondary,
+              foregroundColor: CustomColors.grey,
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             ),
@@ -142,37 +142,28 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
         Consumer(
           builder: (context, ref, _) {
             final state = ref.watch(clinicViewModelProvider);
-            return SizedBox(
-              height: 48.h,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (!_formKey.currentState!.validate() || state.loading) return;
-                  final selectedCountry = ref.read(authViewModelProvider).country;
-                  ref.read(clinicViewModelProvider.notifier).registerClinic(
-                    RegisterClinicReqModel(
-                      clinicName: _clinicNameController.text,
-                      clinicPhone: _clinicPhoneController.text,
-                      clinicEmail: _clinicEmailController.text,
-                      clinicAddress: _clinicAddressController.text,
-                      ownerName: _clinicOwnerNameController.text,
-                      ownerEmail: _clinicOwnerEmailController.text,
-                      cc: selectedCountry?.dialCode ?? '',
-                      country: selectedCountry?.name ?? '',
-                    ),
-                  ).then((success) {
-                    if (success && context.mounted) context.pop();
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColors.deepSlate,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 32.w),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                  textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold),
-                ),
-                child: Text(state.loading ? 'Registering...' : 'Register Clinic'),
-              ),
+            return CustomPrimaryButton(
+              onTap: () {
+                if (!_formKey.currentState!.validate() || state.loading) return;
+                final selectedCountry = ref.read(authViewModelProvider).country;
+                ref.read(clinicViewModelProvider.notifier).registerClinic(
+                  RegisterClinicReqModel(
+                    clinicName: _clinicNameController.text,
+                    clinicPhone: _clinicPhoneController.text,
+                    clinicEmail: _clinicEmailController.text,
+                    clinicAddress: _clinicAddressController.text,
+                    ownerName: _clinicOwnerNameController.text,
+                    ownerEmail: _clinicOwnerEmailController.text,
+                    cc: selectedCountry?.dialCode ?? '',
+                    country: selectedCountry?.name ?? '',
+                  ),
+                ).then((success) {
+                  if (success && context.mounted) context.pop();
+                });
+              },
+              label: 'Register Clinic',
+              isLoading: state.loading,
+              width: 220.w,
             );
           },
         ),
@@ -184,7 +175,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );
@@ -266,7 +257,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Phone Number", style: CustomFonts.textMain14w600),
+                        Text("Phone Number", style: CustomFonts.black14w600),
                         SizedBox(height: 8.h),
                         PhoneWidget(controller: _clinicPhoneController),
                       ],
@@ -293,7 +284,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
           child: TextButton(
             onPressed: () => context.pop(),
             style: TextButton.styleFrom(
-              foregroundColor: CustomColors.textSecondary,
+              foregroundColor: CustomColors.grey,
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             ),
@@ -303,24 +294,15 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
         Consumer(
           builder: (context, ref, _) {
             final state = ref.watch(clinicViewModelProvider);
-            return SizedBox(
-              height: 48.h,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (!_formKey.currentState!.validate() || state.loading) return;
-                  // Update clinic logic here
-                  context.pop();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColors.deepSlate,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: EdgeInsets.symmetric(horizontal: 32.w),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-                  textStyle: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.bold),
-                ),
-                child: Text(state.loading ? 'Saving...' : 'Save Changes'),
-              ),
+            return CustomPrimaryButton(
+              onTap: () {
+                if (!_formKey.currentState!.validate() || state.loading) return;
+                // Update clinic logic here
+                context.pop();
+              },
+              label: 'Save Changes',
+              isLoading: state.loading,
+              width: 200.w,
             );
           },
         ),
@@ -332,7 +314,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.textMain16w600.copyWith(color: CustomColors.brandPrimary)),
+        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );

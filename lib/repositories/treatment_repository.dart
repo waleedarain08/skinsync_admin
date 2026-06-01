@@ -1,4 +1,3 @@
-
 abstract class TreatmentRepository {
   // Future<List<TreatmentModel>> getClinicTreatments();
   // Future<List<TreatmentModel>> getAdminTreatments();

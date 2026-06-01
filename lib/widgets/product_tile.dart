@@ -31,12 +31,12 @@ class ProductTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(15.r),
           boxShadow: [
             BoxShadow(
-              color: CustomColors.lightBlueColor.withOpacity(0.2),
+              color: CustomColors.purple.withValues(alpha: 0.2),
               blurRadius: 8.r,
               offset: Offset(0, 2.h),
             ),
             BoxShadow(
-              color: CustomColors.lightPurpleColor.withOpacity(0.1),
+              color: CustomColors.purple.withValues(alpha: 0.1),
               blurRadius: 10.r,
               offset: Offset(2.h, 0),
             ),
@@ -50,12 +50,9 @@ class ProductTile extends ConsumerWidget {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(15.r)),
                 child: Stack(
                   children: [
-                    Expanded(
-                      flex: 2,
-                      child: CustomCachedImage(
-                        width: double.infinity,
-                        imageUrl: product.image,
-                      ),
+                    CustomCachedImage(
+                      width: double.infinity,
+                      imageUrl: product.image,
                     ),
                   ],
                 ),
@@ -77,9 +74,7 @@ class ProductTile extends ConsumerWidget {
                     SizedBox(height: 8.h),
                     Text(
                       'units: ${product.unit}',
-                      style: CustomFonts.black14w600.copyWith(
-                        color: CustomColors.purpleColor,
-                      ),
+                      style: CustomFonts.purple14w600,
                     ),
                     SizedBox(height: 8.h),
                     Expanded(

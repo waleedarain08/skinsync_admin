@@ -57,7 +57,7 @@ class AuthViewModel extends BaseViewModel<AuthState> {
 
   Future<bool> verifyOtp({required String email, required String otp}) async {
     return await runSafely<bool?>(showLoading: true, () async {
-          final response = await _authRepository.verifyOtp(
+          await _authRepository.verifyOtp(
             email: email,
             otp: otp,
           );

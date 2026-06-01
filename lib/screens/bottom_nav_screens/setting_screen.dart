@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/models/requests/app_version_request_model.dart';
 import 'package:skinsync_admin/view_models/setting_view_model.dart';
-import '../../utils/color_constant.dart';
-import '../../utils/custom_fonts.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import '../../utils/theme.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class SettingScreen extends ConsumerStatefulWidget {
   static const String routeName = '/setting-screen';
@@ -48,8 +51,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+    return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         child: Column(
@@ -68,15 +70,15 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               child: ExpansionTile(
                 title: Text("Customer App", style: CustomFonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
-                collapsedBackgroundColor: CustomColors.whiteColor,
-                backgroundColor: CustomColors.whiteColor,
+                collapsedBackgroundColor: CustomColors.white,
+                backgroundColor: CustomColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
-                  side: BorderSide(color: CustomColors.borderColor),
+                  side: const BorderSide(color: CustomColors.border),
                 ),
                 collapsedShape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
-                  side: BorderSide(color: CustomColors.borderColor),
+                  side: const BorderSide(color: CustomColors.border),
                 ),
                 children: [
                   _buildVersionSection(
@@ -105,15 +107,15 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               child: ExpansionTile(
                 title: Text("Clinic App", style: CustomFonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
-                collapsedBackgroundColor: CustomColors.whiteColor,
-                backgroundColor: CustomColors.whiteColor,
+                collapsedBackgroundColor: CustomColors.white,
+                backgroundColor: CustomColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
-                  side: BorderSide(color: CustomColors.borderColor),
+                  side: const BorderSide(color: CustomColors.border),
                 ),
                 collapsedShape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
-                  side: BorderSide(color: CustomColors.borderColor),
+                  side: const BorderSide(color: CustomColors.border),
                 ),
                 children: [
                   _buildVersionSection(
@@ -153,9 +155,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: CustomColors.dashboardBackgroundColor,
+        color: CustomColors.whiteGrey,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: CustomColors.borderColor),
+        border: Border.all(color: CustomColors.border),
       ),
       child: Form(
         key: formKey,
@@ -168,99 +170,31 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Version Number", style: CustomFonts.black14w500),
-                      SizedBox(height: 8.h),
-                      TextFormField(
-                        controller: versionController,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Required';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: CustomColors.whiteColor,
-                          hintText: "e.g. 1.2.0",
-                          hintStyle: CustomFonts.grey14w400,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 14.h,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.textFeildBoaderColor,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.borderColor,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.blueColor,
-                              width: 1.5,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: BuildTextField(
+                    label: "Version Number",
+                    controller: versionController,
+                    hintText: "e.g. 1.2.0",
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Required';
+                      }
+                      return null;
+                    },
                   ),
                 ),
                 SizedBox(width: 15.w),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Build Number", style: CustomFonts.black14w500),
-                      SizedBox(height: 8.h),
-                      TextFormField(
-                        controller: buildController,
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Required';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: CustomColors.whiteColor,
-                          hintText: "e.g. 5",
-                          hintStyle: CustomFonts.grey14w400,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 14.h,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.textFeildBoaderColor,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.borderColor,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: CustomColors.blueColor,
-                              width: 1.5,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: BuildTextField(
+                    label: "Build Number",
+                    controller: buildController,
+                    hintText: "e.g. 5",
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Required';
+                      }
+                      return null;
+                    },
                   ),
                 ),
               ],
@@ -268,8 +202,8 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             SizedBox(height: 20.h),
             Align(
               alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () {
+              child: CustomPrimaryButton(
+                onTap: () {
                   _submitUpdate(
                     formKey: formKey,
                     versionController: versionController,
@@ -278,14 +212,8 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                     isCustomer: isCustomer,
                   );
                 },
-                // style: ElevatedButton.styleFrom(
-                //   backgroundColor: CustomColors.blackColor,
-                //   padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 14.h),
-                //   shape: RoundedRectangleBorder(
-                //     borderRadius: BorderRadius.circular(30.r),
-                //   ),
-                // ),
-                child: Text("Submit", style: CustomFonts.white16w400),
+                label: "Submit",
+                width: 140.w,
               ),
             ),
           ],

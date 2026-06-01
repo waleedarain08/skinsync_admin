@@ -5,14 +5,15 @@ import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
 class PushNotificationScreen extends StatelessWidget {
   const PushNotificationScreen({super.key});
   static const String routeName = '/pushNotification-screen';
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+    return GradientScaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30.w),
         child: SingleChildScrollView(
@@ -20,20 +21,20 @@ class PushNotificationScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 40.h),
-              Text("Push Notifications", style: CustomFonts.textMain32w700),
+              Text("Push Notifications", style: CustomFonts.black32w700),
               SizedBox(height: 10.h),
               Text(
                 "Send push notifications to app users about updates, offers, and alerts",
-                style: CustomFonts.textMain14w400.copyWith(color: CustomColors.textMuted),
+                style: CustomFonts.grey14w400,
               ),
               SizedBox(height: 20.h),
-              Divider(color: CustomColors.greyColor),
+              const Divider(color: CustomColors.border),
               SizedBox(height: 50.h),
               Container(
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: CustomColors.greyColor),
+                  border: Border.all(color: CustomColors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,22 +44,22 @@ class PushNotificationScreen extends StatelessWidget {
                         Icon(
                           Icons.notifications_outlined,
                           size: 20.sp,
-                          color: Colors.black,
+                          color: CustomColors.black,
                         ),
                         SizedBox(width: 20.w),
                         Text(
                           "Send New Notification",
-                          style: CustomFonts.textMain20w600,
+                          style: CustomFonts.black20w600,
                         ),
                       ],
                     ),
                     SizedBox(height: 40.h),
-                    Text("Notification Title", style: CustomFonts.textMain16w600),
+                    Text("Notification Title", style: CustomFonts.black16w600),
                     SizedBox(height: 10.h),
                     TextField(
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: CustomColors.fillColor,
+                        fillColor: CustomColors.white,
                         hintText: "e.g., New Feature Launch",
                         hintStyle: CustomFonts.grey16w400,
                         contentPadding: EdgeInsets.symmetric(
@@ -67,15 +68,15 @@ class PushNotificationScreen extends StatelessWidget {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(color: CustomColors.fillColor),
+                          borderSide: const BorderSide(color: CustomColors.border),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(color: CustomColors.fillColor),
+                          borderSide: const BorderSide(color: CustomColors.purple),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(color: CustomColors.fillColor),
+                          borderSide: const BorderSide(color: CustomColors.border),
                         ),
                       ),
                     ),
@@ -88,7 +89,7 @@ class PushNotificationScreen extends StatelessWidget {
                       maxLines: 3,
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: CustomColors.fillColor,
+                        fillColor: CustomColors.white,
                         hintText: "Enter your notification message...",
                         hintStyle: CustomFonts.grey16w400,
                         contentPadding: EdgeInsets.symmetric(
@@ -97,15 +98,15 @@ class PushNotificationScreen extends StatelessWidget {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(color: CustomColors.fillColor),
+                          borderSide: const BorderSide(color: CustomColors.border),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(color: CustomColors.fillColor),
+                          borderSide: const BorderSide(color: CustomColors.purple),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(color: CustomColors.fillColor),
+                          borderSide: const BorderSide(color: CustomColors.border),
                         ),
                       ),
                     ),
@@ -115,7 +116,7 @@ class PushNotificationScreen extends StatelessWidget {
                     TextField(
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: CustomColors.fillColor,
+                        fillColor: CustomColors.white,
                         hintText: "All Users (1,247 users)",
                         hintStyle: CustomFonts.grey16w400,
                         contentPadding: EdgeInsets.symmetric(
@@ -124,15 +125,15 @@ class PushNotificationScreen extends StatelessWidget {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(color: CustomColors.fillColor),
+                          borderSide: const BorderSide(color: CustomColors.border),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(color: CustomColors.fillColor),
+                          borderSide: const BorderSide(color: CustomColors.purple),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
-                          borderSide: BorderSide(color: CustomColors.fillColor),
+                          borderSide: const BorderSide(color: CustomColors.border),
                         ),
                       ),
                     ),
@@ -144,8 +145,8 @@ class PushNotificationScreen extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20.r),
-                        color: Color(0xFFEFF6FF),
-                        border: Border.all(color: Color(0XFFBEDBFF)),
+                        color: const Color(0xFFEFF6FF),
+                        border: Border.all(color: const Color(0XFFBEDBFF)),
                       ),
                       child: Row(
                         children: [
@@ -196,16 +197,16 @@ class PushNotificationScreen extends StatelessWidget {
                 padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: CustomColors.greyColor),
+                  border: Border.all(color: CustomColors.border),
                 ),
                 child: Column(
                   children: [
                     Text(
                       "Notification History",
-                      style: CustomFonts.textMain20w600,
+                      style: CustomFonts.black20w600,
                     ),
                     SizedBox(height: 20.h),
-                    PushNotificationTable(),
+                    const PushNotificationTable(),
                      SizedBox(height: 20.h),
                   ],
                 ),
@@ -216,15 +217,15 @@ class PushNotificationScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 15.w),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20.r),
-                  color: Color(0xFFFAF5FF),
-                  border: Border.all(color: Color(0XFFE9D4FF)),
+                  color: const Color(0xFFFAF5FF),
+                  border: Border.all(color: const Color(0XFFE9D4FF)),
                 ),
                 child: Column(
-                  crossAxisAlignment: .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "Best Practices for Push Notifications:",
-                      style: CustomFonts.textMain20w600,
+                      style: CustomFonts.black20w600,
                     ),
                     SizedBox(height: 5.h),
                     Text(
@@ -399,7 +400,7 @@ class PushNotificationTable extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
             decoration: BoxDecoration(
-              color: CustomColors.greenColor,
+              color: CustomColors.green,
               borderRadius: BorderRadius.circular(20.r),
             ),
             child: Row(

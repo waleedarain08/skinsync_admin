@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,8 +9,13 @@ import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
-import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class CreateSubscriptionPlanScreen extends ConsumerStatefulWidget {
   static const String routeName = '/create-subscription-plan';
@@ -34,7 +38,6 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
   late final TextEditingController _standardCommissionController;
   late final TextEditingController _dynamicCommissionController;
   late final TextEditingController _techFeeController;
-  late final TextEditingController _freeMonthsController;
   late final TextEditingController _durationController;
   final TextEditingController _customBenefitController = TextEditingController();
   final TextEditingController _clinicSearchController = TextEditingController();
@@ -88,12 +91,11 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     _dynamicCommissionController = TextEditingController(text: plan.dynamicBookingCommissionPercent.toString());
     _techFeeController = TextEditingController(text: plan.technologyFeePerTreatment.toString());
     _durationController = TextEditingController(text: plan.durationMonths.toString());
-    _freeMonthsController = TextEditingController(text: "0");
     
     _unlimitedDoctors = plan.unlimitedDoctors;
     _unlimitedStaff = plan.unlimitedStaff;
     _isActive = true;
-    _visibilityType = "All Clinics";
+    _visibilityType = "All Clinics"; // System plans usually for all
     _selectedClinics = [];
   }
 
@@ -106,7 +108,6 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     _dynamicCommissionController = TextEditingController(text: plan?.dynamicBookingCommissionPercent.toString() ?? "0");
     _techFeeController = TextEditingController(text: plan?.technologyFeePerTreatment.toString() ?? "0");
     _durationController = TextEditingController(text: "1");
-    _freeMonthsController = TextEditingController(text: "0");
     
     _unlimitedDoctors = plan?.unlimitedDoctors ?? false;
     _unlimitedStaff = plan?.unlimitedStaff ?? false;
@@ -128,7 +129,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     }).toList();
 
     for (var benefit in existingBenefits) {
-      if (!_predefinedFeatures.contains(benefit.title) && (benefit.freeMonths == null || benefit.freeMonths == 0)) {
+      if (!_predefinedFeatures.contains(benefit.title)) {
         _planBenefits.add(PlanBenefit(title: benefit.title, enabled: benefit.enabled));
       }
     }
@@ -143,7 +144,6 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     _standardCommissionController.dispose();
     _dynamicCommissionController.dispose();
     _techFeeController.dispose();
-    _freeMonthsController.dispose();
     _durationController.dispose();
     _customBenefitController.dispose();
     _clinicSearchController.dispose();
@@ -176,7 +176,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
           technologyFeePerTreatment: double.tryParse(_techFeeController.text) ?? 0.0,
           benefits: _planBenefits,
         );
-        if (mounted) context.pop();
+        // Specialized update logic for system plan
+        // final success = await ref.read(subscriptionViewModelProvider.notifier).updateFreeSystemPlan(plan);
+        // Mock success for design
+        context.pop();
       } else {
         final plan = SubscriptionPlanModel(
           id: widget.planToEdit?.id,
@@ -200,22 +203,20 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
         }
       }
       
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isEditMode ? "Plan updated successfully" : "Plan created successfully")),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(isEditMode ? "Plan updated successfully" : "Plan created successfully")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomColors.backgroundLight,
+    return GradientScaffold(
       appBar: AppBar(
-        title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.headlineSmall),
+        flexibleSpace: AppDecorations.appBarGradient,
+        title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.black18w600),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: CustomColors.deepSlate),
+          icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
         ),
         centerTitle: true,
@@ -233,10 +234,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                   if (isSystemPlan) ...[
                     _sectionHeader("System Onboarding Settings"),
                     _formContainer(
-                      backgroundColor: CustomColors.brandPurple.withOpacity(0.05),
+                      backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
                       child: Column(
                         children: [
-                          Text("Configure the default free tier duration for newly onboarded clinics.", style: CustomFonts.bodyMedium),
+                          Text("Configure the default free tier duration for newly onboarded clinics.", style: CustomFonts.grey14w400),
                           SizedBox(height: 20.h),
                           BuildTextField(
                             label: "Trial Duration (Months)",
@@ -287,13 +288,13 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                            SizedBox(height: 24.h),
                            Row(
                              children: [
-                               Text("Plan Status: ", style: CustomFonts.textMain14w600),
+                               Text("Plan Status: ", style: CustomFonts.black14w600),
                                Switch.adaptive(
                                  value: _isActive, 
                                  onChanged: (val) => setState(() => _isActive = val),
-                                 activeColor: CustomColors.success,
+                                 activeTrackColor: CustomColors.green,
                                ),
-                               Text(_isActive ? "Active" : "Inactive", style: CustomFonts.bodySmall.copyWith(color: _isActive ? CustomColors.success : CustomColors.error)),
+                               Text(_isActive ? "Active" : "Inactive", style: _isActive ? CustomFonts.green13w500 : CustomFonts.red13w500),
                              ],
                            ),
                         ],
@@ -427,15 +428,15 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ..._planBenefits.map((benefit) => CheckboxListTile(
-                          title: Text(benefit.title ?? "", style: CustomFonts.bodyMedium),
+                          title: Text(benefit.title ?? "", style: CustomFonts.grey14w400),
                           value: benefit.enabled,
                           onChanged: (val) {
                             setState(() {
                               benefit.enabled = val ?? false;
                             });
                           },
-                          activeColor: CustomColors.brandCyan,
-                          checkColor: CustomColors.deepSlate,
+                          activeColor: CustomColors.green,
+                          checkColor: CustomColors.black,
                           controlAffinity: ListTileControlAffinity.leading,
                           contentPadding: EdgeInsets.zero,
                           dense: true,
@@ -453,13 +454,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                             SizedBox(width: 16.w),
                             Padding(
                               padding: EdgeInsets.only(top: 28.h),
-                              child: ElevatedButton(
-                                onPressed: _addCustomBenefit,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: CustomColors.deepSlate,
-                                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-                                ),
-                                child: Text("Add Feature", style: CustomFonts.white14w600),
+                              child: CustomPrimaryButton(
+                                onTap: _addCustomBenefit,
+                                label: "Add Feature",
+                                width: 160.w,
                               ),
                             ),
                           ],
@@ -475,15 +473,15 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                         width: 160.w,
                         child: OutlinedButton(
                           onPressed: () => context.pop(),
-                          child: Text("Cancel", style: CustomFonts.bodyMedium),
+                          child: Text("Cancel", style: CustomFonts.grey14w400),
                         ),
                       ),
                       SizedBox(width: 24.w),
                       SizedBox(
                         width: 240.w,
-                        child: ElevatedButton(
-                          onPressed: _submit,
-                          child: Text(isEditMode ? "Update Plan" : "Create Plan", style: CustomFonts.white14w600),
+                        child: CustomPrimaryButton(
+                          onTap: _submit,
+                          label: isEditMode ? "Update Plan" : "Create Plan",
                         ),
                       ),
                     ],
@@ -503,12 +501,12 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Target Availability", style: CustomFonts.textMain14w600),
+          Text("Target Availability", style: CustomFonts.black14w600),
           SizedBox(height: 12.h),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             decoration: BoxDecoration(
-              border: Border.all(color: CustomColors.borderLight),
+              border: Border.all(color: CustomColors.border),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: DropdownButtonHideUnderline(
@@ -518,7 +516,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                 items: ["All Clinics", "Specific Clinics"].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: CustomFonts.bodyMedium),
+                    child: Text(value, style: CustomFonts.grey14w400),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -532,7 +530,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
           ),
           if (_visibilityType == "Specific Clinics") ...[
             SizedBox(height: 24.h),
-            Text("Assign to Clinics", style: CustomFonts.textMain14w600),
+            Text("Assign to Clinics", style: CustomFonts.black14w600),
             SizedBox(height: 12.h),
             _buildClinicSelector(),
           ],
@@ -553,12 +551,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CupertinoSearchTextField(
+        AppSearchField(
           controller: _clinicSearchController,
           onChanged: (val) => setState(() => _clinicSearchQuery = val),
-          placeholder: "Search clinics by name or email...",
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          borderRadius: BorderRadius.circular(10.r),
+          hintText: "Search clinics by name or email...",
         ),
         SizedBox(height: 16.h),
         if (_selectedClinics.isNotEmpty) ...[
@@ -568,8 +564,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
             children: _selectedClinics.map((email) {
               final clinic = clinics.firstWhere((c) => c.email == email, orElse: () => clinics.first);
               return Chip(
-                label: Text(clinic.name ?? email, style: CustomFonts.bodySmall.copyWith(color: CustomColors.deepSlate)),
-                backgroundColor: CustomColors.brandCyan.withOpacity(0.1),
+                label: Text(clinic.name ?? email, style: CustomFonts.black13w500),
+                backgroundColor: CustomColors.green.withValues(alpha: 0.1),
                 deleteIcon: const Icon(Icons.close, size: 14),
                 onDeleted: () => setState(() => _selectedClinics.remove(email)),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r), side: BorderSide.none),
@@ -581,22 +577,22 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
         Container(
           constraints: BoxConstraints(maxHeight: 250.h),
           decoration: BoxDecoration(
-            border: Border.all(color: CustomColors.borderLight),
+            border: Border.all(color: CustomColors.border),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: filteredClinics.isEmpty
-              ? Center(child: Padding(padding: EdgeInsets.all(16.w), child: Text("No clinics found", style: CustomFonts.bodyMedium)))
+              ? Center(child: Padding(padding: EdgeInsets.all(16.w), child: Text("No clinics found", style: CustomFonts.grey14w400)))
               : Scrollbar(
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: filteredClinics.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, _) => const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final clinic = filteredClinics[index];
                       final isSelected = _selectedClinics.contains(clinic.email);
                       return CheckboxListTile(
-                        title: Text(clinic.name ?? "N/A", style: CustomFonts.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                        subtitle: Text(clinic.email ?? "N/A", style: CustomFonts.bodySmall),
+                        title: Text(clinic.name ?? "N/A", style: CustomFonts.grey14w600),
+                        subtitle: Text(clinic.email ?? "N/A", style: CustomFonts.grey13w500),
                         value: isSelected,
                         onChanged: (val) {
                           setState(() {
@@ -607,8 +603,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                             }
                           });
                         },
-                        activeColor: CustomColors.brandCyan,
-                        checkColor: CustomColors.deepSlate,
+                        activeColor: CustomColors.green,
+                        checkColor: CustomColors.black,
                         controlAffinity: ListTileControlAffinity.leading,
                         contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
                       );
@@ -623,7 +619,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
   Widget _sectionHeader(String title) {
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
-      child: Text(title, style: CustomFonts.bodyLarge.copyWith(fontWeight: FontWeight.bold)),
+      child: Text(title, style: CustomFonts.black16w700),
     );
   }
 
@@ -642,10 +638,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
         Switch.adaptive(
           value: value, 
           onChanged: onChanged,
-          activeColor: CustomColors.brandCyan,
+          activeTrackColor: CustomColors.green,
         ),
         SizedBox(width: 8.w),
-        Text(label, style: CustomFonts.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+        Text(label, style: CustomFonts.grey13w600),
       ],
     );
   }

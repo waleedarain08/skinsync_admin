@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../utils/custom_fonts.dart';
+import '../utils/theme.dart';
 
 class BuildTextField extends StatelessWidget {
   final String label;
@@ -13,7 +12,10 @@ class BuildTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final Function(String?)? onChanged;
   final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final bool readOnly;
+  final bool obscureText;
+  final double? width;
 
   const BuildTextField({
     super.key,
@@ -25,54 +27,43 @@ class BuildTextField extends StatelessWidget {
     this.keyboardType,
     this.onChanged,
     this.prefixIcon,
+    this.suffixIcon,
     this.readOnly = false,
+    this.obscureText = false,
+    this.width,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: CustomFonts.textMain14w600),
-        SizedBox(height: 10.h),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          style: CustomFonts.textMain14w400,
-          keyboardType: keyboardType,
-          validator: validator,
-          readOnly: readOnly,
-          inputFormatters: [
-            if (keyboardType == TextInputType.phone ||
-                keyboardType == TextInputType.number)
-              FilteringTextInputFormatter.digitsOnly,
-          ],
-          onChanged: onChanged,
-          decoration: InputDecoration(
-            prefixIcon: prefixIcon,
-            hintText: hintText,
-            hintStyle: CustomFonts.textMuted14w400,
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 14.h,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
+    return SizedBox(
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: CustomFonts.black14w600),
+          SizedBox(height: 8.h),
+          TextFormField(
+            controller: controller,
+            maxLines: maxLines,
+            obscureText: obscureText,
+            style: CustomFonts.black14w400,
+            keyboardType: keyboardType,
+            validator: validator,
+            readOnly: readOnly,
+            inputFormatters: [
+              if (keyboardType == TextInputType.phone || keyboardType == TextInputType.number)
+                FilteringTextInputFormatter.digitsOnly,
+            ],
+            onChanged: onChanged,
+            decoration: AppDecorations.input(
+              hint: hintText, 
+              prefixIcon: prefixIcon,
+              suffixIcon: suffixIcon,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
