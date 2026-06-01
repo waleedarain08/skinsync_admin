@@ -153,17 +153,17 @@ class TreatmentDetailScreen extends ConsumerWidget {
             SizedBox(height: 24.h),
             Text("Combinable With:", style: CustomFonts.black16w400),
             SizedBox(height: 12.h),
-            if (treatment.combinableTreatmentIds == null || treatment.combinableTreatmentIds!.isEmpty)
-              Text("No specific combinations defined.", style: CustomFonts.grey13w500)
-            else
-              Wrap(
-                spacing: 8.w,
-                runSpacing: 8.h,
-                children: treatment.combinableTreatmentIds!.map((id) => Chip(
-                  label: Text("Treatment ID: $id", style: CustomFonts.black10w600),
-                  backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
-                )).toList(),
-              ),
+            // if (treatment.combinableTreatmentIds == null || treatment.combinableTreatmentIds!.isEmpty)
+            //   Text("No specific combinations defined.", style: CustomFonts.grey13w500)
+            // else
+            //   Wrap(
+            //     spacing: 8.w,
+            //     runSpacing: 8.h,
+            //     children: treatment.combinableTreatmentIds!.map((id) => Chip(
+            //       label: Text("Treatment ID: $id", style: CustomFonts.black10w600),
+            //       backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
+            //     )).toList(),
+            //   ),
           ],
         )),
         SizedBox(height: 24.h),
