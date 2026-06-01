@@ -7,6 +7,12 @@ export 'color_constant.dart';
 export 'custom_fonts.dart';
 
 class AppTheme {
+  // Design Standards
+  static double get inputHeight => 52.h;
+  static double get buttonHeight => 52.h;
+  static double get borderRadius => 12.r;
+  static double get borderWidth => 1.0;
+
   static ThemeData get calmWellnessTheme => _buildTheme();
 
   // Legacy Aliases
@@ -67,8 +73,8 @@ class AppTheme {
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          side: const BorderSide(color: CustomColors.border, width: 1),
+          borderRadius: BorderRadius.circular(borderRadius),
+          side: BorderSide(color: CustomColors.border, width: borderWidth),
         ),
       ),
 
@@ -83,10 +89,29 @@ class AppTheme {
           backgroundColor: CustomColors.purple,
           foregroundColor: CustomColors.white,
           elevation: 0,
-          minimumSize: Size(0, 48.h),
+          minimumSize: Size(0, buttonHeight),
           padding: EdgeInsets.symmetric(horizontal: 24.w),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
           textStyle: CustomFonts.white14w600,
+        ),
+      ),
+
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: CustomColors.purple,
+          minimumSize: Size(0, buttonHeight),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
+          side: BorderSide(color: CustomColors.purple, width: borderWidth),
+          textStyle: CustomFonts.black14w600.copyWith(color: CustomColors.purple),
+        ),
+      ),
+
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: CustomColors.purple,
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          textStyle: CustomFonts.black14w600.copyWith(color: CustomColors.purple),
         ),
       ),
 
@@ -112,24 +137,25 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: CustomColors.white,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         hintStyle: CustomFonts.grey12w400,
         labelStyle: CustomFonts.black14w400,
+        constraints: BoxConstraints(minHeight: inputHeight, maxHeight: inputHeight),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.border),
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: CustomColors.border, width: borderWidth),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.border),
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: CustomColors.border, width: borderWidth),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.purple, width: 1.5),
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: CustomColors.purple, width: borderWidth * 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.red),
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: CustomColors.red, width: borderWidth),
         ),
       ),
     );
@@ -139,8 +165,8 @@ class AppTheme {
 class AppDecorations {
   static BoxDecoration card = BoxDecoration(
     color: CustomColors.white,
-    borderRadius: BorderRadius.circular(12.r),
-    border: Border.all(color: CustomColors.border),
+    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+    border: Border.all(color: CustomColors.border, width: AppTheme.borderWidth),
   );
 
   static BoxDecoration sidebarItem = BoxDecoration(
@@ -151,6 +177,8 @@ class AppDecorations {
     String? hint,
     Widget? prefixIcon,
     Widget? suffixIcon,
+    Color? fillColor,
+    EdgeInsets? contentPadding,
   }) =>
       InputDecoration(
         hintText: hint,
@@ -158,19 +186,24 @@ class AppDecorations {
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: CustomColors.white,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        fillColor: fillColor ?? CustomColors.white,
+        contentPadding: contentPadding ?? EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        constraints: BoxConstraints(minHeight: AppTheme.inputHeight, maxHeight: AppTheme.inputHeight),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.border),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          borderSide: BorderSide(color: CustomColors.border, width: AppTheme.borderWidth),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.border),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          borderSide: BorderSide(color: CustomColors.border, width: AppTheme.borderWidth),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: CustomColors.purple, width: 1.5),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          borderSide: BorderSide(color: CustomColors.purple, width: AppTheme.borderWidth * 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          borderSide: BorderSide(color: CustomColors.red, width: AppTheme.borderWidth),
         ),
       );
 }

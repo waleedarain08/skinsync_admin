@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../utils/theme.dart';
-import '../widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
@@ -90,39 +91,51 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           _buildChangePasswordHeader(),
           SizedBox(height: 24.h),
           // Current Password Field
-          _buildPasswordField(
+          BuildTextField(
             label: 'Current Password',
             controller: _currentPasswordController,
             obscureText: _obscureCurrentPassword,
-            onToggleVisibility: () {
-              setState(() {
-                _obscureCurrentPassword = !_obscureCurrentPassword;
-              });
-            },
+            hintText: '••••••••',
+            suffixIcon: IconButton(
+              onPressed: () => setState(() => _obscureCurrentPassword = !_obscureCurrentPassword),
+              icon: Icon(
+                _obscureCurrentPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                color: Colors.grey[400],
+                size: 20.sp,
+              ),
+            ),
           ),
           SizedBox(height: 20.h),
           // New Password Field
-          _buildPasswordField(
+          BuildTextField(
             label: 'New Password',
             controller: _newPasswordController,
             obscureText: _obscureNewPassword,
-            onToggleVisibility: () {
-              setState(() {
-                _obscureNewPassword = !_obscureNewPassword;
-              });
-            },
+            hintText: '••••••••',
+            suffixIcon: IconButton(
+              onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
+              icon: Icon(
+                _obscureNewPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                color: Colors.grey[400],
+                size: 20.sp,
+              ),
+            ),
           ),
           SizedBox(height: 20.h),
           // Confirm New Password Field
-          _buildPasswordField(
+          BuildTextField(
             label: 'Confirm New Password',
             controller: _confirmPasswordController,
             obscureText: _obscureConfirmPassword,
-            onToggleVisibility: () {
-              setState(() {
-                _obscureConfirmPassword = !_obscureConfirmPassword;
-              });
-            },
+            hintText: '••••••••',
+            suffixIcon: IconButton(
+              onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+              icon: Icon(
+                _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                color: Colors.grey[400],
+                size: 20.sp,
+              ),
+            ),
           ),
           SizedBox(height: 32.h),
           // Buttons Row

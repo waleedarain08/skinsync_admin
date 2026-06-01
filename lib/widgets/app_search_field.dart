@@ -32,12 +32,14 @@ class AppSearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isSmallScreen = context.isMobile;
-    
-    // Responsive width logic
     final double effectiveMaxWidth = maxWidth ?? (isSmallScreen ? double.infinity : 400.w);
 
     return Container(
-      constraints: BoxConstraints(maxWidth: effectiveMaxWidth),
+      constraints: BoxConstraints(
+        maxWidth: effectiveMaxWidth,
+        minHeight: AppTheme.inputHeight,
+        maxHeight: AppTheme.inputHeight,
+      ),
       child: TextFormField(
         controller: controller,
         onChanged: onChanged,
@@ -45,9 +47,8 @@ class AppSearchField extends StatelessWidget {
         readOnly: readOnly,
         onTap: onTap,
         style: CustomFonts.black14w400,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: CustomFonts.grey14w400,
+        decoration: AppDecorations.input(
+          hint: hintText,
           prefixIcon: prefixIcon ?? Icon(
             Icons.search_rounded,
             color: CustomColors.lightGrey,
@@ -63,21 +64,6 @@ class AppSearchField extends StatelessWidget {
                   },
                 )
               : null),
-          filled: true,
-          fillColor: CustomColors.white,
-          contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.r),
-            borderSide: const BorderSide(color: CustomColors.border),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.r),
-            borderSide: const BorderSide(color: CustomColors.border),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.r),
-            borderSide: const BorderSide(color: CustomColors.purple, width: 1.5),
-          ),
         ),
       ),
     );

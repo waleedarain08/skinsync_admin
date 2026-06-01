@@ -12,6 +12,7 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 

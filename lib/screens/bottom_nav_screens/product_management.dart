@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -129,26 +130,27 @@ class _ProductManagementState extends State<ProductManagement> {
             ),
           ),
           SizedBox(width: 16.w),
-          _filterDropdown("Category", "All Categories"),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: "Category",
+              hintText: "All Categories",
+              items: const ["All Categories", "Skincare", "Supplies"]
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (val) {},
+            ),
+          ),
           SizedBox(width: 12.w),
-          _filterDropdown("Status", "In Stock"),
-        ],
-      ),
-    );
-  }
-
-  Widget _filterDropdown(String label, String value) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        border: Border.all(color: CustomColors.lightGrey),
-        borderRadius: BorderRadius.circular(10.r),
-      ),
-      child: Row(
-        children: [
-          Text("$label: ", style: CustomFonts.white13w500),
-          Text(value, style: CustomFonts.black13w600),
-          Icon(Icons.keyboard_arrow_down, size: 18.sp),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: "Status",
+              hintText: "In Stock",
+              items: const ["In Stock", "Out of Stock", "Low Stock"]
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (val) {},
+            ),
+          ),
         ],
       ),
     );

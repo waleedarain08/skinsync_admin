@@ -2,38 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/theme.dart';
 
-class CustomDropdown extends StatelessWidget {
-  final String hint;
-  final String? value;
-  final List<String>? items;
-  final Function(String?) onChanged;
+class CustomDropdown<T> extends StatelessWidget {
+  final String label;
+  final String hintText;
+  final T? value;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?>? onChanged;
+  final String? Function(T?)? validator;
+  final double? width;
 
   const CustomDropdown({
     super.key,
-    required this.hint,
-    required this.value,
+    required this.label,
+    required this.hintText,
+    this.value,
     required this.items,
-    required this.onChanged,
+    this.onChanged,
+    this.validator,
+    this.width,
   });
 
   @override
   Widget build(BuildContext context) {
-    final dropdownItems = items ?? [];
     return SizedBox(
-      height: 48.h,
-      child: DropdownButtonFormField<String>(
-        isExpanded: true,
-        initialValue: value,
-        style: CustomFonts.grey14w400,
-        decoration: AppDecorations.input(hint: hint),
-        hint: Text(hint, style: CustomFonts.grey13w500),
-        items: dropdownItems
-            .map((item) => DropdownMenuItem<String>(value: item, child: Text(item, style: CustomFonts.grey14w400)))
-            .toList(),
-        onChanged: onChanged,
-        icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.lightGrey, size: 22.sp),
-        dropdownColor: CustomColors.white,
-        borderRadius: BorderRadius.circular(AppRadius.md),
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: CustomFonts.black14w600),
+          SizedBox(height: 8.h),
+          DropdownButtonFormField<T>(
+            value: value,
+            items: items,
+            onChanged: onChanged,
+            validator: validator,
+            style: CustomFonts.black14w400,
+            icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.lightGrey, size: 20.sp),
+            decoration: AppDecorations.input(hint: hintText),
+            dropdownColor: CustomColors.white,
+            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          ),
+        ],
       ),
     );
   }

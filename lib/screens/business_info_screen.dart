@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../utils/theme.dart';
-import '../widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
@@ -242,14 +243,14 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
           _buildProfilePictureSection(),
           SizedBox(height: 24.h),
           // Clinic Name
-          _buildTextField(
+          BuildTextField(
             label: 'Clinic Name',
             controller: _clinicNameController,
             hintText: 'Skin Sync Aesthetics',
           ),
           SizedBox(height: 20.h),
           // Street Address
-          _buildTextField(
+          BuildTextField(
             label: 'Street Address',
             controller: _streetAddressController,
             hintText: '123 Medical Plaza, Suite 100',
@@ -260,7 +261,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
             children: [
               Expanded(
                 flex: 3,
-                child: _buildTextField(
+                child: BuildTextField(
                   label: 'City',
                   controller: _cityController,
                   hintText: 'Los Angeles',
@@ -269,7 +270,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
               SizedBox(width: 16.w),
               Expanded(
                 flex: 2,
-                child: _buildTextField(
+                child: BuildTextField(
                   label: 'State',
                   controller: _stateController,
                   hintText: 'CA',
@@ -278,7 +279,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
               SizedBox(width: 16.w),
               Expanded(
                 flex: 2,
-                child: _buildTextField(
+                child: BuildTextField(
                   label: 'ZIP Code',
                   controller: _zipCodeController,
                   hintText: '90001',
@@ -291,7 +292,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
           Row(
             children: [
               Expanded(
-                child: _buildTextField(
+                child: BuildTextField(
                   label: 'Phone Number',
                   controller: _phoneNumberController,
                   hintText: '+1 (555) 123-4567',
@@ -299,7 +300,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
               ),
               SizedBox(width: 16.w),
               Expanded(
-                child: _buildTextField(
+                child: BuildTextField(
                   label: 'Email Address',
                   controller: _emailAddressController,
                   hintText: 'info@skinsyncclinic.com',
@@ -309,14 +310,14 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
           ),
           SizedBox(height: 20.h),
           // Operating Hours
-          _buildTextField(
+          BuildTextField(
             label: 'Operating Hours',
             controller: _operatingHoursController,
             hintText: 'Mon-Fri: 9AM-6PM, Sat: 10AM-4PM',
           ),
           SizedBox(height: 20.h),
           // Clinic Description
-          _buildTextField(
+          BuildTextField(
             label: 'Clinic Description',
             controller: _clinicDescriptionController,
             hintText:
@@ -406,42 +407,11 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
     required String hintText,
     int maxLines = 1,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: CustomFonts.black14w600,
-        ),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          style: CustomFonts.black14w400,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: CustomFonts.grey14w400,
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 14.h,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-              borderSide: BorderSide(color: Colors.grey[400]!, width: 1),
-            ),
-          ),
-        ),
-      ],
+    return BuildTextField(
+      label: label,
+      controller: controller,
+      hintText: hintText,
+      maxLines: maxLines,
     );
   }
 

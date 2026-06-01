@@ -14,6 +14,7 @@ import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -588,6 +589,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     required TimeOfDay? time,
     required Function(TimeOfDay) onChanged,
   }) {
+    final controller = TextEditingController(text: time?.format(context) ?? "");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -599,22 +601,18 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
               context: context,
               initialTime: time ?? const TimeOfDay(hour: 9, minute: 0),
             );
-            if (picked != null) onChanged(picked);
+            if (picked != null) {
+              onChanged(picked);
+              controller.text = picked.format(context);
+            }
           },
-          child: Container(
-            height: 56.h,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            decoration: BoxDecoration(
-              color: CustomColors.whiteGrey,
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: CustomColors.grey.withValues(alpha: 0.1)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(time?.format(context) ?? "Select Time", style: CustomFonts.black14w400),
-                const Icon(Icons.access_time_rounded, size: 20, color: CustomColors.purple),
-              ],
+          child: IgnorePointer(
+            child: BuildTextField(
+              label: "", // Label handled by parent column
+              controller: controller,
+              hintText: "Select Time",
+              readOnly: true,
+              suffixIcon: const Icon(Icons.access_time_rounded, size: 20, color: CustomColors.purple),
             ),
           ),
         ),

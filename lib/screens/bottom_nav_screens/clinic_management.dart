@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -262,27 +263,36 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             Row(
               children: [
                 Expanded(
-                  child: _buildModalSearchField(
+                  child: CustomDropdown<String>(
                     label: "Region",
-                    hint: "All Regions",
-                    suggestions: const ["East Coast", "West Coast", "Midwest", "South"],
+                    hintText: "All Regions",
+                    items: const ["East Coast", "West Coast", "Midwest", "South"]
+                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                        .toList(),
+                    onChanged: (val) {},
                   ),
                 ),
                 SizedBox(width: AppSpacing.md),
                 Expanded(
-                  child: _buildModalSearchField(
+                  child: CustomDropdown<String>(
                     label: "Status",
-                    hint: "All Status",
-                    suggestions: const ["Active", "Inactive", "Pending"],
+                    hintText: "All Status",
+                    items: const ["Active", "Inactive", "Pending"]
+                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                        .toList(),
+                    onChanged: (val) {},
                   ),
                 ),
               ],
             ),
             SizedBox(height: AppSpacing.xl),
-            _buildModalSearchField(
+            CustomDropdown<String>(
               label: "Subscription Plan",
-              hint: "All Plans",
-              suggestions: const ["Basic", "Standard", "Premium", "Enterprise"],
+              hintText: "All Plans",
+              items: const ["Basic", "Standard", "Premium", "Enterprise"]
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (val) {},
             ),
           ],
         ),
@@ -298,31 +308,6 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildModalSearchField({
-    required String label,
-    required String hint,
-    required List<String> suggestions,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: CustomFonts.black14w600),
-        SizedBox(height: 8.h),
-        DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: CustomColors.whiteGrey,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide.none),
-            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-          ),
-          items: suggestions.map((s) => DropdownMenuItem(value: s, child: Text(s, style: CustomFonts.grey14w400))).toList(),
-          onChanged: (val) {},
-        ),
-      ],
     );
   }
 

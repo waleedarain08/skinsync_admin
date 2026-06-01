@@ -4,12 +4,12 @@ import 'package:skinsync_admin/utils/theme.dart';
 
 class BorderdContainerWidget extends StatefulWidget {
   final Widget child;
-  final double borderRadius;
+  final double? borderRadius;
   final Color borderColor;
   final Color backgroundColor;
   final double? height;
   final double? width;
-  final double borderWidth;
+  final double? borderWidth;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
   final List<BoxShadow>? boxShadow;
@@ -18,12 +18,12 @@ class BorderdContainerWidget extends StatefulWidget {
   const BorderdContainerWidget({
     super.key,
     required this.child,
-    this.borderRadius = 16,
+    this.borderRadius,
     this.borderColor = CustomColors.border,
     this.backgroundColor = CustomColors.white,
     this.height,
     this.width,
-    this.borderWidth = 1,
+    this.borderWidth,
     this.padding,
     this.margin,
     this.boxShadow,
@@ -39,6 +39,9 @@ class _BorderdContainerWidgetState extends State<BorderdContainerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final double effectiveRadius = widget.borderRadius ?? AppTheme.borderRadius;
+    final double effectiveBorderWidth = widget.borderWidth ?? AppTheme.borderWidth;
+
     return MouseRegion(
       onEnter: widget.enableHover ? (_) => setState(() => _hovered = true) : null,
       onExit: widget.enableHover ? (_) => setState(() => _hovered = false) : null,
@@ -51,10 +54,10 @@ class _BorderdContainerWidgetState extends State<BorderdContainerWidget> {
         margin: widget.margin,
         decoration: BoxDecoration(
           color: widget.backgroundColor,
-          borderRadius: BorderRadius.circular(widget.borderRadius.r),
+          borderRadius: BorderRadius.circular(effectiveRadius),
           border: Border.all(
             color: _hovered ? CustomColors.purple.withValues(alpha: 0.3) : widget.borderColor,
-            width: widget.borderWidth,
+            width: effectiveBorderWidth,
           ),
           boxShadow: widget.boxShadow ?? (_hovered && widget.enableHover ? AppShadows.cardHover : AppShadows.card),
         ),

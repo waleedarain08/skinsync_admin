@@ -187,13 +187,13 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
 
   Widget _calendarAction(IconData icon) {
     return Container(
-      padding: EdgeInsets.all(6.w),
+      padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: CustomColors.white,
         border: Border.all(color: CustomColors.border),
         borderRadius: BorderRadius.circular(8.r),
       ),
-      child: Icon(icon, size: 18, color: CustomColors.grey),
+      child: Icon(icon, size: 18.sp, color: CustomColors.grey),
     );
   }
 

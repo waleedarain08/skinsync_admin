@@ -48,15 +48,15 @@ class _CustomPrimaryButtonState extends State<CustomPrimaryButton> {
           color: Colors.transparent,
           child: InkWell(
             onTap: enabled ? widget.onTap : null,
-            borderRadius: BorderRadius.circular(AppRadius.md),
+            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
             child: Ink(
               width: widget.width,
-              height: widget.height ?? 70.h,
+              height: widget.height ?? AppTheme.buttonHeight,
               decoration: BoxDecoration(
                 color: enabled 
                     ? CustomColors.purple 
                     : CustomColors.lightGrey.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(AppRadius.md),
+                borderRadius: BorderRadius.circular(AppTheme.borderRadius),
                 boxShadow: enabled && _hovered 
                   ? [BoxShadow(color: CustomColors.purple.withValues(alpha: 0.25), blurRadius: 12, offset: const Offset(0, 4))]
                   : [],
@@ -75,15 +75,19 @@ class _CustomPrimaryButtonState extends State<CustomPrimaryButton> {
                         )
                       : Row(
                           mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             if (widget.icon != null) ...[
                               Icon(widget.icon, color: CustomColors.white, size: 18.sp),
                               SizedBox(width: 10.w),
                             ],
-                            Text(
-                              widget.label, 
-                              style: CustomFonts.white14w600,
-                              textAlign: TextAlign.center,
+                            Flexible(
+                              child: Text(
+                                widget.label, 
+                                style: CustomFonts.white14w600,
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),

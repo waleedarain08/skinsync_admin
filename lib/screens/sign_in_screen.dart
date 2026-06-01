@@ -12,6 +12,7 @@ import '../utils/enums.dart';
 import '../utils/validators.dart';
 import '../view_models/auth_view_model.dart';
 import '../widgets/custom_primary_button.dart';
+import '../widgets/build_textfield.dart';
 import 'bottom_nav_screens/dashboard_screen.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -173,23 +174,29 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 8.h),
         Text("Enter your credentials to access the admin panel.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
-        _buildInputField(
+        BuildTextField(
           label: "Email Address",
-          hint: "admin@skinsync.com",
+          hintText: "admin@skinsync.com",
           controller: _emailController,
           validator: Validators.email,
-          icon: Icons.alternate_email_rounded,
+          prefixIcon: Icon(Icons.alternate_email_rounded, size: 20.sp, color: CustomColors.lightGrey),
         ),
         SizedBox(height: 24.h),
-        _buildInputField(
+        BuildTextField(
           label: "Password",
-          hint: "••••••••",
+          hintText: "••••••••",
           controller: _passwordController,
-          isPassword: true,
           obscureText: _obscurePassword,
-          onTogglePassword: () => setState(() => _obscurePassword = !_obscurePassword),
           validator: Validators.password,
-          icon: Icons.lock_outline_rounded,
+          prefixIcon: Icon(Icons.lock_outline_rounded, size: 20.sp, color: CustomColors.lightGrey),
+          suffixIcon: IconButton(
+            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+            icon: Icon(
+              _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              size: 20.sp,
+              color: CustomColors.lightGrey,
+            ),
+          ),
         ),
         SizedBox(height: 16.h),
         Row(
@@ -223,12 +230,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 8.h),
         Text("Enter your email and we'll send you an OTP code.", style: CustomFonts.grey13w500),
         SizedBox(height: 32.h),
-        _buildInputField(
+        BuildTextField(
           label: "Registered Email",
-          hint: "Enter your email",
+          hintText: "Enter your email",
           controller: _emailController,
           validator: Validators.email,
-          icon: Icons.alternate_email_rounded,
+          prefixIcon: Icon(Icons.alternate_email_rounded, size: 20.sp, color: CustomColors.lightGrey),
         ),
         SizedBox(height: 32.h),
         _buildSubmitButton("Send Reset Code", _handleForgotPassword),
@@ -291,27 +298,39 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 32.h),
         ValueListenableBuilder(
           valueListenable: _obscureNewPassword,
-          builder: (_, val, __) => _buildInputField(
+          builder: (_, val, __) => BuildTextField(
             label: "New Password",
-            hint: "••••••••",
+            hintText: "••••••••",
             controller: _newPasswordController,
-            isPassword: true,
             obscureText: val,
-            onTogglePassword: () => _obscureNewPassword.value = !val,
-            icon: Icons.lock_outline_rounded,
+            prefixIcon: Icon(Icons.lock_outline_rounded, size: 20.sp, color: CustomColors.lightGrey),
+            suffixIcon: IconButton(
+              onPressed: () => _obscureNewPassword.value = !val,
+              icon: Icon(
+                val ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                size: 20.sp,
+                color: CustomColors.lightGrey,
+              ),
+            ),
           ),
         ),
         SizedBox(height: 24.h),
         ValueListenableBuilder(
           valueListenable: _obscureConfirmPassword,
-          builder: (_, val, __) => _buildInputField(
+          builder: (_, val, __) => BuildTextField(
             label: "Confirm Password",
-            hint: "••••••••",
+            hintText: "••••••••",
             controller: _confirmPasswordController,
-            isPassword: true,
             obscureText: val,
-            onTogglePassword: () => _obscureConfirmPassword.value = !val,
-            icon: Icons.lock_reset_rounded,
+            prefixIcon: Icon(Icons.lock_reset_rounded, size: 20.sp, color: CustomColors.lightGrey),
+            suffixIcon: IconButton(
+              onPressed: () => _obscureConfirmPassword.value = !val,
+              icon: Icon(
+                val ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                size: 20.sp,
+                color: CustomColors.lightGrey,
+              ),
+            ),
           ),
         ),
         SizedBox(height: 32.h),

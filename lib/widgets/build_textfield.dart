@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/theme.dart';
 
 class BuildTextField extends StatelessWidget {
@@ -11,7 +12,10 @@ class BuildTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final Function(String?)? onChanged;
   final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final bool readOnly;
+  final bool obscureText;
+  final double? width;
 
   const BuildTextField({
     super.key,
@@ -23,31 +27,43 @@ class BuildTextField extends StatelessWidget {
     this.keyboardType,
     this.onChanged,
     this.prefixIcon,
+    this.suffixIcon,
     this.readOnly = false,
+    this.obscureText = false,
+    this.width,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: CustomFonts.black14w600),
-        SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          style: CustomFonts.grey14w400,
-          keyboardType: keyboardType,
-          validator: validator,
-          readOnly: readOnly,
-          inputFormatters: [
-            if (keyboardType == TextInputType.phone || keyboardType == TextInputType.number)
-              FilteringTextInputFormatter.digitsOnly,
-          ],
-          onChanged: onChanged,
-          decoration: AppDecorations.input(hint: hintText, prefixIcon: prefixIcon),
-        ),
-      ],
+    return SizedBox(
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: CustomFonts.black14w600),
+          SizedBox(height: 8.h),
+          TextFormField(
+            controller: controller,
+            maxLines: maxLines,
+            obscureText: obscureText,
+            style: CustomFonts.black14w400,
+            keyboardType: keyboardType,
+            validator: validator,
+            readOnly: readOnly,
+            inputFormatters: [
+              if (keyboardType == TextInputType.phone || keyboardType == TextInputType.number)
+                FilteringTextInputFormatter.digitsOnly,
+            ],
+            onChanged: onChanged,
+            decoration: AppDecorations.input(
+              hint: hintText, 
+              prefixIcon: prefixIcon,
+              suffixIcon: suffixIcon,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
