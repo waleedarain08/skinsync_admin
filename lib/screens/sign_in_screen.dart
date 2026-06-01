@@ -124,9 +124,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         SizedBox(height: 32.h),
         Text(
           "SkinSync AI",
-          style: CustomFonts.black40w900ls2,
+          style: CustomFonts.black40w700,
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 2.h),
         Text(
           "ADMIN PANEL",
           style: CustomFonts.purple14w800ls3,

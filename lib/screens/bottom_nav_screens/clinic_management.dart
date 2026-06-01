@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
@@ -230,39 +231,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _buildSearchAndFilterBar(TextEditingController controller, String hint) {
     return Row(
       children: [
-        Expanded(
-          child: Container(
-            height: 52.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: CustomColors.border),
-              boxShadow: AppShadows.xs,
-            ),
-            child: TextField(
-              controller: controller,
-              onChanged: (val) => setState(() {}),
-              style: CustomFonts.grey14w400,
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: CustomFonts.grey13w500,
-                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.lightGrey, size: 20),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 14.h),
-                suffixIcon: controller.text.isNotEmpty 
-                    ? IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 18),
-                        onPressed: () {
-                          controller.clear();
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
-            ),
-          ),
+        AppSearchField(
+          controller: controller,
+          hintText: hint,
+          onChanged: (val) => setState(() {}),
         ),
         SizedBox(width: AppSpacing.md),
         OutlinedButton.icon(

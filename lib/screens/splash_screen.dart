@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.initState();
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 5500),
     )..repeat(reverse: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -64,7 +64,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [CustomColors.green.withValues(alpha: 0.1), Colors.transparent],
+                  colors: [CustomColors.lightPurple, Colors.transparent],
                 ),
               ),
             ),
@@ -84,21 +84,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(24.w),
-                      decoration: BoxDecoration(
-                        gradient: CustomColors.purpleToLightPurpleGradient,
-                        borderRadius: BorderRadius.circular(24.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: CustomColors.purple.withValues(alpha: 0.25),
-                            blurRadius: 32,
-                            offset: const Offset(0, 12),
-                          ),
-                        ],
-                      ),
-                      child: Image.asset(PngAssets.splashLogo, height: 80.w, width: 80.w, color: CustomColors.white),
-                    ),
+                    Image.asset(PngAssets.splashLogo, height: 80.w, width: 80.w),
                     SizedBox(height: AppSpacing.xxl),
                     Text(
                       'SKINSYNC',

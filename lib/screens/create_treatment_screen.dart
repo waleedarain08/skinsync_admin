@@ -9,6 +9,7 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 
@@ -544,34 +545,16 @@ class CreateTreatmentScreen extends ConsumerWidget {
               searchController.text = controller.text;
             }
             
-            return TextFormField(
+            return AppSearchField(
               controller: controller,
               readOnly: true,
-              style: CustomFonts.grey14w400,
               onTap: () {
                 searchController.text = controller.text;
                 searchController.openView();
               },
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: CustomFonts.grey13w500,
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: const BorderSide(color: CustomColors.border),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: const BorderSide(color: CustomColors.border),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: const BorderSide(color: CustomColors.green),
-                ),
-                suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
-              ),
+              hintText: hint,
+              suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
+              maxWidth: double.infinity,
             );
           },
           suggestionsBuilder: (context, searchController) {

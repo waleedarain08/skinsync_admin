@@ -8,6 +8,7 @@ import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -103,40 +104,11 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
   Widget _buildSearchAndFilterBar(TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Row(
       children: [
-        Expanded(
-          child: Container(
-            height: 52.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: CustomColors.border),
-              boxShadow: AppShadows.xs,
-            ),
-            child: TextField(
-              controller: viewModel.searchController,
-              onChanged: (val) => viewModel.onSearchChanged(val),
-              style: CustomFonts.grey14w400,
-              decoration: InputDecoration(
-                hintText: "Search treatments by keyword, category, or area...",
-                hintStyle: CustomFonts.grey13w500,
-                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.lightGrey, size: 20),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 14.h),
-                suffixIcon: viewModel.searchController.text.isNotEmpty 
-                    ? IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 18),
-                        onPressed: () {
-                          viewModel.searchController.clear();
-                          viewModel.onSearchChanged("");
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
-            ),
-          ),
+        AppSearchField(
+          controller: viewModel.searchController,
+          hintText: "Search treatments by keyword, category, or area...",
+          onChanged: (val) => viewModel.onSearchChanged(val),
+          onClear: () => viewModel.onSearchChanged(""),
         ),
         SizedBox(width: AppSpacing.md),
         OutlinedButton.icon(

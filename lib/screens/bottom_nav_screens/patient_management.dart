@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
@@ -102,40 +103,10 @@ class _PatientManagementState extends State<PatientManagement> {
   Widget _buildSearchAndFilters() {
     return Row(
       children: [
-        Expanded(
-          flex: 3,
-          child: Container(
-            height: 52.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: CustomColors.border),
-              boxShadow: AppShadows.xs,
-            ),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (val) => setState(() {}),
-              style: CustomFonts.grey14w400,
-              decoration: InputDecoration(
-                hintText: "Search by name, ID, or phone...",
-                hintStyle: CustomFonts.grey13w500,
-                prefixIcon: const Icon(Icons.search_rounded, color: CustomColors.lightGrey, size: 20),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 14.h),
-                suffixIcon: _searchController.text.isNotEmpty 
-                    ? IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 18),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {});
-                        },
-                      )
-                    : null,
-              ),
-            ),
-          ),
+        AppSearchField(
+          controller: _searchController,
+          hintText: "Search by name, ID, or phone...",
+          onChanged: (val) => setState(() {}),
         ),
         SizedBox(width: AppSpacing.md),
         _filterDropdown("Select Clinic"),

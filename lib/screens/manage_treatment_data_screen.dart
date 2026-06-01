@@ -6,6 +6,7 @@ import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
@@ -462,17 +463,13 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               SizedBox(height: 10.h),
               SearchAnchor(
                 viewHintText: "Search treatments...",
-                builder: (context, controller) => TextFormField(
+                builder: (context, controller) => AppSearchField(
                   controller: searchController,
                   readOnly: true,
                   onTap: () => controller.openView(),
-                  decoration: InputDecoration(
-                    hintText: "Select treatment to add",
-                    suffixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: CustomColors.whiteGrey,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide.none),
-                  ),
+                  hintText: "Select treatment to add",
+                  suffixIcon: const Icon(Icons.search),
+                  maxWidth: double.infinity,
                 ),
                 suggestionsBuilder: (context, controller) {
                   final query = controller.text.toLowerCase();

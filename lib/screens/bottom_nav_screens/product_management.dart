@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
@@ -17,6 +17,14 @@ class ProductManagement extends StatefulWidget {
 }
 
 class _ProductManagementState extends State<ProductManagement> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GradientScaffold(
@@ -114,11 +122,10 @@ class _ProductManagementState extends State<ProductManagement> {
         children: [
           Expanded(
             flex: 3,
-            child: CupertinoSearchTextField(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              placeholder: "Search products by name, SKU or brand...",
-              backgroundColor: CustomColors.whiteGrey,
-              borderRadius: BorderRadius.circular(10.r),
+            child: AppSearchField(
+              controller: _searchController,
+              hintText: "Search products by name, SKU or brand...",
+              onChanged: (val) => setState(() {}),
             ),
           ),
           SizedBox(width: 16.w),

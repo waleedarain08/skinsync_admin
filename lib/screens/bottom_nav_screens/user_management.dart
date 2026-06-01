@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/user_management_dailog_box.dart';
 
@@ -18,6 +18,13 @@ class UserManagement extends StatefulWidget {
 
 class _UserManagementState extends State<UserManagement> {
   int _selectedTab = 0; // 0 for Patients, 1 for Clinics
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,13 +148,11 @@ class _UserManagementState extends State<UserManagement> {
               children: [
                 Text(_selectedTab == 0 ? "Patient Users" : "Clinic Admins", style: CustomFonts.black20w600),
                 const Spacer(),
-                SizedBox(
-                  width: 300.w,
-                  child: CupertinoSearchTextField(
-                    backgroundColor: CustomColors.whiteGrey,
-                    placeholder: "Search by name or email...",
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
+                AppSearchField(
+                  controller: _searchController,
+                  hintText: "Search by name or email...",
+                  onChanged: (val) => setState(() {}),
+                  maxWidth: 300.w,
                 ),
               ],
             ),

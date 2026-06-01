@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +10,7 @@ import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 
@@ -549,12 +549,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CupertinoSearchTextField(
+        AppSearchField(
           controller: _clinicSearchController,
           onChanged: (val) => setState(() => _clinicSearchQuery = val),
-          placeholder: "Search clinics by name or email...",
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          borderRadius: BorderRadius.circular(10.r),
+          hintText: "Search clinics by name or email...",
         ),
         SizedBox(height: 16.h),
         if (_selectedClinics.isNotEmpty) ...[
