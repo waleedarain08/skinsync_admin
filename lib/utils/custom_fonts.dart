@@ -10,7 +10,7 @@ class CustomFontsGetter {
   final BuildContext context;
   CustomFontsGetter(this.context);
 
-  static const String _fontFamily = 'Degular';
+  static const String _fontFamily = 'Geist';
 
   TextStyle get grey11w600ls12 => TextStyle(
     fontSize: context.sp(11),
@@ -595,7 +595,7 @@ class CustomFontsGetter {
 }
 
 class CustomFonts {
-  static const String _fontFamily = 'Degular';
+  static const String _fontFamily = 'Geist';
 
   // --- BACKWARD COMPATIBILITY ---
   static TextStyle get grey11w600ls12 => TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w600, color: CustomColors.grey, fontFamily: _fontFamily, letterSpacing: 1.2);
