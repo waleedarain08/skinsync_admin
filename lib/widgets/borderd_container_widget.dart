@@ -38,8 +38,8 @@ class _BorderdContainerWidgetState extends State<BorderdContainerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final double effectiveRadius = widget.borderRadius ?? AppTheme.borderRadius;
-    final double effectiveBorderWidth = widget.borderWidth ?? AppTheme.borderWidth;
+    final double effectiveRadius = widget.borderRadius ?? 12.0;
+    final double effectiveBorderWidth = widget.borderWidth ?? 1.0;
 
     return MouseRegion(
       onEnter: widget.enableHover ? (_) => setState(() => _hovered = true) : null,
@@ -49,7 +49,7 @@ class _BorderdContainerWidgetState extends State<BorderdContainerWidget> {
         curve: Curves.easeOutCubic,
         height: widget.height,
         width: widget.width,
-        padding: widget.padding ?? EdgeInsets.all(AppSpacing.cardPadding),
+        padding: widget.padding ?? context.appEdgeInsets(all: 24),
         margin: widget.margin,
         decoration: BoxDecoration(
           color: widget.backgroundColor,
@@ -58,7 +58,7 @@ class _BorderdContainerWidgetState extends State<BorderdContainerWidget> {
             color: _hovered ? CustomColors.purple.withValues(alpha: 0.3) : widget.borderColor,
             width: effectiveBorderWidth,
           ),
-          boxShadow: widget.boxShadow ?? (_hovered && widget.enableHover ? AppShadows.cardHover : AppShadows.card),
+          boxShadow: widget.boxShadow ?? (_hovered && widget.enableHover ? AppShadows.cardHover(context) : AppShadows.card(context)),
         ),
         child: widget.child,
       ),

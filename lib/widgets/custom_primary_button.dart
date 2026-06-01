@@ -48,26 +48,26 @@ class _CustomPrimaryButtonState extends State<CustomPrimaryButton> {
           color: Colors.transparent,
           child: InkWell(
             onTap: enabled ? widget.onTap : null,
-            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            borderRadius: context.borderRadius(all: 12),
             child: Ink(
               width: widget.width,
-              height: widget.height ?? AppTheme.buttonHeight,
+              height: widget.height ?? context.h(52),
               decoration: BoxDecoration(
                 color: enabled 
                     ? CustomColors.purple 
                     : CustomColors.lightGrey.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                borderRadius: context.borderRadius(all: 12),
                 boxShadow: enabled && _hovered 
                   ? [BoxShadow(color: CustomColors.purple.withValues(alpha: 0.25), blurRadius: 12, offset: const Offset(0, 4))]
                   : [],
               ),
               child: Padding(
-                padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 16.w),
+                padding: widget.padding ?? context.appEdgeInsets(horizontal: 16),
                 child: Center(
                   child: widget.isLoading
                       ? SizedBox(
-                          width: 20.w,
-                          height: 20.w,
+                          width: context.w(20),
+                          height: context.w(20),
                           child: const CircularProgressIndicator(
                             strokeWidth: 2,
                             color: CustomColors.white,
@@ -78,8 +78,8 @@ class _CustomPrimaryButtonState extends State<CustomPrimaryButton> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             if (widget.icon != null) ...[
-                              Icon(widget.icon, color: CustomColors.white, size: 18.sp),
-                              SizedBox(width: 10.w),
+                              Icon(widget.icon, color: CustomColors.white, size: context.sp(18)),
+                              context.horizontalSpace(10),
                             ],
                             Flexible(
                               child: Text(

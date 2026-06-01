@@ -15,9 +15,9 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.pagePaddingH,
-          vertical: AppSpacing.pagePaddingV,
+        padding: context.appEdgeInsets(
+          horizontal: 28,
+          vertical: 28,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,35 +30,35 @@ class DashboardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Good Morning, Alex', style: CustomFonts.black32w700),
-                      SizedBox(height: 6.h),
+                      context.verticalSpace(6),
                       Text(
                         "Here's a summary of your MedSpa network performance.",
-                        style: CustomFonts.grey13w500,
+                        style: context.fonts.grey13w500,
                       ),
                     ],
                   ),
                 ),
-                _buildDateFilter(),
+                _buildDateFilter(context),
               ],
             ),
-            SizedBox(height: AppSpacing.xxl),
-            _buildQuickStats(),
-            SizedBox(height: AppSpacing.xxl),
+            context.verticalSpace(32),
+            _buildQuickStats(context),
+            context.verticalSpace(32),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(flex: 2, child: _buildRevenueChart()),
-                SizedBox(width: AppSpacing.xl),
-                Expanded(flex: 1, child: _buildTopClinics()),
+                Expanded(flex: 2, child: _buildRevenueChart(context)),
+                context.horizontalSpace(24),
+                Expanded(flex: 1, child: _buildTopClinics(context)),
               ],
             ),
-            SizedBox(height: AppSpacing.xxl),
+            context.verticalSpace(32),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _buildRecentAppointments()),
-                SizedBox(width: AppSpacing.xl),
-                Expanded(child: _buildTreatmentAnalytics()),
+                Expanded(child: _buildRecentAppointments(context)),
+                context.horizontalSpace(24),
+                Expanded(child: _buildTreatmentAnalytics(context)),
               ],
             ),
           ],
@@ -67,46 +67,46 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDateFilter() {
+  Widget _buildDateFilter(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 10.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: CustomColors.white,
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: context.appBorderRadius(all: 12),
         border: Border.all(color: CustomColors.border),
-        boxShadow: AppShadows.xs,
+        boxShadow: AppShadows.xs(context),
       ),
       child: Row(
         children: [
-          Icon(Icons.calendar_today_rounded, size: 16.sp, color: CustomColors.purple),
-          SizedBox(width: AppSpacing.sm),
+          Icon(Icons.calendar_today_rounded, size: context.sp(16), color: CustomColors.purple),
+          context.horizontalSpace(12),
           Text('Oct 2023', style: CustomFonts.black14w600),
-          SizedBox(width: AppSpacing.xs),
-          Icon(Icons.keyboard_arrow_down_rounded, size: 18.sp, color: CustomColors.lightGrey),
+          context.horizontalSpace(8),
+          Icon(Icons.keyboard_arrow_down_rounded, size: context.sp(18), color: CustomColors.lightGrey),
         ],
       ),
     );
   }
 
-  Widget _buildQuickStats() {
+  Widget _buildQuickStats(BuildContext context) {
     return Row(
       children: [
-        _buildStatCard('Total Clinics', '54', '+12%', Icons.domain_rounded, CustomColors.purple),
-        SizedBox(width: AppSpacing.md),
-        _buildStatCard('Active Patients', '12,450', '+5.2%', Icons.people_rounded, CustomColors.green),
-        SizedBox(width: AppSpacing.md),
-        _buildStatCard('New Appointments', '3,820', '+18%', Icons.event_available_rounded, CustomColors.lightPurple),
-        SizedBox(width: AppSpacing.md),
-        _buildStatCard('Total Revenue', '\$1.2M', '+24%', Icons.payments_rounded, CustomColors.green),
+        _buildStatCard(context, 'Total Clinics', '54', '+12%', Icons.domain_rounded, CustomColors.purple),
+        context.horizontalSpace(16),
+        _buildStatCard(context, 'Active Patients', '12,450', '+5.2%', Icons.people_rounded, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildStatCard(context, 'New Appointments', '3,820', '+18%', Icons.event_available_rounded, CustomColors.lightPurple),
+        context.horizontalSpace(16),
+        _buildStatCard(context, 'Total Revenue', '\$1.2M', '+24%', Icons.payments_rounded, CustomColors.green),
       ],
     );
   }
 
-  Widget _buildStatCard(String title, String value, String growth, IconData icon, Color color) {
+  Widget _buildStatCard(BuildContext context, String title, String value, String growth, IconData icon, Color color) {
     return Expanded(
       child: BorderdContainerWidget(
         enableHover: true,
-        padding: EdgeInsets.all(AppSpacing.lg),
+        padding: context.appEdgeInsets(all: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -114,43 +114,43 @@ class DashboardScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: EdgeInsets.all(10.w),
+                  padding: context.appEdgeInsets(all: 10),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                    borderRadius: context.appBorderRadius(all: 8),
                   ),
-                  child: Icon(icon, color: color, size: 20.sp),
+                  child: Icon(icon, color: color, size: context.sp(20)),
                 ),
                 AppBadge(label: growth, variant: AppBadgeVariant.success),
               ],
             ),
-            SizedBox(height: AppSpacing.md),
-            Text(value, style: CustomFonts.black20w600),
-            SizedBox(height: 2.h),
-            Text(title, style: CustomFonts.grey13w500),
+            context.verticalSpace(16),
+            Text(value, style: context.fonts.black20w600),
+            context.verticalSpace(2),
+            Text(title, style: context.fonts.grey13w500),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRevenueChart() {
+  Widget _buildRevenueChart(BuildContext context) {
     return BorderdContainerWidget(
       enableHover: true,
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Revenue Overview', style: CustomFonts.black18w600),
-              Text('Target: \$1.5M', style: CustomFonts.grey12w400),
+              Text('Revenue Overview', style: context.fonts.black18w600),
+              Text('Target: \$1.5M', style: context.fonts.grey12w400),
             ],
           ),
-          SizedBox(height: AppSpacing.xl),
+          context.verticalSpace(24),
           SizedBox(
-            height: 280.h,
+            height: context.h(280),
             child: LineChart(
               LineChartData(
                 gridData: FlGridData(
@@ -195,46 +195,46 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTopClinics() {
+  Widget _buildTopClinics(BuildContext context) {
     return BorderdContainerWidget(
       enableHover: true,
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Top Clinics', style: CustomFonts.black18w600),
-          SizedBox(height: AppSpacing.xl),
-          ...List.generate(5, (index) => _buildClinicItem(index)),
+          Text('Top Clinics', style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          ...List.generate(5, (index) => _buildClinicItem(context, index)),
         ],
       ),
     );
   }
 
-  Widget _buildClinicItem(int index) {
+  Widget _buildClinicItem(BuildContext context, int index) {
     return Padding(
-      padding: EdgeInsets.only(bottom: AppSpacing.md),
+      padding: context.appEdgeInsets(bottom: 16),
       child: Row(
         children: [
           Container(
-            width: 36.w,
-            height: 36.w,
+            width: context.w(36),
+            height: context.w(36),
             decoration: BoxDecoration(
               gradient: CustomColors.purpleWhiteStateBlueLightGradient,
-              borderRadius: BorderRadius.circular(AppRadius.sm),
+              borderRadius: context.appBorderRadius(all: 8),
             ),
             alignment: Alignment.center,
             child: Text(
               '${index + 1}',
-              style: CustomFonts.white12w700,
+              style: context.fonts.white12w700,
             ),
           ),
-          SizedBox(width: AppSpacing.sm),
+          context.horizontalSpace(12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Glow MedSpa NY', style: CustomFonts.black14w600),
-                Text('450 Active Patients', style: CustomFonts.grey12w400),
+                Text('Glow MedSpa NY', style: context.fonts.black14w600),
+                Text('450 Active Patients', style: context.fonts.grey12w400),
               ],
             ),
           ),
@@ -244,60 +244,60 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentAppointments() {
+  Widget _buildRecentAppointments(BuildContext context) {
     return BorderdContainerWidget(
       enableHover: true,
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Recent Activity', style: CustomFonts.black18w600),
+              Text('Recent Activity', style: context.fonts.black18w600),
               TextButton(
                 onPressed: () {},
                 child: Text('View Report', style: CustomFonts.purple14w600),
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.md),
-          ...List.generate(4, (index) => _activityItem()),
+          context.verticalSpace(16),
+          ...List.generate(4, (index) => _activityItem(context)),
         ],
       ),
     );
   }
 
-  Widget _activityItem() {
+  Widget _activityItem(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: AppSpacing.md),
+      padding: context.appEdgeInsets(bottom: 16),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(8.w),
+            padding: context.appEdgeInsets(all: 8),
             decoration: BoxDecoration(
               color: CustomColors.softGrey,
-              borderRadius: BorderRadius.circular(AppRadius.sm),
+              borderRadius: context.appBorderRadius(all: 8),
             ),
-            child: Icon(Icons.history_edu_rounded, color: CustomColors.grey, size: 18.sp),
+            child: Icon(Icons.history_edu_rounded, color: CustomColors.grey, size: context.sp(18)),
           ),
-          SizedBox(width: AppSpacing.sm),
+          context.horizontalSpace(12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RichText(
                   text: TextSpan(
-                    style: CustomFonts.black13w500,
+                    style: context.fonts.black13w500,
                     children: [
-                      TextSpan(text: 'Jane Cooper ', style: CustomFonts.black13w600),
+                      TextSpan(text: 'Jane Cooper ', style: context.fonts.black13w600),
                       const TextSpan(text: 'booked '),
-                      TextSpan(text: 'Botox Treatment ', style: CustomFonts.black13w600),
+                      TextSpan(text: 'Botox Treatment ', style: context.fonts.black13w600),
                       const TextSpan(text: 'at Glow NY'),
                     ],
                   ),
                 ),
-                Text('2 hours ago', style: CustomFonts.grey12w400),
+                Text('2 hours ago', style: context.fonts.grey12w400),
               ],
             ),
           ),
@@ -306,17 +306,17 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTreatmentAnalytics() {
+  Widget _buildTreatmentAnalytics(BuildContext context) {
     return BorderdContainerWidget(
       enableHover: true,
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Treatments Distribution', style: CustomFonts.black18w600),
-          SizedBox(height: AppSpacing.xl),
+          Text('Treatments Distribution', style: context.fonts.black18w600),
+          context.verticalSpace(24),
           SizedBox(
-            height: 200.h,
+            height: context.h(200),
             child: PieChart(
               PieChartData(
                 sections: [
@@ -325,43 +325,43 @@ class DashboardScreen extends StatelessWidget {
                     color: CustomColors.purple,
                     title: '45%',
                     radius: 40,
-                    titleStyle: CustomFonts.white12w400,
+                    titleStyle: context.fonts.white12w400,
                   ),
                   PieChartSectionData(
                     value: 30,
                     color: CustomColors.green,
                     title: '30%',
                     radius: 40,
-                    titleStyle: CustomFonts.black12w400,
+                    titleStyle: context.fonts.black12w400,
                   ),
                   PieChartSectionData(
                     value: 25,
                     color: CustomColors.lightPurple,
                     title: '25%',
                     radius: 40,
-                    titleStyle: CustomFonts.white12w400,
+                    titleStyle: context.fonts.white12w400,
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(height: AppSpacing.xl),
-          _legendItem('Injectables', CustomColors.purple),
-          _legendItem('Skin Treatments', CustomColors.green),
-          _legendItem('Laser & Energy', CustomColors.lightPurple),
+          context.verticalSpace(24),
+          _legendItem(context, 'Injectables', CustomColors.purple),
+          _legendItem(context, 'Skin Treatments', CustomColors.green),
+          _legendItem(context, 'Laser & Energy', CustomColors.lightPurple),
         ],
       ),
     );
   }
 
-  Widget _legendItem(String label, Color color) {
+  Widget _legendItem(BuildContext context, String label, Color color) {
     return Padding(
-      padding: EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: context.appEdgeInsets(bottom: 12),
       child: Row(
         children: [
           Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-          SizedBox(width: AppSpacing.sm),
-          Text(label, style: CustomFonts.grey14w400),
+          context.horizontalSpace(12),
+          Text(label, style: context.fonts.grey14w400),
         ],
       ),
     );

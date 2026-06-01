@@ -989,13 +989,6 @@
             </list>
           </value>
         </entry>
-        <entry key="responsive_framework">
-          <value>
-            <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dev/responsive_framework-1.5.1/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="riverpod">
           <value>
             <list>
@@ -1563,7 +1556,6 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/quill_native_bridge_web-0.0.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/quill_native_bridge_windows-0.0.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/quiver-3.2.2/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/responsive_framework-1.5.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/riverpod-3.2.1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/rxdart-0.28.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/shared_preferences-2.5.5/lib" />

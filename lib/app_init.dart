@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart' hide Breakpoint;
-import 'package:responsive_framework/responsive_framework.dart' as rf;
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/route_generator.dart';
 import 'utils/screen_size.dart';
 import 'utils/theme.dart';
@@ -30,12 +29,14 @@ class AppInit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     configLoading();
+    
     return ScreenUtilPlusInit(
-      designSize: getDesignSize(context: context),
+      designSize: const Size(1440, 900),
       ensureScreenSize: true,
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, child) {
+      autoRebuild: false,
+      builder: (context, child) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'SkinSync Admin',
@@ -44,22 +45,7 @@ class AppInit extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           builder: (context, child) {
-            final easyLoadingBuilder = EasyLoading.init();
-            final responsiveBuilder = rf.ResponsiveBreakpoints.builder(
-              child: child!,
-              breakpoints: [
-                const rf.Breakpoint(start: 0, end: 480, name: rf.MOBILE),
-                const rf.Breakpoint(start: 481, end: 1024, name: rf.TABLET),
-                const rf.Breakpoint(start: 482, end: 1920, name: rf.DESKTOP),
-                const rf.Breakpoint(
-                  start: 1921,
-                  end: double.infinity,
-                  name: '4K',
-                ),
-              ],
-            );
-            
-            return easyLoadingBuilder(context, responsiveBuilder);
+            return EasyLoading.init()(context, child);
           },
         );
       },

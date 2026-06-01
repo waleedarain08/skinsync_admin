@@ -58,52 +58,52 @@ class AppSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SidebarX(
       controller: controller,
-      theme: _buildTheme(),
-      extendedTheme: _buildExtendedTheme(),
+      theme: _buildTheme(context),
+      extendedTheme: _buildExtendedTheme(context),
       animationDuration: const Duration(milliseconds: 300),
       showToggleButton: showToggleButton,
       toggleButtonBuilder: (context, extended) => _buildToggleButton(context, extended),
       headerDivider: const SizedBox.shrink(),
-      footerDivider: Divider(color: CustomColors.border, height: 1.h, thickness: 1),
+      footerDivider: Divider(color: CustomColors.border, height: context.h(1), thickness: 1),
       separatorBuilder: (context, index) => _separatorBuilder(context, index, controller),
       headerBuilder: (context, extended) => _headerBuilder(context, extended),
       items: _buildItems(),
     );
   }
 
-  SidebarXTheme _buildTheme() {
+  SidebarXTheme _buildTheme(BuildContext context) {
     return SidebarXTheme(
-      width: 80.w,
+      width: context.w(80),
       decoration: const BoxDecoration(
         color: CustomColors.white,
         border: Border(right: BorderSide(color: CustomColors.border, width: 1)),
       ),
-      padding: EdgeInsets.symmetric(vertical: 24.h),
-      iconTheme: IconThemeData(color: CustomColors.grey, size: 20.sp),
-      selectedIconTheme: IconThemeData(color: CustomColors.purple, size: 20.sp),
-      hoverIconTheme: IconThemeData(color: CustomColors.purple, size: 20.sp),
+      padding: context.appEdgeInsets(vertical: 24),
+      iconTheme: IconThemeData(color: CustomColors.grey, size: context.sp(20)),
+      selectedIconTheme: IconThemeData(color: CustomColors.purple, size: context.sp(20)),
+      hoverIconTheme: IconThemeData(color: CustomColors.purple, size: context.sp(20)),
       textStyle: CustomFonts.grey14w600,
       selectedTextStyle: CustomFonts.purple14w600,
       hoverTextStyle: CustomFonts.purple14w600,
       hoverColor: CustomColors.lightPurple,
-      itemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-      selectedItemMargin: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-      itemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      selectedItemPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      itemDecoration: BoxDecoration(borderRadius: BorderRadius.circular(12.r)),
+      itemMargin: context.appEdgeInsets(horizontal: 12, vertical: 4),
+      selectedItemMargin: context.appEdgeInsets(horizontal: 12, vertical: 4),
+      itemPadding: context.appEdgeInsets(horizontal: 12, vertical: 12),
+      selectedItemPadding: context.appEdgeInsets(horizontal: 12, vertical: 12),
+      itemDecoration: BoxDecoration(borderRadius: context.borderRadius(all: 12)),
       selectedItemDecoration: BoxDecoration(
         color: CustomColors.lightPurple,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: context.borderRadius(all: 12),
         border: Border.all(color: CustomColors.purple.withValues(alpha: 0.2), width: 1),
       ),
     );
   }
 
-  SidebarXTheme _buildExtendedTheme() {
-    return _buildTheme().copyWith(
-      width: 280.w,
-      itemTextPadding: EdgeInsets.only(left: 16.w),
-      selectedItemTextPadding: EdgeInsets.only(left: 16.w),
+  SidebarXTheme _buildExtendedTheme(BuildContext context) {
+    return _buildTheme(context).copyWith(
+      width: context.w(280),
+      itemTextPadding: context.appEdgeInsets(left: 16),
+      selectedItemTextPadding: context.appEdgeInsets(left: 16),
     );
   }
 
@@ -129,26 +129,26 @@ class AppSidebar extends StatelessWidget {
     if (index == 3) return _SectionLabel(title: 'OPERATIONS', controller: controller);
     if (index == 6) return _SectionLabel(title: 'FINANCIALS', controller: controller);
     if (index == 8) return _SectionLabel(title: 'SYSTEM', controller: controller);
-    return SizedBox(height: 2.h);
+    return context.verticalSpace(2);
   }
 
   Widget _headerBuilder(BuildContext context, bool extended) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      padding: EdgeInsets.symmetric(
-        vertical: 28.h,
-        horizontal: extended ? 24.w : 12.w,
+      padding: context.appEdgeInsets(
+        vertical: 28,
+        horizontal: extended ? 24 : 12,
       ),
       child: Row(
         mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: (extended ? 42 : 30).w,
-            height: (extended ? 42 : 30).w,
+            width: context.w(extended ? 42 : 30),
+            height: context.w(extended ? 42 : 30),
             child: Image.asset(PngAssets.splashLogo, fit: BoxFit.contain),
           ),
           if (extended) ...[
-            SizedBox(width: 14.w),
+            context.horizontalSpace(14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,10 +171,10 @@ class AppSidebar extends StatelessWidget {
       hoverColor: CustomColors.purple.withValues(alpha: 0.05),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 16.h),
+        padding: context.appEdgeInsets(vertical: 16),
         child: Icon(
           extended ? Icons.arrow_back_ios_new_rounded : Icons.arrow_forward_ios_rounded,
-          size: 16.sp,
+          size: context.sp(16),
           color: CustomColors.grey.withValues(alpha: 0.7),
         ),
       ),
@@ -194,12 +194,12 @@ class _SectionLabel extends StatelessWidget {
       builder: (context, child) {
         if (!controller.extended) {
           return Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.h),
-            child: Divider(color: CustomColors.border, indent: 20.w, endIndent: 20.w),
+            padding: context.appEdgeInsets(vertical: 8),
+            child: Divider(color: CustomColors.border, indent: context.w(20), endIndent: context.w(20)),
           );
         }
         return Padding(
-          padding: EdgeInsets.fromLTRB(28.w, 24.h, 16.w, 8.h),
+          padding: context.appEdgeInsets(left: 28, top: 24, right: 16, bottom: 8),
           child: Text(title, style: CustomFonts.grey11w600ls12),
         );
       },

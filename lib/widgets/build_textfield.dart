@@ -42,7 +42,7 @@ class BuildTextField extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(label, style: CustomFonts.black14w600),
-          SizedBox(height: 8.h),
+          context.verticalSpace(8),
           TextFormField(
             controller: controller,
             maxLines: maxLines,
@@ -57,6 +57,7 @@ class BuildTextField extends StatelessWidget {
             ],
             onChanged: onChanged,
             decoration: AppDecorations.input(
+              context,
               hint: hintText, 
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,

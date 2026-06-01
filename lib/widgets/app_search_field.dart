@@ -32,13 +32,13 @@ class AppSearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isSmallScreen = context.isMobile;
-    final double effectiveMaxWidth = maxWidth ?? (isSmallScreen ? double.infinity : 400.w);
+    final double effectiveMaxWidth = maxWidth ?? (isSmallScreen ? double.infinity : context.w(400));
 
     return Container(
       constraints: BoxConstraints(
         maxWidth: effectiveMaxWidth,
-        minHeight: AppTheme.inputHeight,
-        maxHeight: AppTheme.inputHeight,
+        minHeight: context.h(52),
+        maxHeight: context.h(52),
       ),
       child: TextFormField(
         controller: controller,
@@ -48,15 +48,16 @@ class AppSearchField extends StatelessWidget {
         onTap: onTap,
         style: CustomFonts.black14w400,
         decoration: AppDecorations.input(
+          context,
           hint: hintText,
           prefixIcon: prefixIcon ?? Icon(
             Icons.search_rounded,
             color: CustomColors.lightGrey,
-            size: 20.sp,
+            size: context.sp(20),
           ),
           suffixIcon: suffixIcon ?? (controller != null && controller!.text.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.close_rounded, size: 18.sp, color: CustomColors.lightGrey),
+                  icon: Icon(Icons.close_rounded, size: context.sp(18), color: CustomColors.lightGrey),
                   onPressed: () {
                     controller?.clear();
                     if (onClear != null) onClear!();

@@ -41,42 +41,42 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerPr
             );
           },
           child: Container(
-            padding: EdgeInsets.all(40.w),
-            margin: EdgeInsets.symmetric(horizontal: 24.w),
+            padding: context.appEdgeInsets(all: 40),
+            margin: context.appEdgeInsets(horizontal: 24),
             decoration: BoxDecoration(
               color: CustomColors.white,
-              borderRadius: BorderRadius.circular(24.r),
+              borderRadius: context.appBorderRadius(all: 24),
               border: Border.all(color: CustomColors.border),
-              boxShadow: AppShadows.lg,
+              boxShadow: AppShadows.lg(context),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: EdgeInsets.all(24.w),
+                  padding: context.appEdgeInsets(all: 24),
                   decoration: BoxDecoration(
                     gradient: CustomColors.purpleWhiteStateBlueLightGradient,
-                    borderRadius: BorderRadius.circular(16.r),
+                    borderRadius: context.appBorderRadius(all: 16),
                   ),
-                  child: Icon(Icons.auto_awesome_rounded, size: 48.sp, color: CustomColors.white),
+                  child: Icon(Icons.auto_awesome_rounded, size: context.sp(48), color: CustomColors.white),
                 ),
-                SizedBox(height: 32.h),
-                Text('Coming Soon', style: CustomFonts.black26w700),
-                SizedBox(height: 12.h),
+                context.verticalSpace(32),
+                Text('Coming Soon', style: context.fonts.black26w700),
+                context.verticalSpace(12),
                 Text(
                   "We're crafting an elegant experience for this module.\nStay tuned for the unveiling.",
                   textAlign: TextAlign.center,
-                  style: CustomFonts.grey16w400,
+                  style: context.fonts.grey16w400,
                 ),
-                SizedBox(height: 32.h),
+                context.verticalSpace(32),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
+                  padding: context.appEdgeInsets(horizontal: 24, vertical: 10),
                   decoration: BoxDecoration(
                     color: CustomColors.palePurple,
-                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    borderRadius: BorderRadius.circular(AppRadius.full(context)),
                     border: Border.all(color: CustomColors.purple.withValues(alpha: 0.1)),
                   ),
-                  child: Text('PREMIUM ACCESS', style: CustomFonts.purple11w600),
+                  child: Text('PREMIUM ACCESS', style: context.fonts.purple11w600),
                 ),
               ],
             ),

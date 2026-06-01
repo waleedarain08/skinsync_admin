@@ -62,25 +62,25 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget build(BuildContext context) {
     return GradientScaffold(
       body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.pagePaddingH,
-          vertical: AppSpacing.pagePaddingV,
+        padding: context.appEdgeInsets(
+          horizontal: 28,
+          vertical: 28,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            SizedBox(height: AppSpacing.xxl),
-            _buildStatsSummary(),
-            SizedBox(height: AppSpacing.xxl),
+            _buildHeader(context),
+            context.verticalSpace(32),
+            _buildStatsSummary(context),
+            context.verticalSpace(32),
             _buildTabs(),
-            SizedBox(height: AppSpacing.xl),
+            context.verticalSpace(24),
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildActiveClinicsTab(),
-                  _buildPendingInvitationsTab(),
+                  _buildActiveClinicsTab(context),
+                  _buildPendingInvitationsTab(context),
                 ],
               ),
             ),
@@ -90,7 +90,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -98,7 +98,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Clinic Partners", style: CustomFonts.black26w700),
-            SizedBox(height: 6.h),
+            context.verticalSpace(6),
             Text(
               "Manage and monitor your MedSpa network performance.",
               style: CustomFonts.grey13w500,
@@ -109,41 +109,41 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
           onTap: () => context.push(AddNewClinicScreen.routeName),
           icon: Icons.add_rounded,
           label: 'Add New Clinic',
-          width: 200.w,
+          width: context.w(200),
         ),
       ],
     );
   }
 
-  Widget _buildStatsSummary() {
+  Widget _buildStatsSummary(BuildContext context) {
     return Row(
       children: [
-        _buildMiniStat("Total Clinics", "48", Icons.business_rounded, CustomColors.purple),
-        SizedBox(width: AppSpacing.md),
-        _buildMiniStat("Active Partners", "42", Icons.bolt_rounded, CustomColors.green),
-        SizedBox(width: AppSpacing.md),
-        _buildMiniStat("Network Revenue", "\$245K", Icons.payments_rounded, CustomColors.green),
-        SizedBox(width: AppSpacing.md),
-        _buildMiniStat("Avg Patient Rating", "4.8", Icons.star_rounded, Colors.amber),
+        _buildMiniStat(context, "Total Clinics", "48", Icons.business_rounded, CustomColors.purple),
+        context.horizontalSpace(16),
+        _buildMiniStat(context, "Active Partners", "42", Icons.bolt_rounded, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildMiniStat(context, "Network Revenue", "\$245K", Icons.payments_rounded, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildMiniStat(context, "Avg Patient Rating", "4.8", Icons.star_rounded, Colors.amber),
       ],
     );
   }
 
-  Widget _buildMiniStat(String title, String value, IconData icon, Color color) {
+  Widget _buildMiniStat(BuildContext context, String title, String value, IconData icon, Color color) {
     return Expanded(
       child: BorderdContainerWidget(
-        padding: EdgeInsets.all(AppSpacing.lg),
+        padding: context.appEdgeInsets(all: 20),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(12.w),
+              padding: context.appEdgeInsets(all: 12),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
+                borderRadius: context.borderRadius(all: 8),
               ),
-              child: Icon(icon, color: color, size: 22.sp),
+              child: Icon(icon, color: color, size: context.sp(22)),
             ),
-            SizedBox(width: AppSpacing.md),
+            context.horizontalSpace(16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -173,15 +173,16 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     );
   }
 
-  Widget _buildActiveClinicsTab() {
+  Widget _buildActiveClinicsTab(BuildContext context) {
     final state = ref.watch(clinicViewModelProvider);
     final clinics = state.clinics ?? [];
     return Column(
       children: [
-        _buildSearchAndFilterBar(_activeSearchController, "Search by name, email or location..."),
-        SizedBox(height: AppSpacing.md),
+        _buildSearchAndFilterBar(context, _activeSearchController, "Search by name, email or location..."),
+        context.verticalSpace(16),
         Expanded(
           child: _buildUnifiedTable<ClinicModel>(
+            context,
             title: "Partner Directory",
             items: clinics,
             isLoading: state.loading,
@@ -195,22 +196,23 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
               DataColumn(label: Text('STATUS')),
               DataColumn(label: Text('ACTIONS')),
             ],
-            rowBuilder: (item) => _buildActiveClinicRow(item),
+            rowBuilder: (item) => _buildActiveClinicRow(context, item),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildPendingInvitationsTab() {
+  Widget _buildPendingInvitationsTab(BuildContext context) {
     final state = ref.watch(clinicViewModelProvider);
     final inviteClinics = state.inviteClinics ?? [];
     return Column(
       children: [
-        _buildSearchAndFilterBar(_inviteSearchController, "Search prospect clinics..."),
-        SizedBox(height: AppSpacing.md),
+        _buildSearchAndFilterBar(context, _inviteSearchController, "Search prospect clinics..."),
+        context.verticalSpace(16),
         Expanded(
           child: _buildUnifiedTable<InviteClinicModel>(
+            context,
             title: "Prospect Pipeline",
             items: inviteClinics,
             isLoading: state.loading,
@@ -222,14 +224,14 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
               DataColumn(label: Text('STATUS')),
               DataColumn(label: Text('ACTIONS')),
             ],
-            rowBuilder: (item) => _buildInviteClinicRow(item),
+            rowBuilder: (item) => _buildInviteClinicRow(context, item),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSearchAndFilterBar(TextEditingController controller, String hint) {
+  Widget _buildSearchAndFilterBar(BuildContext context, TextEditingController controller, String hint) {
     return Row(
       children: [
         AppSearchField(
@@ -237,26 +239,26 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
           hintText: hint,
           onChanged: (val) => setState(() {}),
         ),
-        SizedBox(width: AppSpacing.md),
+        context.horizontalSpace(16),
         OutlinedButton.icon(
-          onPressed: () => _showFiltersModal(),
+          onPressed: () => _showFiltersModal(context),
           icon: const Icon(Icons.filter_list_rounded, size: 20),
           label: const Text("Filters"),
           style: OutlinedButton.styleFrom(
             backgroundColor: Colors.white,
-            minimumSize: Size(0, 52.h),
+            minimumSize: Size(0, context.h(52)),
           ),
         ),
       ],
     );
   }
 
-  void _showFiltersModal() {
+  void _showFiltersModal(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => StandardDialog(
         title: "Filter Clinics",
-        width: 600.w,
+        width: context.w(600),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -272,7 +274,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                     onChanged: (val) {},
                   ),
                 ),
-                SizedBox(width: AppSpacing.md),
+                context.horizontalSpace(16),
                 Expanded(
                   child: CustomDropdown<String>(
                     label: "Status",
@@ -285,7 +287,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                 ),
               ],
             ),
-            SizedBox(height: AppSpacing.xl),
+            context.verticalSpace(24),
             CustomDropdown<String>(
               label: "Subscription Plan",
               hintText: "All Plans",
@@ -304,14 +306,15 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
           CustomPrimaryButton(
             onTap: () => Navigator.pop(context),
             label: "Apply Filters",
-            width: 140.w,
+            width: context.w(140),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildUnifiedTable<T>({
+  Widget _buildUnifiedTable<T>(
+    BuildContext context, {
     required String title,
     required List<T> items,
     required bool isLoading,
@@ -325,7 +328,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.md),
+            padding: context.appEdgeInsets(left: 24, top: 24, right: 24, bottom: 16),
             child: Text(title, style: CustomFonts.black18w600),
           ),
           Expanded(
@@ -334,7 +337,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                 : items.isEmpty
                     ? Center(
                         child: Padding(
-                          padding: EdgeInsets.all(AppSpacing.xxl),
+                          padding: context.appEdgeInsets(all: 32),
                           child: Text("No entries found", style: CustomFonts.grey13w500),
                         ),
                       )
@@ -369,21 +372,21 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     );
   }
 
-  DataRow _buildActiveClinicRow(ClinicModel clinic) {
+  DataRow _buildActiveClinicRow(BuildContext context, ClinicModel clinic) {
     return DataRow(
       cells: [
-        DataCell(_buildNameCell(clinic.name, clinic.logo)),
+        DataCell(_buildNameCell(context, clinic.name, clinic.logo)),
         DataCell(_buildContactCell(clinic.email, clinic.phone)),
         DataCell(Text(clinic.address ?? 'N/A', style: CustomFonts.grey13w500)),
         DataCell(_buildPlanBadge(clinic.subscriptionPlan ?? "Standard")),
-        DataCell(_buildStatsCell(clinic.totalAppointments?.toString() ?? "0", Icons.people_outline_rounded, clinic.rating?.toString() ?? "0", Icons.star_outline_rounded)),
+        DataCell(_buildStatsCell(context, clinic.totalAppointments?.toString() ?? "0", Icons.people_outline_rounded, clinic.rating?.toString() ?? "0", Icons.star_outline_rounded)),
         DataCell(_statusBadge(clinic.status ?? 'Active')),
         DataCell(
           Row(
             children: [
               IconButton(
                 tooltip: 'View Details',
-                icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.grey),
+                icon: Icon(Icons.visibility_outlined, size: context.sp(20), color: CustomColors.grey),
                 onPressed: () {
                   ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
                   context.push(ClinicDetailScreen.routeName);
@@ -391,7 +394,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
               ),
               IconButton(
                 tooltip: 'Edit Partner',
-                icon: Icon(Icons.edit_outlined, size: 20.sp, color: CustomColors.grey),
+                icon: Icon(Icons.edit_outlined, size: context.sp(20), color: CustomColors.grey),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -406,17 +409,17 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     );
   }
 
-  DataRow _buildInviteClinicRow(InviteClinicModel clinic) {
+  DataRow _buildInviteClinicRow(BuildContext context, InviteClinicModel clinic) {
     return DataRow(
       cells: [
-        DataCell(_buildNameCell(clinic.name, clinic.logo)),
+        DataCell(_buildNameCell(context, clinic.name, clinic.logo)),
         DataCell(_buildContactCell(clinic.email, clinic.phone)),
         DataCell(Text(clinic.address, style: CustomFonts.grey13w500)),
         DataCell(_invitationStatusBadge(clinic.invitationStatus)),
         DataCell(
           IconButton(
             tooltip: 'View Prospect',
-            icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.grey),
+            icon: Icon(Icons.visibility_outlined, size: context.sp(20), color: CustomColors.grey),
             onPressed: () {
               ref.read(clinicViewModelProvider.notifier).selectInviteClinic(clinic);
               context.push(InviteClinicDetailScreen.routeName);
@@ -427,18 +430,18 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     );
   }
 
-  Widget _buildNameCell(String? name, String? logo) {
+  Widget _buildNameCell(BuildContext context, String? name, String? logo) {
     return Row(
       children: [
         CircleAvatar(
-          radius: 16.r,
+          radius: context.r(16),
           backgroundColor: CustomColors.palePurple,
           backgroundImage: (logo != null && logo.isNotEmpty) ? NetworkImage(logo) : null,
           child: (logo == null || logo.isEmpty)
               ? Text(name?[0] ?? "C", style: CustomFonts.purple12w700)
               : null,
         ),
-        SizedBox(width: AppSpacing.sm),
+        context.horizontalSpace(12),
         Text(name ?? 'N/A', style: CustomFonts.black14w600),
       ],
     );
@@ -459,21 +462,21 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     return AppBadge(label: plan, variant: AppBadgeVariant.secondary);
   }
 
-  Widget _buildStatsCell(String val1, IconData icon1, String val2, IconData icon2) {
+  Widget _buildStatsCell(BuildContext context, String val1, IconData icon1, String val2, IconData icon2) {
     return Row(
       children: [
-        _miniIconStat(icon1, val1),
-        SizedBox(width: AppSpacing.sm),
-        _miniIconStat(icon2, val2),
+        _miniIconStat(context, icon1, val1),
+        context.horizontalSpace(12),
+        _miniIconStat(context, icon2, val2),
       ],
     );
   }
 
-  Widget _miniIconStat(IconData icon, String value) {
+  Widget _miniIconStat(BuildContext context, IconData icon, String value) {
     return Row(
       children: [
-        Icon(icon, size: 14.sp, color: CustomColors.lightGrey),
-        SizedBox(width: 4.w),
+        Icon(icon, size: context.sp(14), color: CustomColors.lightGrey),
+        context.horizontalSpace(4),
         Text(value, style: CustomFonts.grey12w400),
       ],
     );

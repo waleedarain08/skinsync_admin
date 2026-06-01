@@ -13,15 +13,19 @@ class CustomColors {
 
   static const Color green = Color(0xFF10B981);
   static const Color paleGreen = Color(0x2610B981);
+  static const Color successBg = Color(0x2610B981);
 
   static const Color red = Color(0xFFEF4444);
   static const Color paleRed = Color(0x26EF4444);
+  static const Color errorBg = Color(0x26EF4444);
 
   static const Color amber = Color(0xFFF59E0B);
   static const Color paleAmber = Color(0x26F59E0B);
+  static const Color warningBg = Color(0x26F59E0B);
 
   static const Color blue = Color(0xFF3B82F6);
   static const Color paleBlue = Color(0x263B82F6);
+  static const Color infoBg = Color(0x263B82F6);
 
   // Neutrals
   static const Color black = Color(0xFF0F172A);

@@ -35,20 +35,20 @@ class InviteClinicDetailScreen extends ConsumerWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 1000.w),
+            constraints: BoxConstraints(maxWidth: context.w(1000)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeaderCard(clinic),
-                SizedBox(height: 32.h),
+                _buildHeaderCard(context, clinic),
+                context.verticalSpace(32),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 3, child: _buildMainContent(clinic)),
-                    SizedBox(width: 32.w),
+                    Expanded(flex: 3, child: _buildMainContent(context, clinic)),
+                    context.horizontalSpace(32),
                     Expanded(flex: 2, child: _buildActionSidebar(context, clinic)),
                   ],
                 ),
@@ -60,26 +60,26 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeaderCard(InviteClinicModel clinic) {
+  Widget _buildHeaderCard(BuildContext context, InviteClinicModel clinic) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(32.w),
+      padding: context.appEdgeInsets(all: 32),
       child: Row(
         children: [
           Container(
-            width: 120.w,
-            height: 120.w,
+            width: context.w(120),
+            height: context.w(120),
             decoration: BoxDecoration(
               color: CustomColors.whiteGrey,
-              borderRadius: BorderRadius.circular(20.r),
+              borderRadius: context.borderRadius(all: 20),
               image: (clinic.logo != null && clinic.logo!.isNotEmpty)
                   ? DecorationImage(image: NetworkImage(clinic.logo!), fit: BoxFit.cover)
                   : null,
             ),
             child: (clinic.logo == null || clinic.logo!.isEmpty)
-                ? Icon(Icons.business_outlined, size: 48.sp, color: CustomColors.black)
+                ? Icon(Icons.business_outlined, size: context.sp(48), color: CustomColors.black)
                 : null,
           ),
-          SizedBox(width: 32.w),
+          context.horizontalSpace(32),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,18 +87,18 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                 Row(
                   children: [
                     Text(clinic.name, style: CustomFonts.black26w700),
-                    SizedBox(width: 16.w),
-                    _statusBadge(clinic.invitationStatus),
+                    context.horizontalSpace(16),
+                    _statusBadge(context, clinic.invitationStatus),
                   ],
                 ),
-                SizedBox(height: 8.h),
+                context.verticalSpace(8),
                 Text(clinic.address, style: CustomFonts.grey16w400),
-                SizedBox(height: 16.h),
+                context.verticalSpace(16),
                 Row(
                   children: [
-                    _infoChip(Icons.calendar_today_outlined, "Identified on: ${clinic.invitedDate}"),
-                    SizedBox(width: 12.w),
-                    _infoChip(Icons.trending_up_rounded, "${clinic.interestedPatientsCount} Potential Patients"),
+                    _infoChip(context, Icons.calendar_today_outlined, "Identified on: ${clinic.invitedDate}"),
+                    context.horizontalSpace(12),
+                    _infoChip(context, Icons.trending_up_rounded, "${clinic.interestedPatientsCount} Potential Patients"),
                   ],
                 ),
               ],
@@ -109,22 +109,22 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMainContent(InviteClinicModel clinic) {
+  Widget _buildMainContent(BuildContext context, InviteClinicModel clinic) {
     return Column(
       children: [
-        _infoSection("Contact Details", [
-          _infoRow(Icons.email_outlined, "Email Address", clinic.email),
-          _infoRow(Icons.phone_outlined, "Phone Number", clinic.phone),
-          _infoRow(Icons.location_on_outlined, "Full Address", clinic.address),
+        _infoSection(context, "Contact Details", [
+          _infoRow(context, Icons.email_outlined, "Email Address", clinic.email),
+          _infoRow(context, Icons.phone_outlined, "Phone Number", clinic.phone),
+          _infoRow(context, Icons.location_on_outlined, "Full Address", clinic.address),
         ]),
-        SizedBox(height: 24.h),
-        _infoSection("Pipeline Metrics", [
-          _infoRow(Icons.people_outline, "Interested Patients", "${clinic.interestedPatientsCount} Patients"),
-          _infoRow(Icons.event_note_rounded, "Pending Appointments", "${clinic.pendingAppointmentsCount} In Queue"),
+        context.verticalSpace(24),
+        _infoSection(context, "Pipeline Metrics", [
+          _infoRow(context, Icons.people_outline, "Interested Patients", "${clinic.interestedPatientsCount} Patients"),
+          _infoRow(context, Icons.event_note_rounded, "Pending Appointments", "${clinic.pendingAppointmentsCount} In Queue"),
         ]),
         if (clinic.notes != null && clinic.notes!.isNotEmpty) ...[
-          SizedBox(height: 24.h),
-          _infoSection("Administrative Notes", [
+          context.verticalSpace(24),
+          _infoSection(context, "Administrative Notes", [
             Text(clinic.notes!, style: CustomFonts.grey14w400h16),
           ]),
         ],
@@ -135,19 +135,21 @@ class InviteClinicDetailScreen extends ConsumerWidget {
   Widget _buildActionSidebar(BuildContext context, InviteClinicModel clinic) {
     return Column(
       children: [
-        _infoSection("Invitation Control", [
+        _infoSection(context, "Invitation Control", [
           Text("Manage the outreach and onboarding workflow for this prospect.", 
             style: CustomFonts.grey13w500h15),
-          SizedBox(height: 28.h),
+          context.verticalSpace(28),
           _actionButton(
+            context,
             "Invite Clinic Now", 
             Icons.mail_outline_rounded, 
             CustomColors.green, 
             CustomColors.black,
             () {},
           ),
-          SizedBox(height: 12.h),
+          context.verticalSpace(12),
           _actionButton(
+            context,
             "Resend Invitation", 
             Icons.refresh_rounded, 
             Colors.white, 
@@ -155,8 +157,9 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             () {},
             isOutlined: true,
           ),
-          SizedBox(height: 12.h),
+          context.verticalSpace(12),
           _actionButton(
+            context,
             "Start Onboarding", 
             Icons.rocket_launch_outlined, 
             CustomColors.green, 
@@ -166,10 +169,11 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             },
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 32.h),
+            padding: context.appEdgeInsets(vertical: 32),
             child: Divider(color: CustomColors.border.withValues(alpha: 0.6)),
           ),
           _actionButton(
+            context,
             "Archive Prospect", 
             Icons.block_flipped, 
             Colors.white, 
@@ -182,31 +186,31 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _infoSection(String title, List<Widget> children) {
+  Widget _infoSection(BuildContext context, String title, List<Widget> children) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: CustomFonts.black16w700),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           ...children,
         ],
       ),
     );
   }
 
-  Widget _infoRow(IconData icon, String label, String value) {
+  Widget _infoRow(BuildContext context, IconData icon, String label, String value) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
+      padding: context.appEdgeInsets(bottom: 16),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(8.r)),
-            child: Icon(icon, size: 18.sp, color: CustomColors.grey),
+            padding: context.appEdgeInsets(all: 8),
+            decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: context.borderRadius(all: 8)),
+            child: Icon(icon, size: context.sp(18), color: CustomColors.grey),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -219,19 +223,19 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _actionButton(String label, IconData icon, Color bg, Color text, VoidCallback onTap, {bool isOutlined = false}) {
+  Widget _actionButton(BuildContext context, String label, IconData icon, Color bg, Color text, VoidCallback onTap, {bool isOutlined = false}) {
     if (isOutlined) {
       return SizedBox(
         width: double.infinity,
         child: OutlinedButton.icon(
           onPressed: onTap,
-          icon: Icon(icon, size: 20.sp),
+          icon: Icon(icon, size: context.sp(20)),
           label: Text(label),
           style: OutlinedButton.styleFrom(
             foregroundColor: text,
             side: BorderSide(color: text.withValues(alpha: 0.5), width: 1.2),
-            padding: EdgeInsets.symmetric(vertical: 20.h),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+            padding: context.appEdgeInsets(vertical: 20),
+            shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 14)),
             textStyle: CustomFonts.grey14w600ls03,
           ).copyWith(
             overlayColor: WidgetStateProperty.all(text.withValues(alpha: 0.05)),
@@ -245,11 +249,11 @@ class InviteClinicDetailScreen extends ConsumerWidget {
       onTap: onTap,
       icon: icon,
       width: double.infinity,
-      height: 56.h,
+      height: context.h(56),
     );
   }
 
-  Widget _statusBadge(String status) {
+  Widget _statusBadge(BuildContext context, String status) {
     Color color = CustomColors.grey;
     TextStyle textStyle = CustomFonts.grey10w700;
     String cleanStatus = status.toLowerCase();
@@ -265,10 +269,10 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: context.borderRadius(all: 20),
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
@@ -278,17 +282,17 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _infoChip(IconData icon, String label) {
+  Widget _infoChip(BuildContext context, IconData icon, String label) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: CustomColors.whiteGrey,
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: context.borderRadius(all: 8),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 14.sp, color: CustomColors.grey),
-          SizedBox(width: 8.w),
+          Icon(icon, size: context.sp(14), color: CustomColors.grey),
+          context.horizontalSpace(8),
           Text(label, style: CustomFonts.grey13w500),
         ],
       ),

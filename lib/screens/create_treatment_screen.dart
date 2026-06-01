@@ -42,17 +42,17 @@ class CreateTreatmentScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          _buildProgressIndicator(state.currentStep),
+          _buildProgressIndicator(context, state.currentStep),
           Expanded(
             child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+              padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 900.w),
+                  constraints: BoxConstraints(maxWidth: context.w(900)),
                   child: Column(
                     children: [
-                      _buildCurrentStepContent(state, viewModel, dataState),
-                      SizedBox(height: 48.h),
+                      _buildCurrentStepContent(context, state, viewModel, dataState),
+                      context.verticalSpace(48),
                       _buildActionButtons(context, state, viewModel),
                     ],
                   ),
@@ -65,33 +65,33 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProgressIndicator(int currentStep) {
+  Widget _buildProgressIndicator(BuildContext context, int currentStep) {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 40.w),
+      padding: context.appEdgeInsets(vertical: 20, horizontal: 40),
       child: Row(
         children: [
-          _stepIndicator(0, "Basic Details", currentStep),
-          _stepConnector(0, currentStep),
-          _stepIndicator(1, "Category", currentStep),
-          _stepConnector(1, currentStep),
-          _stepIndicator(2, "Areas", currentStep),
-          _stepConnector(2, currentStep),
-          _stepIndicator(3, "Materials & Logic", currentStep),
+          _stepIndicator(context, 0, "Basic Details", currentStep),
+          _stepConnector(context, 0, currentStep),
+          _stepIndicator(context, 1, "Category", currentStep),
+          _stepConnector(context, 1, currentStep),
+          _stepIndicator(context, 2, "Areas", currentStep),
+          _stepConnector(context, 2, currentStep),
+          _stepIndicator(context, 3, "Materials & Logic", currentStep),
         ],
       ),
     );
   }
 
-  Widget _stepIndicator(int step, String label, int currentStep) {
+  Widget _stepIndicator(BuildContext context, int step, String label, int currentStep) {
     final bool isActive = currentStep >= step;
     final bool isCompleted = currentStep > step;
 
     return Row(
       children: [
         Container(
-          width: 32.w,
-          height: 32.w,
+          width: context.w(32),
+          height: context.w(32),
           decoration: BoxDecoration(
             color: isCompleted ? CustomColors.green : (isActive ? CustomColors.black : Colors.white),
             shape: BoxShape.circle,
@@ -106,7 +106,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                   ),
           ),
         ),
-        SizedBox(width: 12.w),
+        context.horizontalSpace(12),
         Text(
           label,
           style: isActive ? CustomFonts.black14w600 : CustomFonts.grey14w400,
@@ -115,33 +115,33 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _stepConnector(int step, int currentStep) {
+  Widget _stepConnector(BuildContext context, int step, int currentStep) {
     final bool isCompleted = currentStep > step;
     return Expanded(
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16.w),
-        height: 2.h,
+        margin: context.appEdgeInsets(horizontal: 16),
+        height: context.h(2),
         color: isCompleted ? CustomColors.green : CustomColors.border,
       ),
     );
   }
 
-  Widget _buildCurrentStepContent(TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildCurrentStepContent(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     switch (state.currentStep) {
-      case 0: return _buildStep1(state, viewModel);
-      case 1: return _buildStep2(state, viewModel, dataState);
-      case 2: return _buildStep3(state, viewModel, dataState);
-      case 3: return _buildStep4(state, viewModel, dataState);
+      case 0: return _buildStep1(context, state, viewModel);
+      case 1: return _buildStep2(context, state, viewModel, dataState);
+      case 2: return _buildStep3(context, state, viewModel, dataState);
+      case 3: return _buildStep4(context, state, viewModel, dataState);
       default: return const SizedBox.shrink();
     }
   }
 
-  Widget _buildStep1(TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildStep1(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionTitle("Basic Information"),
-        SizedBox(height: 24.h),
+        context.verticalSpace(24),
         Row(
           children: [
             Expanded(
@@ -152,7 +152,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 validator: Validators.empty,
               ),
             ),
-            SizedBox(width: 24.w),
+            context.horizontalSpace(24),
             Expanded(
               child: BuildTextField(
                 label: "Patient Display Name",
@@ -163,7 +163,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             ),
           ],
         ),
-        SizedBox(height: 24.h),
+        context.verticalSpace(24),
         BuildTextField(
           label: "Treatment Base Price (\$)",
           controller: viewModel.basePriceController,
@@ -171,9 +171,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
           keyboardType: TextInputType.number,
           validator: Validators.empty,
         ),
-        SizedBox(height: 24.h),
+        context.verticalSpace(24),
         Text("Base Duration", style: CustomFonts.black14w600),
-        SizedBox(height: 10.h),
+        context.verticalSpace(10),
         Row(
           children: [
             Expanded(
@@ -190,7 +190,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 },
               ),
             ),
-            SizedBox(width: 24.w),
+            context.horizontalSpace(24),
             Expanded(
               child: BuildTextField(
                 label: "Minutes",
@@ -207,26 +207,26 @@ class CreateTreatmentScreen extends ConsumerWidget {
             ),
           ],
         ),
-        SizedBox(height: 32.h),
+        context.verticalSpace(32),
         _sectionTitle("Visuals"),
-        SizedBox(height: 24.h),
+        context.verticalSpace(24),
         Row(
           children: [
-            Expanded(child: _buildImageUploadTile("Treatment Banner Image", state.treatmentImage, () => viewModel.pickImage(false))),
-            SizedBox(width: 24.w),
-            Expanded(child: _buildImageUploadTile("Treatment Listing Icon", state.treatmentIcon, () => viewModel.pickImage(true))),
+            Expanded(child: _buildImageUploadTile(context, "Treatment Banner Image", state.treatmentImage, () => viewModel.pickImage(false))),
+            context.horizontalSpace(24),
+            Expanded(child: _buildImageUploadTile(context, "Treatment Listing Icon", state.treatmentIcon, () => viewModel.pickImage(true))),
           ],
         ),
-        SizedBox(height: 32.h),
+        context.verticalSpace(32),
         _sectionTitle("Descriptions"),
-        SizedBox(height: 24.h),
+        context.verticalSpace(24),
         BuildTextField(
           label: "Short Description",
           controller: viewModel.shortDescriptionController,
           hintText: "Brief summary for listing...",
           maxLines: 2,
         ),
-        SizedBox(height: 24.h),
+        context.verticalSpace(24),
         BuildTextField(
           label: "Full Description",
           controller: viewModel.fullDescriptionController,
@@ -237,23 +237,25 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStep2(TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildStep2(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionTitle("Categorization"),
-        SizedBox(height: 8.h),
+        context.verticalSpace(8),
         Text("Organize treatments to help patients find them easily.", style: CustomFonts.grey14w400),
-        SizedBox(height: 32.h),
+        context.verticalSpace(32),
         _buildSearchField(
+          context,
           label: "Treatment Category",
           hint: "Select or type a category",
           controller: viewModel.categoryController,
           suggestions: dataState.categories.map((c) => c.name).toList(),
           onSelected: (val) => viewModel.onCategorySelected(val),
         ),
-        SizedBox(height: 32.h),
+        context.verticalSpace(32),
         _buildSearchField(
+          context,
           label: "Treatment Subcategory",
           hint: "Select or type a subcategory",
           controller: viewModel.subcategoryController,
@@ -271,7 +273,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStep3(TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildStep3(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -283,37 +285,38 @@ class CreateTreatmentScreen extends ConsumerWidget {
               onTap: () => viewModel.addArea(),
               icon: Icons.add_location_alt_outlined,
               label: "Add New Area",
-              width: 200.w,
+              width: context.w(200),
             ),
           ],
         ),
-        SizedBox(height: 8.h),
+        context.verticalSpace(8),
         Text("Select areas and mandatory sub-areas for this treatment.", style: CustomFonts.grey14w400),
-        SizedBox(height: 32.h),
+        context.verticalSpace(32),
         ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: state.areas.length,
-          separatorBuilder: (_, _) => SizedBox(height: 24.h),
+          separatorBuilder: (_, _) => context.verticalSpace(24),
           itemBuilder: (context, index) {
-            return _buildAreaRow(index, state.areas[index], viewModel, dataState);
+            return _buildAreaRow(context, index, state.areas[index], viewModel, dataState);
           },
         ),
       ],
     );
   }
 
-  Widget _buildStep4(TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildStep4(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionTitle("Materials & Configuration"),
-        SizedBox(height: 8.h),
+        context.verticalSpace(8),
         Text("Define the materials used and specific configuration per sub-area.", style: CustomFonts.grey14w400),
-        SizedBox(height: 32.h),
+        context.verticalSpace(32),
         _buildSearchField(
+          context,
           label: "Material / Consumable Name",
           hint: "e.g. Syringes, Units, Vials",
           controller: viewModel.materialNameController,
@@ -321,52 +324,52 @@ class CreateTreatmentScreen extends ConsumerWidget {
           onSelected: (val) {},
         ),
         if (allSubAreas.isNotEmpty) ...[
-          SizedBox(height: 32.h),
+          context.verticalSpace(32),
           Text("Material Configuration Per Sub-Area", style: CustomFonts.black16w400),
-          SizedBox(height: 16.h),
+          context.verticalSpace(16),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: allSubAreas.length,
-            separatorBuilder: (_, _) => SizedBox(height: 16.h),
+            separatorBuilder: (_, _) => context.verticalSpace(16),
             itemBuilder: (context, index) {
               final subArea = allSubAreas[index];
-              return _buildSubAreaMaterialConfig(subArea);
+              return _buildSubAreaMaterialConfig(context, subArea);
             },
           ),
         ],
-        SizedBox(height: 40.h),
+        context.verticalSpace(40),
         const Divider(),
-        SizedBox(height: 32.h),
+        context.verticalSpace(32),
         _sectionTitle("AI Simulator Compatibility"),
-        SizedBox(height: 16.h),
+        context.verticalSpace(16),
         Row(
           children: [
             SizedBox(
-              width: 24.w,
-              height: 24.w,
+              width: context.w(24),
+              height: context.w(24),
               child: Checkbox(
                 value: state.useInAiSimulator,
                 onChanged: (val) => viewModel.toggleAiSimulator(val),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
+                shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 4)),
               ),
             ),
-            SizedBox(width: 12.w),
+            context.horizontalSpace(12),
             Text("Use in AI Simulator", style: CustomFonts.black16w400),
           ],
         ),
-        SizedBox(height: 40.h),
-        _buildCombinableTreatmentsField(state, viewModel),
+        context.verticalSpace(40),
+        _buildCombinableTreatmentsField(context, state, viewModel),
       ],
     );
   }
 
-  Widget _buildSubAreaMaterialConfig(SubAreaConfig subArea) {
+  Widget _buildSubAreaMaterialConfig(BuildContext context, SubAreaConfig subArea) {
     return Container(
-      padding: EdgeInsets.all(20.w),
+      padding: context.appEdgeInsets(all: 20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: context.borderRadius(all: 12),
         border: Border.all(color: CustomColors.border),
       ),
       child: Column(
@@ -375,11 +378,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
           Row(
             children: [
               const Icon(Icons.subdirectory_arrow_right, size: 18, color: CustomColors.black),
-              SizedBox(width: 8.w),
+              context.horizontalSpace(8),
               Text(subArea.name, style: CustomFonts.black14w600),
             ],
           ),
-          SizedBox(height: 20.h),
+          context.verticalSpace(20),
           Row(
             children: [
               Expanded(
@@ -390,7 +393,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                   keyboardType: TextInputType.number,
                 ),
               ),
-              SizedBox(width: 20.w),
+              context.horizontalSpace(20),
               Expanded(
                 child: BuildTextField(
                   label: "Base Price (\$)",
@@ -406,15 +409,16 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCombinableTreatmentsField(TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildCombinableTreatmentsField(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionTitle("Combinable Treatments"),
-        SizedBox(height: 8.h),
+        context.verticalSpace(8),
         Text("Select treatments that can be performed alongside this one.", style: CustomFonts.grey13w500),
-        SizedBox(height: 16.h),
+        context.verticalSpace(16),
         _buildSearchField(
+          context,
           label: "Search Treatments",
           hint: "e.g. Botox, Chemical Peel",
           controller: viewModel.combinableSearchController,
@@ -425,10 +429,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
           },
         ),
         if (state.combinableTreatments.isNotEmpty) ...[
-          SizedBox(height: 16.h),
+          context.verticalSpace(16),
           Wrap(
-            spacing: 12.w,
-            runSpacing: 12.h,
+            spacing: context.w(12),
+            runSpacing: context.h(12),
             children: state.combinableTreatments.map((t) => Chip(
               label: Text(t.name ?? "N/A"),
               onDeleted: () => viewModel.removeCombinableTreatment(t.id ?? 0),
@@ -443,12 +447,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAreaRow(int index, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildAreaRow(BuildContext context, int index, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Container(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: context.borderRadius(all: 16),
         border: Border.all(color: CustomColors.border),
       ),
       child: Column(
@@ -459,6 +463,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: _buildSearchField(
+                  context,
                   label: "Area Name",
                   hint: "e.g. Upper Face",
                   controller: entry.areaController,
@@ -468,7 +473,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
               ),
               if (index > 0)
                 Padding(
-                  padding: EdgeInsets.only(top: 32.h, left: 16.w),
+                  padding: context.appEdgeInsets(top: 32, left: 16),
                   child: IconButton(
                     onPressed: () => viewModel.removeArea(index),
                     icon: const Icon(Icons.delete_outline, color: CustomColors.red),
@@ -476,18 +481,19 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 ),
             ],
           ),
-          SizedBox(height: 24.h),
-          _buildSubAreaSection(index, entry, viewModel, dataState),
+          context.verticalSpace(24),
+          _buildSubAreaSection(context, index, entry, viewModel, dataState),
         ],
       ),
     );
   }
 
-  Widget _buildSubAreaSection(int areaIndex, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildSubAreaSection(BuildContext context, int areaIndex, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSearchField(
+          context,
           label: "Sub Areas (Mandatory)",
           hint: "Select or type to add sub areas",
           controller: entry.subAreaController,
@@ -502,10 +508,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
           onSelected: (val) => viewModel.addSubArea(areaIndex, val),
         ),
         if (entry.subAreas.isNotEmpty) ...[
-          SizedBox(height: 16.h),
+          context.verticalSpace(16),
           Wrap(
-            spacing: 12.w,
-            runSpacing: 12.h,
+            spacing: context.w(12),
+            runSpacing: context.h(12),
             children: entry.subAreas.map((sub) {
               return Chip(
                 avatar: const Icon(Icons.subdirectory_arrow_right, size: 14),
@@ -521,7 +527,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSearchField({
+  Widget _buildSearchField(
+    BuildContext context, {
     required String label,
     required String hint,
     required TextEditingController controller,
@@ -532,11 +539,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: CustomFonts.black14w600),
-        SizedBox(height: 10.h),
+        context.verticalSpace(10),
         SearchAnchor(
           viewHintText: hint,
-          viewConstraints: BoxConstraints(maxHeight: 350.h),
-          viewShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          viewConstraints: BoxConstraints(maxHeight: context.h(350)),
+          viewShape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 16)),
           viewSurfaceTintColor: Colors.white,
           viewBackgroundColor: Colors.white,
           viewElevation: 12,
@@ -564,25 +571,25 @@ class CreateTreatmentScreen extends ConsumerWidget {
             return [
               if (searchController.text.isNotEmpty && !suggestions.contains(searchController.text))
                 Padding(
-                  padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 8.h),
+                  padding: context.appEdgeInsets(left: 16, top: 12, right: 16, bottom: 8),
                   child: InkWell(
                     onTap: () {
                       controller.text = searchController.text;
                       onSelected(searchController.text);
                       searchController.closeView(searchController.text);
                     },
-                    borderRadius: BorderRadius.circular(10.r),
+                    borderRadius: context.borderRadius(all: 10),
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                      padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
                         color: CustomColors.purple.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(10.r),
+                        borderRadius: context.borderRadius(all: 10),
                         border: Border.all(color: CustomColors.purple.withValues(alpha: 0.1)),
                       ),
                       child: Row(
                         children: [
                           const Icon(Icons.add_circle_outline_rounded, color: CustomColors.black, size: 20),
-                          SizedBox(width: 12.w),
+                          context.horizontalSpace(12),
                           Expanded(
                             child: Text(
                               'Create new: "${searchController.text}"',
@@ -601,11 +608,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 return Column(
                   children: [
                     ListTile(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 4.h),
+                      contentPadding: context.appEdgeInsets(horizontal: 24, vertical: 4),
                       leading: Container(
-                        width: 32.w,
-                        height: 32.w,
-                        decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(6.r)),
+                        width: context.w(32),
+                        height: context.w(32),
+                        decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: context.borderRadius(all: 6)),
                         child: const Icon(Icons.circle_outlined, size: 14, color: CustomColors.grey),
                       ),
                       title: Text(item, style: CustomFonts.grey14w400),
@@ -627,20 +634,20 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildImageUploadTile(String label, dynamic file, VoidCallback onTap) {
+  Widget _buildImageUploadTile(BuildContext context, String label, dynamic file, VoidCallback onTap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: CustomFonts.black14w600),
-        SizedBox(height: 10.h),
+        context.verticalSpace(10),
         GestureDetector(
           onTap: onTap,
           child: Container(
-            height: 160.h,
+            height: context.h(160),
             width: double.infinity,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16.r),
+              borderRadius: context.borderRadius(all: 16),
               border: Border.all(color: CustomColors.border, width: 2),
               image: file != null
                   ? DecorationImage(
@@ -654,11 +661,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(12.r),
-                        decoration: BoxDecoration(color: CustomColors.whiteGrey, shape: BoxShape.circle),
+                        padding: context.appEdgeInsets(all: 12),
+                        decoration: const BoxDecoration(color: CustomColors.whiteGrey, shape: BoxShape.circle),
                         child: const Icon(Icons.add_a_photo_outlined, color: CustomColors.black),
                       ),
-                      SizedBox(height: 12.h),
+                      context.verticalSpace(12),
                       Text("Tap to upload", style: CustomFonts.grey13w500),
                     ],
                   )
@@ -686,7 +693,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
               child: const Text("Previous Step"),
             ),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
         ],
         if (isStep3) ...[
           Expanded(
@@ -705,7 +712,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
               child: const Text("Finish & Create Now"),
             ),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
         ],
         Expanded(
           flex: 2,
