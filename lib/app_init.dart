@@ -31,7 +31,7 @@ class AppInit extends StatelessWidget {
     configLoading();
     
     return ScreenUtilPlusInit(
-      designSize: const Size(1440, 900),
+      designSize: getDesignSize(context),
       ensureScreenSize: true,
       minTextAdapt: true,
       splitScreenMode: true,
