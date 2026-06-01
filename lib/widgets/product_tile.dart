@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/widgets/custom_cashed_image_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';

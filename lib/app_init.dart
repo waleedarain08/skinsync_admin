@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:responsive_framework/responsive_framework.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart' hide Breakpoint;
+import 'package:responsive_framework/responsive_framework.dart' as rf;
 import 'package:skinsync_admin/route_generator.dart';
 import 'utils/screen_size.dart';
 import 'utils/theme.dart';
@@ -30,7 +30,7 @@ class AppInit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     configLoading();
-    return ScreenUtilInit(
+    return ScreenUtilPlusInit(
       designSize: getDesignSize(context: context),
       ensureScreenSize: true,
       minTextAdapt: true,
@@ -45,13 +45,13 @@ class AppInit extends StatelessWidget {
           darkTheme: AppTheme.darkTheme,
           builder: (context, child) {
             final easyLoadingBuilder = EasyLoading.init();
-            final responsiveBuilder = ResponsiveBreakpoints.builder(
+            final responsiveBuilder = rf.ResponsiveBreakpoints.builder(
               child: child!,
               breakpoints: [
-                const Breakpoint(start: 0, end: 480, name: MOBILE),
-                const Breakpoint(start: 481, end: 1024, name: TABLET),
-                const Breakpoint(start: 1025, end: 1920, name: DESKTOP),
-                const Breakpoint(
+                const rf.Breakpoint(start: 0, end: 480, name: rf.MOBILE),
+                const rf.Breakpoint(start: 481, end: 1024, name: rf.TABLET),
+                const rf.Breakpoint(start: 482, end: 1920, name: rf.DESKTOP),
+                const rf.Breakpoint(
                   start: 1921,
                   end: double.infinity,
                   name: '4K',

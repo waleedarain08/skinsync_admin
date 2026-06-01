@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:sidebarx/sidebarx.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';

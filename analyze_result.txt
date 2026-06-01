@@ -206,7 +206,7 @@ warning • The value of the field '_treatmentRepository' isn't used • lib/vie
 warning • The value of the local variable 'treatment' isn't used • lib/view_models/treatment_view_model.dart:372:13 • unused_local_variable
    info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead • lib/widgets/app_gradient_button.dart:37:40 • deprecated_member_use
    info • The import of '../utils/color_constant.dart' is unnecessary because all of the used elements are also provided by the import of '../utils/theme.dart' • lib/widgets/borderd_container_widget.dart:3:8 • unnecessary_import
-warning • Unused import: 'package:flutter_screenutil/flutter_screenutil.dart' • lib/widgets/build_textfield.dart:3:8 • unused_import
+warning • Unused import: 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart' • lib/widgets/build_textfield.dart:3:8 • unused_import
    info • The import of '../utils/custom_fonts.dart' is unnecessary because all of the used elements are also provided by the import of '../utils/theme.dart' • lib/widgets/build_textfield.dart:4:8 • unnecessary_import
    info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/custom_cashed_image_widget.dart:42:46 • deprecated_member_use
    info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/custom_cashed_image_widget.dart:43:53 • deprecated_member_use

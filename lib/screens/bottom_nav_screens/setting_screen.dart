@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/models/requests/app_version_request_model.dart';
 import 'package:skinsync_admin/view_models/setting_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
