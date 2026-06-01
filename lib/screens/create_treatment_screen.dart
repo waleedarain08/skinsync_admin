@@ -71,9 +71,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
       padding: context.appEdgeInsets(vertical: 20, horizontal: 40),
       child: Row(
         children: [
-          _stepIndicator(context, 0, "Basic Details", currentStep),
+          _stepIndicator(context, 0, "Category", currentStep),
           _stepConnector(context, 0, currentStep),
-          _stepIndicator(context, 1, "Category", currentStep),
+          _stepIndicator(context, 1, "Basic Details", currentStep),
           _stepConnector(context, 1, currentStep),
           _stepIndicator(context, 2, "Areas", currentStep),
           _stepConnector(context, 2, currentStep),
@@ -128,8 +128,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
   Widget _buildCurrentStepContent(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     switch (state.currentStep) {
-      case 0: return _buildStep1(context, state, viewModel);
-      case 1: return _buildStep2(context, state, viewModel, dataState);
+      case 0: return _buildStep2(context, state, viewModel, dataState);
+      case 1: return _buildStep1(context, state, viewModel);
       case 2: return _buildStep3(context, state, viewModel, dataState);
       case 3: return _buildStep4(context, state, viewModel, dataState);
       default: return const SizedBox.shrink();
@@ -719,6 +719,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
           child: CustomPrimaryButton(
             onTap: () {
               if (state.currentStep == 0) {
+                // Category step validation could be added here
+              }
+              if (state.currentStep == 1) {
                 if (!_validateStep1(context, viewModel)) return;
               }
               if (state.currentStep == 2) {
