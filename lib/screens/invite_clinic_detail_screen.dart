@@ -25,7 +25,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
 
     return GradientScaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        flexibleSpace: AppDecorations.appBarGradient,
         elevation: 0,
         centerTitle: true,
         title: Text("Prospect Clinic Detail", style: CustomFonts.black18w600),

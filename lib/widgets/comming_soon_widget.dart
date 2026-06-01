@@ -55,7 +55,7 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerPr
                 Container(
                   padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
-                    gradient: CustomColors.purpleToLightPurpleGradient,
+                    gradient: CustomColors.purpleWhiteStateBlueLightGradient,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   child: Icon(Icons.auto_awesome_rounded, size: 48.sp, color: CustomColors.white),

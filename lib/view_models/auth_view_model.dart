@@ -1,5 +1,4 @@
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -58,7 +57,7 @@ class AuthViewModel extends BaseViewModel<AuthState> {
 
   Future<bool> verifyOtp({required String email, required String otp}) async {
     return await runSafely<bool?>(showLoading: true, () async {
-          final response = await _authRepository.verifyOtp(
+          await _authRepository.verifyOtp(
             email: email,
             otp: otp,
           );

@@ -33,7 +33,7 @@ class CustomColors {
   static const Color border = Color(0xFFE2E8F0);
 
   // Gradients (Descriptive Naming)
-  static const LinearGradient purpleToLightPurpleGradient = LinearGradient(
+  static const LinearGradient purpleWhiteStateBlueLightGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [

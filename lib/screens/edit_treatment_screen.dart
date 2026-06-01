@@ -12,7 +12,6 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
-import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
@@ -33,7 +32,7 @@ class EditTreatmentScreen extends ConsumerWidget {
 
     return GradientScaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        flexibleSpace: AppDecorations.appBarGradient,
         elevation: 0,
         centerTitle: true,
         title: Text("Edit Treatment", style: CustomFonts.black18w600),
@@ -272,7 +271,7 @@ class EditTreatmentScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.areas.length,
-            separatorBuilder: (_, __) => const Divider(height: 32),
+            separatorBuilder: (_, _) => const Divider(height: 32),
             itemBuilder: (context, index) {
               final entry = state.areas[index];
               return Column(
@@ -381,7 +380,7 @@ class EditTreatmentScreen extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: allSubAreas.length,
-              separatorBuilder: (_, __) => SizedBox(height: 12.h),
+              separatorBuilder: (_, _) => SizedBox(height: 12.h),
               itemBuilder: (context, index) {
                 final subArea = allSubAreas[index];
                 return _buildSubAreaConfigCard(subArea);

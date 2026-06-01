@@ -31,7 +31,7 @@ class GradientScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: CustomColors.purpleToLightPurpleGradient,
+        gradient: CustomColors.purpleWhiteStateBlueLightGradient,
       ),
       child: Scaffold(
         key: scaffoldKey,

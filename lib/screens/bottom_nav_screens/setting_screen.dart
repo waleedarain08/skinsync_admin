@@ -5,7 +5,7 @@ import 'package:skinsync_admin/models/requests/app_version_request_model.dart';
 import 'package:skinsync_admin/view_models/setting_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
-import 'package:skinsync_admin/utils/theme.dart';
+import '../../utils/theme.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 

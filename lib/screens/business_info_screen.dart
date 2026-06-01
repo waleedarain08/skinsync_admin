@@ -401,20 +401,6 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    required String hintText,
-    int maxLines = 1,
-  }) {
-    return BuildTextField(
-      label: label,
-      controller: controller,
-      hintText: hintText,
-      maxLines: maxLines,
-    );
-  }
-
   Widget _buildButtonsRow() {
     return Row(
       children: [

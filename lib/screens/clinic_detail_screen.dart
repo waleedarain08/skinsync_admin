@@ -7,8 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
@@ -109,6 +108,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
 
     return GradientScaffold(
       appBar: AppBar(
+        flexibleSpace: AppDecorations.appBarGradient,
         title: Text("Clinic Detail", style: CustomFonts.black18w600),
         centerTitle: true,
         leading: IconButton(

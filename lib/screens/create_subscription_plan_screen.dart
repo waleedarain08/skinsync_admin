@@ -213,6 +213,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
   Widget build(BuildContext context) {
     return GradientScaffold(
       appBar: AppBar(
+        flexibleSpace: AppDecorations.appBarGradient,
         title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.black18w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.black),
@@ -585,7 +586,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: filteredClinics.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, _) => const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final clinic = filteredClinics[index];
                       final isSelected = _selectedClinics.contains(clinic.email);

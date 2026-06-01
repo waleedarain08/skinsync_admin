@@ -209,7 +209,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: 5,
-            separatorBuilder: (_, __) => SizedBox(height: 12.h),
+            separatorBuilder: (_, _) => SizedBox(height: 12.h),
             itemBuilder: (context, index) => _appointmentQueueItem(index),
           ),
         ],

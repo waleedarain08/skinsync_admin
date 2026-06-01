@@ -7,12 +7,10 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
@@ -207,6 +205,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
   Widget build(BuildContext context) {
     return GradientScaffold(
       appBar: AppBar(
+        flexibleSpace: AppDecorations.appBarGradient,
         title: Text("Add New Clinic", style: CustomFonts.black20w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -494,7 +493,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _availabilityEntries.length,
-            separatorBuilder: (_, __) => Padding(
+            separatorBuilder: (_, ___) => Padding(
               padding: EdgeInsets.symmetric(vertical: 16.h),
               child: Divider(color: CustomColors.grey.withValues(alpha: 0.1)),
             ),

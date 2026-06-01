@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
@@ -28,7 +27,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
       length: 4,
       child: GradientScaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          flexibleSpace: AppDecorations.appBarGradient,
           elevation: 0,
           title: Text("Manage Network Taxonomy", style: CustomFonts.black20w600),
           leading: IconButton(
@@ -79,7 +78,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.categories.length,
-            separatorBuilder: (_, __) => SizedBox(height: 16.h),
+            separatorBuilder: (_, _) => SizedBox(height: 16.h),
             itemBuilder: (context, index) {
               final category = state.categories[index];
               return _buildHierarchicalItem(
@@ -120,7 +119,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.areas.length,
-            separatorBuilder: (_, __) => SizedBox(height: 16.h),
+            separatorBuilder: (_, _) => SizedBox(height: 16.h),
             itemBuilder: (context, index) {
               final area = state.areas[index];
               return _buildHierarchicalItem(
@@ -196,7 +195,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.combinationGroups.length,
-            separatorBuilder: (_, __) => SizedBox(height: 16.h),
+            separatorBuilder: (_, _) => SizedBox(height: 16.h),
             itemBuilder: (context, index) {
               final group = state.combinationGroups[index];
               return BorderdContainerWidget(

@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              gradient: CustomColors.purpleToLightPurpleGradient,
+              gradient: CustomColors.purpleWhiteStateBlueLightGradient,
             ),
           ),
 
@@ -85,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen> {
             right: _animate ? screenWidth : -362.r,
             child: CircleAvatar(
               radius: 362.r,
-              backgroundColor: CustomColors.slateBlue,
+              backgroundColor: CustomColors.slateBlueLight,
             ),
           ),
         ],

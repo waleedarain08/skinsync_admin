@@ -50,7 +50,7 @@ class AppTheme {
       ),
 
       appBarTheme: AppBarTheme(
-        backgroundColor: CustomColors.white,
+        backgroundColor: Colors.transparent, // Change to transparent to allow gradient to show
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
@@ -167,6 +167,12 @@ class AppDecorations {
     color: CustomColors.white,
     borderRadius: BorderRadius.circular(AppTheme.borderRadius),
     border: Border.all(color: CustomColors.border, width: AppTheme.borderWidth),
+  );
+
+  static Widget appBarGradient = Container(
+    decoration: const BoxDecoration(
+      gradient: CustomColors.purpleWhiteStateBlueLightGradient,
+    ),
   );
 
   static BoxDecoration sidebarItem = BoxDecoration(

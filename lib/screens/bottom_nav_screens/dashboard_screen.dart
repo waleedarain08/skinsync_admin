@@ -219,7 +219,7 @@ class DashboardScreen extends StatelessWidget {
             width: 36.w,
             height: 36.w,
             decoration: BoxDecoration(
-              gradient: CustomColors.purpleToLightPurpleGradient,
+              gradient: CustomColors.purpleWhiteStateBlueLightGradient,
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             alignment: Alignment.center,

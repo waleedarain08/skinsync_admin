@@ -365,20 +365,6 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    required String hintText,
-    int maxLines = 1,
-  }) {
-    return BuildTextField(
-      label: label,
-      controller: controller,
-      hintText: hintText,
-      maxLines: maxLines,
-    );
-  }
-
   Widget _buildDropdownField({
     required String label,
     required String hintText,

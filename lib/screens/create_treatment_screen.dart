@@ -28,7 +28,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     return GradientScaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        flexibleSpace: AppDecorations.appBarGradient,
         elevation: 0,
         centerTitle: true,
         title: Text("Create New Treatment", style: CustomFonts.black18w600),
@@ -294,7 +294,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: state.areas.length,
-          separatorBuilder: (_, __) => SizedBox(height: 24.h),
+          separatorBuilder: (_, _) => SizedBox(height: 24.h),
           itemBuilder: (context, index) {
             return _buildAreaRow(index, state.areas[index], viewModel, dataState);
           },
@@ -328,7 +328,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: allSubAreas.length,
-            separatorBuilder: (_, __) => SizedBox(height: 16.h),
+            separatorBuilder: (_, _) => SizedBox(height: 16.h),
             itemBuilder: (context, index) {
               final subArea = allSubAreas[index];
               return _buildSubAreaMaterialConfig(subArea);

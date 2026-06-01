@@ -339,43 +339,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     );
   }
 
-  Widget _buildInputField({
-    required String label,
-    required String hint,
-    required TextEditingController controller,
-    required IconData icon,
-    bool isPassword = false,
-    bool? obscureText,
-    VoidCallback? onTogglePassword,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: CustomFonts.black14w600),
-        SizedBox(height: 10.h),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText ?? false,
-          validator: validator,
-          style: CustomFonts.grey14w400,
-          decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 20.sp, color: CustomColors.lightGrey),
-            hintText: hint,
-            suffixIcon: isPassword ? IconButton(
-              onPressed: onTogglePassword,
-              icon: Icon(
-                obscureText! ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                size: 20.sp,
-                color: CustomColors.lightGrey,
-              ),
-            ) : null,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildCheckbox() {
     return Row(
       mainAxisSize: MainAxisSize.min,

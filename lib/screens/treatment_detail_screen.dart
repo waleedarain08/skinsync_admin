@@ -4,8 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -28,7 +27,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
 
     return GradientScaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        flexibleSpace: AppDecorations.appBarGradient,
         elevation: 0,
         centerTitle: true,
         title: Text("Treatment Overview", style: CustomFonts.black20w600),
@@ -236,7 +235,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: treatment.sideAreas!.length,
-              separatorBuilder: (_, __) => Padding(padding: EdgeInsets.symmetric(vertical: 12.h), child: const Divider()),
+              separatorBuilder: (_, _) => Padding(padding: EdgeInsets.symmetric(vertical: 12.h), child: const Divider()),
               itemBuilder: (context, index) {
                 final area = treatment.sideAreas![index];
                 return Column(
