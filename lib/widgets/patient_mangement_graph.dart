@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -23,7 +23,7 @@ class TopTreatmentsChart extends StatelessWidget {
       
         primaryXAxis: CategoryAxis(
           majorGridLines: const MajorGridLines(width: 0),
-          labelStyle: CustomFonts.grey14w400  ,
+          labelStyle: context.fonts.grey14w400  ,
         ),
         primaryYAxis: NumericAxis(
           minimum: 0,

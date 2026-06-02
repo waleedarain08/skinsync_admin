@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
@@ -28,79 +28,79 @@ class _PatientManagementState extends State<PatientManagement> {
   Widget build(BuildContext context) {
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.pagePaddingH,
-          vertical: AppSpacing.pagePaddingV,
+        padding: context.appEdgeInsets(
+          horizontal: 28,
+          vertical: 28,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            SizedBox(height: AppSpacing.xxl),
-            _buildQuickMetrics(),
-            SizedBox(height: AppSpacing.xxl),
-            _buildSearchAndFilters(),
-            SizedBox(height: AppSpacing.xl),
-            _buildPatientsTable(),
+            _buildHeader(context),
+            context.verticalSpace(32),
+            _buildQuickMetrics(context),
+            context.verticalSpace(32),
+            _buildSearchAndFilters(context),
+            context.verticalSpace(24),
+            _buildPatientsTable(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Client Database", style: CustomFonts.black26w700),
-        SizedBox(height: 6.h),
+        Text("Client Database", style: context.fonts.black26w700),
+        context.verticalSpace(6),
         Text(
           "Unified view of all patients across your clinic network.",
-          style: CustomFonts.grey13w500,
+          style: context.fonts.grey13w500,
         ),
       ],
     );
   }
 
-  Widget _buildQuickMetrics() {
+  Widget _buildQuickMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard("Total Patients", "12,840", Icons.people_rounded, CustomColors.purple),
-        SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Verified Profiles", "8,200", Icons.verified_user_rounded, CustomColors.green),
-        SizedBox(width: AppSpacing.md),
-        _buildMetricCard("App Users", "9,450", Icons.smartphone_rounded, CustomColors.green),
-        SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Active Network", "3,390", Icons.hub_rounded, CustomColors.purple),
+        _buildMetricCard(context, "Total Patients", "12,840", Icons.people_rounded, CustomColors.purple),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, "Verified Profiles", "8,200", Icons.verified_user_rounded, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, "App Users", "9,450", Icons.smartphone_rounded, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, "Active Network", "3,390", Icons.hub_rounded, CustomColors.purple),
       ],
     );
   }
 
-  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(BuildContext context, String title, String value, IconData icon, Color color) {
     return Expanded(
       child: BorderdContainerWidget(
-        padding: EdgeInsets.all(AppSpacing.lg),
+        padding: context.appEdgeInsets(all: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.all(10.w),
+              padding: context.appEdgeInsets(all: 10),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
+                borderRadius: context.borderRadius(all: 8),
               ),
-              child: Icon(icon, color: color, size: 20.sp),
+              child: Icon(icon, color: color, size: context.sp(20)),
             ),
-            SizedBox(height: AppSpacing.md),
-            Text(value, style: CustomFonts.black20w600),
-            Text(title, style: CustomFonts.grey12w400),
+            context.verticalSpace(16),
+            Text(value, style: context.fonts.black20w600),
+            Text(title, style: context.fonts.grey12w400),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSearchAndFilters() {
+  Widget _buildSearchAndFilters(BuildContext context) {
     return Row(
       children: [
         AppSearchField(
@@ -108,10 +108,10 @@ class _PatientManagementState extends State<PatientManagement> {
           hintText: "Search by name, ID, or phone...",
           onChanged: (val) => setState(() {}),
         ),
-        SizedBox(width: AppSpacing.md),
-        _filterDropdown("Select Clinic"),
-        SizedBox(width: AppSpacing.sm),
-        _filterDropdown("Registration Source"),
+        context.horizontalSpace(16),
+        _filterDropdown(context, "Select Clinic"),
+        context.horizontalSpace(12),
+        _filterDropdown(context, "Registration Source"),
         const Spacer(),
         TextButton.icon(
           onPressed: () {},
@@ -122,36 +122,36 @@ class _PatientManagementState extends State<PatientManagement> {
     );
   }
 
-  Widget _filterDropdown(String label) {
+  Widget _filterDropdown(BuildContext context, String label) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+      padding: context.appEdgeInsets(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: CustomColors.border),
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: context.borderRadius(all: 8),
       ),
       child: Row(
         children: [
-          Text(label, style: CustomFonts.black14w600.copyWith(fontSize: 12.sp, fontWeight: FontWeight.w500)),
-          SizedBox(width: 8.w),
+          Text(label, style: context.fonts.black14w600.copyWith(fontSize: context.sp(12), fontWeight: FontWeight.w500)),
+          context.horizontalSpace(8),
           const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: CustomColors.lightGrey),
         ],
       ),
     );
   }
 
-  Widget _buildPatientsTable() {
+  Widget _buildPatientsTable(BuildContext context) {
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: EdgeInsets.all(AppSpacing.xl),
+            padding: context.appEdgeInsets(all: 24),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Patient Records", style: CustomFonts.black18w600),
+                Text("Patient Records", style: context.fonts.black18w600),
                 OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.file_download_outlined, size: 18),
@@ -161,7 +161,7 @@ class _PatientManagementState extends State<PatientManagement> {
             ),
           ),
           DataTable(
-            columnSpacing: 40.w,
+            columnSpacing: context.w(40),
             headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
             columns: const [
               DataColumn(label: Text('PATIENT')),
@@ -171,31 +171,31 @@ class _PatientManagementState extends State<PatientManagement> {
               DataColumn(label: Text('STATUS')),
               DataColumn(label: Text('ACTIONS')),
             ],
-            rows: List.generate(5, (index) => _buildPatientRow(index)),
+            rows: List.generate(5, (index) => _buildPatientRow(context, index)),
           ),
         ],
       ),
     );
   }
 
-  DataRow _buildPatientRow(int index) {
+  DataRow _buildPatientRow(BuildContext context, int index) {
     return DataRow(
       cells: [
         DataCell(
           Row(
             children: [
               CircleAvatar(
-                radius: 16.r, 
+                radius: context.r(16), 
                 backgroundColor: CustomColors.palePurple, 
-                child: Icon(Icons.person_rounded, size: 18.sp, color: CustomColors.purple),
+                child: Icon(Icons.person_rounded, size: context.sp(18), color: CustomColors.purple),
               ),
-              SizedBox(width: AppSpacing.sm),
+              context.horizontalSpace(12),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center, 
                 crossAxisAlignment: CrossAxisAlignment.start, 
                 children: [
-                  Text("Bessie Cooper", style: CustomFonts.black14w600),
-                  Text("bessie.c@example.com", style: CustomFonts.grey12w400),
+                  Text("Bessie Cooper", style: context.fonts.black14w600),
+                  Text("bessie.c@example.com", style: context.fonts.grey12w400),
                 ],
               ),
             ],
@@ -210,8 +210,8 @@ class _PatientManagementState extends State<PatientManagement> {
         DataCell(
           Row(
             children: [
-              IconButton(icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.grey), onPressed: () {}),
-              IconButton(icon: Icon(Icons.more_horiz_rounded, size: 20.sp, color: CustomColors.grey), onPressed: () {}),
+              IconButton(icon: Icon(Icons.visibility_outlined, size: context.sp(20), color: CustomColors.grey), onPressed: () {}),
+              IconButton(icon: Icon(Icons.more_horiz_rounded, size: context.sp(20), color: CustomColors.grey), onPressed: () {}),
             ],
           ),
         ),

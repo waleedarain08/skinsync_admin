@@ -27,7 +27,7 @@ SkinSync Admin is a robust, cross-platform administrative dashboard built with F
 -   **UI/UX**: 
     -   `flutter_screenutil` for pixel-perfect scaling.
     -   `responsive_framework` for adaptive layouts.
-    -   `google_fonts` (Degular family).
+    -   `Geist` font family.
     -   `flutter_glass_morphism` for modern aesthetics.
 -   **Utilities**: `flutter_easyloading`, `shimmer` for loading states.
 

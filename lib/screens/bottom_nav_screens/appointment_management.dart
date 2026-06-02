@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
@@ -20,45 +20,45 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
   Widget build(BuildContext context) {
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.pagePaddingH,
-          vertical: AppSpacing.pagePaddingV,
+        padding: context.appEdgeInsets(
+          horizontal: 28,
+          vertical: 28,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            SizedBox(height: AppSpacing.xxl),
-            _buildAppointmentMetrics(),
-            SizedBox(height: AppSpacing.xxl),
+            _buildHeader(context),
+            context.verticalSpace(32),
+            _buildAppointmentMetrics(context),
+            context.verticalSpace(32),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(flex: 2, child: _buildCalendarView()),
-                SizedBox(width: AppSpacing.xl),
-                Expanded(flex: 1, child: _buildUpcomingAppointments()),
+                Expanded(flex: 2, child: _buildCalendarView(context)),
+                context.horizontalSpace(24),
+                Expanded(flex: 1, child: _buildUpcomingAppointments(context)),
               ],
             ),
-            SizedBox(height: AppSpacing.xxl),
-            _buildAppointmentTable(),
+            context.verticalSpace(32),
+            _buildAppointmentTable(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Booking Schedule", style: CustomFonts.black26w700),
-            SizedBox(height: 6.h),
+            Text("Booking Schedule", style: context.fonts.black26w700),
+            context.verticalSpace(6),
             Text(
               "Centralized booking management and real-time clinic capacity tracking.",
-              style: CustomFonts.grey13w500,
+              style: context.fonts.grey13w500,
             ),
           ],
         ),
@@ -71,40 +71,40 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
     );
   }
 
-  Widget _buildAppointmentMetrics() {
+  Widget _buildAppointmentMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard("Upcoming", "1,240", Icons.event_available_rounded, CustomColors.green),
-        SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Completed", "8,450", Icons.check_circle_outline_rounded, CustomColors.green),
-        SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Cancelled", "120", Icons.cancel_outlined, CustomColors.red),
-        SizedBox(width: AppSpacing.md),
-        _buildMetricCard("No Shows", "45", Icons.person_off_outlined, CustomColors.amber),
+        _buildMetricCard(context, "Upcoming", "1,240", Icons.event_available_rounded, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, "Completed", "8,450", Icons.check_circle_outline_rounded, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, "Cancelled", "120", Icons.cancel_outlined, CustomColors.red),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, "No Shows", "45", Icons.person_off_outlined, CustomColors.amber),
       ],
     );
   }
 
-  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(BuildContext context, String title, String value, IconData icon, Color color) {
     return Expanded(
       child: BorderdContainerWidget(
-        padding: EdgeInsets.all(AppSpacing.lg),
+        padding: context.appEdgeInsets(all: 20),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(12.w),
+              padding: context.appEdgeInsets(all: 12),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
+                borderRadius: context.borderRadius(all: 8),
               ),
-              child: Icon(icon, color: color, size: 22.sp),
+              child: Icon(icon, color: color, size: context.sp(22)),
             ),
-            SizedBox(width: AppSpacing.md),
+            context.horizontalSpace(16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.black18w600),
-                Text(title, style: CustomFonts.grey12w400),
+                Text(value, style: context.fonts.black18w600),
+                Text(title, style: context.fonts.grey12w400),
               ],
             ),
           ],
@@ -113,28 +113,28 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
     );
   }
 
-  Widget _buildCalendarView() {
+  Widget _buildCalendarView(BuildContext context) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Network Calendar", style: CustomFonts.black18w600),
+              Text("Network Calendar", style: context.fonts.black18w600),
               Row(
                 children: [
-                  _calendarAction(Icons.chevron_left_rounded),
-                  SizedBox(width: AppSpacing.md),
-                  Text("October 2023", style: CustomFonts.black14w600),
-                  SizedBox(width: AppSpacing.md),
-                  _calendarAction(Icons.chevron_right_rounded),
+                  _calendarAction(context, Icons.chevron_left_rounded),
+                  context.horizontalSpace(16),
+                  Text("October 2023", style: context.fonts.black14w600),
+                  context.horizontalSpace(16),
+                  _calendarAction(context, Icons.chevron_right_rounded),
                 ],
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.xl),
+          context.verticalSpace(24),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -152,27 +152,27 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
               return Container(
                 decoration: BoxDecoration(
                   color: isSelected ? CustomColors.palePurple : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: context.borderRadius(all: 8),
                   border: Border.all(
                     color: isSelected ? CustomColors.green.withValues(alpha: 0.3) : CustomColors.border.withValues(alpha: 0.5),
                   ),
                 ),
-                padding: EdgeInsets.all(8.w),
+                padding: context.appEdgeInsets(all: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       isCurrentMonth ? day.toString() : "",
-                      style: isSelected ? CustomFonts.black14w700 : (isCurrentMonth ? CustomFonts.black12w400 : CustomFonts.grey12w400),
+                      style: isSelected ? context.fonts.black14w700 : (isCurrentMonth ? context.fonts.black12w400 : context.fonts.grey12w400),
                     ),
                     if (isCurrentMonth && (day == 15 || day == 20))
                       Container(
-                        margin: EdgeInsets.only(top: 4.h),
-                        height: 3.h,
-                        width: 12.w,
+                        margin: context.appEdgeInsets(top: 4),
+                        height: context.h(3),
+                        width: context.w(12),
                         decoration: BoxDecoration(
                           color: CustomColors.green,
-                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          borderRadius: BorderRadius.circular(AppRadius.full(context)),
                         ),
                       ),
                   ],
@@ -185,90 +185,90 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
     );
   }
 
-  Widget _calendarAction(IconData icon) {
+  Widget _calendarAction(BuildContext context, IconData icon) {
     return Container(
-      padding: EdgeInsets.all(8.w),
+      padding: context.appEdgeInsets(all: 8),
       decoration: BoxDecoration(
         color: CustomColors.white,
         border: Border.all(color: CustomColors.border),
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: context.borderRadius(all: 8),
       ),
-      child: Icon(icon, size: 18.sp, color: CustomColors.grey),
+      child: Icon(icon, size: context.sp(18), color: CustomColors.grey),
     );
   }
 
-  Widget _buildUpcomingAppointments() {
+  Widget _buildUpcomingAppointments(BuildContext context) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Today's Queue", style: CustomFonts.black18w600),
-          SizedBox(height: AppSpacing.xl),
+          Text("Today's Queue", style: context.fonts.black18w600),
+          context.verticalSpace(24),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: 5,
-            separatorBuilder: (_, _) => SizedBox(height: 12.h),
-            itemBuilder: (context, index) => _appointmentQueueItem(index),
+            separatorBuilder: (_, _) => context.verticalSpace(12),
+            itemBuilder: (context, index) => _appointmentQueueItem(context, index),
           ),
         ],
       ),
     );
   }
 
-  Widget _appointmentQueueItem(int index) {
+  Widget _appointmentQueueItem(BuildContext context, int index) {
     return Container(
-      padding: EdgeInsets.all(12.w),
+      padding: context.appEdgeInsets(all: 12),
       decoration: BoxDecoration(
         color: CustomColors.whiteGrey,
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: context.borderRadius(all: 10),
         border: Border.all(color: CustomColors.border.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
           Container(
-            width: 44.w,
-            height: 44.w,
+            width: context.w(44),
+            height: context.w(44),
             decoration: BoxDecoration(
               color: CustomColors.palePurple,
-              borderRadius: BorderRadius.circular(8.r),
+              borderRadius: context.borderRadius(all: 8),
             ),
             child: Center(
               child: Text(
                 "10:30", 
-                style: CustomFonts.green11w600,
+                style: context.fonts.green11w600,
               ),
             ),
           ),
-          SizedBox(width: 12.w),
+          context.horizontalSpace(12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Bessie Cooper", style: CustomFonts.black14w600),
-                Text("HydraFacial • Glow NY", style: CustomFonts.grey12w400),
+                Text("Bessie Cooper", style: context.fonts.black14w600),
+                Text("HydraFacial • Glow NY", style: context.fonts.grey12w400),
               ],
             ),
           ),
-          Icon(Icons.more_vert_rounded, size: 18, color: CustomColors.lightGrey),
+          const Icon(Icons.more_vert_rounded, size: 18, color: CustomColors.lightGrey),
         ],
       ),
     );
   }
 
-  Widget _buildAppointmentTable() {
+  Widget _buildAppointmentTable(BuildContext context) {
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: EdgeInsets.all(AppSpacing.xl),
-            child: Text("Registry Log", style: CustomFonts.black18w600),
+            padding: context.appEdgeInsets(all: 24),
+            child: Text("Registry Log", style: context.fonts.black18w600),
           ),
           DataTable(
-            columnSpacing: 40.w,
+            columnSpacing: context.w(40),
             headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
             columns: const [
               DataColumn(label: Text('PATIENT')),
@@ -288,11 +288,11 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
   DataRow _appointmentRow(int index) {
     return DataRow(
       cells: [
-        DataCell(Text("Eleanor Pena", style: CustomFonts.black13w600)),
-        DataCell(Text("Glow MedSpa NY", style: CustomFonts.black14w400)),
-        DataCell(Text("Laser Resurfacing", style: CustomFonts.black14w400)),
-        DataCell(Text("Oct 28 • 02:00 PM", style: CustomFonts.black14w400)),
-        DataCell(Text("Dr. Sarah Jenkins", style: CustomFonts.black14w400)),
+        DataCell(Text("Eleanor Pena", style: context.fonts.black13w600)),
+        DataCell(Text("Glow MedSpa NY", style: context.fonts.black14w400)),
+        DataCell(Text("Laser Resurfacing", style: context.fonts.black14w400)),
+        DataCell(Text("Oct 28 • 02:00 PM", style: context.fonts.black14w400)),
+        DataCell(Text("Dr. Sarah Jenkins", style: context.fonts.black14w400)),
         DataCell(_statusBadge("Confirmed")),
       ],
     );

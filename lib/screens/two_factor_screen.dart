@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -51,7 +51,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
         SizedBox(width: 12.w),
         Text(
           'Two-Factor Authentication',
-          style: CustomFonts.black18w600,
+          style: context.fonts.black18w600,
         ),
       ],
     );
@@ -117,12 +117,12 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
           children: [
             Text(
               'Business Information',
-              style: CustomFonts.black14w600,
+              style: context.fonts.black14w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Update clinic details and contact info',
-              style: CustomFonts.grey12w400,
+              style: context.fonts.grey12w400,
             ),
           ],
         ),
@@ -147,12 +147,12 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
             children: [
               Text(
                 'Enable Two-Factor Authentication',
-                style: CustomFonts.black14w600,
+                style: context.fonts.black14w600,
               ),
               SizedBox(height: 4.h),
               Text(
                 'Require a verification code when signing in',
-                style: CustomFonts.grey12w400,
+                style: context.fonts.grey12w400,
               ),
             ],
           ),
@@ -181,7 +181,7 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
       children: [
         Text(
           'Verification Method',
-          style: CustomFonts.black16w600,
+          style: context.fonts.black16w600,
         ),
         SizedBox(height: 16.h),
         // SMS Verification Option
@@ -266,12 +266,12 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
               children: [
                 Text(
                   title,
-                  style: CustomFonts.black14w600,
+                  style: context.fonts.black14w600,
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   subtitle,
-                  style: CustomFonts.grey12w400,
+                  style: context.fonts.grey12w400,
                 ),
               ],
             ),
@@ -291,16 +291,16 @@ class _TwoFactorAuthScreenState extends State<TwoFactorAuthScreen> {
       ),
       child: RichText(
         text: TextSpan(
-          style: CustomFonts.black12w400h14,
+          style: context.fonts.black12w400h14,
           children: [
             TextSpan(
               text: 'Important: ',
-              style: CustomFonts.black12w600,
+              style: context.fonts.black12w600,
             ),
             TextSpan(
               text:
                   'You will need to enter a verification code sent to your phone every time you sign in.',
-              style: CustomFonts.grey12w400,
+              style: context.fonts.grey12w400,
             ),
           ],
         ),

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
@@ -12,8 +12,8 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/nested_category_selector.dart';
 
 class EditTreatmentScreen extends ConsumerWidget {
   const EditTreatmentScreen({super.key});
@@ -27,7 +27,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
     if (state.selectedTreatment == null) {
-      return GradientScaffold(body: Center(child: Text("No Treatment Selected", style: CustomFonts.black16w400)));
+      return GradientScaffold(body: Center(child: Text("No Treatment Selected", style: context.fonts.black16w400)));
     }
 
     return GradientScaffold(
@@ -35,7 +35,7 @@ class EditTreatmentScreen extends ConsumerWidget {
         flexibleSpace: AppDecorations.appBarGradient,
         elevation: 0,
         centerTitle: true,
-        title: Text("Edit Treatment", style: CustomFonts.black18w600),
+        title: Text("Edit Treatment", style: context.fonts.black18w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
@@ -45,30 +45,30 @@ class EditTreatmentScreen extends ConsumerWidget {
             onPressed: () {
               if (!_validateForm(context, viewModel, state)) return;
               viewModel.updateTreatment(context).then((_) {
-                if (context.mounted) context.pop();
+                if (context.mounted) Navigator.pop(context);
               });
             },
-            child: Text("Save Changes", style: CustomFonts.black16w400),
+            child: Text("Save Changes", style: context.fonts.black16w400),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 1000.w),
+            constraints: BoxConstraints(maxWidth: context.w(1000)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildBasicDetailsSection(state, viewModel),
-                SizedBox(height: 32.h),
-                _buildCategorizationSection(state, viewModel, dataState),
-                SizedBox(height: 32.h),
-                _buildAreasSection(state, viewModel, dataState),
-                SizedBox(height: 32.h),
-                _buildMaterialsAndLogicSection(state, viewModel, dataState),
-                SizedBox(height: 48.h),
+                _buildBasicDetailsSection(context, state, viewModel),
+                context.verticalSpace(32),
+                _buildCategorizationSection(context, state, viewModel, dataState),
+                context.verticalSpace(32),
+                _buildAreasSection(context, state, viewModel, dataState),
+                context.verticalSpace(32),
+                _buildMaterialsAndLogicSection(context, state, viewModel, dataState),
+                context.verticalSpace(48),
               ],
             ),
           ),
@@ -118,14 +118,14 @@ class EditTreatmentScreen extends ConsumerWidget {
     return true;
   }
 
-  Widget _buildBasicDetailsSection(TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildBasicDetailsSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Basic Information", style: CustomFonts.black18w600),
-          SizedBox(height: 24.h),
+          Text("Basic Information", style: context.fonts.black18w600),
+          context.verticalSpace(24),
           Row(
             children: [
               Expanded(
@@ -136,7 +136,7 @@ class EditTreatmentScreen extends ConsumerWidget {
                   validator: Validators.empty,
                 ),
               ),
-              SizedBox(width: 24.w),
+              context.horizontalSpace(24),
               Expanded(
                 child: BuildTextField(
                   label: "Patient Display Name",
@@ -147,7 +147,7 @@ class EditTreatmentScreen extends ConsumerWidget {
               ),
             ],
           ),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           BuildTextField(
             label: "Treatment Base Price (\$)",
             controller: viewModel.basePriceController,
@@ -155,9 +155,9 @@ class EditTreatmentScreen extends ConsumerWidget {
             keyboardType: TextInputType.number,
             validator: Validators.empty,
           ),
-          SizedBox(height: 24.h),
-          Text("Base Duration", style: CustomFonts.black14w600),
-          SizedBox(height: 10.h),
+          context.verticalSpace(24),
+          Text("Base Duration", style: context.fonts.black14w600),
+          context.verticalSpace(10),
           Row(
             children: [
               Expanded(
@@ -168,7 +168,7 @@ class EditTreatmentScreen extends ConsumerWidget {
                   keyboardType: TextInputType.number,
                 ),
               ),
-              SizedBox(width: 24.w),
+              context.horizontalSpace(24),
               Expanded(
                 child: BuildTextField(
                   label: "Minutes",
@@ -179,22 +179,22 @@ class EditTreatmentScreen extends ConsumerWidget {
               ),
             ],
           ),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           Row(
             children: [
-              Expanded(child: _buildImageTile("Banner Image", state.treatmentImage, () => viewModel.pickImage(false))),
-              SizedBox(width: 24.w),
-              Expanded(child: _buildImageTile("Listing Icon", state.treatmentIcon, () => viewModel.pickImage(true))),
+              Expanded(child: _buildImageTile(context, "Banner Image", state.treatmentImage, () => viewModel.pickImage(false))),
+              context.horizontalSpace(24),
+              Expanded(child: _buildImageTile(context, "Listing Icon", state.treatmentIcon, () => viewModel.pickImage(true))),
             ],
           ),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           BuildTextField(
             label: "Short Description",
             controller: viewModel.shortDescriptionController,
             hintText: "Brief summary...",
             maxLines: 2,
           ),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           BuildTextField(
             label: "Full Description",
             controller: viewModel.fullDescriptionController,
@@ -206,59 +206,70 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCategorizationSection(TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildCategorizationSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Categorization", style: CustomFonts.black18w600),
-          SizedBox(height: 24.h),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSearchField(
-                  label: "Category",
-                  hint: "Select category",
-                  controller: viewModel.categoryController,
-                  suggestions: dataState.categories.map((c) => c.name).toList(),
-                  onSelected: (val) => viewModel.onCategorySelected(val),
+          Text("Categorization", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          Text("Selected Category", style: context.fonts.black14w600),
+          context.verticalSpace(10),
+          InkWell(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => NestedCategorySelector(
+                  categories: dataState.categories,
+                  initialCategoryId: viewModel.categoryIdController.text,
+                  onSelected: (cat, path) => viewModel.onCategorySelected(cat, path),
                 ),
+              );
+            },
+            child: Container(
+              padding: context.appEdgeInsets(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(color: CustomColors.border),
               ),
-              SizedBox(width: 24.w),
-              Expanded(
-                child: _buildSearchField(
-                  label: "Subcategory",
-                  hint: "Select subcategory",
-                  controller: viewModel.subcategoryController,
-                  suggestions: dataState.categories.isEmpty
-                      ? []
-                      : dataState.categories
-                          .firstWhere((c) => c.name == viewModel.categoryController.text,
-                              orElse: () => dataState.categories.first)
-                          .subcategories
-                          .map((s) => s.name)
-                          .toList(),
-                  onSelected: (val) {},
-                ),
+              child: Row(
+                children: [
+                  const Icon(Icons.category_outlined, color: CustomColors.purple, size: 20),
+                  context.horizontalSpace(12),
+                  Expanded(
+                    child: Text(
+                      viewModel.categoryPathController.text.isEmpty 
+                          ? "Tap to select category" 
+                          : viewModel.categoryPathController.text,
+                      style: viewModel.categoryPathController.text.isEmpty 
+                          ? context.fonts.grey14w400 
+                          : context.fonts.black14w600,
+                    ),
+                  ),
+                  const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAreasSection(TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildAreasSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Body Areas", style: CustomFonts.black18w600),
+              Text("Body Areas", style: context.fonts.black18w600),
               TextButton.icon(
                 onPressed: () => viewModel.addArea(),
                 icon: const Icon(Icons.add),
@@ -266,7 +277,7 @@ class EditTreatmentScreen extends ConsumerWidget {
               ),
             ],
           ),
-          SizedBox(height: 16.h),
+          context.verticalSpace(16),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -279,6 +290,7 @@ class EditTreatmentScreen extends ConsumerWidget {
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Expanded(
                       child: _buildSearchField(
+                        context,
                         label: "Area Name",
                         hint: "e.g. Upper Face",
                         controller: entry.areaController,
@@ -288,13 +300,13 @@ class EditTreatmentScreen extends ConsumerWidget {
                     ),
                     if (state.areas.length > 1)
                       IconButton(
-                        padding: EdgeInsets.only(top: 32.h),
+                        padding: context.appEdgeInsets(top: 32),
                         onPressed: () => viewModel.removeArea(index),
                         icon: const Icon(Icons.delete_outline, color: CustomColors.red),
                       ),
                   ]),
-                  SizedBox(height: 16.h),
-                  _buildSubAreaSection(index, entry, viewModel, dataState),
+                  context.verticalSpace(16),
+                  _buildSubAreaSection(context, index, entry, viewModel, dataState),
                 ],
               );
             },
@@ -304,11 +316,12 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSubAreaSection(int areaIndex, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildSubAreaSection(BuildContext context, int areaIndex, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSearchField(
+          context,
           label: "Sub Areas (Mandatory)",
           hint: "Add sub area",
           controller: entry.subAreaController,
@@ -323,12 +336,12 @@ class EditTreatmentScreen extends ConsumerWidget {
           onSelected: (val) => viewModel.addSubArea(areaIndex, val),
         ),
         if (entry.subAreas.isNotEmpty) ...[
-          SizedBox(height: 12.h),
+          context.verticalSpace(12),
           Wrap(
-            spacing: 8.w,
-            runSpacing: 8.h,
+            spacing: context.w(8),
+            runSpacing: context.h(8),
             children: entry.subAreas.map((sub) => Chip(
-              label: Text(sub.name, style: CustomFonts.grey13w500),
+              label: Text(sub.name, style: context.fonts.grey13w500),
               onDeleted: () => viewModel.removeSubArea(areaIndex, sub.name),
               backgroundColor: CustomColors.green.withValues(alpha: 0.1),
               side: BorderSide(color: CustomColors.green.withValues(alpha: 0.2)),
@@ -339,21 +352,61 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMaterialsAndLogicSection(TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
-    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
-
-    return BorderdContainerWidget(
-      padding: EdgeInsets.all(24.w),
+  Widget _buildSubAreaConfigCard(BuildContext context, SubAreaConfig subArea) {
+    return Container(
+      padding: context.appEdgeInsets(all: 16),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: context.appBorderRadius(all: 10),
+        border: Border.all(color: CustomColors.border),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Materials & Configuration", style: CustomFonts.black18w600),
-          SizedBox(height: 24.h),
+          Text(subArea.name, style: context.fonts.grey14w600),
+          context.verticalSpace(12),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: "Max Qty",
+                  controller: subArea.maxQuantityController,
+                  hintText: "0",
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              context.horizontalSpace(16),
+              Expanded(
+                child: BuildTextField(
+                  label: "Base Price (\$)",
+                  controller: subArea.basePriceController,
+                  hintText: "0",
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMaterialsAndLogicSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Materials & Configuration", style: context.fonts.black18w600),
+          context.verticalSpace(24),
           Row(
             children: [
               Expanded(
                 flex: 3,
                 child: _buildSearchField(
+                  context,
                   label: "Material Name",
                   hint: "Select material",
                   controller: viewModel.materialNameController,
@@ -361,7 +414,7 @@ class EditTreatmentScreen extends ConsumerWidget {
                   onSelected: (val) {},
                 ),
               ),
-              SizedBox(width: 24.w),
+              context.horizontalSpace(24),
               Expanded(
                 child: BuildTextField(
                   label: "Max Quantity",
@@ -373,36 +426,36 @@ class EditTreatmentScreen extends ConsumerWidget {
             ],
           ),
           if (allSubAreas.isNotEmpty) ...[
-            SizedBox(height: 32.h),
-            Text("Configuration Per Sub-Area", style: CustomFonts.black16w400),
-            SizedBox(height: 16.h),
+            context.verticalSpace(32),
+            Text("Configuration Per Sub-Area", style: context.fonts.black16w400),
+            context.verticalSpace(16),
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: allSubAreas.length,
-              separatorBuilder: (_, _) => SizedBox(height: 12.h),
+              separatorBuilder: (_, _) => context.verticalSpace(12),
               itemBuilder: (context, index) {
                 final subArea = allSubAreas[index];
-                return _buildSubAreaConfigCard(subArea);
+                return _buildSubAreaConfigCard(context, subArea);
               },
             ),
           ],
-          SizedBox(height: 32.h),
+          context.verticalSpace(32),
           const Divider(),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           Row(
             children: [
               SizedBox(
-                width: 24.w,
-                height: 24.w,
+                width: context.w(24),
+                height: context.w(24),
                 child: Checkbox(
                   value: state.useInAiSimulator,
                   onChanged: (val) => viewModel.toggleAiSimulator(val),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
+                  shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 4)),
                 ),
               ),
-              SizedBox(width: 12.w),
-              Text("Use in AI Simulator", style: CustomFonts.black16w400),
+              context.horizontalSpace(12),
+              Text("Use in AI Simulator", style: context.fonts.black16w400),
             ],
           ),
           SizedBox(height: 32.h),
@@ -440,59 +493,20 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSubAreaConfigCard(SubAreaConfig subArea) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: CustomColors.whiteGrey,
-        borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: CustomColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(subArea.name, style: CustomFonts.grey14w600),
-          SizedBox(height: 12.h),
-          Row(
-            children: [
-              Expanded(
-                child: BuildTextField(
-                  label: "Max Qty",
-                  controller: subArea.maxQuantityController,
-                  hintText: "0",
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: BuildTextField(
-                  label: "Base Price (\$)",
-                  controller: subArea.basePriceController,
-                  hintText: "0",
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImageTile(String label, dynamic file, VoidCallback onTap) {
+  Widget _buildImageTile(BuildContext context, String label, dynamic file, VoidCallback onTap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.grey14w600),
-        SizedBox(height: 10.h),
+        Text(label, style: context.fonts.grey14w600),
+        context.verticalSpace(10),
         GestureDetector(
           onTap: onTap,
           child: Container(
-            height: 120.h,
+            height: context.h(120),
             width: double.infinity,
             decoration: BoxDecoration(
               color: CustomColors.whiteGrey,
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: context.appBorderRadius(all: 12),
               image: file != null ? DecorationImage(
                 image: kIsWeb ? NetworkImage(file.path) : FileImage(File(file.path)) as ImageProvider,
                 fit: BoxFit.cover,
@@ -505,7 +519,8 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSearchField({
+  Widget _buildSearchField(
+    BuildContext context, {
     required String label,
     required String hint,
     required TextEditingController controller,
@@ -515,12 +530,12 @@ class EditTreatmentScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.grey14w600),
-        SizedBox(height: 10.h),
+        Text(label, style: context.fonts.grey14w600),
+        context.verticalSpace(10),
         SearchAnchor(
           viewHintText: hint,
-          viewConstraints: BoxConstraints(maxHeight: 350.h),
-          viewShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          viewConstraints: BoxConstraints(maxHeight: context.h(350)),
+          viewShape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 16)),
           viewSurfaceTintColor: Colors.white,
           viewBackgroundColor: Colors.white,
           viewElevation: 12,
@@ -547,7 +562,7 @@ class EditTreatmentScreen extends ConsumerWidget {
             return [
               if (searchController.text.isNotEmpty && !suggestions.contains(searchController.text))
                 ListTile(
-                  title: Text('Use "${searchController.text}"', style: CustomFonts.black14w700),
+                  title: Text('Use "${searchController.text}"', style: context.fonts.black14w700),
                   onTap: () {
                     controller.text = searchController.text;
                     onSelected(searchController.text);
@@ -556,12 +571,12 @@ class EditTreatmentScreen extends ConsumerWidget {
                 ),
               ...filteredList.map((item) => ListTile(
                 leading: Container(
-                  width: 32.w,
-                  height: 32.w,
-                  decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(6.r)),
+                  width: context.w(32),
+                  height: context.w(32),
+                  decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: context.appBorderRadius(all: 6)),
                   child: const Icon(Icons.circle_outlined, size: 14, color: CustomColors.grey),
                 ),
-                title: Text(item, style: CustomFonts.grey14w400),
+                title: Text(item, style: context.fonts.grey14w400),
                 onTap: () {
                   controller.text = item;
                   onSelected(item);

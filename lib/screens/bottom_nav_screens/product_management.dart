@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
@@ -55,11 +55,11 @@ class _ProductManagementState extends State<ProductManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Inventory & Products", style: CustomFonts.black32w700),
+            Text("Inventory & Products", style: context.fonts.black32w700),
             SizedBox(height: 8.h),
             Text(
               "Manage retail products and professional supplies across all clinics.",
-              style: CustomFonts.grey14w400,
+              style: context.fonts.grey14w400,
             ),
           ],
         ),
@@ -107,8 +107,8 @@ class _ProductManagementState extends State<ProductManagement> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.black20w600),
-                Text(title, style: CustomFonts.grey12w400),
+                Text(value, style: context.fonts.black20w600),
+                Text(title, style: context.fonts.grey12w400),
               ],
             ),
           ],
@@ -195,11 +195,11 @@ class _ProductManagementState extends State<ProductManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("SKU-9283$index", style: CustomFonts.amber10w800ls1),
+                Text("SKU-9283$index", style: context.fonts.amber10w800ls1),
                 SizedBox(height: 4.h),
-                Text("Advanced Night Repair", style: CustomFonts.black16w600, maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text("Advanced Night Repair", style: context.fonts.black16w600, maxLines: 1, overflow: TextOverflow.ellipsis),
                 SizedBox(height: 4.h),
-                Text("Skincare • 50ml", style: CustomFonts.white12w400),
+                Text("Skincare • 50ml", style: context.fonts.white12w400),
                 SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -207,8 +207,8 @@ class _ProductManagementState extends State<ProductManagement> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Stock", style: CustomFonts.white10w600),
-                        Text("45 Units", style: CustomFonts.black14w600),
+                        Text("Stock", style: context.fonts.white10w600),
+                        Text("45 Units", style: context.fonts.black14w600),
                       ],
                     ),
                     _stockBadge(index == 1 ? "Low Stock" : "In Stock"),
@@ -232,7 +232,7 @@ class _ProductManagementState extends State<ProductManagement> {
       ),
       child: Text(
         status,
-        style: isLow ? CustomFonts.red10w600 : CustomFonts.green10w600,
+        style: isLow ? context.fonts.red10w600 : context.fonts.green10w600,
       ),
     );
   }

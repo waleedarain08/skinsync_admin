@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/utils/theme.dart';
@@ -63,7 +63,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         SizedBox(width: 12.w),
         Text(
           'Password & Security',
-          style: CustomFonts.black18w600,
+          style: context.fonts.black18w600,
         ),
       ],
     );
@@ -171,12 +171,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           children: [
             Text(
               'Change Password',
-              style: CustomFonts.black16w600,
+              style: context.fonts.black16w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Keep your account secure with a strong password',
-              style: CustomFonts.grey12w400,
+              style: context.fonts.grey12w400,
             ),
           ],
         ),
@@ -231,7 +231,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             ),
             child: Text(
               'Cancel',
-              style: CustomFonts.black14w500,
+              style: context.fonts.black14w500,
             ),
           ),
         ),

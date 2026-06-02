@@ -1,39 +1,36 @@
 
-
 class CategoryItem {
+  final String id;
   final String name;
   final String? icon;
-  final List<SubcategoryItem> subcategories;
+  final String? parentId;
+  final List<CategoryItem> children;
+  final int sortOrder;
 
   CategoryItem({
+    required this.id,
     required this.name,
     this.icon,
-    this.subcategories = const [],
+    this.parentId,
+    this.children = const [],
+    this.sortOrder = 0,
   });
 
   CategoryItem copyWith({
+    String? id,
     String? name,
     String? icon,
-    List<SubcategoryItem>? subcategories,
+    String? parentId,
+    List<CategoryItem>? children,
+    int? sortOrder,
   }) {
     return CategoryItem(
+      id: id ?? this.id,
       name: name ?? this.name,
       icon: icon ?? this.icon,
-      subcategories: subcategories ?? this.subcategories,
-    );
-  }
-}
-
-class SubcategoryItem {
-  final String name;
-  final String? icon;
-
-  SubcategoryItem({required this.name, this.icon});
-
-  SubcategoryItem copyWith({String? name, String? icon}) {
-    return SubcategoryItem(
-      name: name ?? this.name,
-      icon: icon ?? this.icon,
+      parentId: parentId ?? this.parentId,
+      children: children ?? this.children,
+      sortOrder: sortOrder ?? this.sortOrder,
     );
   }
 }

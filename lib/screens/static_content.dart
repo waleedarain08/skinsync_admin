@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 
@@ -55,7 +55,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
             /// Screen Title
             Text(
               'Static Content',
-              style: CustomFonts.black24w700,
+              style: context.fonts.black24w700,
             ),
 
             SizedBox(height: 12.h),
@@ -96,7 +96,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                               child: Text(
                                 tabs[index],
                                 textAlign: TextAlign.center,
-                                style: isActive ? CustomFonts.black14w600 : CustomFonts.grey14w400,
+                                style: isActive ? context.fonts.black14w600 : context.fonts.grey14w400,
                               ),
                             ),
                           ),
@@ -110,7 +110,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                   /// Section Title
                   Text(
                     titles[selectedIndex]!,
-                    style: CustomFonts.black16w600,
+                    style: context.fonts.black16w600,
                   ),
 
                   SizedBox(height: 12.h),
@@ -138,7 +138,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                     children: [
                       Text(
                         'Last updated: 11/4/2025',
-                        style: CustomFonts.grey12w400,
+                        style: context.fonts.grey12w400,
                       ),
                       CustomPrimaryButton(
                         onTap: () {},
@@ -171,7 +171,7 @@ class _StaticContentScreenState extends State<StaticContentScreen> {
                     child: Text(
                       'Changes to static content will be immediately reflected on both the website and mobile application. '
                       'Please review carefully before saving.',
-                      style: CustomFonts.black13w400,
+                      style: context.fonts.black13w400,
                     ),
                   ),
                 ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
@@ -14,8 +14,8 @@ import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/nested_category_selector.dart';
 
 class TreatmentManagementScreen extends ConsumerStatefulWidget {
   const TreatmentManagementScreen({super.key});
@@ -42,36 +42,36 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
 
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.pagePaddingH,
-          vertical: AppSpacing.pagePaddingV,
+        padding: context.appEdgeInsets(
+          horizontal: 28,
+          vertical: 28,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            SizedBox(height: AppSpacing.xxl),
-            _buildSearchAndFilterBar(viewModel, dataState),
-            SizedBox(height: AppSpacing.xl),
-            _buildTreatmentList(state, viewModel),
+            _buildHeader(context),
+            context.verticalSpace(32),
+            _buildSearchAndFilterBar(context, viewModel, dataState),
+            context.verticalSpace(24),
+            _buildTreatmentList(context, state, viewModel),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Treatment Library", style: CustomFonts.black26w700),
-            SizedBox(height: 6.h),
+            Text("Treatment Library", style: context.fonts.black26w700),
+            context.verticalSpace(6),
             Text(
               "Manage medical aesthetic procedures and treatment logic.",
-              style: CustomFonts.grey13w500,
+              style: context.fonts.grey13w500,
             ),
           ],
         ),
@@ -85,7 +85,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                 backgroundColor: Colors.white,
               ),
             ),
-            SizedBox(width: AppSpacing.md),
+            context.horizontalSpace(16),
             CustomPrimaryButton(
               onTap: () {
                 ref.read(treatmentViewModelProvider.notifier).resetForm();
@@ -93,7 +93,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               },
               icon: Icons.add_rounded,
               label: 'New Treatment',
-              width: 180.w,
+              width: context.w(180),
             ),
           ],
         ),
@@ -101,7 +101,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     );
   }
 
-  Widget _buildSearchAndFilterBar(TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildSearchAndFilterBar(BuildContext context, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Row(
       children: [
         AppSearchField(
@@ -110,14 +110,14 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           onChanged: (val) => viewModel.onSearchChanged(val),
           onClear: () => viewModel.onSearchChanged(""),
         ),
-        SizedBox(width: AppSpacing.md),
+        context.horizontalSpace(16),
         OutlinedButton.icon(
           onPressed: () => _showFiltersModal(context, viewModel, dataState),
           icon: const Icon(Icons.filter_list_rounded, size: 20),
           label: const Text("Refine Results"),
           style: OutlinedButton.styleFrom(
             backgroundColor: Colors.white,
-            minimumSize: Size(0, 52.h),
+            minimumSize: Size(0, context.h(52)),
           ),
         ),
       ],
@@ -129,7 +129,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
       context: context,
       builder: (context) => StandardDialog(
         title: "Filter Library",
-        width: 600.w,
+        width: context.w(600),
         content: StatefulBuilder(
           builder: (context, setModalState) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,39 +137,62 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               Row(
                 children: [
                   Expanded(
-                    child: _buildModalSearchField(
-                      label: "Category",
-                      hint: "All Categories",
-                      controller: viewModel.filterCategoryController,
-                      suggestions: dataState.categories.map((c) => c.name).toList(),
-                      onSelected: (val) {
-                        viewModel.onFilterCategorySelected(val);
-                        setModalState(() {});
-                      },
-                    ),
-                  ),
-                  SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: _buildModalSearchField(
-                      label: "Subcategory",
-                      hint: "All Subcategories",
-                      controller: viewModel.filterSubcategoryController,
-                      suggestions: dataState.categories
-                          .firstWhere((c) => c.name == viewModel.filterCategoryController.text,
-                              orElse: () => dataState.categories.first)
-                          .subcategories
-                          .map((s) => s.name)
-                          .toList(),
-                      onSelected: (val) => viewModel.onFilterChanged(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Category Hierarchy", style: context.fonts.black14w600),
+                        context.verticalSpace(8),
+                        InkWell(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => NestedCategorySelector(
+                                categories: dataState.categories,
+                                initialCategoryId: null,
+                                onSelected: (cat, path) {
+                                  viewModel.filterCategoryController.text = path;
+                                  viewModel.onFilterChanged();
+                                  setModalState(() {});
+                                },
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: CustomColors.whiteGrey,
+                              borderRadius: context.borderRadius(all: 12),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    viewModel.filterCategoryController.text.isEmpty 
+                                        ? "All Categories" 
+                                        : viewModel.filterCategoryController.text,
+                                    style: context.fonts.grey14w400,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: AppSpacing.xl),
+              context.verticalSpace(24),
               Row(
                 children: [
                   Expanded(
                     child: _buildModalSearchField(
+                      context,
                       label: "Target Area",
                       hint: "All Areas",
                       controller: viewModel.filterAreaController,
@@ -180,13 +203,14 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                       },
                     ),
                   ),
-                  SizedBox(width: AppSpacing.md),
+                  context.horizontalSpace(16),
                   Expanded(
                     child: _buildModalSearchField(
+                      context,
                       label: "Visibility",
                       hint: "Any Status",
                       controller: viewModel.filterStatusController,
-                      suggestions: ["Active", "Inactive"],
+                      suggestions: const ["Active", "Inactive"],
                       onSelected: (val) => viewModel.onFilterChanged(),
                     ),
                   ),
@@ -206,14 +230,15 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           CustomPrimaryButton(
             onTap: () => Navigator.pop(context),
             label: "Apply Refinements",
-            width: 180.w,
+            width: context.w(180),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildModalSearchField({
+  Widget _buildModalSearchField(
+    BuildContext context, {
     required String label,
     required String hint,
     required TextEditingController controller,
@@ -223,11 +248,11 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.black14w600),
-        SizedBox(height: 8.h),
+        Text(label, style: context.fonts.black14w600),
+        context.verticalSpace(8),
         SearchAnchor(
           viewHintText: hint,
-          viewConstraints: BoxConstraints(maxHeight: 350.h),
+          viewConstraints: BoxConstraints(maxHeight: context.h(350)),
           builder: (context, searchController) {
             if (searchController.text.isEmpty && controller.text.isNotEmpty) {
               searchController.text = controller.text;
@@ -235,7 +260,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             return TextFormField(
               controller: controller,
               readOnly: true,
-              style: CustomFonts.grey14w400,
+              style: context.fonts.grey14w400,
               onTap: () {
                 searchController.text = controller.text;
                 searchController.openView();
@@ -245,7 +270,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                 suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
                 filled: true,
                 fillColor: CustomColors.whiteGrey,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md), borderSide: BorderSide.none),
+                border: OutlineInputBorder(borderRadius: context.borderRadius(all: 12), borderSide: BorderSide.none),
               ),
             );
           },
@@ -253,7 +278,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             final query = searchController.text.toLowerCase();
             return [
               ListTile(
-                title: Text("All $label", style: CustomFonts.black14w600.copyWith(color: CustomColors.purple)),
+                title: Text("All $label", style: context.fonts.black14w600.copyWith(color: CustomColors.purple)),
                 onTap: () {
                   controller.clear();
                   onSelected("");
@@ -263,7 +288,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               ...suggestions
                   .where((s) => s.toLowerCase().contains(query))
                   .map((item) => ListTile(
-                        title: Text(item, style: CustomFonts.grey14w400),
+                        title: Text(item, style: context.fonts.grey14w400),
                         onTap: () {
                           controller.text = item;
                           onSelected(item);
@@ -277,18 +302,18 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     );
   }
 
-  Widget _buildTreatmentList(TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildTreatmentList(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     if (state.loading) return const Center(child: CircularProgressIndicator());
     
     if (state.filteredTreatments.isEmpty) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.only(top: 80.h),
+          padding: context.appEdgeInsets(top: 80),
           child: Column(
             children: [
-              Icon(Icons.search_off_rounded, size: 48.sp, color: CustomColors.lightGrey),
-              SizedBox(height: AppSpacing.md),
-              Text("No matching treatments found.", style: CustomFonts.black16w400.copyWith(color: CustomColors.grey)),
+              Icon(Icons.search_off_rounded, size: context.sp(48), color: CustomColors.lightGrey),
+              context.verticalSpace(16),
+              Text("No matching treatments found.", style: context.fonts.black16w400.copyWith(color: CustomColors.grey)),
             ],
           ),
         ),
@@ -299,23 +324,23 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: state.filteredTreatments.length,
-      separatorBuilder: (context, index) => SizedBox(height: AppSpacing.md),
-      itemBuilder: (context, index) => _buildTreatmentListItem(state.filteredTreatments[index], viewModel),
+      separatorBuilder: (context, index) => context.verticalSpace(16),
+      itemBuilder: (context, index) => _buildTreatmentListItem(context, state.filteredTreatments[index], viewModel),
     );
   }
 
-  Widget _buildTreatmentListItem(TreatmentModel treatment, TreatmentViewModel viewModel) {
+  Widget _buildTreatmentListItem(BuildContext context, TreatmentModel treatment, TreatmentViewModel viewModel) {
     return BorderdContainerWidget(
       enableHover: true,
-      padding: EdgeInsets.all(AppSpacing.md),
+      padding: context.appEdgeInsets(all: 16),
       child: Row(
         children: [
           Container(
-            width: 72.w,
-            height: 72.w,
+            width: context.w(72),
+            height: context.w(72),
             decoration: BoxDecoration(
               color: CustomColors.softGrey,
-              borderRadius: BorderRadius.circular(AppRadius.md),
+              borderRadius: context.borderRadius(all: 12),
               image: (treatment.image != null && treatment.image!.isNotEmpty)
                   ? DecorationImage(
                       image: NetworkImage(treatment.image!),
@@ -324,10 +349,10 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                   : null,
             ),
             child: (treatment.image == null || treatment.image!.isEmpty)
-                ? Icon(Icons.image_outlined, color: CustomColors.lightGrey, size: 24.sp)
+                ? Icon(Icons.image_outlined, color: CustomColors.lightGrey, size: context.sp(24))
                 : null,
           ),
-          SizedBox(width: AppSpacing.xl),
+          context.horizontalSpace(24),
           
           Expanded(
             child: Column(
@@ -335,20 +360,20 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               children: [
                 Row(
                   children: [
-                    Text(treatment.name ?? "N/A", style: CustomFonts.black14w600.copyWith(fontSize: 15.sp)),
-                    SizedBox(width: AppSpacing.sm),
+                    Text(treatment.name ?? "N/A", style: context.fonts.black14w600.copyWith(fontSize: context.sp(15))),
+                    context.horizontalSpace(12),
                     _statusBadge(treatment.isActive),
                   ],
                 ),
-                SizedBox(height: 4.h),
+                context.verticalSpace(4),
                 Text(
-                  "${treatment.category ?? 'General'} • ${treatment.subcategory ?? 'N/A'}",
-                  style: CustomFonts.grey12w400,
+                  treatment.categoryPath ?? treatment.categoryName ?? 'General',
+                  style: context.fonts.grey12w400,
                 ),
-                SizedBox(height: 6.h),
+                context.verticalSpace(6),
                 Text(
                   treatment.shortDescription ?? treatment.description ?? "No description provided.",
-                  style: CustomFonts.grey13w500,
+                  style: context.fonts.grey13w500,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -357,27 +382,27 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           ),
           
           Container(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 8.h),
+            padding: context.appEdgeInsets(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: CustomColors.palePurple,
-              borderRadius: BorderRadius.circular(AppRadius.full),
+              borderRadius: context.borderRadius(all: 999),
               border: Border.all(color: CustomColors.green.withValues(alpha: 0.1)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.layers_outlined, size: 14.sp, color: CustomColors.green),
-                SizedBox(width: 8.w),
+                Icon(Icons.layers_outlined, size: context.sp(14), color: CustomColors.green),
+                context.horizontalSpace(8),
                 Text(
                   "${treatment.sideAreas?.length ?? 0} Active Areas",
-                  style: CustomFonts.black14w600.copyWith(fontSize: 11.sp, color: CustomColors.green),
+                  style: context.fonts.black14w600.copyWith(fontSize: context.sp(11), color: CustomColors.green),
                 ),
               ],
             ),
           ),
-          SizedBox(width: AppSpacing.xxl),
+          context.horizontalSpace(32),
           
-          _buildMoreMenu(treatment, viewModel),
+          _buildMoreMenu(context, treatment, viewModel),
         ],
       ),
     );
@@ -390,7 +415,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     );
   }
 
-  Widget _buildMoreMenu(TreatmentModel treatment, TreatmentViewModel viewModel) {
+  Widget _buildMoreMenu(BuildContext context, TreatmentModel treatment, TreatmentViewModel viewModel) {
     return PopupMenuButton<String>(
       onSelected: (value) {
         switch (value) {
@@ -399,7 +424,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             context.push(TreatmentDetailScreen.routeName);
             break;
           case 'delete':
-            _showDeleteConfirmation(treatment, viewModel);
+            _showDeleteConfirmation(context, treatment, viewModel);
             break;
           case 'toggle':
             viewModel.toggleTreatmentStatus(treatment.id ?? 0);
@@ -409,14 +434,14 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
       icon: const Icon(Icons.more_horiz_rounded, size: 24, color: CustomColors.grey),
       offset: const Offset(0, 40),
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+      shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 12)),
       itemBuilder: (context) => [
         PopupMenuItem(
           value: 'detail',
           child: Row(
             children: [
               const Icon(Icons.visibility_outlined, size: 18, color: CustomColors.grey),
-              SizedBox(width: AppSpacing.sm),
+              context.horizontalSpace(12),
               const Text("View Profile"),
             ],
           ),
@@ -430,7 +455,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                 size: 18,
                 color: treatment.isActive ? CustomColors.amber : CustomColors.green,
               ),
-              SizedBox(width: AppSpacing.sm),
+              context.horizontalSpace(12),
               Text(treatment.isActive ? "Deactivate" : "Activate"),
             ],
           ),
@@ -441,8 +466,8 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           child: Row(
             children: [
               const Icon(Icons.delete_outline_rounded, size: 18, color: CustomColors.red),
-              SizedBox(width: AppSpacing.sm),
-              Text("Archive Treatment", style: TextStyle(color: CustomColors.red)),
+              context.horizontalSpace(12),
+              const Text("Archive Treatment", style: TextStyle(color: CustomColors.red)),
             ],
           ),
         ),
@@ -450,13 +475,13 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     );
   }
 
-  void _showDeleteConfirmation(TreatmentModel treatment, TreatmentViewModel viewModel) {
+  void _showDeleteConfirmation(BuildContext context, TreatmentModel treatment, TreatmentViewModel viewModel) {
     showDialog(
       context: context,
       builder: (context) => StandardDialog(
         title: "Archive Treatment",
-        width: 400.w,
-        content: Text("Confirm archiving '${treatment.name}'? It will be removed from all active catalogs.", style: CustomFonts.grey14w400),
+        width: context.w(400),
+        content: Text("Confirm archiving '${treatment.name}'? It will be removed from all active catalogs.", style: context.fonts.grey14w400),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           CustomPrimaryButton(
@@ -465,7 +490,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               Navigator.pop(context);
             },
             label: "Archive",
-            width: 120.w,
+            width: context.w(120),
           ),
         ],
       ),

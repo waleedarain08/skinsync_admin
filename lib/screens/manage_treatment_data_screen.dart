@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
@@ -29,7 +30,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         appBar: AppBar(
           flexibleSpace: AppDecorations.appBarGradient,
           elevation: 0,
-          title: Text("Manage Network Taxonomy", style: CustomFonts.black20w600),
+          title: Text("Manage Network Taxonomy", style: context.fonts.black20w600),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: CustomColors.black),
             onPressed: () => context.pop(),
@@ -61,37 +62,30 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
 
   Widget _buildCategoriesTab(BuildContext context, TreatmentDataState state, TreatmentDataViewModel viewModel) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTabHeader(
+            context: context,
             title: "Treatment Categories",
             onAdd: () => _showItemDialog(
               context: context,
-              title: "Add New Category",
+              title: "Add Root Category",
               onConfirm: (name, icon) => viewModel.addCategory(name, icon: icon),
             ),
           ),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.categories.length,
-            separatorBuilder: (_, _) => SizedBox(height: 16.h),
+            separatorBuilder: (context, index) => context.verticalSpace(16),
             itemBuilder: (context, index) {
-              final category = state.categories[index];
-              return _buildHierarchicalItem(
-                context: context,
-                name: category.name,
-                icon: category.icon,
-                childrenCount: category.subcategories.length,
-                children: category.subcategories.map((s) => _ChildItemData(name: s.name, icon: s.icon)).toList(),
-                onEdit: (name, icon) => viewModel.editCategory(category.name, name, icon: icon),
-                onDelete: () => viewModel.deleteCategory(category.name),
-                onAddChild: (name, icon) => viewModel.addSubcategory(category.name, name, icon: icon),
-                onEditChild: (old, name, icon) => viewModel.editSubcategory(category.name, old, name, icon: icon),
-                onDeleteChild: (name) => viewModel.deleteSubcategory(category.name, name),
+              return _RecursiveCategoryTile(
+                category: state.categories[index],
+                viewModel: viewModel,
+                level: 0,
               );
             },
           ),
@@ -102,11 +96,12 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
 
   Widget _buildAreasTab(BuildContext context, TreatmentDataState state, TreatmentDataViewModel viewModel) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTabHeader(
+            context: context,
             title: "Anatomical Body Areas",
             onAdd: () => _showItemDialog(
               context: context,
@@ -114,12 +109,12 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               onConfirm: (name, icon) => viewModel.addArea(name, icon: icon),
             ),
           ),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.areas.length,
-            separatorBuilder: (_, _) => SizedBox(height: 16.h),
+            separatorBuilder: (context, index) => context.verticalSpace(16),
             itemBuilder: (context, index) {
               final area = state.areas[index];
               return _buildHierarchicalItem(
@@ -143,11 +138,12 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
 
   Widget _buildMaterialsTab(BuildContext context, TreatmentDataState state, TreatmentDataViewModel viewModel) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTabHeader(
+            context: context,
             title: "Consumable Materials",
             onAdd: () => _showItemDialog(
               context: context,
@@ -156,18 +152,18 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               onConfirm: (name, _) => viewModel.addMaterial(name),
             ),
           ),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           Wrap(
-            spacing: 12.w,
-            runSpacing: 12.h,
+            spacing: context.w(12),
+            runSpacing: context.h(12),
             children: state.materials.map((item) => Chip(
               label: Text(item),
               onDeleted: () => _showDeleteConfirm(context, item, () => viewModel.deleteMaterial(item)),
               deleteIcon: const Icon(Icons.close, size: 16),
-              labelStyle: CustomFonts.purple14w600,
+              labelStyle: context.fonts.purple14w600,
               backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
               side: BorderSide(color: CustomColors.purple.withValues(alpha: 0.1)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+              shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 8)),
             )).toList(),
           ),
         ],
@@ -177,11 +173,12 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
 
   Widget _buildCombinationsTab(BuildContext context, TreatmentDataState state, TreatmentDataViewModel viewModel, WidgetRef ref) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTabHeader(
+            context: context,
             title: "Treatment Combination Groups",
             onAdd: () => _showCombinationDialog(
               context: context,
@@ -190,12 +187,12 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               onConfirm: (name, treatments) => viewModel.addCombinationGroup(name, treatments),
             ),
           ),
-          SizedBox(height: 24.h),
+          context.verticalSpace(24),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.combinationGroups.length,
-            separatorBuilder: (_, _) => SizedBox(height: 16.h),
+            separatorBuilder: (context, index) => context.verticalSpace(16),
             itemBuilder: (context, index) {
               final group = state.combinationGroups[index];
               return BorderdContainerWidget(
@@ -203,16 +200,16 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                 child: ExpansionTile(
                   shape: const RoundedRectangleBorder(side: BorderSide.none),
                   leading: Container(
-                    width: 40.w,
-                    height: 40.w,
+                    width: context.w(40),
+                    height: context.w(40),
                     decoration: BoxDecoration(
                       color: CustomColors.purple.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8.r),
+                      borderRadius: context.borderRadius(all: 8),
                     ),
                     child: const Icon(Icons.auto_awesome_motion_rounded, color: CustomColors.purple),
                   ),
-                  title: Text(group.name, style: CustomFonts.black16w600),
-                  subtitle: Text("${group.treatmentNames.length} combined treatments", style: CustomFonts.grey12w400),
+                  title: Text(group.name, style: context.fonts.black16w600),
+                  subtitle: Text("${group.treatmentNames.length} combined treatments", style: context.fonts.grey12w400),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -236,21 +233,21 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                   ),
                   children: [
                     Padding(
-                      padding: EdgeInsets.all(16.w),
+                      padding: context.appEdgeInsets(all: 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Wrap(
-                            spacing: 12.w,
-                            runSpacing: 12.h,
+                            spacing: context.w(12),
+                            runSpacing: context.h(12),
                             children: group.treatmentNames.map((t) => Chip(
                               label: Text(t),
                               backgroundColor: CustomColors.whiteGrey,
                               side: BorderSide(color: Colors.grey[200]!),
-                              labelStyle: CustomFonts.black12w600,
+                              labelStyle: context.fonts.black12w600,
                             )).toList(),
                           ),
-                          SizedBox(height: 8.h),
+                          context.verticalSpace(8),
                         ],
                       ),
                     ),
@@ -264,16 +261,16 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTabHeader({required String title, required VoidCallback onAdd}) {
+  Widget _buildTabHeader({required BuildContext context, required String title, required VoidCallback onAdd}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: CustomFonts.black18w600),
+        Text(title, style: context.fonts.black18w600),
         CustomPrimaryButton(
           onTap: onAdd,
           icon: Icons.add,
           label: "Add New",
-          width: 140.w,
+          width: context.w(140),
         ),
       ],
     );
@@ -296,21 +293,21 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
       child: ExpansionTile(
         shape: const RoundedRectangleBorder(side: BorderSide.none),
         leading: Container(
-          width: 40.w,
-          height: 40.w,
-          decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(8.r)),
+          width: context.w(40),
+          height: context.w(40),
+          decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: context.borderRadius(all: 8)),
           child: icon != null 
-              ? Image.network(icon, errorBuilder: (_, __, ___) => const Icon(Icons.category_outlined)) 
+              ? Image.network(icon, errorBuilder: (context, error, stackTrace) => const Icon(Icons.category_outlined)) 
               : const Icon(Icons.category_outlined, color: CustomColors.purple),
         ),
-        title: Text(name, style: CustomFonts.black16w600),
-        subtitle: Text("$childrenCount sub-items", style: CustomFonts.grey12w400),
+        title: Text(name, style: context.fonts.black16w600),
+        subtitle: Text("$childrenCount sub-items", style: context.fonts.grey12w400),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
               icon: const Icon(Icons.edit_outlined, size: 20),
-              onPressed: () => _showItemDialog(
+              onPressed: () => ManageTreatmentDataScreen._showItemDialog(
                 context: context,
                 title: "Edit Item",
                 initialName: name,
@@ -320,33 +317,33 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             ),
             IconButton(
               icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.red),
-              onPressed: () => _showDeleteConfirm(context, name, onDelete),
+              onPressed: () => ManageTreatmentDataScreen._showDeleteConfirm(context, name, onDelete),
             ),
             const Icon(Icons.expand_more),
           ],
         ),
         children: [
           Padding(
-            padding: EdgeInsets.all(16.w),
+            padding: context.appEdgeInsets(all: 16),
             child: Column(
               children: [
                 ...children.map((child) => ListTile(
                   dense: true,
                   leading: Container(
-                    width: 32.w,
-                    height: 32.w,
-                    decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(6.r)),
+                    width: context.w(32),
+                    height: context.w(32),
+                    decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: context.borderRadius(all: 6)),
                     child: child.icon != null 
-                        ? Image.network(child.icon!, errorBuilder: (_, __, ___) => const Icon(Icons.subdirectory_arrow_right, size: 16)) 
+                        ? Image.network(child.icon!, errorBuilder: (context, error, stackTrace) => const Icon(Icons.subdirectory_arrow_right, size: 16))
                         : const Icon(Icons.subdirectory_arrow_right, size: 16, color: CustomColors.grey),
                   ),
-                  title: Text(child.name, style: CustomFonts.black14w400),
+                  title: Text(child.name, style: context.fonts.black14w400),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.edit_outlined, size: 18),
-                        onPressed: () => _showItemDialog(
+                        onPressed: () => ManageTreatmentDataScreen._showItemDialog(
                           context: context,
                           title: "Edit Sub-item",
                           initialName: child.name,
@@ -361,9 +358,9 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                     ],
                   ),
                 )),
-                SizedBox(height: 8.h),
+                context.verticalSpace(8),
                 TextButton.icon(
-                  onPressed: () => _showItemDialog(
+                  onPressed: () => ManageTreatmentDataScreen._showItemDialog(
                     context: context,
                     title: "Add Sub-item",
                     onConfirm: onAddChild,
@@ -380,7 +377,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     );
   }
 
-  void _showItemDialog({
+  static void _showItemDialog({
     required BuildContext context,
     required String title,
     String? initialName,
@@ -395,7 +392,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
       context: context,
       builder: (context) => StandardDialog(
         title: title,
-        width: 450.w,
+        width: context.w(450),
         content: Column(
           children: [
             BuildTextField(
@@ -404,7 +401,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               hintText: "Enter name...",
             ),
             if (showIconField) ...[
-              SizedBox(height: 20.h),
+              context.verticalSpace(20),
               BuildTextField(
                 label: "Icon URL (Optional)",
                 controller: iconController,
@@ -423,7 +420,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               }
             },
             label: "Confirm",
-            width: 120.w,
+            width: context.w(120),
           ),
         ],
       ),
@@ -448,7 +445,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => StandardDialog(
           title: title,
-          width: 500.w,
+          width: context.w(500),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -457,9 +454,9 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                 controller: nameController,
                 hintText: "e.g. Skin Glow Package",
               ),
-              SizedBox(height: 24.h),
-              Text("Add Treatments", style: CustomFonts.black14w600),
-              SizedBox(height: 10.h),
+              context.verticalSpace(24),
+              Text("Add Treatments", style: context.fonts.black14w600),
+              context.verticalSpace(10),
               SearchAnchor(
                 viewHintText: "Search treatments...",
                 builder: (context, controller) => AppSearchField(
@@ -487,12 +484,12 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                 },
               ),
               if (selectedTreatments.isNotEmpty) ...[
-                SizedBox(height: 16.h),
+                context.verticalSpace(16),
                 Wrap(
-                  spacing: 8.w,
-                  runSpacing: 8.h,
+                  spacing: context.w(8),
+                  runSpacing: context.h(8),
                   children: selectedTreatments.map((t) => Chip(
-                    label: Text(t, style: CustomFonts.black11w400),
+                    label: Text(t, style: context.fonts.black11w400),
                     onDeleted: () => setState(() => selectedTreatments.remove(t)),
                     backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
                     deleteIconColor: CustomColors.purple,
@@ -511,7 +508,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                 }
               },
               label: "Save Group",
-              width: 140.w,
+              width: context.w(140),
             ),
           ],
         ),
@@ -519,13 +516,13 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     );
   }
 
-  void _showDeleteConfirm(BuildContext context, String name, VoidCallback onConfirm) {
+  static void _showDeleteConfirm(BuildContext context, String name, VoidCallback onConfirm) {
     showDialog(
       context: context,
       builder: (context) => StandardDialog(
         title: "Confirm Delete",
-        width: 400.w,
-        content: Text("Are you sure you want to delete '$name'? This action is irreversible.", style: CustomFonts.black14w400),
+        width: context.w(400),
+        content: Text("Are you sure you want to delete '$name'? This action is irreversible. All child sub-items will also be removed.", style: context.fonts.black14w400),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           CustomPrimaryButton(
@@ -534,9 +531,86 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               Navigator.pop(context);
             },
             label: "Delete",
-            width: 120.w,
+            width: context.w(120),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RecursiveCategoryTile extends StatelessWidget {
+  final CategoryItem category;
+  final TreatmentDataViewModel viewModel;
+  final int level;
+
+  const _RecursiveCategoryTile({
+    required this.category,
+    required this.viewModel,
+    required this.level,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BorderdContainerWidget(
+      padding: EdgeInsets.zero,
+      margin: EdgeInsets.only(left: level * 24.w),
+      child: ExpansionTile(
+        initiallyExpanded: level == 0,
+        shape: const RoundedRectangleBorder(side: BorderSide.none),
+        leading: Container(
+          width: context.w(40),
+          height: context.w(40),
+          decoration: BoxDecoration(
+            color: CustomColors.whiteGrey,
+            borderRadius: context.borderRadius(all: 8),
+          ),
+          child: category.icon != null 
+              ? Image.network(category.icon!, errorBuilder: (context, error, stackTrace) => const Icon(Icons.category_outlined))
+              : const Icon(Icons.category_outlined, color: CustomColors.purple),
+        ),
+        title: Text(category.name, style: context.fonts.black16w600),
+        subtitle: Text("${category.children.length} sub-categories", style: context.fonts.grey12w400),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              tooltip: "Add Child Category",
+              icon: const Icon(Icons.add_circle_outline, size: 20, color: CustomColors.green),
+              onPressed: () => ManageTreatmentDataScreen._showItemDialog(
+                context: context,
+                title: "Add Child under '${category.name}'",
+                onConfirm: (name, icon) => viewModel.addCategory(name, icon: icon, parentId: category.id),
+              ),
+            ),
+            IconButton(
+              tooltip: "Edit Category",
+              icon: const Icon(Icons.edit_outlined, size: 20),
+              onPressed: () => ManageTreatmentDataScreen._showItemDialog(
+                context: context,
+                title: "Edit Category",
+                initialName: category.name,
+                initialIcon: category.icon,
+                onConfirm: (name, icon) => viewModel.editCategory(category.id, name, icon: icon),
+              ),
+            ),
+            IconButton(
+              tooltip: "Delete Category",
+              icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.red),
+              onPressed: () => ManageTreatmentDataScreen._showDeleteConfirm(
+                context, 
+                category.name, 
+                () => viewModel.deleteCategory(category.id)
+              ),
+            ),
+            if (category.children.isNotEmpty) const Icon(Icons.expand_more),
+          ],
+        ),
+        children: category.children.map((child) => _RecursiveCategoryTile(
+          category: child,
+          viewModel: viewModel,
+          level: level + 1,
+        )).toList(),
       ),
     );
   }

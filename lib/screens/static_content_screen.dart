@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import '../utils/theme.dart';
 import '../widgets/custom_primary_button.dart';
 
@@ -142,13 +142,13 @@ For any inquiries, please reach out to our support team.
               // Title
               Text(
                 'Static Content',
-                style: CustomFonts.black24w700,
+                style: context.fonts.black24w700,
               ),
               SizedBox(height: 8.h),
               // Subtitle
               Text(
                 'Manage financial transactions and release payments to clinics',
-                style: CustomFonts.grey14w400,
+                style: context.fonts.grey14w400,
               ),
               SizedBox(height: 16.h),
               // Divider
@@ -199,20 +199,20 @@ For any inquiries, please reach out to our support team.
                               SizedBox(width: 8.w),
                               Text(
                                 _tabs[_selectedTab],
-                                style: CustomFonts.black16w600,
+                                style: context.fonts.black16w600,
                               ),
                             ],
                           ),
                           SizedBox(height: 4.h),
                           Text(
                             _tabDescriptions[_selectedTab],
-                            style: CustomFonts.grey13w500,
+                            style: context.fonts.grey13w500,
                           ),
                           SizedBox(height: 16.h),
                           // Content Label
                           Text(
                             'Content',
-                            style: CustomFonts.black14w500,
+                            style: context.fonts.black14w500,
                           ),
                           SizedBox(height: 12.h),
                           // Quill Editor Container
@@ -246,7 +246,7 @@ For any inquiries, please reach out to our support team.
                             children: [
                               Text(
                                 'Last updated: ${_lastUpdatedDates[_selectedTab]}',
-                                style: CustomFonts.grey13w500,
+                                style: context.fonts.grey13w500,
                               ),
                               const Spacer(),
                               CustomPrimaryButton(
@@ -290,7 +290,7 @@ For any inquiries, please reach out to our support team.
         child: Center(
           child: Text(
             _tabs[index],
-            style: isSelected ? CustomFonts.black13w600 : CustomFonts.grey13w500,
+            style: isSelected ? context.fonts.black13w600 : context.fonts.grey13w500,
             textAlign: TextAlign.center,
           ),
         ),
@@ -325,12 +325,12 @@ For any inquiries, please reach out to our support team.
               children: [
                 Text(
                   'Important Note',
-                  style: CustomFonts.black14w600,
+                  style: context.fonts.black14w600,
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   'Changes to static content will be immediately reflected on both the website and mobile application. Please review carefully before saving. Consider consulting with legal counsel before making changes to Terms & Conditions or Privacy Policy.',
-                  style: CustomFonts.grey13w500h14,
+                  style: context.fonts.grey13w500h14,
                 ),
               ],
             ),

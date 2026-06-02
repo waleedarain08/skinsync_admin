@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/utils/validators.dart';
@@ -170,7 +170,7 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Product Image", style: CustomFonts.black14w600),
+        Text("Product Image", style: context.fonts.black14w600),
         SizedBox(height: 12.h),
         Container(
           height: 140.h,

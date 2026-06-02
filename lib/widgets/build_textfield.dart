@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import '../utils/theme.dart';
 
 class BuildTextField extends StatelessWidget {
@@ -41,13 +41,13 @@ class BuildTextField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: CustomFonts.black14w600),
-          SizedBox(height: 8.h),
+          Text(label, style: context.fonts.black14w600),
+          context.verticalSpace(8),
           TextFormField(
             controller: controller,
             maxLines: maxLines,
             obscureText: obscureText,
-            style: CustomFonts.black14w400,
+            style: context.fonts.black14w400,
             keyboardType: keyboardType,
             validator: validator,
             readOnly: readOnly,
@@ -57,6 +57,7 @@ class BuildTextField extends StatelessWidget {
             ],
             onChanged: onChanged,
             decoration: AppDecorations.input(
+              context,
               hint: hintText, 
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,

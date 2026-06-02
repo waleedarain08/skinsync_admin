@@ -11,7 +11,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # build by specifying --build-name and --build-number, respectively.
 # In Android, build-name is used as versionName while build-number used as versionCode.
 # Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
@@ -34,7 +34,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.9
-  flutter_screenutil: ^5.9.3
+  flutter_screenutil_plus: ^1.5.0
   shared_preferences: ^2.5.5
   flutter_easyloading: ^3.0.5
   flutter_secure_storage: ^10.1.0
@@ -53,7 +53,6 @@ dependencies:
   dropdown_button2: ^3.1.0
   syncfusion_flutter_charts: ^33.2.5
   data_table_2: ^2.7.2
-  responsive_framework: ^1.5.1
   fl_chart: ^1.2.0
   connectivity_plus: ^7.1.1
   shimmer: ^3.0.0
@@ -104,43 +103,9 @@ flutter:
     - assets/fonts/
 
   fonts:
-    - family: Degular
+    - family: Geist
       fonts:
-        - asset: assets/fonts/fonnts.com-DegularDemo-Thin.otf
-          weight: 100
-        - asset: assets/fonts/fonnts.com-DegularDemo-Light.otf
-          weight: 300
-        - asset: assets/fonts/fonnts.com-DegularDemo-Regular.otf
-          weight: 400
-        - asset: assets/fonts/fonnts.com-DegularDemo-Medium.otf
-          weight: 500
-        - asset: assets/fonts/fonnts.com-DegularDemo-Semibold.otf
-          weight: 600
-        - asset: assets/fonts/fonnts.com-DegularDemo-Bold.otf
-          weight: 700
-        - asset: assets/fonts/fonnts.com-DegularDemo-Black.otf
-          weight: 900
-        - asset: assets/fonts/fonnts.com-DegularDemo-ThinItalic.otf
-          weight: 100
-          style: italic
-        - asset: assets/fonts/fonnts.com-DegularDemo-LightItalic.otf
-          weight: 300
-          style: italic
-        - asset: assets/fonts/fonnts.com-DegularDemo-Italic.otf
-          weight: 400
-          style: italic
-        - asset: assets/fonts/fonnts.com-DegularDemo-MediumItalic.otf
-          weight: 500
-          style: italic
-        - asset: assets/fonts/fonnts.com-DegularDemo-SemiboldItalic.otf
-          weight: 600
-          style: italic
-        - asset: assets/fonts/fonnts.com-DegularDemo-BoldItalic.otf
-          weight: 700
-          style: italic
-        - asset: assets/fonts/fonnts.com-DegularDemo-BlackItalic.otf
-          weight: 900
-          style: italic
+        - asset: assets/fonts/Geist-VariableFont_wght.ttf
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
