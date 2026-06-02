@@ -14,8 +14,8 @@ import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/nested_category_selector.dart';
 
 class TreatmentManagementScreen extends ConsumerStatefulWidget {
   const TreatmentManagementScreen({super.key});
@@ -137,32 +137,52 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
               Row(
                 children: [
                   Expanded(
-                    child: _buildModalSearchField(
-                      context,
-                      label: "Category",
-                      hint: "All Categories",
-                      controller: viewModel.filterCategoryController,
-                      suggestions: dataState.categories.map((c) => c.name).toList(),
-                      onSelected: (val) {
-                        viewModel.onFilterCategorySelected(val);
-                        setModalState(() {});
-                      },
-                    ),
-                  ),
-                  context.horizontalSpace(16),
-                  Expanded(
-                    child: _buildModalSearchField(
-                      context,
-                      label: "Subcategory",
-                      hint: "All Subcategories",
-                      controller: viewModel.filterSubcategoryController,
-                      suggestions: dataState.categories
-                          .firstWhere((c) => c.name == viewModel.filterCategoryController.text,
-                              orElse: () => dataState.categories.first)
-                          .subcategories
-                          .map((s) => s.name)
-                          .toList(),
-                      onSelected: (val) => viewModel.onFilterChanged(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Category Hierarchy", style: context.fonts.black14w600),
+                        context.verticalSpace(8),
+                        InkWell(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => NestedCategorySelector(
+                                categories: dataState.categories,
+                                initialCategoryId: null,
+                                onSelected: (cat, path) {
+                                  viewModel.filterCategoryController.text = path;
+                                  viewModel.onFilterChanged();
+                                  setModalState(() {});
+                                },
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: CustomColors.whiteGrey,
+                              borderRadius: context.borderRadius(all: 12),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    viewModel.filterCategoryController.text.isEmpty 
+                                        ? "All Categories" 
+                                        : viewModel.filterCategoryController.text,
+                                    style: context.fonts.grey14w400,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -347,7 +367,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                 ),
                 context.verticalSpace(4),
                 Text(
-                  "${treatment.category ?? 'General'} • ${treatment.subcategory ?? 'N/A'}",
+                  treatment.categoryPath ?? treatment.categoryName ?? 'General',
                   style: context.fonts.grey12w400,
                 ),
                 context.verticalSpace(6),

@@ -107,9 +107,11 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 SizedBox(height: 16.h),
                 Row(
                   children: [
-                    _categoryChip(treatment.category ?? "General"),
-                    SizedBox(width: 12.w),
-                    _categoryChip(treatment.subcategory ?? "N/A", isSub: true),
+                    _categoryChip(treatment.categoryName ?? "General"),
+                    if (treatment.categoryPath != null && treatment.categoryPath!.contains(" > ")) ...[
+                      SizedBox(width: 12.w),
+                      _categoryChip(treatment.categoryPath!.split(" > ").last, isSub: true),
+                    ],
                     if (treatment.baseDurationHours != null || treatment.baseDurationMinutes != null) ...[
                       SizedBox(width: 12.w),
                       _durationChip(treatment.baseDurationHours ?? 0, treatment.baseDurationMinutes ?? 0),

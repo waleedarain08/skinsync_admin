@@ -12,8 +12,8 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/nested_category_selector.dart';
 
 class EditTreatmentScreen extends ConsumerWidget {
   const EditTreatmentScreen({super.key});
@@ -45,7 +45,7 @@ class EditTreatmentScreen extends ConsumerWidget {
             onPressed: () {
               if (!_validateForm(context, viewModel, state)) return;
               viewModel.updateTreatment(context).then((_) {
-                if (context.mounted) context.pop();
+                if (context.mounted) Navigator.pop(context);
               });
             },
             child: Text("Save Changes", style: CustomFonts.black16w400),
@@ -63,7 +63,7 @@ class EditTreatmentScreen extends ConsumerWidget {
               children: [
                 _buildBasicDetailsSection(state, viewModel),
                 SizedBox(height: 32.h),
-                _buildCategorizationSection(state, viewModel, dataState),
+                _buildCategorizationSection(context, state, viewModel, dataState),
                 SizedBox(height: 32.h),
                 _buildAreasSection(state, viewModel, dataState),
                 SizedBox(height: 32.h),
@@ -206,7 +206,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCategorizationSection(TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildCategorizationSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return BorderdContainerWidget(
       padding: EdgeInsets.all(24.w),
       child: Column(
@@ -214,35 +214,46 @@ class EditTreatmentScreen extends ConsumerWidget {
         children: [
           Text("Categorization", style: CustomFonts.black18w600),
           SizedBox(height: 24.h),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSearchField(
-                  label: "Category",
-                  hint: "Select category",
-                  controller: viewModel.categoryController,
-                  suggestions: dataState.categories.map((c) => c.name).toList(),
-                  onSelected: (val) => viewModel.onCategorySelected(val),
+          Text("Selected Category", style: CustomFonts.black14w600),
+          SizedBox(height: 10.h),
+          InkWell(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => NestedCategorySelector(
+                  categories: dataState.categories,
+                  initialCategoryId: viewModel.categoryIdController.text,
+                  onSelected: (cat, path) => viewModel.onCategorySelected(cat, path),
                 ),
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: CustomColors.border),
               ),
-              SizedBox(width: 24.w),
-              Expanded(
-                child: _buildSearchField(
-                  label: "Subcategory",
-                  hint: "Select subcategory",
-                  controller: viewModel.subcategoryController,
-                  suggestions: dataState.categories.isEmpty
-                      ? []
-                      : dataState.categories
-                          .firstWhere((c) => c.name == viewModel.categoryController.text,
-                              orElse: () => dataState.categories.first)
-                          .subcategories
-                          .map((s) => s.name)
-                          .toList(),
-                  onSelected: (val) {},
-                ),
+              child: Row(
+                children: [
+                  const Icon(Icons.category_outlined, color: CustomColors.purple, size: 20),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Text(
+                      viewModel.categoryPathController.text.isEmpty 
+                          ? "Tap to select category" 
+                          : viewModel.categoryPathController.text,
+                      style: viewModel.categoryPathController.text.isEmpty 
+                          ? CustomFonts.grey14w400 
+                          : CustomFonts.black14w600,
+                    ),
+                  ),
+                  const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ),

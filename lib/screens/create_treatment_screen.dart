@@ -12,8 +12,8 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/nested_category_selector.dart';
 
 class CreateTreatmentScreen extends ConsumerWidget {
   const CreateTreatmentScreen({super.key});
@@ -243,31 +243,48 @@ class CreateTreatmentScreen extends ConsumerWidget {
       children: [
         _sectionTitle("Categorization"),
         context.verticalSpace(8),
-        Text("Organize treatments to help patients find them easily.", style: CustomFonts.grey14w400),
+        Text("Select a category for this treatment from the network hierarchy.", style: CustomFonts.grey14w400),
         context.verticalSpace(32),
-        _buildSearchField(
-          context,
-          label: "Treatment Category",
-          hint: "Select or type a category",
-          controller: viewModel.categoryController,
-          suggestions: dataState.categories.map((c) => c.name).toList(),
-          onSelected: (val) => viewModel.onCategorySelected(val),
-        ),
-        context.verticalSpace(32),
-        _buildSearchField(
-          context,
-          label: "Treatment Subcategory",
-          hint: "Select or type a subcategory",
-          controller: viewModel.subcategoryController,
-          suggestions: dataState.categories.isEmpty 
-              ? [] 
-              : dataState.categories
-                  .firstWhere((c) => c.name == viewModel.categoryController.text,
-                      orElse: () => dataState.categories.first)
-                  .subcategories
-                  .map((s) => s.name)
-                  .toList(),
-          onSelected: (val) {},
+        Text("Selected Category", style: CustomFonts.black14w600),
+        context.verticalSpace(10),
+        InkWell(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => NestedCategorySelector(
+                categories: dataState.categories,
+                initialCategoryId: viewModel.categoryIdController.text,
+                onSelected: (cat, path) => viewModel.onCategorySelected(cat, path),
+              ),
+            );
+          },
+          child: Container(
+            padding: context.appEdgeInsets(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: context.borderRadius(all: 12),
+              border: Border.all(color: CustomColors.border),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.category_outlined, color: CustomColors.purple, size: 20),
+                context.horizontalSpace(12),
+                Expanded(
+                  child: Text(
+                    viewModel.categoryPathController.text.isEmpty 
+                        ? "Tap to select category" 
+                        : viewModel.categoryPathController.text,
+                    style: viewModel.categoryPathController.text.isEmpty 
+                        ? CustomFonts.grey14w400 
+                        : CustomFonts.black14w600,
+                  ),
+                ),
+                const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
+              ],
+            ),
+          ),
         ),
       ],
     );

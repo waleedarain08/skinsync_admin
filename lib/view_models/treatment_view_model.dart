@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import '../models/treatment_data_models.dart';
 import '../models/treatment_model.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
@@ -27,8 +28,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final durationMinutesController = TextEditingController();
 
   // Step 2 Controllers
-  final categoryController = TextEditingController();
-  final subcategoryController = TextEditingController();
+  final categoryIdController = TextEditingController();
+  final categoryNameController = TextEditingController();
+  final categoryPathController = TextEditingController();
 
   // Step 4 Controllers
   final materialNameController = TextEditingController();
@@ -55,8 +57,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.dispose();
     durationHoursController.dispose();
     durationMinutesController.dispose();
-    categoryController.dispose();
-    subcategoryController.dispose();
+    categoryIdController.dispose();
+    categoryNameController.dispose();
+    categoryPathController.dispose();
     materialNameController.dispose();
     maxMaterialQuantityController.dispose();
     combinableSearchController.dispose();
@@ -102,8 +105,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.clear();
     durationHoursController.clear();
     durationMinutesController.clear();
-    categoryController.clear();
-    subcategoryController.clear();
+    categoryIdController.clear();
+    categoryNameController.clear();
+    categoryPathController.clear();
     materialNameController.clear();
     maxMaterialQuantityController.text = '0';
     combinableSearchController.clear();
@@ -134,8 +138,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.text = treatment.basePrice?.toString() ?? '';
     durationHoursController.text = treatment.baseDurationHours?.toString() ?? '';
     durationMinutesController.text = treatment.baseDurationMinutes?.toString() ?? '';
-    categoryController.text = treatment.category ?? '';
-    subcategoryController.text = treatment.subcategory ?? '';
+    categoryIdController.text = treatment.categoryId ?? '';
+    categoryNameController.text = treatment.categoryName ?? '';
+    categoryPathController.text = treatment.categoryPath ?? '';
     materialNameController.text = treatment.materialName ?? '';
     maxMaterialQuantityController.text = treatment.maxMaterialQuantity.toString();
     
@@ -195,8 +200,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }
   }
 
-  void onCategorySelected(String val) {
-    subcategoryController.clear();
+  void onCategorySelected(CategoryItem category, String path) {
+    categoryIdController.text = category.id;
+    categoryNameController.text = category.name;
+    categoryPathController.text = path;
     state = state.copyWith(); 
   }
 
@@ -262,8 +269,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   // Filter Logic
   void _applyFilters() {
     final query = searchController.text.toLowerCase();
-    final category = filterCategoryController.text.toLowerCase();
-    final subcategory = filterSubcategoryController.text.toLowerCase();
+    final categoryPath = filterCategoryController.text.toLowerCase();
     final area = filterAreaController.text.toLowerCase();
     final status = filterStatusController.text.toLowerCase();
     
@@ -273,11 +279,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             (t.name?.toLowerCase().contains(query) ?? false) ||
             (t.description?.toLowerCase().contains(query) ?? false);
             
-        final matchesCategory = category.isEmpty || 
-            (t.category?.toLowerCase() == category);
-
-        final matchesSubcategory = subcategory.isEmpty || 
-            (t.subcategory?.toLowerCase() == subcategory);
+        final matchesCategory = categoryPath.isEmpty || 
+            (t.categoryPath?.toLowerCase().contains(categoryPath) ?? false);
 
         final matchesArea = area.isEmpty || 
             (t.sideAreas?.any((a) => a.name?.toLowerCase() == area) ?? false);
@@ -286,7 +289,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             (status == 'active' && t.isActive) ||
             (status == 'inactive' && !t.isActive);
 
-        return matchesQuery && matchesCategory && matchesSubcategory && matchesArea && matchesStatus;
+        return matchesQuery && matchesCategory && matchesArea && matchesStatus;
       }).toList(),
     );
   }
@@ -344,8 +347,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   List<TreatmentModel> _getFilteredList(List<TreatmentModel> source) {
     final query = searchController.text.toLowerCase();
-    final category = filterCategoryController.text.toLowerCase();
-    final subcategory = filterSubcategoryController.text.toLowerCase();
+    final categoryPath = filterCategoryController.text.toLowerCase();
     final area = filterAreaController.text.toLowerCase();
     final status = filterStatusController.text.toLowerCase();
 
@@ -354,9 +356,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           (t.name?.toLowerCase().contains(query) ?? false) ||
           (t.description?.toLowerCase().contains(query) ?? false);
 
-      final matchesCategory = category.isEmpty || (t.category?.toLowerCase() == category);
-
-      final matchesSubcategory = subcategory.isEmpty || (t.subcategory?.toLowerCase() == subcategory);
+      final matchesCategory = categoryPath.isEmpty || (t.categoryPath?.toLowerCase().contains(categoryPath) ?? false);
 
       final matchesArea = area.isEmpty || (t.sideAreas?.any((a) => a.name?.toLowerCase() == area) ?? false);
 
@@ -364,7 +364,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           (status == 'active' && t.isActive) ||
           (status == 'inactive' && !t.isActive);
 
-      return matchesQuery && matchesCategory && matchesSubcategory && matchesArea && matchesStatus;
+      return matchesQuery && matchesCategory && matchesArea && matchesStatus;
     }).toList();
   }
 
@@ -379,8 +379,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         basePrice: double.tryParse(basePriceController.text),
         baseDurationHours: int.tryParse(durationHoursController.text),
         baseDurationMinutes: int.tryParse(durationMinutesController.text),
-        category: categoryController.text,
-        subcategory: subcategoryController.text,
+        categoryId: categoryIdController.text,
+        categoryName: categoryNameController.text,
+        categoryPath: categoryPathController.text,
         materialName: materialNameController.text,
         maxMaterialQuantity: int.tryParse(maxMaterialQuantityController.text) ?? 0,
         useInAiSimulator: state.useInAiSimulator,

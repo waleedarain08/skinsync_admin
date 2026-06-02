@@ -11,14 +11,18 @@ import 'business_info_screen.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
-class CreateStaffScreen extends StatefulWidget {
+import 'package:skinsync_admin/widgets/nested_category_selector.dart';
+import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class CreateStaffScreen extends ConsumerStatefulWidget {
   const CreateStaffScreen({super.key});
 
   @override
-  State<CreateStaffScreen> createState() => _CreateStaffScreenState();
+  ConsumerState<CreateStaffScreen> createState() => _CreateStaffScreenState();
 }
 
-class _CreateStaffScreenState extends State<CreateStaffScreen> {
+class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
   final TextEditingController _treatmentNameController =
       TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -26,28 +30,10 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _selectedImage;
 
-  // Dropdown values
-  String? _selectedCategory;
-  String? _selectedSubcategory;
+  // Selected category data
+  String? _categoryId;
+  String? _categoryPath;
 
-  // Dropdown lists
-  final List<String> _categories = [
-    'Facial Treatments',
-    'Body Treatments',
-    'Skin Care',
-    'Hair Treatments',
-    'Massage Therapy',
-    'Wellness',
-  ];
-
-  final List<String> _subcategories = [
-    'Anti-Aging',
-    'Hydration',
-    'Acne Treatment',
-    'Brightening',
-    'Relaxation',
-    'Deep Tissue',
-  ];
 
   @override
   void dispose() {
@@ -255,32 +241,55 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             hintText: 'e.g., Botox, Dermal Fillers',
           ),
           context.verticalSpace(20),
-          // Category Dropdown
-          _buildDropdownField(
-            context,
-            label: 'Category',
-            hintText: 'Select category',
-            value: _selectedCategory,
-            items: _categories,
-            onChanged: (value) {
-              setState(() {
-                _selectedCategory = value;
-              });
-            },
-          ),
-          context.verticalSpace(20),
-          // Subcategory Dropdown
-          _buildDropdownField(
-            context,
-            label: 'Subcategory',
-            hintText: 'Select subcategory',
-            value: _selectedSubcategory,
-            items: _subcategories,
-            onChanged: (value) {
-              setState(() {
-                _selectedSubcategory = value;
-              });
-            },
+          // Category Selection
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Category Hierarchy", style: context.fonts.black14w600),
+              context.verticalSpace(8),
+              InkWell(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => NestedCategorySelector(
+                      categories: ref.watch(treatmentDataViewModelProvider).categories,
+                      initialCategoryId: _categoryId,
+                      onSelected: (cat, path) {
+                        setState(() {
+                          _categoryId = cat.id;
+                          _categoryPath = path;
+                        });
+                      },
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: context.borderRadius(all: 12),
+                    border: Border.all(color: CustomColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _categoryPath ?? "Select category",
+                          style: _categoryPath == null 
+                              ? context.fonts.grey14w400 
+                              : context.fonts.black14w600,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
           context.verticalSpace(20),
           // Description
@@ -362,54 +371,6 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
               style: context.fonts.grey12w400,
             ),
           ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdownField(
-    BuildContext context, {
-    required String label,
-    required String hintText,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: context.fonts.black14w600,
-        ),
-        context.verticalSpace(8),
-        DropdownButtonFormField<String>(
-          isExpanded: true,
-          hint: Text(
-            hintText,
-            style: context.fonts.grey14w400,
-          ),
-          initialValue: value,
-          items: items
-              .map(
-                (item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: context.fonts.black14w400,
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: Colors.grey[500],
-            size: context.sp(24),
-          ),
-          dropdownColor: Colors.white,
-          borderRadius: context.borderRadius(all: 12),
-          decoration: AppDecorations.input(context, hint: hintText),
         ),
       ],
     );

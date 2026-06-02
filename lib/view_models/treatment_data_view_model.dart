@@ -37,13 +37,26 @@ class TreatmentDataState {
 class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
   @override
   TreatmentDataState build() {
-    // Transform dummy data to models
-    final categories = TreatmentData.categoriesWithSubcategories.entries.map((e) {
-      return CategoryItem(
-        name: e.key,
-        subcategories: e.value.map((s) => SubcategoryItem(name: s)).toList(),
-      );
-    }).toList();
+    // Initializing with hierarchical data based on dummy data
+    int idCounter = 1;
+    final List<CategoryItem> categories = [];
+
+    TreatmentData.categoriesWithSubcategories.forEach((parentName, subList) {
+      final parentId = (idCounter++).toString();
+      final children = subList.map((subName) {
+        return CategoryItem(
+          id: (idCounter++).toString(),
+          name: subName,
+          parentId: parentId,
+        );
+      }).toList();
+
+      categories.add(CategoryItem(
+        id: parentId,
+        name: parentName,
+        children: children,
+      ));
+    });
 
     final areas = TreatmentData.areasWithSubAreas.entries.map((e) {
       return AreaItem(
@@ -63,65 +76,83 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     );
   }
 
-  // --- Category Actions ---
-  void addCategory(String name, {String? icon}) {
+  // --- Category Actions (Supports Unlimited Nesting) ---
+
+  void addCategory(String name, {String? icon, String? parentId}) {
     if (name.isEmpty) return;
-    state = state.copyWith(categories: [...state.categories, CategoryItem(name: name, icon: icon)]);
+    final newCategory = CategoryItem(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+      icon: icon,
+      parentId: parentId,
+    );
+
+    if (parentId == null) {
+      state = state.copyWith(categories: [...state.categories, newCategory]);
+    } else {
+      state = state.copyWith(
+        categories: _addChildToTree(state.categories, parentId, newCategory),
+      );
+    }
   }
 
-  void editCategory(String oldName, String newName, {String? icon}) {
+  List<CategoryItem> _addChildToTree(List<CategoryItem> items, String parentId, CategoryItem newChild) {
+    return items.map((item) {
+      if (item.id == parentId) {
+        return item.copyWith(children: [...item.children, newChild]);
+      } else if (item.children.isNotEmpty) {
+        return item.copyWith(children: _addChildToTree(item.children, parentId, newChild));
+      }
+      return item;
+    }).toList();
+  }
+
+  void editCategory(String id, String newName, {String? icon}) {
     state = state.copyWith(
-      categories: state.categories.map((c) {
-        if (c.name == oldName) {
-          return c.copyWith(name: newName, icon: icon ?? c.icon);
-        }
-        return c;
-      }).toList(),
+      categories: _updateInTree(state.categories, id, newName, icon),
     );
   }
 
-  void deleteCategory(String name) {
-    state = state.copyWith(categories: state.categories.where((c) => c.name != name).toList());
+  List<CategoryItem> _updateInTree(List<CategoryItem> items, String id, String newName, String? icon) {
+    return items.map((item) {
+      if (item.id == id) {
+        return item.copyWith(name: newName, icon: icon ?? item.icon);
+      } else if (item.children.isNotEmpty) {
+        return item.copyWith(children: _updateInTree(item.children, id, newName, icon));
+      }
+      return item;
+    }).toList();
   }
 
-  void addSubcategory(String categoryName, String name, {String? icon}) {
+  void deleteCategory(String id) {
     state = state.copyWith(
-      categories: state.categories.map((c) {
-        if (c.name == categoryName) {
-          return c.copyWith(subcategories: [...c.subcategories, SubcategoryItem(name: name, icon: icon)]);
-        }
-        return c;
-      }).toList(),
+      categories: _removeFromTree(state.categories, id),
     );
   }
 
-  void editSubcategory(String categoryName, String oldName, String newName, {String? icon}) {
-    state = state.copyWith(
-      categories: state.categories.map((c) {
-        if (c.name == categoryName) {
-          return c.copyWith(
-            subcategories: c.subcategories.map((s) {
-              if (s.name == oldName) {
-                return s.copyWith(name: newName, icon: icon ?? s.icon);
-              }
-              return s;
-            }).toList(),
-          );
-        }
-        return c;
-      }).toList(),
-    );
+  List<CategoryItem> _removeFromTree(List<CategoryItem> items, String id) {
+    // Remove if matches ID at this level
+    final filtered = items.where((item) => item.id != id).toList();
+    // Recursively remove from children
+    return filtered.map((item) {
+      if (item.children.isNotEmpty) {
+        return item.copyWith(children: _removeFromTree(item.children, id));
+      }
+      return item;
+    }).toList();
   }
 
-  void deleteSubcategory(String categoryName, String name) {
-    state = state.copyWith(
-      categories: state.categories.map((c) {
-        if (c.name == categoryName) {
-          return c.copyWith(subcategories: c.subcategories.where((s) => s.name != name).toList());
-        }
-        return c;
-      }).toList(),
-    );
+  // Legacy support for Subcategory (mapping to the tree logic)
+  void addSubcategory(String parentId, String name, {String? icon}) {
+    addCategory(name, icon: icon, parentId: parentId);
+  }
+
+  void editSubcategory(String parentId, String id, String newName, {String? icon}) {
+    editCategory(id, newName, icon: icon);
+  }
+
+  void deleteSubcategory(String parentId, String id) {
+    deleteCategory(id);
   }
 
   // --- Area Actions ---

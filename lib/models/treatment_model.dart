@@ -4,8 +4,9 @@ class TreatmentModel {
   String? patientDisplayName;
   String? description;
   String? shortDescription;
-  String? category;
-  String? subcategory;
+  String? categoryId;
+  String? categoryName;
+  String? categoryPath; // e.g. "Injectables > Botox > Forehead"
   String? icon;
   String? image;
   double? basePrice;
@@ -25,8 +26,9 @@ class TreatmentModel {
     this.patientDisplayName,
     this.description,
     this.shortDescription,
-    this.category,
-    this.subcategory,
+    this.categoryId,
+    this.categoryName,
+    this.categoryPath,
     this.icon,
     this.image,
     this.basePrice,
@@ -50,8 +52,9 @@ class TreatmentModel {
     patientDisplayName = json['patient_display_name'];
     description = json['description'];
     shortDescription = json['short_description'];
-    category = json['category'];
-    subcategory = json['subcategory'];
+    categoryId = json['category_id'];
+    categoryName = json['category_name'];
+    categoryPath = json['category_path'];
     icon = json['icon'];
     image = json['image'];
     basePrice = json['base_price']?.toDouble();
@@ -75,8 +78,9 @@ class TreatmentModel {
     String? patientDisplayName,
     String? description,
     String? shortDescription,
-    String? category,
-    String? subcategory,
+    String? categoryId,
+    String? categoryName,
+    String? categoryPath,
     String? icon,
     String? image,
     double? basePrice,
@@ -96,8 +100,9 @@ class TreatmentModel {
       patientDisplayName: patientDisplayName ?? this.patientDisplayName,
       description: description ?? this.description,
       shortDescription: shortDescription ?? this.shortDescription,
-      category: category ?? this.category,
-      subcategory: subcategory ?? this.subcategory,
+      categoryId: categoryId ?? this.categoryId,
+      categoryName: categoryName ?? this.categoryName,
+      categoryPath: categoryPath ?? this.categoryPath,
       icon: icon ?? this.icon,
       image: image ?? this.image,
       basePrice: basePrice ?? this.basePrice,
@@ -120,8 +125,9 @@ class TreatmentModel {
       'patient_display_name': patientDisplayName,
       'description': description,
       'short_description': shortDescription,
-      'category': category,
-      'subcategory': subcategory,
+      'category_id': categoryId,
+      'category_name': categoryName,
+      'category_path': categoryPath,
       'icon': icon,
       'image': image,
       'base_price': basePrice,

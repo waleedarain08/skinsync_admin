@@ -303,7 +303,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         context.verticalSpace(32),
         ValueListenableBuilder(
           valueListenable: _obscureNewPassword,
-          builder: (_, val, __) => BuildTextField(
+          builder: (context, val, child) => BuildTextField(
             label: "New Password",
             hintText: "••••••••",
             controller: _newPasswordController,
@@ -322,7 +322,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         context.verticalSpace(24),
         ValueListenableBuilder(
           valueListenable: _obscureConfirmPassword,
-          builder: (_, val, __) => BuildTextField(
+          builder: (context, val, child) => BuildTextField(
             label: "Confirm Password",
             hintText: "••••••••",
             controller: _confirmPasswordController,

@@ -586,6 +586,12 @@ class CustomFontsGetter {
   );
 
   // --- Red Styles ---
+  TextStyle get red13w500 => TextStyle(
+    fontSize: context.sp(13),
+    fontWeight: FontWeight.w500,
+    color: CustomColors.red,
+    fontFamily: _fontFamily,
+  );
   TextStyle get red11w600 => TextStyle(
     fontSize: context.sp(11),
     fontWeight: FontWeight.w600,
