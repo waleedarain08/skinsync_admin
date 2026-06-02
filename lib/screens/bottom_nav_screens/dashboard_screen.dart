@@ -29,7 +29,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Good Morning, Alex', style: CustomFonts.black32w700),
+                      Text('Good Morning, Alex', style: context.fonts.black32w700),
                       context.verticalSpace(6),
                       Text(
                         "Here's a summary of your MedSpa network performance.",
@@ -80,7 +80,7 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Icon(Icons.calendar_today_rounded, size: context.sp(16), color: CustomColors.purple),
           context.horizontalSpace(12),
-          Text('Oct 2023', style: CustomFonts.black14w600),
+          Text('Oct 2023', style: context.fonts.black14w600),
           context.horizontalSpace(8),
           Icon(Icons.keyboard_arrow_down_rounded, size: context.sp(18), color: CustomColors.lightGrey),
         ],
@@ -238,7 +238,7 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          Text('\$42k', style: CustomFonts.purple14w600),
+          Text('\$42k', style: context.fonts.purple14w600),
         ],
       ),
     );
@@ -257,7 +257,7 @@ class DashboardScreen extends StatelessWidget {
               Text('Recent Activity', style: context.fonts.black18w600),
               TextButton(
                 onPressed: () {},
-                child: Text('View Report', style: CustomFonts.purple14w600),
+                child: Text('View Report', style: context.fonts.purple14w600),
               ),
             ],
           ),

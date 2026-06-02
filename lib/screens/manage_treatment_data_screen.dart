@@ -30,7 +30,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         appBar: AppBar(
           flexibleSpace: AppDecorations.appBarGradient,
           elevation: 0,
-          title: Text("Manage Network Taxonomy", style: CustomFonts.black20w600),
+          title: Text("Manage Network Taxonomy", style: context.fonts.black20w600),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: CustomColors.black),
             onPressed: () => context.pop(),
@@ -67,6 +67,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTabHeader(
+            context: context,
             title: "Treatment Categories",
             onAdd: () => _showItemDialog(
               context: context,
@@ -100,6 +101,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTabHeader(
+            context: context,
             title: "Anatomical Body Areas",
             onAdd: () => _showItemDialog(
               context: context,
@@ -141,6 +143,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTabHeader(
+            context: context,
             title: "Consumable Materials",
             onAdd: () => _showItemDialog(
               context: context,
@@ -157,7 +160,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               label: Text(item),
               onDeleted: () => _showDeleteConfirm(context, item, () => viewModel.deleteMaterial(item)),
               deleteIcon: const Icon(Icons.close, size: 16),
-              labelStyle: CustomFonts.purple14w600,
+              labelStyle: context.fonts.purple14w600,
               backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
               side: BorderSide(color: CustomColors.purple.withValues(alpha: 0.1)),
               shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 8)),
@@ -175,6 +178,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTabHeader(
+            context: context,
             title: "Treatment Combination Groups",
             onAdd: () => _showCombinationDialog(
               context: context,
@@ -204,8 +208,8 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                     ),
                     child: const Icon(Icons.auto_awesome_motion_rounded, color: CustomColors.purple),
                   ),
-                  title: Text(group.name, style: CustomFonts.black16w600),
-                  subtitle: Text("${group.treatmentNames.length} combined treatments", style: CustomFonts.grey12w400),
+                  title: Text(group.name, style: context.fonts.black16w600),
+                  subtitle: Text("${group.treatmentNames.length} combined treatments", style: context.fonts.grey12w400),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -240,7 +244,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                               label: Text(t),
                               backgroundColor: CustomColors.whiteGrey,
                               side: BorderSide(color: Colors.grey[200]!),
-                              labelStyle: CustomFonts.black12w600,
+                              labelStyle: context.fonts.black12w600,
                             )).toList(),
                           ),
                           context.verticalSpace(8),
@@ -257,16 +261,16 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTabHeader({required String title, required VoidCallback onAdd}) {
+  Widget _buildTabHeader({required BuildContext context, required String title, required VoidCallback onAdd}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: CustomFonts.black18w600),
+        Text(title, style: context.fonts.black18w600),
         CustomPrimaryButton(
           onTap: onAdd,
           icon: Icons.add,
           label: "Add New",
-          width: 140.w,
+          width: context.w(140),
         ),
       ],
     );
@@ -296,8 +300,8 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               ? Image.network(icon, errorBuilder: (context, error, stackTrace) => const Icon(Icons.category_outlined)) 
               : const Icon(Icons.category_outlined, color: CustomColors.purple),
         ),
-        title: Text(name, style: CustomFonts.black16w600),
-        subtitle: Text("$childrenCount sub-items", style: CustomFonts.grey12w400),
+        title: Text(name, style: context.fonts.black16w600),
+        subtitle: Text("$childrenCount sub-items", style: context.fonts.grey12w400),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -333,7 +337,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                         ? Image.network(child.icon!, errorBuilder: (context, error, stackTrace) => const Icon(Icons.subdirectory_arrow_right, size: 16))
                         : const Icon(Icons.subdirectory_arrow_right, size: 16, color: CustomColors.grey),
                   ),
-                  title: Text(child.name, style: CustomFonts.black14w400),
+                  title: Text(child.name, style: context.fonts.black14w400),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -451,7 +455,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                 hintText: "e.g. Skin Glow Package",
               ),
               context.verticalSpace(24),
-              Text("Add Treatments", style: CustomFonts.black14w600),
+              Text("Add Treatments", style: context.fonts.black14w600),
               context.verticalSpace(10),
               SearchAnchor(
                 viewHintText: "Search treatments...",
@@ -485,7 +489,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                   spacing: context.w(8),
                   runSpacing: context.h(8),
                   children: selectedTreatments.map((t) => Chip(
-                    label: Text(t, style: CustomFonts.black11w400),
+                    label: Text(t, style: context.fonts.black11w400),
                     onDeleted: () => setState(() => selectedTreatments.remove(t)),
                     backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
                     deleteIconColor: CustomColors.purple,
@@ -518,7 +522,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
       builder: (context) => StandardDialog(
         title: "Confirm Delete",
         width: context.w(400),
-        content: Text("Are you sure you want to delete '$name'? This action is irreversible. All child sub-items will also be removed.", style: CustomFonts.black14w400),
+        content: Text("Are you sure you want to delete '$name'? This action is irreversible. All child sub-items will also be removed.", style: context.fonts.black14w400),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           CustomPrimaryButton(
@@ -565,8 +569,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
               ? Image.network(category.icon!, errorBuilder: (context, error, stackTrace) => const Icon(Icons.category_outlined))
               : const Icon(Icons.category_outlined, color: CustomColors.purple),
         ),
-        title: Text(category.name, style: CustomFonts.black16w600),
-        subtitle: Text("${category.children.length} sub-categories", style: CustomFonts.grey12w400),
+        title: Text(category.name, style: context.fonts.black16w600),
+        subtitle: Text("${category.children.length} sub-categories", style: context.fonts.grey12w400),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

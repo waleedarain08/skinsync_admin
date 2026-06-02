@@ -23,7 +23,7 @@ class TopTreatmentsChart extends StatelessWidget {
       
         primaryXAxis: CategoryAxis(
           majorGridLines: const MajorGridLines(width: 0),
-          labelStyle: CustomFonts.grey14w400  ,
+          labelStyle: context.fonts.grey14w400  ,
         ),
         primaryYAxis: NumericAxis(
           minimum: 0,

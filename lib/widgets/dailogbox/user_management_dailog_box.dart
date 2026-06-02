@@ -11,40 +11,40 @@ class UserManagementDialogBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return StandardDialog(
       title: "User Profile Details",
-      width: 700.w,
+      width: context.w(700),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle("Personal Information"),
-            SizedBox(height: 20.h),
+            _buildSectionTitle(context, "Personal Information"),
+            context.verticalSpace(20),
             Row(
               children: [
-                Expanded(child: _infoBlock("First Name", "Emma")),
-                SizedBox(width: 24.w),
-                Expanded(child: _infoBlock("Last Name", "Johnson")),
+                Expanded(child: _infoBlock(context, "First Name", "Emma")),
+                context.horizontalSpace(24),
+                Expanded(child: _infoBlock(context, "Last Name", "Johnson")),
               ],
             ),
-            SizedBox(height: 16.h),
+            context.verticalSpace(16),
             Row(
               children: [
-                Expanded(child: _infoBlock("Email", "emma.j@example.com")),
-                SizedBox(width: 24.w),
-                Expanded(child: _infoBlock("Mobile", "+1 (555) 123-4567")),
+                Expanded(child: _infoBlock(context, "Email", "emma.j@example.com")),
+                context.horizontalSpace(24),
+                Expanded(child: _infoBlock(context, "Mobile", "+1 (555) 123-4567")),
               ],
             ),
-            SizedBox(height: 32.h),
-            _buildSectionTitle("Skin Analysis & Goals"),
-            SizedBox(height: 20.h),
-            _buildTagSection("Skin Goals", ["Anti-aging", "Hydration"]),
-            SizedBox(height: 20.h),
-            _buildTagSection("Primary Concerns", ["Fine lines", "Dryness", "Dark spots"]),
-            SizedBox(height: 32.h),
-            _buildSectionTitle("Bio & History"),
-            SizedBox(height: 16.h),
-            _infoBlock("Bio", "Looking to improve skin texture and reduce signs of aging."),
-            SizedBox(height: 16.h),
-            _infoBlock("Medical History", "No known allergies. Previous treatments include chemical peels."),
+            context.verticalSpace(32),
+            _buildSectionTitle(context, "Skin Analysis & Goals"),
+            context.verticalSpace(20),
+            _buildTagSection(context, "Skin Goals", ["Anti-aging", "Hydration"]),
+            context.verticalSpace(20),
+            _buildTagSection(context, "Primary Concerns", ["Fine lines", "Dryness", "Dark spots"]),
+            context.verticalSpace(32),
+            _buildSectionTitle(context, "Bio & History"),
+            context.verticalSpace(16),
+            _infoBlock(context, "Bio", "Looking to improve skin texture and reduce signs of aging."),
+            context.verticalSpace(16),
+            _infoBlock(context, "Medical History", "No known allergies. Previous treatments include chemical peels."),
           ],
         ),
       ),
@@ -52,50 +52,50 @@ class UserManagementDialogBox extends StatelessWidget {
         CustomPrimaryButton(
           onTap: () => Navigator.pop(context),
           label: "Close Profile",
-          width: 160.w,
+          width: context.w(160),
         ),
       ],
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
+        Text(title, style: context.fonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );
   }
 
-  Widget _infoBlock(String label, String value) {
+  Widget _infoBlock(BuildContext context, String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.grey13w500),
-        SizedBox(height: 4.h),
-        Text(value, style: CustomFonts.black16w600),
+        Text(label, style: context.fonts.grey13w500),
+        context.verticalSpace(4),
+        Text(value, style: context.fonts.black16w600),
       ],
     );
   }
 
-  Widget _buildTagSection(String label, List<String> tags) {
+  Widget _buildTagSection(BuildContext context, String label, List<String> tags) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.grey13w500),
-        SizedBox(height: 12.h),
+        Text(label, style: context.fonts.grey13w500),
+        context.verticalSpace(12),
         Wrap(
-          spacing: 12.w,
-          runSpacing: 12.h,
+          spacing: context.w(12),
+          runSpacing: context.h(12),
           children: tags.map((tag) => Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            padding: context.appEdgeInsets(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: CustomColors.green.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8.r),
+              borderRadius: context.appBorderRadius(all: 8),
               border: Border.all(color: CustomColors.green.withValues(alpha: 0.2)),
             ),
-            child: Text(tag, style: CustomFonts.black14w600.copyWith(color: CustomColors.purple, fontSize: 11.sp)),
+            child: Text(tag, style: context.fonts.black14w600.copyWith(color: CustomColors.purple, fontSize: context.sp(11))),
           )).toList(),
         ),
       ],

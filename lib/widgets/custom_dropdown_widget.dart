@@ -30,14 +30,14 @@ class CustomDropdown<T> extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: CustomFonts.black14w600),
+          Text(label, style: context.fonts.black14w600),
           context.verticalSpace(8),
           DropdownButtonFormField<T>(
             initialValue: value,
             items: items,
             onChanged: onChanged,
             validator: validator,
-            style: CustomFonts.black14w400,
+            style: context.fonts.black14w400,
             icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.lightGrey, size: context.sp(20)),
             decoration: AppDecorations.input(context, hint: hintText),
             dropdownColor: CustomColors.white,

@@ -14,7 +14,7 @@ class RevenueTrendWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Revenue Trend (Last 6 Months)", style: CustomFonts.black20w600),
+          Text("Revenue Trend (Last 6 Months)", style: context.fonts.black20w600),
           SizedBox(height: 17.h),
           SizedBox(
             height: 250.h,
@@ -47,7 +47,7 @@ class RevenueTrendWidget extends StatelessWidget {
                             value == 240000) {
                           return Text(
                             value.toInt().toString(),
-                            style: CustomFonts.black12w400,
+                            style: context.fonts.black12w400,
                           );
                         }
                         return const SizedBox.shrink();
@@ -71,7 +71,7 @@ class RevenueTrendWidget extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
                             months[value.toInt()],
-                            style: CustomFonts.black13w400,
+                            style: context.fonts.black13w400,
                           ),
                         );
                       },

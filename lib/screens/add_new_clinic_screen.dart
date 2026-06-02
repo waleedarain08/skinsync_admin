@@ -96,7 +96,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Select Clinic Logo', style: CustomFonts.black20w600),
+              Text('Select Clinic Logo', style: context.fonts.black20w600),
               SizedBox(height: 20.h),
               ListTile(
                 leading: Container(
@@ -107,7 +107,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                   ),
                   child: const Icon(Icons.photo_library_outlined, color: Colors.blue),
                 ),
-                title: Text('Choose from Gallery', style: CustomFonts.black14w600),
+                title: Text('Choose from Gallery', style: context.fonts.black14w600),
                 onTap: () async {
                   Navigator.pop(context);
                   final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
@@ -124,7 +124,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                   ),
                   child: const Icon(Icons.camera_alt_outlined, color: Colors.green),
                 ),
-                title: Text('Take a Photo', style: CustomFonts.black14w600),
+                title: Text('Take a Photo', style: context.fonts.black14w600),
                 onTap: () async {
                   Navigator.pop(context);
                   final XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
@@ -206,7 +206,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     return GradientScaffold(
       appBar: AppBar(
         flexibleSpace: AppDecorations.appBarGradient,
-        title: Text("Add New Clinic", style: CustomFonts.black20w600),
+        title: Text("Add New Clinic", style: context.fonts.black20w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -261,7 +261,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Phone Number (Selection sets Country & CC)", style: CustomFonts.black14w600),
+                                Text("Phone Number (Selection sets Country & CC)", style: context.fonts.black14w600),
                                 SizedBox(height: 10.h),
                                 PhoneWidget(
                                   controller: _clinicPhoneController,
@@ -364,7 +364,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                             foregroundColor: CustomColors.grey,
                             side: const BorderSide(color: CustomColors.border, width: 1.5),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                            textStyle: CustomFonts.black16w600,
+                            textStyle: context.fonts.black16w600,
                           ),
                           child: const Text("Cancel"),
                         ),
@@ -424,7 +424,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
             SizedBox(height: 12.h),
             Text(
               _selectedLogo == null ? "Tap to upload logo" : "Change Logo",
-              style: CustomFonts.grey13w500,
+              style: context.fonts.grey13w500,
             ),
           ],
         ),
@@ -450,7 +450,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: CustomFonts.black20w600),
+          Text(title, style: context.fonts.black20w600),
           SizedBox(height: 32.h),
           ...children,
         ],
@@ -479,7 +479,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Clinic Availability", style: CustomFonts.black20w600),
+              Text("Clinic Availability", style: context.fonts.black20w600),
               CustomPrimaryButton(
                 onTap: _addAvailability,
                 icon: Icons.add_circle_outline,
@@ -514,7 +514,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("Timing Slot ${index + 1}", style: CustomFonts.purple16w600),
+            Text("Timing Slot ${index + 1}", style: context.fonts.purple16w600),
             if (_availabilityEntries.length > 1)
               TextButton.icon(
                 onPressed: () => _removeAvailability(index),
@@ -545,7 +545,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
           ],
         ),
         SizedBox(height: 24.h),
-        Text("Active Days", style: CustomFonts.black14w600),
+        Text("Active Days", style: context.fonts.black14w600),
         SizedBox(height: 16.h),
         Wrap(
           spacing: 12.w,
@@ -569,7 +569,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
               backgroundColor: Colors.white,
               selectedColor: CustomColors.purple.withValues(alpha: 0.1),
               checkmarkColor: CustomColors.purple,
-              labelStyle: isSelected ? CustomFonts.purple13w700 : CustomFonts.grey13w500,
+              labelStyle: isSelected ? context.fonts.purple13w700 : context.fonts.grey13w500,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.r),
                 side: BorderSide(
@@ -592,7 +592,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomFonts.grey13w500),
+        Text(label, style: context.fonts.grey13w500),
         SizedBox(height: 10.h),
         InkWell(
           onTap: () async {

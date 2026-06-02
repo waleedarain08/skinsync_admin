@@ -46,7 +46,7 @@ class AppSearchField extends StatelessWidget {
         autofocus: autoFocus,
         readOnly: readOnly,
         onTap: onTap,
-        style: CustomFonts.black14w400,
+        style: context.fonts.black14w400,
         decoration: AppDecorations.input(
           context,
           hint: hintText,

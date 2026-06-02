@@ -15,64 +15,64 @@ class DisputeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            SizedBox(height: 32.h),
-            _buildDisputeMetrics(),
-            SizedBox(height: 32.h),
+            _buildHeader(context),
+            context.verticalSpace(32),
+            _buildDisputeMetrics(context),
+            context.verticalSpace(32),
             _buildPendingDisputesTable(context),
-            SizedBox(height: 32.h),
-            _buildResolvedDisputesTable(),
+            context.verticalSpace(32),
+            _buildResolvedDisputesTable(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Dispute Management", style: CustomFonts.black26w700),
-        SizedBox(height: 8.h),
+        Text("Dispute Management", style: context.fonts.black26w700),
+        context.verticalSpace(8),
         Text(
           "Review, mediate, and resolve patient-clinic disputes.",
-          style: CustomFonts.grey14w400,
+          style: context.fonts.grey14w400,
         ),
       ],
     );
   }
 
-  Widget _buildDisputeMetrics() {
+  Widget _buildDisputeMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard("Active Disputes", "12", Icons.gavel_outlined, CustomColors.red),
-        SizedBox(width: 16.w),
-        _buildMetricCard("Pending Review", "8", Icons.hourglass_top, CustomColors.amber),
-        SizedBox(width: 16.w),
-        _buildMetricCard("Resolved (30d)", "45", Icons.check_circle_outline, CustomColors.green),
-        SizedBox(width: 16.w),
-        _buildMetricCard("Avg Resolution Time", "2.4 Days", Icons.timer_outlined, CustomColors.black),
+        _buildMetricCard(context, "Active Disputes", "12", Icons.gavel_outlined, CustomColors.red),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, "Pending Review", "8", Icons.hourglass_top, CustomColors.amber),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, "Resolved (30d)", "45", Icons.check_circle_outline, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, "Avg Resolution Time", "2.4 Days", Icons.timer_outlined, CustomColors.black),
       ],
     );
   }
 
-  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(BuildContext context, String title, String value, IconData icon, Color color) {
     return Expanded(
       child: BorderdContainerWidget(
-        padding: EdgeInsets.all(24.w),
+        padding: context.appEdgeInsets(all: 24),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 28.sp),
-            SizedBox(width: 16.w),
+            Icon(icon, color: color, size: context.sp(28)),
+            context.horizontalSpace(16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.black20w600),
-                Text(title, style: CustomFonts.grey12w400),
+                Text(value, style: context.fonts.black20w600),
+                Text(title, style: context.fonts.grey12w400),
               ],
             ),
           ],
@@ -88,11 +88,11 @@ class DisputeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Text("Pending Action", style: CustomFonts.black20w600),
+            padding: context.appEdgeInsets(all: 20),
+            child: Text("Pending Action", style: context.fonts.black20w600),
           ),
           SizedBox(
-            height: 300.h,
+            height: context.h(300),
             child: DataTable2(
               columnSpacing: 24,
               horizontalMargin: 20,
@@ -117,15 +117,15 @@ class DisputeScreen extends StatelessWidget {
   DataRow _disputeRow(BuildContext context) {
     return DataRow(
       cells: [
-        DataCell(Text('#DSP-421', style: CustomFonts.black14w400)),
-        DataCell(Text('Emily Davis', style: CustomFonts.black14w400)),
-        DataCell(Text('Pure Skin Care', style: CustomFonts.black14w400)),
-        DataCell(Text('Service mismatch', style: CustomFonts.black14w400)),
+        DataCell(Text('#DSP-421', style: context.fonts.black14w400)),
+        DataCell(Text('Emily Davis', style: context.fonts.black14w400)),
+        DataCell(Text('Pure Skin Care', style: context.fonts.black14w400)),
+        DataCell(Text('Service mismatch', style: context.fonts.black14w400)),
         DataCell(
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4.r)),
-            child: Text("High", style: CustomFonts.red10w700), // Updated to static style
+            padding: context.appEdgeInsets(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(color: CustomColors.red.withValues(alpha: 0.1), borderRadius: context.appBorderRadius(all: 4)),
+            child: Text("High", style: context.fonts.red10w700),
           ),
         ),
         DataCell(
@@ -145,18 +145,18 @@ class DisputeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildResolvedDisputesTable() {
+  Widget _buildResolvedDisputesTable(BuildContext context) {
     return BorderdContainerWidget(
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Text("Resolution History", style: CustomFonts.black20w600),
+            padding: context.appEdgeInsets(all: 20),
+            child: Text("Resolution History", style: context.fonts.black20w600),
           ),
           SizedBox(
-            height: 300.h,
+            height: context.h(300),
             child: DataTable2(
               columnSpacing: 24,
               horizontalMargin: 20,
@@ -169,7 +169,7 @@ class DisputeScreen extends StatelessWidget {
                 DataColumn2(label: Text('Outcome'), size: ColumnSize.L),
                 DataColumn2(label: Text('Date'), size: ColumnSize.M),
               ],
-              rows: List.generate(5, (index) => _resolvedDisputeRow()),
+              rows: List.generate(5, (index) => _resolvedDisputeRow(context)),
             ),
           ),
         ],
@@ -177,14 +177,14 @@ class DisputeScreen extends StatelessWidget {
     );
   }
 
-  DataRow _resolvedDisputeRow() {
+  DataRow _resolvedDisputeRow(BuildContext context) {
     return DataRow(
       cells: [
-        DataCell(Text('#DSP-390', style: CustomFonts.black14w400)),
-        DataCell(Text('Aura Med Spa', style: CustomFonts.black14w400)),
-        DataCell(Text('Admin Alex', style: CustomFonts.black14w400)),
-        DataCell(Text('Partial Refund Release', style: CustomFonts.black14w400)),
-        DataCell(Text('Oct 20, 2023', style: CustomFonts.black14w400)),
+        DataCell(Text('#DSP-390', style: context.fonts.black14w400)),
+        DataCell(Text('Aura Med Spa', style: context.fonts.black14w400)),
+        DataCell(Text('Admin Alex', style: context.fonts.black14w400)),
+        DataCell(Text('Partial Refund Release', style: context.fonts.black14w400)),
+        DataCell(Text('Oct 20, 2023', style: context.fonts.black14w400)),
       ],
     );
   }

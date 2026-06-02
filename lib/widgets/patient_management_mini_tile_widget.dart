@@ -33,8 +33,8 @@ class PatientManagementMiniTileWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(data.title, style: CustomFonts.black16w600),
-              Text(data.subTitle, style: CustomFonts.black20w600),
+              Text(data.title, style: context.fonts.black16w600),
+              Text(data.subTitle, style: context.fonts.black20w600),
             ],
           ),
           // SizedBox(width: 20.w),

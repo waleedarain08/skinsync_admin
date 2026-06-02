@@ -41,13 +41,13 @@ class BuildTextField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: CustomFonts.black14w600),
+          Text(label, style: context.fonts.black14w600),
           context.verticalSpace(8),
           TextFormField(
             controller: controller,
             maxLines: maxLines,
             obscureText: obscureText,
-            style: CustomFonts.black14w400,
+            style: context.fonts.black14w400,
             keyboardType: keyboardType,
             validator: validator,
             readOnly: readOnly,

@@ -170,7 +170,7 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Product Image", style: CustomFonts.black14w600),
+        Text("Product Image", style: context.fonts.black14w600),
         SizedBox(height: 12.h),
         Container(
           height: 140.h,

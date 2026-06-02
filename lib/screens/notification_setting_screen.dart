@@ -52,7 +52,7 @@ class _NotificationSettingsScreenState
         SizedBox(width: 12.w),
         Text(
           'Notification Settings',
-          style: CustomFonts.black18w600,
+          style: context.fonts.black18w600,
         ),
       ],
     );
@@ -83,7 +83,7 @@ class _NotificationSettingsScreenState
             padding: EdgeInsets.symmetric(vertical: 16.w),
             child: Text(
               'Manage Notifications',
-              style: CustomFonts.black16w600,
+              style: context.fonts.black16w600,
             ),
           ),
           // Notification Options
@@ -162,12 +162,12 @@ class _NotificationSettingsScreenState
               children: [
                 Text(
                   title,
-                  style: CustomFonts.black14w600,
+                  style: context.fonts.black14w600,
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   subtitle,
-                  style: CustomFonts.grey12w400,
+                  style: context.fonts.grey12w400,
                 ),
               ],
             ),
@@ -200,16 +200,16 @@ class _NotificationSettingsScreenState
       ),
       child: RichText(
         text: TextSpan(
-          style: CustomFonts.black12w400h14,
+          style: context.fonts.black12w400h14,
           children: [
             TextSpan(
               text: 'Important: ',
-              style: CustomFonts.black12w600,
+              style: context.fonts.black12w600,
             ),
             TextSpan(
               text:
                   'You will need to enter a verification code sent to your phone every time you sign in.',
-              style: CustomFonts.grey12w400,
+              style: context.fonts.grey12w400,
             ),
           ],
         ),

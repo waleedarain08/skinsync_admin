@@ -38,13 +38,13 @@ class PhoneWidget extends StatelessWidget {
         }
         return null;
       },
-      style: CustomFonts.black14w400,
+      style: context.fonts.black14w400,
       keyboardType: TextInputType.phone,
       decoration: InputDecoration(
         filled: filled,
         fillColor: CustomColors.white,
         hintText: 'Enter phone number',
-        hintStyle: CustomFonts.grey14w400,
+        hintStyle: context.fonts.grey14w400,
         prefixIcon: _buildPhoneNumberPicker(context: context),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         border: OutlineInputBorder(
@@ -78,7 +78,7 @@ class PhoneWidget extends StatelessWidget {
                   authNotifier.setCountry(country);
                 },
                 dialogSize: Size(400.w, 500.h),
-                textStyle: CustomFonts.black14w400,
+                textStyle: context.fonts.black14w400,
                 initialSelection: authState.country?.code ?? "US",
                 showCountryOnly: false,
                 showOnlyCountryWhenClosed: false,

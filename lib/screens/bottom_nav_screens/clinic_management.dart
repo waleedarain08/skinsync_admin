@@ -97,11 +97,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Clinic Partners", style: CustomFonts.black26w700),
+            Text("Clinic Partners", style: context.fonts.black26w700),
             context.verticalSpace(6),
             Text(
               "Manage and monitor your MedSpa network performance.",
-              style: CustomFonts.grey13w500,
+              style: context.fonts.grey13w500,
             ),
           ],
         ),
@@ -139,7 +139,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
               padding: context.appEdgeInsets(all: 12),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: context.borderRadius(all: 8),
+                borderRadius: context.appBorderRadius(all: 8),
               ),
               child: Icon(icon, color: color, size: context.sp(22)),
             ),
@@ -147,8 +147,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.black18w600),
-                Text(title, style: CustomFonts.grey12w400),
+                Text(value, style: context.fonts.black18w600),
+                Text(title, style: context.fonts.grey12w400),
               ],
             ),
           ],
@@ -329,7 +329,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         children: [
           Padding(
             padding: context.appEdgeInsets(left: 24, top: 24, right: 24, bottom: 16),
-            child: Text(title, style: CustomFonts.black18w600),
+            child: Text(title, style: context.fonts.black18w600),
           ),
           Expanded(
             child: isLoading
@@ -338,7 +338,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                     ? Center(
                         child: Padding(
                           padding: context.appEdgeInsets(all: 32),
-                          child: Text("No entries found", style: CustomFonts.grey13w500),
+                          child: Text("No entries found", style: context.fonts.grey13w500),
                         ),
                       )
                     : Scrollbar(
@@ -376,8 +376,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     return DataRow(
       cells: [
         DataCell(_buildNameCell(context, clinic.name, clinic.logo)),
-        DataCell(_buildContactCell(clinic.email, clinic.phone)),
-        DataCell(Text(clinic.address ?? 'N/A', style: CustomFonts.grey13w500)),
+        DataCell(_buildContactCell(context, clinic.email, clinic.phone)),
+        DataCell(Text(clinic.address ?? 'N/A', style: context.fonts.grey13w500)),
         DataCell(_buildPlanBadge(clinic.subscriptionPlan ?? "Standard")),
         DataCell(_buildStatsCell(context, clinic.totalAppointments?.toString() ?? "0", Icons.people_outline_rounded, clinic.rating?.toString() ?? "0", Icons.star_outline_rounded)),
         DataCell(_statusBadge(clinic.status ?? 'Active')),
@@ -413,8 +413,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     return DataRow(
       cells: [
         DataCell(_buildNameCell(context, clinic.name, clinic.logo)),
-        DataCell(_buildContactCell(clinic.email, clinic.phone)),
-        DataCell(Text(clinic.address, style: CustomFonts.grey13w500)),
+        DataCell(_buildContactCell(context, clinic.email, clinic.phone)),
+        DataCell(Text(clinic.address, style: context.fonts.grey13w500)),
         DataCell(_invitationStatusBadge(clinic.invitationStatus)),
         DataCell(
           IconButton(
@@ -438,22 +438,22 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
           backgroundColor: CustomColors.palePurple,
           backgroundImage: (logo != null && logo.isNotEmpty) ? NetworkImage(logo) : null,
           child: (logo == null || logo.isEmpty)
-              ? Text(name?[0] ?? "C", style: CustomFonts.purple12w700)
+              ? Text(name?[0] ?? "C", style: context.fonts.purple12w700)
               : null,
         ),
         context.horizontalSpace(12),
-        Text(name ?? 'N/A', style: CustomFonts.black14w600),
+        Text(name ?? 'N/A', style: context.fonts.black14w600),
       ],
     );
   }
 
-  Widget _buildContactCell(String? email, String? phone) {
+  Widget _buildContactCell(BuildContext context, String? email, String? phone) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(email ?? 'N/A', style: CustomFonts.grey13w500),
-        Text(phone ?? '', style: CustomFonts.grey12w400),
+        Text(email ?? 'N/A', style: context.fonts.grey13w500),
+        Text(phone ?? '', style: context.fonts.grey12w400),
       ],
     );
   }
@@ -477,7 +477,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       children: [
         Icon(icon, size: context.sp(14), color: CustomColors.lightGrey),
         context.horizontalSpace(4),
-        Text(value, style: CustomFonts.grey12w400),
+        Text(value, style: context.fonts.grey12w400),
       ],
     );
   }

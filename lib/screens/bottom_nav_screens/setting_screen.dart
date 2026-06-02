@@ -58,17 +58,17 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20.h),
-            Text("Settings", style: CustomFonts.black30w600),
+            Text("Settings", style: context.fonts.black30w600),
             SizedBox(height: 10.h),
             Text(
               "Manage application versions for Customer and Clinic apps.",
-              style: CustomFonts.grey18w400,
+              style: context.fonts.grey18w400,
             ),
             SizedBox(height: 30.h),
             Theme(
               data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
-                title: Text("Customer App", style: CustomFonts.black20w500),
+                title: Text("Customer App", style: context.fonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
                 collapsedBackgroundColor: CustomColors.white,
                 backgroundColor: CustomColors.white,
@@ -105,7 +105,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             Theme(
               data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
-                title: Text("Clinic App", style: CustomFonts.black20w500),
+                title: Text("Clinic App", style: context.fonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
                 collapsedBackgroundColor: CustomColors.white,
                 backgroundColor: CustomColors.white,
@@ -164,7 +164,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: CustomFonts.black18w600),
+            Text(title, style: context.fonts.black18w600),
             SizedBox(height: 15.h),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,

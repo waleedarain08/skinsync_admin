@@ -7,11 +7,11 @@ export 'color_constant.dart';
 export 'custom_fonts.dart';
 
 class AppTheme {
-  // Design Standards (Context-aware getters)
-  static double inputHeight(BuildContext context) => context.h(52);
-  static double buttonHeight(BuildContext context) => context.h(52);
-  static double borderRadius(BuildContext context) => context.r(12);
-  static double borderWidth = 1.0;
+  // Design Standards (Static getters using singleton)
+  static double get inputHeight => 52.h;
+  static double get buttonHeight => 52.h;
+  static double get borderRadius => 12.r;
+  static double get borderWidth => 1.0;
 
   static ThemeData get calmWellnessTheme => _buildTheme();
 
@@ -39,14 +39,14 @@ class AppTheme {
         surfaceContainerHighest: CustomColors.softGrey,
       ),
 
-      iconTheme: const IconThemeData(
+      iconTheme: IconThemeData(
         color: CustomColors.grey,
-        size: 20,
+        size: 20.sp,
       ),
 
-      primaryIconTheme: const IconThemeData(
+      primaryIconTheme: IconThemeData(
         color: CustomColors.purple,
-        size: 20,
+        size: 20.sp,
       ),
 
       appBarTheme: AppBarTheme(
@@ -54,7 +54,7 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        iconTheme: const IconThemeData(color: CustomColors.black, size: 22),
+        iconTheme: IconThemeData(color: CustomColors.black, size: 22.sp),
         titleTextStyle: CustomFonts.black18w600,
       ),
 
@@ -73,8 +73,8 @@ class AppTheme {
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          side: const BorderSide(color: CustomColors.border, width: 1),
+          borderRadius: BorderRadius.circular(borderRadius),
+          side: BorderSide(color: CustomColors.border, width: borderWidth),
         ),
       ),
 
@@ -89,9 +89,9 @@ class AppTheme {
           backgroundColor: CustomColors.purple,
           foregroundColor: CustomColors.white,
           elevation: 0,
-          minimumSize: const Size(0, 52),
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          minimumSize: Size(0, buttonHeight),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
           textStyle: CustomFonts.white14w600,
         ),
       ),
@@ -99,10 +99,10 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: CustomColors.purple,
-          minimumSize: const Size(0, 52),
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          side: const BorderSide(color: CustomColors.purple, width: 1),
+          minimumSize: Size(0, buttonHeight),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
+          side: BorderSide(color: CustomColors.purple, width: borderWidth),
           textStyle: CustomFonts.black14w600.copyWith(color: CustomColors.purple),
         ),
       ),
@@ -110,7 +110,7 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: CustomColors.purple,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           textStyle: CustomFonts.black14w600.copyWith(color: CustomColors.purple),
         ),
       ),
@@ -137,25 +137,25 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: CustomColors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         hintStyle: CustomFonts.grey12w400,
         labelStyle: CustomFonts.black14w400,
-        constraints: const BoxConstraints(minHeight: 52, maxHeight: 52),
+        constraints: BoxConstraints(minHeight: inputHeight, maxHeight: inputHeight),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: CustomColors.border, width: 1),
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: CustomColors.border, width: borderWidth),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: CustomColors.border, width: 1),
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: CustomColors.border, width: borderWidth),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: CustomColors.purple, width: 1.5),
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: CustomColors.purple, width: borderWidth * 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: CustomColors.red, width: 1),
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide(color: CustomColors.red, width: borderWidth),
         ),
       ),
     );
@@ -288,6 +288,6 @@ class AppShadows {
   ];
   
   static List<BoxShadow> xs(BuildContext context) => [
-    BoxShadow(color: CustomColors.black.withValues(alpha: 0.05), blurRadius: 10.r, offset: Offset(0, context.h(2)))
+    BoxShadow(color: CustomColors.black.withValues(alpha: 0.05), blurRadius: 10.r, offset: const Offset(0, 2))
   ];
 }

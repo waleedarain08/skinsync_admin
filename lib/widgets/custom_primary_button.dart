@@ -84,7 +84,7 @@ class _CustomPrimaryButtonState extends State<CustomPrimaryButton> {
                             Flexible(
                               child: Text(
                                 widget.label, 
-                                style: CustomFonts.white14w600,
+                                style: context.fonts.white14w600,
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
                               ),

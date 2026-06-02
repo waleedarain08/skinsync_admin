@@ -81,7 +81,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Phone Number", style: CustomFonts.black14w600),
+                        Text("Phone Number", style: context.fonts.black14w600),
                         SizedBox(height: 8.h),
                         PhoneWidget(controller: _clinicPhoneController),
                       ],
@@ -175,7 +175,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
+        Text(title, style: context.fonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );
@@ -257,7 +257,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Phone Number", style: CustomFonts.black14w600),
+                        Text("Phone Number", style: context.fonts.black14w600),
                         SizedBox(height: 8.h),
                         PhoneWidget(controller: _clinicPhoneController),
                       ],
@@ -314,7 +314,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
+        Text(title, style: context.fonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );

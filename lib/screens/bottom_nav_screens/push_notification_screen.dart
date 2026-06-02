@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:skinsync_admin/utils/assets.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
@@ -15,25 +14,25 @@ class PushNotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GradientScaffold(
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 30.w),
+        padding: context.appEdgeInsets(horizontal: 30),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 40.h),
-              Text("Push Notifications", style: CustomFonts.black32w700),
-              SizedBox(height: 10.h),
+              context.verticalSpace(40),
+              Text("Push Notifications", style: context.fonts.black32w700),
+              context.verticalSpace(10),
               Text(
                 "Send push notifications to app users about updates, offers, and alerts",
-                style: CustomFonts.grey14w400,
+                style: context.fonts.grey14w400,
               ),
-              SizedBox(height: 20.h),
+              context.verticalSpace(20),
               const Divider(color: CustomColors.border),
-              SizedBox(height: 50.h),
+              context.verticalSpace(50),
               Container(
-                padding: EdgeInsets.all(20.w),
+                padding: context.appEdgeInsets(all: 20),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.r),
+                  borderRadius: context.appBorderRadius(all: 20),
                   border: Border.all(color: CustomColors.border),
                 ),
                 child: Column(
@@ -43,108 +42,108 @@ class PushNotificationScreen extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.notifications_outlined,
-                          size: 20.sp,
+                          size: context.sp(20),
                           color: CustomColors.black,
                         ),
-                        SizedBox(width: 20.w),
+                        context.horizontalSpace(20),
                         Text(
                           "Send New Notification",
-                          style: CustomFonts.black20w600,
+                          style: context.fonts.black20w600,
                         ),
                       ],
                     ),
-                    SizedBox(height: 40.h),
-                    Text("Notification Title", style: CustomFonts.black16w600),
-                    SizedBox(height: 10.h),
+                    context.verticalSpace(40),
+                    Text("Notification Title", style: context.fonts.black16w600),
+                    context.verticalSpace(10),
                     TextField(
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: CustomColors.white,
                         hintText: "e.g., New Feature Launch",
-                        hintStyle: CustomFonts.grey16w400,
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 15.h,
-                          horizontal: 20.w,
+                        hintStyle: context.fonts.grey16w400,
+                        contentPadding: context.appEdgeInsets(
+                          vertical: 15,
+                          horizontal: 20,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: context.appBorderRadius(all: 10),
                           borderSide: const BorderSide(color: CustomColors.border),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: context.appBorderRadius(all: 10),
                           borderSide: const BorderSide(color: CustomColors.purple),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: context.appBorderRadius(all: 10),
                           borderSide: const BorderSide(color: CustomColors.border),
                         ),
                       ),
                     ),
-                    SizedBox(height: 10.h),
-                    Text("0/50 characters", style: CustomFonts.grey14w400),
-                    SizedBox(height: 10.h),
-                    Text("Message", style: CustomFonts.black16w600),
-                    SizedBox(height: 10.h),
+                    context.verticalSpace(10),
+                    Text("0/50 characters", style: context.fonts.grey14w400),
+                    context.verticalSpace(10),
+                    Text("Message", style: context.fonts.black16w600),
+                    context.verticalSpace(10),
                     TextField(
                       maxLines: 3,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: CustomColors.white,
                         hintText: "Enter your notification message...",
-                        hintStyle: CustomFonts.grey16w400,
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 15.h,
-                          horizontal: 20.w,
+                        hintStyle: context.fonts.grey16w400,
+                        contentPadding: context.appEdgeInsets(
+                          vertical: 15,
+                          horizontal: 20,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: context.appBorderRadius(all: 10),
                           borderSide: const BorderSide(color: CustomColors.border),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: context.appBorderRadius(all: 10),
                           borderSide: const BorderSide(color: CustomColors.purple),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: context.appBorderRadius(all: 10),
                           borderSide: const BorderSide(color: CustomColors.border),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20.h),
-                    Text("Target Audience", style: CustomFonts.black16w600),
-                    SizedBox(height: 10.h),
+                    context.verticalSpace(20),
+                    Text("Target Audience", style: context.fonts.black16w600),
+                    context.verticalSpace(10),
                     TextField(
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: CustomColors.white,
                         hintText: "All Users (1,247 users)",
-                        hintStyle: CustomFonts.grey16w400,
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 15.h,
-                          horizontal: 20.w,
+                        hintStyle: context.fonts.grey16w400,
+                        contentPadding: context.appEdgeInsets(
+                          vertical: 15,
+                          horizontal: 20,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: context.appBorderRadius(all: 10),
                           borderSide: const BorderSide(color: CustomColors.border),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: context.appBorderRadius(all: 10),
                           borderSide: const BorderSide(color: CustomColors.purple),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: context.appBorderRadius(all: 10),
                           borderSide: const BorderSide(color: CustomColors.border),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20.h),
+                    context.verticalSpace(20),
                     Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 15.h,
-                        horizontal: 20.w,
+                      padding: context.appEdgeInsets(
+                        vertical: 15,
+                        horizontal: 20,
                       ),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.r),
+                        borderRadius: context.appBorderRadius(all: 20),
                         color: const Color(0xFFEFF6FF),
                         border: Border.all(color: const Color(0XFFBEDBFF)),
                       ),
@@ -152,71 +151,71 @@ class PushNotificationScreen extends StatelessWidget {
                         children: [
                           SvgPicture.asset(
                             SvgAssets.pushNotification,
-                            height: 30.w,
-                            width: 30.w,
+                            height: context.w(30),
+                            width: context.w(30),
                           ),
-                          SizedBox(width: 12.w),
+                          context.horizontalSpace(12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "Notification Preview",
-                                style: CustomFonts.black20w600,
+                                style: context.fonts.black20w600,
                               ),
-                              SizedBox(width: 12.w),
+                              context.horizontalSpace(12),
                               Text(
                                 "Your notification preview will appear here",
-                                style: CustomFonts.black16w400,
+                                style: context.fonts.black16w400,
                               ),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 20.h),
+                    context.verticalSpace(20),
                     Divider(color: Colors.grey.shade300, height: 0),
-                    SizedBox(height: 34.5.h),
+                    context.verticalSpace(34.5),
                     Text.rich(
                       TextSpan(
                         text: "This notification will be sent to ",
-                        style: CustomFonts.black16w500, // normal text
+                        style: context.fonts.black16w500, // normal text
                         children: [
                           TextSpan(
                             text: "1247 users",
-                            style: CustomFonts.black18w600, // BIG text
+                            style: context.fonts.black18w600, // BIG text
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 34.5.h),
+                    context.verticalSpace(34.5),
                   ],
                 ),
               ),
-              SizedBox(height: 20.h),
+              context.verticalSpace(20),
               Container(
-                padding: EdgeInsets.all(20.w),
+                padding: context.appEdgeInsets(all: 20),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.r),
+                  borderRadius: context.appBorderRadius(all: 20),
                   border: Border.all(color: CustomColors.border),
                 ),
                 child: Column(
                   children: [
                     Text(
                       "Notification History",
-                      style: CustomFonts.black20w600,
+                      style: context.fonts.black20w600,
                     ),
-                    SizedBox(height: 20.h),
+                    context.verticalSpace(20),
                     const PushNotificationTable(),
-                     SizedBox(height: 20.h),
+                     context.verticalSpace(20),
                   ],
                 ),
               ),
-              SizedBox(height: 20.h),
+              context.verticalSpace(20),
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 15.w),
+                padding: context.appEdgeInsets(vertical: 15, horizontal: 15),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.r),
+                  borderRadius: context.appBorderRadius(all: 20),
                   color: const Color(0xFFFAF5FF),
                   border: Border.all(color: const Color(0XFFE9D4FF)),
                 ),
@@ -225,37 +224,37 @@ class PushNotificationScreen extends StatelessWidget {
                   children: [
                     Text(
                       "Best Practices for Push Notifications:",
-                      style: CustomFonts.black20w600,
+                      style: context.fonts.black20w600,
                     ),
-                    SizedBox(height: 5.h),
+                    context.verticalSpace(5),
                     Text(
                       " • Keep titles short and actionable (under 50 characters)",
-                      style: CustomFonts.black16w400,
+                      style: context.fonts.black16w400,
                     ),
-                    SizedBox(height: 5.h),
+                    context.verticalSpace(5),
                     Text(
                       " • Make messages clear and concise (under 200 characters)",
-                      style: CustomFonts.black16w400,
+                      style: context.fonts.black16w400,
                     ),
-                    SizedBox(height: 5.h),
+                    context.verticalSpace(5),
                     Text(
                       " • Target the right audience to improve engagement",
-                      style: CustomFonts.black16w400,
+                      style: context.fonts.black16w400,
                     ),
-                    SizedBox(height: 5.h),
+                    context.verticalSpace(5),
                     Text(
                       " • Avoid sending too many notifications to prevent user fatigue",
-                      style: CustomFonts.black16w400,
+                      style: context.fonts.black16w400,
                     ),
-                    SizedBox(height: 5.h),
+                    context.verticalSpace(5),
                     Text(
                       " • Use notifications for important updates, offers, and alerts only",
-                      style: CustomFonts.black16w400,
+                      style: context.fonts.black16w400,
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 30.h),
+              context.verticalSpace(30),
             ],
           ),
         ),
@@ -274,7 +273,7 @@ class PushNotificationTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: context.appBorderRadius(all: 8),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -286,10 +285,10 @@ class PushNotificationTable extends StatelessWidget {
                 headingRowColor: WidgetStateProperty.all(
                   Colors.grey.shade100,
                 ),
-                headingRowHeight: 50.h,
-                dataRowMinHeight: 60.h,
-                dataRowMaxHeight: 60.h,
-                columnSpacing: 40.w,
+                headingRowHeight: context.h(50),
+                dataRowMinHeight: context.h(60),
+                dataRowMaxHeight: context.h(60),
+                columnSpacing: context.w(40),
                 border: TableBorder(
                   horizontalInside: BorderSide(
                     color: Colors.grey.shade300,
@@ -302,39 +301,40 @@ class PushNotificationTable extends StatelessWidget {
                 ),
                 columns: [
                   DataColumn(
-                    columnWidth: FixedColumnWidth(176.w),
-                    label: Text('Title', style: CustomFonts.black16w600),
+                    columnWidth: FixedColumnWidth(context.w(176)),
+                    label: Text('Title', style: context.fonts.black16w600),
                   ),
                   DataColumn(
-                    columnWidth: FixedColumnWidth(260.w),
+                    columnWidth: FixedColumnWidth(context.w(260)),
                     label: Text('Message',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis, 
-                    style: CustomFonts.black16w600),
+                    style: context.fonts.black16w600),
                   ),
                   DataColumn(
-                    columnWidth: FixedColumnWidth(192.w),
-                    label: Text('Audience', style: CustomFonts.black16w600),
+                    columnWidth: FixedColumnWidth(context.w(192)),
+                    label: Text('Audience', style: context.fonts.black16w600),
                   ),
                   DataColumn(
-                    columnWidth: FixedColumnWidth(130.w),
-                    label: Text('Recipients', style: CustomFonts.black16w600),
+                    columnWidth: FixedColumnWidth(context.w(130)),
+                    label: Text('Recipients', style: context.fonts.black16w600),
                   ),
                   DataColumn(
-                    columnWidth: FixedColumnWidth(102.w),
-                    label: Text('Sent At', style: CustomFonts.black16w600),
+                    columnWidth: FixedColumnWidth(context.w(102)),
+                    label: Text('Sent At', style: context.fonts.black16w600),
                   ),
                   DataColumn(
-                    columnWidth: FixedColumnWidth(130.w),
-                    label: Text('Sent At', style: CustomFonts.black16w600),
+                    columnWidth: FixedColumnWidth(context.w(130)),
+                    label: Text('Sent At', style: context.fonts.black16w600),
                   ),
                   DataColumn(
-                    columnWidth: FixedColumnWidth(114.w),
-                    label: Text('Status', style: CustomFonts.black16w600),
+                    columnWidth: FixedColumnWidth(context.w(114)),
+                    label: Text('Status', style: context.fonts.black16w600),
                   ),
                 ],
                 rows: [
                   _buildDataRow(
+                    context,
                     'New Feature Launch',
                     'Check out our new AI-powered skin consultation feature!',
                     'Radiant Skin Clinic',
@@ -344,6 +344,7 @@ class PushNotificationTable extends StatelessWidget {
                     "Sent",
                   ),
                   _buildDataRow(
+                    context,
                     'New Feature Launch',
                     'Check out our new AI-powered skin consultation feature!',
                     'Radiant Skin Clinic',
@@ -353,6 +354,7 @@ class PushNotificationTable extends StatelessWidget {
                     "Sent",
                   ),
                   _buildDataRow(
+                    context,
                     'New Feature Launch',
                     'Check out our new AI-powered skin consultation feature!',
                     'Radiant Skin Clinic',
@@ -362,6 +364,7 @@ class PushNotificationTable extends StatelessWidget {
                     "Sent",
                   ),
                   _buildDataRow(
+                    context,
                     'New Feature Launch',
                     'Check out our new AI-powered skin consultation feature!',
                     'Radiant Skin Clinic',
@@ -380,6 +383,7 @@ class PushNotificationTable extends StatelessWidget {
   }
 
   DataRow _buildDataRow(
+    BuildContext context,
     String title,
     String message,
     String audience,
@@ -390,28 +394,28 @@ class PushNotificationTable extends StatelessWidget {
   ) {
     return DataRow(
       cells: [
-        DataCell(Text(title, style: CustomFonts.black14w400)),
-        DataCell(Text(message, style: CustomFonts.black14w400)),
-        DataCell(Text(audience, style: CustomFonts.black14w400)),
-        DataCell(Text(recipients, style: CustomFonts.black14w400)),
-        DataCell(Text(sentAtTime, style: CustomFonts.black14w400)),
-        DataCell(Text(sentAtDate, style: CustomFonts.black14w400)),
+        DataCell(Text(title, style: context.fonts.black14w400)),
+        DataCell(Text(message, style: context.fonts.black14w400)),
+        DataCell(Text(audience, style: context.fonts.black14w400)),
+        DataCell(Text(recipients, style: context.fonts.black14w400)),
+        DataCell(Text(sentAtTime, style: context.fonts.black14w400)),
+        DataCell(Text(sentAtDate, style: context.fonts.black14w400)),
         DataCell(
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            padding: context.appEdgeInsets(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: CustomColors.green,
-              borderRadius: BorderRadius.circular(20.r),
+              borderRadius: context.appBorderRadius(all: 20),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.check_circle_outline,
                   color: Colors.white,
-                  size: 10.sp,
+                  size: context.sp(10),
                 ),
-                SizedBox(width: 10.w),
-                Text(status, style: CustomFonts.white16w400),
+                context.horizontalSpace(10),
+                Text(status, style: context.fonts.white16w400),
               ],
             ),
           ),

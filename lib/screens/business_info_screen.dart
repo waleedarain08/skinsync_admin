@@ -65,7 +65,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
             children: [
               Text(
                 'Select Image',
-                style: CustomFonts.black18w600,
+                style: context.fonts.black18w600,
               ),
               SizedBox(height: 20.h),
               ListTile(
@@ -83,7 +83,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
                 ),
                 title: Text(
                   'Choose from Gallery',
-                  style: CustomFonts.black14w600,
+                  style: context.fonts.black14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -106,7 +106,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
                 ),
                 title: Text(
                   'Take a Photo',
-                  style: CustomFonts.black14w600,
+                  style: context.fonts.black14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -130,7 +130,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
                   ),
                   title: Text(
                     'Remove Photo',
-                    style: CustomFonts.black14w600.copyWith(color: Colors.red),
+                    style: context.fonts.black14w600.copyWith(color: Colors.red),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -215,7 +215,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
         SizedBox(width: 12.w),
         Text(
           'Business Information',
-          style: CustomFonts.black18w600,
+          style: context.fonts.black18w600,
         ),
       ],
     );
@@ -388,12 +388,12 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
           children: [
             Text(
               'Profile Picture',
-              style: CustomFonts.black14w600,
+              style: context.fonts.black14w600,
             ),
             SizedBox(height: 4.h),
             Text(
               'Upload your profile picture',
-              style: CustomFonts.grey12w400,
+              style: context.fonts.grey12w400,
             ),
           ],
         ),
@@ -436,7 +436,7 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
             ),
             child: Text(
               'Cancel',
-              style: CustomFonts.black14w500,
+              style: context.fonts.black14w500,
             ),
           ),
         ),

@@ -67,14 +67,14 @@ class ProductTile extends ConsumerWidget {
                   children: [
                     Text(
                       product.name,
-                      style: CustomFonts.black16w600,
+                      style: context.fonts.black16w600,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 8.h),
                     Text(
                       'units: ${product.unit}',
-                      style: CustomFonts.purple14w600,
+                      style: context.fonts.purple14w600,
                     ),
                     SizedBox(height: 8.h),
                     Expanded(
@@ -82,7 +82,7 @@ class ProductTile extends ConsumerWidget {
                         product.description,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 3,
-                        style: CustomFonts.black13w400,
+                        style: context.fonts.black13w400,
                       ),
                     ),
                   ],

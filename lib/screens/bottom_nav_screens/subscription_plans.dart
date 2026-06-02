@@ -140,7 +140,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text("\$0.00", style: context.fonts.purple32w700),
+              Text("\$0.00", style: context.fonts.black32w700.copyWith(color: CustomColors.purple, fontSize: context.sp(32))),
               context.horizontalSpace(4),
               Text(" / ${plan.durationMonths} months introductory", style: context.fonts.grey12w400),
             ],
@@ -230,7 +230,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text("\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}", 
-                style: context.fonts.purple32w700),
+                style: context.fonts.black32w700.copyWith(color: CustomColors.purple, fontSize: context.sp(32))),
               context.horizontalSpace(4),
               Text("/ month", style: context.fonts.grey12w400),
             ],
@@ -254,7 +254,12 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             plan.unlimitedStaff ? "Unlimited" : "${plan.staffSeats}"
           ),
           context.verticalSpace(8),
-          _limitRow(context, Icons.percent_rounded, "Commission Rate:", "${plan.standardBookingCommissionPercent}%"),
+          _limitRow(
+            context,
+            Icons.percent_rounded, 
+            "Commission Rate:", 
+            "${plan.standardBookingCommissionPercent}%"
+          ),
           context.verticalSpace(8),
           _limitRow(context, Icons.terminal_rounded, "Tech Fee:", "\$${plan.technologyFeePerTreatment}"),
           context.verticalSpace(24),
@@ -289,7 +294,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
               ),
               context.horizontalSpace(12),
               IconButton(
-                onPressed: () => _confirmDelete(plan),
+                onPressed: () => _confirmDelete(context, plan),
                 icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.red),
                 style: IconButton.styleFrom(
                   backgroundColor: CustomColors.red.withValues(alpha: 0.05),
@@ -302,7 +307,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     );
   }
 
-  void _confirmDelete(SubscriptionPlanModel plan) async {
+  void _confirmDelete(BuildContext context, SubscriptionPlanModel plan) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => StandardDialog(

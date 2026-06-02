@@ -204,7 +204,46 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     categoryIdController.text = category.id;
     categoryNameController.text = category.name;
     categoryPathController.text = path;
+    
+    // Build path from ID
+    // Note: We'll refine this to work with the recursive UI
     state = state.copyWith(); 
+  }
+
+  void selectCategoryAtLevel(int level, CategoryItem category, List<CategoryItem> allCategories) {
+    List<String> currentPath = List.from(state.selectedCategoryPath);
+    
+    if (level < currentPath.length) {
+      currentPath = currentPath.sublist(0, level);
+    }
+    
+    currentPath.add(category.id);
+    
+    // Build category path string for the model (e.g. "Beauty > Hair > Coloring")
+    String fullPath = "";
+    for (int i = 0; i < currentPath.length; i++) {
+      final node = _findCategoryById(allCategories, currentPath[i]);
+      if (node != null) {
+        fullPath += (i == 0 ? "" : " > ") + node.name;
+      }
+    }
+
+    categoryIdController.text = category.id;
+    categoryNameController.text = category.name;
+    categoryPathController.text = fullPath;
+
+    state = state.copyWith(selectedCategoryPath: currentPath);
+  }
+
+  CategoryItem? _findCategoryById(List<CategoryItem> items, String id) {
+    for (var item in items) {
+      if (item.id == id) return item;
+      if (item.children.isNotEmpty) {
+        final found = _findCategoryById(item.children, id);
+        if (found != null) return found;
+      }
+    }
+    return null;
   }
 
   void onAreaSelected(int index, String val) {
@@ -423,6 +462,7 @@ class TreatmentState {
   final XFile? treatmentImage;
   final XFile? treatmentIcon;
   final List<AreaViewModelEntry> areas;
+  final List<String> selectedCategoryPath;
   
   // Step 4 fields
   final bool useInAiSimulator;
@@ -437,6 +477,7 @@ class TreatmentState {
     this.currentStep = 0,
     this.treatmentImage,
     this.treatmentIcon,
+    this.selectedCategoryPath = const [],
     this.useInAiSimulator = false,
     this.combinableTreatments = const [],
     List<AreaViewModelEntry>? areas,
@@ -452,6 +493,7 @@ class TreatmentState {
     XFile? treatmentImage,
     XFile? treatmentIcon,
     List<AreaViewModelEntry>? areas,
+    List<String>? selectedCategoryPath,
     bool? useInAiSimulator,
     List<TreatmentModel>? combinableTreatments,
   }) {
@@ -465,6 +507,7 @@ class TreatmentState {
       treatmentImage: treatmentImage ?? this.treatmentImage,
       treatmentIcon: treatmentIcon ?? this.treatmentIcon,
       areas: areas ?? this.areas,
+      selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
       combinableTreatments: combinableTreatments ?? this.combinableTreatments,
     );

@@ -101,7 +101,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final clinic = ref.watch(clinicViewModelProvider).selectedClinic;
 
     if (clinic == null) {
-      return GradientScaffold(body: Center(child: Text("No Clinic Data Found", style: CustomFonts.black16w400)));
+      return GradientScaffold(body: Center(child: Text("No Clinic Data Found", style: context.fonts.black16w400)));
     }
 
     final bool isMobile = context.isMobile;
@@ -109,7 +109,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     return GradientScaffold(
       appBar: AppBar(
         flexibleSpace: AppDecorations.appBarGradient,
-        title: Text("Clinic Detail", style: CustomFonts.black18w600),
+        title: Text("Clinic Detail", style: context.fonts.black18w600),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.black),
@@ -221,13 +221,13 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                   children: [
                     Row(
                       children: [
-                        Flexible(child: Text(clinic.name ?? 'N/A', style: CustomFonts.black26w700, overflow: TextOverflow.ellipsis)),
+                        Flexible(child: Text(clinic.name ?? 'N/A', style: context.fonts.black26w700, overflow: TextOverflow.ellipsis)),
                         SizedBox(width: 16.w),
                         _statusBadge(clinic.status ?? 'Active'),
                       ],
                     ),
                     SizedBox(height: 8.h),
-                    Text(clinic.address ?? 'N/A', style: CustomFonts.grey16w400),
+                    Text(clinic.address ?? 'N/A', style: context.fonts.grey16w400),
                     SizedBox(height: 16.h),
                     Wrap(
                       spacing: 12.w,
@@ -284,7 +284,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Phone Number", style: CustomFonts.black14w600),
+                  Text("Phone Number", style: context.fonts.black14w600),
                   SizedBox(height: 10.h),
                   PhoneWidget(controller: _clinicPhoneController, readOnly: !_isEditMode),
                 ],
@@ -338,7 +338,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: CustomFonts.black16w700),
+          Text(title, style: context.fonts.black16w700),
           SizedBox(height: 24.h),
           ...children,
         ],
@@ -356,10 +356,10 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             children: [
               Icon(icon, size: 18.sp, color: CustomColors.grey),
               SizedBox(width: 12.w),
-              Text(label, style: CustomFonts.grey13w500),
+              Text(label, style: context.fonts.grey13w500),
             ],
           ),
-          Flexible(child: Text(value, style: CustomFonts.grey14w600, overflow: TextOverflow.ellipsis)),
+          Flexible(child: Text(value, style: context.fonts.grey14w600, overflow: TextOverflow.ellipsis)),
         ],
       ),
     );
@@ -375,7 +375,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       ),
       child: Text(
         status.toUpperCase(),
-        style: isActive ? CustomFonts.green10w700 : CustomFonts.red10w700,
+        style: isActive ? context.fonts.green10w700 : context.fonts.red10w700,
       ),
     );
   }
@@ -389,7 +389,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         children: [
           Icon(icon, size: 14.sp, color: CustomColors.grey),
           SizedBox(width: 8.w),
-          Text(label, style: CustomFonts.grey13w500),
+          Text(label, style: context.fonts.grey13w500),
         ],
       ),
     );

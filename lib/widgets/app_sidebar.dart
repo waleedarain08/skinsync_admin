@@ -82,9 +82,9 @@ class AppSidebar extends StatelessWidget {
       iconTheme: IconThemeData(color: CustomColors.grey, size: context.sp(20)),
       selectedIconTheme: IconThemeData(color: CustomColors.purple, size: context.sp(20)),
       hoverIconTheme: IconThemeData(color: CustomColors.purple, size: context.sp(20)),
-      textStyle: CustomFonts.grey14w600,
-      selectedTextStyle: CustomFonts.purple14w600,
-      hoverTextStyle: CustomFonts.purple14w600,
+      textStyle: context.fonts.grey14w600,
+      selectedTextStyle: context.fonts.purple14w600,
+      hoverTextStyle: context.fonts.purple14w600,
       hoverColor: CustomColors.lightPurple,
       itemMargin: context.appEdgeInsets(horizontal: 12, vertical: 4),
       selectedItemMargin: context.appEdgeInsets(horizontal: 12, vertical: 4),
@@ -154,8 +154,8 @@ class AppSidebar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('SkinSync', style: CustomFonts.black18w600lsNeg04),
-                  Text('ADMIN PANEL', style: CustomFonts.purple9w800ls1),
+                  Text('SkinSync', style: context.fonts.black18w600lsNeg04),
+                  Text('ADMIN PANEL', style: context.fonts.purple9w800ls1),
                 ],
               ),
             ),
@@ -200,7 +200,7 @@ class _SectionLabel extends StatelessWidget {
         }
         return Padding(
           padding: context.appEdgeInsets(left: 28, top: 24, right: 16, bottom: 8),
-          child: Text(title, style: CustomFonts.grey11w600ls12),
+          child: Text(title, style: context.fonts.grey11w600ls12),
         );
       },
     );
