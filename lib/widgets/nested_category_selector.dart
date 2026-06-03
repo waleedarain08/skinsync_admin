@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import '../models/treatment_data_models.dart';
 import '../utils/theme.dart';
 import '../view_models/treatment_data_view_model.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import '../../utils/theme.dart';
 import '../build_textfield.dart';
 import 'standard_dialog.dart';
