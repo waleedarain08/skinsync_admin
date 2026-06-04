@@ -12,6 +12,7 @@ import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/nested_category_selector.dart';
+import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 
 class CreateTreatmentScreen extends ConsumerWidget {
   const CreateTreatmentScreen({super.key});
@@ -49,7 +50,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                   constraints: BoxConstraints(maxWidth: context.w(900)),
                   child: Column(
                     children: [
-                      _buildCurrentStepContent(context, state, viewModel, dataState),
+                      _buildCurrentStepContent(context, state, viewModel, dataState, ref),
                       context.verticalSpace(48),
                       _buildActionButtons(context, state, viewModel),
                     ],
@@ -71,11 +72,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
         children: [
           _stepIndicator(context, 0, "Category", currentStep),
           _stepConnector(0, currentStep),
-          _stepIndicator(context, 1, "Basic Details", currentStep),
+          _stepIndicator(context, 1, "Details", currentStep),
           _stepConnector(1, currentStep),
-          _stepIndicator(context, 2, "Areas", currentStep),
+          _stepIndicator(context, 2, "Protocols", currentStep),
           _stepConnector(2, currentStep),
-          _stepIndicator(context, 3, "Materials & Logic", currentStep),
+          _stepIndicator(context, 3, "Areas", currentStep),
+          _stepConnector(3, currentStep),
+          _stepIndicator(context, 4, "Logic", currentStep),
         ],
       ),
     );
@@ -128,17 +131,18 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCurrentStepContent(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildCurrentStepContent(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
     switch (state.currentStep) {
-      case 0: return _buildStep2(context, state, viewModel, dataState);
-      case 1: return _buildStep1(context, state, viewModel);
-      case 2: return _buildStep3(context, state, viewModel, dataState);
-      case 3: return _buildStep4(context, state, viewModel, dataState);
+      case 0: return _buildStepCategory(context, state, viewModel, dataState);
+      case 1: return _buildStepDetails(context, state, viewModel);
+      case 2: return _buildStepProtocols(context, state, viewModel, dataState, ref);
+      case 3: return _buildStepAreas(context, state, viewModel, dataState);
+      case 4: return _buildStepLogic(context, state, viewModel, dataState);
       default: return const SizedBox.shrink();
     }
   }
 
-  Widget _buildStep1(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildStepDetails(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -239,7 +243,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStep2(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildStepCategory(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -278,7 +282,83 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStep3(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildStepProtocols(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _sectionTitle(context, "Protocols"),
+            IconButton(
+              onPressed: () => _showAddProtocolDialog(context, ref),
+              icon: const Icon(Icons.add_circle_outline_rounded, color: CustomColors.purple, size: 28),
+            ),
+          ],
+        ),
+        context.verticalSpace(8),
+        Text("Select standard protocols associated with this treatment.", style: context.fonts.grey14w400),
+        context.verticalSpace(24),
+        if (dataState.protocols.isEmpty)
+          Center(
+            child: Padding(
+              padding: context.appEdgeInsets(vertical: 40),
+              child: Text("No protocols available. Click '+' to add one.", style: context.fonts.grey14w400),
+            ),
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: dataState.protocols.length,
+            separatorBuilder: (context, index) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final protocol = dataState.protocols[index];
+              final isSelected = state.selectedProtocolIds.contains(protocol.id);
+              return CheckboxListTile(
+                title: Text(protocol.name, style: context.fonts.black14w600),
+                value: isSelected,
+                onChanged: (val) => viewModel.toggleProtocolSelection(protocol.id),
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
+                activeColor: CustomColors.purple,
+                shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 8)),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  void _showAddProtocolDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => StandardDialog(
+        title: "Add New Protocol",
+        width: context.w(400),
+        content: BuildTextField(
+          label: "Protocol Name",
+          controller: controller,
+          hintText: "e.g. Pre-Treatment Peeling",
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.isNotEmpty) {
+                ref.read(treatmentDataViewModelProvider.notifier).addProtocol(controller.text);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Add"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepAreas(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -310,7 +390,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStep4(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildStepLogic(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
 
     return Column(
@@ -336,7 +416,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: allSubAreas.length,
-            separatorBuilder: (_, _) => context.verticalSpace(16),
+            separatorBuilder: (_, _) => context.verticalSpace(12),
             itemBuilder: (context, index) {
               final subArea = allSubAreas[index];
               return _buildSubAreaMaterialConfig(context, subArea);
@@ -646,8 +726,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final bool isLastStep = state.currentStep == 3;
-    final bool isStep3 = state.currentStep == 2;
+    final bool isLastStep = state.currentStep == 4;
+    final bool isStep4 = state.currentStep == 3;
 
     return Row(
       children: [
@@ -660,7 +740,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
           ),
           context.horizontalSpace(16),
         ],
-        if (isStep3) ...[
+        if (isStep4) ...[
           Expanded(
             flex: 2,
             child: OutlinedButton(
@@ -687,13 +767,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 // Category step validation could be added here
               }
               if (state.currentStep == 1) {
-                if (!_validateStep1(context, viewModel)) return;
+                if (!_validateStepDetails(context, viewModel)) return;
               }
-              if (state.currentStep == 2) {
+              if (state.currentStep == 3) {
                 if (!_validateSubAreas(context, state)) return;
               }
               
-              if (state.currentStep < 3) {
+              if (state.currentStep < 4) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel.submitTreatment(context).then((_) {
@@ -701,14 +781,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 });
               }
             },
-            label: isLastStep ? "Finish & Create Treatment" : (isStep3 ? "Add Materials" : "Next Step"),
+            label: isLastStep ? "Finish & Create Treatment" : (isStep4 ? "Add Materials" : "Next Step"),
           ),
         ),
       ],
     );
   }
 
-  bool _validateStep1(BuildContext context, TreatmentViewModel viewModel) {
+  bool _validateStepDetails(BuildContext context, TreatmentViewModel viewModel) {
     if (viewModel.internalNameController.text.isEmpty ||
         viewModel.displayNameController.text.isEmpty ||
         viewModel.basePriceController.text.isEmpty) {

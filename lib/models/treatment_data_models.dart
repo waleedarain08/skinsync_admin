@@ -96,3 +96,17 @@ class CombinationGroup {
     );
   }
 }
+
+class ProtocolItem {
+  final String id;
+  final String name;
+
+  ProtocolItem({required this.id, required this.name});
+
+  ProtocolItem copyWith({String? id, String? name}) {
+    return ProtocolItem(
+      id: id ?? this.id,
+      name: name ?? this.name,
+    );
+  }
+}

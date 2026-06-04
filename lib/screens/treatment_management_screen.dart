@@ -16,6 +16,7 @@ import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/nested_category_selector.dart';
+import 'package:skinsync_admin/widgets/pagination_footer.dart';
 
 class TreatmentManagementScreen extends ConsumerStatefulWidget {
   const TreatmentManagementScreen({super.key});
@@ -54,6 +55,13 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             _buildSearchAndFilterBar(context, viewModel, dataState),
             context.verticalSpace(24),
             _buildTreatmentList(context, state, viewModel),
+            PaginationFooter(
+              currentPage: state.currentPage,
+              totalPages: state.totalPages,
+              onPageChanged: (page) {
+                viewModel.getTreatments(page: page + 1);
+              },
+            ),
           ],
         ),
       ),
