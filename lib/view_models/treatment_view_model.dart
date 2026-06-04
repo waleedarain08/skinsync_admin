@@ -6,6 +6,7 @@ import '../models/treatment_model.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
 import '../utils/dummy_data.dart';
+import 'base_state_model.dart';
 import 'base_view_model.dart';
 
 final treatmentViewModelProvider = NotifierProvider<TreatmentViewModel, TreatmentState>(
@@ -26,6 +27,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final basePriceController = TextEditingController();
   final durationHoursController = TextEditingController();
   final durationMinutesController = TextEditingController();
+
+  // Step 3 Controllers (Protocols)
+  final protocolNameController = TextEditingController();
 
   // Step 2 Controllers
   final categoryIdController = TextEditingController();
@@ -56,6 +60,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.dispose();
     durationHoursController.dispose();
     durationMinutesController.dispose();
+    protocolNameController.dispose();
     categoryIdController.dispose();
     categoryNameController.dispose();
     categoryPathController.dispose();
@@ -80,15 +85,17 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     await getTreatments();
   }
 
-  Future<bool> getTreatments() async {
+  Future<bool> getTreatments({int page = 1}) async {
     return await runSafely<bool?>(showLoading: false, () async {
-          state = state.copyWith(loading: true);
+          state = state.copyWith(loading: true, currentPage: page);
           // Using dummy data for now
           await Future.delayed(const Duration(milliseconds: 500));
           state = state.copyWith(
             treatments: TreatmentData.dummyTreatments, 
             filteredTreatments: TreatmentData.dummyTreatments,
             loading: false,
+            totalPages: 5,
+            totalResults: 50,
           );
           return true;
         }) ??
@@ -103,6 +110,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.clear();
     durationHoursController.clear();
     durationMinutesController.clear();
+    protocolNameController.clear();
     categoryIdController.clear();
     categoryNameController.clear();
     categoryPathController.clear();
@@ -120,7 +128,18 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       areas: [AreaViewModelEntry()],
       selectedTreatment: null,
       useInAiSimulator: false,
+      selectedProtocolIds: [],
     );
+  }
+
+  void toggleProtocolSelection(String protocolId) {
+    final List<String> currentSelected = List.from(state.selectedProtocolIds);
+    if (currentSelected.contains(protocolId)) {
+      currentSelected.remove(protocolId);
+    } else {
+      currentSelected.add(protocolId);
+    }
+    state = state.copyWith(selectedProtocolIds: currentSelected);
   }
 
   void selectTreatment(TreatmentModel treatment) {
@@ -168,6 +187,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       treatmentImage: null, 
       treatmentIcon: null,
       useInAiSimulator: treatment.useInAiSimulator,
+      selectedProtocolIds: treatment.protocolIds ?? [],
     );
   }
 
@@ -395,6 +415,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         materialName: materialNameController.text,
         maxMaterialQuantity: int.tryParse(maxMaterialQuantityController.text) ?? 0,
         useInAiSimulator: state.useInAiSimulator,
+        protocolIds: state.selectedProtocolIds,
         sideAreas: state.areas.map((a) => SideAreaModel(
           name: a.areaController.text,
           subAreas: a.subAreas.map((s) => SubAreaModel(
@@ -422,37 +443,44 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   }
 }
 
-class TreatmentState {
+class TreatmentState extends BaseStateModel {
   final List<TreatmentModel> treatments;
   final List<TreatmentModel> filteredTreatments;
   final TreatmentModel? selectedTreatment;
   final int? selectedTreatmentId;
-  final bool loading;
   final int currentStep;
   final XFile? treatmentImage;
   final XFile? treatmentIcon;
   final List<AreaViewModelEntry> areas;
   final List<String> selectedCategoryPath;
+  final List<String> selectedProtocolIds;
   
   // Step 4 fields
   final bool useInAiSimulator;
 
   TreatmentState({
+    super.loading,
+    super.currentPage,
+    super.totalPages,
+    super.totalResults,
     this.treatments = const [],
     this.filteredTreatments = const [],
     this.selectedTreatment,
-    this.loading = false,
     this.selectedTreatmentId,
     this.currentStep = 0,
     this.treatmentImage,
     this.treatmentIcon,
     this.selectedCategoryPath = const [],
+    this.selectedProtocolIds = const [],
     this.useInAiSimulator = false,
     List<AreaViewModelEntry>? areas,
   }) : areas = areas ?? [AreaViewModelEntry()];
 
   TreatmentState copyWith({
     bool? loading,
+    int? currentPage,
+    int? totalPages,
+    int? totalResults,
     List<TreatmentModel>? treatments,
     List<TreatmentModel>? filteredTreatments,
     TreatmentModel? selectedTreatment,
@@ -462,10 +490,14 @@ class TreatmentState {
     XFile? treatmentIcon,
     List<AreaViewModelEntry>? areas,
     List<String>? selectedCategoryPath,
+    List<String>? selectedProtocolIds,
     bool? useInAiSimulator,
   }) {
     return TreatmentState(
       loading: loading ?? this.loading,
+      currentPage: currentPage ?? this.currentPage,
+      totalPages: totalPages ?? this.totalPages,
+      totalResults: totalResults ?? this.totalResults,
       treatments: treatments ?? this.treatments,
       filteredTreatments: filteredTreatments ?? this.filteredTreatments,
       selectedTreatment: selectedTreatment ?? this.selectedTreatment,
@@ -475,6 +507,7 @@ class TreatmentState {
       treatmentIcon: treatmentIcon ?? this.treatmentIcon,
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
+      selectedProtocolIds: selectedProtocolIds ?? this.selectedProtocolIds,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
     );
   }

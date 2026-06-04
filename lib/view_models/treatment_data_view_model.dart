@@ -11,12 +11,14 @@ class TreatmentDataState {
   final List<AreaItem> areas;
   final List<String> materials;
   final List<CombinationGroup> combinationGroups;
+  final List<ProtocolItem> protocols;
 
   TreatmentDataState({
     required this.categories,
     required this.areas,
     required this.materials,
     this.combinationGroups = const [],
+    this.protocols = const [],
   });
 
   TreatmentDataState copyWith({
@@ -24,12 +26,14 @@ class TreatmentDataState {
     List<AreaItem>? areas,
     List<String>? materials,
     List<CombinationGroup>? combinationGroups,
+    List<ProtocolItem>? protocols,
   }) {
     return TreatmentDataState(
       categories: categories ?? this.categories,
       areas: areas ?? this.areas,
       materials: materials ?? this.materials,
       combinationGroups: combinationGroups ?? this.combinationGroups,
+      protocols: protocols ?? this.protocols,
     );
   }
 }
@@ -73,7 +77,24 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
         CombinationGroup(id: '1', name: 'Full Face Rejuvenation', treatmentNames: ['Botox', 'Dermal Fillers', 'Skin Tightening']),
         CombinationGroup(id: '2', name: 'Skin Glow Package', treatmentNames: ['Hydra Facial', 'Chemical Peel', 'PRP']),
       ],
+      protocols: [
+        ProtocolItem(id: '1', name: 'Before Care Instructions'),
+        ProtocolItem(id: '2', name: 'After Care Instructions'),
+        ProtocolItem(id: '3', name: 'Follow Up Protocol'),
+        ProtocolItem(id: '4', name: 'Consultation Required'),
+      ],
     );
+  }
+
+  // --- Protocol Actions ---
+
+  void addProtocol(String name) {
+    if (name.isEmpty) return;
+    final newProtocol = ProtocolItem(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+    );
+    state = state.copyWith(protocols: [...state.protocols, newProtocol]);
   }
 
   // --- Category Actions (Supports Unlimited Nesting) ---

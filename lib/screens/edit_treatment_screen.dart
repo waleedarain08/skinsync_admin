@@ -2,9 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
@@ -458,36 +456,10 @@ class EditTreatmentScreen extends ConsumerWidget {
               Text("Use in AI Simulator", style: context.fonts.black16w400),
             ],
           ),
-          SizedBox(height: 32.h),
-          Text("Combinable Treatments", style: CustomFonts.black16w400),
-          SizedBox(height: 8.h),
-          Text("Select treatments that can be performed alongside this one.", style: CustomFonts.grey13w500),
-          // SizedBox(height: 16.h),
-          // _buildSearchField(
-          //   label: "Search Treatments",
-          //   hint: "Search to add...",
-          //   controller: viewModel.combinableSearchController,
-          //   suggestions: state.treatments.map((t) => t.name ?? '').toList(),
-          //   onSelected: (val) {
-          //     final treatment = state.treatments.firstWhere((t) => t.name == val, orElse: () => TreatmentModel(name: val));
-          //     viewModel.addCombinableTreatment(treatment);
-          //   },
-          // ),
-          // if (state.combinableTreatments.isNotEmpty) ...[
-          //   SizedBox(height: 16.h),
-          //   Wrap(
-          //     spacing: 12.w,
-          //     runSpacing: 12.h,
-          //     children: state.combinableTreatments.map((t) => Chip(
-          //       label: Text(t.name ?? "N/A"),
-          //       onDeleted: () => viewModel.removeCombinableTreatment(t.id ?? 0),
-          //       backgroundColor: CustomColors.purple.withValues(alpha: 0.1),
-          //       side: BorderSide(color: CustomColors.purple.withValues(alpha: 0.2)),
-          //       labelStyle: CustomFonts.black12w400,
-          //       deleteIconColor: CustomColors.black,
-          //     )).toList(),
-          //   ),
-          // ],
+          context.verticalSpace(32),
+          Text("Combinable Treatments", style: context.fonts.black16w400),
+          context.verticalSpace(8),
+          Text("Select treatments that can be performed alongside this one.", style: context.fonts.grey13w500),
         ],
       ),
     );

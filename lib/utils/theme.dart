@@ -3,6 +3,7 @@ import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'color_constant.dart';
 import 'custom_fonts.dart';
 
+export 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 export 'color_constant.dart';
 export 'custom_fonts.dart';
 
