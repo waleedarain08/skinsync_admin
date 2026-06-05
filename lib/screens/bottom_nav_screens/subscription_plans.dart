@@ -8,6 +8,7 @@ import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
@@ -196,12 +197,12 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             )).toList(),
           ),
           context.verticalSpace(24),
-          OutlinedButton.icon(
-            onPressed: () {
+          CustomOutlinedButton(
+            onTap: () {
               context.push(CreateSubscriptionPlanScreen.routeName, extra: plan);
             },
-            icon: const Icon(Icons.tune_rounded, size: 18),
-            label: const Text("Configure Default Model"),
+            icon: Icons.tune_rounded,
+            label: "Configure Default Model",
           ),
         ],
       ),
@@ -285,11 +286,11 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
+                child: CustomOutlinedButton(
+                  onTap: () {
                     context.push(CreateSubscriptionPlanScreen.routeName, extra: plan);
                   },
-                  child: const Text("Edit Tier"),
+                  label: "Edit Tier",
                 ),
               ),
               context.horizontalSpace(12),

@@ -7,6 +7,7 @@ import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -225,22 +226,13 @@ class InviteClinicDetailScreen extends ConsumerWidget {
 
   Widget _actionButton(BuildContext context, String label, IconData icon, Color bg, Color text, VoidCallback onTap, {bool isOutlined = false}) {
     if (isOutlined) {
-      return SizedBox(
+      return CustomOutlinedButton(
+        label: label,
+        onTap: onTap,
+        icon: icon,
         width: double.infinity,
-        child: OutlinedButton.icon(
-          onPressed: onTap,
-          icon: Icon(icon, size: context.sp(20)),
-          label: Text(label),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: text,
-            side: BorderSide(color: text.withValues(alpha: 0.5), width: 1.2),
-            padding: context.appEdgeInsets(vertical: 20),
-            shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 14)),
-            textStyle: context.fonts.grey14w600ls03,
-          ).copyWith(
-            overlayColor: WidgetStateProperty.all(text.withValues(alpha: 0.05)),
-          ),
-        ),
+        height: context.h(56),
+        color: text,
       );
     }
 

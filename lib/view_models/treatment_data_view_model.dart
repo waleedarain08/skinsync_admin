@@ -10,14 +10,12 @@ class TreatmentDataState {
   final List<CategoryItem> categories;
   final List<AreaItem> areas;
   final List<String> materials;
-  final List<CombinationGroup> combinationGroups;
   final List<ProtocolItem> protocols;
 
   TreatmentDataState({
     required this.categories,
     required this.areas,
     required this.materials,
-    this.combinationGroups = const [],
     this.protocols = const [],
   });
 
@@ -25,14 +23,12 @@ class TreatmentDataState {
     List<CategoryItem>? categories,
     List<AreaItem>? areas,
     List<String>? materials,
-    List<CombinationGroup>? combinationGroups,
     List<ProtocolItem>? protocols,
   }) {
     return TreatmentDataState(
       categories: categories ?? this.categories,
       areas: areas ?? this.areas,
       materials: materials ?? this.materials,
-      combinationGroups: combinationGroups ?? this.combinationGroups,
       protocols: protocols ?? this.protocols,
     );
   }
@@ -73,10 +69,6 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
       categories: categories,
       areas: areas,
       materials: List.from(TreatmentData.consumableTypes),
-      combinationGroups: [
-        CombinationGroup(id: '1', name: 'Full Face Rejuvenation', treatmentNames: ['Botox', 'Dermal Fillers', 'Skin Tightening']),
-        CombinationGroup(id: '2', name: 'Skin Glow Package', treatmentNames: ['Hydra Facial', 'Chemical Peel', 'PRP']),
-      ],
       protocols: [
         ProtocolItem(id: '1', title: 'Cleanse treatment area', type: ProtocolType.checkbox),
         ProtocolItem(id: '2', title: 'Review contraindications', type: ProtocolType.checkbox),
@@ -98,6 +90,23 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
       type: type,
     );
     state = state.copyWith(protocols: [...state.protocols, newProtocol]);
+  }
+
+  void editProtocol(String id, String newTitle) {
+    state = state.copyWith(
+      protocols: state.protocols.map((p) {
+        if (p.id == id) {
+          return p.copyWith(title: newTitle);
+        }
+        return p;
+      }).toList(),
+    );
+  }
+
+  void deleteProtocol(String id) {
+    state = state.copyWith(
+      protocols: state.protocols.where((p) => p.id != id).toList(),
+    );
   }
 
   // --- Category Actions (Supports Unlimited Nesting) ---
@@ -254,32 +263,5 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
 
   void deleteMaterial(String name) {
     state = state.copyWith(materials: state.materials.where((m) => m != name).toList());
-  }
-
-  // --- Combination Group Actions ---
-  void addCombinationGroup(String name, List<String> treatments) {
-    state = state.copyWith(
-      combinationGroups: [
-        ...state.combinationGroups,
-        CombinationGroup(id: DateTime.now().toString(), name: name, treatmentNames: treatments),
-      ],
-    );
-  }
-
-  void editCombinationGroup(String id, String name, List<String> treatments) {
-    state = state.copyWith(
-      combinationGroups: state.combinationGroups.map((g) {
-        if (g.id == id) {
-          return g.copyWith(name: name, treatmentNames: treatments);
-        }
-        return g;
-      }).toList(),
-    );
-  }
-
-  void deleteCombinationGroup(String id) {
-    state = state.copyWith(
-      combinationGroups: state.combinationGroups.where((g) => g.id != id).toList(),
-    );
   }
 }

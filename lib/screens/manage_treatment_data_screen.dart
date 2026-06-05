@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
-import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -44,7 +41,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               Tab(text: "Categories"),
               Tab(text: "Body Areas"),
               Tab(text: "Materials"),
-              Tab(text: "Combinations"),
+              Tab(text: "Protocols"),
             ],
           ),
         ),
@@ -53,7 +50,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             _buildCategoriesTab(context, state, viewModel),
             _buildAreasTab(context, state, viewModel),
             _buildMaterialsTab(context, state, viewModel),
-            _buildCombinationsTab(context, state, viewModel, ref),
+            _buildProtocolsTab(context, state, viewModel),
           ],
         ),
       ),
@@ -171,7 +168,40 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCombinationsTab(BuildContext context, TreatmentDataState state, TreatmentDataViewModel viewModel, WidgetRef ref) {
+  Widget _buildProtocolsTab(BuildContext context, TreatmentDataState state, TreatmentDataViewModel viewModel) {
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          Container(
+            color: Colors.white.withValues(alpha: 0.5),
+            child: TabBar(
+              labelColor: CustomColors.purple,
+              unselectedLabelColor: CustomColors.grey,
+              indicatorColor: CustomColors.purple,
+              tabs: const [
+                Tab(text: "Checkboxes"),
+                Tab(text: "Text Fields"),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _buildProtocolList(context, state, viewModel, ProtocolType.checkbox),
+                _buildProtocolList(context, state, viewModel, ProtocolType.text),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProtocolList(BuildContext context, TreatmentDataState state, TreatmentDataViewModel viewModel, ProtocolType type) {
+    final filteredProtocols = state.protocols.where((p) => p.type == type).toList();
+    final title = type == ProtocolType.checkbox ? "Checkbox Protocols" : "Text Field Protocols";
+
     return SingleChildScrollView(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
@@ -179,77 +209,46 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         children: [
           _buildTabHeader(
             context: context,
-            title: "Treatment Combination Groups",
-            onAdd: () => _showCombinationDialog(
+            title: title,
+            onAdd: () => _showProtocolDialog(
               context: context,
-              ref: ref,
-              title: "Create Combination Group",
-              onConfirm: (name, treatments) => viewModel.addCombinationGroup(name, treatments),
+              title: "Add ${type == ProtocolType.checkbox ? 'Checkbox' : 'Text'} Protocol",
+              onConfirm: (val) => viewModel.addProtocol(val, type),
             ),
           ),
           context.verticalSpace(24),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: state.combinationGroups.length,
-            separatorBuilder: (context, index) => context.verticalSpace(16),
+            itemCount: filteredProtocols.length,
+            separatorBuilder: (context, index) => context.verticalSpace(12),
             itemBuilder: (context, index) {
-              final group = state.combinationGroups[index];
+              final protocol = filteredProtocols[index];
               return BorderdContainerWidget(
-                padding: EdgeInsets.zero,
-                child: ExpansionTile(
-                  shape: const RoundedRectangleBorder(side: BorderSide.none),
-                  leading: Container(
-                    width: context.w(40),
-                    height: context.w(40),
-                    decoration: BoxDecoration(
-                      color: CustomColors.purple.withValues(alpha: 0.1),
-                      borderRadius: context.borderRadius(all: 8),
-                    ),
-                    child: const Icon(Icons.auto_awesome_motion_rounded, color: CustomColors.purple),
-                  ),
-                  title: Text(group.name, style: context.fonts.black16w600),
-                  subtitle: Text("${group.treatmentNames.length} combined treatments", style: context.fonts.grey12w400),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 20),
-                        onPressed: () => _showCombinationDialog(
-                          context: context,
-                          ref: ref,
-                          title: "Edit Combination Group",
-                          initialName: group.name,
-                          initialTreatments: group.treatmentNames,
-                          onConfirm: (name, treatments) => viewModel.editCombinationGroup(group.id, name, treatments),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.red),
-                        onPressed: () => _showDeleteConfirm(context, group.name, () => viewModel.deleteCombinationGroup(group.id)),
-                      ),
-                      const Icon(Icons.expand_more),
-                    ],
-                  ),
+                padding: context.appEdgeInsets(horizontal: 20, vertical: 12),
+                child: Row(
                   children: [
-                    Padding(
-                      padding: context.appEdgeInsets(all: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Wrap(
-                            spacing: context.w(12),
-                            runSpacing: context.h(12),
-                            children: group.treatmentNames.map((t) => Chip(
-                              label: Text(t),
-                              backgroundColor: CustomColors.whiteGrey,
-                              side: BorderSide(color: Colors.grey[200]!),
-                              labelStyle: context.fonts.black12w600,
-                            )).toList(),
-                          ),
-                          context.verticalSpace(8),
-                        ],
+                    Icon(
+                      type == ProtocolType.checkbox ? Icons.check_box_outlined : Icons.text_fields_rounded,
+                      color: CustomColors.purple,
+                      size: 20,
+                    ),
+                    context.horizontalSpace(16),
+                    Expanded(
+                      child: Text(protocol.title, style: context.fonts.black14w600),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined, size: 20),
+                      onPressed: () => _showProtocolDialog(
+                        context: context,
+                        title: "Edit Protocol",
+                        initialValue: protocol.title,
+                        onConfirm: (val) => viewModel.editProtocol(protocol.id, val),
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.red),
+                      onPressed: () => _showDeleteConfirm(context, protocol.title, () => viewModel.deleteProtocol(protocol.id)),
                     ),
                   ],
                 ),
@@ -427,91 +426,37 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     );
   }
 
-  void _showCombinationDialog({
+  static void _showProtocolDialog({
     required BuildContext context,
-    required WidgetRef ref,
     required String title,
-    String? initialName,
-    List<String>? initialTreatments,
-    required Function(String, List<String>) onConfirm,
+    String? initialValue,
+    required Function(String) onConfirm,
   }) {
-    final nameController = TextEditingController(text: initialName);
-    final List<String> selectedTreatments = List.from(initialTreatments ?? []);
-    final treatmentsState = ref.read(treatmentViewModelProvider);
-    final searchController = TextEditingController();
+    final controller = TextEditingController(text: initialValue);
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => StandardDialog(
-          title: title,
-          width: context.w(500),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BuildTextField(
-                label: "Group Name",
-                controller: nameController,
-                hintText: "e.g. Skin Glow Package",
-              ),
-              context.verticalSpace(24),
-              Text("Add Treatments", style: context.fonts.black14w600),
-              context.verticalSpace(10),
-              SearchAnchor(
-                viewHintText: "Search treatments...",
-                builder: (context, controller) => AppSearchField(
-                  controller: searchController,
-                  readOnly: true,
-                  onTap: () => controller.openView(),
-                  hintText: "Select treatment to add",
-                  suffixIcon: const Icon(Icons.search),
-                  maxWidth: double.infinity,
-                ),
-                suggestionsBuilder: (context, controller) {
-                  final query = controller.text.toLowerCase();
-                  return treatmentsState.treatments
-                      .where((t) => t.name!.toLowerCase().contains(query))
-                      .map((t) => ListTile(
-                        title: Text(t.name!),
-                        onTap: () {
-                          if (!selectedTreatments.contains(t.name)) {
-                            setState(() => selectedTreatments.add(t.name!));
-                          }
-                          controller.closeView(t.name!);
-                        },
-                      ))
-                      .toList();
-                },
-              ),
-              if (selectedTreatments.isNotEmpty) ...[
-                context.verticalSpace(16),
-                Wrap(
-                  spacing: context.w(8),
-                  runSpacing: context.h(8),
-                  children: selectedTreatments.map((t) => Chip(
-                    label: Text(t, style: context.fonts.black11w400),
-                    onDeleted: () => setState(() => selectedTreatments.remove(t)),
-                    backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
-                    deleteIconColor: CustomColors.purple,
-                  )).toList(),
-                ),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-            CustomPrimaryButton(
-              onTap: () {
-                if (nameController.text.trim().isNotEmpty) {
-                  onConfirm(nameController.text.trim(), selectedTreatments);
-                  Navigator.pop(context);
-                }
-              },
-              label: "Save Group",
-              width: context.w(140),
-            ),
-          ],
+      builder: (context) => StandardDialog(
+        title: title,
+        width: context.w(450),
+        content: BuildTextField(
+          label: "Protocol Title",
+          controller: controller,
+          hintText: "Enter protocol title...",
         ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          CustomPrimaryButton(
+            onTap: () {
+              if (controller.text.trim().isNotEmpty) {
+                onConfirm(controller.text.trim());
+                Navigator.pop(context);
+              }
+            },
+            label: "Confirm",
+            width: context.w(120),
+          ),
+        ],
       ),
     );
   }

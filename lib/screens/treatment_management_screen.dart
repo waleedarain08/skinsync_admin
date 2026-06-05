@@ -10,6 +10,7 @@ import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
@@ -85,13 +86,12 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
         ),
         Row(
           children: [
-            OutlinedButton.icon(
-              onPressed: () => context.push(ManageTreatmentDataScreen.routeName),
-              icon: const Icon(Icons.tune_rounded, size: 20),
-              label: const Text('Configure Meta-Data'),
-              style: OutlinedButton.styleFrom(
-                backgroundColor: Colors.white,
-              ),
+            CustomOutlinedButton(
+              onTap: () => context.push(ManageTreatmentDataScreen.routeName),
+              icon: Icons.tune_rounded,
+              label: 'Configure Meta-Data',
+              color: Colors.white,
+              textColor: CustomColors.purple,
             ),
             context.horizontalSpace(16),
             CustomPrimaryButton(
@@ -119,14 +119,13 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           onClear: () => viewModel.onSearchChanged(""),
         ),
         context.horizontalSpace(16),
-        OutlinedButton.icon(
-          onPressed: () => _showFiltersModal(context, viewModel, dataState),
-          icon: const Icon(Icons.filter_list_rounded, size: 20),
-          label: const Text("Refine Results"),
-          style: OutlinedButton.styleFrom(
-            backgroundColor: Colors.white,
-            minimumSize: Size(0, context.h(52)),
-          ),
+        CustomOutlinedButton(
+          onTap: () => _showFiltersModal(context, viewModel, dataState),
+          icon: Icons.filter_list_rounded,
+          label: "Refine Results",
+          color: Colors.white,
+          textColor: CustomColors.purple,
+          height: context.h(52),
         ),
       ],
     );

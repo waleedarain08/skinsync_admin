@@ -8,6 +8,7 @@ import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
@@ -240,14 +241,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
           onChanged: (val) => setState(() {}),
         ),
         context.horizontalSpace(16),
-        OutlinedButton.icon(
-          onPressed: () => _showFiltersModal(context),
-          icon: const Icon(Icons.filter_list_rounded, size: 20),
-          label: const Text("Filters"),
-          style: OutlinedButton.styleFrom(
-            backgroundColor: Colors.white,
-            minimumSize: Size(0, context.h(52)),
-          ),
+        CustomOutlinedButton(
+          onTap: () => _showFiltersModal(context),
+          icon: Icons.filter_list_rounded,
+          label: "Filters",
+          color: Colors.white,
+          textColor: CustomColors.purple,
+          height: context.h(52),
         ),
       ],
     );

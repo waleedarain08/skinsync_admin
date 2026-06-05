@@ -8,6 +8,7 @@ import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -456,12 +457,12 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      SizedBox(
+                      CustomOutlinedButton(
+                        onTap: () => context.pop(),
+                        label: "Cancel",
                         width: context.w(160),
-                        child: OutlinedButton(
-                          onPressed: () => context.pop(),
-                          child: Text("Cancel", style: context.fonts.grey14w400),
-                        ),
+                        textColor: CustomColors.grey,
+                        color: CustomColors.border,
                       ),
                       context.horizontalSpace(24),
                       SizedBox(

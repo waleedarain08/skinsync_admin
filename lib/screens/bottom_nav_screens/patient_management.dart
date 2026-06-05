@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
@@ -152,10 +153,10 @@ class _PatientManagementState extends State<PatientManagement> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Patient Records", style: context.fonts.black18w600),
-                OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.file_download_outlined, size: 18),
-                  label: const Text("Export Registry"),
+                CustomOutlinedButton(
+                  onTap: () {},
+                  icon: Icons.file_download_outlined,
+                  label: "Export Registry",
                 ),
               ],
             ),

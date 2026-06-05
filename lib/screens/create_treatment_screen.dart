@@ -9,6 +9,7 @@ import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/nested_category_selector.dart';
@@ -800,9 +801,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
       children: [
         if (state.currentStep > 0) ...[
           Expanded(
-            child: OutlinedButton(
-              onPressed: () => viewModel.setStep(state.currentStep - 1),
-              child: const Text("Previous Step"),
+            child: CustomOutlinedButton(
+              onTap: () => viewModel.setStep(state.currentStep - 1),
+              label: "Previous Step",
             ),
           ),
           context.horizontalSpace(16),
@@ -810,18 +811,15 @@ class CreateTreatmentScreen extends ConsumerWidget {
         if (isStep4) ...[
           Expanded(
             flex: 2,
-            child: OutlinedButton(
-              onPressed: () {
+            child: CustomOutlinedButton(
+              onTap: () {
                 if (!_validateSubAreas(context, state)) return;
                 viewModel.submitTreatment(context).then((_) {
                   if (context.mounted) context.pop();
                 });
               },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: CustomColors.black),
-                foregroundColor: CustomColors.black,
-              ),
-              child: const Text("Finish & Create Now"),
+              label: "Finish & Create Now",
+              color: CustomColors.black,
             ),
           ),
           context.horizontalSpace(16),

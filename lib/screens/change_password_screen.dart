@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -216,23 +217,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         SizedBox(width: 16.w),
         // Cancel Button
         Expanded(
-          child: OutlinedButton(
-            onPressed: () {
+          child: CustomOutlinedButton(
+            onTap: () {
               // Handle cancel
               Navigator.pop(context);
             },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.black,
-              padding: EdgeInsets.symmetric(vertical: 20.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              side: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            child: Text(
-              'Cancel',
-              style: context.fonts.black14w500,
-            ),
+            label: 'Cancel',
+            color: Colors.grey[300],
+            textColor: Colors.black,
           ),
         ),
       ],
