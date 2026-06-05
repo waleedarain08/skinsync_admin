@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'business_info_screen.dart';
 
@@ -396,23 +397,14 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
         context.horizontalSpace(16),
         // Cancel Button
         Expanded(
-          child: OutlinedButton(
-            onPressed: () {
+          child: CustomOutlinedButton(
+            onTap: () {
               // Handle cancel
               Navigator.pop(context);
             },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.black,
-              padding: context.appEdgeInsets(vertical: 20),
-              shape: RoundedRectangleBorder(
-                borderRadius: context.borderRadius(all: 8),
-              ),
-              side: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            child: Text(
-              'Cancel',
-              style: context.fonts.black14w500,
-            ),
+            label: 'Cancel',
+            color: Colors.grey[300],
+            textColor: Colors.black,
           ),
         ),
       ],

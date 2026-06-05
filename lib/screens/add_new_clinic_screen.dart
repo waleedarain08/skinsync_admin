@@ -13,6 +13,7 @@ import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -355,27 +356,21 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      SizedBox(
-                        width: 160.w,
-                        height: 56.h,
-                        child: OutlinedButton(
-                          onPressed: () => context.pop(),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: CustomColors.grey,
-                            side: const BorderSide(color: CustomColors.border, width: 1.5),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                            textStyle: context.fonts.black16w600,
-                          ),
-                          child: const Text("Cancel"),
-                        ),
+                      CustomOutlinedButton(
+                        onTap: () => context.pop(),
+                        label: "Cancel",
+                        width: context.w(160),
+                        height: context.h(56),
+                        textColor: CustomColors.grey,
+                        color: CustomColors.border,
                       ),
-                      SizedBox(width: 24.w),
+                      context.horizontalSpace(24),
                       SizedBox(
-                        width: 240.w,
+                        width: context.w(240),
                         child: CustomPrimaryButton(
                           onTap: _submit,
                           label: "Register Clinic",
-                          height: 56.h,
+                          height: context.h(56),
                         ),
                       ),
                     ],
