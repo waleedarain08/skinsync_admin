@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,6 +28,21 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final basePriceController = TextEditingController();
   final durationHoursController = TextEditingController();
   final durationMinutesController = TextEditingController();
+
+  // Step - Treatment Instructions Controllers
+  final preTreatmentInstructionsController = TextEditingController();
+  final postTreatmentInstructionsController = TextEditingController();
+
+  // Step - Patient Communications Controllers
+  final preNotificationTitleController = TextEditingController();
+  final preNotificationDescriptionController = TextEditingController();
+  final postNotificationTitleController = TextEditingController();
+  final postNotificationDescriptionController = TextEditingController();
+
+  // Step - Follow-Up Controllers
+  final totalFollowUpsController = TextEditingController();
+  final followUpDurationValueController = TextEditingController();
+  final followUpNotesController = TextEditingController();
 
   // Step 3 Controllers (Protocols)
   final protocolNameController = TextEditingController();
@@ -60,6 +76,15 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.dispose();
     durationHoursController.dispose();
     durationMinutesController.dispose();
+    preTreatmentInstructionsController.dispose();
+    postTreatmentInstructionsController.dispose();
+    preNotificationTitleController.dispose();
+    preNotificationDescriptionController.dispose();
+    postNotificationTitleController.dispose();
+    postNotificationDescriptionController.dispose();
+    totalFollowUpsController.dispose();
+    followUpDurationValueController.dispose();
+    followUpNotesController.dispose();
     protocolNameController.dispose();
     categoryIdController.dispose();
     categoryNameController.dispose();
@@ -110,6 +135,15 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.clear();
     durationHoursController.clear();
     durationMinutesController.clear();
+    preTreatmentInstructionsController.clear();
+    postTreatmentInstructionsController.clear();
+    preNotificationTitleController.clear();
+    preNotificationDescriptionController.clear();
+    postNotificationTitleController.clear();
+    postNotificationDescriptionController.clear();
+    totalFollowUpsController.clear();
+    followUpDurationValueController.clear();
+    followUpNotesController.clear();
     protocolNameController.clear();
     categoryIdController.clear();
     categoryNameController.clear();
@@ -125,10 +159,17 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       currentStep: 0,
       treatmentImage: null,
       treatmentIcon: null,
+      preTreatmentAttachments: [],
+      postTreatmentAttachments: [],
+      existingPreAttachments: [],
+      existingPostAttachments: [],
       areas: [AreaViewModelEntry()],
       selectedTreatment: null,
       useInAiSimulator: false,
       selectedProtocolIds: [],
+      isFollowUpRequired: false,
+      followUpType: null,
+      followUpDurationUnit: 'minutes',
     );
   }
 
@@ -153,6 +194,18 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.text = treatment.basePrice?.toString() ?? '';
     durationHoursController.text = treatment.baseDurationHours?.toString() ?? '';
     durationMinutesController.text = treatment.baseDurationMinutes?.toString() ?? '';
+    preTreatmentInstructionsController.text = treatment.preTreatmentInstructions ?? '';
+    postTreatmentInstructionsController.text = treatment.postTreatmentInstructions ?? '';
+    
+    preNotificationTitleController.text = treatment.preTreatmentNotificationTitle ?? '';
+    preNotificationDescriptionController.text = treatment.preTreatmentNotificationDescription ?? '';
+    postNotificationTitleController.text = treatment.postTreatmentNotificationTitle ?? '';
+    postNotificationDescriptionController.text = treatment.postTreatmentNotificationDescription ?? '';
+
+    totalFollowUpsController.text = treatment.totalFollowUps?.toString() ?? '';
+    followUpDurationValueController.text = treatment.followUpDurationValue?.toString() ?? '';
+    followUpNotesController.text = treatment.followUpNotes ?? '';
+
     categoryIdController.text = treatment.categoryId ?? '';
     categoryNameController.text = treatment.categoryName ?? '';
     categoryPathController.text = treatment.categoryPath ?? '';
@@ -188,6 +241,15 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       treatmentIcon: null,
       useInAiSimulator: treatment.useInAiSimulator,
       selectedProtocolIds: treatment.protocolIds ?? [],
+      preTreatmentAttachments: [], 
+      postTreatmentAttachments: [],
+      existingPreAttachments: treatment.preTreatmentAttachments ?? [],
+      existingPostAttachments: treatment.postTreatmentAttachments ?? [],
+      isFollowUpRequired: treatment.isFollowUpRequired,
+      followUpType: treatment.followUpType,
+      followUpDurationUnit: treatment.followUpDurationUnit ?? 'minutes',
+      preNotificationOffset: treatment.preTreatmentNotificationOffset,
+      postNotificationOffset: treatment.postTreatmentNotificationOffset,
     );
   }
 
@@ -211,8 +273,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     categoryNameController.text = category.name;
     categoryPathController.text = path;
     
-    // Build path from ID
-    // Note: We'll refine this to work with the recursive UI
     state = state.copyWith(); 
   }
 
@@ -225,7 +285,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     
     currentPath.add(category.id);
     
-    // Build category path string for the model (e.g. "Beauty > Hair > Coloring")
     String fullPath = "";
     for (int i = 0; i < currentPath.length; i++) {
       final node = _findCategoryById(allCategories, currentPath[i]);
@@ -294,6 +353,63 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   // Step 4 Actions
   void toggleAiSimulator(bool? value) {
     state = state.copyWith(useInAiSimulator: value ?? false);
+  }
+
+  void setPreNotificationOffset(int? offset) {
+    state = state.copyWith(preNotificationOffset: offset);
+  }
+
+  void setPostNotificationOffset(int? offset) {
+    state = state.copyWith(postNotificationOffset: offset);
+  }
+
+  Future<void> pickAttachments(bool isPreTreatment) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'mp4', 'mov', 'avi'],
+    );
+
+    if (result != null) {
+      if (isPreTreatment) {
+        state = state.copyWith(preTreatmentAttachments: [...state.preTreatmentAttachments, ...result.files]);
+      } else {
+        state = state.copyWith(postTreatmentAttachments: [...state.postTreatmentAttachments, ...result.files]);
+      }
+    }
+  }
+
+  void removeAttachment(bool isPreTreatment, int index) {
+    if (isPreTreatment) {
+      final updated = List<PlatformFile>.from(state.preTreatmentAttachments)..removeAt(index);
+      state = state.copyWith(preTreatmentAttachments: updated);
+    } else {
+      final updated = List<PlatformFile>.from(state.postTreatmentAttachments)..removeAt(index);
+      state = state.copyWith(postTreatmentAttachments: updated);
+    }
+  }
+
+  void removeExistingAttachment(bool isPreTreatment, int index) {
+    if (isPreTreatment) {
+      final updated = List<Attachment>.from(state.existingPreAttachments)..removeAt(index);
+      state = state.copyWith(existingPreAttachments: updated);
+    } else {
+      final updated = List<Attachment>.from(state.existingPostAttachments)..removeAt(index);
+      state = state.copyWith(existingPostAttachments: updated);
+    }
+  }
+
+  // Follow-Up Actions
+  void toggleFollowUpRequired(bool? value) {
+    state = state.copyWith(isFollowUpRequired: value ?? false);
+  }
+
+  void setFollowUpType(String? type) {
+    state = state.copyWith(followUpType: type);
+  }
+
+  void setFollowUpDurationUnit(String? unit) {
+    state = state.copyWith(followUpDurationUnit: unit);
   }
 
   // Filter Logic
@@ -416,6 +532,28 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         maxMaterialQuantity: int.tryParse(maxMaterialQuantityController.text) ?? 0,
         useInAiSimulator: state.useInAiSimulator,
         protocolIds: state.selectedProtocolIds,
+        preTreatmentInstructions: preTreatmentInstructionsController.text,
+        postTreatmentInstructions: postTreatmentInstructionsController.text,
+        preTreatmentNotificationTitle: preNotificationTitleController.text,
+        preTreatmentNotificationDescription: preNotificationDescriptionController.text,
+        preTreatmentNotificationOffset: state.preNotificationOffset,
+        postTreatmentNotificationTitle: postNotificationTitleController.text,
+        postTreatmentNotificationDescription: postNotificationDescriptionController.text,
+        postTreatmentNotificationOffset: state.postNotificationOffset,
+        preTreatmentAttachments: [
+          ...state.existingPreAttachments,
+          ...state.preTreatmentAttachments.map((f) => Attachment(url: f.path ?? '', type: _getFileType(f), name: f.name)),
+        ],
+        postTreatmentAttachments: [
+          ...state.existingPostAttachments,
+          ...state.postTreatmentAttachments.map((f) => Attachment(url: f.path ?? '', type: _getFileType(f), name: f.name)),
+        ],
+        isFollowUpRequired: state.isFollowUpRequired,
+        totalFollowUps: int.tryParse(totalFollowUpsController.text),
+        followUpType: state.followUpType,
+        followUpDurationValue: int.tryParse(followUpDurationValueController.text),
+        followUpDurationUnit: state.followUpDurationUnit,
+        followUpNotes: followUpNotesController.text,
         sideAreas: state.areas.map((a) => SideAreaModel(
           name: a.areaController.text,
           subAreas: a.subAreas.map((s) => SubAreaModel(
@@ -432,6 +570,14 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       await Future.delayed(const Duration(seconds: 1));
       resetForm();
     });
+  }
+
+  String _getFileType(PlatformFile file) {
+    final ext = file.extension?.toLowerCase();
+    if (ext == 'pdf') return 'pdf';
+    if (['jpg', 'jpeg', 'png', 'webp'].contains(ext)) return 'image';
+    if (['mp4', 'mov', 'avi', 'mkv'].contains(ext)) return 'video';
+    return 'other';
   }
 
   Future<void> updateTreatment(BuildContext context) async {
@@ -455,6 +601,20 @@ class TreatmentState extends BaseStateModel {
   final List<String> selectedCategoryPath;
   final List<String> selectedProtocolIds;
   
+  final int? preNotificationOffset;
+  final int? postNotificationOffset;
+
+  final List<PlatformFile> preTreatmentAttachments;
+  final List<PlatformFile> postTreatmentAttachments;
+
+  final List<Attachment> existingPreAttachments;
+  final List<Attachment> existingPostAttachments;
+
+  // Follow-Up fields
+  final bool isFollowUpRequired;
+  final String? followUpType;
+  final String? followUpDurationUnit;
+
   // Step 4 fields
   final bool useInAiSimulator;
 
@@ -472,6 +632,15 @@ class TreatmentState extends BaseStateModel {
     this.treatmentIcon,
     this.selectedCategoryPath = const [],
     this.selectedProtocolIds = const [],
+    this.preNotificationOffset,
+    this.postNotificationOffset,
+    this.preTreatmentAttachments = const [],
+    this.postTreatmentAttachments = const [],
+    this.existingPreAttachments = const [],
+    this.existingPostAttachments = const [],
+    this.isFollowUpRequired = false,
+    this.followUpType,
+    this.followUpDurationUnit = 'minutes',
     this.useInAiSimulator = false,
     List<AreaViewModelEntry>? areas,
   }) : areas = areas ?? [AreaViewModelEntry()];
@@ -491,6 +660,15 @@ class TreatmentState extends BaseStateModel {
     List<AreaViewModelEntry>? areas,
     List<String>? selectedCategoryPath,
     List<String>? selectedProtocolIds,
+    int? preNotificationOffset,
+    int? postNotificationOffset,
+    List<PlatformFile>? preTreatmentAttachments,
+    List<PlatformFile>? postTreatmentAttachments,
+    List<Attachment>? existingPreAttachments,
+    List<Attachment>? existingPostAttachments,
+    bool? isFollowUpRequired,
+    String? followUpType,
+    String? followUpDurationUnit,
     bool? useInAiSimulator,
   }) {
     return TreatmentState(
@@ -508,6 +686,15 @@ class TreatmentState extends BaseStateModel {
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
       selectedProtocolIds: selectedProtocolIds ?? this.selectedProtocolIds,
+      preNotificationOffset: preNotificationOffset ?? this.preNotificationOffset,
+      postNotificationOffset: postNotificationOffset ?? this.postNotificationOffset,
+      preTreatmentAttachments: preTreatmentAttachments ?? this.preTreatmentAttachments,
+      postTreatmentAttachments: postTreatmentAttachments ?? this.postTreatmentAttachments,
+      existingPreAttachments: existingPreAttachments ?? this.existingPreAttachments,
+      existingPostAttachments: existingPostAttachments ?? this.existingPostAttachments,
+      isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
+      followUpType: followUpType ?? this.followUpType,
+      followUpDurationUnit: followUpDurationUnit ?? this.followUpDurationUnit,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
     );
   }

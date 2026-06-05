@@ -61,6 +61,7 @@ class BuildTextField extends StatelessWidget {
               hint: hintText, 
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,
+              maxLines: maxLines,
             ),
           ),
         ],

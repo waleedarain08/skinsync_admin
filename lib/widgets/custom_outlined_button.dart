@@ -62,9 +62,7 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
                 color: _hovered && enabled ? baseColor.withValues(alpha: 0.05) : Colors.transparent,
                 borderRadius: context.borderRadius(all: 12),
                 border: Border.all(
-                  color: enabled 
-                      ? baseColor 
-                      : CustomColors.lightGrey.withValues(alpha: 0.5),
+                  color:  CustomColors.purple,
                   width: 1.5,
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,9 +79,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
           _stepConnector(1, currentStep),
           _stepIndicator(context, 2, "Protocols", currentStep),
           _stepConnector(2, currentStep),
-          _stepIndicator(context, 3, "Areas", currentStep),
+          _stepIndicator(context, 3, "Patient Journey", currentStep),
           _stepConnector(3, currentStep),
-          _stepIndicator(context, 4, "Logic", currentStep),
+          _stepIndicator(context, 4, "Areas", currentStep),
+          _stepConnector(4, currentStep),
+          _stepIndicator(context, 5, "Logic", currentStep),
         ],
       ),
     );
@@ -138,10 +141,470 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 0: return _buildStepCategory(context, state, viewModel, dataState);
       case 1: return _buildStepDetails(context, state, viewModel);
       case 2: return _buildStepProtocols(context, state, viewModel, dataState, ref);
-      case 3: return _buildStepAreas(context, state, viewModel, dataState);
-      case 4: return _buildStepLogic(context, state, viewModel, dataState);
+      case 3: return _buildStepPatientJourney(context, state, viewModel);
+      case 4: return _buildStepAreas(context, state, viewModel, dataState);
+      case 5: return _buildStepLogic(context, state, viewModel, dataState);
       default: return const SizedBox.shrink();
     }
+  }
+
+  Widget _buildStepPatientJourney(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle(context, "Patient Journey & Notifications"),
+        context.verticalSpace(8),
+        Text("Standardize patient experience with automated instructions and reminders.", style: context.fonts.grey14w400),
+        context.verticalSpace(32),
+
+        _buildJourneySection(
+          context,
+          title: "Pre-Treatment Phase",
+          instructionController: viewModel.preTreatmentInstructionsController,
+          instructionLabel: "Preparation Instructions",
+          notificationTitleController: viewModel.preNotificationTitleController,
+          notificationDescController: viewModel.preNotificationDescriptionController,
+          selectedOffset: state.preNotificationOffset,
+          offsetOptions: {
+            15: "15 Minutes Before",
+            30: "30 Minutes Before",
+            60: "1 Hour Before",
+            120: "2 Hours Before",
+            360: "6 Hours Before",
+            720: "12 Hours Before",
+            1440: "24 Hours Before",
+          },
+          offsetLabel: "Send automated reminder",
+          onOffsetChanged: (val) => viewModel.setPreNotificationOffset(val),
+          attachments: state.preTreatmentAttachments,
+          onPickAttachments: () => viewModel.pickAttachments(true),
+          onRemoveAttachment: (idx) => viewModel.removeAttachment(true, idx),
+        ),
+
+        context.verticalSpace(48),
+        const Divider(),
+        context.verticalSpace(48),
+
+        _buildJourneySection(
+          context,
+          title: "Post-Treatment Phase",
+          instructionController: viewModel.postTreatmentInstructionsController,
+          instructionLabel: "Aftercare Instructions",
+          notificationTitleController: viewModel.postNotificationTitleController,
+          notificationDescController: viewModel.postNotificationDescriptionController,
+          selectedOffset: state.postNotificationOffset,
+          offsetOptions: {
+            0: "Immediately After",
+            60: "1 Hour After",
+            360: "6 Hours After",
+            1440: "24 Hours After",
+            2880: "2 Days After",
+            10080: "7 Days After",
+          },
+          offsetLabel: "Send follow-up notification",
+          onOffsetChanged: (val) => viewModel.setPostNotificationOffset(val),
+          attachments: state.postTreatmentAttachments,
+          onPickAttachments: () => viewModel.pickAttachments(false),
+          onRemoveAttachment: (idx) => viewModel.removeAttachment(false, idx),
+          isPostTreatment: true,
+          isFollowUpRequired: state.isFollowUpRequired,
+          onFollowUpToggle: (val) => viewModel.toggleFollowUpRequired(val),
+          totalFollowUpsController: viewModel.totalFollowUpsController,
+          followUpType: state.followUpType,
+          onFollowUpTypeChanged: (val) => viewModel.setFollowUpType(val),
+          followUpDurationValueController: viewModel.followUpDurationValueController,
+          followUpDurationUnit: state.followUpDurationUnit,
+          onFollowUpDurationUnitChanged: (val) => viewModel.setFollowUpDurationUnit(val),
+          followUpNotesController: viewModel.followUpNotesController,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildJourneySection(
+    BuildContext context, {
+    required String title,
+    required TextEditingController instructionController,
+    required String instructionLabel,
+    required TextEditingController notificationTitleController,
+    required TextEditingController notificationDescController,
+    required int? selectedOffset,
+    required Map<int, String> offsetOptions,
+    required String offsetLabel,
+    required Function(int?) onOffsetChanged,
+    required List<PlatformFile> attachments,
+    required VoidCallback onPickAttachments,
+    required Function(int) onRemoveAttachment,
+    bool isPostTreatment = false,
+    bool isFollowUpRequired = false,
+    Function(bool?)? onFollowUpToggle,
+    TextEditingController? totalFollowUpsController,
+    String? followUpType,
+    Function(String?)? onFollowUpTypeChanged,
+    TextEditingController? followUpDurationValueController,
+    String? followUpDurationUnit,
+    Function(String?)? onFollowUpDurationUnitChanged,
+    TextEditingController? followUpNotesController,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: context.w(4),
+              height: context.h(24),
+              decoration: BoxDecoration(
+                color: CustomColors.purple,
+                borderRadius: context.appBorderRadius(all: 2),
+              ),
+            ),
+            context.horizontalSpace(12),
+            Text(title, style: context.fonts.black18w600),
+          ],
+        ),
+        context.verticalSpace(24),
+        BuildTextField(
+          label: instructionLabel,
+          controller: instructionController,
+          hintText: "Detailed instructions for the patient...",
+          maxLines: 5,
+        ),
+        context.verticalSpace(32),
+        _buildAttachmentsField(context, attachments, onPickAttachments, onRemoveAttachment),
+        context.verticalSpace(32),
+        Container(
+          padding: context.appEdgeInsets(all: 24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: context.appBorderRadius(all: 12),
+            border: Border.all(color: CustomColors.border),
+            boxShadow: AppShadows.card(context),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.auto_awesome_rounded, size: 20, color: CustomColors.purple),
+                  context.horizontalSpace(12),
+                  Text("Phase Notification", style: context.fonts.black16w600),
+                ],
+              ),
+              context.verticalSpace(20),
+              BuildTextField(
+                label: "Notification Title",
+                controller: notificationTitleController,
+                hintText: "Title seen by patient",
+              ),
+              context.verticalSpace(20),
+              BuildTextField(
+                label: "Notification Description",
+                controller: notificationDescController,
+                hintText: "Body of the notification",
+                maxLines: 3,
+              ),
+              context.verticalSpace(20),
+              Text(offsetLabel, style: context.fonts.black14w600),
+              context.verticalSpace(10),
+              Container(
+                padding: context.appEdgeInsets(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: CustomColors.whiteGrey,
+                  borderRadius: context.appBorderRadius(all: 12),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    value: selectedOffset,
+                    hint: Text("Select timing", style: context.fonts.grey14w400),
+                    isExpanded: true,
+                    dropdownColor: Colors.white,
+                    borderRadius: context.appBorderRadius(all: 12),
+                    items: offsetOptions.entries.map((e) {
+                      return DropdownMenuItem<int>(
+                        value: e.key,
+                        child: Text(e.value, style: context.fonts.black14w400),
+                      );
+                    }).toList(),
+                    onChanged: onOffsetChanged,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (isPostTreatment) ...[
+          context.verticalSpace(32),
+          _buildFollowUpSection(
+            context,
+            isFollowUpRequired: isFollowUpRequired,
+            onFollowUpToggle: onFollowUpToggle!,
+            totalFollowUpsController: totalFollowUpsController!,
+            followUpType: followUpType,
+            onFollowUpTypeChanged: onFollowUpTypeChanged!,
+            followUpDurationValueController: followUpDurationValueController!,
+            followUpDurationUnit: followUpDurationUnit!,
+            onFollowUpDurationUnitChanged: onFollowUpDurationUnitChanged!,
+            followUpNotesController: followUpNotesController!,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildFollowUpSection(
+    BuildContext context, {
+    required bool isFollowUpRequired,
+    required Function(bool?) onFollowUpToggle,
+    required TextEditingController totalFollowUpsController,
+    required String? followUpType,
+    required Function(String?) onFollowUpTypeChanged,
+    required TextEditingController followUpDurationValueController,
+    required String followUpDurationUnit,
+    required Function(String?) onFollowUpDurationUnitChanged,
+    required TextEditingController followUpNotesController,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            SizedBox(
+              width: context.w(24),
+              height: context.w(24),
+              child: Checkbox(
+                value: isFollowUpRequired,
+                onChanged: onFollowUpToggle,
+                shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 4)),
+              ),
+            ),
+            context.horizontalSpace(12),
+            Text("Is Follow-Up Required?", style: context.fonts.black16w600),
+          ],
+        ),
+        if (isFollowUpRequired) ...[
+          context.verticalSpace(24),
+          Container(
+            padding: context.appEdgeInsets(all: 24),
+            decoration: BoxDecoration(
+              color: CustomColors.whiteGrey,
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(color: CustomColors.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Follow-Up Configuration", style: context.fonts.black16w600),
+                context.verticalSpace(20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: BuildTextField(
+                        label: "Total Follow-Ups",
+                        controller: totalFollowUpsController,
+                        hintText: "e.g. 1",
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    context.horizontalSpace(24),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Appointment Type", style: context.fonts.black14w600),
+                          context.verticalSpace(10),
+                          Container(
+                            padding: context.appEdgeInsets(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: context.appBorderRadius(all: 12),
+                              border: Border.all(color: CustomColors.border),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: followUpType,
+                                hint: Text("Select type", style: context.fonts.grey14w400),
+                                isExpanded: true,
+                                dropdownColor: Colors.white,
+                                borderRadius: context.appBorderRadius(all: 12),
+                                items: [
+                                  DropdownMenuItem(value: 'virtual', child: Text("Virtual", style: context.fonts.black14w400)),
+                                  DropdownMenuItem(value: 'in_person', child: Text("In-Person", style: context.fonts.black14w400)),
+                                ],
+                                onChanged: onFollowUpTypeChanged,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                context.verticalSpace(20),
+                Text("Follow-Up Duration", style: context.fonts.black14w600),
+                context.verticalSpace(10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: BuildTextField(
+                        label: "Value",
+                        controller: followUpDurationValueController,
+                        hintText: "e.g. 30",
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    context.horizontalSpace(24),
+                    Expanded(
+                      child: Container(
+                        margin: context.appEdgeInsets(top: 24),
+                        padding: context.appEdgeInsets(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: context.appBorderRadius(all: 12),
+                          border: Border.all(color: CustomColors.border),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: followUpDurationUnit,
+                            isExpanded: true,
+                            dropdownColor: Colors.white,
+                            borderRadius: context.appBorderRadius(all: 12),
+                            items: [
+                              DropdownMenuItem(value: 'minutes', child: Text("Minutes", style: context.fonts.black14w400)),
+                              DropdownMenuItem(value: 'hours', child: Text("Hours", style: context.fonts.black14w400)),
+                            ],
+                            onChanged: onFollowUpDurationUnitChanged,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                context.verticalSpace(20),
+                BuildTextField(
+                  label: "Follow-Up Notes",
+                  controller: followUpNotesController,
+                  hintText: "Additional clinical instructions...",
+                  maxLines: 3,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildAttachmentsField(BuildContext context, List<PlatformFile> files, VoidCallback onPick, Function(int) onRemove) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Supporting Media (Optional)", style: context.fonts.black14w600),
+            TextButton.icon(
+              onPressed: onPick,
+              icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
+              label: const Text("Add Files"),
+              style: TextButton.styleFrom(foregroundColor: CustomColors.purple),
+            ),
+          ],
+        ),
+        context.verticalSpace(12),
+        if (files.isEmpty)
+          InkWell(
+            onTap: onPick,
+            child: Container(
+              width: double.infinity,
+              padding: context.appEdgeInsets(vertical: 20),
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(color: CustomColors.border, style: BorderStyle.solid),
+              ),
+              child: Column(
+                children: [
+                  const Icon(Icons.cloud_upload_outlined, color: CustomColors.grey, size: 24),
+                  context.verticalSpace(8),
+                  Text("Upload PDFs, Images, or Videos", style: context.fonts.grey13w500),
+                ],
+              ),
+            ),
+          )
+        else
+          Wrap(
+            spacing: context.w(12),
+            runSpacing: context.h(12),
+            children: List.generate(files.length, (index) {
+              final file = files[index];
+              return Container(
+                width: context.w(160),
+                padding: context.appEdgeInsets(all: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: context.appBorderRadius(all: 10),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: Column(
+                  children: [
+                    Stack(
+                      children: [
+                        Container(
+                          height: context.h(80),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: CustomColors.whiteGrey,
+                            borderRadius: context.appBorderRadius(all: 6),
+                          ),
+                          child: _buildFilePreview(context, file),
+                        ),
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: InkWell(
+                            onTap: () => onRemove(index),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                              child: const Icon(Icons.close_rounded, size: 14, color: CustomColors.red),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(8),
+                    Text(
+                      file.name,
+                      style: context.fonts.grey10w400,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildFilePreview(BuildContext context, PlatformFile file) {
+    final ext = file.extension?.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'webp'].contains(ext)) {
+      return ClipRRect(
+        borderRadius: context.appBorderRadius(all: 6),
+        child: kIsWeb 
+          ? Image.network(file.path!, fit: BoxFit.cover) 
+          : Image.file(File(file.path!), fit: BoxFit.cover),
+      );
+    } else if (ext == 'pdf') {
+      return const Icon(Icons.picture_as_pdf_rounded, color: CustomColors.red, size: 32);
+    } else if (['mp4', 'mov', 'avi'].contains(ext)) {
+      return const Icon(Icons.video_collection_rounded, color: CustomColors.purple, size: 32);
+    }
+    return const Icon(Icons.insert_drive_file_outlined, color: CustomColors.grey, size: 32);
   }
 
   Widget _buildStepDetails(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
@@ -794,8 +1257,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final bool isLastStep = state.currentStep == 4;
-    final bool isStep4 = state.currentStep == 3;
+    final bool isLastStep = state.currentStep == 5;
+    final bool isStepAreas = state.currentStep == 4;
 
     return Row(
       children: [
@@ -808,7 +1271,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
           ),
           context.horizontalSpace(16),
         ],
-        if (isStep4) ...[
+        if (isStepAreas) ...[
           Expanded(
             flex: 2,
             child: CustomOutlinedButton(
@@ -828,17 +1291,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
           flex: 2,
           child: CustomPrimaryButton(
             onTap: () {
-              if (state.currentStep == 0) {
-                // Category step validation could be added here
-              }
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
               }
-              if (state.currentStep == 3) {
+              if (state.currentStep == 4) {
                 if (!_validateSubAreas(context, state)) return;
               }
               
-              if (state.currentStep < 4) {
+              if (state.currentStep < 5) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel.submitTreatment(context).then((_) {
@@ -846,7 +1306,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 });
               }
             },
-            label: isLastStep ? "Finish & Create Treatment" : (isStep4 ? "Add Materials" : "Next Step"),
+            label: isLastStep ? "Finish & Create Treatment" : (isStepAreas ? "Add Materials" : "Next Step"),
           ),
         ),
       ],

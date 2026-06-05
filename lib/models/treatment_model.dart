@@ -20,6 +20,24 @@ class TreatmentModel {
   List<String>? protocolIds;
   int? baseDurationHours;
   int? baseDurationMinutes;
+  String? preTreatmentInstructions;
+  String? postTreatmentInstructions;
+  String? preTreatmentNotificationTitle;
+  String? preTreatmentNotificationDescription;
+  int? preTreatmentNotificationOffset; // in minutes
+  String? postTreatmentNotificationTitle;
+  String? postTreatmentNotificationDescription;
+  int? postTreatmentNotificationOffset; // in minutes
+  List<Attachment>? preTreatmentAttachments;
+  List<Attachment>? postTreatmentAttachments;
+  
+  // Follow-Up Fields
+  bool isFollowUpRequired;
+  int? totalFollowUps;
+  String? followUpType; // virtual | in_person
+  int? followUpDurationValue;
+  String? followUpDurationUnit; // minutes | hours
+  String? followUpNotes;
 
   TreatmentModel({
     this.id,
@@ -43,12 +61,29 @@ class TreatmentModel {
     this.protocolIds,
     this.baseDurationHours,
     this.baseDurationMinutes,
+    this.preTreatmentInstructions,
+    this.postTreatmentInstructions,
+    this.preTreatmentNotificationTitle,
+    this.preTreatmentNotificationDescription,
+    this.preTreatmentNotificationOffset,
+    this.postTreatmentNotificationTitle,
+    this.postTreatmentNotificationDescription,
+    this.postTreatmentNotificationOffset,
+    this.preTreatmentAttachments,
+    this.postTreatmentAttachments,
+    this.isFollowUpRequired = false,
+    this.totalFollowUps,
+    this.followUpType,
+    this.followUpDurationValue,
+    this.followUpDurationUnit,
+    this.followUpNotes,
   });
 
   TreatmentModel.fromJson(Map<String, dynamic> json)
       : isActive = json['is_active'] ?? true,
         useInAiSimulator = json['use_in_ai_simulator'] ?? false,
-        maxMaterialQuantity = json['max_material_quantity'] ?? 0 {
+        maxMaterialQuantity = json['max_material_quantity'] ?? 0,
+        isFollowUpRequired = json['is_follow_up_required'] ?? false {
     id = json['id'];
     name = json['name'];
     patientDisplayName = json['patient_display_name'];
@@ -75,6 +110,29 @@ class TreatmentModel {
         : null;
     baseDurationHours = json['base_duration_hours'];
     baseDurationMinutes = json['base_duration_minutes'];
+    preTreatmentInstructions = json['pre_treatment_instructions'];
+    postTreatmentInstructions = json['post_treatment_instructions'];
+    preTreatmentNotificationTitle = json['pre_treatment_notification_title'];
+    preTreatmentNotificationDescription = json['pre_treatment_notification_description'];
+    preTreatmentNotificationOffset = json['pre_treatment_notification_offset'];
+    postTreatmentNotificationTitle = json['post_treatment_notification_title'];
+    postTreatmentNotificationDescription = json['post_treatment_notification_description'];
+    postTreatmentNotificationOffset = json['post_treatment_notification_offset'];
+    preTreatmentAttachments = json['pre_treatment_attachments'] != null
+        ? (json['pre_treatment_attachments'] as List)
+            .map((e) => Attachment.fromJson(e))
+            .toList()
+        : null;
+    postTreatmentAttachments = json['post_treatment_attachments'] != null
+        ? (json['post_treatment_attachments'] as List)
+            .map((e) => Attachment.fromJson(e))
+            .toList()
+        : null;
+    totalFollowUps = json['total_follow_ups'];
+    followUpType = json['follow_up_type'];
+    followUpDurationValue = json['follow_up_duration_value'];
+    followUpDurationUnit = json['follow_up_duration_unit'];
+    followUpNotes = json['follow_up_notes'];
   }
 
   TreatmentModel copyWith({
@@ -99,6 +157,22 @@ class TreatmentModel {
     List<String>? protocolIds,
     int? baseDurationHours,
     int? baseDurationMinutes,
+    String? preTreatmentInstructions,
+    String? postTreatmentInstructions,
+    String? preTreatmentNotificationTitle,
+    String? preTreatmentNotificationDescription,
+    int? preTreatmentNotificationOffset,
+    String? postTreatmentNotificationTitle,
+    String? postTreatmentNotificationDescription,
+    int? postTreatmentNotificationOffset,
+    List<Attachment>? preTreatmentAttachments,
+    List<Attachment>? postTreatmentAttachments,
+    bool? isFollowUpRequired,
+    int? totalFollowUps,
+    String? followUpType,
+    int? followUpDurationValue,
+    String? followUpDurationUnit,
+    String? followUpNotes,
   }) {
     return TreatmentModel(
       id: id ?? this.id,
@@ -122,6 +196,22 @@ class TreatmentModel {
       protocolIds: protocolIds ?? this.protocolIds,
       baseDurationHours: baseDurationHours ?? this.baseDurationHours,
       baseDurationMinutes: baseDurationMinutes ?? this.baseDurationMinutes,
+      preTreatmentInstructions: preTreatmentInstructions ?? this.preTreatmentInstructions,
+      postTreatmentInstructions: postTreatmentInstructions ?? this.postTreatmentInstructions,
+      preTreatmentNotificationTitle: preTreatmentNotificationTitle ?? this.preTreatmentNotificationTitle,
+      preTreatmentNotificationDescription: preTreatmentNotificationDescription ?? this.preTreatmentNotificationDescription,
+      preTreatmentNotificationOffset: preTreatmentNotificationOffset ?? this.preTreatmentNotificationOffset,
+      postTreatmentNotificationTitle: postTreatmentNotificationTitle ?? this.postTreatmentNotificationTitle,
+      postTreatmentNotificationDescription: postTreatmentNotificationDescription ?? this.postTreatmentNotificationDescription,
+      postTreatmentNotificationOffset: postTreatmentNotificationOffset ?? this.postTreatmentNotificationOffset,
+      preTreatmentAttachments: preTreatmentAttachments ?? this.preTreatmentAttachments,
+      postTreatmentAttachments: postTreatmentAttachments ?? this.postTreatmentAttachments,
+      isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
+      totalFollowUps: totalFollowUps ?? this.totalFollowUps,
+      followUpType: followUpType ?? this.followUpType,
+      followUpDurationValue: followUpDurationValue ?? this.followUpDurationValue,
+      followUpDurationUnit: followUpDurationUnit ?? this.followUpDurationUnit,
+      followUpNotes: followUpNotes ?? this.followUpNotes,
     );
   }
 
@@ -147,8 +237,44 @@ class TreatmentModel {
       'protocol_ids': protocolIds,
       'base_duration_hours': baseDurationHours,
       'base_duration_minutes': baseDurationMinutes,
+      'pre_treatment_instructions': preTreatmentInstructions,
+      'post_treatment_instructions': postTreatmentInstructions,
+      'pre_treatment_notification_title': preTreatmentNotificationTitle,
+      'pre_treatment_notification_description': preTreatmentNotificationDescription,
+      'pre_treatment_notification_offset': preTreatmentNotificationOffset,
+      'post_treatment_notification_title': postTreatmentNotificationTitle,
+      'post_treatment_notification_description': postTreatmentNotificationDescription,
+      'post_treatment_notification_offset': postTreatmentNotificationOffset,
+      'pre_treatment_attachments': preTreatmentAttachments?.map((e) => e.toJson()).toList(),
+      'post_treatment_attachments': postTreatmentAttachments?.map((e) => e.toJson()).toList(),
+      'is_follow_up_required': isFollowUpRequired,
+      'total_follow_ups': totalFollowUps,
+      'follow_up_type': followUpType,
+      'follow_up_duration_value': followUpDurationValue,
+      'follow_up_duration_unit': followUpDurationUnit,
+      'follow_up_notes': followUpNotes,
     };
   }
+}
+
+class Attachment {
+  String url;
+  String type; // image | video | pdf
+  String name;
+
+  Attachment({required this.url, required this.type, required this.name});
+
+  factory Attachment.fromJson(Map<String, dynamic> json) => Attachment(
+    url: json['url'],
+    type: json['type'],
+    name: json['name'],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'url': url,
+    'type': type,
+    'name': name,
+  };
 }
 
 class SideAreaModel {
