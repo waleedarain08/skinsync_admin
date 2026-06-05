@@ -77,11 +77,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
           _stepConnector(0, currentStep),
           _stepIndicator(context, 1, "Details", currentStep),
           _stepConnector(1, currentStep),
-          _stepIndicator(context, 2, "Patient Journey", currentStep),
+          _stepIndicator(context, 2, "Areas", currentStep),
           _stepConnector(2, currentStep),
-          _stepIndicator(context, 3, "Areas", currentStep),
+          _stepIndicator(context, 3, "Pre-Treatment", currentStep),
           _stepConnector(3, currentStep),
-          _stepIndicator(context, 4, "Logic", currentStep),
+          _stepIndicator(context, 4, "Post-Treatment", currentStep),
+          _stepConnector(4, currentStep),
+          _stepIndicator(context, 5, "Logic", currentStep),
         ],
       ),
     );
@@ -138,22 +140,18 @@ class CreateTreatmentScreen extends ConsumerWidget {
     switch (state.currentStep) {
       case 0: return _buildStepCategory(context, state, viewModel, dataState);
       case 1: return _buildStepDetails(context, state, viewModel);
-      case 2: return _buildStepPatientJourney(context, state, viewModel, dataState, ref);
-      case 3: return _buildStepAreas(context, state, viewModel, dataState);
-      case 4: return _buildStepLogic(context, state, viewModel, dataState);
+      case 2: return _buildStepAreas(context, state, viewModel, dataState);
+      case 3: return _buildStepPreTreatment(context, state, viewModel, dataState, ref);
+      case 4: return _buildStepPostTreatment(context, state, viewModel);
+      case 5: return _buildStepLogic(context, state, viewModel, dataState);
       default: return const SizedBox.shrink();
     }
   }
 
-  Widget _buildStepPatientJourney(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
+  Widget _buildStepPreTreatment(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle(context, "Patient Journey & Notifications"),
-        context.verticalSpace(8),
-        Text("Standardize patient experience with automated instructions, protocols, and reminders.", style: context.fonts.grey14w400),
-        context.verticalSpace(32),
-
         _buildJourneySection(
           context,
           title: "Pre-Treatment Phase",
@@ -182,11 +180,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
           selectedProtocolIds: state.selectedProtocolIds,
           onProtocolToggle: (id) => viewModel.toggleProtocolSelection(id),
         ),
+      ],
+    );
+  }
 
-        context.verticalSpace(48),
-        const Divider(),
-        context.verticalSpace(48),
-
+  Widget _buildStepPostTreatment(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _buildJourneySection(
           context,
           title: "Post-Treatment Phase",
@@ -1263,8 +1264,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final bool isLastStep = state.currentStep == 4;
-    final bool isStepAreas = state.currentStep == 3;
+    final bool isLastStep = state.currentStep == 5;
 
     return Row(
       children: [
@@ -1277,22 +1277,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
           ),
           context.horizontalSpace(16),
         ],
-        if (isStepAreas) ...[
-          Expanded(
-            flex: 2,
-            child: CustomOutlinedButton(
-              onTap: () {
-                if (!_validateSubAreas(context, state)) return;
-                viewModel.submitTreatment(context).then((_) {
-                  if (context.mounted) context.pop();
-                });
-              },
-              label: "Finish & Create Now",
-              color: CustomColors.black,
-            ),
-          ),
-          context.horizontalSpace(16),
-        ],
         Expanded(
           flex: 2,
           child: CustomPrimaryButton(
@@ -1300,11 +1284,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
               }
-              if (state.currentStep == 3) {
+              if (state.currentStep == 2) {
                 if (!_validateSubAreas(context, state)) return;
               }
               
-              if (state.currentStep < 4) {
+              if (state.currentStep < 5) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel.submitTreatment(context).then((_) {
@@ -1312,7 +1296,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 });
               }
             },
-            label: isLastStep ? "Finish & Create Treatment" : (isStepAreas ? "Add Materials" : "Next Step"),
+            label: isLastStep ? "Finish & Create Treatment" : "Next Step",
           ),
         ),
       ],

@@ -145,6 +145,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     followUpDurationValueController.clear();
     followUpNotesController.clear();
     protocolNameController.clear();
+    preNotificationTitleController.clear();
+    preNotificationDescriptionController.clear();
+    postNotificationTitleController.clear();
+    postNotificationDescriptionController.clear();
+    protocolNameController.clear();
     categoryIdController.clear();
     categoryNameController.clear();
     categoryPathController.clear();
@@ -163,6 +168,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       postTreatmentAttachments: [],
       existingPreAttachments: [],
       existingPostAttachments: [],
+      preTreatmentConsentForm: null,
+      existingConsentForm: null,
       areas: [AreaViewModelEntry()],
       selectedTreatment: null,
       useInAiSimulator: false,
@@ -245,6 +252,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       postTreatmentAttachments: [],
       existingPreAttachments: treatment.preTreatmentAttachments ?? [],
       existingPostAttachments: treatment.postTreatmentAttachments ?? [],
+      preTreatmentConsentForm: null,
+      existingConsentForm: treatment.preTreatmentConsentForm,
       isFollowUpRequired: treatment.isFollowUpRequired,
       followUpType: treatment.followUpType,
       followUpDurationUnit: treatment.followUpDurationUnit ?? 'minutes',
@@ -377,6 +386,21 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         state = state.copyWith(postTreatmentAttachments: [...state.postTreatmentAttachments, ...result.files]);
       }
     }
+  }
+
+  Future<void> pickConsentForm() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      state = state.copyWith(preTreatmentConsentForm: result.files.first);
+    }
+  }
+
+  void removeConsentForm() {
+    state = state.copyWith(preTreatmentConsentForm: null, existingConsentForm: null);
   }
 
   void removeAttachment(bool isPreTreatment, int index) {
@@ -548,6 +572,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           ...state.existingPostAttachments,
           ...state.postTreatmentAttachments.map((f) => Attachment(url: f.path ?? '', type: _getFileType(f), name: f.name)),
         ],
+        preTreatmentConsentForm: state.preTreatmentConsentForm != null 
+            ? Attachment(url: state.preTreatmentConsentForm!.path ?? '', type: 'pdf', name: state.preTreatmentConsentForm!.name)
+            : state.existingConsentForm,
         isFollowUpRequired: state.isFollowUpRequired,
         totalFollowUps: int.tryParse(totalFollowUpsController.text),
         followUpType: state.followUpType,
@@ -610,6 +637,9 @@ class TreatmentState extends BaseStateModel {
   final List<Attachment> existingPreAttachments;
   final List<Attachment> existingPostAttachments;
 
+  final PlatformFile? preTreatmentConsentForm;
+  final Attachment? existingConsentForm;
+
   // Follow-Up fields
   final bool isFollowUpRequired;
   final String? followUpType;
@@ -638,6 +668,8 @@ class TreatmentState extends BaseStateModel {
     this.postTreatmentAttachments = const [],
     this.existingPreAttachments = const [],
     this.existingPostAttachments = const [],
+    this.preTreatmentConsentForm,
+    this.existingConsentForm,
     this.isFollowUpRequired = false,
     this.followUpType,
     this.followUpDurationUnit = 'minutes',
@@ -666,6 +698,8 @@ class TreatmentState extends BaseStateModel {
     List<PlatformFile>? postTreatmentAttachments,
     List<Attachment>? existingPreAttachments,
     List<Attachment>? existingPostAttachments,
+    PlatformFile? preTreatmentConsentForm,
+    Attachment? existingConsentForm,
     bool? isFollowUpRequired,
     String? followUpType,
     String? followUpDurationUnit,
@@ -692,6 +726,8 @@ class TreatmentState extends BaseStateModel {
       postTreatmentAttachments: postTreatmentAttachments ?? this.postTreatmentAttachments,
       existingPreAttachments: existingPreAttachments ?? this.existingPreAttachments,
       existingPostAttachments: existingPostAttachments ?? this.existingPostAttachments,
+      preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
+      existingConsentForm: existingConsentForm ?? this.existingConsentForm,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
       followUpType: followUpType ?? this.followUpType,
       followUpDurationUnit: followUpDurationUnit ?? this.followUpDurationUnit,

@@ -30,6 +30,7 @@ class TreatmentModel {
   int? postTreatmentNotificationOffset; // in minutes
   List<Attachment>? preTreatmentAttachments;
   List<Attachment>? postTreatmentAttachments;
+  Attachment? preTreatmentConsentForm;
   
   // Follow-Up Fields
   bool isFollowUpRequired;
@@ -71,6 +72,7 @@ class TreatmentModel {
     this.postTreatmentNotificationOffset,
     this.preTreatmentAttachments,
     this.postTreatmentAttachments,
+    this.preTreatmentConsentForm,
     this.isFollowUpRequired = false,
     this.totalFollowUps,
     this.followUpType,
@@ -128,6 +130,9 @@ class TreatmentModel {
             .map((e) => Attachment.fromJson(e))
             .toList()
         : null;
+    preTreatmentConsentForm = json['pre_treatment_consent_form'] != null 
+        ? Attachment.fromJson(json['pre_treatment_consent_form']) 
+        : null;
     totalFollowUps = json['total_follow_ups'];
     followUpType = json['follow_up_type'];
     followUpDurationValue = json['follow_up_duration_value'];
@@ -167,6 +172,7 @@ class TreatmentModel {
     int? postTreatmentNotificationOffset,
     List<Attachment>? preTreatmentAttachments,
     List<Attachment>? postTreatmentAttachments,
+    Attachment? preTreatmentConsentForm,
     bool? isFollowUpRequired,
     int? totalFollowUps,
     String? followUpType,
@@ -206,6 +212,7 @@ class TreatmentModel {
       postTreatmentNotificationOffset: postTreatmentNotificationOffset ?? this.postTreatmentNotificationOffset,
       preTreatmentAttachments: preTreatmentAttachments ?? this.preTreatmentAttachments,
       postTreatmentAttachments: postTreatmentAttachments ?? this.postTreatmentAttachments,
+      preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
       totalFollowUps: totalFollowUps ?? this.totalFollowUps,
       followUpType: followUpType ?? this.followUpType,
@@ -247,6 +254,7 @@ class TreatmentModel {
       'post_treatment_notification_offset': postTreatmentNotificationOffset,
       'pre_treatment_attachments': preTreatmentAttachments?.map((e) => e.toJson()).toList(),
       'post_treatment_attachments': postTreatmentAttachments?.map((e) => e.toJson()).toList(),
+      'pre_treatment_consent_form': preTreatmentConsentForm?.toJson(),
       'is_follow_up_required': isFollowUpRequired,
       'total_follow_ups': totalFollowUps,
       'follow_up_type': followUpType,

@@ -68,7 +68,9 @@ class EditTreatmentScreen extends ConsumerWidget {
                 context.verticalSpace(32),
                 _buildCategorizationSection(context, state, viewModel, dataState),
                 context.verticalSpace(32),
-                _buildPatientJourneySection(context, state, viewModel, dataState, ref),
+                _buildPreTreatmentSection(context, state, viewModel, dataState, ref),
+                context.verticalSpace(32),
+                _buildPostTreatmentSection(context, state, viewModel),
                 context.verticalSpace(32),
                 _buildAreasSection(context, state, viewModel, dataState),
                 context.verticalSpace(32),
@@ -265,17 +267,12 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPatientJourneySection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
+  Widget _buildPreTreatmentSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Patient Journey", style: context.fonts.black18w600),
-          context.verticalSpace(8),
-          Text("Medical guidelines, protocols, and automated notifications.", style: context.fonts.grey13w500),
-          context.verticalSpace(32),
-
           _buildJourneySubSection(
             context,
             title: "Pre-Treatment Phase",
@@ -306,11 +303,17 @@ class EditTreatmentScreen extends ConsumerWidget {
             selectedProtocolIds: state.selectedProtocolIds,
             onProtocolToggle: (id) => viewModel.toggleProtocolSelection(id),
           ),
+        ],
+      ),
+    );
+  }
 
-          context.verticalSpace(40),
-          const Divider(),
-          context.verticalSpace(40),
-
+  Widget _buildPostTreatmentSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           _buildJourneySubSection(
             context,
             title: "Post-Treatment Phase",
