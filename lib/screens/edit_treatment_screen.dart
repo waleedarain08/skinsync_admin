@@ -68,9 +68,7 @@ class EditTreatmentScreen extends ConsumerWidget {
                 context.verticalSpace(32),
                 _buildCategorizationSection(context, state, viewModel, dataState),
                 context.verticalSpace(32),
-                _buildPatientJourneySection(context, state, viewModel),
-                context.verticalSpace(32),
-                _buildProtocolsSection(context, state, viewModel, dataState, ref),
+                _buildPatientJourneySection(context, state, viewModel, dataState, ref),
                 context.verticalSpace(32),
                 _buildAreasSection(context, state, viewModel, dataState),
                 context.verticalSpace(32),
@@ -267,7 +265,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPatientJourneySection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildPatientJourneySection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
@@ -275,7 +273,7 @@ class EditTreatmentScreen extends ConsumerWidget {
         children: [
           Text("Patient Journey", style: context.fonts.black18w600),
           context.verticalSpace(8),
-          Text("Medical guidelines and automated notifications.", style: context.fonts.grey13w500),
+          Text("Medical guidelines, protocols, and automated notifications.", style: context.fonts.grey13w500),
           context.verticalSpace(32),
 
           _buildJourneySubSection(
@@ -302,6 +300,11 @@ class EditTreatmentScreen extends ConsumerWidget {
             onPickAttachments: () => viewModel.pickAttachments(true),
             onRemoveExisting: (idx) => viewModel.removeExistingAttachment(true, idx),
             onRemoveNew: (idx) => viewModel.removeAttachment(true, idx),
+            isPreTreatment: true,
+            dataState: dataState,
+            ref: ref,
+            selectedProtocolIds: state.selectedProtocolIds,
+            onProtocolToggle: (id) => viewModel.toggleProtocolSelection(id),
           ),
 
           context.verticalSpace(40),
@@ -363,7 +366,12 @@ class EditTreatmentScreen extends ConsumerWidget {
     required VoidCallback onPickAttachments,
     required Function(int) onRemoveExisting,
     required Function(int) onRemoveNew,
+    bool isPreTreatment = false,
     bool isPostTreatment = false,
+    TreatmentDataState? dataState,
+    WidgetRef? ref,
+    List<String>? selectedProtocolIds,
+    Function(String)? onProtocolToggle,
     bool isFollowUpRequired = false,
     Function(bool?)? onFollowUpToggle,
     TextEditingController? totalFollowUpsController,
@@ -399,6 +407,10 @@ class EditTreatmentScreen extends ConsumerWidget {
           maxLines: 5,
         ),
         context.verticalSpace(32),
+        if (isPreTreatment && dataState != null && ref != null && selectedProtocolIds != null && onProtocolToggle != null) ...[
+          _buildJourneyProtocols(context, dataState, ref, selectedProtocolIds, onProtocolToggle),
+          context.verticalSpace(32),
+        ],
         _buildAttachmentsField(
           context, 
           existingAttachments, 
@@ -773,41 +785,33 @@ class EditTreatmentScreen extends ConsumerWidget {
     return const Icon(Icons.insert_drive_file_outlined, color: CustomColors.grey, size: 32);
   }
 
-  Widget _buildProtocolsSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
+  Widget _buildJourneyProtocols(BuildContext context, TreatmentDataState dataState, WidgetRef ref, List<String> selectedIds, Function(String) onToggle) {
     final checkboxProtocols = dataState.protocols.where((p) => p.type == ProtocolType.checkbox).toList();
     final textProtocols = dataState.protocols.where((p) => p.type == ProtocolType.text).toList();
 
-    return BorderdContainerWidget(
-      padding: context.appEdgeInsets(all: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Treatment Protocols", style: context.fonts.black18w600),
-          context.verticalSpace(8),
-          Text("Standardize procedures with checklists and instructions.", style: context.fonts.grey13w500),
-          context.verticalSpace(32),
-          
-          _buildProtocolGroup(
-            context,
-            title: "Checkboxes",
-            protocols: checkboxProtocols,
-            selectedIds: state.selectedProtocolIds,
-            onToggle: (id) => viewModel.toggleProtocolSelection(id),
-            onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.checkbox),
-          ),
-          
-          context.verticalSpace(32),
-          
-          _buildProtocolGroup(
-            context,
-            title: "Text Fields",
-            protocols: textProtocols,
-            selectedIds: state.selectedProtocolIds,
-            onToggle: (id) => viewModel.toggleProtocolSelection(id),
-            onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.text),
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Phase Protocols", style: context.fonts.black14w600),
+        context.verticalSpace(16),
+        _buildProtocolGroup(
+          context,
+          title: "Checkboxes",
+          protocols: checkboxProtocols,
+          selectedIds: selectedIds,
+          onToggle: onToggle,
+          onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.checkbox),
+        ),
+        context.verticalSpace(24),
+        _buildProtocolGroup(
+          context,
+          title: "Text Fields",
+          protocols: textProtocols,
+          selectedIds: selectedIds,
+          onToggle: onToggle,
+          onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.text),
+        ),
+      ],
     );
   }
 

@@ -77,13 +77,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
           _stepConnector(0, currentStep),
           _stepIndicator(context, 1, "Details", currentStep),
           _stepConnector(1, currentStep),
-          _stepIndicator(context, 2, "Protocols", currentStep),
+          _stepIndicator(context, 2, "Patient Journey", currentStep),
           _stepConnector(2, currentStep),
-          _stepIndicator(context, 3, "Patient Journey", currentStep),
+          _stepIndicator(context, 3, "Areas", currentStep),
           _stepConnector(3, currentStep),
-          _stepIndicator(context, 4, "Areas", currentStep),
-          _stepConnector(4, currentStep),
-          _stepIndicator(context, 5, "Logic", currentStep),
+          _stepIndicator(context, 4, "Logic", currentStep),
         ],
       ),
     );
@@ -140,21 +138,20 @@ class CreateTreatmentScreen extends ConsumerWidget {
     switch (state.currentStep) {
       case 0: return _buildStepCategory(context, state, viewModel, dataState);
       case 1: return _buildStepDetails(context, state, viewModel);
-      case 2: return _buildStepProtocols(context, state, viewModel, dataState, ref);
-      case 3: return _buildStepPatientJourney(context, state, viewModel);
-      case 4: return _buildStepAreas(context, state, viewModel, dataState);
-      case 5: return _buildStepLogic(context, state, viewModel, dataState);
+      case 2: return _buildStepPatientJourney(context, state, viewModel, dataState, ref);
+      case 3: return _buildStepAreas(context, state, viewModel, dataState);
+      case 4: return _buildStepLogic(context, state, viewModel, dataState);
       default: return const SizedBox.shrink();
     }
   }
 
-  Widget _buildStepPatientJourney(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildStepPatientJourney(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionTitle(context, "Patient Journey & Notifications"),
         context.verticalSpace(8),
-        Text("Standardize patient experience with automated instructions and reminders.", style: context.fonts.grey14w400),
+        Text("Standardize patient experience with automated instructions, protocols, and reminders.", style: context.fonts.grey14w400),
         context.verticalSpace(32),
 
         _buildJourneySection(
@@ -179,6 +176,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
           attachments: state.preTreatmentAttachments,
           onPickAttachments: () => viewModel.pickAttachments(true),
           onRemoveAttachment: (idx) => viewModel.removeAttachment(true, idx),
+          isPreTreatment: true,
+          dataState: dataState,
+          ref: ref,
+          selectedProtocolIds: state.selectedProtocolIds,
+          onProtocolToggle: (id) => viewModel.toggleProtocolSelection(id),
         ),
 
         context.verticalSpace(48),
@@ -235,7 +237,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     required List<PlatformFile> attachments,
     required VoidCallback onPickAttachments,
     required Function(int) onRemoveAttachment,
+    bool isPreTreatment = false,
     bool isPostTreatment = false,
+    TreatmentDataState? dataState,
+    WidgetRef? ref,
+    List<String>? selectedProtocolIds,
+    Function(String)? onProtocolToggle,
     bool isFollowUpRequired = false,
     Function(bool?)? onFollowUpToggle,
     TextEditingController? totalFollowUpsController,
@@ -271,6 +278,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
           maxLines: 5,
         ),
         context.verticalSpace(32),
+        if (isPreTreatment && dataState != null && ref != null && selectedProtocolIds != null && onProtocolToggle != null) ...[
+          _buildJourneyProtocols(context, dataState, ref, selectedProtocolIds, onProtocolToggle),
+          context.verticalSpace(32),
+        ],
         _buildAttachmentsField(context, attachments, onPickAttachments, onRemoveAttachment),
         context.verticalSpace(32),
         Container(
@@ -743,41 +754,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
               ],
             ),
           ),
-      ],
-    );
-  }
-
-  Widget _buildStepProtocols(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
-    final checkboxProtocols = dataState.protocols.where((p) => p.type == ProtocolType.checkbox).toList();
-    final textProtocols = dataState.protocols.where((p) => p.type == ProtocolType.text).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _sectionTitle(context, "Treatment Protocols"),
-        context.verticalSpace(8),
-        Text("Organize protocols into groups. Select standard protocols associated with this treatment.", style: context.fonts.grey14w400),
-        context.verticalSpace(32),
-        
-        _buildProtocolGroup(
-          context,
-          title: "Checkboxes",
-          protocols: checkboxProtocols,
-          selectedIds: state.selectedProtocolIds,
-          onToggle: (id) => viewModel.toggleProtocolSelection(id),
-          onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.checkbox),
-        ),
-        
-        context.verticalSpace(32),
-        
-        _buildProtocolGroup(
-          context,
-          title: "Text Fields",
-          protocols: textProtocols,
-          selectedIds: state.selectedProtocolIds,
-          onToggle: (id) => viewModel.toggleProtocolSelection(id),
-          onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.text),
-        ),
       ],
     );
   }
@@ -1256,9 +1232,39 @@ class CreateTreatmentScreen extends ConsumerWidget {
     return Text(title, style: context.fonts.black18w600);
   }
 
+  Widget _buildJourneyProtocols(BuildContext context, TreatmentDataState dataState, WidgetRef ref, List<String> selectedIds, Function(String) onToggle) {
+    final checkboxProtocols = dataState.protocols.where((p) => p.type == ProtocolType.checkbox).toList();
+    final textProtocols = dataState.protocols.where((p) => p.type == ProtocolType.text).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Phase Protocols", style: context.fonts.black14w600),
+        context.verticalSpace(16),
+        _buildProtocolGroup(
+          context,
+          title: "Checkboxes",
+          protocols: checkboxProtocols,
+          selectedIds: selectedIds,
+          onToggle: onToggle,
+          onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.checkbox),
+        ),
+        context.verticalSpace(24),
+        _buildProtocolGroup(
+          context,
+          title: "Text Fields",
+          protocols: textProtocols,
+          selectedIds: selectedIds,
+          onToggle: onToggle,
+          onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.text),
+        ),
+      ],
+    );
+  }
+
   Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final bool isLastStep = state.currentStep == 5;
-    final bool isStepAreas = state.currentStep == 4;
+    final bool isLastStep = state.currentStep == 4;
+    final bool isStepAreas = state.currentStep == 3;
 
     return Row(
       children: [
@@ -1294,11 +1300,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
               }
-              if (state.currentStep == 4) {
+              if (state.currentStep == 3) {
                 if (!_validateSubAreas(context, state)) return;
               }
               
-              if (state.currentStep < 5) {
+              if (state.currentStep < 4) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel.submitTreatment(context).then((_) {
