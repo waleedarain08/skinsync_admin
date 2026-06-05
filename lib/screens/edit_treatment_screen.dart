@@ -10,8 +10,11 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/nested_category_selector.dart';
+import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
+import 'package:skinsync_admin/models/treatment_data_models.dart';
 
 class EditTreatmentScreen extends ConsumerWidget {
   const EditTreatmentScreen({super.key});
@@ -62,6 +65,8 @@ class EditTreatmentScreen extends ConsumerWidget {
                 _buildBasicDetailsSection(context, state, viewModel),
                 context.verticalSpace(32),
                 _buildCategorizationSection(context, state, viewModel, dataState),
+                context.verticalSpace(32),
+                _buildProtocolsSection(context, state, viewModel, dataState, ref),
                 context.verticalSpace(32),
                 _buildAreasSection(context, state, viewModel, dataState),
                 context.verticalSpace(32),
@@ -252,6 +257,151 @@ class EditTreatmentScreen extends ConsumerWidget {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProtocolsSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
+    final checkboxProtocols = dataState.protocols.where((p) => p.type == ProtocolType.checkbox).toList();
+    final textProtocols = dataState.protocols.where((p) => p.type == ProtocolType.text).toList();
+
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Treatment Protocols", style: context.fonts.black18w600),
+          context.verticalSpace(8),
+          Text("Standardize procedures with checklists and instructions.", style: context.fonts.grey13w500),
+          context.verticalSpace(32),
+          
+          _buildProtocolGroup(
+            context,
+            title: "Checkboxes",
+            protocols: checkboxProtocols,
+            selectedIds: state.selectedProtocolIds,
+            onToggle: (id) => viewModel.toggleProtocolSelection(id),
+            onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.checkbox),
+          ),
+          
+          context.verticalSpace(32),
+          
+          _buildProtocolGroup(
+            context,
+            title: "Text Fields",
+            protocols: textProtocols,
+            selectedIds: state.selectedProtocolIds,
+            onToggle: (id) => viewModel.toggleProtocolSelection(id),
+            onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.text),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProtocolGroup(
+    BuildContext context, {
+    required String title,
+    required List<ProtocolItem> protocols,
+    required List<String> selectedIds,
+    required Function(String) onToggle,
+    required VoidCallback onAdd,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: context.fonts.black16w600),
+            IconButton(
+              onPressed: onAdd,
+              icon: const Icon(Icons.add_circle_outline_rounded, color: CustomColors.purple, size: 24),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ],
+        ),
+        context.verticalSpace(16),
+        if (protocols.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: context.appEdgeInsets(all: 20),
+            decoration: BoxDecoration(
+              color: CustomColors.whiteGrey,
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(color: CustomColors.border),
+            ),
+            child: Text("No protocols in this group.", style: context.fonts.grey13w500),
+          )
+        else
+          Wrap(
+            spacing: context.w(12),
+            runSpacing: context.h(12),
+            children: protocols.map((protocol) {
+              final isSelected = selectedIds.contains(protocol.id);
+              return InkWell(
+                onTap: () => onToggle(protocol.id),
+                borderRadius: context.appBorderRadius(all: 10),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isSelected ? CustomColors.purple.withValues(alpha: 0.08) : Colors.white,
+                    borderRadius: context.appBorderRadius(all: 10),
+                    border: Border.all(
+                      color: isSelected ? CustomColors.purple : CustomColors.border,
+                      width: isSelected ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                        size: 18,
+                        color: isSelected ? CustomColors.purple : CustomColors.grey,
+                      ),
+                      context.horizontalSpace(10),
+                      Text(
+                        protocol.title,
+                        style: isSelected ? context.fonts.purple14w600 : context.fonts.black14w400,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+      ],
+    );
+  }
+
+  void _showAddProtocolDialog(BuildContext context, WidgetRef ref, ProtocolType type) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => StandardDialog(
+        title: "Add ${type == ProtocolType.checkbox ? 'Checkbox' : 'Text'} Protocol",
+        width: context.w(450),
+        content: BuildTextField(
+          label: "Protocol Title",
+          controller: controller,
+          hintText: "e.g. ${type == ProtocolType.checkbox ? 'Cleanse treatment area' : 'Pre-Treatment Instructions'}",
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          CustomPrimaryButton(
+            onTap: () {
+              if (controller.text.isNotEmpty) {
+                ref.read(treatmentDataViewModelProvider.notifier).addProtocol(controller.text.trim(), type);
+                Navigator.pop(context);
+              }
+            },
+            label: "Save Protocol",
+            width: context.w(150),
           ),
         ],
       ),

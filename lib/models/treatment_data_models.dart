@@ -97,16 +97,31 @@ class CombinationGroup {
   }
 }
 
+enum ProtocolType {
+  checkbox,
+  text,
+}
+
 class ProtocolItem {
   final String id;
-  final String name;
+  final String title;
+  final ProtocolType type;
 
-  ProtocolItem({required this.id, required this.name});
+  ProtocolItem({
+    required this.id,
+    required this.title,
+    required this.type,
+  });
 
-  ProtocolItem copyWith({String? id, String? name}) {
+  ProtocolItem copyWith({
+    String? id,
+    String? title,
+    ProtocolType? type,
+  }) {
     return ProtocolItem(
       id: id ?? this.id,
-      name: name ?? this.name,
+      title: title ?? this.title,
+      type: type ?? this.type,
     );
   }
 }

@@ -78,21 +78,24 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
         CombinationGroup(id: '2', name: 'Skin Glow Package', treatmentNames: ['Hydra Facial', 'Chemical Peel', 'PRP']),
       ],
       protocols: [
-        ProtocolItem(id: '1', name: 'Before Care Instructions'),
-        ProtocolItem(id: '2', name: 'After Care Instructions'),
-        ProtocolItem(id: '3', name: 'Follow Up Protocol'),
-        ProtocolItem(id: '4', name: 'Consultation Required'),
+        ProtocolItem(id: '1', title: 'Cleanse treatment area', type: ProtocolType.checkbox),
+        ProtocolItem(id: '2', title: 'Review contraindications', type: ProtocolType.checkbox),
+        ProtocolItem(id: '3', title: 'Mark injection sites', type: ProtocolType.checkbox),
+        ProtocolItem(id: '4', title: 'Pre-Treatment Instructions', type: ProtocolType.text),
+        ProtocolItem(id: '5', title: 'Post-Treatment Notes', type: ProtocolType.text),
+        ProtocolItem(id: '6', title: 'Recovery Instructions', type: ProtocolType.text),
       ],
     );
   }
 
   // --- Protocol Actions ---
 
-  void addProtocol(String name) {
-    if (name.isEmpty) return;
+  void addProtocol(String title, ProtocolType type) {
+    if (title.isEmpty) return;
     final newProtocol = ProtocolItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: name,
+      title: title,
+      type: type,
     );
     state = state.copyWith(protocols: [...state.protocols, newProtocol]);
   }
