@@ -12,6 +12,7 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/nested_category_selector.dart';
@@ -207,6 +208,18 @@ class EditTreatmentScreen extends ConsumerWidget {
             controller: viewModel.fullDescriptionController,
             hintText: "Detailed info...",
             maxLines: 4,
+          ),
+          context.verticalSpace(24),
+          CustomDropdown<String>(
+            label: "Treatment Status",
+            hintText: "Select status",
+            value: state.status,
+            items: [
+              DropdownMenuItem(value: 'active', child: Text("Active", style: context.fonts.black14w400)),
+              DropdownMenuItem(value: 'deactive', child: Text("Deactive", style: context.fonts.black14w400)),
+              DropdownMenuItem(value: 'draft', child: Text("Draft", style: context.fonts.black14w400)),
+            ],
+            onChanged: (val) => viewModel.setStatus(val ?? 'active'),
           ),
         ],
       ),
@@ -869,8 +882,6 @@ class EditTreatmentScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Phase Protocols", style: context.fonts.black14w600),
-        context.verticalSpace(16),
         _buildProtocolGroup(
           context,
           title: "Checkboxes",

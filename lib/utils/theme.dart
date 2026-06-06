@@ -164,6 +164,9 @@ class AppTheme {
 }
 
 extension AppScreenUtilContext on BuildContext {
+  double get screenWidth => MediaQuery.of(this).size.width;
+  double get screenHeight => MediaQuery.of(this).size.height;
+
   EdgeInsets appEdgeInsets({double? horizontal, double? vertical, double? all, double? left, double? top, double? right, double? bottom}) {
     if (all != null) return EdgeInsets.all(r(all));
     return EdgeInsets.only(

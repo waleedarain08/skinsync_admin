@@ -99,8 +99,10 @@ class TreatmentDetailScreen extends ConsumerWidget {
                     Text(treatment.name ?? "N/A", style: context.fonts.black26w700),
                     context.horizontalSpace(16),
                     AppBadge(
-                      label: treatment.isActive ? "ACTIVE" : "INACTIVE",
-                      variant: treatment.isActive ? AppBadgeVariant.success : AppBadgeVariant.neutral,
+                      label: (treatment.status).toUpperCase(),
+                      variant: treatment.status == 'active' 
+                          ? AppBadgeVariant.success 
+                          : (treatment.status == 'draft' ? AppBadgeVariant.warning : AppBadgeVariant.neutral),
                     ),
                   ],
                 ),

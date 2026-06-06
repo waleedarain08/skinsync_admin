@@ -46,6 +46,7 @@ class CustomFontsGetter {
   TextStyle get white12w400 => TextStyle(fontSize: context.sp(12), fontWeight: FontWeight.w400, color: CustomColors.white, fontFamily: _fontFamily);
   TextStyle get white16w400 => TextStyle(fontSize: context.sp(16), fontWeight: FontWeight.w400, color: CustomColors.white, fontFamily: _fontFamily);
   TextStyle get white10w600 => TextStyle(fontSize: context.sp(10), fontWeight: FontWeight.w600, color: CustomColors.white, fontFamily: _fontFamily);
+  TextStyle get white10w700 => TextStyle(fontSize: context.sp(10), fontWeight: FontWeight.w700, color: CustomColors.white, fontFamily: _fontFamily);
 
   TextStyle get grey16w400 => TextStyle(fontSize: context.sp(16), fontWeight: FontWeight.w400, color: CustomColors.grey, fontFamily: _fontFamily);
   TextStyle get grey14w400 => TextStyle(fontSize: context.sp(14), fontWeight: FontWeight.w400, color: CustomColors.grey, fontFamily: _fontFamily);
@@ -68,9 +69,11 @@ class CustomFontsGetter {
   TextStyle get grey10w700ls1 => TextStyle(fontSize: context.sp(10), fontWeight: FontWeight.w700, color: CustomColors.grey, fontFamily: _fontFamily, letterSpacing: 1.0);
 
   TextStyle get purple14w600 => TextStyle(fontSize: context.sp(14), fontWeight: FontWeight.w600, color: CustomColors.purple, fontFamily: _fontFamily);
+  TextStyle get purple14w700 => TextStyle(fontSize: context.sp(14), fontWeight: FontWeight.w700, color: CustomColors.purple, fontFamily: _fontFamily);
   TextStyle get purple11w600 => TextStyle(fontSize: context.sp(11), fontWeight: FontWeight.w600, color: CustomColors.purple, fontFamily: _fontFamily);
   TextStyle get purple9w800ls1 => TextStyle(fontSize: context.sp(9), fontWeight: FontWeight.w800, color: CustomColors.purple, fontFamily: _fontFamily, letterSpacing: 1.0);
   TextStyle get purple16w600 => TextStyle(fontSize: context.sp(16), fontWeight: FontWeight.w600, color: CustomColors.purple, fontFamily: _fontFamily);
+  TextStyle get purple16w700 => TextStyle(fontSize: context.sp(16), fontWeight: FontWeight.w700, color: CustomColors.purple, fontFamily: _fontFamily);
   TextStyle get purple13w700 => TextStyle(fontSize: context.sp(13), fontWeight: FontWeight.w700, color: CustomColors.purple, fontFamily: _fontFamily);
   TextStyle get purple12w700 => TextStyle(fontSize: context.sp(12), fontWeight: FontWeight.w700, color: CustomColors.purple, fontFamily: _fontFamily);
   TextStyle get purple13w600 => TextStyle(fontSize: context.sp(13), fontWeight: FontWeight.w600, color: CustomColors.purple, fontFamily: _fontFamily);
@@ -133,6 +136,7 @@ class CustomFonts {
   static TextStyle get white12w400 => TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400, color: CustomColors.white, fontFamily: _fontFamily);
   static TextStyle get white16w400 => TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400, color: CustomColors.white, fontFamily: _fontFamily);
   static TextStyle get white10w600 => TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600, color: CustomColors.white, fontFamily: _fontFamily);
+  static TextStyle get white10w700 => TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w700, color: CustomColors.white, fontFamily: _fontFamily);
 
   static TextStyle get grey16w400 => TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400, color: CustomColors.grey, fontFamily: _fontFamily);
   static TextStyle get grey14w400 => TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400, color: CustomColors.grey, fontFamily: _fontFamily);
@@ -155,9 +159,11 @@ class CustomFonts {
   static TextStyle get grey10w700ls1 => TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w700, color: CustomColors.grey, fontFamily: _fontFamily, letterSpacing: 1.0);
 
   static TextStyle get purple14w600 => TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: CustomColors.purple, fontFamily: _fontFamily);
+  static TextStyle get purple14w700 => TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700, color: CustomColors.purple, fontFamily: _fontFamily);
   static TextStyle get purple11w600 => TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w600, color: CustomColors.purple, fontFamily: _fontFamily);
   static TextStyle get purple9w800ls1 => TextStyle(fontSize: 9.sp, fontWeight: FontWeight.w800, color: CustomColors.purple, fontFamily: _fontFamily, letterSpacing: 1.0);
   static TextStyle get purple16w600 => TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600, color: CustomColors.purple, fontFamily: _fontFamily);
+  static TextStyle get purple16w700 => TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700, color: CustomColors.purple, fontFamily: _fontFamily);
   static TextStyle get purple13w700 => TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w700, color: CustomColors.purple, fontFamily: _fontFamily);
   static TextStyle get purple12w700 => TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700, color: CustomColors.purple, fontFamily: _fontFamily);
   static TextStyle get purple13w600 => TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: CustomColors.purple, fontFamily: _fontFamily);

@@ -59,7 +59,7 @@ class TreatmentData {
       categoryPath: "Injectables > Neurotoxins",
       materialName: "Units",
       maxMaterialQuantity: 50,
-      isActive: true,
+      status: 'active',
       sideAreas: [
         SideAreaModel(
           name: "Upper Face",
@@ -84,7 +84,7 @@ class TreatmentData {
       categoryPath: "Injectables > Dermal Fillers",
       materialName: "Syringes",
       maxMaterialQuantity: 2,
-      isActive: true,
+      status: 'active',
       sideAreas: [
         SideAreaModel(
           name: "Mid Face",
@@ -106,7 +106,7 @@ class TreatmentData {
       image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop",
       categoryName: "Skin Treatments",
       categoryPath: "Skin Treatments > Facials",
-      isActive: false,
+      status: 'deactive',
     ),
     TreatmentModel(
       id: 4,
@@ -120,7 +120,7 @@ class TreatmentData {
       image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc2069?q=80&w=1000&auto=format&fit=crop",
       categoryName: "Laser & Energy",
       categoryPath: "Laser & Energy > Resurfacing",
-      isActive: true,
+      status: 'active',
       sideAreas: [
         SideAreaModel(
           name: "Body",
@@ -143,7 +143,7 @@ class TreatmentData {
       image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc2069?q=80&w=1000&auto=format&fit=crop",
       categoryName: "Skin Treatments",
       categoryPath: "Skin Treatments > Chemical Peels",
-      isActive: true,
+      status: 'active',
     ),
     TreatmentModel(
       id: 6,
@@ -157,7 +157,7 @@ class TreatmentData {
       image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=1000&auto=format&fit=crop",
       categoryName: "Skin Treatments",
       categoryPath: "Skin Treatments > Facials",
-      isActive: true,
+      status: 'active',
       sideAreas: [
         SideAreaModel(
           name: "Face",

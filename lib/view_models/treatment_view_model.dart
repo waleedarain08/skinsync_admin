@@ -174,6 +174,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       selectedTreatment: null,
       useInAiSimulator: false,
       selectedProtocolIds: [],
+      status: 'active',
       isFollowUpRequired: false,
       followUpType: null,
       followUpDurationUnit: 'minutes',
@@ -188,6 +189,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       currentSelected.add(protocolId);
     }
     state = state.copyWith(selectedProtocolIds: currentSelected);
+  }
+
+  void setStatus(String status) {
+    state = state.copyWith(status: status);
   }
 
   void selectTreatment(TreatmentModel treatment) {
@@ -244,6 +249,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
     state = state.copyWith(
       areas: newAreas,
+      status: treatment.status,
       treatmentImage: null, 
       treatmentIcon: null,
       useInAiSimulator: treatment.useInAiSimulator,
@@ -456,8 +462,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             (t.sideAreas?.any((a) => a.name?.toLowerCase() == area) ?? false);
 
         final matchesStatus = status.isEmpty || 
-            (status == 'active' && t.isActive) ||
-            (status == 'inactive' && !t.isActive);
+            (status == 'active' && t.status == 'active') ||
+            (status == 'deactive' && t.status == 'deactive') ||
+            (status == 'draft' && t.status == 'draft');
 
         return matchesQuery && matchesCategory && matchesArea && matchesStatus;
       }).toList(),
@@ -496,7 +503,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   void toggleTreatmentStatus(int treatmentId) {
     final updatedList = state.treatments.map((t) {
       if (t.id == treatmentId) {
-        return t.copyWith(isActive: !t.isActive);
+        return t.copyWith(status: t.status == 'active' ? 'deactive' : 'active');
       }
       return t;
     }).toList();
@@ -531,8 +538,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       final matchesArea = area.isEmpty || (t.sideAreas?.any((a) => a.name?.toLowerCase() == area) ?? false);
 
       final matchesStatus = status.isEmpty ||
-          (status == 'active' && t.isActive) ||
-          (status == 'inactive' && !t.isActive);
+          (status == 'active' && t.status == 'active') ||
+          (status == 'deactive' && t.status == 'deactive') ||
+          (status == 'draft' && t.status == 'draft');
 
       return matchesQuery && matchesCategory && matchesArea && matchesStatus;
     }).toList();
@@ -554,6 +562,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         categoryPath: categoryPathController.text,
         materialName: materialNameController.text,
         maxMaterialQuantity: int.tryParse(maxMaterialQuantityController.text) ?? 0,
+        status: state.status,
         useInAiSimulator: state.useInAiSimulator,
         protocolIds: state.selectedProtocolIds,
         preTreatmentInstructions: preTreatmentInstructionsController.text,
@@ -627,6 +636,7 @@ class TreatmentState extends BaseStateModel {
   final List<AreaViewModelEntry> areas;
   final List<String> selectedCategoryPath;
   final List<String> selectedProtocolIds;
+  final String status; // draft | active | deactive
   
   final int? preNotificationOffset;
   final int? postNotificationOffset;
@@ -662,6 +672,7 @@ class TreatmentState extends BaseStateModel {
     this.treatmentIcon,
     this.selectedCategoryPath = const [],
     this.selectedProtocolIds = const [],
+    this.status = 'active',
     this.preNotificationOffset,
     this.postNotificationOffset,
     this.preTreatmentAttachments = const [],
@@ -692,6 +703,7 @@ class TreatmentState extends BaseStateModel {
     List<AreaViewModelEntry>? areas,
     List<String>? selectedCategoryPath,
     List<String>? selectedProtocolIds,
+    String? status,
     int? preNotificationOffset,
     int? postNotificationOffset,
     List<PlatformFile>? preTreatmentAttachments,
@@ -720,6 +732,7 @@ class TreatmentState extends BaseStateModel {
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
       selectedProtocolIds: selectedProtocolIds ?? this.selectedProtocolIds,
+      status: status ?? this.status,
       preNotificationOffset: preNotificationOffset ?? this.preNotificationOffset,
       postNotificationOffset: postNotificationOffset ?? this.postNotificationOffset,
       preTreatmentAttachments: preTreatmentAttachments ?? this.preTreatmentAttachments,

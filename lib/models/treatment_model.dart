@@ -14,7 +14,7 @@ class TreatmentModel {
   int maxMaterialQuantity;
   bool? isArea;
   List<SideAreaModel>? sideAreas;
-  bool isActive;
+  String status; // draft | active | deactive
   bool useInAiSimulator;
   List<int>? combinableTreatmentIds;
   List<String>? protocolIds;
@@ -56,7 +56,7 @@ class TreatmentModel {
     this.maxMaterialQuantity = 0,
     this.isArea,
     this.sideAreas,
-    this.isActive = true,
+    this.status = 'active',
     this.useInAiSimulator = false,
     this.combinableTreatmentIds,
     this.protocolIds,
@@ -82,7 +82,7 @@ class TreatmentModel {
   });
 
   TreatmentModel.fromJson(Map<String, dynamic> json)
-      : isActive = json['is_active'] ?? true,
+      : status = json['status'] ?? (json['is_active'] == false ? 'deactive' : 'active'),
         useInAiSimulator = json['use_in_ai_simulator'] ?? false,
         maxMaterialQuantity = json['max_material_quantity'] ?? 0,
         isFollowUpRequired = json['is_follow_up_required'] ?? false {
@@ -156,7 +156,7 @@ class TreatmentModel {
     int? maxMaterialQuantity,
     bool? isArea,
     List<SideAreaModel>? sideAreas,
-    bool? isActive,
+    String? status,
     bool? useInAiSimulator,
     List<int>? combinableTreatmentIds,
     List<String>? protocolIds,
@@ -196,7 +196,7 @@ class TreatmentModel {
       maxMaterialQuantity: maxMaterialQuantity ?? this.maxMaterialQuantity,
       isArea: isArea ?? this.isArea,
       sideAreas: sideAreas ?? this.sideAreas,
-      isActive: isActive ?? this.isActive,
+      status: status ?? this.status,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
       combinableTreatmentIds: combinableTreatmentIds ?? this.combinableTreatmentIds,
       protocolIds: protocolIds ?? this.protocolIds,
@@ -238,7 +238,8 @@ class TreatmentModel {
       'material_name': materialName,
       'max_material_quantity': maxMaterialQuantity,
       'side_areas': sideAreas?.map((sideArea) => sideArea.toJson()).toList(),
-      'is_active': isActive,
+      'status': status,
+      'is_active': status == 'active',
       'use_in_ai_simulator': useInAiSimulator,
       'combinable_treatment_ids': combinableTreatmentIds,
       'protocol_ids': protocolIds,

@@ -12,6 +12,7 @@ import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/nested_category_selector.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
@@ -28,38 +29,160 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
+    final bool isDesktop = context.screenWidth > 1200;
+    final bool isTablet = context.screenWidth > 800 && context.screenWidth <= 1200;
+
     return GradientScaffold(
       appBar: AppBar(
         flexibleSpace: AppDecorations.appBarGradient,
         elevation: 0,
         centerTitle: true,
-        title: Text("Create New Treatment", style: context.fonts.black18w600),
+        title: Text("Treatment Builder", style: context.fonts.black18w600),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CustomColors.black),
+          icon: const Icon(Icons.close, color: CustomColors.black),
           onPressed: () {
             viewModel.resetForm();
             context.pop();
           },
         ),
       ),
-      body: Column(
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildProgressIndicator(context, state.currentStep),
+          if (isDesktop || isTablet) _buildLeftSidebar(context, state, viewModel),
           Expanded(
-            child: SingleChildScrollView(
-              padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: context.w(900)),
-                  child: Column(
-                    children: [
-                      _buildCurrentStepContent(context, state, viewModel, dataState, ref),
-                      context.verticalSpace(48),
-                      _buildActionButtons(context, state, viewModel),
-                    ],
+            child: Column(
+              children: [
+                if (!isDesktop && !isTablet) _buildMobileProgress(context, state),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: context.w(isDesktop ? 800 : 900)),
+                        child: Column(
+                          children: [
+                            _buildStepHeader(context, state),
+                            context.verticalSpace(32),
+                            Container(
+                              padding: context.appEdgeInsets(all: 32),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: context.appBorderRadius(all: 16),
+                                border: Border.all(color: CustomColors.border),
+                                boxShadow: AppShadows.card(context),
+                              ),
+                              child: _buildCurrentStepContent(context, state, viewModel, dataState, ref),
+                            ),
+                            context.verticalSpace(48),
+                            _buildActionButtons(context, state, viewModel),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
+            ),
+          ),
+          if (isDesktop) _buildRightSidebar(context, state, viewModel, dataState),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeftSidebar(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    final steps = [
+      "Categories",
+      "Basic Information",
+      "Treatment Areas",
+      "Protocols",
+      "Pre-Treatment",
+      "Post-Treatment",
+      "Logic & Materials"
+    ];
+
+    return Container(
+      width: context.w(280),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(right: BorderSide(color: CustomColors.border)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: context.appEdgeInsets(all: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Progress", style: context.fonts.grey12w600),
+                context.verticalSpace(12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("${state.currentStep + 1} / ${steps.length}", style: context.fonts.black14w700),
+                    Text("${((state.currentStep + 1) / steps.length * 100).toInt()}%", style: context.fonts.purple14w700),
+                  ],
+                ),
+                context.verticalSpace(12),
+                ClipRRect(
+                  borderRadius: context.appBorderRadius(all: 10),
+                  child: LinearProgressIndicator(
+                    value: (state.currentStep + 1) / steps.length,
+                    minHeight: context.h(8),
+                    backgroundColor: CustomColors.whiteGrey,
+                    valueColor: const AlwaysStoppedAnimation<Color>(CustomColors.purple),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: ListView.builder(
+              padding: context.appEdgeInsets(vertical: 16),
+              itemCount: steps.length,
+              itemBuilder: (context, index) {
+                final bool isActive = state.currentStep == index;
+                final bool isCompleted = state.currentStep > index;
+
+                return InkWell(
+                  onTap: index < state.currentStep ? () => viewModel.setStep(index) : null,
+                  child: Container(
+                    padding: context.appEdgeInsets(horizontal: 24, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: isActive ? CustomColors.purple.withValues(alpha: 0.05) : Colors.transparent,
+                      border: Border(right: BorderSide(color: isActive ? CustomColors.purple : Colors.transparent, width: 3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: context.w(24),
+                          height: context.w(24),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isCompleted ? CustomColors.green : (isActive ? CustomColors.purple : Colors.white),
+                            border: Border.all(color: isActive || isCompleted ? Colors.transparent : CustomColors.border),
+                          ),
+                          child: Center(
+                            child: isCompleted
+                                ? const Icon(Icons.check, color: Colors.white, size: 14)
+                                : Text("${index + 1}", style: isActive ? context.fonts.white10w700 : context.fonts.grey10w700),
+                          ),
+                        ),
+                        context.horizontalSpace(16),
+                        Expanded(
+                          child: Text(
+                            steps[index],
+                            style: isActive ? context.fonts.purple14w600 : (isCompleted ? context.fonts.black14w400 : context.fonts.grey14w400),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -67,71 +190,312 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProgressIndicator(BuildContext context, int currentStep) {
-    return Container(
-      color: Colors.white,
-      padding: context.appEdgeInsets(vertical: 20, horizontal: 40),
-      child: Row(
-        children: [
-          _stepIndicator(context, 0, "Category", currentStep),
-          _stepConnector(0, currentStep),
-          _stepIndicator(context, 1, "Details", currentStep),
-          _stepConnector(1, currentStep),
-          _stepIndicator(context, 2, "Areas", currentStep),
-          _stepConnector(2, currentStep),
-          _stepIndicator(context, 3, "Pre-Treatment", currentStep),
-          _stepConnector(3, currentStep),
-          _stepIndicator(context, 4, "Post-Treatment", currentStep),
-          _stepConnector(4, currentStep),
-          _stepIndicator(context, 5, "Logic", currentStep),
-        ],
-      ),
-    );
-  }
+  Widget _buildStepHeader(BuildContext context, TreatmentState state) {
+    final titles = [
+      "Categorization",
+      "Basic Information",
+      "Body Areas",
+      "Clinical Protocols",
+      "Preparation Requirements",
+      "Recovery & Follow-Up",
+      "Clinical Logic"
+    ];
+    final descriptions = [
+      "Organize treatments to help patients and staff find them easily.",
+      "Core identification details including pricing and duration.",
+      "Define mandatory sub-areas and max material quantities.",
+      "Standardize procedures with checklists and required text fields.",
+      "Guidelines, clinical protocols, and automated preparation reminders.",
+      "Aftercare instructions and scheduled engagement rules.",
+      "Final configuration for materials, AI, and combinations."
+    ];
+    final icons = [
+      Icons.category_outlined,
+      Icons.description_outlined,
+      Icons.accessibility_new_outlined,
+      Icons.assignment_turned_in_outlined,
+      Icons.medical_services_outlined,
+      Icons.healing_outlined,
+      Icons.settings_suggest_outlined
+    ];
 
-  Widget _stepIndicator(BuildContext context, int step, String label, int currentStep) {
-    final bool isActive = currentStep >= step;
-    final bool isCompleted = currentStep > step;
-
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: context.w(32),
-          height: context.w(32),
-          decoration: BoxDecoration(
-            color: isCompleted ? CustomColors.green : (isActive ? CustomColors.black : Colors.white),
-            shape: BoxShape.circle,
-            border: Border.all(color: isActive ? Colors.transparent : CustomColors.border),
-          ),
-          child: Center(
-            child: isCompleted
-                ? const Icon(Icons.check, color: Colors.white, size: 16)
-                : Text(
-                    "${step + 1}",
-                    style: isActive ? context.fonts.white12w700 : context.fonts.grey12w700,
-                  ),
-          ),
-        ),
-        context.horizontalSpace(12),
-        Text(
-          label,
-          style: isActive ? context.fonts.black14w600 : context.fonts.grey14w400,
+        Row(
+          children: [
+            Container(
+              padding: context.appEdgeInsets(all: 12),
+              decoration: BoxDecoration(
+                color: CustomColors.purple.withValues(alpha: 0.1),
+                borderRadius: context.appBorderRadius(all: 12),
+              ),
+              child: Icon(icons[state.currentStep], color: CustomColors.purple, size: 24),
+            ),
+            context.horizontalSpace(16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(titles[state.currentStep], style: context.fonts.black20w600),
+                  Text(descriptions[state.currentStep], style: context.fonts.grey14w400),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _stepConnector(int step, int currentStep) {
-    final bool isCompleted = currentStep > step;
-    return Expanded(
-      child: Builder(
-        builder: (context) {
-          return Container(
-            margin: context.appEdgeInsets(horizontal: 16),
-            height: context.h(2),
-            color: isCompleted ? CustomColors.green : CustomColors.border,
-          );
-        }
+  Widget _buildRightSidebar(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    return Container(
+      width: context.w(350),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey.withValues(alpha: 0.5),
+        border: Border(left: BorderSide(color: CustomColors.border)),
+      ),
+      child: SingleChildScrollView(
+        padding: context.appEdgeInsets(all: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Live Preview", style: context.fonts.black16w600),
+            context.verticalSpace(20),
+            _buildPreviewCard(context, viewModel, state),
+            context.verticalSpace(32),
+            Text("Clinical Protocol Form Preview", style: context.fonts.black16w600),
+            context.verticalSpace(16),
+            _buildProtocolFormPreview(context, state, dataState),
+            context.verticalSpace(32),
+            Text("Configuration Summary", style: context.fonts.black16w600),
+            context.verticalSpace(16),
+            _buildSummaryChips(context, viewModel, state, dataState),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProtocolFormPreview(BuildContext context, TreatmentState state, TreatmentDataState dataState) {
+    final selectedProtocols = dataState.protocols.where((p) => state.selectedProtocolIds.contains(p.id)).toList();
+    final checkboxes = selectedProtocols.where((p) => p.type == ProtocolType.checkbox).toList();
+    final textFields = selectedProtocols.where((p) => p.type == ProtocolType.text).toList();
+
+    return Container(
+      width: double.infinity,
+      padding: context.appEdgeInsets(all: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: selectedProtocols.isEmpty
+          ? Center(
+              child: Text(
+                "No clinical protocols configured yet.",
+                style: context.fonts.grey12w400,
+                textAlign: TextAlign.center,
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (checkboxes.isNotEmpty) ...[
+                  Text("CHECKLIST", style: context.fonts.grey10w700ls1),
+                  context.verticalSpace(12),
+                  ...checkboxes.map((p) => Padding(
+                        padding: context.appEdgeInsets(bottom: 12),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: context.w(18),
+                              height: context.w(18),
+                              decoration: BoxDecoration(
+                                borderRadius: context.appBorderRadius(all: 4),
+                                border: Border.all(color: CustomColors.border, width: 1.5),
+                              ),
+                            ),
+                            context.horizontalSpace(12),
+                            Expanded(child: Text(p.title, style: context.fonts.black13w400)),
+                          ],
+                        ),
+                      )),
+                ],
+                if (checkboxes.isNotEmpty && textFields.isNotEmpty) context.verticalSpace(12),
+                if (textFields.isNotEmpty) ...[
+                  Text("NOTES", style: context.fonts.grey10w700ls1),
+                  context.verticalSpace(12),
+                  ...textFields.map((p) => Padding(
+                        padding: context.appEdgeInsets(bottom: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(p.title, style: context.fonts.black12w600),
+                            context.verticalSpace(8),
+                            Container(
+                              height: context.h(40),
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: CustomColors.whiteGrey,
+                                borderRadius: context.appBorderRadius(all: 8),
+                                border: Border.all(color: CustomColors.border),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ],
+              ],
+            ),
+    );
+  }
+
+  Widget _buildPreviewCard(BuildContext context, TreatmentViewModel viewModel, TreatmentState state) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 16),
+        boxShadow: AppShadows.card(context),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: context.h(160),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: CustomColors.whiteGrey,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              image: state.treatmentImage != null
+                  ? DecorationImage(
+                      image: kIsWeb ? NetworkImage(state.treatmentImage!.path) : FileImage(File(state.treatmentImage!.path)) as ImageProvider,
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+            ),
+            child: state.treatmentImage == null ? const Center(child: Icon(Icons.image_outlined, color: CustomColors.grey, size: 40)) : null,
+          ),
+          Padding(
+            padding: context.appEdgeInsets(all: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        viewModel.displayNameController.text.isEmpty ? "New Treatment" : viewModel.displayNameController.text,
+                        style: context.fonts.black16w700,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(
+                      "\$${viewModel.basePriceController.text.isEmpty ? "0" : viewModel.basePriceController.text}",
+                      style: context.fonts.purple16w700,
+                    ),
+                  ],
+                ),
+                context.verticalSpace(8),
+                Text(
+                  viewModel.shortDescriptionController.text.isEmpty ? "No description provided yet." : viewModel.shortDescriptionController.text,
+                  style: context.fonts.grey12w400,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                context.verticalSpace(16),
+                const Divider(),
+                context.verticalSpace(16),
+                Row(
+                  children: [
+                    const Icon(Icons.access_time_rounded, size: 16, color: CustomColors.grey),
+                    context.horizontalSpace(8),
+                    Text(
+                      "${viewModel.durationHoursController.text}h ${viewModel.durationMinutesController.text}m",
+                      style: context.fonts.black12w600,
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: context.appEdgeInsets(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: CustomColors.green.withValues(alpha: 0.1),
+                        borderRadius: context.appBorderRadius(all: 20),
+                      ),
+                      child: Text("Active", style: context.fonts.green10w700),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryChips(BuildContext context, TreatmentViewModel viewModel, TreatmentState state, TreatmentDataState dataState) {
+    final checkboxCount = dataState.protocols.where((p) => p.type == ProtocolType.checkbox && state.selectedProtocolIds.contains(p.id)).length;
+    final textCount = dataState.protocols.where((p) => p.type == ProtocolType.text && state.selectedProtocolIds.contains(p.id)).length;
+
+    return Wrap(
+      spacing: context.w(8),
+      runSpacing: context.h(8),
+      children: [
+        if (viewModel.categoryPathController.text.isNotEmpty) _summaryChip(context, viewModel.categoryPathController.text, Icons.category_outlined),
+        if (state.areas.any((a) => a.areaController.text.isNotEmpty)) _summaryChip(context, "${state.areas.where((a) => a.areaController.text.isNotEmpty).length} Areas", Icons.location_on_outlined),
+        if (checkboxCount > 0) _summaryChip(context, "$checkboxCount Checkboxes", Icons.check_box_outlined),
+        if (textCount > 0) _summaryChip(context, "$textCount Text Protocols", Icons.text_snippet_outlined),
+        if (state.preTreatmentConsentForm != null || state.existingConsentForm != null) _summaryChip(context, "Consent Required", Icons.fact_check_outlined),
+        if (state.isFollowUpRequired) _summaryChip(context, "Follow-Up Required", Icons.replay_outlined),
+        if (state.useInAiSimulator) _summaryChip(context, "AI Compatible", Icons.auto_awesome_outlined),
+        _summaryChip(context, state.status.toUpperCase(), Icons.info_outline_rounded),
+      ],
+    );
+  }
+
+  Widget _summaryChip(BuildContext context, String label, IconData icon) {
+    return Container(
+      padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 8),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: CustomColors.purple),
+          context.horizontalSpace(8),
+          Text(label, style: context.fonts.black12w400),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileProgress(BuildContext context, TreatmentState state) {
+    return Container(
+      padding: context.appEdgeInsets(horizontal: 24, vertical: 16),
+      color: Colors.white,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Step ${state.currentStep + 1} of 7", style: context.fonts.black14w700),
+              Text("${((state.currentStep + 1) / 7 * 100).toInt()}%", style: context.fonts.purple14w700),
+            ],
+          ),
+          context.verticalSpace(8),
+          LinearProgressIndicator(
+            value: (state.currentStep + 1) / 7,
+            minHeight: context.h(4),
+            backgroundColor: CustomColors.whiteGrey,
+            valueColor: const AlwaysStoppedAnimation<Color>(CustomColors.purple),
+          ),
+        ],
       ),
     );
   }
@@ -141,11 +505,21 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 0: return _buildStepCategory(context, state, viewModel, dataState);
       case 1: return _buildStepDetails(context, state, viewModel);
       case 2: return _buildStepAreas(context, state, viewModel, dataState);
-      case 3: return _buildStepPreTreatment(context, state, viewModel, dataState, ref);
-      case 4: return _buildStepPostTreatment(context, state, viewModel);
-      case 5: return _buildStepLogic(context, state, viewModel, dataState);
+      case 3: return _buildStepProtocolsStep(context, state, viewModel, dataState, ref);
+      case 4: return _buildStepPreTreatment(context, state, viewModel, dataState, ref);
+      case 5: return _buildStepPostTreatment(context, state, viewModel);
+      case 6: return _buildStepLogic(context, state, viewModel, dataState);
       default: return const SizedBox.shrink();
     }
+  }
+
+  Widget _buildStepProtocolsStep(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildJourneyProtocols(context, dataState, ref, state.selectedProtocolIds, (id) => viewModel.toggleProtocolSelection(id)),
+      ],
+    );
   }
 
   Widget _buildStepPreTreatment(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
@@ -285,9 +659,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
           maxLines: 5,
         ),
         context.verticalSpace(32),
-        if (isPreTreatment && dataState != null && ref != null && selectedProtocolIds != null && onProtocolToggle != null) ...[
-          _buildJourneyProtocols(context, dataState, ref, selectedProtocolIds, onProtocolToggle),
-          context.verticalSpace(32),
+        if (isPreTreatment && dataState != null && ref != null) ...[
           _buildConsentFormSection(context, consentForm, onPickConsent!, onRemoveConsent!),
           context.verticalSpace(32),
         ],
@@ -790,6 +1162,18 @@ class CreateTreatmentScreen extends ConsumerWidget {
           controller: viewModel.fullDescriptionController,
           hintText: "Detailed medical and process information...",
           maxLines: 5,
+        ),
+        context.verticalSpace(24),
+        CustomDropdown<String>(
+          label: "Treatment Status",
+          hintText: "Select status",
+          value: state.status,
+          items: [
+            DropdownMenuItem(value: 'active', child: Text("Active", style: context.fonts.black14w400)),
+            DropdownMenuItem(value: 'deactive', child: Text("Deactive", style: context.fonts.black14w400)),
+            DropdownMenuItem(value: 'draft', child: Text("Draft", style: context.fonts.black14w400)),
+          ],
+          onChanged: (val) => viewModel.setStatus(val ?? 'active'),
         ),
       ],
     );
@@ -1315,8 +1699,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Phase Protocols", style: context.fonts.black14w600),
-        context.verticalSpace(16),
         _buildProtocolGroup(
           context,
           title: "Checkboxes",
@@ -1339,7 +1721,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final bool isLastStep = state.currentStep == 5;
+    final bool isLastStep = state.currentStep == 6;
 
     return Row(
       children: [
@@ -1363,7 +1745,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 if (!_validateSubAreas(context, state)) return;
               }
               
-              if (state.currentStep < 5) {
+              if (state.currentStep < 6) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel.submitTreatment(context).then((_) {

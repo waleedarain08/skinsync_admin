@@ -369,7 +369,7 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
                   children: [
                     Text(treatment.name ?? "N/A", style: context.fonts.black14w600.copyWith(fontSize: context.sp(15))),
                     context.horizontalSpace(12),
-                    _statusBadge(treatment.isActive),
+                    _statusBadge(treatment.status),
                   ],
                 ),
                 context.verticalSpace(4),
@@ -415,10 +415,13 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
     );
   }
 
-  Widget _statusBadge(bool isActive) {
+  Widget _statusBadge(String? status) {
+    final String cleanStatus = status ?? 'active';
     return AppBadge(
-      label: isActive ? "ACTIVE" : "INACTIVE",
-      variant: isActive ? AppBadgeVariant.success : AppBadgeVariant.neutral,
+      label: cleanStatus.toUpperCase(),
+      variant: cleanStatus == 'active' 
+          ? AppBadgeVariant.success 
+          : (cleanStatus == 'draft' ? AppBadgeVariant.warning : AppBadgeVariant.neutral),
     );
   }
 
@@ -458,12 +461,12 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
           child: Row(
             children: [
               Icon(
-                treatment.isActive ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                treatment.status == 'active' ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                 size: 18,
-                color: treatment.isActive ? CustomColors.amber : CustomColors.green,
+                color: treatment.status == 'active' ? CustomColors.amber : CustomColors.green,
               ),
               context.horizontalSpace(12),
-              Text(treatment.isActive ? "Deactivate" : "Activate"),
+              Text(treatment.status == 'active' ? "Deactivate" : "Activate"),
             ],
           ),
         ),
