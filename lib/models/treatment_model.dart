@@ -265,6 +265,7 @@ class TreatmentModel {
   }
 }
 
+
 class Attachment {
   String url;
   String type; // image | video | pdf

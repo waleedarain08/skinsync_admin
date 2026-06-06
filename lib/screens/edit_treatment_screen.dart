@@ -302,6 +302,10 @@ class EditTreatmentScreen extends ConsumerWidget {
             ref: ref,
             selectedProtocolIds: state.selectedProtocolIds,
             onProtocolToggle: (id) => viewModel.toggleProtocolSelection(id),
+            consentForm: state.preTreatmentConsentForm,
+            existingConsent: state.existingConsentForm,
+            onPickConsent: () => viewModel.pickConsentForm(),
+            onRemoveConsent: () => viewModel.removeConsentForm(),
           ),
         ],
       ),
@@ -375,6 +379,10 @@ class EditTreatmentScreen extends ConsumerWidget {
     WidgetRef? ref,
     List<String>? selectedProtocolIds,
     Function(String)? onProtocolToggle,
+    PlatformFile? consentForm,
+    Attachment? existingConsent,
+    VoidCallback? onPickConsent,
+    VoidCallback? onRemoveConsent,
     bool isFollowUpRequired = false,
     Function(bool?)? onFollowUpToggle,
     TextEditingController? totalFollowUpsController,
@@ -412,6 +420,8 @@ class EditTreatmentScreen extends ConsumerWidget {
         context.verticalSpace(32),
         if (isPreTreatment && dataState != null && ref != null && selectedProtocolIds != null && onProtocolToggle != null) ...[
           _buildJourneyProtocols(context, dataState, ref, selectedProtocolIds, onProtocolToggle),
+          context.verticalSpace(32),
+          _buildConsentFormSection(context, consentForm, existingConsent, onPickConsent!, onRemoveConsent!),
           context.verticalSpace(32),
         ],
         _buildAttachmentsField(
@@ -641,6 +651,70 @@ class EditTreatmentScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ],
+    );
+  }
+
+  Widget _buildConsentFormSection(BuildContext context, PlatformFile? file, Attachment? existing, VoidCallback onPick, VoidCallback onRemove) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Patient Consent Form (PDF)", style: context.fonts.black14w600),
+        context.verticalSpace(12),
+        if (file == null && existing == null)
+          InkWell(
+            onTap: onPick,
+            child: Container(
+              width: double.infinity,
+              padding: context.appEdgeInsets(vertical: 24),
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(color: CustomColors.border, style: BorderStyle.solid),
+              ),
+              child: Column(
+                children: [
+                  const Icon(Icons.description_outlined, color: CustomColors.purple, size: 28),
+                  context.verticalSpace(8),
+                  Text("Upload Treatment Consent Form", style: context.fonts.purple14w600),
+                  context.verticalSpace(4),
+                  Text("Patients must sign this before procedure", style: context.fonts.grey12w400),
+                ],
+              ),
+            ),
+          )
+        else
+          Container(
+            padding: context.appEdgeInsets(all: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(color: CustomColors.purple.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: context.appEdgeInsets(all: 10),
+                  decoration: BoxDecoration(color: CustomColors.red.withValues(alpha: 0.1), borderRadius: context.appBorderRadius(all: 8)),
+                  child: const Icon(Icons.picture_as_pdf_rounded, color: CustomColors.red, size: 24),
+                ),
+                context.horizontalSpace(16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(file?.name ?? existing?.name ?? "Consent Form", style: context.fonts.black14w600, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(file != null ? "${(file.size / 1024).toStringAsFixed(1)} KB" : "Existing PDF", style: context.fonts.grey12w400),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: onRemove,
+                  icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.red, size: 20),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
