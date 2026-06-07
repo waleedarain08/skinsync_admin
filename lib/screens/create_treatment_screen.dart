@@ -589,7 +589,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 5: return _buildStepPostInstructions(context, state, viewModel);
       case 6: return _buildStepNotifications(context, state, viewModel);
       case 7: return _buildStepFollowUp(context, state, viewModel);
-      case 8: return _buildStepConsent(context, state, viewModel);
+      case 8: return _buildStepConsent(context, state, viewModel, ref);
       case 9: return _buildStepLogic(context, state, viewModel, dataState);
       case 10: return _buildStepPricing(context, state, viewModel);
       default: return const SizedBox.shrink();
@@ -821,18 +821,85 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStepConsent(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildStepConsent(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, WidgetRef ref) {
+    final dataState = ref.watch(treatmentDataViewModelProvider);
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildConsentFormSection(context, state.preTreatmentConsentForm, () => viewModel.pickConsentForm(), () => viewModel.removeConsentForm()),
+        Text("Consent Form Selection", style: context.fonts.black18w600),
+        context.verticalSpace(24),
+        Row(
+          children: [
+            _radioOption(
+              context,
+              "Use Category Default",
+              state.consentType == 'category',
+              () => viewModel.setConsentType('category'),
+            ),
+            context.horizontalSpace(32),
+            _radioOption(
+              context,
+              "Upload Custom Form",
+              state.consentType == 'custom',
+              () => viewModel.setConsentType('custom'),
+            ),
+          ],
+        ),
+        context.verticalSpace(32),
+        if (state.consentType == 'category') ...[
+          Container(
+            padding: context.appEdgeInsets(all: 20),
+            decoration: BoxDecoration(
+              color: CustomColors.whiteGrey,
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(color: CustomColors.border),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline_rounded, color: CustomColors.purple),
+                context.horizontalSpace(16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Default Category Form", style: context.fonts.black14w600),
+                      context.verticalSpace(4),
+                      Text(
+                        selectedCategory?.consentFormName ?? "No default form found for this category.",
+                        style: context.fonts.grey12w400,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ] else ...[
+          _buildConsentFormSection(context, state.preTreatmentConsentForm, () => viewModel.pickConsentForm(), () => viewModel.removeConsentForm()),
+        ],
         context.verticalSpace(24),
         Text(
-          "This consent form will be presented to patients in the app. They must digitally sign it before the procedure begins.",
+          "Patients must digitally sign the selected consent form before the procedure begins.",
           style: context.fonts.grey14w400,
         ),
       ],
     );
+  }
+
+  CategoryItem? _findCategoryInTree(List<CategoryItem> items, String id) {
+    for (var item in items) {
+      if (item.id == id) return item;
+      if (item.children.isNotEmpty) {
+        final found = _findCategoryInTree(item.children, id);
+        if (found != null) return found;
+      }
+    }
+    return null;
   }
 
   Widget _buildOffsetDropdown(BuildContext context, {required String label, required int? value, required Map<int, String> options, required Function(int?) onChanged}) {

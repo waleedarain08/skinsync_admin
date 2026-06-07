@@ -111,13 +111,15 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
 
   // --- Category Actions (Supports Unlimited Nesting) ---
 
-  void addCategory(String name, {String? icon, String? parentId}) {
+  void addCategory(String name, {String? icon, String? parentId, String? consentFormUrl, String? consentFormName}) {
     if (name.isEmpty) return;
     final newCategory = CategoryItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: name,
       icon: icon,
       parentId: parentId,
+      consentFormUrl: consentFormUrl,
+      consentFormName: consentFormName,
     );
 
     if (parentId == null) {
@@ -140,18 +142,23 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     }).toList();
   }
 
-  void editCategory(String id, String newName, {String? icon}) {
+  void editCategory(String id, String newName, {String? icon, String? consentFormUrl, String? consentFormName}) {
     state = state.copyWith(
-      categories: _updateInTree(state.categories, id, newName, icon),
+      categories: _updateInTree(state.categories, id, newName, icon, consentFormUrl, consentFormName),
     );
   }
 
-  List<CategoryItem> _updateInTree(List<CategoryItem> items, String id, String newName, String? icon) {
+  List<CategoryItem> _updateInTree(List<CategoryItem> items, String id, String newName, String? icon, String? consentFormUrl, String? consentFormName) {
     return items.map((item) {
       if (item.id == id) {
-        return item.copyWith(name: newName, icon: icon ?? item.icon);
+        return item.copyWith(
+          name: newName, 
+          icon: icon ?? item.icon,
+          consentFormUrl: consentFormUrl,
+          consentFormName: consentFormName,
+        );
       } else if (item.children.isNotEmpty) {
-        return item.copyWith(children: _updateInTree(item.children, id, newName, icon));
+        return item.copyWith(children: _updateInTree(item.children, id, newName, icon, consentFormUrl, consentFormName));
       }
       return item;
     }).toList();

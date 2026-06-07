@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+import 'package:skinsync_admin/widgets/dailogbox/category_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -66,10 +68,14 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
           _buildTabHeader(
             context: context,
             title: "Treatment Categories",
-            onAdd: () => _showItemDialog(
+            onAdd: () => _showCategoryCreationDialog(
               context: context,
-              title: "Add Root Category",
-              onConfirm: (name, icon) => viewModel.addCategory(name, icon: icon),
+              onConfirm: (name, icon, consentFile) => viewModel.addCategory(
+                name, 
+                icon: icon, 
+                consentFormName: (consentFile as PlatformFile?)?.name, 
+                consentFormUrl: (consentFile as PlatformFile?)?.path
+              ),
             ),
           ),
           context.verticalSpace(24),
@@ -376,6 +382,29 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     );
   }
 
+  static void _showCategoryCreationDialog({
+    required BuildContext context,
+    String? parentName,
+    String? initialName,
+    String? initialIcon,
+    String? initialConsentName,
+    required Function(String, String, PlatformFile?) onConfirm,
+  }) async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => CategoryCreationDialog(
+        parentName: parentName,
+        initialName: initialName,
+        initialIcon: initialIcon,
+        initialConsentName: initialConsentName,
+      ),
+    );
+
+    if (result != null) {
+      onConfirm(result['name'], result['icon'], result['consentFile']);
+    }
+  }
+
   static void _showItemDialog({
     required BuildContext context,
     required String title,
@@ -522,21 +551,33 @@ class _RecursiveCategoryTile extends StatelessWidget {
             IconButton(
               tooltip: "Add Child Category",
               icon: const Icon(Icons.add_circle_outline, size: 20, color: CustomColors.green),
-              onPressed: () => ManageTreatmentDataScreen._showItemDialog(
+              onPressed: () => ManageTreatmentDataScreen._showCategoryCreationDialog(
                 context: context,
-                title: "Add Child under '${category.name}'",
-                onConfirm: (name, icon) => viewModel.addCategory(name, icon: icon, parentId: category.id),
+                parentName: category.name,
+                onConfirm: (name, icon, consentFile) => viewModel.addCategory(
+                  name, 
+                  icon: icon, 
+                  parentId: category.id,
+                  consentFormName: (consentFile as PlatformFile?)?.name,
+                  consentFormUrl: (consentFile as PlatformFile?)?.path,
+                ),
               ),
             ),
             IconButton(
               tooltip: "Edit Category",
               icon: const Icon(Icons.edit_outlined, size: 20),
-              onPressed: () => ManageTreatmentDataScreen._showItemDialog(
+              onPressed: () => ManageTreatmentDataScreen._showCategoryCreationDialog(
                 context: context,
-                title: "Edit Category",
                 initialName: category.name,
                 initialIcon: category.icon,
-                onConfirm: (name, icon) => viewModel.editCategory(category.id, name, icon: icon),
+                initialConsentName: category.consentFormName,
+                onConfirm: (name, icon, consentFile) => viewModel.editCategory(
+                  category.id, 
+                  name, 
+                  icon: icon,
+                  consentFormName: (consentFile as PlatformFile?)?.name ?? category.consentFormName,
+                  consentFormUrl: (consentFile as PlatformFile?)?.path ?? category.consentFormUrl,
+                ),
               ),
             ),
             IconButton(

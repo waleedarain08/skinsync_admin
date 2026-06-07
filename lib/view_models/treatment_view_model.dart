@@ -315,6 +315,17 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(selectedCategoryPath: currentPath);
   }
 
+  CategoryItem? findCategoryById(List<CategoryItem> items, String id) {
+    for (var item in items) {
+      if (item.id == id) return item;
+      if (item.children.isNotEmpty) {
+        final found = findCategoryById(item.children, id);
+        if (found != null) return found;
+      }
+    }
+    return null;
+  }
+
   CategoryItem? _findCategoryById(List<CategoryItem> items, String id) {
     for (var item in items) {
       if (item.id == id) return item;
@@ -407,6 +418,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   void removeConsentForm() {
     state = state.copyWith(preTreatmentConsentForm: null, existingConsentForm: null);
+  }
+
+  void setConsentType(String type) {
+    state = state.copyWith(consentType: type);
   }
 
   void removeAttachment(bool isPreTreatment, int index) {
@@ -581,9 +596,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           ...state.existingPostAttachments,
           ...state.postTreatmentAttachments.map((f) => Attachment(url: f.path ?? '', type: _getFileType(f), name: f.name)),
         ],
-        preTreatmentConsentForm: state.preTreatmentConsentForm != null 
-            ? Attachment(url: state.preTreatmentConsentForm!.path ?? '', type: 'pdf', name: state.preTreatmentConsentForm!.name)
-            : state.existingConsentForm,
+        preTreatmentConsentForm: state.consentType == 'custom' 
+            ? (state.preTreatmentConsentForm != null 
+                ? Attachment(url: state.preTreatmentConsentForm!.path ?? '', type: 'pdf', name: state.preTreatmentConsentForm!.name)
+                : state.existingConsentForm)
+            : null,
         isFollowUpRequired: state.isFollowUpRequired,
         totalFollowUps: int.tryParse(totalFollowUpsController.text),
         followUpType: state.followUpType,
@@ -649,6 +666,7 @@ class TreatmentState extends BaseStateModel {
 
   final PlatformFile? preTreatmentConsentForm;
   final Attachment? existingConsentForm;
+  final String consentType; // category | custom
 
   // Follow-Up fields
   final bool isFollowUpRequired;
@@ -681,6 +699,7 @@ class TreatmentState extends BaseStateModel {
     this.existingPostAttachments = const [],
     this.preTreatmentConsentForm,
     this.existingConsentForm,
+    this.consentType = 'category',
     this.isFollowUpRequired = false,
     this.followUpType,
     this.followUpDurationUnit = 'minutes',
@@ -712,6 +731,7 @@ class TreatmentState extends BaseStateModel {
     List<Attachment>? existingPostAttachments,
     PlatformFile? preTreatmentConsentForm,
     Attachment? existingConsentForm,
+    String? consentType,
     bool? isFollowUpRequired,
     String? followUpType,
     String? followUpDurationUnit,
@@ -741,6 +761,7 @@ class TreatmentState extends BaseStateModel {
       existingPostAttachments: existingPostAttachments ?? this.existingPostAttachments,
       preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
       existingConsentForm: existingConsentForm ?? this.existingConsentForm,
+      consentType: consentType ?? this.consentType,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
       followUpType: followUpType ?? this.followUpType,
       followUpDurationUnit: followUpDurationUnit ?? this.followUpDurationUnit,

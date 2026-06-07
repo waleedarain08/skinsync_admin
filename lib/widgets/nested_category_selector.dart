@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/treatment_data_models.dart';
@@ -77,11 +78,11 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
           items: widget.categories,
           selectedId: _selectedPath.isNotEmpty ? _selectedPath[0] : null,
           onSelect: (item) => _onLevelSelect(0, item),
-          onAddChild: (parent) => _showCreationDialog(context, parent.name, (name, icon) {
-            dataViewModel.addCategory(name, icon: icon, parentId: parent.id);
+          onAddChild: (parent) => _showCreationDialog(context, parent.name, (name, icon, consentFile) {
+            dataViewModel.addCategory(name, icon: icon, parentId: parent.id, consentFormName: consentFile?.name, consentFormUrl: (consentFile as PlatformFile?)?.path);
           }),
-          onAddRoot: () => _showCreationDialog(context, null, (name, icon) {
-            dataViewModel.addCategory(name, icon: icon);
+          onAddRoot: () => _showCreationDialog(context, null, (name, icon, consentFile) {
+            dataViewModel.addCategory(name, icon: icon, consentFormName: consentFile?.name, consentFormUrl: (consentFile as PlatformFile?)?.path);
           }),
         ),
 
@@ -100,8 +101,8 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
               items: parentNode.children,
               selectedId: _selectedPath.length > index + 1 ? _selectedPath[index + 1] : null,
               onSelect: (item) => _onLevelSelect(index + 1, item),
-              onAddChild: (parent) => _showCreationDialog(context, parent.name, (name, icon) {
-                dataViewModel.addCategory(name, icon: icon, parentId: parent.id);
+              onAddChild: (parent) => _showCreationDialog(context, parent.name, (name, icon, consentFile) {
+                dataViewModel.addCategory(name, icon: icon, parentId: parent.id, consentFormName: consentFile?.name, consentFormUrl: (consentFile as PlatformFile?)?.path);
               }),
             ),
           );
@@ -155,14 +156,14 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
     );
   }
 
-  void _showCreationDialog(BuildContext context, String? parentName, Function(String, String) onSave) async {
+  void _showCreationDialog(BuildContext context, String? parentName, Function(String, String, PlatformFile?) onSave) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => CategoryCreationDialog(parentName: parentName),
     );
 
     if (result != null) {
-      onSave(result['name'], result['icon']);
+      onSave(result['name'], result['icon'], result['consentFile']);
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 import '../build_textfield.dart';
@@ -5,15 +6,35 @@ import 'standard_dialog.dart';
 
 class CategoryCreationDialog extends StatefulWidget {
   final String? parentName;
-  const CategoryCreationDialog({super.key, this.parentName});
+  final String? initialName;
+  final String? initialIcon;
+  final String? initialConsentName;
+
+  const CategoryCreationDialog({
+    super.key, 
+    this.parentName,
+    this.initialName,
+    this.initialIcon,
+    this.initialConsentName,
+  });
 
   @override
   State<CategoryCreationDialog> createState() => _CategoryCreationDialogState();
 }
 
 class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
-  final _nameController = TextEditingController();
-  String _selectedIcon = "category"; // Default icon
+  late final TextEditingController _nameController;
+  late String _selectedIcon;
+  PlatformFile? _consentFile;
+  String? _existingConsentName;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.initialName);
+    _selectedIcon = widget.initialIcon ?? "category";
+    _existingConsentName = widget.initialConsentName;
+  }
 
   final List<Map<String, dynamic>> _icons = [
     {'name': 'Category', 'icon': Icons.category_outlined},
@@ -31,12 +52,25 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     super.dispose();
   }
 
+  Future<void> _pickConsent() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        _consentFile = result.files.first;
+        _existingConsentName = null;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StandardDialog(
-      title: widget.parentName == null 
-          ? "Create New Category" 
-          : "Add Subcategory to ${widget.parentName}",
+      title: widget.initialName != null 
+          ? "Edit Category" 
+          : (widget.parentName == null ? "Create New Category" : "Add Subcategory to ${widget.parentName}"),
       width: context.w(480),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,6 +110,37 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
               );
             }).toList(),
           ),
+          context.verticalSpace(24),
+          Text("Patient Consent Form (Optional)", style: context.fonts.black14w600),
+          context.verticalSpace(12),
+          InkWell(
+            onTap: _pickConsent,
+            child: Container(
+              padding: context.appEdgeInsets(all: 16),
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(color: CustomColors.border, style: BorderStyle.solid),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.picture_as_pdf_rounded, color: CustomColors.red, size: 24),
+                  context.horizontalSpace(16),
+                  Expanded(
+                    child: Text(
+                      _consentFile?.name ?? _existingConsentName ?? "Upload Default PDF",
+                      style: (_consentFile != null || _existingConsentName != null) 
+                          ? context.fonts.black14w600 
+                          : context.fonts.grey14w400,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const Icon(Icons.cloud_upload_outlined, color: CustomColors.grey, size: 20),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
       actions: [
@@ -91,10 +156,11 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                 Navigator.pop(context, {
                   'name': _nameController.text,
                   'icon': _selectedIcon,
+                  'consentFile': _consentFile,
                 });
               }
             },
-            child: const Text("Create"),
+            child: Text(widget.initialName != null ? "Update" : "Create"),
           ),
         ),
       ],

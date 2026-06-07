@@ -6,6 +6,8 @@ class CategoryItem {
   final String? parentId;
   final List<CategoryItem> children;
   final int sortOrder;
+  final String? consentFormUrl;
+  final String? consentFormName;
 
   CategoryItem({
     required this.id,
@@ -14,6 +16,8 @@ class CategoryItem {
     this.parentId,
     this.children = const [],
     this.sortOrder = 0,
+    this.consentFormUrl,
+    this.consentFormName,
   });
 
   CategoryItem copyWith({
@@ -23,6 +27,8 @@ class CategoryItem {
     String? parentId,
     List<CategoryItem>? children,
     int? sortOrder,
+    String? consentFormUrl,
+    String? consentFormName,
   }) {
     return CategoryItem(
       id: id ?? this.id,
@@ -31,6 +37,8 @@ class CategoryItem {
       parentId: parentId ?? this.parentId,
       children: children ?? this.children,
       sortOrder: sortOrder ?? this.sortOrder,
+      consentFormUrl: consentFormUrl ?? this.consentFormUrl,
+      consentFormName: consentFormName ?? this.consentFormName,
     );
   }
 }
