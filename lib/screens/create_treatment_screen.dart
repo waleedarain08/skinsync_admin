@@ -97,9 +97,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Basic Information",
       "Treatment Areas",
       "Protocols",
-      "Pre-Treatment",
-      "Post-Treatment",
-      "Logic & Materials"
+      "Pre-Treatment Instructions",
+      "Post-Treatment Instructions",
+      "Phase Notifications",
+      "Follow-Up Setup",
+      "Patient Consent",
+      "Materials & Logic",
+      "Pricing"
     ];
 
     return Container(
@@ -196,27 +200,39 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Basic Information",
       "Body Areas",
       "Clinical Protocols",
-      "Preparation Requirements",
-      "Recovery & Follow-Up",
-      "Clinical Logic"
+      "Pre-Treatment Instructions",
+      "Post-Treatment Instructions",
+      "Phase Notifications",
+      "Follow-Up Configuration",
+      "Patient Consent Form",
+      "Materials & Logic",
+      "Pricing Setup"
     ];
     final descriptions = [
       "Organize treatments to help patients and staff find them easily.",
-      "Core identification details including pricing and duration.",
+      "Core identification details including status and duration.",
       "Define mandatory sub-areas and max material quantities.",
       "Standardize procedures with checklists and required text fields.",
-      "Guidelines, clinical protocols, and automated preparation reminders.",
-      "Aftercare instructions and scheduled engagement rules.",
-      "Final configuration for materials, AI, and combinations."
+      "Detailed instructions and supporting media for patients before the procedure.",
+      "Aftercare guidelines and recovery media for patients after the procedure.",
+      "Automated reminders and follow-up engagement messages.",
+      "Manage rules and scheduling for post-procedure clinical check-ins.",
+      "Upload and manage legal procedural consent documentation.",
+      "Configure materials and AI simulator settings.",
+      "Finalize treatment base price and sub-area pricing adjustments."
     ];
     final icons = [
       Icons.category_outlined,
       Icons.description_outlined,
       Icons.accessibility_new_outlined,
       Icons.assignment_turned_in_outlined,
-      Icons.medical_services_outlined,
-      Icons.healing_outlined,
-      Icons.settings_suggest_outlined
+      Icons.login_rounded,
+      Icons.logout_rounded,
+      Icons.notifications_active_outlined,
+      Icons.replay_outlined,
+      Icons.fact_check_outlined,
+      Icons.inventory_2_outlined,
+      Icons.payments_outlined
     ];
 
     return Column(
@@ -267,6 +283,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
             Text("Clinical Protocol Form Preview", style: context.fonts.black16w600),
             context.verticalSpace(16),
             _buildProtocolFormPreview(context, state, dataState),
+            context.verticalSpace(32),
+            Text("Patient Journey Preview", style: context.fonts.black16w600),
+            context.verticalSpace(16),
+            _buildPatientJourneyPreview(context, state, viewModel),
             context.verticalSpace(32),
             Text("Configuration Summary", style: context.fonts.black16w600),
             context.verticalSpace(16),
@@ -475,6 +495,65 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildPatientJourneyPreview(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    final hasPreInstructions = viewModel.preTreatmentInstructionsController.text.isNotEmpty;
+    final hasPreNotification = viewModel.preNotificationTitleController.text.isNotEmpty;
+    final hasPostInstructions = viewModel.postTreatmentInstructionsController.text.isNotEmpty;
+    final hasPostNotification = viewModel.postNotificationTitleController.text.isNotEmpty;
+
+    return Container(
+      width: double.infinity,
+      padding: context.appEdgeInsets(all: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _previewRow(context, "Pre-Treatment Instructions", hasPreInstructions),
+          _previewRow(context, "Pre-Treatment Notification", hasPreNotification),
+          if (state.preTreatmentAttachments.isNotEmpty)
+            _previewText(context, "${state.preTreatmentAttachments.length} Pre-Treatment Files"),
+          context.verticalSpace(16),
+          _previewRow(context, "Post-Treatment Instructions", hasPostInstructions),
+          _previewRow(context, "Post-Treatment Notification", hasPostNotification),
+          if (state.postTreatmentAttachments.isNotEmpty)
+            _previewText(context, "${state.postTreatmentAttachments.length} Post-Treatment Files"),
+          context.verticalSpace(16),
+          _previewRow(context, "Follow-Up Required", state.isFollowUpRequired),
+          if (state.isFollowUpRequired) ...[
+            _previewText(context, "${viewModel.totalFollowUpsController.text} Follow-Ups"),
+            _previewText(context, state.followUpType == 'virtual' ? "Virtual Appointment" : "In-Person Appointment"),
+            _previewText(context, "${viewModel.followUpDurationValueController.text} ${state.followUpDurationUnit}"),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _previewRow(BuildContext context, String label, bool check) {
+    return Padding(
+      padding: context.appEdgeInsets(bottom: 8),
+      child: Row(
+        children: [
+          Icon(check ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded, 
+               size: 16, color: check ? CustomColors.green : CustomColors.grey),
+          context.horizontalSpace(12),
+          Expanded(child: Text(label, style: check ? context.fonts.black13w600 : context.fonts.grey13w500)),
+        ],
+      ),
+    );
+  }
+
+  Widget _previewText(BuildContext context, String text) {
+    return Padding(
+      padding: context.appEdgeInsets(left: 28, bottom: 4),
+      child: Text(text, style: context.fonts.grey12w400),
+    );
+  }
+
   Widget _buildMobileProgress(BuildContext context, TreatmentState state) {
     return Container(
       padding: context.appEdgeInsets(horizontal: 24, vertical: 16),
@@ -484,13 +563,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Step ${state.currentStep + 1} of 7", style: context.fonts.black14w700),
-              Text("${((state.currentStep + 1) / 7 * 100).toInt()}%", style: context.fonts.purple14w700),
+              Text("Step ${state.currentStep + 1} of 11", style: context.fonts.black14w700),
+              Text("${((state.currentStep + 1) / 11 * 100).toInt()}%", style: context.fonts.purple14w700),
             ],
           ),
           context.verticalSpace(8),
           LinearProgressIndicator(
-            value: (state.currentStep + 1) / 7,
+            value: (state.currentStep + 1) / 11,
             minHeight: context.h(4),
             backgroundColor: CustomColors.whiteGrey,
             valueColor: const AlwaysStoppedAnimation<Color>(CustomColors.purple),
@@ -506,11 +585,282 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 1: return _buildStepDetails(context, state, viewModel);
       case 2: return _buildStepAreas(context, state, viewModel, dataState);
       case 3: return _buildStepProtocolsStep(context, state, viewModel, dataState, ref);
-      case 4: return _buildStepPreTreatment(context, state, viewModel, dataState, ref);
-      case 5: return _buildStepPostTreatment(context, state, viewModel);
-      case 6: return _buildStepLogic(context, state, viewModel, dataState);
+      case 4: return _buildStepPreInstructions(context, state, viewModel);
+      case 5: return _buildStepPostInstructions(context, state, viewModel);
+      case 6: return _buildStepNotifications(context, state, viewModel);
+      case 7: return _buildStepFollowUp(context, state, viewModel);
+      case 8: return _buildStepConsent(context, state, viewModel);
+      case 9: return _buildStepLogic(context, state, viewModel, dataState);
+      case 10: return _buildStepPricing(context, state, viewModel);
       default: return const SizedBox.shrink();
     }
+  }
+
+  Widget _buildStepPricing(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle(context, "Base Pricing"),
+        context.verticalSpace(24),
+        BuildTextField(
+          label: "Treatment Base Price (\$)",
+          controller: viewModel.basePriceController,
+          hintText: "100",
+          keyboardType: TextInputType.number,
+          validator: Validators.empty,
+        ),
+        if (allSubAreas.isNotEmpty) ...[
+          context.verticalSpace(40),
+          _sectionTitle(context, "Sub-Area Pricing Adjustments"),
+          context.verticalSpace(8),
+          Text("Define specific pricing per sub-area if it differs from the base price.", style: context.fonts.grey14w400),
+          context.verticalSpace(24),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: allSubAreas.length,
+            separatorBuilder: (_, _) => context.verticalSpace(12),
+            itemBuilder: (context, index) {
+              final subArea = allSubAreas[index];
+              return Container(
+                padding: context.appEdgeInsets(all: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: context.appBorderRadius(all: 12),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.subdirectory_arrow_right, size: 18, color: CustomColors.black),
+                        context.horizontalSpace(8),
+                        Text(subArea.name, style: context.fonts.black14w600),
+                      ],
+                    ),
+                    context.verticalSpace(20),
+                    BuildTextField(
+                      label: "Base Price (\$)",
+                      controller: subArea.basePriceController,
+                      hintText: "0",
+                      keyboardType: TextInputType.number,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ],
+    );
+  }
+
+
+  Widget _buildStepPreInstructions(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        BuildTextField(
+          label: "Pre-Treatment Instructions",
+          controller: viewModel.preTreatmentInstructionsController,
+          hintText: "Instructions for the patient before their procedure...",
+          maxLines: 8,
+        ),
+        context.verticalSpace(32),
+        _buildAttachmentsField(context, state.preTreatmentAttachments, () => viewModel.pickAttachments(true), (idx) => viewModel.removeAttachment(true, idx)),
+      ],
+    );
+  }
+
+  Widget _buildStepPostInstructions(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        BuildTextField(
+          label: "Post-Treatment Instructions",
+          controller: viewModel.postTreatmentInstructionsController,
+          hintText: "Aftercare and recovery guidelines...",
+          maxLines: 8,
+        ),
+        context.verticalSpace(32),
+        _buildAttachmentsField(context, state.postTreatmentAttachments, () => viewModel.pickAttachments(false), (idx) => viewModel.removeAttachment(false, idx)),
+      ],
+    );
+  }
+
+  Widget _buildStepNotifications(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return Column(
+      children: [
+        _expandableSection(
+          context,
+          title: "Pre-Treatment Notification",
+          icon: Icons.notifications_none_rounded,
+          content: Column(
+            children: [
+              BuildTextField(
+                label: "Notification Title",
+                controller: viewModel.preNotificationTitleController,
+                hintText: "e.g. Appointment Reminder",
+              ),
+              context.verticalSpace(20),
+              BuildTextField(
+                label: "Notification Description",
+                controller: viewModel.preNotificationDescriptionController,
+                hintText: "Body of the notification",
+                maxLines: 3,
+              ),
+              context.verticalSpace(20),
+              _buildOffsetDropdown(
+                context,
+                label: "Reminder Timing (Minutes Before)",
+                value: state.preNotificationOffset,
+                options: {
+                  15: "15 Minutes Before",
+                  30: "30 Minutes Before",
+                  60: "1 Hour Before",
+                  120: "2 Hours Before",
+                  360: "6 Hours Before",
+                  720: "12 Hours Before",
+                  1440: "24 Hours Before",
+                },
+                onChanged: (val) => viewModel.setPreNotificationOffset(val),
+              ),
+            ],
+          ),
+        ),
+        context.verticalSpace(24),
+        _expandableSection(
+          context,
+          title: "Post-Treatment Notification",
+          icon: Icons.notifications_active_outlined,
+          content: Column(
+            children: [
+              BuildTextField(
+                label: "Notification Title",
+                controller: viewModel.postNotificationTitleController,
+                hintText: "e.g. Aftercare Reminder",
+              ),
+              context.verticalSpace(20),
+              BuildTextField(
+                label: "Notification Description",
+                controller: viewModel.postNotificationDescriptionController,
+                hintText: "Body of the notification",
+                maxLines: 3,
+              ),
+              context.verticalSpace(20),
+              _buildOffsetDropdown(
+                context,
+                label: "Engagement Timing (Minutes After)",
+                value: state.postNotificationOffset,
+                options: {
+                  0: "Immediately After",
+                  60: "1 Hour After",
+                  360: "6 Hours After",
+                  1440: "24 Hours After",
+                  2880: "2 Days After",
+                  10080: "7 Days After",
+                },
+                onChanged: (val) => viewModel.setPostNotificationOffset(val),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepFollowUp(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _radioOption(context, "Active Follow-Up", state.isFollowUpRequired, () => viewModel.toggleFollowUpRequired(true)),
+            context.horizontalSpace(32),
+            _radioOption(context, "No Follow-Up", !state.isFollowUpRequired, () => viewModel.toggleFollowUpRequired(false)),
+          ],
+        ),
+        if (state.isFollowUpRequired) ...[
+          context.verticalSpace(32),
+          _buildFollowUpSection(
+            context,
+            isFollowUpRequired: state.isFollowUpRequired,
+            onFollowUpToggle: (_) {}, // Handled by radio buttons above
+            totalFollowUpsController: viewModel.totalFollowUpsController,
+            followUpType: state.followUpType,
+            onFollowUpTypeChanged: (val) => viewModel.setFollowUpType(val),
+            followUpDurationValueController: viewModel.followUpDurationValueController,
+            followUpDurationUnit: state.followUpDurationUnit!,
+            onFollowUpDurationUnitChanged: (val) => viewModel.setFollowUpDurationUnit(val),
+            followUpNotesController: viewModel.followUpNotesController,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _radioOption(BuildContext context, String label, bool isSelected, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: context.appBorderRadius(all: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Radio<bool>(
+            value: true,
+            groupValue: isSelected,
+            onChanged: (_) => onTap(),
+            activeColor: CustomColors.purple,
+          ),
+          Text(label, style: context.fonts.black14w600),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepConsent(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildConsentFormSection(context, state.preTreatmentConsentForm, () => viewModel.pickConsentForm(), () => viewModel.removeConsentForm()),
+        context.verticalSpace(24),
+        Text(
+          "This consent form will be presented to patients in the app. They must digitally sign it before the procedure begins.",
+          style: context.fonts.grey14w400,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOffsetDropdown(BuildContext context, {required String label, required int? value, required Map<int, String> options, required Function(int?) onChanged}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: context.fonts.black14w600),
+        context.verticalSpace(10),
+        Container(
+          padding: context.appEdgeInsets(horizontal: 16),
+          decoration: BoxDecoration(
+            color: CustomColors.whiteGrey,
+            borderRadius: context.appBorderRadius(all: 12),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              value: value,
+              hint: Text("Select timing", style: context.fonts.grey14w400),
+              isExpanded: true,
+              dropdownColor: Colors.white,
+              borderRadius: context.appBorderRadius(all: 12),
+              items: options.entries.map((e) => DropdownMenuItem<int>(value: e.key, child: Text(e.value, style: context.fonts.black14w400))).toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildStepProtocolsStep(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
@@ -522,84 +872,37 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStepPreTreatment(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildJourneySection(
-          context,
-          title: "Pre-Treatment Phase",
-          instructionController: viewModel.preTreatmentInstructionsController,
-          instructionLabel: "Preparation Instructions",
-          notificationTitleController: viewModel.preNotificationTitleController,
-          notificationDescController: viewModel.preNotificationDescriptionController,
-          selectedOffset: state.preNotificationOffset,
-          offsetOptions: {
-            15: "15 Minutes Before",
-            30: "30 Minutes Before",
-            60: "1 Hour Before",
-            120: "2 Hours Before",
-            360: "6 Hours Before",
-            720: "12 Hours Before",
-            1440: "24 Hours Before",
-          },
-          offsetLabel: "Send automated reminder",
-          onOffsetChanged: (val) => viewModel.setPreNotificationOffset(val),
-          attachments: state.preTreatmentAttachments,
-          onPickAttachments: () => viewModel.pickAttachments(true),
-          onRemoveAttachment: (idx) => viewModel.removeAttachment(true, idx),
-          isPreTreatment: true,
-          dataState: dataState,
-          ref: ref,
-          selectedProtocolIds: state.selectedProtocolIds,
-          onProtocolToggle: (id) => viewModel.toggleProtocolSelection(id),
-          consentForm: state.preTreatmentConsentForm,
-          onPickConsent: () => viewModel.pickConsentForm(),
-          onRemoveConsent: () => viewModel.removeConsentForm(),
+  Widget _expandableSection(BuildContext context, {required String title, required IconData icon, required Widget content}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: true,
+          leading: Container(
+            padding: context.appEdgeInsets(all: 8),
+            decoration: BoxDecoration(color: CustomColors.purple.withValues(alpha: 0.1), shape: BoxShape.circle),
+            child: Icon(icon, color: CustomColors.purple, size: 18),
+          ),
+          title: Text(title, style: context.fonts.black16w600),
+          children: [
+            const Divider(height: 1),
+            Padding(
+              padding: context.appEdgeInsets(all: 24),
+              child: content,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildStepPostTreatment(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildJourneySection(
-          context,
-          title: "Post-Treatment Phase",
-          instructionController: viewModel.postTreatmentInstructionsController,
-          instructionLabel: "Aftercare Instructions",
-          notificationTitleController: viewModel.postNotificationTitleController,
-          notificationDescController: viewModel.postNotificationDescriptionController,
-          selectedOffset: state.postNotificationOffset,
-          offsetOptions: {
-            0: "Immediately After",
-            60: "1 Hour After",
-            360: "6 Hours After",
-            1440: "24 Hours After",
-            2880: "2 Days After",
-            10080: "7 Days After",
-          },
-          offsetLabel: "Send follow-up notification",
-          onOffsetChanged: (val) => viewModel.setPostNotificationOffset(val),
-          attachments: state.postTreatmentAttachments,
-          onPickAttachments: () => viewModel.pickAttachments(false),
-          onRemoveAttachment: (idx) => viewModel.removeAttachment(false, idx),
-          isPostTreatment: true,
-          isFollowUpRequired: state.isFollowUpRequired,
-          onFollowUpToggle: (val) => viewModel.toggleFollowUpRequired(val),
-          totalFollowUpsController: viewModel.totalFollowUpsController,
-          followUpType: state.followUpType,
-          onFollowUpTypeChanged: (val) => viewModel.setFollowUpType(val),
-          followUpDurationValueController: viewModel.followUpDurationValueController,
-          followUpDurationUnit: state.followUpDurationUnit,
-          onFollowUpDurationUnitChanged: (val) => viewModel.setFollowUpDurationUnit(val),
-          followUpNotesController: viewModel.followUpNotesController,
-        ),
-      ],
-    );
-  }
+
+
 
   Widget _buildJourneySection(
     BuildContext context, {
@@ -1094,14 +1397,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
           ],
         ),
         context.verticalSpace(24),
-        BuildTextField(
-          label: "Treatment Base Price (\$)",
-          controller: viewModel.basePriceController,
-          hintText: "100",
-          keyboardType: TextInputType.number,
-          validator: Validators.empty,
-        ),
-        context.verticalSpace(24),
         Text("Base Duration", style: context.fonts.black14w600),
         context.verticalSpace(10),
         Row(
@@ -1363,9 +1658,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle(context, "Materials & Configuration"),
+        _sectionTitle(context, "Materials & Inventory"),
         context.verticalSpace(8),
-        Text("Define the materials used and specific configuration per sub-area.", style: context.fonts.grey14w400),
+        Text("Define the materials used and maximum quantity allowed per sub-area.", style: context.fonts.grey14w400),
         context.verticalSpace(32),
         _buildSearchField(
           context,
@@ -1377,7 +1672,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ),
         if (allSubAreas.isNotEmpty) ...[
           context.verticalSpace(32),
-          Text("Material Configuration Per Sub-Area", style: context.fonts.black16w400),
+          Text("Inventory Configuration Per Sub-Area", style: context.fonts.black16w400),
           context.verticalSpace(16),
           ListView.separated(
             shrinkWrap: true,
@@ -1386,7 +1681,33 @@ class CreateTreatmentScreen extends ConsumerWidget {
             separatorBuilder: (_, _) => context.verticalSpace(12),
             itemBuilder: (context, index) {
               final subArea = allSubAreas[index];
-              return _buildSubAreaMaterialConfig(context, subArea);
+              return Container(
+                padding: context.appEdgeInsets(all: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: context.appBorderRadius(all: 12),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.subdirectory_arrow_right, size: 18, color: CustomColors.black),
+                        context.horizontalSpace(8),
+                        Text(subArea.name, style: context.fonts.black14w600),
+                      ],
+                    ),
+                    context.verticalSpace(20),
+                    BuildTextField(
+                      label: "Max Quantity",
+                      controller: subArea.maxQuantityController,
+                      hintText: "0",
+                      keyboardType: TextInputType.number,
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         ],
@@ -1721,7 +2042,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final bool isLastStep = state.currentStep == 6;
+    final bool isLastStep = state.currentStep == 10;
 
     return Row(
       children: [
@@ -1745,7 +2066,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 if (!_validateSubAreas(context, state)) return;
               }
               
-              if (state.currentStep < 6) {
+              if (state.currentStep < 10) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel.submitTreatment(context).then((_) {
@@ -1762,8 +2083,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
   bool _validateStepDetails(BuildContext context, TreatmentViewModel viewModel) {
     if (viewModel.internalNameController.text.isEmpty ||
-        viewModel.displayNameController.text.isEmpty ||
-        viewModel.basePriceController.text.isEmpty) {
+        viewModel.displayNameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.red),
       );
