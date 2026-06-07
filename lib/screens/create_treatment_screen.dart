@@ -524,9 +524,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
           context.verticalSpace(16),
           _previewRow(context, "Follow-Up Required", state.isFollowUpRequired),
           if (state.isFollowUpRequired) ...[
-            _previewText(context, "${viewModel.totalFollowUpsController.text} Follow-Ups"),
-            _previewText(context, state.followUpType == 'virtual' ? "Virtual Appointment" : "In-Person Appointment"),
-            _previewText(context, "${viewModel.followUpDurationValueController.text} ${state.followUpDurationUnit}"),
+            _previewText(context, "${state.followUpEntries.length} Follow-Ups"),
+            ...state.followUpEntries.asMap().entries.map((entry) {
+              final idx = entry.key + 1;
+              final e = entry.value;
+              return _previewText(context, "FU $idx: ${e.type.toUpperCase()} - ${e.durationValueController.text} ${e.durationUnit}");
+            }),
           ],
         ],
       ),
@@ -785,20 +788,162 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ),
         if (state.isFollowUpRequired) ...[
           context.verticalSpace(32),
-          _buildFollowUpSection(
-            context,
-            isFollowUpRequired: state.isFollowUpRequired,
-            onFollowUpToggle: (_) {}, // Handled by radio buttons above
-            totalFollowUpsController: viewModel.totalFollowUpsController,
-            followUpType: state.followUpType,
-            onFollowUpTypeChanged: (val) => viewModel.setFollowUpType(val),
-            followUpDurationValueController: viewModel.followUpDurationValueController,
-            followUpDurationUnit: state.followUpDurationUnit!,
-            onFollowUpDurationUnitChanged: (val) => viewModel.setFollowUpDurationUnit(val),
-            followUpNotesController: viewModel.followUpNotesController,
+          BuildTextField(
+            label: "Total Follow-Ups",
+            controller: viewModel.totalFollowUpsController,
+            hintText: "e.g. 1",
+            keyboardType: TextInputType.number,
+            onChanged: (String? val) => viewModel.updateFollowUpCount(val ?? ''),
+          ),
+          context.verticalSpace(32),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: state.followUpEntries.length,
+            separatorBuilder: (_, __) => context.verticalSpace(24),
+            itemBuilder: (context, index) {
+              return _buildFollowUpEntryCard(context, index, state.followUpEntries[index], viewModel);
+            },
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildFollowUpEntryCard(BuildContext context, int index, FollowUpEntry entry, TreatmentViewModel viewModel) {
+    return Container(
+      padding: context.appEdgeInsets(all: 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 16),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: CustomColors.purple.withValues(alpha: 0.1),
+                  borderRadius: context.appBorderRadius(all: 20),
+                ),
+                child: Text("Follow-Up ${index + 1}", style: context.fonts.purple12w700),
+              ),
+            ],
+          ),
+          context.verticalSpace(20),
+          Row(
+            children: [
+              Expanded(
+                child: CustomDropdown<String>(
+                  label: "Appointment Type",
+                  hintText: "Select type",
+                  value: entry.type,
+                  items: const [
+                    DropdownMenuItem(value: 'virtual', child: Text("Virtual")),
+                    DropdownMenuItem(value: 'in_person', child: Text("In-Person")),
+                  ],
+                  onChanged: (val) => viewModel.updateFollowUpEntry(index, type: val),
+                ),
+              ),
+              context.horizontalSpace(24),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Duration", style: context.fonts.black14w600),
+                    context.verticalSpace(10),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: BuildTextField(
+                            label: "Value",
+                            controller: entry.durationValueController,
+                            hintText: "30",
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        context.horizontalSpace(12),
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            margin: context.appEdgeInsets(top: 24),
+                            child: CustomDropdown<String>(
+                              label: "",
+                              hintText: "Unit",
+                              value: entry.durationUnit,
+                              items: const [
+                                DropdownMenuItem(value: 'minutes', child: Text("Minutes")),
+                                DropdownMenuItem(value: 'hours', child: Text("Hours")),
+                              ],
+                              onChanged: (val) => viewModel.updateFollowUpEntry(index, durationUnit: val),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(20),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Scheduling Interval", style: context.fonts.black14w600),
+                    context.verticalSpace(10),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: BuildTextField(
+                            label: "Interval",
+                            controller: entry.intervalValueController,
+                            hintText: "1",
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        context.horizontalSpace(12),
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            margin: context.appEdgeInsets(top: 24),
+                            child: CustomDropdown<String>(
+                              label: "",
+                              hintText: "Unit",
+                              value: entry.intervalUnit,
+                              items: const [
+                                DropdownMenuItem(value: 'days', child: Text("Days After")),
+                                DropdownMenuItem(value: 'weeks', child: Text("Weeks After")),
+                              ],
+                              onChanged: (val) => viewModel.updateFollowUpEntry(index, intervalUnit: val),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+          context.verticalSpace(20),
+          BuildTextField(
+            label: "Clinical Notes",
+            controller: entry.notesController,
+            hintText: "Specific instructions for this follow-up...",
+            maxLines: 3,
+          ),
+        ],
+      ),
     );
   }
 

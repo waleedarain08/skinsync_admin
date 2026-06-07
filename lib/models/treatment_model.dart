@@ -34,11 +34,7 @@ class TreatmentModel {
   
   // Follow-Up Fields
   bool isFollowUpRequired;
-  int? totalFollowUps;
-  String? followUpType; // virtual | in_person
-  int? followUpDurationValue;
-  String? followUpDurationUnit; // minutes | hours
-  String? followUpNotes;
+  List<FollowUpConfig>? followUps;
 
   TreatmentModel({
     this.id,
@@ -74,11 +70,7 @@ class TreatmentModel {
     this.postTreatmentAttachments,
     this.preTreatmentConsentForm,
     this.isFollowUpRequired = false,
-    this.totalFollowUps,
-    this.followUpType,
-    this.followUpDurationValue,
-    this.followUpDurationUnit,
-    this.followUpNotes,
+    this.followUps,
   });
 
   TreatmentModel.fromJson(Map<String, dynamic> json)
@@ -133,11 +125,9 @@ class TreatmentModel {
     preTreatmentConsentForm = json['pre_treatment_consent_form'] != null 
         ? Attachment.fromJson(json['pre_treatment_consent_form']) 
         : null;
-    totalFollowUps = json['total_follow_ups'];
-    followUpType = json['follow_up_type'];
-    followUpDurationValue = json['follow_up_duration_value'];
-    followUpDurationUnit = json['follow_up_duration_unit'];
-    followUpNotes = json['follow_up_notes'];
+    followUps = json['follow_ups'] != null
+        ? (json['follow_ups'] as List).map((e) => FollowUpConfig.fromJson(e)).toList()
+        : null;
   }
 
   TreatmentModel copyWith({
@@ -174,11 +164,7 @@ class TreatmentModel {
     List<Attachment>? postTreatmentAttachments,
     Attachment? preTreatmentConsentForm,
     bool? isFollowUpRequired,
-    int? totalFollowUps,
-    String? followUpType,
-    int? followUpDurationValue,
-    String? followUpDurationUnit,
-    String? followUpNotes,
+    List<FollowUpConfig>? followUps,
   }) {
     return TreatmentModel(
       id: id ?? this.id,
@@ -214,11 +200,7 @@ class TreatmentModel {
       postTreatmentAttachments: postTreatmentAttachments ?? this.postTreatmentAttachments,
       preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
-      totalFollowUps: totalFollowUps ?? this.totalFollowUps,
-      followUpType: followUpType ?? this.followUpType,
-      followUpDurationValue: followUpDurationValue ?? this.followUpDurationValue,
-      followUpDurationUnit: followUpDurationUnit ?? this.followUpDurationUnit,
-      followUpNotes: followUpNotes ?? this.followUpNotes,
+      followUps: followUps ?? this.followUps,
     );
   }
 
@@ -257,13 +239,45 @@ class TreatmentModel {
       'post_treatment_attachments': postTreatmentAttachments?.map((e) => e.toJson()).toList(),
       'pre_treatment_consent_form': preTreatmentConsentForm?.toJson(),
       'is_follow_up_required': isFollowUpRequired,
-      'total_follow_ups': totalFollowUps,
-      'follow_up_type': followUpType,
-      'follow_up_duration_value': followUpDurationValue,
-      'follow_up_duration_unit': followUpDurationUnit,
-      'follow_up_notes': followUpNotes,
+      'follow_ups': followUps?.map((e) => e.toJson()).toList(),
     };
   }
+}
+
+class FollowUpConfig {
+  String type; // virtual | in_person
+  int? durationValue;
+  String durationUnit; // minutes | hours
+  String? notes;
+  int? intervalValue;
+  String? intervalUnit; // days | weeks
+
+  FollowUpConfig({
+    required this.type,
+    this.durationValue,
+    this.durationUnit = 'minutes',
+    this.notes,
+    this.intervalValue,
+    this.intervalUnit = 'days',
+  });
+
+  factory FollowUpConfig.fromJson(Map<String, dynamic> json) => FollowUpConfig(
+    type: json['type'] ?? 'virtual',
+    durationValue: json['duration_value'],
+    durationUnit: json['duration_unit'] ?? 'minutes',
+    notes: json['notes'],
+    intervalValue: json['interval_value'],
+    intervalUnit: json['interval_unit'],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'type': type,
+    'duration_value': durationValue,
+    'duration_unit': durationUnit,
+    'notes': notes,
+    'interval_value': intervalValue,
+    'interval_unit': intervalUnit,
+  };
 }
 
 

@@ -156,6 +156,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     materialNameController.clear();
     maxMaterialQuantityController.text = '0';
     
+    for (var entry in state.followUpEntries) {
+      entry.dispose();
+    }
+
     for (var area in state.areas) {
       area.dispose();
     }
@@ -171,13 +175,12 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       preTreatmentConsentForm: null,
       existingConsentForm: null,
       areas: [AreaViewModelEntry()],
+      followUpEntries: [],
       selectedTreatment: null,
       useInAiSimulator: false,
       selectedProtocolIds: [],
       status: 'active',
       isFollowUpRequired: false,
-      followUpType: null,
-      followUpDurationUnit: 'minutes',
     );
   }
 
@@ -193,6 +196,35 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   void setStatus(String status) {
     state = state.copyWith(status: status);
+  }
+
+  void updateFollowUpCount(String val) {
+    final count = int.tryParse(val) ?? 0;
+    final currentEntries = [...state.followUpEntries];
+    
+    if (count > currentEntries.length) {
+      // Add new entries
+      for (int i = currentEntries.length; i < count; i++) {
+        currentEntries.add(FollowUpEntry());
+      }
+    } else if (count < currentEntries.length) {
+      // Remove extra entries
+      for (int i = currentEntries.length - 1; i >= count; i--) {
+        currentEntries[i].dispose();
+        currentEntries.removeAt(i);
+      }
+    }
+    state = state.copyWith(followUpEntries: currentEntries);
+  }
+
+  void updateFollowUpEntry(int index, {String? type, String? durationUnit, String? intervalUnit}) {
+    final updatedEntries = [...state.followUpEntries];
+    updatedEntries[index] = updatedEntries[index].copyWith(
+      type: type,
+      durationUnit: durationUnit,
+      intervalUnit: intervalUnit,
+    );
+    state = state.copyWith(followUpEntries: updatedEntries);
   }
 
   void selectTreatment(TreatmentModel treatment) {
@@ -214,9 +246,24 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     postNotificationTitleController.text = treatment.postTreatmentNotificationTitle ?? '';
     postNotificationDescriptionController.text = treatment.postTreatmentNotificationDescription ?? '';
 
-    totalFollowUpsController.text = treatment.totalFollowUps?.toString() ?? '';
-    followUpDurationValueController.text = treatment.followUpDurationValue?.toString() ?? '';
-    followUpNotesController.text = treatment.followUpNotes ?? '';
+    // Follow Up Entries
+    for (var entry in state.followUpEntries) {
+      entry.dispose();
+    }
+    final List<FollowUpEntry> newFollowUpEntries = [];
+    if (treatment.followUps != null) {
+      for (var config in treatment.followUps!) {
+        newFollowUpEntries.add(FollowUpEntry(
+          type: config.type,
+          durationUnit: config.durationUnit,
+          durationValueController: TextEditingController(text: config.durationValue?.toString() ?? ''),
+          notesController: TextEditingController(text: config.notes ?? ''),
+          intervalValueController: TextEditingController(text: config.intervalValue?.toString() ?? ''),
+          intervalUnit: config.intervalUnit ?? 'days',
+        ));
+      }
+    }
+    totalFollowUpsController.text = newFollowUpEntries.length.toString();
 
     categoryIdController.text = treatment.categoryId ?? '';
     categoryNameController.text = treatment.categoryName ?? '';
@@ -260,9 +307,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       existingPostAttachments: treatment.postTreatmentAttachments ?? [],
       preTreatmentConsentForm: null,
       existingConsentForm: treatment.preTreatmentConsentForm,
+      followUpEntries: newFollowUpEntries,
       isFollowUpRequired: treatment.isFollowUpRequired,
-      followUpType: treatment.followUpType,
-      followUpDurationUnit: treatment.followUpDurationUnit ?? 'minutes',
       preNotificationOffset: treatment.preTreatmentNotificationOffset,
       postNotificationOffset: treatment.postTreatmentNotificationOffset,
     );
@@ -447,14 +493,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   // Follow-Up Actions
   void toggleFollowUpRequired(bool? value) {
     state = state.copyWith(isFollowUpRequired: value ?? false);
-  }
-
-  void setFollowUpType(String? type) {
-    state = state.copyWith(followUpType: type);
-  }
-
-  void setFollowUpDurationUnit(String? unit) {
-    state = state.copyWith(followUpDurationUnit: unit);
+    if (state.isFollowUpRequired && state.followUpEntries.isEmpty) {
+      updateFollowUpCount('1');
+      totalFollowUpsController.text = '1';
+    }
   }
 
   // Filter Logic
@@ -602,11 +644,14 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 : state.existingConsentForm)
             : null,
         isFollowUpRequired: state.isFollowUpRequired,
-        totalFollowUps: int.tryParse(totalFollowUpsController.text),
-        followUpType: state.followUpType,
-        followUpDurationValue: int.tryParse(followUpDurationValueController.text),
-        followUpDurationUnit: state.followUpDurationUnit,
-        followUpNotes: followUpNotesController.text,
+        followUps: state.followUpEntries.map((e) => FollowUpConfig(
+          type: e.type,
+          durationValue: int.tryParse(e.durationValueController.text),
+          durationUnit: e.durationUnit,
+          notes: e.notesController.text,
+          intervalValue: int.tryParse(e.intervalValueController.text),
+          intervalUnit: e.intervalUnit,
+        )).toList(),
         sideAreas: state.areas.map((a) => SideAreaModel(
           name: a.areaController.text,
           subAreas: a.subAreas.map((s) => SubAreaModel(
@@ -667,11 +712,10 @@ class TreatmentState extends BaseStateModel {
   final PlatformFile? preTreatmentConsentForm;
   final Attachment? existingConsentForm;
   final String consentType; // category | custom
+  final List<FollowUpEntry> followUpEntries;
 
   // Follow-Up fields
   final bool isFollowUpRequired;
-  final String? followUpType;
-  final String? followUpDurationUnit;
 
   // Step 4 fields
   final bool useInAiSimulator;
@@ -700,9 +744,8 @@ class TreatmentState extends BaseStateModel {
     this.preTreatmentConsentForm,
     this.existingConsentForm,
     this.consentType = 'category',
+    this.followUpEntries = const [],
     this.isFollowUpRequired = false,
-    this.followUpType,
-    this.followUpDurationUnit = 'minutes',
     this.useInAiSimulator = false,
     List<AreaViewModelEntry>? areas,
   }) : areas = areas ?? [AreaViewModelEntry()];
@@ -732,9 +775,8 @@ class TreatmentState extends BaseStateModel {
     PlatformFile? preTreatmentConsentForm,
     Attachment? existingConsentForm,
     String? consentType,
+    List<FollowUpEntry>? followUpEntries,
     bool? isFollowUpRequired,
-    String? followUpType,
-    String? followUpDurationUnit,
     bool? useInAiSimulator,
   }) {
     return TreatmentState(
@@ -762,9 +804,8 @@ class TreatmentState extends BaseStateModel {
       preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
       existingConsentForm: existingConsentForm ?? this.existingConsentForm,
       consentType: consentType ?? this.consentType,
+      followUpEntries: followUpEntries ?? this.followUpEntries,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
-      followUpType: followUpType ?? this.followUpType,
-      followUpDurationUnit: followUpDurationUnit ?? this.followUpDurationUnit,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
     );
   }
@@ -781,6 +822,47 @@ class AreaViewModelEntry {
     for (var sub in subAreas) {
       sub.dispose();
     }
+  }
+}
+
+class FollowUpEntry {
+  final String type; // virtual | in_person
+  final String durationUnit;
+  final TextEditingController durationValueController;
+  final TextEditingController notesController;
+  final TextEditingController intervalValueController;
+  final String intervalUnit;
+
+  FollowUpEntry({
+    this.type = 'virtual',
+    this.durationUnit = 'minutes',
+    TextEditingController? durationValueController,
+    TextEditingController? notesController,
+    TextEditingController? intervalValueController,
+    this.intervalUnit = 'days',
+  }) : durationValueController = durationValueController ?? TextEditingController(),
+       notesController = notesController ?? TextEditingController(),
+       intervalValueController = intervalValueController ?? TextEditingController();
+
+  FollowUpEntry copyWith({
+    String? type,
+    String? durationUnit,
+    String? intervalUnit,
+  }) {
+    return FollowUpEntry(
+      type: type ?? this.type,
+      durationUnit: durationUnit ?? this.durationUnit,
+      durationValueController: durationValueController,
+      notesController: notesController,
+      intervalValueController: intervalValueController,
+      intervalUnit: intervalUnit ?? this.intervalUnit,
+    );
+  }
+
+  void dispose() {
+    durationValueController.dispose();
+    notesController.dispose();
+    intervalValueController.dispose();
   }
 }
 

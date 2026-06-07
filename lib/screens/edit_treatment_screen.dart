@@ -286,39 +286,22 @@ class EditTreatmentScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildJourneySubSection(
-            context,
-            title: "Pre-Treatment Phase",
-            instructionController: viewModel.preTreatmentInstructionsController,
-            instructionLabel: "Preparation Instructions",
-            notificationTitleController: viewModel.preNotificationTitleController,
-            notificationDescController: viewModel.preNotificationDescriptionController,
-            selectedOffset: state.preNotificationOffset,
-            offsetOptions: {
-              15: "15 Minutes Before",
-              30: "30 Minutes Before",
-              60: "1 Hour Before",
-              120: "2 Hours Before",
-              360: "6 Hours Before",
-              720: "12 Hours Before",
-              1440: "24 Hours Before",
-            },
-            offsetLabel: "Send automated reminder",
-            onOffsetChanged: (val) => viewModel.setPreNotificationOffset(val),
-            existingAttachments: state.existingPreAttachments,
-            newAttachments: state.preTreatmentAttachments,
-            onPickAttachments: () => viewModel.pickAttachments(true),
-            onRemoveExisting: (idx) => viewModel.removeExistingAttachment(true, idx),
-            onRemoveNew: (idx) => viewModel.removeAttachment(true, idx),
-            isPreTreatment: true,
-            dataState: dataState,
-            ref: ref,
-            selectedProtocolIds: state.selectedProtocolIds,
-            onProtocolToggle: (id) => viewModel.toggleProtocolSelection(id),
-            consentForm: state.preTreatmentConsentForm,
-            existingConsent: state.existingConsentForm,
-            onPickConsent: () => viewModel.pickConsentForm(),
-            onRemoveConsent: () => viewModel.removeConsentForm(),
+          Text("Pre-Treatment Instructions", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          BuildTextField(
+            label: "Instructions",
+            controller: viewModel.preTreatmentInstructionsController,
+            hintText: "Detailed instructions...",
+            maxLines: 5,
+          ),
+          context.verticalSpace(32),
+          _buildAttachmentsField(
+            context, 
+            state.existingPreAttachments, 
+            state.preTreatmentAttachments, 
+            () => viewModel.pickAttachments(true), 
+            (idx) => viewModel.removeExistingAttachment(true, idx), 
+            (idx) => viewModel.removeAttachment(true, idx)
           ),
         ],
       ),
@@ -331,197 +314,476 @@ class EditTreatmentScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildJourneySubSection(
-            context,
-            title: "Post-Treatment Phase",
-            instructionController: viewModel.postTreatmentInstructionsController,
-            instructionLabel: "Aftercare Instructions",
-            notificationTitleController: viewModel.postNotificationTitleController,
-            notificationDescController: viewModel.postNotificationDescriptionController,
-            selectedOffset: state.postNotificationOffset,
-            offsetOptions: {
-              0: "Immediately",
-              60: "1 Hour After",
-              360: "6 Hours After",
-              1440: "24 Hours After",
-              2880: "2 Days After",
-              10080: "7 Days After",
-            },
-            offsetLabel: "Send follow-up notification",
-            onOffsetChanged: (val) => viewModel.setPostNotificationOffset(val),
-            existingAttachments: state.existingPostAttachments,
-            newAttachments: state.postTreatmentAttachments,
-            onPickAttachments: () => viewModel.pickAttachments(false),
-            onRemoveExisting: (idx) => viewModel.removeExistingAttachment(false, idx),
-            onRemoveNew: (idx) => viewModel.removeAttachment(false, idx),
-            isPostTreatment: true,
-            isFollowUpRequired: state.isFollowUpRequired,
-            onFollowUpToggle: (val) => viewModel.toggleFollowUpRequired(val),
-            totalFollowUpsController: viewModel.totalFollowUpsController,
-            followUpType: state.followUpType,
-            onFollowUpTypeChanged: (val) => viewModel.setFollowUpType(val),
-            followUpDurationValueController: viewModel.followUpDurationValueController,
-            followUpDurationUnit: state.followUpDurationUnit,
-            onFollowUpDurationUnitChanged: (val) => viewModel.setFollowUpDurationUnit(val),
-            followUpNotesController: viewModel.followUpNotesController,
+          Text("Post-Treatment Instructions", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          BuildTextField(
+            label: "Aftercare Guidelines",
+            controller: viewModel.postTreatmentInstructionsController,
+            hintText: "Detailed instructions...",
+            maxLines: 5,
+          ),
+          context.verticalSpace(32),
+          _buildAttachmentsField(
+            context, 
+            state.existingPostAttachments, 
+            state.postTreatmentAttachments, 
+            () => viewModel.pickAttachments(false), 
+            (idx) => viewModel.removeExistingAttachment(false, idx), 
+            (idx) => viewModel.removeAttachment(false, idx)
           ),
         ],
       ),
     );
   }
 
-  Widget _buildJourneySubSection(
-    BuildContext context, {
-    required String title,
-    required TextEditingController instructionController,
-    required String instructionLabel,
-    required TextEditingController notificationTitleController,
-    required TextEditingController notificationDescController,
-    required int? selectedOffset,
-    required Map<int, String> offsetOptions,
-    required String offsetLabel,
-    required Function(int?) onOffsetChanged,
-    required List<Attachment> existingAttachments,
-    required List<PlatformFile> newAttachments,
-    required VoidCallback onPickAttachments,
-    required Function(int) onRemoveExisting,
-    required Function(int) onRemoveNew,
-    bool isPreTreatment = false,
-    bool isPostTreatment = false,
-    TreatmentDataState? dataState,
-    WidgetRef? ref,
-    List<String>? selectedProtocolIds,
-    Function(String)? onProtocolToggle,
-    PlatformFile? consentForm,
-    Attachment? existingConsent,
-    VoidCallback? onPickConsent,
-    VoidCallback? onRemoveConsent,
-    bool isFollowUpRequired = false,
-    Function(bool?)? onFollowUpToggle,
-    TextEditingController? totalFollowUpsController,
-    String? followUpType,
-    Function(String?)? onFollowUpTypeChanged,
-    TextEditingController? followUpDurationValueController,
-    String? followUpDurationUnit,
-    Function(String?)? onFollowUpDurationUnitChanged,
-    TextEditingController? followUpNotesController,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              width: context.w(4),
-              height: context.h(20),
-              decoration: BoxDecoration(
-                color: CustomColors.purple,
-                borderRadius: context.appBorderRadius(all: 2),
-              ),
-            ),
-            context.horizontalSpace(12),
-            Text(title, style: context.fonts.black16w600),
-          ],
-        ),
-        context.verticalSpace(24),
-        BuildTextField(
-          label: instructionLabel,
-          controller: instructionController,
-          hintText: "Detailed instructions...",
-          maxLines: 5,
-        ),
-        context.verticalSpace(32),
-        if (isPreTreatment && dataState != null && ref != null && selectedProtocolIds != null && onProtocolToggle != null) ...[
-          _buildJourneyProtocols(context, dataState, ref, selectedProtocolIds, onProtocolToggle),
-          context.verticalSpace(32),
-          _buildConsentFormSection(context, consentForm, existingConsent, onPickConsent!, onRemoveConsent!),
-          context.verticalSpace(32),
-        ],
-        _buildAttachmentsField(
-          context, 
-          existingAttachments, 
-          newAttachments, 
-          onPickAttachments, 
-          onRemoveExisting, 
-          onRemoveNew
-        ),
-        context.verticalSpace(32),
-        Container(
-          padding: context.appEdgeInsets(all: 20),
-          decoration: BoxDecoration(
-            color: CustomColors.whiteGrey,
-            borderRadius: context.appBorderRadius(all: 12),
-            border: Border.all(color: CustomColors.border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.auto_awesome_rounded, size: 20, color: CustomColors.purple),
-                  context.horizontalSpace(12),
-                  Text("Phase Notification", style: context.fonts.black16w600),
-                ],
-              ),
-              context.verticalSpace(20),
-              BuildTextField(
-                label: "Notification Title",
-                controller: notificationTitleController,
-                hintText: "Enter title...",
-              ),
-              context.verticalSpace(20),
-              BuildTextField(
-                label: "Notification Description",
-                controller: notificationDescController,
-                hintText: "Enter description...",
-                maxLines: 3,
-              ),
-              context.verticalSpace(20),
-              Text(offsetLabel, style: context.fonts.black14w600),
-              context.verticalSpace(8),
-              Container(
-                padding: context.appEdgeInsets(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: context.appBorderRadius(all: 12),
-                  border: Border.all(color: CustomColors.border),
+  Widget _buildNotificationsSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Phase Notifications", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          _expandableSection(
+            context,
+            title: "Pre-Treatment Notification",
+            icon: Icons.notifications_none_rounded,
+            content: Column(
+              children: [
+                BuildTextField(
+                  label: "Notification Title",
+                  controller: viewModel.preNotificationTitleController,
+                  hintText: "Enter title...",
                 ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<int>(
-                    value: selectedOffset,
-                    hint: Text("Select timing", style: context.fonts.grey14w400),
-                    isExpanded: true,
-                    dropdownColor: Colors.white,
-                    borderRadius: context.appBorderRadius(all: 12),
-                    items: offsetOptions.entries.map((e) {
-                      return DropdownMenuItem<int>(
-                        value: e.key,
-                        child: Text(e.value, style: context.fonts.black14w400),
-                      );
-                    }).toList(),
-                    onChanged: onOffsetChanged,
-                  ),
+                context.verticalSpace(20),
+                BuildTextField(
+                  label: "Notification Description",
+                  controller: viewModel.preNotificationDescriptionController,
+                  hintText: "Enter description...",
+                  maxLines: 3,
+                ),
+                context.verticalSpace(20),
+                _buildOffsetDropdown(
+                  context,
+                  label: "Reminder Timing",
+                  value: state.preNotificationOffset,
+                  options: {
+                    15: "15 Minutes Before",
+                    30: "30 Minutes Before",
+                    60: "1 Hour Before",
+                    120: "2 Hours Before",
+                    360: "6 Hours Before",
+                    720: "12 Hours Before",
+                    1440: "24 Hours Before",
+                  },
+                  onChanged: (val) => viewModel.setPreNotificationOffset(val),
+                ),
+              ],
+            ),
+          ),
+          context.verticalSpace(24),
+          _expandableSection(
+            context,
+            title: "Post-Treatment Notification",
+            icon: Icons.notifications_active_outlined,
+            content: Column(
+              children: [
+                BuildTextField(
+                  label: "Notification Title",
+                  controller: viewModel.postNotificationTitleController,
+                  hintText: "Enter title...",
+                ),
+                context.verticalSpace(20),
+                BuildTextField(
+                  label: "Notification Description",
+                  controller: viewModel.postNotificationDescriptionController,
+                  hintText: "Enter description...",
+                  maxLines: 3,
+                ),
+                context.verticalSpace(20),
+                _buildOffsetDropdown(
+                  context,
+                  label: "Engagement Timing",
+                  value: state.postNotificationOffset,
+                  options: {
+                    0: "Immediately After",
+                    60: "1 Hour After",
+                    360: "6 Hours After",
+                    1440: "24 Hours After",
+                    2880: "2 Days After",
+                    10080: "7 Days After",
+                  },
+                  onChanged: (val) => viewModel.setPostNotificationOffset(val),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFollowUpEditSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Follow-Up Configuration", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              _radioOption(context, "Active Follow-Up", state.isFollowUpRequired, () => viewModel.toggleFollowUpRequired(true)),
+              context.horizontalSpace(32),
+              _radioOption(context, "No Follow-Up", !state.isFollowUpRequired, () => viewModel.toggleFollowUpRequired(false)),
+            ],
+          ),
+          if (state.isFollowUpRequired) ...[
+            context.verticalSpace(32),
+            BuildTextField(
+              label: "Total Follow-Ups",
+              controller: viewModel.totalFollowUpsController,
+              hintText: "e.g. 1",
+              keyboardType: TextInputType.number,
+              onChanged: (String? val) => viewModel.updateFollowUpCount(val ?? ''),
+            ),
+            context.verticalSpace(24),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: state.followUpEntries.length,
+              separatorBuilder: (_, __) => context.verticalSpace(20),
+              itemBuilder: (context, index) {
+                return _buildFollowUpEntryCard(context, index, state.followUpEntries[index], viewModel);
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFollowUpEntryCard(BuildContext context, int index, FollowUpEntry entry, TreatmentViewModel viewModel) {
+    return Container(
+      padding: context.appEdgeInsets(all: 20),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Follow-Up ${index + 1}", style: context.fonts.purple12w700),
+          context.verticalSpace(16),
+          Row(
+            children: [
+              Expanded(
+                child: CustomDropdown<String>(
+                  label: "Appointment Type",
+                  hintText: "Select type",
+                  value: entry.type,
+                  items: const [
+                    DropdownMenuItem(value: 'virtual', child: Text("Virtual")),
+                    DropdownMenuItem(value: 'in_person', child: Text("In-Person")),
+                  ],
+                  onChanged: (val) => viewModel.updateFollowUpEntry(index, type: val),
+                ),
+              ),
+              context.horizontalSpace(20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Duration", style: context.fonts.black14w600),
+                    context.verticalSpace(8),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: BuildTextField(
+                            label: "",
+                            controller: entry.durationValueController,
+                            hintText: "30",
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        context.horizontalSpace(8),
+                        Expanded(
+                          flex: 3,
+                          child: CustomDropdown<String>(
+                            label: "",
+                            hintText: "Unit",
+                            value: entry.durationUnit,
+                            items: const [
+                              DropdownMenuItem(value: 'minutes', child: Text("Minutes")),
+                              DropdownMenuItem(value: 'hours', child: Text("Hours")),
+                            ],
+                            onChanged: (val) => viewModel.updateFollowUpEntry(index, durationUnit: val),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
-        if (isPostTreatment) ...[
-          context.verticalSpace(32),
-          _buildFollowUpSection(
-            context,
-            isFollowUpRequired: isFollowUpRequired,
-            onFollowUpToggle: onFollowUpToggle!,
-            totalFollowUpsController: totalFollowUpsController!,
-            followUpType: followUpType,
-            onFollowUpTypeChanged: onFollowUpTypeChanged!,
-            followUpDurationValueController: followUpDurationValueController!,
-            followUpDurationUnit: followUpDurationUnit!,
-            onFollowUpDurationUnitChanged: onFollowUpDurationUnitChanged!,
-            followUpNotesController: followUpNotesController!,
+          context.verticalSpace(16),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Interval", style: context.fonts.black14w600),
+                    context.verticalSpace(8),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: BuildTextField(
+                            label: "",
+                            controller: entry.intervalValueController,
+                            hintText: "1",
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        context.horizontalSpace(8),
+                        Expanded(
+                          flex: 3,
+                          child: CustomDropdown<String>(
+                            label: "",
+                            hintText: "Unit",
+                            value: entry.intervalUnit,
+                            items: const [
+                              DropdownMenuItem(value: 'days', child: Text("Days After")),
+                              DropdownMenuItem(value: 'weeks', child: Text("Weeks After")),
+                            ],
+                            onChanged: (val) => viewModel.updateFollowUpEntry(index, intervalUnit: val),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+          context.verticalSpace(16),
+          BuildTextField(
+            label: "Notes",
+            controller: entry.notesController,
+            hintText: "Clinical notes...",
+            maxLines: 2,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildConsentSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, WidgetRef ref) {
+    final dataState = ref.watch(treatmentDataViewModelProvider);
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Patient Consent Form", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              _radioOption(context, "Use Category Default", state.consentType == 'category', () => viewModel.setConsentType('category')),
+              context.horizontalSpace(32),
+              _radioOption(context, "Upload Custom Form", state.consentType == 'custom', () => viewModel.setConsentType('custom')),
+            ],
+          ),
+          context.verticalSpace(32),
+          if (state.consentType == 'category') ...[
+            Container(
+              padding: context.appEdgeInsets(all: 20),
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(color: CustomColors.border),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline_rounded, color: CustomColors.purple),
+                  context.horizontalSpace(16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Default Category Form", style: context.fonts.black14w600),
+                        context.verticalSpace(4),
+                        Text(
+                          selectedCategory?.consentFormName ?? "No default form found.",
+                          style: context.fonts.grey12w400,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
+            _buildConsentFormSection(context, state.preTreatmentConsentForm, state.existingConsentForm, () => viewModel.pickConsentForm(), () => viewModel.removeConsentForm()),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPricingSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Pricing Setup", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          BuildTextField(
+            label: "Treatment Base Price (\$)",
+            controller: viewModel.basePriceController,
+            hintText: "100",
+            keyboardType: TextInputType.number,
+          ),
+          if (allSubAreas.isNotEmpty) ...[
+            context.verticalSpace(32),
+            Text("Sub-Area Pricing Adjustments", style: context.fonts.black16w400),
+            context.verticalSpace(16),
+            ...allSubAreas.map((subArea) => Padding(
+              padding: context.appEdgeInsets(bottom: 12),
+              child: _buildSubAreaConfigCard(context, subArea),
+            )),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMaterialsSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Materials & Logic", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: _buildSearchField(
+                  context,
+                  label: "Material Name",
+                  hint: "Select material",
+                  controller: viewModel.materialNameController,
+                  suggestions: dataState.materials,
+                  onSelected: (val) {},
+                ),
+              ),
+              context.horizontalSpace(24),
+              Expanded(
+                child: BuildTextField(
+                  label: "Max Quantity",
+                  controller: viewModel.maxMaterialQuantityController,
+                  hintText: "0",
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(32),
+          Row(
+            children: [
+              Checkbox(
+                value: state.useInAiSimulator,
+                onChanged: (val) => viewModel.toggleAiSimulator(val),
+              ),
+              context.horizontalSpace(12),
+              Text("Use in AI Simulator", style: context.fonts.black16w400),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _radioOption(BuildContext context, String label, bool isSelected, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: context.appBorderRadius(all: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Radio<bool>(
+            value: true,
+            groupValue: isSelected,
+            onChanged: (_) => onTap(),
+            activeColor: CustomColors.purple,
+          ),
+          Text(label, style: context.fonts.black14w600),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOffsetDropdown(BuildContext context, {required String label, required int? value, required Map<int, String> options, required Function(int?) onChanged}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: context.fonts.black14w600),
+        context.verticalSpace(8),
+        Container(
+          padding: context.appEdgeInsets(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: context.appBorderRadius(all: 12),
+            border: Border.all(color: CustomColors.border),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              value: value,
+              isExpanded: true,
+              items: options.entries.map((e) => DropdownMenuItem<int>(value: e.key, child: Text(e.value))).toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
       ],
+    );
+  }
+
+  Widget _expandableSection(BuildContext context, {required String title, required IconData icon, required Widget content}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: ExpansionTile(
+        initiallyExpanded: true,
+        leading: Icon(icon, color: CustomColors.purple),
+        title: Text(title, style: context.fonts.black16w600),
+        children: [
+          Padding(
+            padding: context.appEdgeInsets(all: 20),
+            child: content,
+          ),
+        ],
+      ),
     );
   }
 

@@ -79,10 +79,10 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
           selectedId: _selectedPath.isNotEmpty ? _selectedPath[0] : null,
           onSelect: (item) => _onLevelSelect(0, item),
           onAddChild: (parent) => _showCreationDialog(context, parent.name, (name, icon, consentFile) {
-            dataViewModel.addCategory(name, icon: icon, parentId: parent.id, consentFormName: consentFile?.name, consentFormUrl: (consentFile as PlatformFile?)?.path);
+            dataViewModel.addCategory(name, icon: icon, parentId: parent.id, consentFormName: consentFile?.name, consentFormUrl: consentFile?.path);
           }),
           onAddRoot: () => _showCreationDialog(context, null, (name, icon, consentFile) {
-            dataViewModel.addCategory(name, icon: icon, consentFormName: consentFile?.name, consentFormUrl: (consentFile as PlatformFile?)?.path);
+            dataViewModel.addCategory(name, icon: icon, consentFormName: consentFile?.name, consentFormUrl: consentFile?.path);
           }),
         ),
 
@@ -102,7 +102,7 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
               selectedId: _selectedPath.length > index + 1 ? _selectedPath[index + 1] : null,
               onSelect: (item) => _onLevelSelect(index + 1, item),
               onAddChild: (parent) => _showCreationDialog(context, parent.name, (name, icon, consentFile) {
-                dataViewModel.addCategory(name, icon: icon, parentId: parent.id, consentFormName: consentFile?.name, consentFormUrl: (consentFile as PlatformFile?)?.path);
+                dataViewModel.addCategory(name, icon: icon, parentId: parent.id, consentFormName: consentFile?.name, consentFormUrl: consentFile?.path);
               }),
             ),
           );

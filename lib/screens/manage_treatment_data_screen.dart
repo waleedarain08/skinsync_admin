@@ -73,8 +73,8 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               onConfirm: (name, icon, consentFile) => viewModel.addCategory(
                 name, 
                 icon: icon, 
-                consentFormName: (consentFile as PlatformFile?)?.name, 
-                consentFormUrl: (consentFile as PlatformFile?)?.path
+                consentFormName: consentFile?.name, 
+                consentFormUrl: consentFile?.path
               ),
             ),
           ),
@@ -558,8 +558,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
                   name, 
                   icon: icon, 
                   parentId: category.id,
-                  consentFormName: (consentFile as PlatformFile?)?.name,
-                  consentFormUrl: (consentFile as PlatformFile?)?.path,
+                  consentFormName: consentFile?.name,
+                  consentFormUrl: consentFile?.path,
                 ),
               ),
             ),
@@ -575,8 +575,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
                   category.id, 
                   name, 
                   icon: icon,
-                  consentFormName: (consentFile as PlatformFile?)?.name ?? category.consentFormName,
-                  consentFormUrl: (consentFile as PlatformFile?)?.path ?? category.consentFormUrl,
+                  consentFormName: consentFile?.name ?? category.consentFormName,
+                  consentFormUrl: consentFile?.path ?? category.consentFormUrl,
                 ),
               ),
             ),

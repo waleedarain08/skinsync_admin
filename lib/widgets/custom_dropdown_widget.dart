@@ -34,6 +34,7 @@ class CustomDropdown<T> extends StatelessWidget {
           context.verticalSpace(8),
           DropdownButtonFormField<T>(
             initialValue: value,
+            isExpanded: true,
             items: items,
             onChanged: onChanged,
             validator: validator,
