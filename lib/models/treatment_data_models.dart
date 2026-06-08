@@ -12,8 +12,8 @@ class CategoryItem {
   final int sortOrder;
   final String? consentFormUrl;
   final String? consentFormName;
-  final List<FollowUpConfig>? defaultFollowUps;
   final List<SessionConfig>? defaultSessions;
+  final List<FollowUpConfig>? defaultFollowUps;
   final int totalSessions;
   
   // New operational rule defaults
@@ -31,8 +31,8 @@ class CategoryItem {
     this.sortOrder = 0,
     this.consentFormUrl,
     this.consentFormName,
-    this.defaultFollowUps,
     this.defaultSessions,
+    this.defaultFollowUps,
     this.totalSessions = 1,
     this.preNotification,
     this.postNotification,
@@ -49,8 +49,8 @@ class CategoryItem {
     int? sortOrder,
     String? consentFormUrl,
     String? consentFormName,
-    List<FollowUpConfig>? defaultFollowUps,
     List<SessionConfig>? defaultSessions,
+    List<FollowUpConfig>? defaultFollowUps,
     int? totalSessions,
     NotificationConfig? preNotification,
     NotificationConfig? postNotification,
@@ -66,8 +66,8 @@ class CategoryItem {
       sortOrder: sortOrder ?? this.sortOrder,
       consentFormUrl: consentFormUrl ?? this.consentFormUrl,
       consentFormName: consentFormName ?? this.consentFormName,
-      defaultFollowUps: defaultFollowUps ?? this.defaultFollowUps,
       defaultSessions: defaultSessions ?? this.defaultSessions,
+      defaultFollowUps: defaultFollowUps ?? this.defaultFollowUps,
       totalSessions: totalSessions ?? this.totalSessions,
       preNotification: preNotification ?? this.preNotification,
       postNotification: postNotification ?? this.postNotification,
