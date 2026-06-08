@@ -67,12 +67,16 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             title: "Treatment Categories",
             onAdd: () => _showCategoryCreationDialog(
               context: context,
-              onConfirm: (name, icon, consentFile, followUps) => viewModel.addCategory(
+              onConfirm: (name, icon, consentFile, followUps, preNotif, postNotif, downtime, roles) => viewModel.addCategory(
                 name, 
                 icon: icon, 
                 consentFormName: consentFile?.name, 
                 consentFormUrl: consentFile?.path,
                 defaultFollowUps: followUps,
+                preNotification: preNotif,
+                postNotification: postNotif,
+                downtimePresets: downtime,
+                defaultRoles: roles,
               ),
             ),
           ),
@@ -352,7 +356,11 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     String? initialIcon,
     String? initialConsentName,
     List<FollowUpConfig>? initialFollowUps,
-    required Function(String, String, PlatformFile?, List<FollowUpConfig>?) onConfirm,
+    NotificationConfig? initialPreNotification,
+    NotificationConfig? initialPostNotification,
+    DowntimePresets? initialDowntimePresets,
+    List<String>? initialDefaultRoles,
+    required Function(String, String, PlatformFile?, List<FollowUpConfig>?, NotificationConfig?, NotificationConfig?, DowntimePresets?, List<String>?) onConfirm,
   }) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -362,11 +370,24 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         initialIcon: initialIcon,
         initialConsentName: initialConsentName,
         initialFollowUps: initialFollowUps,
+        initialPreNotification: initialPreNotification,
+        initialPostNotification: initialPostNotification,
+        initialDowntimePresets: initialDowntimePresets,
+        initialDefaultRoles: initialDefaultRoles,
       ),
     );
 
     if (result != null) {
-      onConfirm(result['name'], result['icon'], result['consentFile'], result['followUps']);
+      onConfirm(
+        result['name'], 
+        result['icon'], 
+        result['consentFile'], 
+        result['followUps'],
+        result['preNotification'],
+        result['postNotification'],
+        result['downtimePresets'],
+        result['defaultRoles'],
+      );
     }
   }
 
@@ -520,13 +541,17 @@ class _RecursiveCategoryTile extends StatelessWidget {
               onPressed: () => ManageTreatmentDataScreen._showCategoryCreationDialog(
                 context: context,
                 parentName: category.name,
-                onConfirm: (name, icon, consentFile, followUps) => viewModel.addCategory(
+                onConfirm: (name, icon, consentFile, followUps, preNotif, postNotif, downtime, roles) => viewModel.addCategory(
                   name, 
                   icon: icon, 
                   parentId: category.id,
                   consentFormName: consentFile?.name,
                   consentFormUrl: consentFile?.path,
                   defaultFollowUps: followUps,
+                  preNotification: preNotif,
+                  postNotification: postNotif,
+                  downtimePresets: downtime,
+                  defaultRoles: roles,
                 ),
               ),
             ),
@@ -539,13 +564,21 @@ class _RecursiveCategoryTile extends StatelessWidget {
                 initialIcon: category.icon,
                 initialConsentName: category.consentFormName,
                 initialFollowUps: category.defaultFollowUps,
-                onConfirm: (name, icon, consentFile, followUps) => viewModel.editCategory(
+                initialPreNotification: category.preNotification,
+                initialPostNotification: category.postNotification,
+                initialDowntimePresets: category.downtimePresets,
+                initialDefaultRoles: category.defaultRoles,
+                onConfirm: (name, icon, consentFile, followUps, preNotif, postNotif, downtime, roles) => viewModel.editCategory(
                   category.id, 
                   name, 
                   icon: icon,
                   consentFormName: consentFile?.name ?? category.consentFormName,
                   consentFormUrl: consentFile?.path ?? category.consentFormUrl,
                   defaultFollowUps: followUps ?? category.defaultFollowUps,
+                  preNotification: preNotif ?? category.preNotification,
+                  postNotification: postNotif ?? category.postNotification,
+                  downtimePresets: downtime ?? category.downtimePresets,
+                  defaultRoles: roles ?? category.defaultRoles,
                 ),
               ),
             ),

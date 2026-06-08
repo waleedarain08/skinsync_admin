@@ -34,6 +34,51 @@ class FollowUpConfig {
   };
 }
 
+class NotificationConfig {
+  String? message;
+  int? timing; // in minutes/hours/days - we should standardize to minutes internal
+
+  NotificationConfig({this.message, this.timing});
+
+  factory NotificationConfig.fromJson(Map<String, dynamic> json) => NotificationConfig(
+    message: json['message'],
+    timing: json['timing'],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'message': message,
+    'timing': timing,
+  };
+}
+
+class DowntimePresets {
+  int none;
+  int low;
+  int moderate;
+  int high;
+
+  DowntimePresets({
+    this.none = 0,
+    this.low = 2,
+    this.moderate = 5,
+    this.high = 10,
+  });
+
+  factory DowntimePresets.fromJson(Map<String, dynamic> json) => DowntimePresets(
+    none: json['none'] ?? 0,
+    low: json['low'] ?? 2,
+    moderate: json['moderate'] ?? 5,
+    high: json['high'] ?? 10,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'none': none,
+    'low': low,
+    'moderate': moderate,
+    'high': high,
+  };
+}
+
 class ProductUsageModel {
   int productId;
   String productName;

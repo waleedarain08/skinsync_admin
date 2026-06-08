@@ -26,12 +26,24 @@ class TreatmentModel {
   int? baseDurationMinutes;
   String? preTreatmentInstructions;
   String? postTreatmentInstructions;
+  
+  // Notifications
+  String preNotificationSource; // category | custom
+  String postNotificationSource; // category | custom
   String? preTreatmentNotificationTitle;
   String? preTreatmentNotificationDescription;
   int? preTreatmentNotificationOffset; // in minutes
   String? postTreatmentNotificationTitle;
   String? postTreatmentNotificationDescription;
   int? postTreatmentNotificationOffset; // in minutes
+  
+  // Downtime
+  String downtimeLevel; // None | Low | Moderate | High
+
+  // Provider Roles
+  String providerRolesSource; // category | custom
+  List<String> allowedRoles;
+
   List<Attachment>? preTreatmentAttachments;
   List<Attachment>? postTreatmentAttachments;
   Attachment? preTreatmentConsentForm;
@@ -65,12 +77,17 @@ class TreatmentModel {
     this.baseDurationMinutes,
     this.preTreatmentInstructions,
     this.postTreatmentInstructions,
+    this.preNotificationSource = 'category',
+    this.postNotificationSource = 'category',
     this.preTreatmentNotificationTitle,
     this.preTreatmentNotificationDescription,
     this.preTreatmentNotificationOffset,
     this.postTreatmentNotificationTitle,
     this.postTreatmentNotificationDescription,
     this.postTreatmentNotificationOffset,
+    this.downtimeLevel = 'None',
+    this.providerRolesSource = 'category',
+    this.allowedRoles = const [],
     this.preTreatmentAttachments,
     this.postTreatmentAttachments,
     this.preTreatmentConsentForm,
@@ -83,6 +100,11 @@ class TreatmentModel {
       : status = json['status'] ?? (json['is_active'] == false ? 'deactive' : 'active'),
         useInAiSimulator = json['use_in_ai_simulator'] ?? false,
         enableByDefault = json['enable_by_default'] ?? false,
+        preNotificationSource = json['pre_notification_source'] ?? 'category',
+        postNotificationSource = json['post_notification_source'] ?? 'category',
+        downtimeLevel = json['downtime_level'] ?? 'None',
+        providerRolesSource = json['provider_roles_source'] ?? 'category',
+        allowedRoles = json['allowed_roles'] != null ? List<String>.from(json['allowed_roles']) : [],
         isFollowUpRequired = json['is_follow_up_required'] ?? false {
     id = json['id'];
     name = json['name'];
@@ -161,12 +183,17 @@ class TreatmentModel {
     int? baseDurationMinutes,
     String? preTreatmentInstructions,
     String? postTreatmentInstructions,
+    String? preNotificationSource,
+    String? postNotificationSource,
     String? preTreatmentNotificationTitle,
     String? preTreatmentNotificationDescription,
     int? preTreatmentNotificationOffset,
     String? postTreatmentNotificationTitle,
     String? postTreatmentNotificationDescription,
     int? postTreatmentNotificationOffset,
+    String? downtimeLevel,
+    String? providerRolesSource,
+    List<String>? allowedRoles,
     List<Attachment>? preTreatmentAttachments,
     List<Attachment>? postTreatmentAttachments,
     Attachment? preTreatmentConsentForm,
@@ -197,12 +224,17 @@ class TreatmentModel {
       baseDurationMinutes: baseDurationMinutes ?? this.baseDurationMinutes,
       preTreatmentInstructions: preTreatmentInstructions ?? this.preTreatmentInstructions,
       postTreatmentInstructions: postTreatmentInstructions ?? this.postTreatmentInstructions,
+      preNotificationSource: preNotificationSource ?? this.preNotificationSource,
+      postNotificationSource: postNotificationSource ?? this.postNotificationSource,
       preTreatmentNotificationTitle: preTreatmentNotificationTitle ?? this.preTreatmentNotificationTitle,
       preTreatmentNotificationDescription: preTreatmentNotificationDescription ?? this.preTreatmentNotificationDescription,
       preTreatmentNotificationOffset: preTreatmentNotificationOffset ?? this.preTreatmentNotificationOffset,
       postTreatmentNotificationTitle: postTreatmentNotificationTitle ?? this.postTreatmentNotificationTitle,
       postTreatmentNotificationDescription: postTreatmentNotificationDescription ?? this.postTreatmentNotificationDescription,
       postTreatmentNotificationOffset: postTreatmentNotificationOffset ?? this.postTreatmentNotificationOffset,
+      downtimeLevel: downtimeLevel ?? this.downtimeLevel,
+      providerRolesSource: providerRolesSource ?? this.providerRolesSource,
+      allowedRoles: allowedRoles ?? this.allowedRoles,
       preTreatmentAttachments: preTreatmentAttachments ?? this.preTreatmentAttachments,
       postTreatmentAttachments: postTreatmentAttachments ?? this.postTreatmentAttachments,
       preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
@@ -236,12 +268,17 @@ class TreatmentModel {
       'base_duration_minutes': baseDurationMinutes,
       'pre_treatment_instructions': preTreatmentInstructions,
       'post_treatment_instructions': postTreatmentInstructions,
+      'pre_notification_source': preNotificationSource,
+      'post_notification_source': postNotificationSource,
       'pre_treatment_notification_title': preTreatmentNotificationTitle,
       'pre_treatment_notification_description': preTreatmentNotificationDescription,
       'pre_treatment_notification_offset': preTreatmentNotificationOffset,
       'post_treatment_notification_title': postTreatmentNotificationTitle,
       'post_treatment_notification_description': postTreatmentNotificationDescription,
       'post_treatment_notification_offset': postTreatmentNotificationOffset,
+      'downtime_level': downtimeLevel,
+      'provider_roles_source': providerRolesSource,
+      'allowed_roles': allowedRoles,
       'pre_treatment_attachments': preTreatmentAttachments?.map((e) => e.toJson()).toList(),
       'post_treatment_attachments': postTreatmentAttachments?.map((e) => e.toJson()).toList(),
       'pre_treatment_consent_form': preTreatmentConsentForm?.toJson(),

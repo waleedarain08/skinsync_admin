@@ -12,6 +12,10 @@ class CategoryCreationDialog extends StatefulWidget {
   final String? initialIcon;
   final String? initialConsentName;
   final List<FollowUpConfig>? initialFollowUps;
+  final NotificationConfig? initialPreNotification;
+  final NotificationConfig? initialPostNotification;
+  final DowntimePresets? initialDowntimePresets;
+  final List<String>? initialDefaultRoles;
 
   const CategoryCreationDialog({
     super.key, 
@@ -20,6 +24,10 @@ class CategoryCreationDialog extends StatefulWidget {
     this.initialIcon,
     this.initialConsentName,
     this.initialFollowUps,
+    this.initialPreNotification,
+    this.initialPostNotification,
+    this.initialDowntimePresets,
+    this.initialDefaultRoles,
   });
 
   @override
@@ -34,6 +42,21 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   String? _existingConsentName;
   List<FollowUpConfig> _followUps = [];
 
+  // Notifications
+  late final TextEditingController _preNotifyMessageController;
+  late final TextEditingController _preNotifyTimingController;
+  late final TextEditingController _postNotifyMessageController;
+  late final TextEditingController _postNotifyTimingController;
+
+  // Downtime
+  late final TextEditingController _downtimeLowController;
+  late final TextEditingController _downtimeModerateController;
+  late final TextEditingController _downtimeHighController;
+
+  // Roles
+  List<String> _selectedRoles = [];
+  final List<String> _availableRoles = ["Injector", "Aesthetician", "MD", "Nurse", "Specialist"];
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +69,17 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     _totalFollowUpsController = TextEditingController(
       text: _followUps.isEmpty ? "" : _followUps.length.toString()
     );
+
+    _preNotifyMessageController = TextEditingController(text: widget.initialPreNotification?.message);
+    _preNotifyTimingController = TextEditingController(text: widget.initialPreNotification?.timing?.toString());
+    _postNotifyMessageController = TextEditingController(text: widget.initialPostNotification?.message);
+    _postNotifyTimingController = TextEditingController(text: widget.initialPostNotification?.timing?.toString());
+
+    _downtimeLowController = TextEditingController(text: (widget.initialDowntimePresets?.low ?? 2).toString());
+    _downtimeModerateController = TextEditingController(text: (widget.initialDowntimePresets?.moderate ?? 5).toString());
+    _downtimeHighController = TextEditingController(text: (widget.initialDowntimePresets?.high ?? 10).toString());
+
+    _selectedRoles = widget.initialDefaultRoles != null ? List.from(widget.initialDefaultRoles!) : [];
   }
 
   final List<Map<String, dynamic>> _icons = [
@@ -62,6 +96,13 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   void dispose() {
     _nameController.dispose();
     _totalFollowUpsController.dispose();
+    _preNotifyMessageController.dispose();
+    _preNotifyTimingController.dispose();
+    _postNotifyMessageController.dispose();
+    _postNotifyTimingController.dispose();
+    _downtimeLowController.dispose();
+    _downtimeModerateController.dispose();
+    _downtimeHighController.dispose();
     super.dispose();
   }
 
@@ -97,11 +138,14 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
       title: widget.initialName != null 
           ? "Edit Category" 
           : (widget.parentName == null ? "Create New Category" : "Add Subcategory to ${widget.parentName}"),
-      width: context.w(600),
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          BuildTextField(
+      width: context.w(700),
+      content: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("General Information", style: context.fonts.purple14w700),
+            context.verticalSpace(16),
+            BuildTextField(
               label: "Category Name",
               controller: _nameController,
               hintText: "e.g. Skin Rejuvenation",
@@ -136,7 +180,69 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                 );
               }).toList(),
             ),
+            
+            context.verticalSpace(32),
+            const Divider(),
             context.verticalSpace(24),
+            Text("Operational Defaults", style: context.fonts.purple14w700),
+            context.verticalSpace(20),
+            
+            // Notifications Section
+            Text("Default Patient Notifications", style: context.fonts.black16w600),
+            context.verticalSpace(16),
+            _buildNotificationSection("Pre-Treatment Notification", _preNotifyMessageController, _preNotifyTimingController, "timing (hours before)"),
+            context.verticalSpace(24),
+            _buildNotificationSection("Post-Treatment Notification", _postNotifyMessageController, _postNotifyTimingController, "timing (hours after)"),
+            
+            context.verticalSpace(32),
+            const Divider(),
+            context.verticalSpace(24),
+            
+            // Downtime Presets
+            Text("Programmable Downtime Levels (Days)", style: context.fonts.black16w600),
+            context.verticalSpace(16),
+            Row(
+              children: [
+                Expanded(child: BuildTextField(label: "Low", controller: _downtimeLowController, hintText: "2", keyboardType: TextInputType.number)),
+                context.horizontalSpace(12),
+                Expanded(child: BuildTextField(label: "Moderate", controller: _downtimeModerateController, hintText: "5", keyboardType: TextInputType.number)),
+                context.horizontalSpace(12),
+                Expanded(child: BuildTextField(label: "High", controller: _downtimeHighController, hintText: "10", keyboardType: TextInputType.number)),
+              ],
+            ),
+            
+            context.verticalSpace(32),
+            const Divider(),
+            context.verticalSpace(24),
+            
+            // Allowed Provider Roles
+            Text("Default Allowed Provider Roles", style: context.fonts.black16w600),
+            context.verticalSpace(16),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: _availableRoles.map((role) {
+                final isSelected = _selectedRoles.contains(role);
+                return FilterChip(
+                  label: Text(role),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedRoles.add(role);
+                      } else {
+                        _selectedRoles.remove(role);
+                      }
+                    });
+                  },
+                  selectedColor: CustomColors.purple.withOpacity(0.2),
+                  checkmarkColor: CustomColors.purple,
+                  labelStyle: isSelected ? context.fonts.purple14w600 : context.fonts.black14w400,
+                );
+              }).toList(),
+            ),
+
+            context.verticalSpace(32),
             const Divider(),
             context.verticalSpace(24),
             Text("Default Patient Consent Form (Optional)", style: context.fonts.black16w600),
@@ -194,6 +300,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
             ],
           ],
         ),
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -209,10 +316,52 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   'icon': _selectedIcon,
                   'consentFile': _consentFile,
                   'followUps': _followUps,
+                  'preNotification': NotificationConfig(
+                    message: _preNotifyMessageController.text,
+                    timing: int.tryParse(_preNotifyTimingController.text),
+                  ),
+                  'postNotification': NotificationConfig(
+                    message: _postNotifyMessageController.text,
+                    timing: int.tryParse(_postNotifyTimingController.text),
+                  ),
+                  'downtimePresets': DowntimePresets(
+                    none: 0,
+                    low: int.tryParse(_downtimeLowController.text) ?? 2,
+                    moderate: int.tryParse(_downtimeModerateController.text) ?? 5,
+                    high: int.tryParse(_downtimeHighController.text) ?? 10,
+                  ),
+                  'defaultRoles': _selectedRoles,
                 });
               }
             },
             child: Text(widget.initialName != null ? "Update" : "Create"),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNotificationSection(String title, TextEditingController msgController, TextEditingController timeController, String timeHint) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: context.fonts.black14w600),
+        context.verticalSpace(8),
+        BuildTextField(
+          label: "Message Content",
+          controller: msgController,
+          hintText: "Enter notification message...",
+          maxLines: 2,
+        ),
+        context.verticalSpace(12),
+        BuildTextField(
+          label: "Timing",
+          controller: timeController,
+          hintText: "e.g. 24",
+          keyboardType: TextInputType.number,
+          suffixIcon: Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: Text("Hours", style: context.fonts.grey12w400),
           ),
         ),
       ],

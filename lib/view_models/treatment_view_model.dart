@@ -166,6 +166,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       existingPostAttachments: [],
       preTreatmentConsentForm: null,
       existingConsentForm: null,
+      preNotificationSource: 'category',
+      postNotificationSource: 'category',
+      downtimeLevel: 'None',
+      providerRolesSource: 'category',
+      selectedRoles: [],
       areas: [AreaViewModelEntry()],
       followUpEntries: [],
       followUpSource: 'category',
@@ -319,6 +324,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       existingPostAttachments: treatment.postTreatmentAttachments ?? [],
       preTreatmentConsentForm: null,
       existingConsentForm: treatment.preTreatmentConsentForm,
+      preNotificationSource: treatment.preNotificationSource,
+      postNotificationSource: treatment.postNotificationSource,
+      downtimeLevel: treatment.downtimeLevel,
+      providerRolesSource: treatment.providerRolesSource,
+      selectedRoles: treatment.allowedRoles,
       followUpEntries: newFollowUpEntries,
       followUpSource: 'custom', 
       productUsageEntries: newProductUsageEntries,
@@ -329,6 +339,23 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       postNotificationOffset: treatment.postTreatmentNotificationOffset,
     );
   }
+
+  void setPreNotificationSource(String source) => state = state.copyWith(preNotificationSource: source);
+  void setPostNotificationSource(String source) => state = state.copyWith(postNotificationSource: source);
+  void setDowntimeLevel(String level) => state = state.copyWith(downtimeLevel: level);
+  void setProviderRolesSource(String source) => state = state.copyWith(providerRolesSource: source);
+
+  void toggleRole(String role) {
+    final List<String> current = List.from(state.selectedRoles);
+    if (current.contains(role)) {
+      current.remove(role);
+    } else {
+      current.add(role);
+    }
+    state = state.copyWith(selectedRoles: current);
+  }
+
+  void setRoles(List<String> roles) => state = state.copyWith(selectedRoles: roles);
 
   void setStep(int step) {
     state = state.copyWith(currentStep: step);
@@ -694,12 +721,17 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         protocolIds: state.selectedProtocolIds,
         preTreatmentInstructions: preTreatmentInstructionsController.text,
         postTreatmentInstructions: postTreatmentInstructionsController.text,
+        preNotificationSource: state.preNotificationSource,
+        postNotificationSource: state.postNotificationSource,
         preTreatmentNotificationTitle: preNotificationTitleController.text,
         preTreatmentNotificationDescription: preNotificationDescriptionController.text,
         preTreatmentNotificationOffset: state.preNotificationOffset,
         postTreatmentNotificationTitle: postNotificationTitleController.text,
         postTreatmentNotificationDescription: postNotificationDescriptionController.text,
         postTreatmentNotificationOffset: state.postNotificationOffset,
+        downtimeLevel: state.downtimeLevel,
+        providerRolesSource: state.providerRolesSource,
+        allowedRoles: state.selectedRoles,
         preTreatmentAttachments: [
           ...state.existingPreAttachments,
           ...state.preTreatmentAttachments.map((f) => Attachment(url: f.path ?? '', type: _getFileType(f), name: f.name)),
@@ -786,6 +818,11 @@ class TreatmentState extends BaseStateModel {
   final PlatformFile? preTreatmentConsentForm;
   final Attachment? existingConsentForm;
   final String consentType; // category | custom
+  final String preNotificationSource; // category | custom
+  final String postNotificationSource; // category | custom
+  final String downtimeLevel; // None | Low | Moderate | High
+  final String providerRolesSource; // category | custom
+  final List<String> selectedRoles;
   final List<FollowUpEntry> followUpEntries;
   final String followUpSource; // category | custom
   final List<ProductUsageEntry> productUsageEntries;
@@ -821,6 +858,11 @@ class TreatmentState extends BaseStateModel {
     this.preTreatmentConsentForm,
     this.existingConsentForm,
     this.consentType = 'category',
+    this.preNotificationSource = 'category',
+    this.postNotificationSource = 'category',
+    this.downtimeLevel = 'None',
+    this.providerRolesSource = 'category',
+    this.selectedRoles = const [],
     this.followUpEntries = const [],
     this.followUpSource = 'category',
     this.productUsageEntries = const [],
@@ -855,6 +897,11 @@ class TreatmentState extends BaseStateModel {
     PlatformFile? preTreatmentConsentForm,
     Attachment? existingConsentForm,
     String? consentType,
+    String? preNotificationSource,
+    String? postNotificationSource,
+    String? downtimeLevel,
+    String? providerRolesSource,
+    List<String>? selectedRoles,
     List<FollowUpEntry>? followUpEntries,
     String? followUpSource,
     List<ProductUsageEntry>? productUsageEntries,
@@ -887,6 +934,11 @@ class TreatmentState extends BaseStateModel {
       preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
       existingConsentForm: existingConsentForm ?? this.existingConsentForm,
       consentType: consentType ?? this.consentType,
+      preNotificationSource: preNotificationSource ?? this.preNotificationSource,
+      postNotificationSource: postNotificationSource ?? this.postNotificationSource,
+      downtimeLevel: downtimeLevel ?? this.downtimeLevel,
+      providerRolesSource: providerRolesSource ?? this.providerRolesSource,
+      selectedRoles: selectedRoles ?? this.selectedRoles,
       followUpEntries: followUpEntries ?? this.followUpEntries,
       followUpSource: followUpSource ?? this.followUpSource,
       productUsageEntries: productUsageEntries ?? this.productUsageEntries,

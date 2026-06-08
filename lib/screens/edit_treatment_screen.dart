@@ -74,7 +74,11 @@ class EditTreatmentScreen extends ConsumerWidget {
                 context.verticalSpace(32),
                 _buildPostTreatmentSection(context, state, viewModel),
                 context.verticalSpace(32),
-                _buildNotificationsSection(context, state, viewModel),
+                _buildNotificationsSection(context, state, viewModel, dataState),
+                context.verticalSpace(32),
+                _buildDowntimeSection(context, state, viewModel, dataState),
+                context.verticalSpace(32),
+                _buildRolesSection(context, state, viewModel, dataState),
                 context.verticalSpace(32),
                 _buildFollowUpEditSection(context, state, viewModel, ref),
                 context.verticalSpace(32),
@@ -310,7 +314,12 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNotificationsSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildNotificationsSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
@@ -323,35 +332,55 @@ class EditTreatmentScreen extends ConsumerWidget {
             title: "Pre-Treatment Notification",
             icon: Icons.notifications_none_rounded,
             content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BuildTextField(
-                  label: "Notification Title",
-                  controller: viewModel.preNotificationTitleController,
-                  hintText: "Enter title...",
+                Text("Notification Source", style: context.fonts.black14w600),
+                context.verticalSpace(12),
+                Row(
+                  children: [
+                    _radioOption(context, "Use Category Default", state.preNotificationSource == 'category', () => viewModel.setPreNotificationSource('category')),
+                    context.horizontalSpace(32),
+                    _radioOption(context, "Create Custom", state.preNotificationSource == 'custom', () => viewModel.setPreNotificationSource('custom')),
+                  ],
                 ),
-                context.verticalSpace(20),
-                BuildTextField(
-                  label: "Notification Description",
-                  controller: viewModel.preNotificationDescriptionController,
-                  hintText: "Enter description...",
-                  maxLines: 3,
-                ),
-                context.verticalSpace(20),
-                _buildOffsetDropdown(
-                  context,
-                  label: "Reminder Timing",
-                  value: state.preNotificationOffset,
-                  options: {
-                    15: "15 Minutes Before",
-                    30: "30 Minutes Before",
-                    60: "1 Hour Before",
-                    120: "2 Hours Before",
-                    360: "6 Hours Before",
-                    720: "12 Hours Before",
-                    1440: "24 Hours Before",
-                  },
-                  onChanged: (val) => viewModel.setPreNotificationOffset(val),
-                ),
+                context.verticalSpace(24),
+                if (state.preNotificationSource == 'category') ...[
+                  _buildNotificationPreview(
+                    context,
+                    title: "Category Default",
+                    message: selectedCategory?.preNotification?.message ?? "No message defined in category.",
+                    timing: selectedCategory?.preNotification?.timing != null ? "${selectedCategory!.preNotification!.timing} Hours Before" : "Not set",
+                  ),
+                ] else ...[
+                  BuildTextField(
+                    label: "Notification Title",
+                    controller: viewModel.preNotificationTitleController,
+                    hintText: "Enter title...",
+                  ),
+                  context.verticalSpace(20),
+                  BuildTextField(
+                    label: "Notification Description",
+                    controller: viewModel.preNotificationDescriptionController,
+                    hintText: "Enter description...",
+                    maxLines: 3,
+                  ),
+                  context.verticalSpace(20),
+                  _buildOffsetDropdown(
+                    context,
+                    label: "Reminder Timing",
+                    value: state.preNotificationOffset,
+                    options: {
+                      15: "15 Minutes Before",
+                      30: "30 Minutes Before",
+                      60: "1 Hour Before",
+                      120: "2 Hours Before",
+                      360: "6 Hours Before",
+                      720: "12 Hours Before",
+                      1440: "24 Hours Before",
+                    },
+                    onChanged: (val) => viewModel.setPreNotificationOffset(val),
+                  ),
+                ],
               ],
             ),
           ),
@@ -361,37 +390,189 @@ class EditTreatmentScreen extends ConsumerWidget {
             title: "Post-Treatment Notification",
             icon: Icons.notifications_active_outlined,
             content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BuildTextField(
-                  label: "Notification Title",
-                  controller: viewModel.postNotificationTitleController,
-                  hintText: "Enter title...",
+                Text("Notification Source", style: context.fonts.black14w600),
+                context.verticalSpace(12),
+                Row(
+                  children: [
+                    _radioOption(context, "Use Category Default", state.postNotificationSource == 'category', () => viewModel.setPostNotificationSource('category')),
+                    context.horizontalSpace(32),
+                    _radioOption(context, "Create Custom", state.postNotificationSource == 'custom', () => viewModel.setPostNotificationSource('custom')),
+                  ],
                 ),
-                context.verticalSpace(20),
-                BuildTextField(
-                  label: "Notification Description",
-                  controller: viewModel.postNotificationDescriptionController,
-                  hintText: "Enter description...",
-                  maxLines: 3,
-                ),
-                context.verticalSpace(20),
-                _buildOffsetDropdown(
-                  context,
-                  label: "Engagement Timing",
-                  value: state.postNotificationOffset,
-                  options: {
-                    0: "Immediately After",
-                    60: "1 Hour After",
-                    360: "6 Hours After",
-                    1440: "24 Hours After",
-                    2880: "2 Days After",
-                    10080: "7 Days After",
-                  },
-                  onChanged: (val) => viewModel.setPostNotificationOffset(val),
-                ),
+                context.verticalSpace(24),
+                if (state.postNotificationSource == 'category') ...[
+                  _buildNotificationPreview(
+                    context,
+                    title: "Category Default",
+                    message: selectedCategory?.postNotification?.message ?? "No message defined in category.",
+                    timing: selectedCategory?.postNotification?.timing != null ? "${selectedCategory!.postNotification!.timing} Hours After" : "Not set",
+                  ),
+                ] else ...[
+                  BuildTextField(
+                    label: "Notification Title",
+                    controller: viewModel.postNotificationTitleController,
+                    hintText: "Enter title...",
+                  ),
+                  context.verticalSpace(20),
+                  BuildTextField(
+                    label: "Notification Description",
+                    controller: viewModel.postNotificationDescriptionController,
+                    hintText: "Enter description...",
+                    maxLines: 3,
+                  ),
+                  context.verticalSpace(20),
+                  _buildOffsetDropdown(
+                    context,
+                    label: "Engagement Timing",
+                    value: state.postNotificationOffset,
+                    options: {
+                      0: "Immediately After",
+                      60: "1 Hour After",
+                      360: "6 Hours After",
+                      1440: "24 Hours After",
+                      2880: "2 Days After",
+                      10080: "7 Days After",
+                    },
+                    onChanged: (val) => viewModel.setPostNotificationOffset(val),
+                  ),
+                ],
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationPreview(BuildContext context, {required String title, required String message, required String timing}) {
+    return Container(
+      padding: context.appEdgeInsets(all: 16),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: context.fonts.grey10w700ls1),
+              Container(
+                padding: context.appEdgeInsets(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: CustomColors.purple.withValues(alpha: 0.1), borderRadius: context.appBorderRadius(all: 4)),
+                child: Text(timing, style: context.fonts.purple12w700),
+              ),
+            ],
+          ),
+          context.verticalSpace(12),
+          Text(message, style: context.fonts.black14w400),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDowntimeSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+    final presets = selectedCategory?.downtimePresets ?? DowntimePresets();
+
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Downtime Level", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          _downtimeOption(context, "None", "${presets.none} Days", state.downtimeLevel == 'None', () => viewModel.setDowntimeLevel('None')),
+          context.verticalSpace(16),
+          _downtimeOption(context, "Low", "${presets.low} Days", state.downtimeLevel == 'Low', () => viewModel.setDowntimeLevel('Low')),
+          context.verticalSpace(16),
+          _downtimeOption(context, "Moderate", "${presets.moderate} Days", state.downtimeLevel == 'Moderate', () => viewModel.setDowntimeLevel('Moderate')),
+          context.verticalSpace(16),
+          _downtimeOption(context, "High", "${presets.high} Days", state.downtimeLevel == 'High', () => viewModel.setDowntimeLevel('High')),
+        ],
+      ),
+    );
+  }
+
+  Widget _downtimeOption(BuildContext context, String title, String duration, bool isSelected, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: context.appBorderRadius(all: 12),
+      child: Container(
+        padding: context.appEdgeInsets(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? CustomColors.purple.withValues(alpha: 0.05) : Colors.white,
+          borderRadius: context.appBorderRadius(all: 12),
+          border: Border.all(color: isSelected ? CustomColors.purple : CustomColors.border, width: isSelected ? 1.5 : 1),
+        ),
+        child: Row(
+          children: [
+            Text(title, style: context.fonts.black16w600),
+            const Spacer(),
+            Text(duration, style: context.fonts.purple14w700),
+            context.horizontalSpace(16),
+            Icon(isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded, color: isSelected ? CustomColors.purple : CustomColors.grey, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRolesSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+    final List<String> availableRoles = ["Injector", "Aesthetician", "MD", "Nurse", "Specialist"];
+    final List<String> categoryRoles = selectedCategory?.defaultRoles ?? [];
+
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Allowed Provider Roles", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              _radioOption(context, "Use Category Defaults", state.providerRolesSource == 'category', () {
+                viewModel.setProviderRolesSource('category');
+                viewModel.setRoles(categoryRoles);
+              }),
+              context.horizontalSpace(32),
+              _radioOption(context, "Define Custom Roles", state.providerRolesSource == 'custom', () => viewModel.setProviderRolesSource('custom')),
+            ],
+          ),
+          context.verticalSpace(32),
+          if (state.providerRolesSource == 'category') ...[
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: categoryRoles.map((role) => Chip(label: Text(role), backgroundColor: CustomColors.purple.withOpacity(0.1))).toList(),
+            ),
+          ] else ...[
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: availableRoles.map((role) {
+                final isSelected = state.selectedRoles.contains(role);
+                return FilterChip(
+                  label: Text(role),
+                  selected: isSelected,
+                  onSelected: (_) => viewModel.toggleRole(role),
+                  selectedColor: CustomColors.purple.withOpacity(0.2),
+                  checkmarkColor: CustomColors.purple,
+                );
+              }).toList(),
+            ),
+          ],
         ],
       ),
     );

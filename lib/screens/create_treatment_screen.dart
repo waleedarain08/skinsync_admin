@@ -207,6 +207,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Pre-Treatment Instructions",
       "Post-Treatment Instructions",
       "Phase Notifications",
+      "Downtime Level",
+      "Allowed Provider Roles",
       "Follow-Up Configuration",
       "Patient Consent Form",
       "Inventory Products",
@@ -221,6 +223,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Detailed instructions and supporting media for patients before the procedure.",
       "Aftercare guidelines and recovery media for patients after the procedure.",
       "Automated reminders and follow-up engagement messages.",
+      "Configure booking restriction window after treatment.",
+      "Define which provider roles are authorized to perform this treatment.",
       "Manage rules and scheduling for post-procedure clinical check-ins.",
       "Upload and manage legal procedural consent documentation.",
       "Configure required products from inventory and area-wise consumption.",
@@ -235,6 +239,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       Icons.login_rounded,
       Icons.logout_rounded,
       Icons.notifications_active_outlined,
+      Icons.hourglass_bottom_rounded,
+      Icons.badge_outlined,
       Icons.replay_outlined,
       Icons.fact_check_outlined,
       Icons.inventory_2_outlined,
@@ -600,12 +606,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 3: return _buildStepProtocolsStep(context, state, viewModel, dataState, ref);
       case 4: return _buildStepPreInstructions(context, state, viewModel);
       case 5: return _buildStepPostInstructions(context, state, viewModel);
-      case 6: return _buildStepNotifications(context, state, viewModel);
-      case 7: return _buildStepFollowUp(context, state, viewModel, dataState);
-      case 8: return _buildStepConsent(context, state, viewModel, ref);
-      case 9: return _buildStepMaterials(context, state, viewModel, dataState, ref);
-      case 10: return _buildStepLogic(context, state, viewModel);
-      case 11: return _buildStepPricing(context, state, viewModel);
+      case 6: return _buildStepNotifications(context, state, viewModel, dataState);
+      case 7: return _buildStepDowntime(context, state, viewModel, dataState);
+      case 8: return _buildStepRoles(context, state, viewModel, dataState);
+      case 9: return _buildStepFollowUp(context, state, viewModel, dataState);
+      case 10: return _buildStepConsent(context, state, viewModel, ref);
+      case 11: return _buildStepMaterials(context, state, viewModel, dataState, ref);
+      case 12: return _buildStepLogic(context, state, viewModel);
+      case 13: return _buildStepPricing(context, state, viewModel);
       default: return const SizedBox.shrink();
     }
   }
@@ -705,7 +713,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStepNotifications(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildStepNotifications(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+
     return Column(
       children: [
         _expandableSection(
@@ -713,35 +726,55 @@ class CreateTreatmentScreen extends ConsumerWidget {
           title: "Pre-Treatment Notification",
           icon: Icons.notifications_none_rounded,
           content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              BuildTextField(
-                label: "Notification Title",
-                controller: viewModel.preNotificationTitleController,
-                hintText: "e.g. Appointment Reminder",
+              Text("Notification Source", style: context.fonts.black14w600),
+              context.verticalSpace(12),
+              Row(
+                children: [
+                  _radioOption(context, "Use Category Default", state.preNotificationSource == 'category', () => viewModel.setPreNotificationSource('category')),
+                  context.horizontalSpace(32),
+                  _radioOption(context, "Create Custom", state.preNotificationSource == 'custom', () => viewModel.setPreNotificationSource('custom')),
+                ],
               ),
-              context.verticalSpace(20),
-              BuildTextField(
-                label: "Notification Description",
-                controller: viewModel.preNotificationDescriptionController,
-                hintText: "Body of the notification",
-                maxLines: 3,
-              ),
-              context.verticalSpace(20),
-              _buildOffsetDropdown(
-                context,
-                label: "Reminder Timing (Minutes Before)",
-                value: state.preNotificationOffset,
-                options: {
-                  15: "15 Minutes Before",
-                  30: "30 Minutes Before",
-                  60: "1 Hour Before",
-                  120: "2 Hours Before",
-                  360: "6 Hours Before",
-                  720: "12 Hours Before",
-                  1440: "24 Hours Before",
-                },
-                onChanged: (val) => viewModel.setPreNotificationOffset(val),
-              ),
+              context.verticalSpace(24),
+              if (state.preNotificationSource == 'category') ...[
+                _buildNotificationPreview(
+                  context,
+                  title: "Category Default (Read-only)",
+                  message: selectedCategory?.preNotification?.message ?? "No message defined in category.",
+                  timing: selectedCategory?.preNotification?.timing != null ? "${selectedCategory!.preNotification!.timing} Hours Before" : "Not set",
+                ),
+              ] else ...[
+                BuildTextField(
+                  label: "Notification Title",
+                  controller: viewModel.preNotificationTitleController,
+                  hintText: "e.g. Appointment Reminder",
+                ),
+                context.verticalSpace(20),
+                BuildTextField(
+                  label: "Notification Description",
+                  controller: viewModel.preNotificationDescriptionController,
+                  hintText: "Body of the notification",
+                  maxLines: 3,
+                ),
+                context.verticalSpace(20),
+                _buildOffsetDropdown(
+                  context,
+                  label: "Reminder Timing (Minutes Before)",
+                  value: state.preNotificationOffset,
+                  options: {
+                    15: "15 Minutes Before",
+                    30: "30 Minutes Before",
+                    60: "1 Hour Before",
+                    120: "2 Hours Before",
+                    360: "6 Hours Before",
+                    720: "12 Hours Before",
+                    1440: "24 Hours Before",
+                  },
+                  onChanged: (val) => viewModel.setPreNotificationOffset(val),
+                ),
+              ],
             ],
           ),
         ),
@@ -751,38 +784,269 @@ class CreateTreatmentScreen extends ConsumerWidget {
           title: "Post-Treatment Notification",
           icon: Icons.notifications_active_outlined,
           content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              BuildTextField(
-                label: "Notification Title",
-                controller: viewModel.postNotificationTitleController,
-                hintText: "e.g. Aftercare Reminder",
+              Text("Notification Source", style: context.fonts.black14w600),
+              context.verticalSpace(12),
+              Row(
+                children: [
+                  _radioOption(context, "Use Category Default", state.postNotificationSource == 'category', () => viewModel.setPostNotificationSource('category')),
+                  context.horizontalSpace(32),
+                  _radioOption(context, "Create Custom", state.postNotificationSource == 'custom', () => viewModel.setPostNotificationSource('custom')),
+                ],
               ),
-              context.verticalSpace(20),
-              BuildTextField(
-                label: "Notification Description",
-                controller: viewModel.postNotificationDescriptionController,
-                hintText: "Body of the notification",
-                maxLines: 3,
-              ),
-              context.verticalSpace(20),
-              _buildOffsetDropdown(
-                context,
-                label: "Engagement Timing (Minutes After)",
-                value: state.postNotificationOffset,
-                options: {
-                  0: "Immediately After",
-                  60: "1 Hour After",
-                  360: "6 Hours After",
-                  1440: "24 Hours After",
-                  2880: "2 Days After",
-                  10080: "7 Days After",
-                },
-                onChanged: (val) => viewModel.setPostNotificationOffset(val),
-              ),
+              context.verticalSpace(24),
+              if (state.postNotificationSource == 'category') ...[
+                _buildNotificationPreview(
+                  context,
+                  title: "Category Default (Read-only)",
+                  message: selectedCategory?.postNotification?.message ?? "No message defined in category.",
+                  timing: selectedCategory?.postNotification?.timing != null ? "${selectedCategory!.postNotification!.timing} Hours After" : "Not set",
+                ),
+              ] else ...[
+                BuildTextField(
+                  label: "Notification Title",
+                  controller: viewModel.postNotificationTitleController,
+                  hintText: "e.g. Aftercare Reminder",
+                ),
+                context.verticalSpace(20),
+                BuildTextField(
+                  label: "Notification Description",
+                  controller: viewModel.postNotificationDescriptionController,
+                  hintText: "Body of the notification",
+                  maxLines: 3,
+                ),
+                context.verticalSpace(20),
+                _buildOffsetDropdown(
+                  context,
+                  label: "Engagement Timing (Minutes After)",
+                  value: state.postNotificationOffset,
+                  options: {
+                    0: "Immediately After",
+                    60: "1 Hour After",
+                    360: "6 Hours After",
+                    1440: "24 Hours After",
+                    2880: "2 Days After",
+                    10080: "7 Days After",
+                  },
+                  onChanged: (val) => viewModel.setPostNotificationOffset(val),
+                ),
+              ],
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildNotificationPreview(BuildContext context, {required String title, required String message, required String timing}) {
+    return Container(
+      padding: context.appEdgeInsets(all: 16),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: context.fonts.grey10w700ls1),
+              Container(
+                padding: context.appEdgeInsets(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: CustomColors.purple.withValues(alpha: 0.1), borderRadius: context.appBorderRadius(all: 4)),
+                child: Text(timing, style: context.fonts.purple12w700),
+              ),
+            ],
+          ),
+          context.verticalSpace(12),
+          Text(message, style: context.fonts.black14w400),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepDowntime(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+    final presets = selectedCategory?.downtimePresets ?? DowntimePresets();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle(context, "Downtime Level Configuration"),
+        context.verticalSpace(8),
+        Text("Define how long a patient cannot book other services in the treatment area after this procedure.", style: context.fonts.grey14w400),
+        context.verticalSpace(32),
+        
+        _downtimeOption(
+          context, 
+          "None", 
+          "${presets.none} Days", 
+          "No booking restrictions.", 
+          state.downtimeLevel == 'None',
+          () => viewModel.setDowntimeLevel('None'),
+        ),
+        context.verticalSpace(16),
+        _downtimeOption(
+          context, 
+          "Low", 
+          "${presets.low} Days", 
+          "Short recovery window.", 
+          state.downtimeLevel == 'Low',
+          () => viewModel.setDowntimeLevel('Low'),
+        ),
+        context.verticalSpace(16),
+        _downtimeOption(
+          context, 
+          "Moderate", 
+          "${presets.moderate} Days", 
+          "Standard clinical recovery.", 
+          state.downtimeLevel == 'Moderate',
+          () => viewModel.setDowntimeLevel('Moderate'),
+        ),
+        context.verticalSpace(16),
+        _downtimeOption(
+          context, 
+          "High", 
+          "${presets.high} Days", 
+          "Extended recovery required.", 
+          state.downtimeLevel == 'High',
+          () => viewModel.setDowntimeLevel('High'),
+        ),
+      ],
+    );
+  }
+
+  Widget _downtimeOption(BuildContext context, String title, String duration, String desc, bool isSelected, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: context.appBorderRadius(all: 12),
+      child: Container(
+        padding: context.appEdgeInsets(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? CustomColors.purple.withValues(alpha: 0.05) : Colors.white,
+          borderRadius: context.appBorderRadius(all: 12),
+          border: Border.all(color: isSelected ? CustomColors.purple : CustomColors.border, width: isSelected ? 1.5 : 1),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: context.w(48),
+              height: context.w(48),
+              decoration: BoxDecoration(color: isSelected ? CustomColors.purple : CustomColors.whiteGrey, borderRadius: context.appBorderRadius(all: 10)),
+              child: Icon(Icons.timer_outlined, color: isSelected ? Colors.white : CustomColors.grey, size: 24),
+            ),
+            context.horizontalSpace(20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: context.fonts.black16w600),
+                  Text(desc, style: context.fonts.grey12w400),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(duration, style: context.fonts.purple14w700),
+                if (isSelected) context.verticalSpace(4),
+                if (isSelected) const Icon(Icons.check_circle_rounded, color: CustomColors.purple, size: 20),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepRoles(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+    final List<String> availableRoles = ["Injector", "Aesthetician", "MD", "Nurse", "Specialist"];
+    final List<String> categoryRoles = selectedCategory?.defaultRoles ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle(context, "Allowed Provider Roles"),
+        context.verticalSpace(8),
+        Text("Define which provider roles are authorized to perform this treatment.", style: context.fonts.grey14w400),
+        context.verticalSpace(32),
+        
+        Row(
+          children: [
+            _radioOption(context, "Use Category Defaults", state.providerRolesSource == 'category', () {
+              viewModel.setProviderRolesSource('category');
+              viewModel.setRoles(categoryRoles);
+            }),
+            context.horizontalSpace(32),
+            _radioOption(context, "Define Custom Roles", state.providerRolesSource == 'custom', () => viewModel.setProviderRolesSource('custom')),
+          ],
+        ),
+        
+        context.verticalSpace(40),
+        
+        if (state.providerRolesSource == 'category') ...[
+          Text("Category Roles (Read-only)", style: context.fonts.grey10w700ls1),
+          context.verticalSpace(16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: categoryRoles.isEmpty 
+              ? [Text("No roles defined in category.", style: context.fonts.grey14w400)]
+              : categoryRoles.map((role) => _roleChip(context, role, true, null)).toList(),
+          ),
+        ] else ...[
+          Text("Select Authorized Roles", style: context.fonts.black16w600),
+          context.verticalSpace(16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: availableRoles.map((role) {
+              final isSelected = state.selectedRoles.contains(role);
+              return _roleChip(context, role, isSelected, () => viewModel.toggleRole(role));
+            }).toList(),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _roleChip(BuildContext context, String role, bool isSelected, VoidCallback? onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: context.appBorderRadius(all: 30),
+      child: Container(
+        padding: context.appEdgeInsets(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? CustomColors.purple : Colors.white,
+          borderRadius: context.appBorderRadius(all: 30),
+          border: Border.all(color: isSelected ? CustomColors.purple : CustomColors.border),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? Icons.check_circle_rounded : Icons.add_circle_outline_rounded,
+              color: isSelected ? Colors.white : CustomColors.grey,
+              size: 18,
+            ),
+            context.horizontalSpace(8),
+            Text(
+              role,
+              style: isSelected ? context.fonts.white14w600 : context.fonts.black14w400,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

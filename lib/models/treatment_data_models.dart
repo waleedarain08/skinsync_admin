@@ -13,6 +13,12 @@ class CategoryItem {
   final String? consentFormUrl;
   final String? consentFormName;
   final List<FollowUpConfig>? defaultFollowUps;
+  
+  // New operational rule defaults
+  final NotificationConfig? preNotification;
+  final NotificationConfig? postNotification;
+  final DowntimePresets downtimePresets;
+  final List<String> defaultRoles;
 
   CategoryItem({
     required this.id,
@@ -24,7 +30,11 @@ class CategoryItem {
     this.consentFormUrl,
     this.consentFormName,
     this.defaultFollowUps,
-  });
+    this.preNotification,
+    this.postNotification,
+    DowntimePresets? downtimePresets,
+    this.defaultRoles = const [],
+  }) : downtimePresets = downtimePresets ?? DowntimePresets();
 
   CategoryItem copyWith({
     String? id,
@@ -36,6 +46,10 @@ class CategoryItem {
     String? consentFormUrl,
     String? consentFormName,
     List<FollowUpConfig>? defaultFollowUps,
+    NotificationConfig? preNotification,
+    NotificationConfig? postNotification,
+    DowntimePresets? downtimePresets,
+    List<String>? defaultRoles,
   }) {
     return CategoryItem(
       id: id ?? this.id,
@@ -47,6 +61,10 @@ class CategoryItem {
       consentFormUrl: consentFormUrl ?? this.consentFormUrl,
       consentFormName: consentFormName ?? this.consentFormName,
       defaultFollowUps: defaultFollowUps ?? this.defaultFollowUps,
+      preNotification: preNotification ?? this.preNotification,
+      postNotification: postNotification ?? this.postNotification,
+      downtimePresets: downtimePresets ?? this.downtimePresets,
+      defaultRoles: defaultRoles ?? this.defaultRoles,
     );
   }
 }

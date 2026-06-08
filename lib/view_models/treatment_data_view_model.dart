@@ -106,7 +106,18 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
 
   // --- Category Actions (Supports Unlimited Nesting) ---
 
-  void addCategory(String name, {String? icon, String? parentId, String? consentFormUrl, String? consentFormName, List<FollowUpConfig>? defaultFollowUps}) {
+  void addCategory(
+    String name, {
+    String? icon,
+    String? parentId,
+    String? consentFormUrl,
+    String? consentFormName,
+    List<FollowUpConfig>? defaultFollowUps,
+    NotificationConfig? preNotification,
+    NotificationConfig? postNotification,
+    DowntimePresets? downtimePresets,
+    List<String>? defaultRoles,
+  }) {
     if (name.isEmpty) return;
     final newCategory = CategoryItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -116,6 +127,10 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
       consentFormUrl: consentFormUrl,
       consentFormName: consentFormName,
       defaultFollowUps: defaultFollowUps,
+      preNotification: preNotification,
+      postNotification: postNotification,
+      downtimePresets: downtimePresets,
+      defaultRoles: defaultRoles ?? [],
     );
 
     if (parentId == null) {
@@ -138,24 +153,77 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     }).toList();
   }
 
-  void editCategory(String id, String newName, {String? icon, String? consentFormUrl, String? consentFormName, List<FollowUpConfig>? defaultFollowUps}) {
+  void editCategory(
+    String id,
+    String newName, {
+    String? icon,
+    String? consentFormUrl,
+    String? consentFormName,
+    List<FollowUpConfig>? defaultFollowUps,
+    NotificationConfig? preNotification,
+    NotificationConfig? postNotification,
+    DowntimePresets? downtimePresets,
+    List<String>? defaultRoles,
+  }) {
     state = state.copyWith(
-      categories: _updateInTree(state.categories, id, newName, icon, consentFormUrl, consentFormName, defaultFollowUps),
+      categories: _updateInTree(
+        state.categories,
+        id,
+        newName,
+        icon,
+        consentFormUrl,
+        consentFormName,
+        defaultFollowUps,
+        preNotification,
+        postNotification,
+        downtimePresets,
+        defaultRoles,
+      ),
     );
   }
 
-  List<CategoryItem> _updateInTree(List<CategoryItem> items, String id, String newName, String? icon, String? consentFormUrl, String? consentFormName, List<FollowUpConfig>? defaultFollowUps) {
+  List<CategoryItem> _updateInTree(
+    List<CategoryItem> items,
+    String id,
+    String newName,
+    String? icon,
+    String? consentFormUrl,
+    String? consentFormName,
+    List<FollowUpConfig>? defaultFollowUps,
+    NotificationConfig? preNotification,
+    NotificationConfig? postNotification,
+    DowntimePresets? downtimePresets,
+    List<String>? defaultRoles,
+  ) {
     return items.map((item) {
       if (item.id == id) {
         return item.copyWith(
-          name: newName, 
+          name: newName,
           icon: icon ?? item.icon,
           consentFormUrl: consentFormUrl,
           consentFormName: consentFormName,
           defaultFollowUps: defaultFollowUps ?? item.defaultFollowUps,
+          preNotification: preNotification ?? item.preNotification,
+          postNotification: postNotification ?? item.postNotification,
+          downtimePresets: downtimePresets ?? item.downtimePresets,
+          defaultRoles: defaultRoles ?? item.defaultRoles,
         );
       } else if (item.children.isNotEmpty) {
-        return item.copyWith(children: _updateInTree(item.children, id, newName, icon, consentFormUrl, consentFormName, defaultFollowUps));
+        return item.copyWith(
+          children: _updateInTree(
+            item.children,
+            id,
+            newName,
+            icon,
+            consentFormUrl,
+            consentFormName,
+            defaultFollowUps,
+            preNotification,
+            postNotification,
+            downtimePresets,
+            defaultRoles,
+          ),
+        );
       }
       return item;
     }).toList();
