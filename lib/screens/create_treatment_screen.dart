@@ -780,10 +780,22 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
   Widget _buildPricingSummary(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     final basePrice = viewModel.basePriceController.text;
-    final subAreaPricingRules = state.areas
-        .expand((a) => a.subAreas)
-        .where((s) => s.basePriceController.text.isNotEmpty)
+    
+    final uniqueUnits = state.productUsageEntries
+        .map((e) => e.unit)
+        .where((unit) => unit.trim().isNotEmpty)
+        .toSet()
         .toList();
+
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+    final configuredSubAreas = allSubAreas.where((s) {
+      final hasBase = s.basePriceController.text.isNotEmpty && s.basePriceController.text != '0';
+      final hasUnits = uniqueUnits.any((u) {
+        final ctrl = s.getControllerForUnit(u);
+        return ctrl.text.isNotEmpty && ctrl.text != '0';
+      });
+      return hasBase || hasUnits;
+    }).toList();
 
     return _blueprintSection(
       context,
@@ -792,16 +804,39 @@ class CreateTreatmentScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _blueprintRow(context, "Base Price", basePrice.isEmpty ? "\$0" : "\$$basePrice"),
-          _blueprintRow(context, "Pricing Logic", subAreaPricingRules.isEmpty ? "Standard flat base pricing" : "Custom Sub-Area Adjustments"),
-          if (subAreaPricingRules.isNotEmpty) ...[
-            context.verticalSpace(8),
+          _blueprintRow(context, "Pricing Logic", configuredSubAreas.isEmpty ? "Standard flat base pricing" : "Custom Sub-Area Adjustments"),
+          if (configuredSubAreas.isNotEmpty) ...[
+            context.verticalSpace(12),
             Text("Sub-Area Overrides:", style: context.fonts.black12w600),
-            ...subAreaPricingRules.map((rule) {
+            ...configuredSubAreas.map((rule) {
+              final List<String> details = [];
+              final bp = rule.basePriceController.text;
+              if (bp.isNotEmpty && bp != '0') {
+                details.add("Base: \$$bp");
+              }
+              for (final u in uniqueUnits) {
+                final ctrl = rule.getControllerForUnit(u);
+                if (ctrl.text.isNotEmpty && ctrl.text != '0') {
+                  final formattedUnit = u.isNotEmpty ? (u[0].toUpperCase() + u.substring(1)) : u;
+                  details.add("Per $formattedUnit: \$${ctrl.text}");
+                }
+              }
+              
               return Padding(
-                padding: const EdgeInsets.only(left: 12, top: 2),
-                child: Text(
-                  "• ${rule.name}: \$${rule.basePriceController.text}",
-                  style: context.fonts.grey11w400,
+                padding: const EdgeInsets.only(left: 12, top: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("• ${rule.name}", style: context.fonts.black12w600),
+                    if (details.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12, top: 2),
+                        child: Text(
+                          details.join(" | "),
+                          style: context.fonts.grey11w400,
+                        ),
+                      ),
+                  ],
                 ),
               );
             }).toList(),
@@ -1191,6 +1226,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
   Widget _buildStepPricing(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+    final uniqueUnits = state.productUsageEntries
+        .map((e) => e.unit)
+        .where((unit) => unit.trim().isNotEmpty)
+        .toSet()
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1208,7 +1248,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
           context.verticalSpace(40),
           _sectionTitle(context, "Sub-Area Pricing Adjustments"),
           context.verticalSpace(8),
-          Text("Define specific pricing per sub-area if it differs from the base price.", style: context.fonts.grey14w400),
+          Text("Define specific pricing per sub-area if it differs from the base price. Pricing units are generated automatically based on the products selected in the Inventory Products step.", style: context.fonts.grey14w400),
           context.verticalSpace(24),
           ListView.separated(
             shrinkWrap: true,
@@ -1235,11 +1275,32 @@ class CreateTreatmentScreen extends ConsumerWidget {
                       ],
                     ),
                     context.verticalSpace(20),
-                    BuildTextField(
-                      label: "Base Price (\$)",
-                      controller: subArea.basePriceController,
-                      hintText: "0",
-                      keyboardType: TextInputType.number,
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: [
+                        SizedBox(
+                          width: context.w(180),
+                          child: BuildTextField(
+                            label: "Base Price (\$)",
+                            controller: subArea.basePriceController,
+                            hintText: "0",
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        ...uniqueUnits.map((unit) {
+                          final formattedUnit = unit.isNotEmpty ? (unit[0].toUpperCase() + unit.substring(1)) : unit;
+                          return SizedBox(
+                            width: context.w(180),
+                            child: BuildTextField(
+                              label: "Price Per $formattedUnit (\$)",
+                              controller: subArea.getControllerForUnit(unit),
+                              hintText: "0",
+                              keyboardType: TextInputType.number,
+                            ),
+                          );
+                        }).toList(),
+                      ],
                     ),
                   ],
                 ),

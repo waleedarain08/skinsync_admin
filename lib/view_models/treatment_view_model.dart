@@ -315,6 +315,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           entry.subAreas = area.subAreas!.map((s) => SubAreaConfig(
             name: s.name ?? '',
             basePrice: s.basePrice?.toString(),
+            unitPrices: s.unitPrices,
           )).toList();
         }
         newAreas.add(entry);
@@ -971,10 +972,20 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         )).toList(),
         sideAreas: state.areas.map((a) => SideAreaModel(
           name: a.areaController.text,
-          subAreas: a.subAreas.map((s) => SubAreaModel(
-            name: s.name,
-            basePrice: double.tryParse(s.basePriceController.text),
-          )).toList(),
+          subAreas: a.subAreas.map((s) {
+            final Map<String, double> unitPrices = {};
+            s.unitPriceControllers.forEach((unit, controller) {
+              final val = double.tryParse(controller.text);
+              if (val != null) {
+                unitPrices[unit] = val;
+              }
+            });
+            return SubAreaModel(
+              name: s.name,
+              basePrice: double.tryParse(s.basePriceController.text),
+              unitPrices: unitPrices,
+            );
+          }).toList(),
         )).toList(),
       );
 
@@ -1379,12 +1390,25 @@ class ProductUsageEntry {
 class SubAreaConfig {
   final String name;
   final basePriceController = TextEditingController(text: '0');
+  final Map<String, TextEditingController> unitPriceControllers = {};
 
-  SubAreaConfig({required this.name, String? basePrice}) {
+  SubAreaConfig({required this.name, String? basePrice, Map<String, double>? unitPrices}) {
     if (basePrice != null) basePriceController.text = basePrice;
+    if (unitPrices != null) {
+      unitPrices.forEach((unit, price) {
+        unitPriceControllers[unit] = TextEditingController(text: price.toString());
+      });
+    }
+  }
+
+  TextEditingController getControllerForUnit(String unit) {
+    return unitPriceControllers.putIfAbsent(unit, () => TextEditingController(text: '0'));
   }
 
   void dispose() {
     basePriceController.dispose();
+    for (var controller in unitPriceControllers.values) {
+      controller.dispose();
+    }
   }
 }

@@ -1154,6 +1154,11 @@ class EditTreatmentScreen extends ConsumerWidget {
 
   Widget _buildPricingSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+    final uniqueUnits = state.productUsageEntries
+        .map((e) => e.unit)
+        .where((unit) => unit.trim().isNotEmpty)
+        .toSet()
+        .toList();
 
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
@@ -1174,7 +1179,7 @@ class EditTreatmentScreen extends ConsumerWidget {
             context.verticalSpace(16),
             ...allSubAreas.map((subArea) => Padding(
               padding: context.appEdgeInsets(bottom: 12),
-              child: _buildSubAreaConfigCard(context, subArea),
+              child: _buildSubAreaConfigCard(context, subArea, uniqueUnits),
             )),
           ],
         ],
@@ -1274,7 +1279,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSubAreaConfigCard(BuildContext context, SubAreaConfig subArea) {
+  Widget _buildSubAreaConfigCard(BuildContext context, SubAreaConfig subArea, List<String> uniqueUnits) {
     return Container(
       padding: context.appEdgeInsets(all: 16),
       decoration: BoxDecoration(
@@ -1287,11 +1292,32 @@ class EditTreatmentScreen extends ConsumerWidget {
         children: [
           Text(subArea.name, style: context.fonts.grey14w600),
           context.verticalSpace(12),
-          BuildTextField(
-            label: "Base Price (\$)",
-            controller: subArea.basePriceController,
-            hintText: "0",
-            keyboardType: TextInputType.number,
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: [
+              SizedBox(
+                width: context.w(180),
+                child: BuildTextField(
+                  label: "Base Price (\$)",
+                  controller: subArea.basePriceController,
+                  hintText: "0",
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              ...uniqueUnits.map((unit) {
+                final formattedUnit = unit.isNotEmpty ? (unit[0].toUpperCase() + unit.substring(1)) : unit;
+                return SizedBox(
+                  width: context.w(180),
+                  child: BuildTextField(
+                    label: "Price Per $formattedUnit (\$)",
+                    controller: subArea.getControllerForUnit(unit),
+                    hintText: "0",
+                    keyboardType: TextInputType.number,
+                  ),
+                );
+              }).toList(),
+            ],
           ),
         ],
       ),

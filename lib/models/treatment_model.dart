@@ -384,13 +384,20 @@ class SubAreaModel {
   int? id;
   String? name;
   double? basePrice;
+  Map<String, double>? unitPrices;
 
-  SubAreaModel({this.id, this.name, this.basePrice});
+  SubAreaModel({this.id, this.name, this.basePrice, this.unitPrices});
 
   SubAreaModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     basePrice = json['base_price']?.toDouble();
+    if (json['unit_prices'] != null) {
+      unitPrices = {};
+      (json['unit_prices'] as Map).forEach((key, value) {
+        unitPrices![key.toString()] = (value as num).toDouble();
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -398,6 +405,7 @@ class SubAreaModel {
       "id": id,
       "name": name,
       "base_price": basePrice,
+      if (unitPrices != null) "unit_prices": unitPrices,
     };
   }
 }
