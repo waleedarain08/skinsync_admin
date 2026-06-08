@@ -331,7 +331,52 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   void setPostNotificationSource(String source) => state = state.copyWith(postNotificationSource: source);
   void setDowntimeLevel(String level) => state = state.copyWith(downtimeLevel: level);
   void setProviderRolesSource(String source) => state = state.copyWith(providerRolesSource: source);
-  void setSessionSource(String source) => state = state.copyWith(sessionSource: source);
+  
+  void setSessionSource(String source, {CategoryItem? category}) {
+    state = state.copyWith(sessionSource: source);
+    if (source == 'category' && category != null) {
+      for (var entry in state.sessions) {
+        entry.dispose();
+      }
+      final List<SessionViewModelEntry> newSessions = [];
+      if (category.defaultSessions != null && category.defaultSessions!.isNotEmpty) {
+        for (var s in category.defaultSessions!) {
+          newSessions.add(SessionViewModelEntry(
+            sessionNumber: s.sessionNumber,
+            totalFollowUpsController: TextEditingController(text: s.followUps.length.toString()),
+            followUps: s.followUps.map((fu) => FollowUpEntry(
+              type: fu.type,
+              durationUnit: fu.durationUnit,
+              durationValueController: TextEditingController(text: fu.durationValue?.toString() ?? ''),
+              notesController: TextEditingController(text: fu.notes ?? ''),
+              intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
+              intervalUnit: fu.intervalUnit ?? 'days',
+            )).toList(),
+          ));
+        }
+      } else {
+        final int sessionCount = category.totalSessions;
+        for (int i = 0; i < sessionCount; i++) {
+          newSessions.add(SessionViewModelEntry(
+            sessionNumber: i + 1,
+            totalFollowUpsController: TextEditingController(text: (category.defaultFollowUps?.length ?? 0).toString()),
+            followUps: (category.defaultFollowUps ?? []).map((fu) => FollowUpEntry(
+              type: fu.type,
+              durationUnit: fu.durationUnit,
+              durationValueController: TextEditingController(text: fu.durationValue?.toString() ?? ''),
+              notesController: TextEditingController(text: fu.notes ?? ''),
+              intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
+              intervalUnit: fu.intervalUnit ?? 'days',
+            )).toList(),
+          ));
+        }
+      }
+      state = state.copyWith(
+        totalSessions: newSessions.length,
+        sessions: newSessions,
+      );
+    }
+  }
 
   void setTotalSessions(String val, {List<CategoryItem> categories = const []}) {
     final count = int.tryParse(val) ?? 1;
@@ -420,7 +465,50 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     categoryNameController.text = category.name;
     categoryPathController.text = path;
     
-    state = state.copyWith(); 
+    if (state.sessionSource == 'category') {
+      for (var entry in state.sessions) {
+        entry.dispose();
+      }
+      final List<SessionViewModelEntry> newSessions = [];
+      if (category.defaultSessions != null && category.defaultSessions!.isNotEmpty) {
+        for (var s in category.defaultSessions!) {
+          newSessions.add(SessionViewModelEntry(
+            sessionNumber: s.sessionNumber,
+            totalFollowUpsController: TextEditingController(text: s.followUps.length.toString()),
+            followUps: s.followUps.map((fu) => FollowUpEntry(
+              type: fu.type,
+              durationUnit: fu.durationUnit,
+              durationValueController: TextEditingController(text: fu.durationValue?.toString() ?? ''),
+              notesController: TextEditingController(text: fu.notes ?? ''),
+              intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
+              intervalUnit: fu.intervalUnit ?? 'days',
+            )).toList(),
+          ));
+        }
+      } else {
+        final int sessionCount = category.totalSessions;
+        for (int i = 0; i < sessionCount; i++) {
+          newSessions.add(SessionViewModelEntry(
+            sessionNumber: i + 1,
+            totalFollowUpsController: TextEditingController(text: (category.defaultFollowUps?.length ?? 0).toString()),
+            followUps: (category.defaultFollowUps ?? []).map((fu) => FollowUpEntry(
+              type: fu.type,
+              durationUnit: fu.durationUnit,
+              durationValueController: TextEditingController(text: fu.durationValue?.toString() ?? ''),
+              notesController: TextEditingController(text: fu.notes ?? ''),
+              intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
+              intervalUnit: fu.intervalUnit ?? 'days',
+            )).toList(),
+          ));
+        }
+      }
+      state = state.copyWith(
+        totalSessions: newSessions.length,
+        sessions: newSessions,
+      );
+    } else {
+      state = state.copyWith();
+    }
   }
 
   void selectCategoryAtLevel(int level, CategoryItem category, List<CategoryItem> allCategories) {
@@ -445,6 +533,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     categoryPathController.text = fullPath;
 
     state = state.copyWith(selectedCategoryPath: currentPath);
+    onCategorySelected(category, fullPath);
   }
 
   CategoryItem? findCategoryById(List<CategoryItem> items, String id) {
@@ -727,12 +816,26 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       
       if (state.sessionSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
-        final int sessionCount = selectedCategory?.totalSessions ?? 1;
-        for (int i = 0; i < sessionCount; i++) {
-          effectiveSessions.add(SessionConfig(
-            sessionNumber: i + 1,
-            followUps: selectedCategory?.defaultFollowUps ?? [],
-          ));
+        if (selectedCategory != null && selectedCategory.defaultSessions != null && selectedCategory.defaultSessions!.isNotEmpty) {
+          effectiveSessions = selectedCategory.defaultSessions!.map((s) => SessionConfig(
+            sessionNumber: s.sessionNumber,
+            followUps: s.followUps.map((f) => FollowUpConfig(
+              type: f.type,
+              durationValue: f.durationValue,
+              durationUnit: f.durationUnit,
+              notes: f.notes,
+              intervalValue: f.intervalValue,
+              intervalUnit: f.intervalUnit,
+            )).toList(),
+          )).toList();
+        } else {
+          final int sessionCount = selectedCategory?.totalSessions ?? 1;
+          for (int i = 0; i < sessionCount; i++) {
+            effectiveSessions.add(SessionConfig(
+              sessionNumber: i + 1,
+              followUps: selectedCategory?.defaultFollowUps ?? [],
+            ));
+          }
         }
       } else {
         effectiveSessions = state.sessions.map((s) => SessionConfig(
@@ -835,12 +938,26 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       
       if (state.sessionSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
-        final int sessionCount = selectedCategory?.totalSessions ?? 1;
-        for (int i = 0; i < sessionCount; i++) {
-          effectiveSessions.add(SessionConfig(
-            sessionNumber: i + 1,
-            followUps: selectedCategory?.defaultFollowUps ?? [],
-          ));
+        if (selectedCategory != null && selectedCategory.defaultSessions != null && selectedCategory.defaultSessions!.isNotEmpty) {
+          effectiveSessions = selectedCategory.defaultSessions!.map((s) => SessionConfig(
+            sessionNumber: s.sessionNumber,
+            followUps: s.followUps.map((f) => FollowUpConfig(
+              type: f.type,
+              durationValue: f.durationValue,
+              durationUnit: f.durationUnit,
+              notes: f.notes,
+              intervalValue: f.intervalValue,
+              intervalUnit: f.intervalUnit,
+            )).toList(),
+          )).toList();
+        } else {
+          final int sessionCount = selectedCategory?.totalSessions ?? 1;
+          for (int i = 0; i < sessionCount; i++) {
+            effectiveSessions.add(SessionConfig(
+              sessionNumber: i + 1,
+              followUps: selectedCategory?.defaultFollowUps ?? [],
+            ));
+          }
         }
       } else {
         effectiveSessions = state.sessions.map((s) => SessionConfig(

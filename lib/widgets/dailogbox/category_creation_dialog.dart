@@ -12,6 +12,7 @@ class CategoryCreationDialog extends StatefulWidget {
   final String? initialIcon;
   final String? initialConsentName;
   final List<FollowUpConfig>? initialFollowUps;
+  final List<SessionConfig>? initialSessions;
   final int? initialTotalSessions;
   final NotificationConfig? initialPreNotification;
   final NotificationConfig? initialPostNotification;
@@ -25,6 +26,7 @@ class CategoryCreationDialog extends StatefulWidget {
     this.initialIcon,
     this.initialConsentName,
     this.initialFollowUps,
+    this.initialSessions,
     this.initialTotalSessions,
     this.initialPreNotification,
     this.initialPostNotification,
@@ -39,11 +41,11 @@ class CategoryCreationDialog extends StatefulWidget {
 class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _totalSessionsController;
-  late final TextEditingController _totalFollowUpsController;
+  final List<TextEditingController> _sessionFollowUpsCountControllers = [];
   late String _selectedIcon;
   PlatformFile? _consentFile;
   String? _existingConsentName;
-  List<FollowUpConfig> _followUps = [];
+  List<SessionConfig> _sessions = [];
 
   // Notifications
   late final TextEditingController _preNotifyMessageController;
@@ -64,15 +66,28 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName);
-    _totalSessionsController = TextEditingController(text: (widget.initialTotalSessions ?? 1).toString());
+    
+    final int initialTotalSessions = widget.initialTotalSessions ?? 1;
+    _totalSessionsController = TextEditingController(text: initialTotalSessions.toString());
     _selectedIcon = widget.initialIcon ?? "category";
     _existingConsentName = widget.initialConsentName;
-    _followUps = widget.initialFollowUps != null 
-        ? List.from(widget.initialFollowUps!) 
-        : [];
-    _totalFollowUpsController = TextEditingController(
-      text: _followUps.isEmpty ? "" : _followUps.length.toString()
-    );
+
+    if (widget.initialSessions != null && widget.initialSessions!.isNotEmpty) {
+      _sessions = List.from(widget.initialSessions!.map((s) => SessionConfig(
+        sessionNumber: s.sessionNumber,
+        followUps: List.from(s.followUps),
+      )));
+    } else {
+      _sessions = List.generate(initialTotalSessions, (index) {
+        return SessionConfig(
+          sessionNumber: index + 1,
+          followUps: index == 0 && widget.initialFollowUps != null
+              ? List.from(widget.initialFollowUps!)
+              : [],
+        );
+      });
+    }
+    _syncFollowUpsCountControllers();
 
     _preNotifyMessageController = TextEditingController(text: widget.initialPreNotification?.message);
     _preNotifyTimingController = TextEditingController(text: widget.initialPreNotification?.timing?.toString());
@@ -84,6 +99,20 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     _downtimeHighController = TextEditingController(text: (widget.initialDowntimePresets?.high ?? 10).toString());
 
     _selectedRoles = widget.initialDefaultRoles != null ? List.from(widget.initialDefaultRoles!) : [];
+  }
+
+  void _syncFollowUpsCountControllers() {
+    while (_sessionFollowUpsCountControllers.length < _sessions.length) {
+      final sIdx = _sessionFollowUpsCountControllers.length;
+      final initialCount = _sessions[sIdx].followUps.length;
+      _sessionFollowUpsCountControllers.add(TextEditingController(
+        text: initialCount == 0 ? "0" : initialCount.toString(),
+      ));
+    }
+    while (_sessionFollowUpsCountControllers.length > _sessions.length) {
+      _sessionFollowUpsCountControllers.last.dispose();
+      _sessionFollowUpsCountControllers.removeLast();
+    }
   }
 
   final List<Map<String, dynamic>> _icons = [
@@ -100,7 +129,9 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   void dispose() {
     _nameController.dispose();
     _totalSessionsController.dispose();
-    _totalFollowUpsController.dispose();
+    for (var controller in _sessionFollowUpsCountControllers) {
+      controller.dispose();
+    }
     _preNotifyMessageController.dispose();
     _preNotifyTimingController.dispose();
     _postNotifyMessageController.dispose();
@@ -111,16 +142,41 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     super.dispose();
   }
 
-  void _updateFollowUpCount(String val) {
-    final count = int.tryParse(val) ?? 0;
+  void _updateSessionsCount(String val) {
+    final count = int.tryParse(val) ?? 1;
+    if (count < 1) return;
     setState(() {
-      if (count > _followUps.length) {
-        for (int i = _followUps.length; i < count; i++) {
-          _followUps.add(FollowUpConfig(type: 'virtual'));
+      if (count > _sessions.length) {
+        for (int i = _sessions.length; i < count; i++) {
+          _sessions.add(SessionConfig(
+            sessionNumber: i + 1,
+            followUps: [],
+          ));
         }
-      } else if (count < _followUps.length) {
-        _followUps = _followUps.sublist(0, count);
+      } else if (count < _sessions.length) {
+        _sessions = _sessions.sublist(0, count);
       }
+      _syncFollowUpsCountControllers();
+    });
+  }
+
+  void _updateSessionFollowUpCount(int sIdx, String val) {
+    final count = int.tryParse(val) ?? 0;
+    if (count < 0) return;
+    setState(() {
+      final session = _sessions[sIdx];
+      final currentFus = List<FollowUpConfig>.from(session.followUps);
+      if (count > currentFus.length) {
+        for (int i = currentFus.length; i < count; i++) {
+          currentFus.add(FollowUpConfig(type: 'virtual'));
+        }
+      } else if (count < currentFus.length) {
+        currentFus.removeRange(count, currentFus.length);
+      }
+      _sessions[sIdx] = SessionConfig(
+        sessionNumber: session.sessionNumber,
+        followUps: currentFus,
+      );
     });
   }
 
@@ -155,13 +211,6 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
               hintText: "e.g. Skin Rejuvenation",
             ),
             context.verticalSpace(24),
-            BuildTextField(
-              label: "Default Total Sessions",
-              controller: _totalSessionsController,
-              hintText: "1",
-              keyboardType: TextInputType.number,
-            ),
-            context.verticalSpace(24),
             Text("Select Category Icon", style: context.fonts.black14w600),
             context.verticalSpace(12),
             Wrap(
@@ -192,6 +241,68 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
               }).toList(),
             ),
             
+            context.verticalSpace(32),
+            const Divider(),
+            context.verticalSpace(24),
+            Text("Sessions Configuration", style: context.fonts.black16w600),
+            context.verticalSpace(8),
+            Text("Configure sessions and their respective follow-ups for this category.", style: context.fonts.grey12w400),
+            context.verticalSpace(20),
+            BuildTextField(
+              label: "Total Sessions",
+              controller: _totalSessionsController,
+              hintText: "1",
+              keyboardType: TextInputType.number,
+              onChanged: (val) => _updateSessionsCount(val ?? ""),
+            ),
+            if (_sessions.isNotEmpty) ...[
+              context.verticalSpace(24),
+              ...List.generate(_sessions.length, (sIdx) {
+                final session = _sessions[sIdx];
+                return Container(
+                  margin: context.appEdgeInsets(bottom: 24),
+                  padding: context.appEdgeInsets(all: 20),
+                  decoration: BoxDecoration(
+                    color: CustomColors.purple.withOpacity(0.02),
+                    borderRadius: context.appBorderRadius(all: 12),
+                    border: Border.all(color: CustomColors.purple.withOpacity(0.1)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.event_note_rounded, color: CustomColors.purple),
+                          context.horizontalSpace(12),
+                          Text("SESSION ${session.sessionNumber}", style: context.fonts.purple14w700),
+                          const Spacer(),
+                          SizedBox(
+                            width: context.w(150),
+                            child: BuildTextField(
+                              label: "Total Follow-Ups",
+                              controller: _sessionFollowUpsCountControllers[sIdx],
+                              hintText: "0",
+                              keyboardType: TextInputType.number,
+                              onChanged: (val) => _updateSessionFollowUpCount(sIdx, val ?? ""),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (session.followUps.isNotEmpty) ...[
+                        context.verticalSpace(20),
+                        ...List.generate(session.followUps.length, (fuIdx) {
+                          return Padding(
+                            padding: context.appEdgeInsets(bottom: 16),
+                            child: _buildSessionFollowUpCard(sIdx, fuIdx),
+                          );
+                        }),
+                      ],
+                    ],
+                  ),
+                );
+              }),
+            ],
+
             context.verticalSpace(32),
             const Divider(),
             context.verticalSpace(24),
@@ -287,28 +398,6 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
               ),
             ),
             context.verticalSpace(32),
-            const Divider(),
-            context.verticalSpace(24),
-            Text("Default Follow-Up Journey", style: context.fonts.black16w600),
-            context.verticalSpace(8),
-            Text("Define the default follow-up sequence for treatments in this category.", style: context.fonts.grey12w400),
-            context.verticalSpace(20),
-            BuildTextField(
-              label: "Total Follow-Ups",
-              controller: _totalFollowUpsController,
-              hintText: "0",
-              keyboardType: TextInputType.number,
-              onChanged: (val) => _updateFollowUpCount(val ?? ""),
-            ),
-            if (_followUps.isNotEmpty) ...[
-              context.verticalSpace(24),
-              ...List.generate(_followUps.length, (index) {
-                return Padding(
-                  padding: context.appEdgeInsets(bottom: 16),
-                  child: _buildFollowUpCard(index),
-                );
-              }),
-            ],
           ],
         ),
       actions: [
@@ -326,7 +415,8 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   'totalSessions': int.tryParse(_totalSessionsController.text) ?? 1,
                   'icon': _selectedIcon,
                   'consentFile': _consentFile,
-                  'followUps': _followUps,
+                  'sessions': _sessions,
+                  'followUps': _sessions.isNotEmpty ? _sessions.first.followUps : <FollowUpConfig>[],
                   'preNotification': NotificationConfig(
                     message: _preNotifyMessageController.text,
                     timing: int.tryParse(_preNotifyTimingController.text),
@@ -379,8 +469,8 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     );
   }
 
-  Widget _buildFollowUpCard(int index) {
-    final config = _followUps[index];
+  Widget _buildSessionFollowUpCard(int sIdx, int fuIdx) {
+    final config = _sessions[sIdx].followUps[fuIdx];
     final intervalController = TextEditingController(text: config.intervalValue?.toString() ?? "");
     final durationController = TextEditingController(text: config.durationValue?.toString() ?? "");
 
@@ -394,7 +484,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Follow-Up ${index + 1}", style: context.fonts.purple12w700),
+          Text("Follow-Up ${fuIdx + 1}", style: context.fonts.purple12w700),
           context.verticalSpace(12),
           Row(
             children: [
@@ -408,7 +498,11 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                     DropdownMenuItem(value: 'in_person', child: Text("In-Person")),
                   ],
                   onChanged: (val) {
-                    if (val != null) setState(() => config.type = val);
+                    if (val != null) {
+                      setState(() {
+                        config.type = val;
+                      });
+                    }
                   },
                 ),
               ),
@@ -440,7 +534,11 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                                 DropdownMenuItem(value: 'hours', child: Text("h")),
                               ],
                               onChanged: (v) {
-                                if (v != null) setState(() => config.durationUnit = v);
+                                if (v != null) {
+                                  setState(() {
+                                    config.durationUnit = v;
+                                  });
+                                }
                               },
                             ),
                           ),
@@ -476,7 +574,11 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                       DropdownMenuItem(value: 'weeks', child: Text("Weeks")),
                     ],
                     onChanged: (v) {
-                      if (v != null) setState(() => config.intervalUnit = v);
+                      if (v != null) {
+                        setState(() {
+                          config.intervalUnit = v;
+                        });
+                      }
                     },
                   ),
                 ),

@@ -601,8 +601,7 @@ class EditTreatmentScreen extends ConsumerWidget {
                 "Use Category Sessions ($categorySessions)", 
                 state.sessionSource == 'category', 
                 () {
-                  viewModel.setSessionSource('category');
-                  viewModel.setTotalSessions(categorySessions.toString());
+                  viewModel.setSessionSource('category', category: selectedCategory);
                 }
               ),
               context.horizontalSpace(32),

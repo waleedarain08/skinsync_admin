@@ -326,7 +326,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
     if (state.sessionSource == 'custom') {
       totalFus = state.sessions.fold(0, (sum, s) => sum + s.followUps.length);
     } else if (selectedCategory != null) {
-      totalFus = (selectedCategory.totalSessions) * (selectedCategory.defaultFollowUps?.length ?? 0);
+      if (selectedCategory.defaultSessions != null && selectedCategory.defaultSessions!.isNotEmpty) {
+        totalFus = selectedCategory.defaultSessions!.fold(0, (sum, s) => sum + s.followUps.length);
+      } else {
+        totalFus = (selectedCategory.totalSessions) * (selectedCategory.defaultFollowUps?.length ?? 0);
+      }
     }
 
     return Container(
@@ -1070,8 +1074,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
               "Use Category Sessions ($categorySessions)", 
               state.sessionSource == 'category', 
               () {
-                viewModel.setSessionSource('category');
-                viewModel.setTotalSessions(categorySessions.toString());
+                viewModel.setSessionSource('category', category: selectedCategory);
               }
             ),
             context.horizontalSpace(32),
