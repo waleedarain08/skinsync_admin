@@ -100,6 +100,30 @@ class DowntimePresets {
   };
 }
 
+class SubAreaConsumption {
+  String subAreaName;
+  double minQuantity;
+  double maxQuantity;
+
+  SubAreaConsumption({
+    required this.subAreaName,
+    this.minQuantity = 0.0,
+    this.maxQuantity = 0.0,
+  });
+
+  factory SubAreaConsumption.fromJson(Map<String, dynamic> json) => SubAreaConsumption(
+    subAreaName: json['sub_area_name'] ?? '',
+    minQuantity: (json['min_quantity'] as num?)?.toDouble() ?? 0.0,
+    maxQuantity: (json['max_quantity'] as num?)?.toDouble() ?? 0.0,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'sub_area_name': subAreaName,
+    'min_quantity': minQuantity,
+    'max_quantity': maxQuantity,
+  };
+}
+
 class ProductUsageModel {
   int productId;
   String productName;
@@ -110,6 +134,7 @@ class ProductUsageModel {
   bool allowSubstitution;
   String? notes;
   String unit;
+  List<SubAreaConsumption>? subAreaConsumptions;
 
   ProductUsageModel({
     required this.productId,
@@ -121,6 +146,7 @@ class ProductUsageModel {
     this.allowSubstitution = false,
     this.notes,
     this.unit = 'Units',
+    this.subAreaConsumptions,
   });
 
   factory ProductUsageModel.fromJson(Map<String, dynamic> json) => ProductUsageModel(
@@ -133,6 +159,11 @@ class ProductUsageModel {
     allowSubstitution: json['allow_substitution'] ?? false,
     notes: json['notes'],
     unit: json['unit'] ?? 'Units',
+    subAreaConsumptions: json['sub_area_consumptions'] != null
+        ? (json['sub_area_consumptions'] as List)
+            .map((e) => SubAreaConsumption.fromJson(e))
+            .toList()
+        : null,
   );
 
   Map<String, dynamic> toJson() => {
@@ -145,6 +176,8 @@ class ProductUsageModel {
     'allow_substitution': allowSubstitution,
     'notes': notes,
     'unit': unit,
+    if (subAreaConsumptions != null)
+      'sub_area_consumptions': subAreaConsumptions!.map((e) => e.toJson()).toList(),
   };
 }
 

@@ -750,6 +750,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: state.productUsageEntries.map((entry) {
+                final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+                
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Column(
@@ -762,9 +764,25 @@ class CreateTreatmentScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Usage Type: ${entry.usageType}", style: context.fonts.grey11w400),
-                            Text("Quantity: Min ${entry.minQuantityController.text} / Max ${entry.maxQuantityController.text} ${entry.unit}", style: context.fonts.grey11w400),
+                            Text("Treatment-Level Quantity: Min ${entry.minQuantityController.text} / Max ${entry.maxQuantityController.text} ${entry.unit}", style: context.fonts.grey11w400),
                             Text("Deduction Timing: ${entry.deductionTiming}", style: context.fonts.grey11w400),
                             Text("Substitution Allowed: ${entry.allowSubstitution ? 'Yes' : 'No'}", style: context.fonts.grey11w400),
+                            if (allSubAreas.isNotEmpty) ...[
+                              context.verticalSpace(4),
+                              Text("Sub-Area Consumption Overrides:", style: context.fonts.black12w600),
+                              ...allSubAreas.map((subArea) {
+                                final controllers = entry.getControllersForSubArea(subArea.name);
+                                final minText = controllers.minController.text;
+                                final maxText = controllers.maxController.text;
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: Text(
+                                    "- ${subArea.name}: Min $minText / Max $maxText ${entry.unit}",
+                                    style: context.fonts.grey11w400,
+                                  ),
+                                );
+                              }).toList(),
+                            ],
                             if (entry.notesController.text.isNotEmpty)
                               Text("Notes: ${entry.notesController.text}", style: context.fonts.grey11w400),
                           ],
@@ -3098,7 +3116,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             itemCount: state.productUsageEntries.length,
             separatorBuilder: (_, __) => context.verticalSpace(24),
             itemBuilder: (context, index) {
-              return _buildProductUsageCard(context, index, state.productUsageEntries[index], viewModel);
+              return _buildProductUsageCard(context, index, state.productUsageEntries[index], viewModel, state);
             },
           ),
         ],
@@ -3142,7 +3160,25 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProductUsageCard(BuildContext context, int index, ProductUsageEntry entry, TreatmentViewModel viewModel) {
+  Widget _buildProductUsageCard(BuildContext context, int index, ProductUsageEntry entry, TreatmentViewModel viewModel, TreatmentState state) {
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+
+    String formatUnitPlural(String unit) {
+      if (unit.isEmpty) return 'Units';
+      final lower = unit.toLowerCase();
+      if (lower == 'unit' || lower == 'u') return 'Units';
+      if (lower.contains('unit (u)')) return 'Units (U)';
+      if (lower == 'syringe') return 'Syringes';
+      if (lower == 'vial') return 'Vials';
+      if (lower == 'bottle') return 'Bottles';
+      if (lower == 'tube') return 'Tubes';
+      if (lower == 'kit') return 'Kits';
+      if (lower == 'pack') return 'Packs';
+      if (lower == 'piece') return 'Pieces';
+      if (lower.endsWith('s')) return unit;
+      return '${unit}s';
+    }
+
     return Container(
       padding: context.appEdgeInsets(all: 20),
       decoration: BoxDecoration(
@@ -3210,7 +3246,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: BuildTextField(
-                  label: "Min Quantity",
+                  label: "Min Quantity (Treatment-Level)",
                   controller: entry.minQuantityController,
                   hintText: "0",
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -3219,7 +3255,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
               context.horizontalSpace(16),
               Expanded(
                 child: BuildTextField(
-                  label: "Max Quantity",
+                  label: "Max Quantity (Treatment-Level)",
                   controller: entry.maxQuantityController,
                   hintText: "0",
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -3250,6 +3286,64 @@ class CreateTreatmentScreen extends ConsumerWidget {
             hintText: "Clinical instructions or restrictions...",
             maxLines: 2,
           ),
+          if (allSubAreas.isNotEmpty) ...[
+            context.verticalSpace(24),
+            const Divider(),
+            context.verticalSpace(16),
+            Text("Sub-Area Consumption Ranges", style: context.fonts.black14w600),
+            context.verticalSpace(4),
+            Text("Define clinical product ranges for each configured sub-area.", style: context.fonts.grey12w400),
+            context.verticalSpace(16),
+            ...allSubAreas.map((subArea) {
+              final controllers = entry.getControllersForSubArea(subArea.name);
+              final pluralUnit = formatUnitPlural(entry.unit);
+              return Padding(
+                padding: context.appEdgeInsets(bottom: 16),
+                child: Container(
+                  padding: context.appEdgeInsets(all: 16),
+                  decoration: BoxDecoration(
+                    color: CustomColors.whiteGrey,
+                    borderRadius: context.appBorderRadius(all: 10),
+                    border: Border.all(color: CustomColors.border),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.subdirectory_arrow_right, size: 16, color: CustomColors.purple),
+                          context.horizontalSpace(8),
+                          Text(subArea.name, style: context.fonts.black14w600),
+                        ],
+                      ),
+                      context.verticalSpace(12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: BuildTextField(
+                              label: "Min $pluralUnit",
+                              controller: controllers.minController,
+                              hintText: "0",
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                          context.horizontalSpace(16),
+                          Expanded(
+                            child: BuildTextField(
+                              label: "Max $pluralUnit",
+                              controller: controllers.maxController,
+                              hintText: "0",
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ],
         ],
       ),
     );
