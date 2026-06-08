@@ -9,26 +9,22 @@ final treatmentDataViewModelProvider = NotifierProvider<TreatmentDataViewModel, 
 class TreatmentDataState {
   final List<CategoryItem> categories;
   final List<AreaItem> areas;
-  final List<String> materials;
   final List<ProtocolItem> protocols;
 
   TreatmentDataState({
     required this.categories,
     required this.areas,
-    required this.materials,
     this.protocols = const [],
   });
 
   TreatmentDataState copyWith({
     List<CategoryItem>? categories,
     List<AreaItem>? areas,
-    List<String>? materials,
     List<ProtocolItem>? protocols,
   }) {
     return TreatmentDataState(
       categories: categories ?? this.categories,
       areas: areas ?? this.areas,
-      materials: materials ?? this.materials,
       protocols: protocols ?? this.protocols,
     );
   }
@@ -68,7 +64,6 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     return TreatmentDataState(
       categories: categories,
       areas: areas,
-      materials: List.from(TreatmentData.consumableTypes),
       protocols: [
         ProtocolItem(id: '1', title: 'Cleanse treatment area', type: ProtocolType.checkbox),
         ProtocolItem(id: '2', title: 'Review contraindications', type: ProtocolType.checkbox),
@@ -111,7 +106,7 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
 
   // --- Category Actions (Supports Unlimited Nesting) ---
 
-  void addCategory(String name, {String? icon, String? parentId, String? consentFormUrl, String? consentFormName}) {
+  void addCategory(String name, {String? icon, String? parentId, String? consentFormUrl, String? consentFormName, List<FollowUpConfig>? defaultFollowUps}) {
     if (name.isEmpty) return;
     final newCategory = CategoryItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -120,6 +115,7 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
       parentId: parentId,
       consentFormUrl: consentFormUrl,
       consentFormName: consentFormName,
+      defaultFollowUps: defaultFollowUps,
     );
 
     if (parentId == null) {
@@ -142,13 +138,13 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     }).toList();
   }
 
-  void editCategory(String id, String newName, {String? icon, String? consentFormUrl, String? consentFormName}) {
+  void editCategory(String id, String newName, {String? icon, String? consentFormUrl, String? consentFormName, List<FollowUpConfig>? defaultFollowUps}) {
     state = state.copyWith(
-      categories: _updateInTree(state.categories, id, newName, icon, consentFormUrl, consentFormName),
+      categories: _updateInTree(state.categories, id, newName, icon, consentFormUrl, consentFormName, defaultFollowUps),
     );
   }
 
-  List<CategoryItem> _updateInTree(List<CategoryItem> items, String id, String newName, String? icon, String? consentFormUrl, String? consentFormName) {
+  List<CategoryItem> _updateInTree(List<CategoryItem> items, String id, String newName, String? icon, String? consentFormUrl, String? consentFormName, List<FollowUpConfig>? defaultFollowUps) {
     return items.map((item) {
       if (item.id == id) {
         return item.copyWith(
@@ -156,9 +152,10 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
           icon: icon ?? item.icon,
           consentFormUrl: consentFormUrl,
           consentFormName: consentFormName,
+          defaultFollowUps: defaultFollowUps ?? item.defaultFollowUps,
         );
       } else if (item.children.isNotEmpty) {
-        return item.copyWith(children: _updateInTree(item.children, id, newName, icon, consentFormUrl, consentFormName));
+        return item.copyWith(children: _updateInTree(item.children, id, newName, icon, consentFormUrl, consentFormName, defaultFollowUps));
       }
       return item;
     }).toList();
@@ -254,21 +251,5 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
         return a;
       }).toList(),
     );
-  }
-
-  // --- Material Actions ---
-  void addMaterial(String name) {
-    if (name.isEmpty || state.materials.contains(name)) return;
-    state = state.copyWith(materials: [...state.materials, name]);
-  }
-
-  void editMaterial(String oldName, String newName) {
-    state = state.copyWith(
-      materials: state.materials.map((m) => m == oldName ? newName : m).toList(),
-    );
-  }
-
-  void deleteMaterial(String name) {
-    state = state.copyWith(materials: state.materials.where((m) => m != name).toList());
   }
 }

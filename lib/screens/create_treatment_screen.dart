@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
+import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
@@ -17,6 +18,8 @@ import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/nested_category_selector.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
+import 'package:skinsync_admin/models/product_model.dart';
+import 'package:skinsync_admin/utils/dummy_data.dart';
 
 class CreateTreatmentScreen extends ConsumerWidget {
   const CreateTreatmentScreen({super.key});
@@ -75,7 +78,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                               child: _buildCurrentStepContent(context, state, viewModel, dataState, ref),
                             ),
                             context.verticalSpace(48),
-                            _buildActionButtons(context, state, viewModel),
+                            _buildActionButtons(context, state, viewModel, dataState),
                           ],
                         ),
                       ),
@@ -102,7 +105,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Phase Notifications",
       "Follow-Up Setup",
       "Patient Consent",
-      "Materials & Logic",
+      "Inventory Products",
+      "Business Logic",
       "Pricing"
     ];
 
@@ -205,20 +209,22 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Phase Notifications",
       "Follow-Up Configuration",
       "Patient Consent Form",
-      "Materials & Logic",
+      "Inventory Products",
+      "Business Logic",
       "Pricing Setup"
     ];
     final descriptions = [
       "Organize treatments to help patients and staff find them easily.",
       "Core identification details including status and duration.",
-      "Define mandatory sub-areas and max material quantities.",
+      "Define mandatory sub-areas.",
       "Standardize procedures with checklists and required text fields.",
       "Detailed instructions and supporting media for patients before the procedure.",
       "Aftercare guidelines and recovery media for patients after the procedure.",
       "Automated reminders and follow-up engagement messages.",
       "Manage rules and scheduling for post-procedure clinical check-ins.",
       "Upload and manage legal procedural consent documentation.",
-      "Configure materials and AI simulator settings.",
+      "Configure required products from inventory and area-wise consumption.",
+      "Manage system-wide treatment behaviors and onboarding settings.",
       "Finalize treatment base price and sub-area pricing adjustments."
     ];
     final icons = [
@@ -232,6 +238,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       Icons.replay_outlined,
       Icons.fact_check_outlined,
       Icons.inventory_2_outlined,
+      Icons.settings_suggest_outlined,
       Icons.payments_outlined
     ];
 
@@ -285,14 +292,58 @@ class CreateTreatmentScreen extends ConsumerWidget {
             _buildProtocolFormPreview(context, state, dataState),
             context.verticalSpace(32),
             Text("Patient Journey Preview", style: context.fonts.black16w600),
-            context.verticalSpace(16),
-            _buildPatientJourneyPreview(context, state, viewModel),
+            context.verticalSpace(20),
+            _buildPatientJourneyPreview(context, state, viewModel, dataState),
             context.verticalSpace(32),
             Text("Configuration Summary", style: context.fonts.black16w600),
             context.verticalSpace(16),
             _buildSummaryChips(context, viewModel, state, dataState),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPatientJourneyPreview(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+    
+    final List<FollowUpConfig> effectiveFollowUps = state.followUpSource == 'custom' 
+        ? state.followUpEntries.map((e) => FollowUpConfig(
+            type: e.type,
+            durationValue: int.tryParse(e.durationValueController.text),
+            durationUnit: e.durationUnit,
+            notes: e.notesController.text,
+            intervalValue: int.tryParse(e.intervalValueController.text),
+            intervalUnit: e.intervalUnit,
+          )).toList()
+        : (selectedCategory?.defaultFollowUps ?? []);
+
+    return Container(
+      padding: context.appEdgeInsets(all: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 16),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _previewRow(context, "Instructions", viewModel.preTreatmentInstructionsController.text.isNotEmpty),
+          _previewRow(context, "Aftercare", viewModel.postTreatmentInstructionsController.text.isNotEmpty),
+          _previewRow(context, "Notifications", state.preNotificationOffset != null || state.postNotificationOffset != null),
+          _previewRow(context, "Follow-Up Required", state.isFollowUpRequired),
+          if (state.isFollowUpRequired) ...[
+            _previewText(context, "${effectiveFollowUps.length} Follow-Ups"),
+            ...effectiveFollowUps.asMap().entries.map((entry) {
+              final idx = entry.key + 1;
+              final e = entry.value;
+              return _previewText(context, "FU $idx: ${e.type.toUpperCase()} - ${e.durationValue} ${e.durationUnit}");
+            }),
+          ],
+        ],
       ),
     );
   }
@@ -495,47 +546,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPatientJourneyPreview(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final hasPreInstructions = viewModel.preTreatmentInstructionsController.text.isNotEmpty;
-    final hasPreNotification = viewModel.preNotificationTitleController.text.isNotEmpty;
-    final hasPostInstructions = viewModel.postTreatmentInstructionsController.text.isNotEmpty;
-    final hasPostNotification = viewModel.postNotificationTitleController.text.isNotEmpty;
-
-    return Container(
-      width: double.infinity,
-      padding: context.appEdgeInsets(all: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: context.appBorderRadius(all: 12),
-        border: Border.all(color: CustomColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _previewRow(context, "Pre-Treatment Instructions", hasPreInstructions),
-          _previewRow(context, "Pre-Treatment Notification", hasPreNotification),
-          if (state.preTreatmentAttachments.isNotEmpty)
-            _previewText(context, "${state.preTreatmentAttachments.length} Pre-Treatment Files"),
-          context.verticalSpace(16),
-          _previewRow(context, "Post-Treatment Instructions", hasPostInstructions),
-          _previewRow(context, "Post-Treatment Notification", hasPostNotification),
-          if (state.postTreatmentAttachments.isNotEmpty)
-            _previewText(context, "${state.postTreatmentAttachments.length} Post-Treatment Files"),
-          context.verticalSpace(16),
-          _previewRow(context, "Follow-Up Required", state.isFollowUpRequired),
-          if (state.isFollowUpRequired) ...[
-            _previewText(context, "${state.followUpEntries.length} Follow-Ups"),
-            ...state.followUpEntries.asMap().entries.map((entry) {
-              final idx = entry.key + 1;
-              final e = entry.value;
-              return _previewText(context, "FU $idx: ${e.type.toUpperCase()} - ${e.durationValueController.text} ${e.durationUnit}");
-            }),
-          ],
-        ],
-      ),
-    );
-  }
-
   Widget _previewRow(BuildContext context, String label, bool check) {
     return Padding(
       padding: context.appEdgeInsets(bottom: 8),
@@ -566,13 +576,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Step ${state.currentStep + 1} of 11", style: context.fonts.black14w700),
-              Text("${((state.currentStep + 1) / 11 * 100).toInt()}%", style: context.fonts.purple14w700),
+              Text("Step ${state.currentStep + 1} of 12", style: context.fonts.black14w700),
+              Text("${((state.currentStep + 1) / 12 * 100).toInt()}%", style: context.fonts.purple14w700),
             ],
           ),
           context.verticalSpace(8),
           LinearProgressIndicator(
-            value: (state.currentStep + 1) / 11,
+            value: (state.currentStep + 1) / 12,
             minHeight: context.h(4),
             backgroundColor: CustomColors.whiteGrey,
             valueColor: const AlwaysStoppedAnimation<Color>(CustomColors.purple),
@@ -591,10 +601,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 4: return _buildStepPreInstructions(context, state, viewModel);
       case 5: return _buildStepPostInstructions(context, state, viewModel);
       case 6: return _buildStepNotifications(context, state, viewModel);
-      case 7: return _buildStepFollowUp(context, state, viewModel);
+      case 7: return _buildStepFollowUp(context, state, viewModel, dataState);
       case 8: return _buildStepConsent(context, state, viewModel, ref);
-      case 9: return _buildStepLogic(context, state, viewModel, dataState);
-      case 10: return _buildStepPricing(context, state, viewModel);
+      case 9: return _buildStepMaterials(context, state, viewModel, dataState, ref);
+      case 10: return _buildStepLogic(context, state, viewModel);
+      case 11: return _buildStepPricing(context, state, viewModel);
       default: return const SizedBox.shrink();
     }
   }
@@ -775,7 +786,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStepFollowUp(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildStepFollowUp(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -788,25 +804,100 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ),
         if (state.isFollowUpRequired) ...[
           context.verticalSpace(32),
-          BuildTextField(
-            label: "Total Follow-Ups",
-            controller: viewModel.totalFollowUpsController,
-            hintText: "e.g. 1",
-            keyboardType: TextInputType.number,
-            onChanged: (String? val) => viewModel.updateFollowUpCount(val ?? ''),
+          Text("Configuration Source", style: context.fonts.black16w600),
+          context.verticalSpace(16),
+          Row(
+            children: [
+              _radioOption(
+                context, 
+                "Use Category Default", 
+                state.followUpSource == 'category', 
+                () => viewModel.setFollowUpSource('category')
+              ),
+              context.horizontalSpace(32),
+              _radioOption(
+                context, 
+                "Treatment-Specific", 
+                state.followUpSource == 'custom', 
+                () => viewModel.setFollowUpSource('custom')
+              ),
+            ],
           ),
           context.verticalSpace(32),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: state.followUpEntries.length,
-            separatorBuilder: (_, __) => context.verticalSpace(24),
-            itemBuilder: (context, index) {
-              return _buildFollowUpEntryCard(context, index, state.followUpEntries[index], viewModel);
-            },
-          ),
+          if (state.followUpSource == 'category') ...[
+            _buildCategoryFollowUpPreview(context, selectedCategory),
+          ] else ...[
+            BuildTextField(
+              label: "Total Follow-Ups",
+              controller: viewModel.totalFollowUpsController,
+              hintText: "e.g. 1",
+              keyboardType: TextInputType.number,
+              onChanged: (String? val) => viewModel.updateFollowUpCount(val ?? ''),
+            ),
+            context.verticalSpace(32),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: state.followUpEntries.length,
+              separatorBuilder: (_, __) => context.verticalSpace(24),
+              itemBuilder: (context, index) {
+                return _buildFollowUpEntryCard(context, index, state.followUpEntries[index], viewModel);
+              },
+            ),
+          ],
         ],
       ],
+    );
+  }
+
+  Widget _buildCategoryFollowUpPreview(BuildContext context, CategoryItem? category) {
+    final configs = category?.defaultFollowUps ?? [];
+
+    return Container(
+      width: double.infinity,
+      padding: context.appEdgeInsets(all: 24),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: context.appBorderRadius(all: 16),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.info_outline_rounded, color: CustomColors.purple),
+              context.horizontalSpace(12),
+              Text("Inherited from ${category?.name ?? 'Category'}", style: context.fonts.black14w600),
+            ],
+          ),
+          context.verticalSpace(20),
+          if (configs.isEmpty)
+            Text("No default follow-ups configured for this category.", style: context.fonts.grey14w400)
+          else
+            ...configs.asMap().entries.map((entry) {
+              final idx = entry.key + 1;
+              final config = entry.value;
+              return Padding(
+                padding: context.appEdgeInsets(bottom: 12),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(color: CustomColors.purple, shape: BoxShape.circle),
+                    ),
+                    context.horizontalSpace(12),
+                    Text(
+                      "Follow-Up $idx: ${config.type.toUpperCase()} - ${config.durationValue} ${config.durationUnit} (${config.intervalValue} ${config.intervalUnit} after)",
+                      style: context.fonts.black14w400,
+                    ),
+                  ],
+                ),
+              );
+            }),
+        ],
+      ),
     );
   }
 
@@ -1864,65 +1955,35 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStepLogic(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
-    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
-
+  Widget _buildStepLogic(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle(context, "Materials & Inventory"),
-        context.verticalSpace(8),
-        Text("Define the materials used and maximum quantity allowed per sub-area.", style: context.fonts.grey14w400),
-        context.verticalSpace(32),
-        _buildSearchField(
-          context,
-          label: "Material / Consumable Name",
-          hint: "e.g. Syringes, Units, Vials",
-          controller: viewModel.materialNameController,
-          suggestions: dataState.materials,
-          onSelected: (val) {},
+        _sectionTitle(context, "Onboarding Behavior"),
+        context.verticalSpace(24),
+        Row(
+          children: [
+            SizedBox(
+              width: context.w(24),
+              height: context.w(24),
+              child: Checkbox(
+                value: state.enableByDefault,
+                onChanged: (val) => viewModel.toggleEnableByDefault(val),
+                shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 4)),
+              ),
+            ),
+            context.horizontalSpace(12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Enable by Default for New Clinics", style: context.fonts.black16w400),
+                  Text("Newly onboarded clinics will have this treatment assigned automatically.", style: context.fonts.grey12w400),
+                ],
+              ),
+            ),
+          ],
         ),
-        if (allSubAreas.isNotEmpty) ...[
-          context.verticalSpace(32),
-          Text("Inventory Configuration Per Sub-Area", style: context.fonts.black16w400),
-          context.verticalSpace(16),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: allSubAreas.length,
-            separatorBuilder: (_, _) => context.verticalSpace(12),
-            itemBuilder: (context, index) {
-              final subArea = allSubAreas[index];
-              return Container(
-                padding: context.appEdgeInsets(all: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: context.appBorderRadius(all: 12),
-                  border: Border.all(color: CustomColors.border),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.subdirectory_arrow_right, size: 18, color: CustomColors.black),
-                        context.horizontalSpace(8),
-                        Text(subArea.name, style: context.fonts.black14w600),
-                      ],
-                    ),
-                    context.verticalSpace(20),
-                    BuildTextField(
-                      label: "Max Quantity",
-                      controller: subArea.maxQuantityController,
-                      hintText: "0",
-                      keyboardType: TextInputType.number,
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
         context.verticalSpace(40),
         const Divider(),
         context.verticalSpace(32),
@@ -1947,6 +2008,182 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildStepMaterials(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
+    final productState = ref.watch(productViewModelProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle(context, "Inventory Products"),
+        context.verticalSpace(8),
+        Text("Select specific products from inventory and define clinical usage rules.", style: context.fonts.grey14w400),
+        context.verticalSpace(32),
+        _buildProductSelector(context, productState.products ?? [], viewModel, state),
+        if (state.productUsageEntries.isNotEmpty) ...[
+          context.verticalSpace(32),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: state.productUsageEntries.length,
+            separatorBuilder: (_, __) => context.verticalSpace(24),
+            itemBuilder: (context, index) {
+              return _buildProductUsageCard(context, index, state.productUsageEntries[index], viewModel);
+            },
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildProductSelector(BuildContext context, List<ProductModel> products, TreatmentViewModel viewModel, TreatmentState state) {
+    final inventoryProducts = TreatmentData.dummyInventoryProducts;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Select Product from Inventory", style: context.fonts.black14w600),
+        context.verticalSpace(10),
+        SearchAnchor(
+          viewHintText: "Search inventory...",
+          builder: (context, controller) => AppSearchField(
+            controller: controller,
+            readOnly: true,
+            onTap: () => controller.openView(),
+            hintText: "Select product from inventory",
+            suffixIcon: const Icon(Icons.add_circle_outline_rounded, color: CustomColors.purple),
+            maxWidth: double.infinity,
+          ),
+          suggestionsBuilder: (context, controller) {
+            final query = controller.text.toLowerCase();
+            final filtered = inventoryProducts.where((p) => p.name.toLowerCase().contains(query)).toList();
+            
+            return filtered.map((p) => ListTile(
+              title: Text(p.name),
+              subtitle: Text("${p.category} • Unit: ${p.unit}"),
+              onTap: () {
+                viewModel.addProductUsage(p.id!, p.name, p.unit);
+                controller.closeView(p.name);
+              },
+            )).toList();
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductUsageCard(BuildContext context, int index, ProductUsageEntry entry, TreatmentViewModel viewModel) {
+    return Container(
+      padding: context.appEdgeInsets(all: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(entry.productName, style: context.fonts.black14w700),
+                  Text("Unit of Measure: ${entry.unit}", style: context.fonts.grey12w400),
+                ],
+              ),
+              IconButton(
+                onPressed: () => viewModel.removeProductUsage(entry.productId),
+                icon: const Icon(Icons.delete_outline, color: CustomColors.red, size: 20),
+              ),
+            ],
+          ),
+          context.verticalSpace(20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: CustomDropdown<String>(
+                  label: "Usage Type",
+                  hintText: "Select",
+                  value: entry.usageType,
+                  items: const [
+                    DropdownMenuItem(value: 'Required', child: Text("Required")),
+                    DropdownMenuItem(value: 'Optional', child: Text("Optional")),
+                    DropdownMenuItem(value: 'Variable', child: Text("Variable")),
+                    DropdownMenuItem(value: 'Setup', child: Text("Setup")),
+                    DropdownMenuItem(value: 'Post_Care', child: Text("Post Care")),
+                    DropdownMenuItem(value: 'Device', child: Text("Device")),
+                  ],
+                  onChanged: (val) => viewModel.updateProductUsageEntry(index, usageType: val),
+                ),
+              ),
+              context.horizontalSpace(16),
+              Expanded(
+                child: CustomDropdown<String>(
+                  label: "Deduction Timing",
+                  hintText: "Select",
+                  value: entry.deductionTiming,
+                  items: const [
+                    DropdownMenuItem(value: 'On_Completion', child: Text("On Completion")),
+                    DropdownMenuItem(value: 'Manual', child: Text("Manual")),
+                    DropdownMenuItem(value: 'Post_Confirmation', child: Text("Post Confirmation")),
+                  ],
+                  onChanged: (val) => viewModel.updateProductUsageEntry(index, deductionTiming: val),
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(20),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: "Min Quantity",
+                  controller: entry.minQuantityController,
+                  hintText: "0",
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                ),
+              ),
+              context.horizontalSpace(16),
+              Expanded(
+                child: BuildTextField(
+                  label: "Max Quantity",
+                  controller: entry.maxQuantityController,
+                  hintText: "0",
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(20),
+          Row(
+            children: [
+              SizedBox(
+                width: context.w(24),
+                height: context.w(24),
+                child: Checkbox(
+                  value: entry.allowSubstitution,
+                  onChanged: (val) => viewModel.updateProductUsageEntry(index, allowSubstitution: val),
+                  shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 4)),
+                ),
+              ),
+              context.horizontalSpace(12),
+              Text("Allow Product Substitution", style: context.fonts.black14w600),
+            ],
+          ),
+          context.verticalSpace(20),
+          BuildTextField(
+            label: "Usage Notes (Optional)",
+            controller: entry.notesController,
+            hintText: "Clinical instructions or restrictions...",
+            maxLines: 2,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSubAreaMaterialConfig(BuildContext context, SubAreaConfig subArea) {
     return Container(
       padding: context.appEdgeInsets(all: 20),
@@ -1968,15 +2205,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
           context.verticalSpace(20),
           Row(
             children: [
-              Expanded(
-                child: BuildTextField(
-                  label: "Max Quantity",
-                  controller: subArea.maxQuantityController,
-                  hintText: "0",
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              context.horizontalSpace(20),
               Expanded(
                 child: BuildTextField(
                   label: "Base Price (\$)",
@@ -2221,8 +2449,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _sectionTitle(BuildContext context, String title) {
-    return Text(title, style: context.fonts.black18w600);
+  Widget _sectionTitle(BuildContext context, String title, {double? fontSize}) {
+    return Text(title, style: context.fonts.black18w600.copyWith(fontSize: fontSize != null ? context.sp(fontSize) : null));
   }
 
   Widget _buildJourneyProtocols(BuildContext context, TreatmentDataState dataState, WidgetRef ref, List<String> selectedIds, Function(String) onToggle) {
@@ -2253,8 +2481,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final bool isLastStep = state.currentStep == 10;
+  Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    final bool isLastStep = state.currentStep == 11;
 
     return Row(
       children: [
@@ -2278,10 +2506,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 if (!_validateSubAreas(context, state)) return;
               }
               
-              if (state.currentStep < 10) {
+              if (state.currentStep < 11) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
-                viewModel.submitTreatment(context).then((_) {
+                viewModel.submitTreatment(context, categories: dataState.categories).then((_) {
                   if (context.mounted) context.pop();
                 });
               }

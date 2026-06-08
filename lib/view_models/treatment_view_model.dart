@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/treatment_data_models.dart';
 import '../models/treatment_model.dart';
+import '../models/common_models.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
 import '../utils/dummy_data.dart';
@@ -52,17 +53,12 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final categoryNameController = TextEditingController();
   final categoryPathController = TextEditingController();
 
-  // Step 4 Controllers
-  final materialNameController = TextEditingController();
-  final maxMaterialQuantityController = TextEditingController(text: '0');
-
   // Filter Controllers
   final searchController = TextEditingController();
   final filterCategoryController = TextEditingController();
   final filterSubcategoryController = TextEditingController();
   final filterAreaController = TextEditingController();
   final filterSubAreaController = TextEditingController();
-  final filterMaterialController = TextEditingController();
   final filterStatusController = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
@@ -89,19 +85,19 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     categoryIdController.dispose();
     categoryNameController.dispose();
     categoryPathController.dispose();
-    materialNameController.dispose();
-    maxMaterialQuantityController.dispose();
     
     searchController.dispose();
     filterCategoryController.dispose();
     filterSubcategoryController.dispose();
     filterAreaController.dispose();
     filterSubAreaController.dispose();
-    filterMaterialController.dispose();
     filterStatusController.dispose();
 
     for (var area in state.areas) {
       area.dispose();
+    }
+    for (var entry in state.productUsageEntries) {
+      entry.dispose();
     }
     super.dispose();
   }
@@ -145,18 +141,14 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     followUpDurationValueController.clear();
     followUpNotesController.clear();
     protocolNameController.clear();
-    preNotificationTitleController.clear();
-    preNotificationDescriptionController.clear();
-    postNotificationTitleController.clear();
-    postNotificationDescriptionController.clear();
-    protocolNameController.clear();
     categoryIdController.clear();
     categoryNameController.clear();
     categoryPathController.clear();
-    materialNameController.clear();
-    maxMaterialQuantityController.text = '0';
     
     for (var entry in state.followUpEntries) {
+      entry.dispose();
+    }
+    for (var entry in state.productUsageEntries) {
       entry.dispose();
     }
 
@@ -176,8 +168,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       existingConsentForm: null,
       areas: [AreaViewModelEntry()],
       followUpEntries: [],
+      followUpSource: 'category',
+      productUsageEntries: [],
       selectedTreatment: null,
       useInAiSimulator: false,
+      enableByDefault: false,
       selectedProtocolIds: [],
       status: 'active',
       isFollowUpRequired: false,
@@ -265,11 +260,30 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }
     totalFollowUpsController.text = newFollowUpEntries.length.toString();
 
+    // Product Usages
+    for (var entry in state.productUsageEntries) {
+      entry.dispose();
+    }
+    final List<ProductUsageEntry> newProductUsageEntries = [];
+    if (treatment.productUsages != null) {
+      for (var usage in treatment.productUsages!) {
+        newProductUsageEntries.add(ProductUsageEntry(
+          productId: usage.productId,
+          productName: usage.productName,
+          unit: usage.unit,
+          usageType: usage.usageType,
+          deductionTiming: usage.deductionTiming,
+          allowSubstitution: usage.allowSubstitution,
+          minQuantityController: TextEditingController(text: usage.minQuantity?.toString() ?? '0'),
+          maxQuantityController: TextEditingController(text: usage.maxQuantity?.toString() ?? '0'),
+          notesController: TextEditingController(text: usage.notes ?? ''),
+        ));
+      }
+    }
+
     categoryIdController.text = treatment.categoryId ?? '';
     categoryNameController.text = treatment.categoryName ?? '';
     categoryPathController.text = treatment.categoryPath ?? '';
-    materialNameController.text = treatment.materialName ?? '';
-    maxMaterialQuantityController.text = treatment.maxMaterialQuantity.toString();
     
     // Clear and re-populate areas
     for (var area in state.areas) {
@@ -284,7 +298,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         if (area.subAreas != null) {
           entry.subAreas = area.subAreas!.map((s) => SubAreaConfig(
             name: s.name ?? '',
-            maxQty: s.maxMaterialQuantity?.toString(),
             basePrice: s.basePrice?.toString(),
           )).toList();
         }
@@ -299,7 +312,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       status: treatment.status,
       treatmentImage: null, 
       treatmentIcon: null,
-      useInAiSimulator: treatment.useInAiSimulator,
       selectedProtocolIds: treatment.protocolIds ?? [],
       preTreatmentAttachments: [], 
       postTreatmentAttachments: [],
@@ -308,7 +320,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       preTreatmentConsentForm: null,
       existingConsentForm: treatment.preTreatmentConsentForm,
       followUpEntries: newFollowUpEntries,
+      followUpSource: 'custom', 
+      productUsageEntries: newProductUsageEntries,
       isFollowUpRequired: treatment.isFollowUpRequired,
+      useInAiSimulator: treatment.useInAiSimulator,
+      enableByDefault: treatment.enableByDefault,
       preNotificationOffset: treatment.preTreatmentNotificationOffset,
       postNotificationOffset: treatment.postTreatmentNotificationOffset,
     );
@@ -427,6 +443,40 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(useInAiSimulator: value ?? false);
   }
 
+  void toggleEnableByDefault(bool? value) {
+    state = state.copyWith(enableByDefault: value ?? false);
+  }
+
+  void addProductUsage(int productId, String productName, String unit) {
+    if (state.productUsageEntries.any((e) => e.productId == productId)) return;
+    
+    final newEntry = ProductUsageEntry(
+      productId: productId,
+      productName: productName,
+      unit: unit,
+    );
+    
+    state = state.copyWith(productUsageEntries: [...state.productUsageEntries, newEntry]);
+  }
+
+  void updateProductUsageEntry(int index, {String? usageType, String? deductionTiming, bool? allowSubstitution}) {
+    final updatedEntries = [...state.productUsageEntries];
+    updatedEntries[index] = updatedEntries[index].copyWith(
+      usageType: usageType,
+      deductionTiming: deductionTiming,
+      allowSubstitution: allowSubstitution,
+    );
+    state = state.copyWith(productUsageEntries: updatedEntries);
+  }
+
+  void removeProductUsage(int productId) {
+    final entry = state.productUsageEntries.firstWhere((e) => e.productId == productId);
+    entry.dispose();
+    state = state.copyWith(
+      productUsageEntries: state.productUsageEntries.where((e) => e.productId != productId).toList(),
+    );
+  }
+
   void setPreNotificationOffset(int? offset) {
     state = state.copyWith(preNotificationOffset: offset);
   }
@@ -439,7 +489,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'mp4', 'mov', 'avi'],
+      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'mp4', 'mov', 'avi'],
     );
 
     if (result != null) {
@@ -468,6 +518,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   void setConsentType(String type) {
     state = state.copyWith(consentType: type);
+  }
+
+  void setFollowUpSource(String source) {
+    state = state.copyWith(followUpSource: source);
   }
 
   void removeAttachment(bool isPreTreatment, int index) {
@@ -552,7 +606,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     filterSubcategoryController.clear();
     filterAreaController.clear();
     filterSubAreaController.clear();
-    filterMaterialController.clear();
     filterStatusController.clear();
     _applyFilters();
   }
@@ -603,8 +656,27 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }).toList();
   }
 
-  Future<void> submitTreatment(BuildContext context) async {
+  Future<void> submitTreatment(BuildContext context, {List<CategoryItem> categories = const []}) async {
     return await runSafely<void>(showLoading: true, () async {
+      List<FollowUpConfig> effectiveFollowUps = [];
+      
+      if (state.isFollowUpRequired) {
+        if (state.followUpSource == 'custom') {
+          effectiveFollowUps = state.followUpEntries.map((e) => FollowUpConfig(
+            type: e.type,
+            durationValue: int.tryParse(e.durationValueController.text),
+            durationUnit: e.durationUnit,
+            notes: e.notesController.text,
+            intervalValue: int.tryParse(e.intervalValueController.text),
+            intervalUnit: e.intervalUnit,
+          )).toList();
+        } else {
+          // Resolve from category
+          final selectedCategory = findCategoryById(categories, categoryIdController.text);
+          effectiveFollowUps = selectedCategory?.defaultFollowUps ?? [];
+        }
+      }
+
       // ignore: unused_local_variable
       final treatment = TreatmentModel(
         name: internalNameController.text,
@@ -617,8 +689,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         categoryId: categoryIdController.text,
         categoryName: categoryNameController.text,
         categoryPath: categoryPathController.text,
-        materialName: materialNameController.text,
-        maxMaterialQuantity: int.tryParse(maxMaterialQuantityController.text) ?? 0,
         status: state.status,
         useInAiSimulator: state.useInAiSimulator,
         protocolIds: state.selectedProtocolIds,
@@ -644,19 +714,22 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 : state.existingConsentForm)
             : null,
         isFollowUpRequired: state.isFollowUpRequired,
-        followUps: state.followUpEntries.map((e) => FollowUpConfig(
-          type: e.type,
-          durationValue: int.tryParse(e.durationValueController.text),
-          durationUnit: e.durationUnit,
+        followUps: effectiveFollowUps,
+        productUsages: state.productUsageEntries.map((e) => ProductUsageModel(
+          productId: e.productId,
+          productName: e.productName,
+          usageType: e.usageType,
+          minQuantity: double.tryParse(e.minQuantityController.text),
+          maxQuantity: double.tryParse(e.maxQuantityController.text),
+          deductionTiming: e.deductionTiming,
+          allowSubstitution: e.allowSubstitution,
           notes: e.notesController.text,
-          intervalValue: int.tryParse(e.intervalValueController.text),
-          intervalUnit: e.intervalUnit,
+          unit: e.unit,
         )).toList(),
         sideAreas: state.areas.map((a) => SideAreaModel(
           name: a.areaController.text,
           subAreas: a.subAreas.map((s) => SubAreaModel(
             name: s.name,
-            maxMaterialQuantity: int.tryParse(s.maxQuantityController.text),
             basePrice: double.tryParse(s.basePriceController.text),
           )).toList(),
         )).toList(),
@@ -678,9 +751,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     return 'other';
   }
 
-  Future<void> updateTreatment(BuildContext context) async {
+  Future<void> updateTreatment(BuildContext context, {List<CategoryItem> categories = const []}) async {
     return await runSafely<void>(showLoading: true, () async {
       // Logic for updating the treatment
+      // (Similar to submitTreatment resolving effective followUps)
       await Future.delayed(const Duration(seconds: 1));
       await getTreatments();
     });
@@ -713,12 +787,15 @@ class TreatmentState extends BaseStateModel {
   final Attachment? existingConsentForm;
   final String consentType; // category | custom
   final List<FollowUpEntry> followUpEntries;
+  final String followUpSource; // category | custom
+  final List<ProductUsageEntry> productUsageEntries;
 
   // Follow-Up fields
   final bool isFollowUpRequired;
 
-  // Step 4 fields
+  // Logic fields
   final bool useInAiSimulator;
+  final bool enableByDefault;
 
   TreatmentState({
     super.loading,
@@ -745,8 +822,11 @@ class TreatmentState extends BaseStateModel {
     this.existingConsentForm,
     this.consentType = 'category',
     this.followUpEntries = const [],
+    this.followUpSource = 'category',
+    this.productUsageEntries = const [],
     this.isFollowUpRequired = false,
     this.useInAiSimulator = false,
+    this.enableByDefault = false,
     List<AreaViewModelEntry>? areas,
   }) : areas = areas ?? [AreaViewModelEntry()];
 
@@ -776,8 +856,11 @@ class TreatmentState extends BaseStateModel {
     Attachment? existingConsentForm,
     String? consentType,
     List<FollowUpEntry>? followUpEntries,
+    String? followUpSource,
+    List<ProductUsageEntry>? productUsageEntries,
     bool? isFollowUpRequired,
     bool? useInAiSimulator,
+    bool? enableByDefault,
   }) {
     return TreatmentState(
       loading: loading ?? this.loading,
@@ -805,8 +888,11 @@ class TreatmentState extends BaseStateModel {
       existingConsentForm: existingConsentForm ?? this.existingConsentForm,
       consentType: consentType ?? this.consentType,
       followUpEntries: followUpEntries ?? this.followUpEntries,
+      followUpSource: followUpSource ?? this.followUpSource,
+      productUsageEntries: productUsageEntries ?? this.productUsageEntries,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
+      enableByDefault: enableByDefault ?? this.enableByDefault,
     );
   }
 }
@@ -866,18 +952,65 @@ class FollowUpEntry {
   }
 }
 
+class ProductUsageEntry {
+  final int productId;
+  final String productName;
+  final String unit;
+  String usageType;
+  String deductionTiming;
+  bool allowSubstitution;
+  final TextEditingController minQuantityController;
+  final TextEditingController maxQuantityController;
+  final TextEditingController notesController;
+
+  ProductUsageEntry({
+    required this.productId,
+    required this.productName,
+    required this.unit,
+    this.usageType = 'Required',
+    this.deductionTiming = 'On_Completion',
+    this.allowSubstitution = false,
+    TextEditingController? minQuantityController,
+    TextEditingController? maxQuantityController,
+    TextEditingController? notesController,
+  }) : minQuantityController = minQuantityController ?? TextEditingController(text: '0'),
+       maxQuantityController = maxQuantityController ?? TextEditingController(text: '0'),
+       notesController = notesController ?? TextEditingController();
+
+  ProductUsageEntry copyWith({
+    String? usageType,
+    String? deductionTiming,
+    bool? allowSubstitution,
+  }) {
+    return ProductUsageEntry(
+      productId: productId,
+      productName: productName,
+      unit: unit,
+      usageType: usageType ?? this.usageType,
+      deductionTiming: deductionTiming ?? this.deductionTiming,
+      allowSubstitution: allowSubstitution ?? this.allowSubstitution,
+      minQuantityController: minQuantityController,
+      maxQuantityController: maxQuantityController,
+      notesController: notesController,
+    );
+  }
+
+  void dispose() {
+    minQuantityController.dispose();
+    maxQuantityController.dispose();
+    notesController.dispose();
+  }
+}
+
 class SubAreaConfig {
   final String name;
-  final maxQuantityController = TextEditingController(text: '0');
   final basePriceController = TextEditingController(text: '0');
 
-  SubAreaConfig({required this.name, String? maxQty, String? basePrice}) {
-    if (maxQty != null) maxQuantityController.text = maxQty;
+  SubAreaConfig({required this.name, String? basePrice}) {
     if (basePrice != null) basePriceController.text = basePrice;
   }
 
   void dispose() {
-    maxQuantityController.dispose();
     basePriceController.dispose();
   }
 }

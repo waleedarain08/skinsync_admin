@@ -1,3 +1,5 @@
+import 'common_models.dart';
+
 class TreatmentModel {
   int? id;
   String? name;
@@ -10,12 +12,14 @@ class TreatmentModel {
   String? icon;
   String? image;
   double? basePrice;
-  String? materialName;
-  int maxMaterialQuantity;
   bool? isArea;
   List<SideAreaModel>? sideAreas;
   String status; // draft | active | deactive
+  
+  // Logic Fields
   bool useInAiSimulator;
+  bool enableByDefault;
+
   List<int>? combinableTreatmentIds;
   List<String>? protocolIds;
   int? baseDurationHours;
@@ -32,6 +36,8 @@ class TreatmentModel {
   List<Attachment>? postTreatmentAttachments;
   Attachment? preTreatmentConsentForm;
   
+  List<ProductUsageModel>? productUsages;
+
   // Follow-Up Fields
   bool isFollowUpRequired;
   List<FollowUpConfig>? followUps;
@@ -48,12 +54,11 @@ class TreatmentModel {
     this.icon,
     this.image,
     this.basePrice,
-    this.materialName,
-    this.maxMaterialQuantity = 0,
     this.isArea,
     this.sideAreas,
     this.status = 'active',
     this.useInAiSimulator = false,
+    this.enableByDefault = false,
     this.combinableTreatmentIds,
     this.protocolIds,
     this.baseDurationHours,
@@ -69,6 +74,7 @@ class TreatmentModel {
     this.preTreatmentAttachments,
     this.postTreatmentAttachments,
     this.preTreatmentConsentForm,
+    this.productUsages,
     this.isFollowUpRequired = false,
     this.followUps,
   });
@@ -76,7 +82,7 @@ class TreatmentModel {
   TreatmentModel.fromJson(Map<String, dynamic> json)
       : status = json['status'] ?? (json['is_active'] == false ? 'deactive' : 'active'),
         useInAiSimulator = json['use_in_ai_simulator'] ?? false,
-        maxMaterialQuantity = json['max_material_quantity'] ?? 0,
+        enableByDefault = json['enable_by_default'] ?? false,
         isFollowUpRequired = json['is_follow_up_required'] ?? false {
     id = json['id'];
     name = json['name'];
@@ -89,7 +95,6 @@ class TreatmentModel {
     icon = json['icon'];
     image = json['image'];
     basePrice = json['base_price']?.toDouble();
-    materialName = json['material_name'];
     isArea = json['is_area'];
     sideAreas = json['side_areas'] != null
         ? (json['side_areas'] as List)
@@ -125,6 +130,9 @@ class TreatmentModel {
     preTreatmentConsentForm = json['pre_treatment_consent_form'] != null 
         ? Attachment.fromJson(json['pre_treatment_consent_form']) 
         : null;
+    productUsages = json['product_usages'] != null
+        ? (json['product_usages'] as List).map((e) => ProductUsageModel.fromJson(e)).toList()
+        : null;
     followUps = json['follow_ups'] != null
         ? (json['follow_ups'] as List).map((e) => FollowUpConfig.fromJson(e)).toList()
         : null;
@@ -142,12 +150,11 @@ class TreatmentModel {
     String? icon,
     String? image,
     double? basePrice,
-    String? materialName,
-    int? maxMaterialQuantity,
     bool? isArea,
     List<SideAreaModel>? sideAreas,
     String? status,
     bool? useInAiSimulator,
+    bool? enableByDefault,
     List<int>? combinableTreatmentIds,
     List<String>? protocolIds,
     int? baseDurationHours,
@@ -163,6 +170,7 @@ class TreatmentModel {
     List<Attachment>? preTreatmentAttachments,
     List<Attachment>? postTreatmentAttachments,
     Attachment? preTreatmentConsentForm,
+    List<ProductUsageModel>? productUsages,
     bool? isFollowUpRequired,
     List<FollowUpConfig>? followUps,
   }) {
@@ -178,12 +186,11 @@ class TreatmentModel {
       icon: icon ?? this.icon,
       image: image ?? this.image,
       basePrice: basePrice ?? this.basePrice,
-      materialName: materialName ?? this.materialName,
-      maxMaterialQuantity: maxMaterialQuantity ?? this.maxMaterialQuantity,
       isArea: isArea ?? this.isArea,
       sideAreas: sideAreas ?? this.sideAreas,
       status: status ?? this.status,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
+      enableByDefault: enableByDefault ?? this.enableByDefault,
       combinableTreatmentIds: combinableTreatmentIds ?? this.combinableTreatmentIds,
       protocolIds: protocolIds ?? this.protocolIds,
       baseDurationHours: baseDurationHours ?? this.baseDurationHours,
@@ -199,6 +206,7 @@ class TreatmentModel {
       preTreatmentAttachments: preTreatmentAttachments ?? this.preTreatmentAttachments,
       postTreatmentAttachments: postTreatmentAttachments ?? this.postTreatmentAttachments,
       preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
+      productUsages: productUsages ?? this.productUsages,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
       followUps: followUps ?? this.followUps,
     );
@@ -217,12 +225,11 @@ class TreatmentModel {
       'icon': icon,
       'image': image,
       'base_price': basePrice,
-      'material_name': materialName,
-      'max_material_quantity': maxMaterialQuantity,
       'side_areas': sideAreas?.map((sideArea) => sideArea.toJson()).toList(),
       'status': status,
       'is_active': status == 'active',
       'use_in_ai_simulator': useInAiSimulator,
+      'enable_by_default': enableByDefault,
       'combinable_treatment_ids': combinableTreatmentIds,
       'protocol_ids': protocolIds,
       'base_duration_hours': baseDurationHours,
@@ -238,67 +245,11 @@ class TreatmentModel {
       'pre_treatment_attachments': preTreatmentAttachments?.map((e) => e.toJson()).toList(),
       'post_treatment_attachments': postTreatmentAttachments?.map((e) => e.toJson()).toList(),
       'pre_treatment_consent_form': preTreatmentConsentForm?.toJson(),
+      'product_usages': productUsages?.map((e) => e.toJson()).toList(),
       'is_follow_up_required': isFollowUpRequired,
       'follow_ups': followUps?.map((e) => e.toJson()).toList(),
     };
   }
-}
-
-class FollowUpConfig {
-  String type; // virtual | in_person
-  int? durationValue;
-  String durationUnit; // minutes | hours
-  String? notes;
-  int? intervalValue;
-  String? intervalUnit; // days | weeks
-
-  FollowUpConfig({
-    required this.type,
-    this.durationValue,
-    this.durationUnit = 'minutes',
-    this.notes,
-    this.intervalValue,
-    this.intervalUnit = 'days',
-  });
-
-  factory FollowUpConfig.fromJson(Map<String, dynamic> json) => FollowUpConfig(
-    type: json['type'] ?? 'virtual',
-    durationValue: json['duration_value'],
-    durationUnit: json['duration_unit'] ?? 'minutes',
-    notes: json['notes'],
-    intervalValue: json['interval_value'],
-    intervalUnit: json['interval_unit'],
-  );
-
-  Map<String, dynamic> toJson() => {
-    'type': type,
-    'duration_value': durationValue,
-    'duration_unit': durationUnit,
-    'notes': notes,
-    'interval_value': intervalValue,
-    'interval_unit': intervalUnit,
-  };
-}
-
-
-class Attachment {
-  String url;
-  String type; // image | video | pdf
-  String name;
-
-  Attachment({required this.url, required this.type, required this.name});
-
-  factory Attachment.fromJson(Map<String, dynamic> json) => Attachment(
-    url: json['url'],
-    type: json['type'],
-    name: json['name'],
-  );
-
-  Map<String, dynamic> toJson() => {
-    'url': url,
-    'type': type,
-    'name': name,
-  };
 }
 
 class SideAreaModel {
@@ -329,15 +280,13 @@ class SideAreaModel {
 class SubAreaModel {
   int? id;
   String? name;
-  int? maxMaterialQuantity;
   double? basePrice;
 
-  SubAreaModel({this.id, this.name, this.maxMaterialQuantity, this.basePrice});
+  SubAreaModel({this.id, this.name, this.basePrice});
 
   SubAreaModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    maxMaterialQuantity = json['max_material_quantity'];
     basePrice = json['base_price']?.toDouble();
   }
 
@@ -345,7 +294,6 @@ class SubAreaModel {
     return {
       "id": id,
       "name": name,
-      "max_material_quantity": maxMaterialQuantity,
       "base_price": basePrice,
     };
   }

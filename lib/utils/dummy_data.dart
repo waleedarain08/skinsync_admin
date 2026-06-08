@@ -1,6 +1,7 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
+import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 
@@ -44,6 +45,44 @@ class TreatmentData {
     "Packs",
   ];
 
+  static final List<ProductModel> dummyInventoryProducts = [
+    // Injectables
+    ProductModel(id: 1, name: "Botox®", category: "Injectables", unit: "Units (U)", image: "", description: "Botulinum toxin type A"),
+    ProductModel(id: 2, name: "Dysport®", category: "Injectables", unit: "Units (U)", image: "", description: "AbobotulinumtoxinA"),
+    ProductModel(id: 3, name: "Xeomin®", category: "Injectables", unit: "Units (U)", image: "", description: "IncobotulinumtoxinA"),
+    ProductModel(id: 4, name: "Jeuveau®", category: "Injectables", unit: "Units (U)", image: "", description: "PrabotulinumtoxinA-xvfs"),
+    
+    // Dermal Fillers
+    ProductModel(id: 5, name: "Juvederm Voluma", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Hyaluronic acid filler for cheeks"),
+    ProductModel(id: 6, name: "Juvederm Ultra XC", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Hyaluronic acid filler for lips"),
+    ProductModel(id: 7, name: "Restylane Lyft", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Hyaluronic acid filler"),
+    ProductModel(id: 8, name: "Restylane Defyne", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Hyaluronic acid filler"),
+    ProductModel(id: 9, name: "RHA Collection", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Resilient hyaluronic acid"),
+
+    // Skin Boosters
+    ProductModel(id: 10, name: "Skinvive", category: "Skin Boosters", unit: "Syringe", image: "", description: "HA injectable gel for skin smoothness"),
+    ProductModel(id: 11, name: "Profhilo", category: "Skin Boosters", unit: "Syringe", image: "", description: "Remodeling HA"),
+    ProductModel(id: 12, name: "Sculptra", category: "Skin Boosters", unit: "Vial", image: "", description: "Poly-L-lactic acid"),
+    ProductModel(id: 13, name: "Radiesse", category: "Skin Boosters", unit: "Syringe", image: "", description: "Calcium hydroxylapatite"),
+
+    // PRP / Regenerative
+    ProductModel(id: 14, name: "PRP Kit", category: "PRP / Regenerative", unit: "Kit", image: "", description: "Platelet-rich plasma preparation kit"),
+    ProductModel(id: 15, name: "PRF Kit", category: "PRP / Regenerative", unit: "Kit", image: "", description: "Platelet-rich fibrin preparation kit"),
+
+    // Topicals
+    ProductModel(id: 16, name: "Medical Grade Numbing Cream", category: "Topicals", unit: "Tube", image: "", description: "Lidocaine/Prilocaine compound"),
+    ProductModel(id: 17, name: "Post Procedure Healing Gel", category: "Topicals", unit: "Tube", image: "", description: "Soothing aftercare gel"),
+    ProductModel(id: 18, name: "Antiseptic Solution", category: "Topicals", unit: "Bottle", image: "", description: "Skin preparation solution"),
+
+    // Devices / Consumables
+    ProductModel(id: 19, name: "Microneedling Cartridge", category: "Devices / Consumables", unit: "Piece", image: "", description: "Sterile needle head"),
+    ProductModel(id: 20, name: "Cannula 25G", category: "Devices / Consumables", unit: "Piece", image: "", description: "Blunt-tip cannula"),
+    ProductModel(id: 21, name: "Cannula 27G", category: "Devices / Consumables", unit: "Piece", image: "", description: "Blunt-tip cannula"),
+    ProductModel(id: 22, name: "Syringe 1ml", category: "Devices / Consumables", unit: "Piece", image: "", description: "Luer lock syringe"),
+    ProductModel(id: 23, name: "Syringe 3ml", category: "Devices / Consumables", unit: "Piece", image: "", description: "Luer lock syringe"),
+    ProductModel(id: 24, name: "Gauze Pack", category: "Devices / Consumables", unit: "Pack", image: "", description: "Sterile gauze sponges"),
+  ];
+
   static final List<TreatmentModel> dummyTreatments = [
     TreatmentModel(
       id: 1,
@@ -57,15 +96,13 @@ class TreatmentData {
       image: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=1000&auto=format&fit=crop",
       categoryName: "Injectables",
       categoryPath: "Injectables > Neurotoxins",
-      materialName: "Units",
-      maxMaterialQuantity: 50,
       status: 'active',
       sideAreas: [
         SideAreaModel(
           name: "Upper Face",
           subAreas: [
-            SubAreaModel(name: "Forehead", maxMaterialQuantity: 50, basePrice: 12.0),
-            SubAreaModel(name: "Crow's Feet", maxMaterialQuantity: 24, basePrice: 12.0),
+            SubAreaModel(name: "Forehead", basePrice: 12.0),
+            SubAreaModel(name: "Crow's Feet", basePrice: 12.0),
           ],
         ),
       ],
@@ -82,14 +119,12 @@ class TreatmentData {
       image: "https://images.unsplash.com/photo-1620331311520-246422ff83f9?q=80&w=1000&auto=format&fit=crop",
       categoryName: "Injectables",
       categoryPath: "Injectables > Dermal Fillers",
-      materialName: "Syringes",
-      maxMaterialQuantity: 2,
       status: 'active',
       sideAreas: [
         SideAreaModel(
           name: "Mid Face",
           subAreas: [
-            SubAreaModel(name: "Cheeks", maxMaterialQuantity: 2, basePrice: 800.0),
+            SubAreaModel(name: "Cheeks", basePrice: 800.0),
           ],
         ),
       ],
@@ -125,8 +160,8 @@ class TreatmentData {
         SideAreaModel(
           name: "Body",
           subAreas: [
-            SubAreaModel(name: "Arms", maxMaterialQuantity: 1, basePrice: 150.0),
-            SubAreaModel(name: "Thighs", maxMaterialQuantity: 1, basePrice: 200.0),
+            SubAreaModel(name: "Arms", basePrice: 150.0),
+            SubAreaModel(name: "Thighs", basePrice: 200.0),
           ],
         ),
       ],
@@ -162,7 +197,7 @@ class TreatmentData {
         SideAreaModel(
           name: "Face",
           subAreas: [
-            SubAreaModel(name: "Full Face", maxMaterialQuantity: 1, basePrice: 350.0),
+            SubAreaModel(name: "Full Face", basePrice: 350.0),
           ],
         ),
       ],
@@ -217,7 +252,7 @@ class TreatmentData {
       email: "admin@elitewellness.com",
       phone: "+1 305-555-0456",
       address: "Miami, FL",
-      logo: "https://images.unsplash.com/photo-1576091160550-217359f4b88c?q=80&w=1000",
+      logo: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000",
       invitationStatus: "Interested",
       interestedPatientsCount: 24,
       pendingAppointmentsCount: 10,

@@ -55,7 +55,11 @@ class StandardDialog extends StatelessWidget {
               ],
             ),
             context.verticalSpace(20),
-            content,
+            Flexible(
+              child: SingleChildScrollView(
+                child: content,
+              ),
+            ),
             if (actions != null) ...[
               context.verticalSpace(24),
               Row(

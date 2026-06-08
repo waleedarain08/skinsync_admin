@@ -1,3 +1,7 @@
+import 'common_models.dart';
+
+export 'treatment_model.dart';
+export 'common_models.dart';
 
 class CategoryItem {
   final String id;
@@ -8,6 +12,7 @@ class CategoryItem {
   final int sortOrder;
   final String? consentFormUrl;
   final String? consentFormName;
+  final List<FollowUpConfig>? defaultFollowUps;
 
   CategoryItem({
     required this.id,
@@ -18,6 +23,7 @@ class CategoryItem {
     this.sortOrder = 0,
     this.consentFormUrl,
     this.consentFormName,
+    this.defaultFollowUps,
   });
 
   CategoryItem copyWith({
@@ -29,6 +35,7 @@ class CategoryItem {
     int? sortOrder,
     String? consentFormUrl,
     String? consentFormName,
+    List<FollowUpConfig>? defaultFollowUps,
   }) {
     return CategoryItem(
       id: id ?? this.id,
@@ -39,6 +46,7 @@ class CategoryItem {
       sortOrder: sortOrder ?? this.sortOrder,
       consentFormUrl: consentFormUrl ?? this.consentFormUrl,
       consentFormName: consentFormName ?? this.consentFormName,
+      defaultFollowUps: defaultFollowUps ?? this.defaultFollowUps,
     );
   }
 }

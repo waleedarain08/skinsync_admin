@@ -10,7 +10,6 @@ import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/category_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class ManageTreatmentDataScreen extends ConsumerWidget {
@@ -24,7 +23,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     final viewModel = ref.read(treatmentDataViewModelProvider.notifier);
 
     return DefaultTabController(
-      length: 4,
+      length: 3,
       child: GradientScaffold(
         appBar: AppBar(
           flexibleSpace: AppDecorations.appBarGradient,
@@ -42,7 +41,6 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             tabs: const [
               Tab(text: "Categories"),
               Tab(text: "Body Areas"),
-              Tab(text: "Materials"),
               Tab(text: "Protocols"),
             ],
           ),
@@ -51,7 +49,6 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
           children: [
             _buildCategoriesTab(context, state, viewModel),
             _buildAreasTab(context, state, viewModel),
-            _buildMaterialsTab(context, state, viewModel),
             _buildProtocolsTab(context, state, viewModel),
           ],
         ),
@@ -70,11 +67,12 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             title: "Treatment Categories",
             onAdd: () => _showCategoryCreationDialog(
               context: context,
-              onConfirm: (name, icon, consentFile) => viewModel.addCategory(
+              onConfirm: (name, icon, consentFile, followUps) => viewModel.addCategory(
                 name, 
                 icon: icon, 
                 consentFormName: consentFile?.name, 
-                consentFormUrl: consentFile?.path
+                consentFormUrl: consentFile?.path,
+                defaultFollowUps: followUps,
               ),
             ),
           ),
@@ -133,41 +131,6 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
                 onDeleteChild: (name) => viewModel.deleteSubArea(area.name, name),
               );
             },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMaterialsTab(BuildContext context, TreatmentDataState state, TreatmentDataViewModel viewModel) {
-    return SingleChildScrollView(
-      padding: context.appEdgeInsets(all: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTabHeader(
-            context: context,
-            title: "Consumable Materials",
-            onAdd: () => _showItemDialog(
-              context: context,
-              title: "Add New Material",
-              showIconField: false,
-              onConfirm: (name, _) => viewModel.addMaterial(name),
-            ),
-          ),
-          context.verticalSpace(24),
-          Wrap(
-            spacing: context.w(12),
-            runSpacing: context.h(12),
-            children: state.materials.map((item) => Chip(
-              label: Text(item),
-              onDeleted: () => _showDeleteConfirm(context, item, () => viewModel.deleteMaterial(item)),
-              deleteIcon: const Icon(Icons.close, size: 16),
-              labelStyle: context.fonts.purple14w600,
-              backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
-              side: BorderSide(color: CustomColors.purple.withValues(alpha: 0.1)),
-              shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 8)),
-            )).toList(),
           ),
         ],
       ),
@@ -388,7 +351,8 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
     String? initialName,
     String? initialIcon,
     String? initialConsentName,
-    required Function(String, String, PlatformFile?) onConfirm,
+    List<FollowUpConfig>? initialFollowUps,
+    required Function(String, String, PlatformFile?, List<FollowUpConfig>?) onConfirm,
   }) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -397,11 +361,12 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         initialName: initialName,
         initialIcon: initialIcon,
         initialConsentName: initialConsentName,
+        initialFollowUps: initialFollowUps,
       ),
     );
 
     if (result != null) {
-      onConfirm(result['name'], result['icon'], result['consentFile']);
+      onConfirm(result['name'], result['icon'], result['consentFile'], result['followUps']);
     }
   }
 
@@ -422,6 +387,7 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
         title: title,
         width: context.w(450),
         content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             BuildTextField(
               label: "Name",
@@ -554,12 +520,13 @@ class _RecursiveCategoryTile extends StatelessWidget {
               onPressed: () => ManageTreatmentDataScreen._showCategoryCreationDialog(
                 context: context,
                 parentName: category.name,
-                onConfirm: (name, icon, consentFile) => viewModel.addCategory(
+                onConfirm: (name, icon, consentFile, followUps) => viewModel.addCategory(
                   name, 
                   icon: icon, 
                   parentId: category.id,
                   consentFormName: consentFile?.name,
                   consentFormUrl: consentFile?.path,
+                  defaultFollowUps: followUps,
                 ),
               ),
             ),
@@ -571,12 +538,14 @@ class _RecursiveCategoryTile extends StatelessWidget {
                 initialName: category.name,
                 initialIcon: category.icon,
                 initialConsentName: category.consentFormName,
-                onConfirm: (name, icon, consentFile) => viewModel.editCategory(
+                initialFollowUps: category.defaultFollowUps,
+                onConfirm: (name, icon, consentFile, followUps) => viewModel.editCategory(
                   category.id, 
                   name, 
                   icon: icon,
                   consentFormName: consentFile?.name ?? category.consentFormName,
                   consentFormUrl: consentFile?.path ?? category.consentFormUrl,
+                  defaultFollowUps: followUps ?? category.defaultFollowUps,
                 ),
               ),
             ),

@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/treatment_model.dart';
+import 'package:skinsync_admin/models/product_model.dart';
+import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
@@ -13,11 +14,11 @@ import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/nested_category_selector.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
+import 'package:skinsync_admin/view_models/product_view_model.dart';
 
 class EditTreatmentScreen extends ConsumerWidget {
   const EditTreatmentScreen({super.key});
@@ -48,7 +49,7 @@ class EditTreatmentScreen extends ConsumerWidget {
           TextButton(
             onPressed: () {
               if (!_validateForm(context, viewModel, state)) return;
-              viewModel.updateTreatment(context).then((_) {
+              viewModel.updateTreatment(context, categories: dataState.categories).then((_) {
                 if (context.mounted) Navigator.pop(context);
               });
             },
@@ -73,9 +74,19 @@ class EditTreatmentScreen extends ConsumerWidget {
                 context.verticalSpace(32),
                 _buildPostTreatmentSection(context, state, viewModel),
                 context.verticalSpace(32),
+                _buildNotificationsSection(context, state, viewModel),
+                context.verticalSpace(32),
+                _buildFollowUpEditSection(context, state, viewModel, ref),
+                context.verticalSpace(32),
+                _buildConsentSection(context, state, viewModel, ref),
+                context.verticalSpace(32),
                 _buildAreasSection(context, state, viewModel, dataState),
                 context.verticalSpace(32),
-                _buildMaterialsAndLogicSection(context, state, viewModel, dataState),
+                _buildProductsUsageSection(context, state, viewModel, ref),
+                context.verticalSpace(32),
+                _buildLogicSection(context, state, viewModel),
+                context.verticalSpace(32),
+                _buildPricingSection(context, state, viewModel),
                 context.verticalSpace(48),
               ],
             ),
@@ -93,35 +104,6 @@ class EditTreatmentScreen extends ConsumerWidget {
         const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.red),
       );
       return false;
-    }
-
-    final hours = int.tryParse(viewModel.durationHoursController.text) ?? 0;
-    final minutes = int.tryParse(viewModel.durationMinutesController.text) ?? 0;
-
-    if (hours <= 0 && minutes <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a valid treatment duration"), backgroundColor: CustomColors.red),
-      );
-      return false;
-    }
-
-    if (minutes > 59) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Minutes must be between 0 and 59"), backgroundColor: CustomColors.red),
-      );
-      return false;
-    }
-
-    for (var area in state.areas) {
-      if (area.subAreas.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Each area must have at least one sub-area: ${area.areaController.text}"),
-            backgroundColor: CustomColors.red,
-          ),
-        );
-        return false;
-      }
     }
     return true;
   }
@@ -154,14 +136,6 @@ class EditTreatmentScreen extends ConsumerWidget {
                 ),
               ),
             ],
-          ),
-          context.verticalSpace(24),
-          BuildTextField(
-            label: "Treatment Base Price (\$)",
-            controller: viewModel.basePriceController,
-            hintText: "0",
-            keyboardType: TextInputType.number,
-            validator: Validators.empty,
           ),
           context.verticalSpace(24),
           Text("Base Duration", style: context.fonts.black14w600),
@@ -423,7 +397,13 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFollowUpEditSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+  Widget _buildFollowUpEditSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, WidgetRef ref) {
+    final dataState = ref.watch(treatmentDataViewModelProvider);
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
@@ -440,24 +420,101 @@ class EditTreatmentScreen extends ConsumerWidget {
           ),
           if (state.isFollowUpRequired) ...[
             context.verticalSpace(32),
-            BuildTextField(
-              label: "Total Follow-Ups",
-              controller: viewModel.totalFollowUpsController,
-              hintText: "e.g. 1",
-              keyboardType: TextInputType.number,
-              onChanged: (String? val) => viewModel.updateFollowUpCount(val ?? ''),
+            Text("Configuration Source", style: context.fonts.black16w600),
+            context.verticalSpace(16),
+            Row(
+              children: [
+                _radioOption(
+                  context, 
+                  "Use Category Default", 
+                  state.followUpSource == 'category', 
+                  () => viewModel.setFollowUpSource('category')
+                ),
+                context.horizontalSpace(32),
+                _radioOption(
+                  context, 
+                  "Treatment-Specific", 
+                  state.followUpSource == 'custom', 
+                  () => viewModel.setFollowUpSource('custom')
+                ),
+              ],
             ),
-            context.verticalSpace(24),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: state.followUpEntries.length,
-              separatorBuilder: (_, __) => context.verticalSpace(20),
-              itemBuilder: (context, index) {
-                return _buildFollowUpEntryCard(context, index, state.followUpEntries[index], viewModel);
-              },
-            ),
+            context.verticalSpace(32),
+            if (state.followUpSource == 'category') ...[
+              _buildCategoryFollowUpPreview(context, selectedCategory),
+            ] else ...[
+              BuildTextField(
+                label: "Total Follow-Ups",
+                controller: viewModel.totalFollowUpsController,
+                hintText: "e.g. 1",
+                keyboardType: TextInputType.number,
+                onChanged: (String? val) => viewModel.updateFollowUpCount(val ?? ''),
+              ),
+              context.verticalSpace(24),
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: state.followUpEntries.length,
+                separatorBuilder: (_, __) => context.verticalSpace(20),
+                itemBuilder: (context, index) {
+                  return _buildFollowUpEntryCard(context, index, state.followUpEntries[index], viewModel);
+                },
+              ),
+            ],
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryFollowUpPreview(BuildContext context, CategoryItem? category) {
+    final configs = category?.defaultFollowUps ?? [];
+
+    return Container(
+      width: double.infinity,
+      padding: context.appEdgeInsets(all: 20),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.info_outline_rounded, color: CustomColors.purple, size: 20),
+              context.horizontalSpace(12),
+              Text("Inherited from ${category?.name ?? 'Category'}", style: context.fonts.black14w600),
+            ],
+          ),
+          context.verticalSpace(16),
+          if (configs.isEmpty)
+            Text("No default follow-ups configured for this category.", style: context.fonts.grey14w400)
+          else
+            ...configs.asMap().entries.map((entry) {
+              final idx = entry.key + 1;
+              final config = entry.value;
+              return Padding(
+                padding: context.appEdgeInsets(bottom: 10),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(color: CustomColors.purple, shape: BoxShape.circle),
+                    ),
+                    context.horizontalSpace(12),
+                    Expanded(
+                      child: Text(
+                        "Follow-Up $idx: ${config.type.toUpperCase()} - ${config.durationValue} ${config.durationUnit} (${config.intervalValue} ${config.intervalUnit} after)",
+                        style: context.fonts.black14w400,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
         ],
       ),
     );
@@ -467,7 +524,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     return Container(
       padding: context.appEdgeInsets(all: 20),
       decoration: BoxDecoration(
-        color: CustomColors.whiteGrey,
+        color: Colors.white,
         borderRadius: context.appBorderRadius(all: 12),
         border: Border.all(color: CustomColors.border),
       ),
@@ -641,6 +698,237 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildProductsUsageSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, WidgetRef ref) {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Inventory Products", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          _buildProductSelector(context, viewModel, state),
+          if (state.productUsageEntries.isNotEmpty) ...[
+            context.verticalSpace(32),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: state.productUsageEntries.length,
+              separatorBuilder: (_, __) => context.verticalSpace(24),
+              itemBuilder: (context, index) {
+                return _buildProductUsageCard(context, index, state.productUsageEntries[index], viewModel);
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductSelector(BuildContext context, TreatmentViewModel viewModel, TreatmentState state) {
+    final inventoryProducts = TreatmentData.dummyInventoryProducts;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Select Product from Inventory", style: context.fonts.black14w600),
+        context.verticalSpace(10),
+        SearchAnchor(
+          viewHintText: "Search inventory...",
+          builder: (context, controller) => AppSearchField(
+            controller: controller,
+            readOnly: true,
+            onTap: () => controller.openView(),
+            hintText: "Select product from inventory",
+            suffixIcon: const Icon(Icons.add_circle_outline_rounded, color: CustomColors.purple),
+            maxWidth: double.infinity,
+          ),
+          suggestionsBuilder: (context, controller) {
+            final query = controller.text.toLowerCase();
+            final filtered = inventoryProducts.where((p) => p.name.toLowerCase().contains(query)).toList();
+            
+            return filtered.map((p) => ListTile(
+              title: Text(p.name),
+              subtitle: Text("${p.category} • Unit: ${p.unit}"),
+              onTap: () {
+                viewModel.addProductUsage(p.id!, p.name, p.unit);
+                controller.closeView(p.name);
+              },
+            )).toList();
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductUsageCard(BuildContext context, int index, ProductUsageEntry entry, TreatmentViewModel viewModel) {
+    return Container(
+      padding: context.appEdgeInsets(all: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(entry.productName, style: context.fonts.black14w700),
+                  Text("Unit of Measure: ${entry.unit}", style: context.fonts.grey12w400),
+                ],
+              ),
+              IconButton(
+                onPressed: () => viewModel.removeProductUsage(entry.productId),
+                icon: const Icon(Icons.delete_outline, color: CustomColors.red, size: 20),
+              ),
+            ],
+          ),
+          context.verticalSpace(20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: CustomDropdown<String>(
+                  label: "Usage Type",
+                  hintText: "Select",
+                  value: entry.usageType,
+                  items: const [
+                    DropdownMenuItem(value: 'Required', child: Text("Required")),
+                    DropdownMenuItem(value: 'Optional', child: Text("Optional")),
+                    DropdownMenuItem(value: 'Variable', child: Text("Variable")),
+                    DropdownMenuItem(value: 'Setup', child: Text("Setup")),
+                    DropdownMenuItem(value: 'Post_Care', child: Text("Post Care")),
+                    DropdownMenuItem(value: 'Device', child: Text("Device")),
+                  ],
+                  onChanged: (val) => viewModel.updateProductUsageEntry(index, usageType: val),
+                ),
+              ),
+              context.horizontalSpace(16),
+              Expanded(
+                child: CustomDropdown<String>(
+                  label: "Deduction Timing",
+                  hintText: "Select",
+                  value: entry.deductionTiming,
+                  items: const [
+                    DropdownMenuItem(value: 'On_Completion', child: Text("On Completion")),
+                    DropdownMenuItem(value: 'Manual', child: Text("Manual")),
+                    DropdownMenuItem(value: 'Post_Confirmation', child: Text("Post Confirmation")),
+                  ],
+                  onChanged: (val) => viewModel.updateProductUsageEntry(index, deductionTiming: val),
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(20),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: "Min Quantity",
+                  controller: entry.minQuantityController,
+                  hintText: "0",
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                ),
+              ),
+              context.horizontalSpace(16),
+              Expanded(
+                child: BuildTextField(
+                  label: "Max Quantity",
+                  controller: entry.maxQuantityController,
+                  hintText: "0",
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(20),
+          Row(
+            children: [
+              SizedBox(
+                width: context.w(24),
+                height: context.w(24),
+                child: Checkbox(
+                  value: entry.allowSubstitution,
+                  onChanged: (val) => viewModel.updateProductUsageEntry(index, allowSubstitution: val),
+                  shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 4)),
+                ),
+              ),
+              context.horizontalSpace(12),
+              Text("Allow Product Substitution", style: context.fonts.black14w600),
+            ],
+          ),
+          context.verticalSpace(20),
+          BuildTextField(
+            label: "Usage Notes (Optional)",
+            controller: entry.notesController,
+            hintText: "Clinical instructions or restrictions...",
+            maxLines: 2,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogicSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Business Logic", style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              SizedBox(
+                width: context.w(24),
+                height: context.w(24),
+                child: Checkbox(
+                  value: state.enableByDefault,
+                  onChanged: (val) => viewModel.toggleEnableByDefault(val),
+                  shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 4)),
+                ),
+              ),
+              context.horizontalSpace(12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Enable by Default for New Clinics", style: context.fonts.black16w400),
+                    Text("Newly onboarded clinics will have this treatment assigned automatically.", style: context.fonts.grey12w400),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(32),
+          const Divider(),
+          context.verticalSpace(32),
+          Text("AI Simulator Compatibility", style: context.fonts.black16w600),
+          context.verticalSpace(16),
+          Row(
+            children: [
+              SizedBox(
+                width: context.w(24),
+                height: context.w(24),
+                child: Checkbox(
+                  value: state.useInAiSimulator,
+                  onChanged: (val) => viewModel.toggleAiSimulator(val),
+                  shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 4)),
+                ),
+              ),
+              context.horizontalSpace(12),
+              Text("Use in AI Simulator", style: context.fonts.black16w400),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPricingSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
 
@@ -671,261 +959,144 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMaterialsSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
-    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
-
+  Widget _buildAreasSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Materials & Logic", style: context.fonts.black18w600),
-          context.verticalSpace(24),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                flex: 3,
-                child: _buildSearchField(
-                  context,
-                  label: "Material Name",
-                  hint: "Select material",
-                  controller: viewModel.materialNameController,
-                  suggestions: dataState.materials,
-                  onSelected: (val) {},
-                ),
-              ),
-              context.horizontalSpace(24),
-              Expanded(
-                child: BuildTextField(
-                  label: "Max Quantity",
-                  controller: viewModel.maxMaterialQuantityController,
-                  hintText: "0",
-                  keyboardType: TextInputType.number,
-                ),
+              Text("Body Areas", style: context.fonts.black18w600),
+              TextButton.icon(
+                onPressed: () => viewModel.addArea(),
+                icon: const Icon(Icons.add),
+                label: const Text("Add Area"),
               ),
             ],
           ),
-          context.verticalSpace(32),
-          Row(
-            children: [
-              Checkbox(
-                value: state.useInAiSimulator,
-                onChanged: (val) => viewModel.toggleAiSimulator(val),
-              ),
-              context.horizontalSpace(12),
-              Text("Use in AI Simulator", style: context.fonts.black16w400),
-            ],
+          context.verticalSpace(16),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: state.areas.length,
+            separatorBuilder: (_, _) => const Divider(height: 32),
+            itemBuilder: (context, index) {
+              final entry = state.areas[index];
+              return Column(
+                children: [
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(
+                      child: _buildSearchField(
+                        context,
+                        label: "Area Name",
+                        hint: "e.g. Upper Face",
+                        controller: entry.areaController,
+                        suggestions: dataState.areas.map((a) => a.name).toList(),
+                        onSelected: (val) => viewModel.onAreaSelected(index, val),
+                      ),
+                    ),
+                    if (state.areas.length > 1)
+                      IconButton(
+                        padding: context.appEdgeInsets(top: 32),
+                        onPressed: () => viewModel.removeArea(index),
+                        icon: const Icon(Icons.delete_outline, color: CustomColors.red),
+                      ),
+                  ]),
+                  context.verticalSpace(16),
+                  _buildSubAreaSection(context, index, entry, viewModel, dataState),
+                ],
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _radioOption(BuildContext context, String label, bool isSelected, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: context.appBorderRadius(all: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Radio<bool>(
-            value: true,
-            groupValue: isSelected,
-            onChanged: (_) => onTap(),
-            activeColor: CustomColors.purple,
-          ),
-          Text(label, style: context.fonts.black14w600),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOffsetDropdown(BuildContext context, {required String label, required int? value, required Map<int, String> options, required Function(int?) onChanged}) {
+  Widget _buildSubAreaSection(BuildContext context, int areaIndex, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: context.fonts.black14w600),
-        context.verticalSpace(8),
-        Container(
-          padding: context.appEdgeInsets(horizontal: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: context.appBorderRadius(all: 12),
-            border: Border.all(color: CustomColors.border),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<int>(
-              value: value,
-              isExpanded: true,
-              items: options.entries.map((e) => DropdownMenuItem<int>(value: e.key, child: Text(e.value))).toList(),
-              onChanged: onChanged,
-            ),
-          ),
+        _buildSearchField(
+          context,
+          label: "Sub Areas (Mandatory)",
+          hint: "Add sub area",
+          controller: entry.subAreaController,
+          suggestions: dataState.areas.isEmpty
+              ? []
+              : dataState.areas
+                  .firstWhere((a) => a.name == entry.areaController.text,
+                      orElse: () => dataState.areas.first)
+                  .subAreas
+                  .map((s) => s.name)
+                  .toList(),
+          onSelected: (val) => viewModel.addSubArea(areaIndex, val),
         ),
+        if (entry.subAreas.isNotEmpty) ...[
+          context.verticalSpace(12),
+          Wrap(
+            spacing: context.w(8),
+            runSpacing: context.h(8),
+            children: entry.subAreas.map((sub) => Chip(
+              label: Text(sub.name, style: context.fonts.grey13w500),
+              onDeleted: () => viewModel.removeSubArea(areaIndex, sub.name),
+              backgroundColor: CustomColors.green.withValues(alpha: 0.1),
+              side: BorderSide(color: CustomColors.green.withValues(alpha: 0.2)),
+            )).toList(),
+          ),
+        ],
       ],
     );
   }
 
-  Widget _expandableSection(BuildContext context, {required String title, required IconData icon, required Widget content}) {
+  Widget _buildSubAreaConfigCard(BuildContext context, SubAreaConfig subArea) {
     return Container(
+      padding: context.appEdgeInsets(all: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: context.appBorderRadius(all: 12),
+        color: CustomColors.whiteGrey,
+        borderRadius: context.appBorderRadius(all: 10),
         border: Border.all(color: CustomColors.border),
       ),
-      child: ExpansionTile(
-        initiallyExpanded: true,
-        leading: Icon(icon, color: CustomColors.purple),
-        title: Text(title, style: context.fonts.black16w600),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: context.appEdgeInsets(all: 20),
-            child: content,
+          Text(subArea.name, style: context.fonts.grey14w600),
+          context.verticalSpace(12),
+          BuildTextField(
+            label: "Base Price (\$)",
+            controller: subArea.basePriceController,
+            hintText: "0",
+            keyboardType: TextInputType.number,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFollowUpSection(
-    BuildContext context, {
-    required bool isFollowUpRequired,
-    required Function(bool?) onFollowUpToggle,
-    required TextEditingController totalFollowUpsController,
-    required String? followUpType,
-    required Function(String?) onFollowUpTypeChanged,
-    required TextEditingController followUpDurationValueController,
-    required String followUpDurationUnit,
-    required Function(String?) onFollowUpDurationUnitChanged,
-    required TextEditingController followUpNotesController,
-  }) {
+  Widget _buildImageTile(BuildContext context, String label, dynamic file, VoidCallback onTap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            SizedBox(
-              width: context.w(24),
-              height: context.w(24),
-              child: Checkbox(
-                value: isFollowUpRequired,
-                onChanged: onFollowUpToggle,
-                shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 4)),
-              ),
-            ),
-            context.horizontalSpace(12),
-            Text("Is Follow-Up Required?", style: context.fonts.black16w600),
-          ],
-        ),
-        if (isFollowUpRequired) ...[
-          context.verticalSpace(24),
-          Container(
-            padding: context.appEdgeInsets(all: 24),
+        Text(label, style: context.fonts.grey14w600),
+        context.verticalSpace(10),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            height: context.h(120),
+            width: double.infinity,
             decoration: BoxDecoration(
               color: CustomColors.whiteGrey,
               borderRadius: context.appBorderRadius(all: 12),
-              border: Border.all(color: CustomColors.border),
+              image: file != null ? DecorationImage(
+                image: kIsWeb ? NetworkImage(file.path) : FileImage(File(file.path)) as ImageProvider,
+                fit: BoxFit.cover,
+              ) : null,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Follow-Up Configuration", style: context.fonts.black16w600),
-                context.verticalSpace(20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: BuildTextField(
-                        label: "Total Follow-Ups",
-                        controller: totalFollowUpsController,
-                        hintText: "e.g. 1",
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    context.horizontalSpace(24),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Appointment Type", style: context.fonts.black14w600),
-                          context.verticalSpace(10),
-                          Container(
-                            padding: context.appEdgeInsets(horizontal: 16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: context.appBorderRadius(all: 12),
-                              border: Border.all(color: CustomColors.border),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: followUpType,
-                                hint: Text("Select type", style: context.fonts.grey14w400),
-                                isExpanded: true,
-                                dropdownColor: Colors.white,
-                                borderRadius: context.appBorderRadius(all: 12),
-                                items: [
-                                  DropdownMenuItem(value: 'virtual', child: Text("Virtual", style: context.fonts.black14w400)),
-                                  DropdownMenuItem(value: 'in_person', child: Text("In-Person", style: context.fonts.black14w400)),
-                                ],
-                                onChanged: onFollowUpTypeChanged,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                context.verticalSpace(20),
-                Text("Follow-Up Duration", style: context.fonts.black14w600),
-                context.verticalSpace(10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: BuildTextField(
-                        label: "Value",
-                        controller: followUpDurationValueController,
-                        hintText: "e.g. 30",
-                        keyboardType: TextInputType.number,
-                      ),
-                    ),
-                    context.horizontalSpace(24),
-                    Expanded(
-                      child: Container(
-                        margin: context.appEdgeInsets(top: 24),
-                        padding: context.appEdgeInsets(horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: context.appBorderRadius(all: 12),
-                          border: Border.all(color: CustomColors.border),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: followUpDurationUnit,
-                            isExpanded: true,
-                            dropdownColor: Colors.white,
-                            borderRadius: context.appBorderRadius(all: 12),
-                            items: [
-                              DropdownMenuItem(value: 'minutes', child: Text("Minutes", style: context.fonts.black14w400)),
-                              DropdownMenuItem(value: 'hours', child: Text("Hours", style: context.fonts.black14w400)),
-                            ],
-                            onChanged: onFollowUpDurationUnitChanged,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                context.verticalSpace(20),
-                BuildTextField(
-                  label: "Follow-Up Notes",
-                  controller: followUpNotesController,
-                  hintText: "Additional clinical instructions...",
-                  maxLines: 3,
-                ),
-              ],
-            ),
+            child: file == null ? const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.grey)) : null,
           ),
-        ],
+        ),
       ],
     );
   }
@@ -1137,374 +1308,6 @@ class EditTreatmentScreen extends ConsumerWidget {
     return const Icon(Icons.insert_drive_file_outlined, color: CustomColors.grey, size: 32);
   }
 
-  Widget _buildJourneyProtocols(BuildContext context, TreatmentDataState dataState, WidgetRef ref, List<String> selectedIds, Function(String) onToggle) {
-    final checkboxProtocols = dataState.protocols.where((p) => p.type == ProtocolType.checkbox).toList();
-    final textProtocols = dataState.protocols.where((p) => p.type == ProtocolType.text).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildProtocolGroup(
-          context,
-          title: "Checkboxes",
-          protocols: checkboxProtocols,
-          selectedIds: selectedIds,
-          onToggle: onToggle,
-          onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.checkbox),
-        ),
-        context.verticalSpace(24),
-        _buildProtocolGroup(
-          context,
-          title: "Text Fields",
-          protocols: textProtocols,
-          selectedIds: selectedIds,
-          onToggle: onToggle,
-          onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.text),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProtocolGroup(
-    BuildContext context, {
-    required String title,
-    required List<ProtocolItem> protocols,
-    required List<String> selectedIds,
-    required Function(String) onToggle,
-    required VoidCallback onAdd,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(title, style: context.fonts.black16w600),
-            IconButton(
-              onPressed: onAdd,
-              icon: const Icon(Icons.add_circle_outline_rounded, color: CustomColors.purple, size: 24),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
-          ],
-        ),
-        context.verticalSpace(16),
-        if (protocols.isEmpty)
-          Container(
-            width: double.infinity,
-            padding: context.appEdgeInsets(all: 20),
-            decoration: BoxDecoration(
-              color: CustomColors.whiteGrey,
-              borderRadius: context.appBorderRadius(all: 12),
-              border: Border.all(color: CustomColors.border),
-            ),
-            child: Text("No protocols in this group.", style: context.fonts.grey13w500),
-          )
-        else
-          Wrap(
-            spacing: context.w(12),
-            runSpacing: context.h(12),
-            children: protocols.map((protocol) {
-              final isSelected = selectedIds.contains(protocol.id);
-              return InkWell(
-                onTap: () => onToggle(protocol.id),
-                borderRadius: context.appBorderRadius(all: 10),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isSelected ? CustomColors.purple.withValues(alpha: 0.08) : Colors.white,
-                    borderRadius: context.appBorderRadius(all: 10),
-                    border: Border.all(
-                      color: isSelected ? CustomColors.purple : CustomColors.border,
-                      width: isSelected ? 1.5 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
-                        size: 18,
-                        color: isSelected ? CustomColors.purple : CustomColors.grey,
-                      ),
-                      context.horizontalSpace(10),
-                      Text(
-                        protocol.title,
-                        style: isSelected ? context.fonts.purple14w600 : context.fonts.black14w400,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-      ],
-    );
-  }
-
-  void _showAddProtocolDialog(BuildContext context, WidgetRef ref, ProtocolType type) {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => StandardDialog(
-        title: "Add ${type == ProtocolType.checkbox ? 'Checkbox' : 'Text'} Protocol",
-        width: context.w(450),
-        content: BuildTextField(
-          label: "Protocol Title",
-          controller: controller,
-          hintText: "e.g. ${type == ProtocolType.checkbox ? 'Cleanse treatment area' : 'Pre-Treatment Instructions'}",
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          CustomPrimaryButton(
-            onTap: () {
-              if (controller.text.isNotEmpty) {
-                ref.read(treatmentDataViewModelProvider.notifier).addProtocol(controller.text.trim(), type);
-                Navigator.pop(context);
-              }
-            },
-            label: "Save Protocol",
-            width: context.w(150),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAreasSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
-    return BorderdContainerWidget(
-      padding: context.appEdgeInsets(all: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Body Areas", style: context.fonts.black18w600),
-              TextButton.icon(
-                onPressed: () => viewModel.addArea(),
-                icon: const Icon(Icons.add),
-                label: const Text("Add Area"),
-              ),
-            ],
-          ),
-          context.verticalSpace(16),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: state.areas.length,
-            separatorBuilder: (_, _) => const Divider(height: 32),
-            itemBuilder: (context, index) {
-              final entry = state.areas[index];
-              return Column(
-                children: [
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Expanded(
-                      child: _buildSearchField(
-                        context,
-                        label: "Area Name",
-                        hint: "e.g. Upper Face",
-                        controller: entry.areaController,
-                        suggestions: dataState.areas.map((a) => a.name).toList(),
-                        onSelected: (val) => viewModel.onAreaSelected(index, val),
-                      ),
-                    ),
-                    if (state.areas.length > 1)
-                      IconButton(
-                        padding: context.appEdgeInsets(top: 32),
-                        onPressed: () => viewModel.removeArea(index),
-                        icon: const Icon(Icons.delete_outline, color: CustomColors.red),
-                      ),
-                  ]),
-                  context.verticalSpace(16),
-                  _buildSubAreaSection(context, index, entry, viewModel, dataState),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSubAreaSection(BuildContext context, int areaIndex, AreaViewModelEntry entry, TreatmentViewModel viewModel, TreatmentDataState dataState) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSearchField(
-          context,
-          label: "Sub Areas (Mandatory)",
-          hint: "Add sub area",
-          controller: entry.subAreaController,
-          suggestions: dataState.areas.isEmpty
-              ? []
-              : dataState.areas
-                  .firstWhere((a) => a.name == entry.areaController.text,
-                      orElse: () => dataState.areas.first)
-                  .subAreas
-                  .map((s) => s.name)
-                  .toList(),
-          onSelected: (val) => viewModel.addSubArea(areaIndex, val),
-        ),
-        if (entry.subAreas.isNotEmpty) ...[
-          context.verticalSpace(12),
-          Wrap(
-            spacing: context.w(8),
-            runSpacing: context.h(8),
-            children: entry.subAreas.map((sub) => Chip(
-              label: Text(sub.name, style: context.fonts.grey13w500),
-              onDeleted: () => viewModel.removeSubArea(areaIndex, sub.name),
-              backgroundColor: CustomColors.green.withValues(alpha: 0.1),
-              side: BorderSide(color: CustomColors.green.withValues(alpha: 0.2)),
-            )).toList(),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildSubAreaConfigCard(BuildContext context, SubAreaConfig subArea) {
-    return Container(
-      padding: context.appEdgeInsets(all: 16),
-      decoration: BoxDecoration(
-        color: CustomColors.whiteGrey,
-        borderRadius: context.appBorderRadius(all: 10),
-        border: Border.all(color: CustomColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(subArea.name, style: context.fonts.grey14w600),
-          context.verticalSpace(12),
-          Row(
-            children: [
-              Expanded(
-                child: BuildTextField(
-                  label: "Max Qty",
-                  controller: subArea.maxQuantityController,
-                  hintText: "0",
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              context.horizontalSpace(16),
-              Expanded(
-                child: BuildTextField(
-                  label: "Base Price (\$)",
-                  controller: subArea.basePriceController,
-                  hintText: "0",
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMaterialsAndLogicSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
-    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
-
-    return BorderdContainerWidget(
-      padding: context.appEdgeInsets(all: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Materials & Configuration", style: context.fonts.black18w600),
-          context.verticalSpace(24),
-          Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: _buildSearchField(
-                  context,
-                  label: "Material Name",
-                  hint: "Select material",
-                  controller: viewModel.materialNameController,
-                  suggestions: dataState.materials,
-                  onSelected: (val) {},
-                ),
-              ),
-              context.horizontalSpace(24),
-              Expanded(
-                child: BuildTextField(
-                  label: "Max Quantity",
-                  controller: viewModel.maxMaterialQuantityController,
-                  hintText: "0",
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-          if (allSubAreas.isNotEmpty) ...[
-            context.verticalSpace(32),
-            Text("Configuration Per Sub-Area", style: context.fonts.black16w400),
-            context.verticalSpace(16),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: allSubAreas.length,
-              separatorBuilder: (_, _) => context.verticalSpace(12),
-              itemBuilder: (context, index) {
-                final subArea = allSubAreas[index];
-                return _buildSubAreaConfigCard(context, subArea);
-              },
-            ),
-          ],
-          context.verticalSpace(32),
-          const Divider(),
-          context.verticalSpace(24),
-          Row(
-            children: [
-              SizedBox(
-                width: context.w(24),
-                height: context.w(24),
-                child: Checkbox(
-                  value: state.useInAiSimulator,
-                  onChanged: (val) => viewModel.toggleAiSimulator(val),
-                  shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 4)),
-                ),
-              ),
-              context.horizontalSpace(12),
-              Text("Use in AI Simulator", style: context.fonts.black16w400),
-            ],
-          ),
-          context.verticalSpace(32),
-          Text("Combinable Treatments", style: context.fonts.black16w400),
-          context.verticalSpace(8),
-          Text("Select treatments that can be performed alongside this one.", style: context.fonts.grey13w500),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImageTile(BuildContext context, String label, dynamic file, VoidCallback onTap) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: context.fonts.grey14w600),
-        context.verticalSpace(10),
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            height: context.h(120),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: CustomColors.whiteGrey,
-              borderRadius: context.appBorderRadius(all: 12),
-              image: file != null ? DecorationImage(
-                image: kIsWeb ? NetworkImage(file.path) : FileImage(File(file.path)) as ImageProvider,
-                fit: BoxFit.cover,
-              ) : null,
-            ),
-            child: file == null ? const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.grey)) : null,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildSearchField(
     BuildContext context, {
     required String label,
@@ -1573,6 +1376,72 @@ class EditTreatmentScreen extends ConsumerWidget {
           },
         ),
       ],
+    );
+  }
+
+  Widget _radioOption(BuildContext context, String label, bool isSelected, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: context.appBorderRadius(all: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Radio<bool>(
+            value: true,
+            groupValue: isSelected,
+            onChanged: (_) => onTap(),
+            activeColor: CustomColors.purple,
+          ),
+          Text(label, style: context.fonts.black14w600),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOffsetDropdown(BuildContext context, {required String label, required int? value, required Map<int, String> options, required Function(int?) onChanged}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: context.fonts.black14w600),
+        context.verticalSpace(8),
+        Container(
+          padding: context.appEdgeInsets(horizontal: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: context.appBorderRadius(all: 12),
+            border: Border.all(color: CustomColors.border),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              value: value,
+              isExpanded: true,
+              items: options.entries.map((e) => DropdownMenuItem<int>(value: e.key, child: Text(e.value))).toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _expandableSection(BuildContext context, {required String title, required IconData icon, required Widget content}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: ExpansionTile(
+        initiallyExpanded: true,
+        leading: Icon(icon, color: CustomColors.purple),
+        title: Text(title, style: context.fonts.black16w600),
+        children: [
+          Padding(
+            padding: context.appEdgeInsets(all: 20),
+            child: content,
+          ),
+        ],
+      ),
     );
   }
 }

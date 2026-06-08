@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class TreatmentDetailScreen extends ConsumerWidget {
@@ -62,6 +60,10 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 ),
                 context.verticalSpace(32),
                 _buildAreasAndLogic(context, treatment),
+                if (treatment.productUsages != null && treatment.productUsages!.isNotEmpty) ...[
+                  context.verticalSpace(32),
+                  _buildProductUsages(context, treatment),
+                ],
               ],
             ),
           ),
@@ -118,7 +120,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
                     context.horizontalSpace(24),
                     _headerMeta(context, Icons.payments_outlined, "Base \$${treatment.basePrice?.toStringAsFixed(2) ?? '0.00'}"),
                     context.horizontalSpace(24),
-                    _headerMeta(context, Icons.inventory_2_outlined, treatment.materialName ?? "No Consumable"),
+                    _headerMeta(context, Icons.inventory_2_outlined, "${treatment.productUsages?.length ?? 0} Products"),
                   ],
                 ),
               ],
@@ -152,25 +154,6 @@ class TreatmentDetailScreen extends ConsumerWidget {
         _infoSection(context, "Patient-Facing Description", treatment.shortDescription ?? "No summary provided."),
         context.verticalSpace(24),
         _infoSection(context, "Clinical Protocol & Process", treatment.description ?? "No detailed clinical information provided."),
-        context.verticalSpace(32),
-        Text("Material Mapping", style: context.fonts.black18w600),
-        context.verticalSpace(16),
-        BorderdContainerWidget(
-          padding: context.appEdgeInsets(all: 20),
-          child: Row(
-            children: [
-              const Icon(Icons.layers_outlined, color: CustomColors.purple),
-              context.horizontalSpace(16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(treatment.materialName ?? "None", style: context.fonts.black14w600),
-                  Text("Max per procedure: ${treatment.maxMaterialQuantity}", style: context.fonts.grey12w400),
-                ],
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -299,13 +282,76 @@ class TreatmentDetailScreen extends ConsumerWidget {
                   borderRadius: context.appBorderRadius(all: 6),
                 ),
                 child: Text(
-                  "${sub.name} (Max: ${sub.maxMaterialQuantity})",
+                  sub.name ?? "N/A",
                   style: context.fonts.purple11w600.copyWith(fontSize: context.sp(10)),
                 ),
               )).toList(),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildProductUsages(BuildContext context, TreatmentModel treatment) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Required Inventory Products", style: context.fonts.black18w600),
+        context.verticalSpace(16),
+        ...treatment.productUsages!.map((usage) => Padding(
+          padding: context.appEdgeInsets(bottom: 12),
+          child: BorderdContainerWidget(
+            padding: context.appEdgeInsets(all: 16),
+            child: Row(
+              children: [
+                const Icon(Icons.inventory_2_outlined, color: CustomColors.purple),
+                context.horizontalSpace(16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(usage.productName, style: context.fonts.black14w600),
+                      context.verticalSpace(4),
+                      Row(
+                        children: [
+                          _metaChip(context, usage.usageType, Colors.blue),
+                          context.horizontalSpace(8),
+                          _metaChip(context, usage.deductionTiming.replaceAll('_', ' '), Colors.orange),
+                          if (usage.allowSubstitution) ...[
+                            context.horizontalSpace(8),
+                            _metaChip(context, "Substitutable", Colors.green),
+                          ],
+                        ],
+                      ),
+                      context.verticalSpace(8),
+                      Text("Min: ${usage.minQuantity ?? 0} • Max: ${usage.maxQuantity ?? 0} ${usage.unit}", style: context.fonts.grey12w400),
+                      if (usage.notes != null && usage.notes!.isNotEmpty) ...[
+                        context.verticalSpace(8),
+                        Text("Notes: ${usage.notes}", style: context.fonts.grey12w400.copyWith(fontStyle: FontStyle.italic)),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )),
+      ],
+    );
+  }
+
+  Widget _metaChip(BuildContext context, String label, Color color) {
+    return Container(
+      padding: context.appEdgeInsets(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: context.appBorderRadius(all: 4),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: color, fontSize: context.sp(10), fontWeight: FontWeight.bold),
       ),
     );
   }
