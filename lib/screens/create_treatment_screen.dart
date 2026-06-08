@@ -109,8 +109,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Follow-Up Setup",
       "Patient Consent",
       "Inventory Products",
-      "Business Logic",
-      "Pricing"
+      "Pricing",
+      "Business Logic"
     ];
 
     return Container(
@@ -216,8 +216,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Follow-Up Configuration",
       "Patient Consent Form",
       "Inventory Products",
-      "Business Logic",
-      "Pricing Setup"
+      "Pricing Setup",
+      "Business Logic"
     ];
     final descriptions = [
       "Organize treatments to help patients and staff find them easily.",
@@ -233,8 +233,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Manage rules and scheduling for post-procedure clinical check-ins.",
       "Upload and manage legal procedural consent documentation.",
       "Configure required products from inventory and area-wise consumption.",
-      "Manage system-wide treatment behaviors and onboarding settings.",
-      "Finalize treatment base price and sub-area pricing adjustments."
+      "Finalize treatment base price and sub-area pricing adjustments.",
+      "Manage system-wide treatment behaviors and onboarding settings."
     ];
     final icons = [
       Icons.category_outlined,
@@ -250,8 +250,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       Icons.replay_outlined,
       Icons.fact_check_outlined,
       Icons.inventory_2_outlined,
-      Icons.settings_suggest_outlined,
-      Icons.payments_outlined
+      Icons.payments_outlined,
+      Icons.settings_suggest_outlined
     ];
 
     return Column(
@@ -284,6 +284,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildRightSidebar(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+
     return Container(
       width: context.w(350),
       decoration: BoxDecoration(
@@ -298,6 +303,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
             Text("Live Preview", style: context.fonts.black16w600),
             context.verticalSpace(20),
             _buildPreviewCard(context, viewModel, state),
+            
+            context.verticalSpace(32),
+            Text("Treatment Blueprint Summary", style: context.fonts.black16w600),
+            context.verticalSpace(16),
+            _buildCompleteTreatmentBlueprint(context, state, viewModel, dataState, selectedCategory),
+            
             context.verticalSpace(32),
             Text("Clinical Protocol Form Preview", style: context.fonts.black16w600),
             context.verticalSpace(16),
@@ -313,6 +324,535 @@ class CreateTreatmentScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCompleteTreatmentBlueprint(
+    BuildContext context,
+    TreatmentState state,
+    TreatmentViewModel viewModel,
+    TreatmentDataState dataState,
+    CategoryItem? selectedCategory,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildValidationIndicators(context, state, viewModel, selectedCategory),
+        _buildBasicInfoSummary(context, state, viewModel, selectedCategory),
+        _buildAreasSummary(context, state),
+        _buildSessionsSummary(context, state, selectedCategory),
+        _buildConsentSummary(context, state, selectedCategory),
+        _buildPreTreatmentInstructionsSummary(context, state, viewModel),
+        _buildNotificationsSummary(context, state, selectedCategory),
+        _buildDowntimeSummary(context, state, selectedCategory),
+        _buildProviderRolesSummary(context, state, selectedCategory),
+        _buildProductsSummary(context, state),
+        _buildPricingSummary(context, state, viewModel),
+        _buildInheritanceSummary(context, state),
+      ],
+    );
+  }
+
+  Widget _blueprintSection(BuildContext context, String title, Widget child) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: context.appEdgeInsets(all: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: context.appBorderRadius(all: 12),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: context.fonts.purple12w700),
+          context.verticalSpace(12),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _blueprintRow(BuildContext context, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(label, style: context.fonts.grey12w400),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              style: context.fonts.black12w600,
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildValidationIndicators(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, CategoryItem? selectedCategory) {
+    final basicOk = viewModel.internalNameController.text.isNotEmpty && viewModel.categoryIdController.text.isNotEmpty;
+    final areasOk = state.areas.any((a) => a.areaController.text.isNotEmpty);
+    final sessionsOk = state.totalSessions > 0;
+    final followUpsOk = state.sessions.any((s) => s.followUps.isNotEmpty);
+    final consentOk = state.consentType == 'category' || state.preTreatmentConsentForm != null || state.existingConsentForm != null;
+    final notifOk = state.preNotificationSource == 'category' || state.postNotificationSource == 'category' || state.preNotificationOffset != null || state.postNotificationOffset != null;
+    final productsOk = state.productUsageEntries.isNotEmpty;
+    final pricingOk = viewModel.basePriceController.text.isNotEmpty;
+    final rolesOk = state.providerRolesSource == 'category' || state.selectedRoles.isNotEmpty;
+
+    return _blueprintSection(
+      context,
+      "Step Validation Status",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _validationRow(context, "Basic Information", basicOk),
+          _validationRow(context, "Areas & Sub Areas", areasOk),
+          _validationRow(context, "Sessions Setup", sessionsOk),
+          _validationRow(context, "Follow-Ups", followUpsOk),
+          _validationRow(context, "Consent Form", consentOk),
+          _validationRow(context, "Notifications", notifOk),
+          _validationRow(context, "Products", productsOk),
+          _validationRow(context, "Pricing", pricingOk),
+          rolesOk ? _validationRow(context, "Provider Roles", true) : _validationRow(context, "Missing Provider Roles", false, warning: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _validationRow(BuildContext context, String label, bool isOk, {bool warning = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Icon(
+            isOk ? Icons.check_circle_rounded : (warning ? Icons.warning_amber_rounded : Icons.cancel_rounded),
+            size: 16,
+            color: isOk ? CustomColors.green : (warning ? Colors.orange : CustomColors.red),
+          ),
+          context.horizontalSpace(8),
+          Expanded(
+            child: Text(
+              label,
+              style: isOk 
+                  ? context.fonts.black12w600 
+                  : (warning ? context.fonts.black12w600.copyWith(color: Colors.orange) : context.fonts.grey12w400),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBasicInfoSummary(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, CategoryItem? selectedCategory) {
+    return _blueprintSection(
+      context,
+      "1. Basic Information",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _blueprintRow(context, "Treatment Name", viewModel.internalNameController.text.isEmpty ? "Not set" : viewModel.internalNameController.text),
+          _blueprintRow(context, "Display Name", viewModel.displayNameController.text.isEmpty ? "Not set" : viewModel.displayNameController.text),
+          _blueprintRow(context, "Description", viewModel.shortDescriptionController.text.isEmpty ? "Not set" : viewModel.shortDescriptionController.text),
+          _blueprintRow(context, "Category", viewModel.categoryNameController.text.isEmpty ? "Not set" : viewModel.categoryNameController.text),
+          _blueprintRow(context, "Status", state.status.toUpperCase()),
+          _blueprintRow(context, "AI Simulation", state.useInAiSimulator ? "Compatible" : "Incompatible"),
+          _blueprintRow(context, "Enable by Default", state.enableByDefault ? "Yes" : "No"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAreasSummary(BuildContext context, TreatmentState state) {
+    final activeAreas = state.areas.where((a) => a.areaController.text.isNotEmpty).toList();
+    int totalSubAreas = activeAreas.fold(0, (sum, a) => sum + a.subAreas.length);
+
+    return _blueprintSection(
+      context,
+      "2. Areas & Sub-Areas (${activeAreas.length} Areas, $totalSubAreas Sub-Areas)",
+      activeAreas.isEmpty
+          ? Text("No areas defined", style: context.fonts.grey12w400)
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: activeAreas.map((area) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("• ${area.areaController.text}", style: context.fonts.black12w600),
+                      if (area.subAreas.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16, top: 4),
+                          child: Text(
+                            area.subAreas.map((s) => s.name).join(", "),
+                            style: context.fonts.grey12w400,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+    );
+  }
+
+  Widget _buildSessionsSummary(BuildContext context, TreatmentState state, CategoryItem? selectedCategory) {
+    final isCategory = state.sessionSource == 'category';
+    
+    return _blueprintSection(
+      context,
+      "3. Sessions Overview",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text("Sessions Source: ", style: context.fonts.black12w600),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isCategory ? CustomColors.green.withValues(alpha: 0.1) : CustomColors.purple.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  isCategory ? "Category Default" : "Custom",
+                  style: isCategory ? context.fonts.green10w700 : context.fonts.purple11w600,
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(10),
+          if (state.sessions.isEmpty)
+            Text("No sessions defined", style: context.fonts.grey12w400)
+          else
+            ...state.sessions.map((session) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Session ${session.sessionNumber} (Total Follow-Ups: ${session.followUps.length})", style: context.fonts.black12w600),
+                    if (session.followUps.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12, top: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: session.followUps.asMap().entries.map((entry) {
+                            final idx = entry.key;
+                            final fu = entry.value;
+                            final durationText = "${fu.durationValueController.text.isEmpty ? '0' : fu.durationValueController.text} ${fu.durationUnit}";
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("• Follow-Up ${idx + 1}", style: context.fonts.black12w600),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                      "Type: ${fu.type.toUpperCase()} | Duration: $durationText | Image Req: ${fu.isImageRequired ? 'Yes' : 'No'}",
+                                      style: context.fonts.grey11w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConsentSummary(BuildContext context, TreatmentState state, CategoryItem? selectedCategory) {
+    final isCategory = state.consentType == 'category';
+    String consentFileName = "No PDF uploaded";
+    if (isCategory) {
+      consentFileName = selectedCategory?.consentFormName ?? "Category Consent Form";
+    } else {
+      consentFileName = state.preTreatmentConsentForm?.name ?? state.existingConsentForm?.name ?? "No PDF uploaded";
+    }
+
+    return _blueprintSection(
+      context,
+      "4. Consent Form",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _blueprintRow(context, "Consent Form Source", isCategory ? "Category Default" : "Treatment Specific"),
+          _blueprintRow(context, "Consent File", consentFileName),
+        ],
+      ),
+    );
+  }
+
+  String _getPlatformFileTypeSummary(PlatformFile file) {
+    final ext = file.extension?.toLowerCase();
+    if (ext == 'pdf') return 'pdf';
+    if (['jpg', 'jpeg', 'png', 'webp'].contains(ext)) return 'image';
+    if (['mp4', 'mov', 'avi', 'mkv'].contains(ext)) return 'video';
+    return 'other';
+  }
+
+  Widget _buildPreTreatmentInstructionsSummary(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    final hasInstructions = viewModel.preTreatmentInstructionsController.text.isNotEmpty;
+    final instructionsText = hasInstructions ? "Configured" : "None";
+
+    final allPre = [
+      ...state.existingPreAttachments,
+      ...state.preTreatmentAttachments.map((f) => Attachment(url: f.path ?? '', type: _getPlatformFileTypeSummary(f), name: f.name)),
+    ];
+
+    final pdfs = allPre.where((a) => a.type == 'pdf').length;
+    final images = allPre.where((a) => a.type == 'image').length;
+    final videos = allPre.where((a) => a.type == 'video').length;
+
+    return _blueprintSection(
+      context,
+      "5. Pre-Treatment Instructions",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _blueprintRow(context, "Instructions Text", instructionsText),
+          _blueprintRow(context, "PDFs Attached", "$pdfs"),
+          _blueprintRow(context, "Images Attached", "$images"),
+          _blueprintRow(context, "Videos Attached", "$videos"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationsSummary(BuildContext context, TreatmentState state, CategoryItem? selectedCategory) {
+    final isPreCategory = state.preNotificationSource == 'category';
+    final isPostCategory = state.postNotificationSource == 'category';
+
+    String preTiming = "Not configured";
+    if (isPreCategory) {
+      preTiming = selectedCategory?.preNotification?.timing != null ? "${selectedCategory!.preNotification!.timing} Hours Before" : "Category Default";
+    } else if (state.preNotificationOffset != null) {
+      preTiming = "${state.preNotificationOffset} Hours Before";
+    }
+
+    String postTiming = "Not configured";
+    if (isPostCategory) {
+      postTiming = selectedCategory?.postNotification?.timing != null ? "${selectedCategory!.postNotification!.timing} Hours After" : "Category Default";
+    } else if (state.postNotificationOffset != null) {
+      postTiming = "${state.postNotificationOffset} Hours After";
+    }
+
+    return _blueprintSection(
+      context,
+      "6. Patient Notifications",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _blueprintRow(context, "Pre-Notification Source", isPreCategory ? "Category Default" : "Custom"),
+          _blueprintRow(context, "Pre-Notification Timing", preTiming),
+          _blueprintRow(context, "Post-Notification Source", isPostCategory ? "Category Default" : "Custom"),
+          _blueprintRow(context, "Post-Notification Timing", postTiming),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDowntimeSummary(BuildContext context, TreatmentState state, CategoryItem? selectedCategory) {
+    final level = state.downtimeLevel;
+    int days = 0;
+    if (selectedCategory != null) {
+      final presets = selectedCategory.downtimePresets;
+      if (level == 'low') days = presets.low;
+      else if (level == 'moderate') days = presets.moderate;
+      else if (level == 'high') days = presets.high;
+    } else {
+      if (level == 'low') days = 2;
+      else if (level == 'moderate') days = 5;
+      else if (level == 'high') days = 10;
+    }
+
+    return _blueprintSection(
+      context,
+      "7. Downtime Configuration",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _blueprintRow(context, "Downtime Level", level.toUpperCase()),
+          _blueprintRow(context, "Restriction Period", "$days Days"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProviderRolesSummary(BuildContext context, TreatmentState state, CategoryItem? selectedCategory) {
+    final isCategory = state.providerRolesSource == 'category';
+    final List<String> roles = isCategory ? (selectedCategory?.defaultRoles ?? []) : state.selectedRoles;
+
+    return _blueprintSection(
+      context,
+      "8. Allowed Provider Roles",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _blueprintRow(context, "Provider Roles Source", isCategory ? "Category Default" : "Custom Overrides"),
+          _blueprintRow(context, "Allowed Roles", roles.isEmpty ? "None allowed" : roles.join(", ")),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductsSummary(BuildContext context, TreatmentState state) {
+    return _blueprintSection(
+      context,
+      "9. Products Configuration",
+      state.productUsageEntries.isEmpty
+          ? Text("No products configured", style: context.fonts.grey12w400)
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: state.productUsageEntries.map((entry) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("• ${entry.productName}", style: context.fonts.black12w600),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12, top: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Usage Type: ${entry.usageType}", style: context.fonts.grey11w400),
+                            Text("Quantity: Min ${entry.minQuantityController.text} / Max ${entry.maxQuantityController.text} ${entry.unit}", style: context.fonts.grey11w400),
+                            Text("Deduction Timing: ${entry.deductionTiming}", style: context.fonts.grey11w400),
+                            Text("Substitution Allowed: ${entry.allowSubstitution ? 'Yes' : 'No'}", style: context.fonts.grey11w400),
+                            if (entry.notesController.text.isNotEmpty)
+                              Text("Notes: ${entry.notesController.text}", style: context.fonts.grey11w400),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+    );
+  }
+
+  Widget _buildPricingSummary(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    final basePrice = viewModel.basePriceController.text;
+    final subAreaPricingRules = state.areas
+        .expand((a) => a.subAreas)
+        .where((s) => s.basePriceController.text.isNotEmpty)
+        .toList();
+
+    return _blueprintSection(
+      context,
+      "10. Pricing & Financial Rules",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _blueprintRow(context, "Base Price", basePrice.isEmpty ? "\$0" : "\$$basePrice"),
+          _blueprintRow(context, "Pricing Logic", subAreaPricingRules.isEmpty ? "Standard flat base pricing" : "Custom Sub-Area Adjustments"),
+          if (subAreaPricingRules.isNotEmpty) ...[
+            context.verticalSpace(8),
+            Text("Sub-Area Overrides:", style: context.fonts.black12w600),
+            ...subAreaPricingRules.map((rule) {
+              return Padding(
+                padding: const EdgeInsets.only(left: 12, top: 2),
+                child: Text(
+                  "• ${rule.name}: \$${rule.basePriceController.text}",
+                  style: context.fonts.grey11w400,
+                ),
+              );
+            }).toList(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInheritanceSummary(BuildContext context, TreatmentState state) {
+    final List<String> inherited = [];
+    final List<String> overrides = [];
+
+    if (state.sessionSource == 'category') {
+      inherited.addAll(["Sessions", "Follow-Ups"]);
+    } else {
+      overrides.addAll(["Custom Sessions", "Custom Follow-Ups"]);
+    }
+
+    if (state.consentType == 'category') {
+      inherited.add("Consent Form");
+    } else {
+      overrides.add("Custom Consent Form");
+    }
+
+    if (state.preNotificationSource == 'category' && state.postNotificationSource == 'category') {
+      inherited.add("Notifications");
+    } else {
+      overrides.add("Custom Notifications");
+    }
+
+    if (state.providerRolesSource == 'category') {
+      inherited.add("Provider Roles");
+    } else {
+      overrides.add("Custom Provider Roles");
+    }
+
+    inherited.add("Downtime Configuration");
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _blueprintSection(
+          context,
+          "11. Inherited From Category",
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: inherited.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  const Icon(Icons.arrow_downward_rounded, size: 14, color: CustomColors.green),
+                  context.horizontalSpace(8),
+                  Text(item, style: context.fonts.grey12w400),
+                ],
+              ),
+            )).toList(),
+          ),
+        ),
+        _blueprintSection(
+          context,
+          "12. Treatment Overrides",
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: overrides.isEmpty
+                ? [Text("No custom overrides defined", style: context.fonts.grey12w400)]
+                : overrides.map((item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.edit_road_rounded, size: 14, color: CustomColors.purple),
+                        context.horizontalSpace(8),
+                        Text(item, style: context.fonts.black12w600),
+                      ],
+                    ),
+                  )).toList(),
+          ),
+        ),
+      ],
     );
   }
 
@@ -614,8 +1154,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 10: return _buildStepFollowUp(context, state, viewModel, dataState);
       case 11: return _buildStepConsent(context, state, viewModel, ref);
       case 12: return _buildStepMaterials(context, state, viewModel, dataState, ref);
-      case 13: return _buildStepLogic(context, state, viewModel);
-      case 14: return _buildStepPricing(context, state, viewModel);
+      case 13: return _buildStepPricing(context, state, viewModel);
+      case 14: return _buildStepLogic(context, state, viewModel);
       default: return const SizedBox.shrink();
     }
   }
