@@ -98,6 +98,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final steps = [
       "Categories",
       "Basic Information",
+      "Scheduling",
       "Treatment Areas",
       "Protocols",
       "Pre-Treatment Instructions",
@@ -205,6 +206,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final titles = [
       "Categorization",
       "Basic Information",
+      "Scheduling",
       "Body Areas",
       "Clinical Protocols",
       "Pre-Treatment Instructions",
@@ -221,7 +223,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
     ];
     final descriptions = [
       "Organize treatments to help patients and staff find them easily.",
-      "Core identification details including status and duration.",
+      "Core identification details including status.",
+      "Centralize appointment duration, preparation times, and booking permissions.",
       "Define mandatory sub-areas.",
       "Standardize procedures with checklists and required text fields.",
       "Detailed instructions and supporting media for patients before the procedure.",
@@ -239,6 +242,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final icons = [
       Icons.category_outlined,
       Icons.description_outlined,
+      Icons.schedule_outlined,
       Icons.accessibility_new_outlined,
       Icons.assignment_turned_in_outlined,
       Icons.login_rounded,
@@ -339,6 +343,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       children: [
         _buildValidationIndicators(context, state, viewModel, selectedCategory),
         _buildBasicInfoSummary(context, state, viewModel, selectedCategory),
+        _buildSchedulingSummary(context, state, viewModel),
         _buildAreasSummary(context, state),
         _buildSessionsSummary(context, state, selectedCategory),
         _buildConsentSummary(context, state, selectedCategory),
@@ -350,6 +355,27 @@ class CreateTreatmentScreen extends ConsumerWidget {
         _buildPricingSummary(context, state, viewModel),
         _buildInheritanceSummary(context, state),
       ],
+    );
+  }
+
+  Widget _buildSchedulingSummary(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return _blueprintSection(
+      context,
+      "Scheduling Configuration",
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _blueprintRow(context, "Treatment Duration", "${viewModel.treatmentDurationController.text.isEmpty ? '0' : viewModel.treatmentDurationController.text} Minutes"),
+          _blueprintRow(context, "Preparation Time", "${viewModel.prepTimeController.text.isEmpty ? '0' : viewModel.prepTimeController.text} Minutes"),
+          _blueprintRow(context, "Cleanup Time", "${viewModel.cleanupTimeController.text.isEmpty ? '0' : viewModel.cleanupTimeController.text} Minutes"),
+          _blueprintRow(context, "Online Bookable", state.onlineBookable ? "Yes" : "No"),
+          _blueprintRow(context, "Manual Approval Required", state.manualApprovalRequired ? "Yes" : "No"),
+          _blueprintRow(context, "Allow Clinic Override", state.allowClinicOverride ? "Yes" : "No"),
+          _blueprintRow(context, "Allow Provider Override", state.allowProviderOverride ? "Yes" : "No"),
+          _blueprintRow(context, "Minimum Booking Notice", "${viewModel.minimumBookingNoticeController.text.isEmpty ? '24' : viewModel.minimumBookingNoticeController.text} Hours"),
+          _blueprintRow(context, "Maximum Days in Advance", "${viewModel.maximumDaysInAdvanceController.text.isEmpty ? '90' : viewModel.maximumDaysInAdvanceController.text} Days"),
+        ],
+      ),
     );
   }
 
@@ -399,6 +425,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
   Widget _buildValidationIndicators(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, CategoryItem? selectedCategory) {
     final basicOk = viewModel.internalNameController.text.isNotEmpty && viewModel.categoryIdController.text.isNotEmpty;
+    final schedOk = viewModel.treatmentDurationController.text.isNotEmpty && (int.tryParse(viewModel.treatmentDurationController.text) ?? 0) > 0;
     final areasOk = state.areas.any((a) => a.areaController.text.isNotEmpty);
     final sessionsOk = state.totalSessions > 0;
     final followUpsOk = state.sessions.any((s) => s.followUps.isNotEmpty);
@@ -415,6 +442,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _validationRow(context, "Basic Information", basicOk),
+          _validationRow(context, "Scheduling Configuration", schedOk),
           _validationRow(context, "Areas & Sub Areas", areasOk),
           _validationRow(context, "Sessions Setup", sessionsOk),
           _validationRow(context, "Follow-Ups", followUpsOk),
@@ -1123,13 +1151,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Step ${state.currentStep + 1} of 12", style: context.fonts.black14w700),
-              Text("${((state.currentStep + 1) / 12 * 100).toInt()}%", style: context.fonts.purple14w700),
+              Text("Step ${state.currentStep + 1} of 16", style: context.fonts.black14w700),
+              Text("${((state.currentStep + 1) / 16 * 100).toInt()}%", style: context.fonts.purple14w700),
             ],
           ),
           context.verticalSpace(8),
           LinearProgressIndicator(
-            value: (state.currentStep + 1) / 12,
+            value: (state.currentStep + 1) / 16,
             minHeight: context.h(4),
             backgroundColor: CustomColors.whiteGrey,
             valueColor: const AlwaysStoppedAnimation<Color>(CustomColors.purple),
@@ -1143,19 +1171,20 @@ class CreateTreatmentScreen extends ConsumerWidget {
     switch (state.currentStep) {
       case 0: return _buildStepCategory(context, state, viewModel, dataState);
       case 1: return _buildStepDetails(context, state, viewModel);
-      case 2: return _buildStepAreas(context, state, viewModel, dataState);
-      case 3: return _buildStepProtocolsStep(context, state, viewModel, dataState, ref);
-      case 4: return _buildStepPreInstructions(context, state, viewModel);
-      case 5: return _buildStepPostInstructions(context, state, viewModel);
-      case 6: return _buildStepNotifications(context, state, viewModel, dataState);
-      case 7: return _buildStepDowntime(context, state, viewModel, dataState);
-      case 8: return _buildStepRoles(context, state, viewModel, dataState);
-      case 9: return _buildStepSessions(context, state, viewModel, dataState);
-      case 10: return _buildStepFollowUp(context, state, viewModel, dataState);
-      case 11: return _buildStepConsent(context, state, viewModel, ref);
-      case 12: return _buildStepMaterials(context, state, viewModel, dataState, ref);
-      case 13: return _buildStepPricing(context, state, viewModel);
-      case 14: return _buildStepLogic(context, state, viewModel);
+      case 2: return _buildStepScheduling(context, state, viewModel);
+      case 3: return _buildStepAreas(context, state, viewModel, dataState);
+      case 4: return _buildStepProtocolsStep(context, state, viewModel, dataState, ref);
+      case 5: return _buildStepPreInstructions(context, state, viewModel);
+      case 6: return _buildStepPostInstructions(context, state, viewModel);
+      case 7: return _buildStepNotifications(context, state, viewModel, dataState);
+      case 8: return _buildStepDowntime(context, state, viewModel, dataState);
+      case 9: return _buildStepRoles(context, state, viewModel, dataState);
+      case 10: return _buildStepSessions(context, state, viewModel, dataState);
+      case 11: return _buildStepFollowUp(context, state, viewModel, dataState);
+      case 12: return _buildStepConsent(context, state, viewModel, ref);
+      case 13: return _buildStepMaterials(context, state, viewModel, dataState, ref);
+      case 14: return _buildStepPricing(context, state, viewModel);
+      case 15: return _buildStepLogic(context, state, viewModel);
       default: return const SizedBox.shrink();
     }
   }
@@ -2581,42 +2610,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
             ),
           ],
         ),
-        context.verticalSpace(24),
-        Text("Base Duration", style: context.fonts.black14w600),
-        context.verticalSpace(10),
-        Row(
-          children: [
-            Expanded(
-              child: BuildTextField(
-                label: "Hours",
-                controller: viewModel.durationHoursController,
-                hintText: "0",
-                keyboardType: TextInputType.number,
-                validator: (val) {
-                  if (val == null || val.isEmpty) return null;
-                  final hours = int.tryParse(val);
-                  if (hours == null || hours < 0) return "Invalid";
-                  return null;
-                },
-              ),
-            ),
-            context.horizontalSpace(24),
-            Expanded(
-              child: BuildTextField(
-                label: "Minutes",
-                controller: viewModel.durationMinutesController,
-                hintText: "0",
-                keyboardType: TextInputType.number,
-                validator: (val) {
-                  if (val == null || val.isEmpty) return null;
-                  final minutes = int.tryParse(val);
-                  if (minutes == null || minutes < 0 || minutes > 59) return "0-59";
-                  return null;
-                },
-              ),
-            ),
-          ],
-        ),
         context.verticalSpace(32),
         _sectionTitle(context, "Visuals"),
         context.verticalSpace(24),
@@ -2654,6 +2647,141 @@ class CreateTreatmentScreen extends ConsumerWidget {
             DropdownMenuItem(value: 'draft', child: Text("Draft", style: context.fonts.black14w400)),
           ],
           onChanged: (val) => viewModel.setStatus(val ?? 'active'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepScheduling(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle(context, "Appointment Duration"),
+        context.verticalSpace(24),
+        Row(
+          children: [
+            Expanded(
+              child: BuildTextField(
+                label: "Treatment Duration (Minutes)",
+                controller: viewModel.treatmentDurationController,
+                hintText: "e.g. 60",
+                keyboardType: TextInputType.number,
+                validator: Validators.empty,
+              ),
+            ),
+          ],
+        ),
+        context.verticalSpace(24),
+        Row(
+          children: [
+            Expanded(
+              child: BuildTextField(
+                label: "Preparation Time (Minutes)",
+                controller: viewModel.prepTimeController,
+                hintText: "e.g. 10",
+                keyboardType: TextInputType.number,
+              ),
+            ),
+            context.horizontalSpace(24),
+            Expanded(
+              child: BuildTextField(
+                label: "Finish / Cleanup Time (Minutes)",
+                controller: viewModel.cleanupTimeController,
+                hintText: "e.g. 5",
+                keyboardType: TextInputType.number,
+              ),
+            ),
+          ],
+        ),
+        context.verticalSpace(32),
+        _sectionTitle(context, "Override & Booking Controls"),
+        context.verticalSpace(24),
+        Row(
+          children: [
+            SizedBox(
+              width: context.w(24),
+              height: context.w(24),
+              child: Checkbox(
+                value: state.allowClinicOverride,
+                onChanged: (val) => viewModel.toggleAllowClinicOverride(val),
+                activeColor: CustomColors.purple,
+              ),
+            ),
+            context.horizontalSpace(12),
+            Text("Allow Clinic Duration Override", style: context.fonts.black14w600),
+          ],
+        ),
+        context.verticalSpace(16),
+        Row(
+          children: [
+            SizedBox(
+              width: context.w(24),
+              height: context.w(24),
+              child: Checkbox(
+                value: state.allowProviderOverride,
+                onChanged: (val) => viewModel.toggleAllowProviderOverride(val),
+                activeColor: CustomColors.purple,
+              ),
+            ),
+            context.horizontalSpace(12),
+            Text("Allow Provider Duration Override", style: context.fonts.black14w600),
+          ],
+        ),
+        context.verticalSpace(16),
+        Row(
+          children: [
+            SizedBox(
+              width: context.w(24),
+              height: context.w(24),
+              child: Checkbox(
+                value: state.onlineBookable,
+                onChanged: (val) => viewModel.toggleOnlineBookable(val),
+                activeColor: CustomColors.purple,
+              ),
+            ),
+            context.horizontalSpace(12),
+            Text("Online Bookable", style: context.fonts.black14w600),
+          ],
+        ),
+        context.verticalSpace(16),
+        Row(
+          children: [
+            SizedBox(
+              width: context.w(24),
+              height: context.w(24),
+              child: Checkbox(
+                value: state.manualApprovalRequired,
+                onChanged: (val) => viewModel.toggleManualApprovalRequired(val),
+                activeColor: CustomColors.purple,
+              ),
+            ),
+            context.horizontalSpace(12),
+            Text("Manual Approval Required", style: context.fonts.black14w600),
+          ],
+        ),
+        context.verticalSpace(32),
+        _sectionTitle(context, "Booking Advance Notice Rules"),
+        context.verticalSpace(24),
+        Row(
+          children: [
+            Expanded(
+              child: BuildTextField(
+                label: "Minimum Booking Notice (Hours)",
+                controller: viewModel.minimumBookingNoticeController,
+                hintText: "e.g. 24",
+                keyboardType: TextInputType.number,
+              ),
+            ),
+            context.horizontalSpace(24),
+            Expanded(
+              child: BuildTextField(
+                label: "Maximum Days in Advance",
+                controller: viewModel.maximumDaysInAdvanceController,
+                hintText: "e.g. 90",
+                keyboardType: TextInputType.number,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -3364,7 +3492,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
-    final bool isLastStep = state.currentStep == 14;
+    final bool isLastStep = state.currentStep == 15;
 
     return Row(
       children: [
@@ -3385,10 +3513,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 if (!_validateStepDetails(context, viewModel)) return;
               }
               if (state.currentStep == 2) {
+                if (!_validateScheduling(context, viewModel)) return;
+              }
+              if (state.currentStep == 3) {
                 if (!_validateSubAreas(context, state)) return;
               }
               
-              if (state.currentStep < 14) {
+              if (state.currentStep < 15) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel.submitTreatment(context, categories: dataState.categories).then((_) {
@@ -3411,24 +3542,23 @@ class CreateTreatmentScreen extends ConsumerWidget {
       );
       return false;
     }
+    return true;
+  }
 
-    final hours = int.tryParse(viewModel.durationHoursController.text) ?? 0;
-    final minutes = int.tryParse(viewModel.durationMinutesController.text) ?? 0;
-
-    if (hours <= 0 && minutes <= 0) {
+  bool _validateScheduling(BuildContext context, TreatmentViewModel viewModel) {
+    if (viewModel.treatmentDurationController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter a valid treatment duration"), backgroundColor: CustomColors.red),
       );
       return false;
     }
-
-    if (minutes > 59) {
+    final duration = int.tryParse(viewModel.treatmentDurationController.text) ?? 0;
+    if (duration <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Minutes must be between 0 and 59"), backgroundColor: CustomColors.red),
+        const SnackBar(content: Text("Treatment duration must be greater than 0"), backgroundColor: CustomColors.red),
       );
       return false;
     }
-
     return true;
   }
 

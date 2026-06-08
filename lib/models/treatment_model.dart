@@ -27,6 +27,16 @@ class TreatmentModel {
   String? preTreatmentInstructions;
   String? postTreatmentInstructions;
   
+  // Scheduling Fields
+  int prepTime;
+  int cleanupTime;
+  bool allowClinicOverride;
+  bool allowProviderOverride;
+  bool onlineBookable;
+  bool manualApprovalRequired;
+  int minimumBookingNotice;
+  int maximumDaysInAdvance;
+
   // Notifications
   String preNotificationSource; // category | custom
   String postNotificationSource; // category | custom
@@ -81,6 +91,14 @@ class TreatmentModel {
     this.baseDurationMinutes,
     this.preTreatmentInstructions,
     this.postTreatmentInstructions,
+    this.prepTime = 0,
+    this.cleanupTime = 0,
+    this.allowClinicOverride = false,
+    this.allowProviderOverride = false,
+    this.onlineBookable = true,
+    this.manualApprovalRequired = false,
+    this.minimumBookingNotice = 24,
+    this.maximumDaysInAdvance = 90,
     this.preNotificationSource = 'category',
     this.postNotificationSource = 'category',
     this.preTreatmentNotificationTitle,
@@ -106,6 +124,14 @@ class TreatmentModel {
       : status = json['status'] ?? (json['is_active'] == false ? 'deactive' : 'active'),
         useInAiSimulator = json['use_in_ai_simulator'] ?? false,
         enableByDefault = json['enable_by_default'] ?? false,
+        prepTime = json['prep_time'] ?? 0,
+        cleanupTime = json['cleanup_time'] ?? 0,
+        allowClinicOverride = json['allow_clinic_override'] ?? false,
+        allowProviderOverride = json['allow_provider_override'] ?? false,
+        onlineBookable = json['online_bookable'] ?? true,
+        manualApprovalRequired = json['manual_approval_required'] ?? false,
+        minimumBookingNotice = json['minimum_booking_notice'] ?? 24,
+        maximumDaysInAdvance = json['maximum_days_in_advance'] ?? 90,
         preNotificationSource = json['pre_notification_source'] ?? 'category',
         postNotificationSource = json['post_notification_source'] ?? 'category',
         sessionSource = json['session_source'] ?? 'category',
@@ -187,6 +213,14 @@ class TreatmentModel {
     String? status,
     bool? useInAiSimulator,
     bool? enableByDefault,
+    int? prepTime,
+    int? cleanupTime,
+    bool? allowClinicOverride,
+    bool? allowProviderOverride,
+    bool? onlineBookable,
+    bool? manualApprovalRequired,
+    int? minimumBookingNotice,
+    int? maximumDaysInAdvance,
     List<int>? combinableTreatmentIds,
     List<String>? protocolIds,
     int? baseDurationHours,
@@ -230,6 +264,14 @@ class TreatmentModel {
       status: status ?? this.status,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
       enableByDefault: enableByDefault ?? this.enableByDefault,
+      prepTime: prepTime ?? this.prepTime,
+      cleanupTime: cleanupTime ?? this.cleanupTime,
+      allowClinicOverride: allowClinicOverride ?? this.allowClinicOverride,
+      allowProviderOverride: allowProviderOverride ?? this.allowProviderOverride,
+      onlineBookable: onlineBookable ?? this.onlineBookable,
+      manualApprovalRequired: manualApprovalRequired ?? this.manualApprovalRequired,
+      minimumBookingNotice: minimumBookingNotice ?? this.minimumBookingNotice,
+      maximumDaysInAdvance: maximumDaysInAdvance ?? this.maximumDaysInAdvance,
       combinableTreatmentIds: combinableTreatmentIds ?? this.combinableTreatmentIds,
       protocolIds: protocolIds ?? this.protocolIds,
       baseDurationHours: baseDurationHours ?? this.baseDurationHours,
@@ -276,6 +318,14 @@ class TreatmentModel {
       'is_active': status == 'active',
       'use_in_ai_simulator': useInAiSimulator,
       'enable_by_default': enableByDefault,
+      'prep_time': prepTime,
+      'cleanup_time': cleanupTime,
+      'allow_clinic_override': allowClinicOverride,
+      'allow_provider_override': allowProviderOverride,
+      'online_bookable': onlineBookable,
+      'manual_approval_required': manualApprovalRequired,
+      'minimum_booking_notice': minimumBookingNotice,
+      'maximum_days_in_advance': maximumDaysInAdvance,
       'combinable_treatment_ids': combinableTreatmentIds,
       'protocol_ids': protocolIds,
       'base_duration_hours': baseDurationHours,

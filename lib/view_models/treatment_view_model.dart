@@ -30,6 +30,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final durationHoursController = TextEditingController();
   final durationMinutesController = TextEditingController();
 
+  // Step - Scheduling Controllers
+  final treatmentDurationController = TextEditingController();
+  final prepTimeController = TextEditingController();
+  final cleanupTimeController = TextEditingController();
+  final minimumBookingNoticeController = TextEditingController();
+  final maximumDaysInAdvanceController = TextEditingController();
+
   // Step - Treatment Instructions Controllers
   final preTreatmentInstructionsController = TextEditingController();
   final postTreatmentInstructionsController = TextEditingController();
@@ -72,6 +79,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.dispose();
     durationHoursController.dispose();
     durationMinutesController.dispose();
+    treatmentDurationController.dispose();
+    prepTimeController.dispose();
+    cleanupTimeController.dispose();
+    minimumBookingNoticeController.dispose();
+    maximumDaysInAdvanceController.dispose();
     preTreatmentInstructionsController.dispose();
     postTreatmentInstructionsController.dispose();
     preNotificationTitleController.dispose();
@@ -131,6 +143,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.clear();
     durationHoursController.clear();
     durationMinutesController.clear();
+    treatmentDurationController.clear();
+    prepTimeController.clear();
+    cleanupTimeController.clear();
+    minimumBookingNoticeController.clear();
+    maximumDaysInAdvanceController.clear();
     preTreatmentInstructionsController.clear();
     postTreatmentInstructionsController.clear();
     preNotificationTitleController.clear();
@@ -218,6 +235,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     basePriceController.text = treatment.basePrice?.toString() ?? '';
     durationHoursController.text = treatment.baseDurationHours?.toString() ?? '';
     durationMinutesController.text = treatment.baseDurationMinutes?.toString() ?? '';
+    
+    final totalDurationInMinutes = (treatment.baseDurationHours ?? 0) * 60 + (treatment.baseDurationMinutes ?? 0);
+    treatmentDurationController.text = totalDurationInMinutes > 0 ? totalDurationInMinutes.toString() : '';
+    prepTimeController.text = treatment.prepTime.toString();
+    cleanupTimeController.text = treatment.cleanupTime.toString();
+    minimumBookingNoticeController.text = treatment.minimumBookingNotice.toString();
+    maximumDaysInAdvanceController.text = treatment.maximumDaysInAdvance.toString();
     preTreatmentInstructionsController.text = treatment.preTreatmentInstructions ?? '';
     postTreatmentInstructionsController.text = treatment.postTreatmentInstructions ?? '';
     
@@ -325,6 +349,14 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       enableByDefault: treatment.enableByDefault,
       preNotificationOffset: treatment.preTreatmentNotificationOffset,
       postNotificationOffset: treatment.postTreatmentNotificationOffset,
+      prepTime: treatment.prepTime,
+      cleanupTime: treatment.cleanupTime,
+      allowClinicOverride: treatment.allowClinicOverride,
+      allowProviderOverride: treatment.allowProviderOverride,
+      onlineBookable: treatment.onlineBookable,
+      manualApprovalRequired: treatment.manualApprovalRequired,
+      minimumBookingNotice: treatment.minimumBookingNotice,
+      maximumDaysInAdvance: treatment.maximumDaysInAdvance,
     );
   }
 
@@ -380,6 +412,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       );
     }
   }
+
+  void toggleAllowClinicOverride(bool? val) => state = state.copyWith(allowClinicOverride: val ?? false);
+  void toggleAllowProviderOverride(bool? val) => state = state.copyWith(allowProviderOverride: val ?? false);
+  void toggleOnlineBookable(bool? val) => state = state.copyWith(onlineBookable: val ?? false);
+  void toggleManualApprovalRequired(bool? val) => state = state.copyWith(manualApprovalRequired: val ?? false);
 
   void setTotalSessions(String val, {List<CategoryItem> categories = const []}) {
     final count = int.tryParse(val) ?? 1;
@@ -875,8 +912,16 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         description: fullDescriptionController.text,
         shortDescription: shortDescriptionController.text,
         basePrice: double.tryParse(basePriceController.text),
-        baseDurationHours: int.tryParse(durationHoursController.text),
-        baseDurationMinutes: int.tryParse(durationMinutesController.text),
+        baseDurationHours: (int.tryParse(treatmentDurationController.text) ?? 0) ~/ 60,
+        baseDurationMinutes: (int.tryParse(treatmentDurationController.text) ?? 0) % 60,
+        prepTime: int.tryParse(prepTimeController.text) ?? 0,
+        cleanupTime: int.tryParse(cleanupTimeController.text) ?? 0,
+        allowClinicOverride: state.allowClinicOverride,
+        allowProviderOverride: state.allowProviderOverride,
+        onlineBookable: state.onlineBookable,
+        manualApprovalRequired: state.manualApprovalRequired,
+        minimumBookingNotice: int.tryParse(minimumBookingNoticeController.text) ?? 24,
+        maximumDaysInAdvance: int.tryParse(maximumDaysInAdvanceController.text) ?? 90,
         categoryId: categoryIdController.text,
         categoryName: categoryNameController.text,
         categoryPath: categoryPathController.text,
@@ -1070,6 +1115,16 @@ class TreatmentState extends BaseStateModel {
   final bool useInAiSimulator;
   final bool enableByDefault;
 
+  // Scheduling fields
+  final int prepTime;
+  final int cleanupTime;
+  final bool allowClinicOverride;
+  final bool allowProviderOverride;
+  final bool onlineBookable;
+  final bool manualApprovalRequired;
+  final int minimumBookingNotice;
+  final int maximumDaysInAdvance;
+
   TreatmentState({
     super.loading,
     super.currentPage,
@@ -1106,6 +1161,14 @@ class TreatmentState extends BaseStateModel {
     this.isFollowUpRequired = false,
     this.useInAiSimulator = false,
     this.enableByDefault = false,
+    this.prepTime = 0,
+    this.cleanupTime = 0,
+    this.allowClinicOverride = false,
+    this.allowProviderOverride = false,
+    this.onlineBookable = true,
+    this.manualApprovalRequired = false,
+    this.minimumBookingNotice = 24,
+    this.maximumDaysInAdvance = 90,
     List<AreaViewModelEntry>? areas,
   }) : areas = areas ?? [AreaViewModelEntry()];
 
@@ -1146,6 +1209,14 @@ class TreatmentState extends BaseStateModel {
     bool? isFollowUpRequired,
     bool? useInAiSimulator,
     bool? enableByDefault,
+    int? prepTime,
+    int? cleanupTime,
+    bool? allowClinicOverride,
+    bool? allowProviderOverride,
+    bool? onlineBookable,
+    bool? manualApprovalRequired,
+    int? minimumBookingNotice,
+    int? maximumDaysInAdvance,
   }) {
     return TreatmentState(
       loading: loading ?? this.loading,
@@ -1184,6 +1255,14 @@ class TreatmentState extends BaseStateModel {
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
       enableByDefault: enableByDefault ?? this.enableByDefault,
+      prepTime: prepTime ?? this.prepTime,
+      cleanupTime: cleanupTime ?? this.cleanupTime,
+      allowClinicOverride: allowClinicOverride ?? this.allowClinicOverride,
+      allowProviderOverride: allowProviderOverride ?? this.allowProviderOverride,
+      onlineBookable: onlineBookable ?? this.onlineBookable,
+      manualApprovalRequired: manualApprovalRequired ?? this.manualApprovalRequired,
+      minimumBookingNotice: minimumBookingNotice ?? this.minimumBookingNotice,
+      maximumDaysInAdvance: maximumDaysInAdvance ?? this.maximumDaysInAdvance,
     );
   }
 }
