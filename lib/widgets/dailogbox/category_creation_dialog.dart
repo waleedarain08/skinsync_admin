@@ -12,6 +12,7 @@ class CategoryCreationDialog extends StatefulWidget {
   final String? initialIcon;
   final String? initialConsentName;
   final List<FollowUpConfig>? initialFollowUps;
+  final int? initialTotalSessions;
   final NotificationConfig? initialPreNotification;
   final NotificationConfig? initialPostNotification;
   final DowntimePresets? initialDowntimePresets;
@@ -24,6 +25,7 @@ class CategoryCreationDialog extends StatefulWidget {
     this.initialIcon,
     this.initialConsentName,
     this.initialFollowUps,
+    this.initialTotalSessions,
     this.initialPreNotification,
     this.initialPostNotification,
     this.initialDowntimePresets,
@@ -36,6 +38,7 @@ class CategoryCreationDialog extends StatefulWidget {
 
 class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   late final TextEditingController _nameController;
+  late final TextEditingController _totalSessionsController;
   late final TextEditingController _totalFollowUpsController;
   late String _selectedIcon;
   PlatformFile? _consentFile;
@@ -61,6 +64,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName);
+    _totalSessionsController = TextEditingController(text: (widget.initialTotalSessions ?? 1).toString());
     _selectedIcon = widget.initialIcon ?? "category";
     _existingConsentName = widget.initialConsentName;
     _followUps = widget.initialFollowUps != null 
@@ -95,6 +99,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   @override
   void dispose() {
     _nameController.dispose();
+    _totalSessionsController.dispose();
     _totalFollowUpsController.dispose();
     _preNotifyMessageController.dispose();
     _preNotifyTimingController.dispose();
@@ -139,16 +144,22 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
           ? "Edit Category" 
           : (widget.parentName == null ? "Create New Category" : "Add Subcategory to ${widget.parentName}"),
       width: context.w(700),
-      content: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("General Information", style: context.fonts.purple14w700),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("General Information", style: context.fonts.purple14w700),
             context.verticalSpace(16),
             BuildTextField(
               label: "Category Name",
               controller: _nameController,
               hintText: "e.g. Skin Rejuvenation",
+            ),
+            context.verticalSpace(24),
+            BuildTextField(
+              label: "Default Total Sessions",
+              controller: _totalSessionsController,
+              hintText: "1",
+              keyboardType: TextInputType.number,
             ),
             context.verticalSpace(24),
             Text("Select Category Icon", style: context.fonts.black14w600),
@@ -300,7 +311,6 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
             ],
           ],
         ),
-      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
@@ -313,6 +323,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
               if (_nameController.text.isNotEmpty) {
                 Navigator.pop(context, {
                   'name': _nameController.text,
+                  'totalSessions': int.tryParse(_totalSessionsController.text) ?? 1,
                   'icon': _selectedIcon,
                   'consentFile': _consentFile,
                   'followUps': _followUps,

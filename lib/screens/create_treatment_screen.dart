@@ -103,6 +103,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Pre-Treatment Instructions",
       "Post-Treatment Instructions",
       "Phase Notifications",
+      "Downtime Level",
+      "Allowed Provider Roles",
+      "Sessions Setup",
       "Follow-Up Setup",
       "Patient Consent",
       "Inventory Products",
@@ -209,6 +212,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Phase Notifications",
       "Downtime Level",
       "Allowed Provider Roles",
+      "Sessions Setup",
       "Follow-Up Configuration",
       "Patient Consent Form",
       "Inventory Products",
@@ -225,6 +229,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Automated reminders and follow-up engagement messages.",
       "Configure booking restriction window after treatment.",
       "Define which provider roles are authorized to perform this treatment.",
+      "Manage total sessions and procedural frequency.",
       "Manage rules and scheduling for post-procedure clinical check-ins.",
       "Upload and manage legal procedural consent documentation.",
       "Configure required products from inventory and area-wise consumption.",
@@ -241,6 +246,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       Icons.notifications_active_outlined,
       Icons.hourglass_bottom_rounded,
       Icons.badge_outlined,
+      Icons.event_repeat_rounded,
       Icons.replay_outlined,
       Icons.fact_check_outlined,
       Icons.inventory_2_outlined,
@@ -316,16 +322,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
       selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
     }
     
-    final List<FollowUpConfig> effectiveFollowUps = state.followUpSource == 'custom' 
-        ? state.followUpEntries.map((e) => FollowUpConfig(
-            type: e.type,
-            durationValue: int.tryParse(e.durationValueController.text),
-            durationUnit: e.durationUnit,
-            notes: e.notesController.text,
-            intervalValue: int.tryParse(e.intervalValueController.text),
-            intervalUnit: e.intervalUnit,
-          )).toList()
-        : (selectedCategory?.defaultFollowUps ?? []);
+    int totalFus = 0;
+    if (state.sessionSource == 'custom') {
+      totalFus = state.sessions.fold(0, (sum, s) => sum + s.followUps.length);
+    } else if (selectedCategory != null) {
+      totalFus = (selectedCategory.totalSessions) * (selectedCategory.defaultFollowUps?.length ?? 0);
+    }
 
     return Container(
       padding: context.appEdgeInsets(all: 20),
@@ -340,15 +342,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
           _previewRow(context, "Instructions", viewModel.preTreatmentInstructionsController.text.isNotEmpty),
           _previewRow(context, "Aftercare", viewModel.postTreatmentInstructionsController.text.isNotEmpty),
           _previewRow(context, "Notifications", state.preNotificationOffset != null || state.postNotificationOffset != null),
-          _previewRow(context, "Follow-Up Required", state.isFollowUpRequired),
-          if (state.isFollowUpRequired) ...[
-            _previewText(context, "${effectiveFollowUps.length} Follow-Ups"),
-            ...effectiveFollowUps.asMap().entries.map((entry) {
-              final idx = entry.key + 1;
-              final e = entry.value;
-              return _previewText(context, "FU $idx: ${e.type.toUpperCase()} - ${e.durationValue} ${e.durationUnit}");
-            }),
-          ],
+          _previewRow(context, "Sessions Defined", true),
+          _previewText(context, "${state.totalSessions} Sessions"),
+          _previewRow(context, "Follow-Ups Active", totalFus > 0),
+          if (totalFus > 0) _previewText(context, "$totalFus Total Follow-Ups"),
         ],
       ),
     );
@@ -609,11 +606,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 6: return _buildStepNotifications(context, state, viewModel, dataState);
       case 7: return _buildStepDowntime(context, state, viewModel, dataState);
       case 8: return _buildStepRoles(context, state, viewModel, dataState);
-      case 9: return _buildStepFollowUp(context, state, viewModel, dataState);
-      case 10: return _buildStepConsent(context, state, viewModel, ref);
-      case 11: return _buildStepMaterials(context, state, viewModel, dataState, ref);
-      case 12: return _buildStepLogic(context, state, viewModel);
-      case 13: return _buildStepPricing(context, state, viewModel);
+      case 9: return _buildStepSessions(context, state, viewModel, dataState);
+      case 10: return _buildStepFollowUp(context, state, viewModel, dataState);
+      case 11: return _buildStepConsent(context, state, viewModel, ref);
+      case 12: return _buildStepMaterials(context, state, viewModel, dataState, ref);
+      case 13: return _buildStepLogic(context, state, viewModel);
+      case 14: return _buildStepPricing(context, state, viewModel);
       default: return const SizedBox.shrink();
     }
   }
@@ -1050,122 +1048,152 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStepFollowUp(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  Widget _buildStepSessions(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     CategoryItem? selectedCategory;
     if (viewModel.categoryIdController.text.isNotEmpty) {
       selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
     }
+    final int categorySessions = selectedCategory?.totalSessions ?? 1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _sectionTitle(context, "Sessions Configuration"),
+        context.verticalSpace(8),
+        Text("Define the total number of clinical sessions for this treatment journey.", style: context.fonts.grey14w400),
+        context.verticalSpace(32),
+        
         Row(
           children: [
-            _radioOption(context, "Active Follow-Up", state.isFollowUpRequired, () => viewModel.toggleFollowUpRequired(true)),
+            _radioOption(
+              context, 
+              "Use Category Sessions ($categorySessions)", 
+              state.sessionSource == 'category', 
+              () {
+                viewModel.setSessionSource('category');
+                viewModel.setTotalSessions(categorySessions.toString());
+              }
+            ),
             context.horizontalSpace(32),
-            _radioOption(context, "No Follow-Up", !state.isFollowUpRequired, () => viewModel.toggleFollowUpRequired(false)),
+            _radioOption(
+              context, 
+              "Custom Session Count", 
+              state.sessionSource == 'custom', 
+              () => viewModel.setSessionSource('custom')
+            ),
           ],
         ),
-        if (state.isFollowUpRequired) ...[
+        
+        if (state.sessionSource == 'custom') ...[
           context.verticalSpace(32),
-          Text("Configuration Source", style: context.fonts.black16w600),
-          context.verticalSpace(16),
-          Row(
-            children: [
-              _radioOption(
-                context, 
-                "Use Category Default", 
-                state.followUpSource == 'category', 
-                () => viewModel.setFollowUpSource('category')
-              ),
-              context.horizontalSpace(32),
-              _radioOption(
-                context, 
-                "Treatment-Specific", 
-                state.followUpSource == 'custom', 
-                () => viewModel.setFollowUpSource('custom')
-              ),
-            ],
+          BuildTextField(
+            label: "Total Sessions",
+            controller: TextEditingController(text: state.totalSessions.toString()),
+            hintText: "e.g. 3",
+            keyboardType: TextInputType.number,
+            onChanged: (val) => viewModel.setTotalSessions(val ?? '1'),
           ),
-          context.verticalSpace(32),
-          if (state.followUpSource == 'category') ...[
-            _buildCategoryFollowUpPreview(context, selectedCategory),
-          ] else ...[
-            BuildTextField(
-              label: "Total Follow-Ups",
-              controller: viewModel.totalFollowUpsController,
-              hintText: "e.g. 1",
-              keyboardType: TextInputType.number,
-              onChanged: (String? val) => viewModel.updateFollowUpCount(val ?? ''),
-            ),
-            context.verticalSpace(32),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: state.followUpEntries.length,
-              separatorBuilder: (_, __) => context.verticalSpace(24),
-              itemBuilder: (context, index) {
-                return _buildFollowUpEntryCard(context, index, state.followUpEntries[index], viewModel);
-              },
-            ),
-          ],
         ],
-      ],
-    );
-  }
-
-  Widget _buildCategoryFollowUpPreview(BuildContext context, CategoryItem? category) {
-    final configs = category?.defaultFollowUps ?? [];
-
-    return Container(
-      width: double.infinity,
-      padding: context.appEdgeInsets(all: 24),
-      decoration: BoxDecoration(
-        color: CustomColors.whiteGrey,
-        borderRadius: context.appBorderRadius(all: 16),
-        border: Border.all(color: CustomColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.info_outline_rounded, color: CustomColors.purple),
-              context.horizontalSpace(12),
-              Text("Inherited from ${category?.name ?? 'Category'}", style: context.fonts.black14w600),
-            ],
+        
+        context.verticalSpace(40),
+        Text("Journey Preview", style: context.fonts.black16w600),
+        context.verticalSpace(16),
+        Container(
+          width: double.infinity,
+          padding: context.appEdgeInsets(all: 20),
+          decoration: BoxDecoration(
+            color: CustomColors.whiteGrey,
+            borderRadius: context.appBorderRadius(all: 12),
+            border: Border.all(color: CustomColors.border),
           ),
-          context.verticalSpace(20),
-          if (configs.isEmpty)
-            Text("No default follow-ups configured for this category.", style: context.fonts.grey14w400)
-          else
-            ...configs.asMap().entries.map((entry) {
-              final idx = entry.key + 1;
-              final config = entry.value;
+          child: Column(
+            children: List.generate(state.totalSessions, (index) {
               return Padding(
-                padding: context.appEdgeInsets(bottom: 12),
+                padding: context.appEdgeInsets(bottom: index == state.totalSessions - 1 ? 0 : 12),
                 child: Row(
                   children: [
                     Container(
-                      width: 8,
-                      height: 8,
+                      padding: context.appEdgeInsets(all: 8),
                       decoration: const BoxDecoration(color: CustomColors.purple, shape: BoxShape.circle),
+                      child: Text("${index + 1}", style: context.fonts.white10w700),
                     ),
-                    context.horizontalSpace(12),
-                    Text(
-                      "Follow-Up $idx: ${config.type.toUpperCase()} - ${config.durationValue} ${config.durationUnit} (${config.intervalValue} ${config.intervalUnit} after)",
-                      style: context.fonts.black14w400,
-                    ),
+                    context.horizontalSpace(16),
+                    Text("Session ${index + 1}", style: context.fonts.black14w600),
+                    const Spacer(),
+                    Text("Follow-ups required", style: context.fonts.grey12w400),
                   ],
                 ),
               );
             }),
-        ],
-      ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildFollowUpEntryCard(BuildContext context, int index, FollowUpEntry entry, TreatmentViewModel viewModel) {
+  Widget _buildStepFollowUp(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Configure Follow-Ups per Session", style: context.fonts.black18w600),
+        context.verticalSpace(8),
+        Text("Each session in the journey can have its own dedicated clinical check-ins.", style: context.fonts.grey14w400),
+        context.verticalSpace(32),
+        
+        ...state.sessions.asMap().entries.map((sessionEntry) {
+          final int sIdx = sessionEntry.key;
+          final session = sessionEntry.value;
+          
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: context.appEdgeInsets(all: 20),
+                decoration: BoxDecoration(
+                  color: CustomColors.purple.withValues(alpha: 0.05),
+                  borderRadius: context.appBorderRadius(all: 12),
+                  border: Border.all(color: CustomColors.purple.withValues(alpha: 0.1)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.event_note_rounded, color: CustomColors.purple),
+                    context.horizontalSpace(12),
+                    Text("SESSION ${session.sessionNumber}", style: context.fonts.purple14w700),
+                    const Spacer(),
+                    SizedBox(
+                      width: context.w(150),
+                      child: BuildTextField(
+                        label: "Follow-Ups",
+                        controller: session.totalFollowUpsController,
+                        hintText: "0",
+                        keyboardType: TextInputType.number,
+                        onChanged: (val) => viewModel.updateSessionFollowUpCount(sIdx, val ?? '0'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (session.followUps.isNotEmpty) ...[
+                context.verticalSpace(20),
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: session.followUps.length,
+                  separatorBuilder: (_, __) => context.verticalSpace(16),
+                  itemBuilder: (context, fuIdx) {
+                    return _buildFollowUpEntryCardV2(context, sIdx, fuIdx, session.followUps[fuIdx], viewModel);
+                  },
+                ),
+              ],
+              context.verticalSpace(32),
+            ],
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildFollowUpEntryCardV2(BuildContext context, int sIdx, int fuIdx, FollowUpEntry entry, TreatmentViewModel viewModel) {
     return Container(
       padding: context.appEdgeInsets(all: 24),
       decoration: BoxDecoration(
@@ -1184,7 +1212,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                   color: CustomColors.purple.withValues(alpha: 0.1),
                   borderRadius: context.appBorderRadius(all: 20),
                 ),
-                child: Text("Follow-Up ${index + 1}", style: context.fonts.purple12w700),
+                child: Text("S${sIdx + 1} - Follow-Up ${fuIdx + 1}", style: context.fonts.purple12w700),
               ),
             ],
           ),
@@ -1200,7 +1228,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                     DropdownMenuItem(value: 'virtual', child: Text("Virtual")),
                     DropdownMenuItem(value: 'in_person', child: Text("In-Person")),
                   ],
-                  onChanged: (val) => viewModel.updateFollowUpEntry(index, type: val),
+                  onChanged: (val) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx, type: val),
                 ),
               ),
               context.horizontalSpace(24),
@@ -1234,7 +1262,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                                 DropdownMenuItem(value: 'minutes', child: Text("Minutes")),
                                 DropdownMenuItem(value: 'hours', child: Text("Hours")),
                               ],
-                              onChanged: (val) => viewModel.updateFollowUpEntry(index, durationUnit: val),
+                              onChanged: (val) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx, durationUnit: val),
                             ),
                           ),
                         ),
@@ -1278,7 +1306,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                                 DropdownMenuItem(value: 'days', child: Text("Days After")),
                                 DropdownMenuItem(value: 'weeks', child: Text("Weeks After")),
                               ],
-                              onChanged: (val) => viewModel.updateFollowUpEntry(index, intervalUnit: val),
+                              onChanged: (val) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx, intervalUnit: val),
                             ),
                           ),
                         ),
@@ -2746,7 +2774,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
-    final bool isLastStep = state.currentStep == 11;
+    final bool isLastStep = state.currentStep == 14;
 
     return Row(
       children: [
@@ -2770,7 +2798,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 if (!_validateSubAreas(context, state)) return;
               }
               
-              if (state.currentStep < 11) {
+              if (state.currentStep < 14) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel.submitTreatment(context, categories: dataState.categories).then((_) {

@@ -145,7 +145,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     categoryNameController.clear();
     categoryPathController.clear();
     
-    for (var entry in state.followUpEntries) {
+    for (var entry in state.sessions) {
       entry.dispose();
     }
     for (var entry in state.productUsageEntries) {
@@ -172,8 +172,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       providerRolesSource: 'category',
       selectedRoles: [],
       areas: [AreaViewModelEntry()],
-      followUpEntries: [],
-      followUpSource: 'category',
+      sessions: [SessionViewModelEntry(sessionNumber: 1)],
+      sessionSource: 'category',
+      totalSessions: 1,
       productUsageEntries: [],
       selectedTreatment: null,
       useInAiSimulator: false,
@@ -199,32 +200,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   }
 
   void updateFollowUpCount(String val) {
-    final count = int.tryParse(val) ?? 0;
-    final currentEntries = [...state.followUpEntries];
-    
-    if (count > currentEntries.length) {
-      // Add new entries
-      for (int i = currentEntries.length; i < count; i++) {
-        currentEntries.add(FollowUpEntry());
-      }
-    } else if (count < currentEntries.length) {
-      // Remove extra entries
-      for (int i = currentEntries.length - 1; i >= count; i--) {
-        currentEntries[i].dispose();
-        currentEntries.removeAt(i);
-      }
-    }
-    state = state.copyWith(followUpEntries: currentEntries);
+    // Deprecated
   }
 
   void updateFollowUpEntry(int index, {String? type, String? durationUnit, String? intervalUnit}) {
-    final updatedEntries = [...state.followUpEntries];
-    updatedEntries[index] = updatedEntries[index].copyWith(
-      type: type,
-      durationUnit: durationUnit,
-      intervalUnit: intervalUnit,
-    );
-    state = state.copyWith(followUpEntries: updatedEntries);
+    // Deprecated
   }
 
   void selectTreatment(TreatmentModel treatment) {
@@ -246,24 +226,30 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     postNotificationTitleController.text = treatment.postTreatmentNotificationTitle ?? '';
     postNotificationDescriptionController.text = treatment.postTreatmentNotificationDescription ?? '';
 
-    // Follow Up Entries
-    for (var entry in state.followUpEntries) {
+    // Sessions and Follow Ups
+    for (var entry in state.sessions) {
       entry.dispose();
     }
-    final List<FollowUpEntry> newFollowUpEntries = [];
-    if (treatment.followUps != null) {
-      for (var config in treatment.followUps!) {
-        newFollowUpEntries.add(FollowUpEntry(
-          type: config.type,
-          durationUnit: config.durationUnit,
-          durationValueController: TextEditingController(text: config.durationValue?.toString() ?? ''),
-          notesController: TextEditingController(text: config.notes ?? ''),
-          intervalValueController: TextEditingController(text: config.intervalValue?.toString() ?? ''),
-          intervalUnit: config.intervalUnit ?? 'days',
-        ));
+    final List<SessionViewModelEntry> newSessions = [];
+    if (treatment.sessions != null && treatment.sessions!.isNotEmpty) {
+      for (var s in treatment.sessions!) {
+        final sessionEntry = SessionViewModelEntry(
+          sessionNumber: s.sessionNumber,
+          totalFollowUpsController: TextEditingController(text: s.followUps.length.toString()),
+          followUps: s.followUps.map((fu) => FollowUpEntry(
+            type: fu.type,
+            durationUnit: fu.durationUnit,
+            durationValueController: TextEditingController(text: fu.durationValue?.toString() ?? ''),
+            notesController: TextEditingController(text: fu.notes ?? ''),
+            intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
+            intervalUnit: fu.intervalUnit ?? 'days',
+          )).toList(),
+        );
+        newSessions.add(sessionEntry);
       }
+    } else {
+      newSessions.add(SessionViewModelEntry(sessionNumber: 1));
     }
-    totalFollowUpsController.text = newFollowUpEntries.length.toString();
 
     // Product Usages
     for (var entry in state.productUsageEntries) {
@@ -329,8 +315,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       downtimeLevel: treatment.downtimeLevel,
       providerRolesSource: treatment.providerRolesSource,
       selectedRoles: treatment.allowedRoles,
-      followUpEntries: newFollowUpEntries,
-      followUpSource: 'custom', 
+      sessionSource: treatment.sessionSource,
+      totalSessions: treatment.totalSessions,
+      sessions: newSessions,
       productUsageEntries: newProductUsageEntries,
       isFollowUpRequired: treatment.isFollowUpRequired,
       useInAiSimulator: treatment.useInAiSimulator,
@@ -344,6 +331,62 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   void setPostNotificationSource(String source) => state = state.copyWith(postNotificationSource: source);
   void setDowntimeLevel(String level) => state = state.copyWith(downtimeLevel: level);
   void setProviderRolesSource(String source) => state = state.copyWith(providerRolesSource: source);
+  void setSessionSource(String source) => state = state.copyWith(sessionSource: source);
+
+  void setTotalSessions(String val, {List<CategoryItem> categories = const []}) {
+    final count = int.tryParse(val) ?? 1;
+    if (count < 1) return;
+    
+    final List<SessionViewModelEntry> updated = List.from(state.sessions);
+    
+    if (count > updated.length) {
+      for (int i = updated.length; i < count; i++) {
+        updated.add(SessionViewModelEntry(sessionNumber: i + 1));
+      }
+    } else if (count < updated.length) {
+      for (int i = count; i < updated.length; i++) {
+        updated[i].dispose();
+      }
+      updated.removeRange(count, updated.length);
+    }
+    
+    state = state.copyWith(totalSessions: count, sessions: updated);
+  }
+
+  void updateSessionFollowUpCount(int sessionIndex, String val) {
+    final count = int.tryParse(val) ?? 0;
+    final session = state.sessions[sessionIndex];
+    final List<FollowUpEntry> fus = List.from(session.followUps);
+    
+    if (count > fus.length) {
+      for (int i = fus.length; i < count; i++) {
+        fus.add(FollowUpEntry());
+      }
+    } else if (count < fus.length) {
+      for (int i = count; i < fus.length; i++) {
+        fus[i].dispose();
+      }
+      fus.removeRange(count, fus.length);
+    }
+    
+    session.followUps = fus;
+    state = state.copyWith(sessions: List.from(state.sessions));
+  }
+
+  void updateSessionFollowUpEntry(int sessionIndex, int fuIndex, {
+    String? type,
+    String? durationUnit,
+    String? intervalUnit,
+  }) {
+    final session = state.sessions[sessionIndex];
+    final fu = session.followUps[fuIndex];
+    session.followUps[fuIndex] = fu.copyWith(
+      type: type,
+      durationUnit: durationUnit,
+      intervalUnit: intervalUnit,
+    );
+    state = state.copyWith(sessions: List.from(state.sessions));
+  }
 
   void toggleRole(String role) {
     final List<String> current = List.from(state.selectedRoles);
@@ -547,10 +590,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(consentType: type);
   }
 
-  void setFollowUpSource(String source) {
-    state = state.copyWith(followUpSource: source);
-  }
-
   void removeAttachment(bool isPreTreatment, int index) {
     if (isPreTreatment) {
       final updated = List<PlatformFile>.from(state.preTreatmentAttachments)..removeAt(index);
@@ -574,9 +613,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   // Follow-Up Actions
   void toggleFollowUpRequired(bool? value) {
     state = state.copyWith(isFollowUpRequired: value ?? false);
-    if (state.isFollowUpRequired && state.followUpEntries.isEmpty) {
-      updateFollowUpCount('1');
-      totalFollowUpsController.text = '1';
+    if (state.isFollowUpRequired && state.sessions.isNotEmpty && state.sessions[0].followUps.isEmpty) {
+      updateSessionFollowUpCount(0, '1');
     }
   }
 
@@ -685,23 +723,29 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   Future<void> submitTreatment(BuildContext context, {List<CategoryItem> categories = const []}) async {
     return await runSafely<void>(showLoading: true, () async {
-      List<FollowUpConfig> effectiveFollowUps = [];
+      List<SessionConfig> effectiveSessions = [];
       
-      if (state.isFollowUpRequired) {
-        if (state.followUpSource == 'custom') {
-          effectiveFollowUps = state.followUpEntries.map((e) => FollowUpConfig(
-            type: e.type,
-            durationValue: int.tryParse(e.durationValueController.text),
-            durationUnit: e.durationUnit,
-            notes: e.notesController.text,
-            intervalValue: int.tryParse(e.intervalValueController.text),
-            intervalUnit: e.intervalUnit,
-          )).toList();
-        } else {
-          // Resolve from category
-          final selectedCategory = findCategoryById(categories, categoryIdController.text);
-          effectiveFollowUps = selectedCategory?.defaultFollowUps ?? [];
+      if (state.sessionSource == 'category') {
+        final selectedCategory = findCategoryById(categories, categoryIdController.text);
+        final int sessionCount = selectedCategory?.totalSessions ?? 1;
+        for (int i = 0; i < sessionCount; i++) {
+          effectiveSessions.add(SessionConfig(
+            sessionNumber: i + 1,
+            followUps: selectedCategory?.defaultFollowUps ?? [],
+          ));
         }
+      } else {
+        effectiveSessions = state.sessions.map((s) => SessionConfig(
+          sessionNumber: s.sessionNumber,
+          followUps: s.followUps.map((fu) => FollowUpConfig(
+            type: fu.type,
+            durationValue: int.tryParse(fu.durationValueController.text),
+            durationUnit: fu.durationUnit,
+            notes: fu.notesController.text,
+            intervalValue: int.tryParse(fu.intervalValueController.text),
+            intervalUnit: fu.intervalUnit,
+          )).toList(),
+        )).toList();
       }
 
       // ignore: unused_local_variable
@@ -729,6 +773,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         postTreatmentNotificationTitle: postNotificationTitleController.text,
         postTreatmentNotificationDescription: postNotificationDescriptionController.text,
         postTreatmentNotificationOffset: state.postNotificationOffset,
+        sessionSource: state.sessionSource,
+        totalSessions: state.totalSessions,
+        sessions: effectiveSessions,
         downtimeLevel: state.downtimeLevel,
         providerRolesSource: state.providerRolesSource,
         allowedRoles: state.selectedRoles,
@@ -746,7 +793,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 : state.existingConsentForm)
             : null,
         isFollowUpRequired: state.isFollowUpRequired,
-        followUps: effectiveFollowUps,
         productUsages: state.productUsageEntries.map((e) => ProductUsageModel(
           productId: e.productId,
           productName: e.productName,
@@ -785,11 +831,56 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   Future<void> updateTreatment(BuildContext context, {List<CategoryItem> categories = const []}) async {
     return await runSafely<void>(showLoading: true, () async {
+      List<SessionConfig> effectiveSessions = [];
+      
+      if (state.sessionSource == 'category') {
+        final selectedCategory = findCategoryById(categories, categoryIdController.text);
+        final int sessionCount = selectedCategory?.totalSessions ?? 1;
+        for (int i = 0; i < sessionCount; i++) {
+          effectiveSessions.add(SessionConfig(
+            sessionNumber: i + 1,
+            followUps: selectedCategory?.defaultFollowUps ?? [],
+          ));
+        }
+      } else {
+        effectiveSessions = state.sessions.map((s) => SessionConfig(
+          sessionNumber: s.sessionNumber,
+          followUps: s.followUps.map((fu) => FollowUpConfig(
+            type: fu.type,
+            durationValue: int.tryParse(fu.durationValueController.text),
+            durationUnit: fu.durationUnit,
+            notes: fu.notesController.text,
+            intervalValue: int.tryParse(fu.intervalValueController.text),
+            intervalUnit: fu.intervalUnit,
+          )).toList(),
+        )).toList();
+      }
+
       // Logic for updating the treatment
-      // (Similar to submitTreatment resolving effective followUps)
+      // await _treatmentRepository.updateTreatment(state.selectedTreatmentId!, treatment.toRequest());
+
       await Future.delayed(const Duration(seconds: 1));
       await getTreatments();
     });
+  }
+}
+
+class SessionViewModelEntry {
+  final int sessionNumber;
+  final TextEditingController totalFollowUpsController;
+  List<FollowUpEntry> followUps;
+
+  SessionViewModelEntry({
+    required this.sessionNumber,
+    TextEditingController? totalFollowUpsController,
+    this.followUps = const [],
+  }) : totalFollowUpsController = totalFollowUpsController ?? TextEditingController();
+
+  void dispose() {
+    totalFollowUpsController.dispose();
+    for (var fu in followUps) {
+      fu.dispose();
+    }
   }
 }
 
@@ -823,8 +914,9 @@ class TreatmentState extends BaseStateModel {
   final String downtimeLevel; // None | Low | Moderate | High
   final String providerRolesSource; // category | custom
   final List<String> selectedRoles;
-  final List<FollowUpEntry> followUpEntries;
-  final String followUpSource; // category | custom
+  final List<SessionViewModelEntry> sessions;
+  final String sessionSource; // category | custom
+  final int totalSessions;
   final List<ProductUsageEntry> productUsageEntries;
 
   // Follow-Up fields
@@ -863,8 +955,9 @@ class TreatmentState extends BaseStateModel {
     this.downtimeLevel = 'None',
     this.providerRolesSource = 'category',
     this.selectedRoles = const [],
-    this.followUpEntries = const [],
-    this.followUpSource = 'category',
+    this.sessions = const [],
+    this.sessionSource = 'category',
+    this.totalSessions = 1,
     this.productUsageEntries = const [],
     this.isFollowUpRequired = false,
     this.useInAiSimulator = false,
@@ -902,8 +995,9 @@ class TreatmentState extends BaseStateModel {
     String? downtimeLevel,
     String? providerRolesSource,
     List<String>? selectedRoles,
-    List<FollowUpEntry>? followUpEntries,
-    String? followUpSource,
+    List<SessionViewModelEntry>? sessions,
+    String? sessionSource,
+    int? totalSessions,
     List<ProductUsageEntry>? productUsageEntries,
     bool? isFollowUpRequired,
     bool? useInAiSimulator,
@@ -939,8 +1033,9 @@ class TreatmentState extends BaseStateModel {
       downtimeLevel: downtimeLevel ?? this.downtimeLevel,
       providerRolesSource: providerRolesSource ?? this.providerRolesSource,
       selectedRoles: selectedRoles ?? this.selectedRoles,
-      followUpEntries: followUpEntries ?? this.followUpEntries,
-      followUpSource: followUpSource ?? this.followUpSource,
+      sessions: sessions ?? this.sessions,
+      sessionSource: sessionSource ?? this.sessionSource,
+      totalSessions: totalSessions ?? this.totalSessions,
       productUsageEntries: productUsageEntries ?? this.productUsageEntries,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,

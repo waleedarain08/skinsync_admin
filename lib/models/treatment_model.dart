@@ -37,6 +37,11 @@ class TreatmentModel {
   String? postTreatmentNotificationDescription;
   int? postTreatmentNotificationOffset; // in minutes
   
+  // Sessions
+  String sessionSource; // category | custom
+  int totalSessions;
+  List<SessionConfig>? sessions;
+
   // Downtime
   String downtimeLevel; // None | Low | Moderate | High
 
@@ -50,9 +55,8 @@ class TreatmentModel {
   
   List<ProductUsageModel>? productUsages;
 
-  // Follow-Up Fields
+  // Follow-Up Fields (Deprecated in favor of session-scoped follow-ups but kept for migration if needed)
   bool isFollowUpRequired;
-  List<FollowUpConfig>? followUps;
 
   TreatmentModel({
     this.id,
@@ -85,6 +89,9 @@ class TreatmentModel {
     this.postTreatmentNotificationTitle,
     this.postTreatmentNotificationDescription,
     this.postTreatmentNotificationOffset,
+    this.sessionSource = 'category',
+    this.totalSessions = 1,
+    this.sessions,
     this.downtimeLevel = 'None',
     this.providerRolesSource = 'category',
     this.allowedRoles = const [],
@@ -93,7 +100,6 @@ class TreatmentModel {
     this.preTreatmentConsentForm,
     this.productUsages,
     this.isFollowUpRequired = false,
-    this.followUps,
   });
 
   TreatmentModel.fromJson(Map<String, dynamic> json)
@@ -102,6 +108,8 @@ class TreatmentModel {
         enableByDefault = json['enable_by_default'] ?? false,
         preNotificationSource = json['pre_notification_source'] ?? 'category',
         postNotificationSource = json['post_notification_source'] ?? 'category',
+        sessionSource = json['session_source'] ?? 'category',
+        totalSessions = json['total_sessions'] ?? 1,
         downtimeLevel = json['downtime_level'] ?? 'None',
         providerRolesSource = json['provider_roles_source'] ?? 'category',
         allowedRoles = json['allowed_roles'] != null ? List<String>.from(json['allowed_roles']) : [],
@@ -139,6 +147,11 @@ class TreatmentModel {
     postTreatmentNotificationTitle = json['post_treatment_notification_title'];
     postTreatmentNotificationDescription = json['post_treatment_notification_description'];
     postTreatmentNotificationOffset = json['post_treatment_notification_offset'];
+    
+    sessions = json['sessions'] != null
+        ? (json['sessions'] as List).map((e) => SessionConfig.fromJson(e)).toList()
+        : null;
+
     preTreatmentAttachments = json['pre_treatment_attachments'] != null
         ? (json['pre_treatment_attachments'] as List)
             .map((e) => Attachment.fromJson(e))
@@ -154,9 +167,6 @@ class TreatmentModel {
         : null;
     productUsages = json['product_usages'] != null
         ? (json['product_usages'] as List).map((e) => ProductUsageModel.fromJson(e)).toList()
-        : null;
-    followUps = json['follow_ups'] != null
-        ? (json['follow_ups'] as List).map((e) => FollowUpConfig.fromJson(e)).toList()
         : null;
   }
 
@@ -191,6 +201,9 @@ class TreatmentModel {
     String? postTreatmentNotificationTitle,
     String? postTreatmentNotificationDescription,
     int? postTreatmentNotificationOffset,
+    String? sessionSource,
+    int? totalSessions,
+    List<SessionConfig>? sessions,
     String? downtimeLevel,
     String? providerRolesSource,
     List<String>? allowedRoles,
@@ -199,7 +212,6 @@ class TreatmentModel {
     Attachment? preTreatmentConsentForm,
     List<ProductUsageModel>? productUsages,
     bool? isFollowUpRequired,
-    List<FollowUpConfig>? followUps,
   }) {
     return TreatmentModel(
       id: id ?? this.id,
@@ -232,6 +244,9 @@ class TreatmentModel {
       postTreatmentNotificationTitle: postTreatmentNotificationTitle ?? this.postTreatmentNotificationTitle,
       postTreatmentNotificationDescription: postTreatmentNotificationDescription ?? this.postTreatmentNotificationDescription,
       postTreatmentNotificationOffset: postTreatmentNotificationOffset ?? this.postTreatmentNotificationOffset,
+      sessionSource: sessionSource ?? this.sessionSource,
+      totalSessions: totalSessions ?? this.totalSessions,
+      sessions: sessions ?? this.sessions,
       downtimeLevel: downtimeLevel ?? this.downtimeLevel,
       providerRolesSource: providerRolesSource ?? this.providerRolesSource,
       allowedRoles: allowedRoles ?? this.allowedRoles,
@@ -240,7 +255,6 @@ class TreatmentModel {
       preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
       productUsages: productUsages ?? this.productUsages,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
-      followUps: followUps ?? this.followUps,
     );
   }
 
@@ -276,6 +290,9 @@ class TreatmentModel {
       'post_treatment_notification_title': postTreatmentNotificationTitle,
       'post_treatment_notification_description': postTreatmentNotificationDescription,
       'post_treatment_notification_offset': postTreatmentNotificationOffset,
+      'session_source': sessionSource,
+      'total_sessions': totalSessions,
+      'sessions': sessions?.map((e) => e.toJson()).toList(),
       'downtime_level': downtimeLevel,
       'provider_roles_source': providerRolesSource,
       'allowed_roles': allowedRoles,
@@ -284,7 +301,6 @@ class TreatmentModel {
       'pre_treatment_consent_form': preTreatmentConsentForm?.toJson(),
       'product_usages': productUsages?.map((e) => e.toJson()).toList(),
       'is_follow_up_required': isFollowUpRequired,
-      'follow_ups': followUps?.map((e) => e.toJson()).toList(),
     };
   }
 }

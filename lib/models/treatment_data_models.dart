@@ -13,6 +13,7 @@ class CategoryItem {
   final String? consentFormUrl;
   final String? consentFormName;
   final List<FollowUpConfig>? defaultFollowUps;
+  final int totalSessions;
   
   // New operational rule defaults
   final NotificationConfig? preNotification;
@@ -30,6 +31,7 @@ class CategoryItem {
     this.consentFormUrl,
     this.consentFormName,
     this.defaultFollowUps,
+    this.totalSessions = 1,
     this.preNotification,
     this.postNotification,
     DowntimePresets? downtimePresets,
@@ -46,6 +48,7 @@ class CategoryItem {
     String? consentFormUrl,
     String? consentFormName,
     List<FollowUpConfig>? defaultFollowUps,
+    int? totalSessions,
     NotificationConfig? preNotification,
     NotificationConfig? postNotification,
     DowntimePresets? downtimePresets,
@@ -61,6 +64,7 @@ class CategoryItem {
       consentFormUrl: consentFormUrl ?? this.consentFormUrl,
       consentFormName: consentFormName ?? this.consentFormName,
       defaultFollowUps: defaultFollowUps ?? this.defaultFollowUps,
+      totalSessions: totalSessions ?? this.totalSessions,
       preNotification: preNotification ?? this.preNotification,
       postNotification: postNotification ?? this.postNotification,
       downtimePresets: downtimePresets ?? this.downtimePresets,

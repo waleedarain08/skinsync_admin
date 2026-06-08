@@ -34,6 +34,23 @@ class FollowUpConfig {
   };
 }
 
+class SessionConfig {
+  final int sessionNumber;
+  final List<FollowUpConfig> followUps;
+
+  SessionConfig({required this.sessionNumber, this.followUps = const []});
+
+  factory SessionConfig.fromJson(Map<String, dynamic> json) => SessionConfig(
+    sessionNumber: json['session_number'] ?? 1,
+    followUps: (json['follow_ups'] as List?)?.map((e) => FollowUpConfig.fromJson(e)).toList() ?? [],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'session_number': sessionNumber,
+    'follow_ups': followUps.map((e) => e.toJson()).toList(),
+  };
+}
+
 class NotificationConfig {
   String? message;
   int? timing; // in minutes/hours/days - we should standardize to minutes internal
