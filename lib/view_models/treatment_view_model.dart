@@ -243,6 +243,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             notesController: TextEditingController(text: fu.notes ?? ''),
             intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
             intervalUnit: fu.intervalUnit ?? 'days',
+            isImageRequired: fu.isImageRequired,
           )).toList(),
         );
         newSessions.add(sessionEntry);
@@ -351,6 +352,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               notesController: TextEditingController(text: fu.notes ?? ''),
               intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
               intervalUnit: fu.intervalUnit ?? 'days',
+              isImageRequired: fu.isImageRequired,
             )).toList(),
           ));
         }
@@ -367,6 +369,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               notesController: TextEditingController(text: fu.notes ?? ''),
               intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
               intervalUnit: fu.intervalUnit ?? 'days',
+              isImageRequired: fu.isImageRequired,
             )).toList(),
           ));
         }
@@ -422,6 +425,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     String? type,
     String? durationUnit,
     String? intervalUnit,
+    bool? isImageRequired,
   }) {
     final session = state.sessions[sessionIndex];
     final fu = session.followUps[fuIndex];
@@ -429,6 +433,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       type: type,
       durationUnit: durationUnit,
       intervalUnit: intervalUnit,
+      isImageRequired: isImageRequired,
     );
     state = state.copyWith(sessions: List.from(state.sessions));
   }
@@ -482,6 +487,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               notesController: TextEditingController(text: fu.notes ?? ''),
               intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
               intervalUnit: fu.intervalUnit ?? 'days',
+              isImageRequired: fu.isImageRequired,
             )).toList(),
           ));
         }
@@ -498,6 +504,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               notesController: TextEditingController(text: fu.notes ?? ''),
               intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
               intervalUnit: fu.intervalUnit ?? 'days',
+              isImageRequired: fu.isImageRequired,
             )).toList(),
           ));
         }
@@ -826,6 +833,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               notes: f.notes,
               intervalValue: f.intervalValue,
               intervalUnit: f.intervalUnit,
+              isImageRequired: f.isImageRequired,
             )).toList(),
           )).toList();
         } else {
@@ -833,7 +841,15 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           for (int i = 0; i < sessionCount; i++) {
             effectiveSessions.add(SessionConfig(
               sessionNumber: i + 1,
-              followUps: selectedCategory?.defaultFollowUps ?? [],
+              followUps: (selectedCategory?.defaultFollowUps ?? []).map((f) => FollowUpConfig(
+                type: f.type,
+                durationValue: f.durationValue,
+                durationUnit: f.durationUnit,
+                notes: f.notes,
+                intervalValue: f.intervalValue,
+                intervalUnit: f.intervalUnit,
+                isImageRequired: f.isImageRequired,
+              )).toList(),
             ));
           }
         }
@@ -847,6 +863,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             notes: fu.notesController.text,
             intervalValue: int.tryParse(fu.intervalValueController.text),
             intervalUnit: fu.intervalUnit,
+            isImageRequired: fu.isImageRequired,
           )).toList(),
         )).toList();
       }
@@ -948,6 +965,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               notes: f.notes,
               intervalValue: f.intervalValue,
               intervalUnit: f.intervalUnit,
+              isImageRequired: f.isImageRequired,
             )).toList(),
           )).toList();
         } else {
@@ -955,7 +973,15 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           for (int i = 0; i < sessionCount; i++) {
             effectiveSessions.add(SessionConfig(
               sessionNumber: i + 1,
-              followUps: selectedCategory?.defaultFollowUps ?? [],
+              followUps: (selectedCategory?.defaultFollowUps ?? []).map((f) => FollowUpConfig(
+                type: f.type,
+                durationValue: f.durationValue,
+                durationUnit: f.durationUnit,
+                notes: f.notes,
+                intervalValue: f.intervalValue,
+                intervalUnit: f.intervalUnit,
+                isImageRequired: f.isImageRequired,
+              )).toList(),
             ));
           }
         }
@@ -969,6 +995,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             notes: fu.notesController.text,
             intervalValue: int.tryParse(fu.intervalValueController.text),
             intervalUnit: fu.intervalUnit,
+            isImageRequired: fu.isImageRequired,
           )).toList(),
         )).toList();
       }
@@ -1182,6 +1209,7 @@ class FollowUpEntry {
   final TextEditingController notesController;
   final TextEditingController intervalValueController;
   final String intervalUnit;
+  final bool isImageRequired;
 
   FollowUpEntry({
     this.type = 'virtual',
@@ -1190,6 +1218,7 @@ class FollowUpEntry {
     TextEditingController? notesController,
     TextEditingController? intervalValueController,
     this.intervalUnit = 'days',
+    this.isImageRequired = false,
   }) : durationValueController = durationValueController ?? TextEditingController(),
        notesController = notesController ?? TextEditingController(),
        intervalValueController = intervalValueController ?? TextEditingController();
@@ -1198,6 +1227,7 @@ class FollowUpEntry {
     String? type,
     String? durationUnit,
     String? intervalUnit,
+    bool? isImageRequired,
   }) {
     return FollowUpEntry(
       type: type ?? this.type,
@@ -1206,6 +1236,7 @@ class FollowUpEntry {
       notesController: notesController,
       intervalValueController: intervalValueController,
       intervalUnit: intervalUnit ?? this.intervalUnit,
+      isImageRequired: isImageRequired ?? this.isImageRequired,
     );
   }
 

@@ -692,23 +692,24 @@ class EditTreatmentScreen extends ConsumerWidget {
 
   Widget _buildFollowUpEntryCardV2(BuildContext context, int sIdx, int fuIdx, FollowUpEntry entry, TreatmentViewModel viewModel) {
     return Container(
-      padding: context.appEdgeInsets(all: 20),
+      padding: context.appEdgeInsets(all: 24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: context.appBorderRadius(all: 12),
+        borderRadius: context.appBorderRadius(all: 16),
         border: Border.all(color: CustomColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("S${sIdx + 1} - Follow-Up ${fuIdx + 1}", style: context.fonts.purple12w700),
-          context.verticalSpace(16),
+          context.verticalSpace(20),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: CustomDropdown<String>(
                   label: "Type",
-                  hintText: "Select",
+                  hintText: "Select type",
                   value: entry.type,
                   items: const [
                     DropdownMenuItem(value: 'virtual', child: Text("Virtual")),
@@ -717,36 +718,46 @@ class EditTreatmentScreen extends ConsumerWidget {
                   onChanged: (val) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx, type: val),
                 ),
               ),
-              context.horizontalSpace(20),
+              context.horizontalSpace(24),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Duration", style: context.fonts.black14w600),
-                    context.verticalSpace(8),
+                    context.verticalSpace(10),
                     Row(
                       children: [
                         Expanded(
                           flex: 2,
-                          child: BuildTextField(
-                            label: "",
+                          child: TextFormField(
                             controller: entry.durationValueController,
-                            hintText: "30",
                             keyboardType: TextInputType.number,
+                            decoration: AppDecorations.input(context, hint: "30"),
+                            onChanged: (v) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx),
                           ),
                         ),
-                        context.horizontalSpace(8),
+                        context.horizontalSpace(12),
                         Expanded(
                           flex: 3,
-                          child: CustomDropdown<String>(
-                            label: "",
-                            hintText: "Unit",
-                            value: entry.durationUnit,
-                            items: const [
-                              DropdownMenuItem(value: 'minutes', child: Text("Minutes")),
-                              DropdownMenuItem(value: 'hours', child: Text("Hours")),
-                            ],
-                            onChanged: (val) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx, durationUnit: val),
+                          child: DropdownButtonHideUnderline(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: CustomColors.border),
+                              ),
+                              child: DropdownButton<String>(
+                                value: entry.durationUnit,
+                                isExpanded: true,
+                                icon: const Icon(Icons.arrow_drop_down, color: CustomColors.grey),
+                                items: const [
+                                  DropdownMenuItem(value: 'minutes', child: Text("Minutes")),
+                                  DropdownMenuItem(value: 'hours', child: Text("Hours")),
+                                ],
+                                onChanged: (val) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx, durationUnit: val),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -756,38 +767,49 @@ class EditTreatmentScreen extends ConsumerWidget {
               ),
             ],
           ),
-          context.verticalSpace(16),
+          context.verticalSpace(20),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Interval", style: context.fonts.black14w600),
-                    context.verticalSpace(8),
+                    context.verticalSpace(10),
                     Row(
                       children: [
                         Expanded(
                           flex: 2,
-                          child: BuildTextField(
-                            label: "",
+                          child: TextFormField(
                             controller: entry.intervalValueController,
-                            hintText: "1",
                             keyboardType: TextInputType.number,
+                            decoration: AppDecorations.input(context, hint: "1"),
+                            onChanged: (v) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx),
                           ),
                         ),
-                        context.horizontalSpace(8),
+                        context.horizontalSpace(12),
                         Expanded(
                           flex: 3,
-                          child: CustomDropdown<String>(
-                            label: "",
-                            hintText: "Unit",
-                            value: entry.intervalUnit,
-                            items: const [
-                              DropdownMenuItem(value: 'days', child: Text("Days After")),
-                              DropdownMenuItem(value: 'weeks', child: Text("Weeks After")),
-                            ],
-                            onChanged: (val) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx, intervalUnit: val),
+                          child: DropdownButtonHideUnderline(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: CustomColors.border),
+                              ),
+                              child: DropdownButton<String>(
+                                value: entry.intervalUnit,
+                                isExpanded: true,
+                                icon: const Icon(Icons.arrow_drop_down, color: CustomColors.grey),
+                                items: const [
+                                  DropdownMenuItem(value: 'days', child: Text("Days After")),
+                                  DropdownMenuItem(value: 'weeks', child: Text("Weeks After")),
+                                ],
+                                onChanged: (val) => viewModel.updateSessionFollowUpEntry(sIdx, fuIdx, intervalUnit: val),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -795,10 +817,41 @@ class EditTreatmentScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const Spacer(),
+              context.horizontalSpace(24),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Requirements", style: context.fonts.black14w600),
+                    context.verticalSpace(10),
+                    Container(
+                      padding: context.appEdgeInsets(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: context.appBorderRadius(all: 8),
+                        border: Border.all(color: CustomColors.border),
+                      ),
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: entry.isImageRequired,
+                            activeColor: CustomColors.purple,
+                            onChanged: (val) => viewModel.updateSessionFollowUpEntry(
+                              sIdx, 
+                              fuIdx, 
+                              isImageRequired: val ?? false,
+                            ),
+                          ),
+                          Text("Image Required", style: context.fonts.black14w600),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-          context.verticalSpace(16),
+          context.verticalSpace(20),
           BuildTextField(
             label: "Notes",
             controller: entry.notesController,

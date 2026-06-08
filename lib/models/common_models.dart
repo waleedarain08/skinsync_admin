@@ -5,6 +5,7 @@ class FollowUpConfig {
   String? notes;
   int? intervalValue;
   String? intervalUnit; // days | weeks
+  bool isImageRequired;
 
   FollowUpConfig({
     required this.type,
@@ -13,6 +14,7 @@ class FollowUpConfig {
     this.notes,
     this.intervalValue,
     this.intervalUnit = 'days',
+    this.isImageRequired = false,
   });
 
   factory FollowUpConfig.fromJson(Map<String, dynamic> json) => FollowUpConfig(
@@ -22,6 +24,7 @@ class FollowUpConfig {
     notes: json['notes'],
     intervalValue: json['interval_value'],
     intervalUnit: json['interval_unit'],
+    isImageRequired: json['is_image_required'] ?? false,
   );
 
   Map<String, dynamic> toJson() => {
@@ -31,6 +34,7 @@ class FollowUpConfig {
     'notes': notes,
     'interval_value': intervalValue,
     'interval_unit': intervalUnit,
+    'is_image_required': isImageRequired,
   };
 }
 
