@@ -1,3 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/screens/patient_detail_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/theme.dart';
@@ -28,15 +31,15 @@ class PatientDummyModel {
   });
 }
 
-class PatientManagement extends StatefulWidget {
+class PatientManagement extends ConsumerStatefulWidget {
   static const String routeName = '/patient-management';
   const PatientManagement({super.key});
 
   @override
-  State<PatientManagement> createState() => _PatientManagementState();
+  ConsumerState<PatientManagement> createState() => _PatientManagementState();
 }
 
-class _PatientManagementState extends State<PatientManagement> {
+class _PatientManagementState extends ConsumerState<PatientManagement> {
   final TextEditingController _searchController = TextEditingController();
 
   String _selectedClinicFilter = "All Clinics";
@@ -311,7 +314,7 @@ class _PatientManagementState extends State<PatientManagement> {
                   _tableTextCell(p.lastAppointment, style: context.fonts.black14w600),
                   _tableTextCell("${p.totalTreatments} Proc", style: context.fonts.grey14w400),
                   _statusBadgeCell(p.status),
-                  _actionsCell(),
+                  _actionsCell(p),
                 ],
               );
             }),
@@ -416,7 +419,7 @@ class _PatientManagementState extends State<PatientManagement> {
     );
   }
 
-  Widget _actionsCell() {
+  Widget _actionsCell(PatientDummyModel p) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
@@ -424,7 +427,10 @@ class _PatientManagementState extends State<PatientManagement> {
           IconButton(
             tooltip: "View Profile",
             icon: Icon(Icons.visibility_outlined, color: CustomColors.grey, size: 20.sp),
-            onPressed: () {},
+            onPressed: () {
+              ref.read(selectedPatientProvider.notifier).state = p;
+              context.push(PatientDetailScreen.routeName);
+            },
           ),
         ],
       ),

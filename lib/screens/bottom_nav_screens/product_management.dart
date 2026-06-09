@@ -1,3 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/screens/product_detail_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/models/product_model.dart';
@@ -10,15 +13,15 @@ import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import '../../widgets/custom_dropdown_widget.dart';
 
-class ProductManagement extends StatefulWidget {
+class ProductManagement extends ConsumerStatefulWidget {
   static const String routeName = '/product-management';
   const ProductManagement({super.key});
 
   @override
-  State<ProductManagement> createState() => _ProductManagementState();
+  ConsumerState<ProductManagement> createState() => _ProductManagementState();
 }
 
-class _ProductManagementState extends State<ProductManagement> {
+class _ProductManagementState extends ConsumerState<ProductManagement> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedPurposeFilter = "All Purposes";
   String _selectedTrackingFilter = "All Statuses";
@@ -415,6 +418,14 @@ class _ProductManagementState extends State<ProductManagement> {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
         children: [
+          IconButton(
+            tooltip: "View Details",
+            icon: Icon(Icons.visibility_outlined, color: CustomColors.grey, size: 20.sp),
+            onPressed: () {
+              ref.read(selectedProductProvider.notifier).state = product;
+              context.push(ProductDetailScreen.routeName);
+            },
+          ),
           IconButton(
             tooltip: "Edit Template",
             icon: Icon(Icons.edit_road_rounded, color: CustomColors.purple, size: 20.sp),

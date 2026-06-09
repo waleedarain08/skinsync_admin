@@ -1,3 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/screens/appointment_detail_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/theme.dart';
@@ -30,15 +33,15 @@ class AppointmentDummyModel {
   });
 }
 
-class AppointmentManagement extends StatefulWidget {
+class AppointmentManagement extends ConsumerStatefulWidget {
   static const String routeName = '/appointment-management';
   const AppointmentManagement({super.key});
 
   @override
-  State<AppointmentManagement> createState() => _AppointmentManagementState();
+  ConsumerState<AppointmentManagement> createState() => _AppointmentManagementState();
 }
 
-class _AppointmentManagementState extends State<AppointmentManagement> {
+class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
   final TextEditingController _searchController = TextEditingController();
 
   String _selectedClinicFilter = "All Clinics";
@@ -359,7 +362,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
                   _tableTextCell(a.dateTime, style: context.fonts.black14w600),
                   _tableTextCell(a.type, style: context.fonts.grey14w400),
                   _statusBadgeCell(a.status),
-                  _actionsCell(),
+                  _actionsCell(a),
                 ],
               );
             }),
@@ -464,7 +467,7 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
     );
   }
 
-  Widget _actionsCell() {
+  Widget _actionsCell(AppointmentDummyModel a) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 16.h),
       child: Row(
@@ -473,7 +476,10 @@ class _AppointmentManagementState extends State<AppointmentManagement> {
           IconButton(
             tooltip: "View Details",
             icon: Icon(Icons.visibility_outlined, color: CustomColors.grey, size: 20.sp),
-            onPressed: () {},
+            onPressed: () {
+              ref.read(selectedAppointmentProvider.notifier).state = a;
+              context.push(AppointmentDetailScreen.routeName);
+            },
           ),
           IconButton(
             tooltip: "Reschedule",
