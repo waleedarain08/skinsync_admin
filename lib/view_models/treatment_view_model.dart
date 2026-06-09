@@ -27,6 +27,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final fullDescriptionController = TextEditingController();
   final shortDescriptionController = TextEditingController();
   final basePriceController = TextEditingController();
+  final Map<String, TextEditingController> unitPriceControllers = {};
+
+  TextEditingController getControllerForUnit(String unit) {
+    return unitPriceControllers.putIfAbsent(unit, () => TextEditingController(text: '0'));
+  }
   final durationHoursController = TextEditingController();
   final durationMinutesController = TextEditingController();
 
@@ -111,6 +116,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     for (var entry in state.productUsageEntries) {
       entry.dispose();
     }
+    for (var controller in unitPriceControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -161,6 +169,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     categoryIdController.clear();
     categoryNameController.clear();
     categoryPathController.clear();
+    unitPriceControllers.clear();
     
     for (var entry in state.sessions) {
       entry.dispose();
@@ -233,6 +242,12 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     fullDescriptionController.text = treatment.description ?? '';
     shortDescriptionController.text = treatment.shortDescription ?? '';
     basePriceController.text = treatment.basePrice?.toString() ?? '';
+    unitPriceControllers.clear();
+    if (treatment.unitPrices != null) {
+      treatment.unitPrices!.forEach((unit, price) {
+        unitPriceControllers[unit] = TextEditingController(text: price.toString());
+      });
+    }
     durationHoursController.text = treatment.baseDurationHours?.toString() ?? '';
     durationMinutesController.text = treatment.baseDurationMinutes?.toString() ?? '';
     
@@ -914,6 +929,16 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         description: fullDescriptionController.text,
         shortDescription: shortDescriptionController.text,
         basePrice: double.tryParse(basePriceController.text),
+        unitPrices: (() {
+          final Map<String, double> up = {};
+          unitPriceControllers.forEach((unit, controller) {
+            final val = double.tryParse(controller.text);
+            if (val != null) {
+              up[unit] = val;
+            }
+          });
+          return up.isNotEmpty ? up : null;
+        })(),
         baseDurationHours: (int.tryParse(treatmentDurationController.text) ?? 0) ~/ 60,
         baseDurationMinutes: (int.tryParse(treatmentDurationController.text) ?? 0) % 60,
         prepTime: int.tryParse(prepTimeController.text) ?? 0,

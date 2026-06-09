@@ -1067,28 +1067,6 @@ class EditTreatmentScreen extends ConsumerWidget {
           context.verticalSpace(20),
           Row(
             children: [
-              Expanded(
-                child: BuildTextField(
-                  label: "Min Quantity (Treatment-Level)",
-                  controller: entry.minQuantityController,
-                  hintText: "0",
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                ),
-              ),
-              context.horizontalSpace(16),
-              Expanded(
-                child: BuildTextField(
-                  label: "Max Quantity (Treatment-Level)",
-                  controller: entry.maxQuantityController,
-                  hintText: "0",
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                ),
-              ),
-            ],
-          ),
-          context.verticalSpace(20),
-          Row(
-            children: [
               SizedBox(
                 width: context.w(24),
                 height: context.w(24),
@@ -1229,12 +1207,16 @@ class EditTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildPricingSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
     final uniqueUnits = state.productUsageEntries
         .map((e) => e.unit)
         .where((unit) => unit.trim().isNotEmpty)
         .toSet()
         .toList();
+
+    String formatUnitLabel(String unit) {
+      if (unit.isEmpty) return '';
+      return unit[0].toUpperCase() + unit.substring(1);
+    }
 
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
@@ -1249,14 +1231,36 @@ class EditTreatmentScreen extends ConsumerWidget {
             hintText: "100",
             keyboardType: TextInputType.number,
           ),
-          if (allSubAreas.isNotEmpty) ...[
+          if (uniqueUnits.isNotEmpty) ...[
             context.verticalSpace(32),
-            Text("Sub-Area Pricing Adjustments", style: context.fonts.black16w400),
-            context.verticalSpace(16),
-            ...allSubAreas.map((subArea) => Padding(
-              padding: context.appEdgeInsets(bottom: 12),
-              child: _buildSubAreaConfigCard(context, subArea, uniqueUnits),
-            )),
+            Text("Unit-Based Pricing Overrides", style: context.fonts.black16w400),
+            context.verticalSpace(8),
+            Text("Define dynamic pricing overrides for each unit of measure from the selected inventory products.", style: context.fonts.grey14w400),
+            context.verticalSpace(24),
+            Container(
+              padding: context.appEdgeInsets(all: 16),
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 10),
+                border: Border.all(color: CustomColors.border),
+              ),
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: uniqueUnits.map((unit) {
+                  final formattedUnit = formatUnitLabel(unit);
+                  return SizedBox(
+                    width: context.w(180),
+                    child: BuildTextField(
+                      label: "Price Per $formattedUnit (\$)",
+                      controller: viewModel.getControllerForUnit(unit),
+                      hintText: "0",
+                      keyboardType: TextInputType.number,
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ],
         ],
       ),
@@ -1355,50 +1359,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSubAreaConfigCard(BuildContext context, SubAreaConfig subArea, List<String> uniqueUnits) {
-    return Container(
-      padding: context.appEdgeInsets(all: 16),
-      decoration: BoxDecoration(
-        color: CustomColors.whiteGrey,
-        borderRadius: context.appBorderRadius(all: 10),
-        border: Border.all(color: CustomColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(subArea.name, style: context.fonts.grey14w600),
-          context.verticalSpace(12),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: [
-              SizedBox(
-                width: context.w(180),
-                child: BuildTextField(
-                  label: "Base Price (\$)",
-                  controller: subArea.basePriceController,
-                  hintText: "0",
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              ...uniqueUnits.map((unit) {
-                final formattedUnit = unit.isNotEmpty ? (unit[0].toUpperCase() + unit.substring(1)) : unit;
-                return SizedBox(
-                  width: context.w(180),
-                  child: BuildTextField(
-                    label: "Price Per $formattedUnit (\$)",
-                    controller: subArea.getControllerForUnit(unit),
-                    hintText: "0",
-                    keyboardType: TextInputType.number,
-                  ),
-                );
-              }).toList(),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildImageTile(BuildContext context, String label, dynamic file, VoidCallback onTap) {
     return Column(

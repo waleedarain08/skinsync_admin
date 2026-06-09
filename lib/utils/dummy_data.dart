@@ -5,6 +5,119 @@ import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 
+final List<ProductModel> dummyProducts = [
+  ProductModel(
+    id: 101,
+    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop",
+    name: "Botox Cosmetic 100 Unit Vial",
+    brand: "Allergan",
+    sku: "ALL-BTX-100U-V",
+    global_sku: "ALL-BTX-100U-V",
+    product_purpose: "variable",
+    unit_type: "units",
+    unit: "Units",
+    category: "variable",
+    enforce_lot_tracking: true,
+    description: "Preservative-free sterile, vacuum-dried powder for reconstitution. Contains 100 units.",
+    status: "Active",
+  ),
+  ProductModel(
+    id: 102,
+    image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=1000&auto=format&fit=crop",
+    name: "Perfect Derma Peel Kit",
+    brand: "Bella Medical",
+    sku: "BEL-PDP-KIT",
+    global_sku: "BEL-PDP-KIT",
+    product_purpose: "required",
+    unit_type: "vial",
+    unit: "Vial",
+    category: "required",
+    enforce_lot_tracking: true,
+    description: "Synergistic blend of 5 powerful acids to treat acne, hyperpigmentation, and aging.",
+    status: "Active",
+  ),
+  ProductModel(
+    id: 103,
+    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=1000&auto=format&fit=crop",
+    name: "Nitrile Gloves - Large",
+    brand: "McKesson",
+    sku: "MCK-GLV-LG",
+    global_sku: "MCK-GLV-LG",
+    product_purpose: "setup/supply",
+    unit_type: "box",
+    unit: "Box",
+    category: "setup/supply",
+    enforce_lot_tracking: false,
+    description: "Powder-free, textured fingertips, medical-grade nitrile gloves.",
+    status: "Active",
+  ),
+  ProductModel(
+    id: 104,
+    image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1000&auto=format&fit=crop",
+    name: "Physical Tinted SPF 44",
+    brand: "Regimen MD",
+    sku: "RMD-SPF-44",
+    global_sku: "RMD-SPF-44",
+    product_purpose: "retail/sale",
+    unit_type: "pieces",
+    unit: "Pieces",
+    category: "retail/sale",
+    enforce_lot_tracking: false,
+    description: "Water-resistant, medical-grade physical sunscreen with universal tint.",
+    status: "Active",
+  ),
+  ProductModel(
+    id: 105,
+    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=1000&auto=format&fit=crop",
+    name: "Candela GentleMax Pro",
+    brand: "Candela",
+    sku: "CAN-GMP-PRO",
+    global_sku: "CAN-GMP-PRO",
+    product_purpose: "device",
+    unit_type: "pieces",
+    unit: "Pieces",
+    category: "device",
+    enforce_lot_tracking: false,
+    description: "Dual wavelength laser system combining Alexandrite and Nd:YAG lasers.",
+    status: "Active",
+  ),
+  // Original Injectables
+  ProductModel(id: 1, name: "Botox®", category: "Injectables", unit: "Units (U)", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Botulinum toxin type A", brand: "Allergan", global_sku: "ALL-BTX-O", product_purpose: "variable", unit_type: "units", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 2, name: "Dysport®", category: "Injectables", unit: "Units (U)", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "AbobotulinumtoxinA", brand: "Galderma", global_sku: "GAL-DSP-O", product_purpose: "variable", unit_type: "units", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 3, name: "Xeomin®", category: "Injectables", unit: "Units (U)", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "IncobotulinumtoxinA", brand: "Merz", global_sku: "MRZ-XEO-O", product_purpose: "variable", unit_type: "units", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 4, name: "Jeuveau®", category: "Injectables", unit: "Units (U)", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "PrabotulinumtoxinA-xvfs", brand: "Evolus", global_sku: "EVO-JEV-O", product_purpose: "variable", unit_type: "units", enforce_lot_tracking: true, status: "Active"),
+  
+  // Dermal Fillers
+  ProductModel(id: 5, name: "Juvederm Voluma", category: "Dermal Fillers", unit: "Syringe", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Hyaluronic acid filler for cheeks", brand: "Allergan", global_sku: "ALL-JVD-O", product_purpose: "variable", unit_type: "syringe", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 6, name: "Juvederm Ultra XC", category: "Dermal Fillers", unit: "Syringe", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Hyaluronic acid filler for lips", brand: "Allergan", global_sku: "ALL-JVD-UXC", product_purpose: "variable", unit_type: "syringe", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 7, name: "Restylane Lyft", category: "Dermal Fillers", unit: "Syringe", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Hyaluronic acid filler", brand: "Galderma", global_sku: "GAL-RST-L", product_purpose: "variable", unit_type: "syringe", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 8, name: "Restylane Defyne", category: "Dermal Fillers", unit: "Syringe", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Hyaluronic acid filler", brand: "Galderma", global_sku: "GAL-RST-D", product_purpose: "variable", unit_type: "syringe", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 9, name: "RHA Collection", category: "Dermal Fillers", unit: "Syringe", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Resilient hyaluronic acid", brand: "Revance", global_sku: "REV-RHA-O", product_purpose: "variable", unit_type: "syringe", enforce_lot_tracking: true, status: "Active"),
+
+  // Skin Boosters
+  ProductModel(id: 10, name: "Skinvive", category: "Skin Boosters", unit: "Syringe", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "HA injectable gel for skin smoothness", brand: "Allergan", global_sku: "ALL-SKV-O", product_purpose: "variable", unit_type: "syringe", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 11, name: "Profhilo", category: "Skin Boosters", unit: "Syringe", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Remodeling HA", brand: "IBSA", global_sku: "IBS-PRF-O", product_purpose: "variable", unit_type: "syringe", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 12, name: "Sculptra", category: "Skin Boosters", unit: "Vial", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Poly-L-lactic acid", brand: "Galderma", global_sku: "GAL-SCL-O", product_purpose: "variable", unit_type: "vial", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 13, name: "Radiesse", category: "Skin Boosters", unit: "Syringe", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Calcium hydroxylapatite", brand: "Merz", global_sku: "MRZ-RAD-O", product_purpose: "variable", unit_type: "syringe", enforce_lot_tracking: true, status: "Active"),
+
+  // PRP / Regenerative
+  ProductModel(id: 14, name: "PRP Kit", category: "PRP / Regenerative", unit: "Kit", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Platelet-rich plasma preparation kit", brand: "Eclipse", global_sku: "ECL-PRP-K", product_purpose: "required", unit_type: "box", enforce_lot_tracking: true, status: "Active"),
+  ProductModel(id: 15, name: "PRF Kit", category: "PRP / Regenerative", unit: "Kit", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Platelet-rich fibrin preparation kit", brand: "Eclipse", global_sku: "ECL-PRF-K", product_purpose: "required", unit_type: "box", enforce_lot_tracking: true, status: "Active"),
+
+  // Topicals
+  ProductModel(id: 16, name: "Medical Grade Numbing Cream", category: "Topicals", unit: "Tube", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Lidocaine/Prilocaine compound", brand: "McKesson", global_sku: "MCK-NUM-C", product_purpose: "required", unit_type: "pieces", enforce_lot_tracking: false, status: "Active"),
+  ProductModel(id: 17, name: "Post Procedure Healing Gel", category: "Topicals", unit: "Tube", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Soothing aftercare gel", brand: "Regimen MD", global_sku: "RMD-PPH-G", product_purpose: "required", unit_type: "pieces", enforce_lot_tracking: false, status: "Active"),
+  ProductModel(id: 18, name: "Antiseptic Solution", category: "Topicals", unit: "Bottle", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Skin preparation solution", brand: "McKesson", global_sku: "MCK-ANT-S", product_purpose: "setup/supply", unit_type: "pieces", enforce_lot_tracking: false, status: "Active"),
+
+  // Devices / Consumables
+  ProductModel(id: 19, name: "Microneedling Cartridge", category: "Devices / Consumables", unit: "Piece", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Sterile needle head", brand: "Candela", global_sku: "CAN-MNC-O", product_purpose: "required", unit_type: "pieces", enforce_lot_tracking: false, status: "Active"),
+  ProductModel(id: 20, name: "Cannula 25G", category: "Devices / Consumables", unit: "Piece", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Blunt-tip cannula", brand: "BD", global_sku: "BD-CAN-25G", product_purpose: "setup/supply", unit_type: "pieces", enforce_lot_tracking: false, status: "Active"),
+  ProductModel(id: 21, name: "Cannula 27G", category: "Devices / Consumables", unit: "Piece", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Blunt-tip cannula", brand: "BD", global_sku: "BD-CAN-27G", product_purpose: "setup/supply", unit_type: "pieces", enforce_lot_tracking: false, status: "Active"),
+  ProductModel(id: 22, name: "Syringe 1ml", category: "Devices / Consumables", unit: "Piece", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Luer lock syringe", brand: "BD", global_sku: "BD-SYR-1ML", product_purpose: "setup/supply", unit_type: "pieces", enforce_lot_tracking: false, status: "Active"),
+  ProductModel(id: 23, name: "Syringe 3ml", category: "Devices / Consumables", unit: "Piece", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Luer lock syringe", brand: "BD", global_sku: "BD-SYR-3ML", product_purpose: "setup/supply", unit_type: "pieces", enforce_lot_tracking: false, status: "Active"),
+  ProductModel(id: 24, name: "Gauze Pack", category: "Devices / Consumables", unit: "Pack", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop", description: "Sterile gauze sponges", brand: "McKesson", global_sku: "MCK-GAU-P", product_purpose: "setup/supply", unit_type: "box", enforce_lot_tracking: false, status: "Active"),
+];
+
 class TreatmentData {
   // Category Hierarchy
   static const Map<String, List<String>> categoriesWithSubcategories = {
@@ -45,43 +158,7 @@ class TreatmentData {
     "Packs",
   ];
 
-  static final List<ProductModel> dummyInventoryProducts = [
-    // Injectables
-    ProductModel(id: 1, name: "Botox®", category: "Injectables", unit: "Units (U)", image: "", description: "Botulinum toxin type A"),
-    ProductModel(id: 2, name: "Dysport®", category: "Injectables", unit: "Units (U)", image: "", description: "AbobotulinumtoxinA"),
-    ProductModel(id: 3, name: "Xeomin®", category: "Injectables", unit: "Units (U)", image: "", description: "IncobotulinumtoxinA"),
-    ProductModel(id: 4, name: "Jeuveau®", category: "Injectables", unit: "Units (U)", image: "", description: "PrabotulinumtoxinA-xvfs"),
-    
-    // Dermal Fillers
-    ProductModel(id: 5, name: "Juvederm Voluma", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Hyaluronic acid filler for cheeks"),
-    ProductModel(id: 6, name: "Juvederm Ultra XC", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Hyaluronic acid filler for lips"),
-    ProductModel(id: 7, name: "Restylane Lyft", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Hyaluronic acid filler"),
-    ProductModel(id: 8, name: "Restylane Defyne", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Hyaluronic acid filler"),
-    ProductModel(id: 9, name: "RHA Collection", category: "Dermal Fillers", unit: "Syringe", image: "", description: "Resilient hyaluronic acid"),
-
-    // Skin Boosters
-    ProductModel(id: 10, name: "Skinvive", category: "Skin Boosters", unit: "Syringe", image: "", description: "HA injectable gel for skin smoothness"),
-    ProductModel(id: 11, name: "Profhilo", category: "Skin Boosters", unit: "Syringe", image: "", description: "Remodeling HA"),
-    ProductModel(id: 12, name: "Sculptra", category: "Skin Boosters", unit: "Vial", image: "", description: "Poly-L-lactic acid"),
-    ProductModel(id: 13, name: "Radiesse", category: "Skin Boosters", unit: "Syringe", image: "", description: "Calcium hydroxylapatite"),
-
-    // PRP / Regenerative
-    ProductModel(id: 14, name: "PRP Kit", category: "PRP / Regenerative", unit: "Kit", image: "", description: "Platelet-rich plasma preparation kit"),
-    ProductModel(id: 15, name: "PRF Kit", category: "PRP / Regenerative", unit: "Kit", image: "", description: "Platelet-rich fibrin preparation kit"),
-
-    // Topicals
-    ProductModel(id: 16, name: "Medical Grade Numbing Cream", category: "Topicals", unit: "Tube", image: "", description: "Lidocaine/Prilocaine compound"),
-    ProductModel(id: 17, name: "Post Procedure Healing Gel", category: "Topicals", unit: "Tube", image: "", description: "Soothing aftercare gel"),
-    ProductModel(id: 18, name: "Antiseptic Solution", category: "Topicals", unit: "Bottle", image: "", description: "Skin preparation solution"),
-
-    // Devices / Consumables
-    ProductModel(id: 19, name: "Microneedling Cartridge", category: "Devices / Consumables", unit: "Piece", image: "", description: "Sterile needle head"),
-    ProductModel(id: 20, name: "Cannula 25G", category: "Devices / Consumables", unit: "Piece", image: "", description: "Blunt-tip cannula"),
-    ProductModel(id: 21, name: "Cannula 27G", category: "Devices / Consumables", unit: "Piece", image: "", description: "Blunt-tip cannula"),
-    ProductModel(id: 22, name: "Syringe 1ml", category: "Devices / Consumables", unit: "Piece", image: "", description: "Luer lock syringe"),
-    ProductModel(id: 23, name: "Syringe 3ml", category: "Devices / Consumables", unit: "Piece", image: "", description: "Luer lock syringe"),
-    ProductModel(id: 24, name: "Gauze Pack", category: "Devices / Consumables", unit: "Pack", image: "", description: "Sterile gauze sponges"),
-  ];
+  static List<ProductModel> get dummyInventoryProducts => dummyProducts;
 
   static final List<TreatmentModel> dummyTreatments = [
     TreatmentModel(

@@ -764,7 +764,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Usage Type: ${entry.usageType}", style: context.fonts.grey11w400),
-                            Text("Treatment-Level Quantity: Min ${entry.minQuantityController.text} / Max ${entry.maxQuantityController.text} ${entry.unit}", style: context.fonts.grey11w400),
                             Text("Deduction Timing: ${entry.deductionTiming}", style: context.fonts.grey11w400),
                             Text("Substitution Allowed: ${entry.allowSubstitution ? 'Yes' : 'No'}", style: context.fonts.grey11w400),
                             if (allSubAreas.isNotEmpty) ...[
@@ -805,14 +804,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
         .toSet()
         .toList();
 
-    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
-    final configuredSubAreas = allSubAreas.where((s) {
-      final hasBase = s.basePriceController.text.isNotEmpty && s.basePriceController.text != '0';
-      final hasUnits = uniqueUnits.any((u) {
-        final ctrl = s.getControllerForUnit(u);
-        return ctrl.text.isNotEmpty && ctrl.text != '0';
-      });
-      return hasBase || hasUnits;
+    final configuredUnits = uniqueUnits.where((u) {
+      final ctrl = viewModel.getControllerForUnit(u);
+      return ctrl.text.isNotEmpty && ctrl.text != '0';
     }).toList();
 
     return _blueprintSection(
@@ -822,39 +816,18 @@ class CreateTreatmentScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _blueprintRow(context, "Base Price", basePrice.isEmpty ? "\$0" : "\$$basePrice"),
-          _blueprintRow(context, "Pricing Logic", configuredSubAreas.isEmpty ? "Standard flat base pricing" : "Custom Sub-Area Adjustments"),
-          if (configuredSubAreas.isNotEmpty) ...[
+          _blueprintRow(context, "Pricing Logic", configuredUnits.isEmpty ? "Standard flat base pricing" : "Dynamic Unit Pricing"),
+          if (configuredUnits.isNotEmpty) ...[
             context.verticalSpace(12),
-            Text("Sub-Area Overrides:", style: context.fonts.black12w600),
-            ...configuredSubAreas.map((rule) {
-              final List<String> details = [];
-              final bp = rule.basePriceController.text;
-              if (bp.isNotEmpty && bp != '0') {
-                details.add("Base: \$$bp");
-              }
-              for (final u in uniqueUnits) {
-                final ctrl = rule.getControllerForUnit(u);
-                if (ctrl.text.isNotEmpty && ctrl.text != '0') {
-                  final formattedUnit = u.isNotEmpty ? (u[0].toUpperCase() + u.substring(1)) : u;
-                  details.add("Per $formattedUnit: \$${ctrl.text}");
-                }
-              }
-              
+            Text("Unit Pricing Overrides:", style: context.fonts.black12w600),
+            ...configuredUnits.map((unit) {
+              final ctrl = viewModel.getControllerForUnit(unit);
+              final formattedUnit = unit.isNotEmpty ? (unit[0].toUpperCase() + unit.substring(1)) : unit;
               return Padding(
                 padding: const EdgeInsets.only(left: 12, top: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("• ${rule.name}", style: context.fonts.black12w600),
-                    if (details.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12, top: 2),
-                        child: Text(
-                          details.join(" | "),
-                          style: context.fonts.grey11w400,
-                        ),
-                      ),
-                  ],
+                child: Text(
+                  "• Price Per $formattedUnit: \$${ctrl.text}",
+                  style: context.fonts.grey11w400,
                 ),
               );
             }).toList(),
@@ -1243,12 +1216,16 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildStepPricing(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
-    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
     final uniqueUnits = state.productUsageEntries
         .map((e) => e.unit)
         .where((unit) => unit.trim().isNotEmpty)
         .toSet()
         .toList();
+
+    String formatUnitLabel(String unit) {
+      if (unit.isEmpty) return '';
+      return unit[0].toUpperCase() + unit.substring(1);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1262,68 +1239,35 @@ class CreateTreatmentScreen extends ConsumerWidget {
           keyboardType: TextInputType.number,
           validator: Validators.empty,
         ),
-        if (allSubAreas.isNotEmpty) ...[
+        if (uniqueUnits.isNotEmpty) ...[
           context.verticalSpace(40),
-          _sectionTitle(context, "Sub-Area Pricing Adjustments"),
+          _sectionTitle(context, "Unit-Based Pricing Overrides"),
           context.verticalSpace(8),
-          Text("Define specific pricing per sub-area if it differs from the base price. Pricing units are generated automatically based on the products selected in the Inventory Products step.", style: context.fonts.grey14w400),
+          Text("Define dynamic pricing overrides for each unit of measure from the selected inventory products.", style: context.fonts.grey14w400),
           context.verticalSpace(24),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: allSubAreas.length,
-            separatorBuilder: (_, _) => context.verticalSpace(12),
-            itemBuilder: (context, index) {
-              final subArea = allSubAreas[index];
-              return Container(
-                padding: context.appEdgeInsets(all: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: context.appBorderRadius(all: 12),
-                  border: Border.all(color: CustomColors.border),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.subdirectory_arrow_right, size: 18, color: CustomColors.black),
-                        context.horizontalSpace(8),
-                        Text(subArea.name, style: context.fonts.black14w600),
-                      ],
-                    ),
-                    context.verticalSpace(20),
-                    Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
-                      children: [
-                        SizedBox(
-                          width: context.w(180),
-                          child: BuildTextField(
-                            label: "Base Price (\$)",
-                            controller: subArea.basePriceController,
-                            hintText: "0",
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        ...uniqueUnits.map((unit) {
-                          final formattedUnit = unit.isNotEmpty ? (unit[0].toUpperCase() + unit.substring(1)) : unit;
-                          return SizedBox(
-                            width: context.w(180),
-                            child: BuildTextField(
-                              label: "Price Per $formattedUnit (\$)",
-                              controller: subArea.getControllerForUnit(unit),
-                              hintText: "0",
-                              keyboardType: TextInputType.number,
-                            ),
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
+          Container(
+            padding: context.appEdgeInsets(all: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(color: CustomColors.border),
+            ),
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: uniqueUnits.map((unit) {
+                final formattedUnit = formatUnitLabel(unit);
+                return SizedBox(
+                  width: context.w(180),
+                  child: BuildTextField(
+                    label: "Price Per $formattedUnit (\$)",
+                    controller: viewModel.getControllerForUnit(unit),
+                    hintText: "0",
+                    keyboardType: TextInputType.number,
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ],
@@ -3237,28 +3181,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
                     DropdownMenuItem(value: 'Post_Confirmation', child: Text("Post Confirmation")),
                   ],
                   onChanged: (val) => viewModel.updateProductUsageEntry(index, deductionTiming: val),
-                ),
-              ),
-            ],
-          ),
-          context.verticalSpace(20),
-          Row(
-            children: [
-              Expanded(
-                child: BuildTextField(
-                  label: "Min Quantity (Treatment-Level)",
-                  controller: entry.minQuantityController,
-                  hintText: "0",
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                ),
-              ),
-              context.horizontalSpace(16),
-              Expanded(
-                child: BuildTextField(
-                  label: "Max Quantity (Treatment-Level)",
-                  controller: entry.maxQuantityController,
-                  hintText: "0",
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
               ),
             ],

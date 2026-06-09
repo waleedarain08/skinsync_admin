@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
+import 'package:skinsync_admin/models/product_model.dart';
+import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-
 import '../../widgets/custom_dropdown_widget.dart';
 
 class ProductManagement extends StatefulWidget {
@@ -20,6 +20,16 @@ class ProductManagement extends StatefulWidget {
 
 class _ProductManagementState extends State<ProductManagement> {
   final TextEditingController _searchController = TextEditingController();
+  String _selectedPurposeFilter = "All Purposes";
+  String _selectedTrackingFilter = "All Statuses";
+
+  late List<ProductModel> _catalogProducts;
+
+  @override
+  void initState() {
+    super.initState();
+    _catalogProducts = List.from(dummyProducts);
+  }
 
   @override
   void dispose() {
@@ -29,6 +39,24 @@ class _ProductManagementState extends State<ProductManagement> {
 
   @override
   Widget build(BuildContext context) {
+    // Filter products dynamically
+    final filteredProducts = _catalogProducts.where((p) {
+      final query = _searchController.text.toLowerCase();
+      final matchesQuery = query.isEmpty ||
+          p.name.toLowerCase().contains(query) ||
+          (p.brand?.toLowerCase().contains(query) ?? false) ||
+          (p.global_sku?.toLowerCase().contains(query) ?? false);
+
+      final matchesPurpose = _selectedPurposeFilter == "All Purposes" ||
+          p.product_purpose == _selectedPurposeFilter.toLowerCase();
+
+      final matchesTracking = _selectedTrackingFilter == "All Statuses" ||
+          (_selectedTrackingFilter == "Tracking Enabled" && (p.enforce_lot_tracking ?? false)) ||
+          (_selectedTrackingFilter == "Tracking Disabled" && !(p.enforce_lot_tracking ?? false));
+
+      return matchesQuery && matchesPurpose && matchesTracking;
+    }).toList();
+
     return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
@@ -37,11 +65,11 @@ class _ProductManagementState extends State<ProductManagement> {
           children: [
             _buildHeader(),
             SizedBox(height: 32.h),
-            _buildInventoryOverview(),
+            _buildCatalogOverview(),
             SizedBox(height: 32.h),
             _buildFilters(),
             SizedBox(height: 24.h),
-            _buildProductsGrid(),
+            _buildCatalogTable(filteredProducts),
           ],
         ),
       ),
@@ -55,10 +83,10 @@ class _ProductManagementState extends State<ProductManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Inventory & Products", style: context.fonts.black32w700),
+            Text("Global Product Catalog", style: context.fonts.black32w700),
             SizedBox(height: 8.h),
             Text(
-              "Manage retail products and professional supplies across all clinics.",
+              "Manage platform-wide product definitions and template specifications for clinics.",
               style: context.fonts.grey14w400,
             ),
           ],
@@ -67,32 +95,43 @@ class _ProductManagementState extends State<ProductManagement> {
           onTap: () {
             showDialog(
               context: context,
-              builder: (context) => const ProductDialogBox(),
-            );
+              builder: (context) => ProductDialogBox(
+                product: null,
+              ),
+            ).then((_) {
+              // Normally, Riverpod state updates automatically.
+              // To ensure the dummy state is updated for demonstration:
+              setState(() {});
+            });
           },
-          icon: Icons.add,
-          label: 'Add New Product',
-          width: 220.w,
+          icon: Icons.add_circle_outline,
+          label: 'Create Catalog Product',
+          width: 240.w,
         ),
       ],
     );
   }
 
-  Widget _buildInventoryOverview() {
+  Widget _buildCatalogOverview() {
+    final totalSkus = _catalogProducts.length;
+    final totalBrands = _catalogProducts.map((p) => p.brand).toSet().length;
+    final lotTrackingEnabled = _catalogProducts.where((p) => p.enforce_lot_tracking ?? false).length;
+    final devicesCount = _catalogProducts.where((p) => p.product_purpose == 'device').length;
+
     return Row(
       children: [
-        _buildInventoryStat("Total SKU", "124", Icons.inventory_2_outlined, CustomColors.amber),
+        _buildCatalogStat("Total Master SKUs", "$totalSkus", Icons.inventory_2_outlined, CustomColors.purple),
         SizedBox(width: 16.w),
-        _buildInventoryStat("Low Stock Items", "12", Icons.warning_amber_rounded, CustomColors.red),
+        _buildCatalogStat("Published Brands", "$totalBrands", Icons.workspace_premium_outlined, CustomColors.amber),
         SizedBox(width: 16.w),
-        _buildInventoryStat("Total Stock Value", "\$84,200", Icons.monetization_on_outlined, CustomColors.green),
+        _buildCatalogStat("Lot Tracking Enabled", "$lotTrackingEnabled", Icons.pin_outlined, CustomColors.green),
         SizedBox(width: 16.w),
-        _buildInventoryStat("Categories", "8", Icons.category_outlined, CustomColors.black),
+        _buildCatalogStat("Device Catalog", "$devicesCount Devices", Icons.biotech_outlined, CustomColors.black),
       ],
     );
   }
 
-  Widget _buildInventoryStat(String title, String value, IconData icon, Color color) {
+  Widget _buildCatalogStat(String title, String value, IconData icon, Color color) {
     return Expanded(
       child: BorderdContainerWidget(
         padding: EdgeInsets.all(20.w),
@@ -100,16 +139,21 @@ class _ProductManagementState extends State<ProductManagement> {
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
               child: Icon(icon, color: color, size: 24.sp),
             ),
             SizedBox(width: 16.w),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: context.fonts.black20w600),
-                Text(title, style: context.fonts.grey12w400),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(value, style: context.fonts.black20w600, overflow: TextOverflow.ellipsis),
+                  Text(title, style: context.fonts.grey12w400, overflow: TextOverflow.ellipsis),
+                ],
+              ),
             ),
           ],
         ),
@@ -126,30 +170,40 @@ class _ProductManagementState extends State<ProductManagement> {
             flex: 3,
             child: AppSearchField(
               controller: _searchController,
-              hintText: "Search products by name, SKU or brand...",
+              hintText: "Search master catalog by product name, SKU or brand manufacturer...",
               onChanged: (val) => setState(() {}),
             ),
           ),
           SizedBox(width: 16.w),
           Expanded(
             child: CustomDropdown<String>(
-              label: "Category",
-              hintText: "All Categories",
-              items: const ["All Categories", "Skincare", "Supplies"]
+              label: "Product Purpose",
+              hintText: "All Purposes",
+              value: _selectedPurposeFilter,
+              items: const ["All Purposes", "Variable", "Required", "Setup/Supply", "Retail/Sale", "Device"]
                   .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                   .toList(),
-              onChanged: (val) {},
+              onChanged: (val) {
+                setState(() {
+                  _selectedPurposeFilter = val ?? "All Purposes";
+                });
+              },
             ),
           ),
           SizedBox(width: 12.w),
           Expanded(
             child: CustomDropdown<String>(
-              label: "Status",
-              hintText: "In Stock",
-              items: const ["In Stock", "Out of Stock", "Low Stock"]
+              label: "Lot Enforcement",
+              hintText: "All Statuses",
+              value: _selectedTrackingFilter,
+              items: const ["All Statuses", "Tracking Enabled", "Tracking Disabled"]
                   .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                   .toList(),
-              onChanged: (val) {},
+              onChanged: (val) {
+                setState(() {
+                  _selectedTrackingFilter = val ?? "All Statuses";
+                });
+              },
             ),
           ),
         ],
@@ -157,62 +211,118 @@ class _ProductManagementState extends State<ProductManagement> {
     );
   }
 
-  Widget _buildProductsGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        crossAxisSpacing: 16.w,
-        mainAxisSpacing: 16.h,
-        childAspectRatio: 0.75,
+  Widget _buildCatalogTable(List<ProductModel> products) {
+    if (products.isEmpty) {
+      return BorderdContainerWidget(
+        padding: EdgeInsets.all(40.w),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(Icons.inventory_2_outlined, color: CustomColors.grey, size: 48.sp),
+              SizedBox(height: 16.h),
+              Text("No Matching Products Found", style: context.fonts.black16w600),
+              SizedBox(height: 4.h),
+              Text("Try refining your filters or search keywords.", style: context.fonts.grey14w400),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return BorderdContainerWidget(
+      padding: EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: Table(
+          columnWidths: const {
+            0: FlexColumnWidth(4), // Product & Brand
+            1: FlexColumnWidth(2), // SKU
+            2: FlexColumnWidth(2), // Purpose / Usage Type
+            3: FlexColumnWidth(2), // Base Unit
+            4: FlexColumnWidth(2), // Lot Tracking
+            5: FlexColumnWidth(2), // Actions
+          },
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          children: [
+            // Header Row
+            TableRow(
+              decoration: const BoxDecoration(
+                color: CustomColors.whiteGrey,
+                border: Border(bottom: BorderSide(color: CustomColors.border)),
+              ),
+              children: [
+                _tableHeaderCell("PRODUCT & BRAND"),
+                _tableHeaderCell("GLOBAL SKU"),
+                _tableHeaderCell("USAGE TYPE"),
+                _tableHeaderCell("BASE UNIT"),
+                _tableHeaderCell("LOT TRACKING"),
+                _tableHeaderCell("ACTIONS"),
+              ],
+            ),
+            // Data Rows
+            ...products.map((p) {
+              return TableRow(
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: CustomColors.border)),
+                ),
+                children: [
+                  _productNameCell(p),
+                  _tableTextCell(p.global_sku ?? p.sku ?? "N/A", style: context.fonts.grey14w400),
+                  _purposeBadgeCell(p.product_purpose ?? p.category ?? "variable"),
+                  _tableTextCell((p.unit_type ?? p.unit).toUpperCase(), style: context.fonts.black14w600),
+                  _lotTrackingCell(p.enforce_lot_tracking ?? true),
+                  _actionsCell(p),
+                ],
+              );
+            }),
+          ],
+        ),
       ),
-      itemCount: 8,
-      itemBuilder: (context, index) => _buildProductCard(index),
     );
   }
 
-  Widget _buildProductCard(int index) {
-    return BorderdContainerWidget(
-      padding: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _tableHeaderCell(String label) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Text(
+        label,
+        style: context.fonts.grey12w600.copyWith(letterSpacing: 1),
+      ),
+    );
+  }
+
+  Widget _productNameCell(ProductModel product) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
         children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: CustomColors.whiteGrey,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-                image: const DecorationImage(
-                  image: NetworkImage("https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop"),
-                  fit: BoxFit.cover,
-                ),
+          Container(
+            width: 48.w,
+            height: 48.w,
+            decoration: BoxDecoration(
+              color: CustomColors.whiteGrey,
+              borderRadius: BorderRadius.circular(8.r),
+              image: DecorationImage(
+                image: NetworkImage(product.image),
+                fit: BoxFit.cover,
               ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.all(16.w),
+          SizedBox(width: 16.w),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("SKU-9283$index", style: context.fonts.amber10w800ls1),
-                SizedBox(height: 4.h),
-                Text("Advanced Night Repair", style: context.fonts.black16w600, maxLines: 1, overflow: TextOverflow.ellipsis),
-                SizedBox(height: 4.h),
-                Text("Skincare • 50ml", style: context.fonts.white12w400),
-                SizedBox(height: 12.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Stock", style: context.fonts.white10w600),
-                        Text("45 Units", style: context.fonts.black14w600),
-                      ],
-                    ),
-                    _stockBadge(index == 1 ? "Low Stock" : "In Stock"),
-                  ],
+                Text(
+                  product.name,
+                  style: context.fonts.black14w600,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  product.brand ?? "Unknown Brand",
+                  style: context.fonts.purple12w700,
                 ),
               ],
             ),
@@ -222,17 +332,112 @@ class _ProductManagementState extends State<ProductManagement> {
     );
   }
 
-  Widget _stockBadge(String status) {
-    final bool isLow = status == "Low Stock";
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: isLow ? CustomColors.red.withValues(alpha: 0.1) : CustomColors.green.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4.r),
-      ),
+  Widget _tableTextCell(String text, {required TextStyle style}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Text(
-        status,
-        style: isLow ? context.fonts.red10w600 : context.fonts.green10w600,
+        text,
+        style: style,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  Widget _purposeBadgeCell(String purpose) {
+    final lower = purpose.toLowerCase();
+    Color badgeColor = CustomColors.purple;
+    String label = "Variable";
+
+    if (lower == 'required') {
+      badgeColor = CustomColors.green;
+      label = "Required";
+    } else if (lower == 'setup/supply') {
+      badgeColor = CustomColors.amber;
+      label = "Setup/Supply";
+    } else if (lower == 'retail/sale') {
+      badgeColor = Colors.orange;
+      label = "Retail/Sale";
+    } else if (lower == 'device') {
+      badgeColor = CustomColors.red;
+      label = "Device";
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: badgeColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20.r),
+              border: Border.all(color: badgeColor.withValues(alpha: 0.2)),
+            ),
+            child: Text(
+              label,
+              style: context.fonts.amber10w800ls1.copyWith(
+                color: badgeColor,
+                fontSize: 10.sp,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _lotTrackingCell(bool enforce) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        children: [
+          Icon(
+            enforce ? Icons.check_circle_rounded : Icons.cancel_rounded,
+            size: 18.sp,
+            color: enforce ? CustomColors.green : CustomColors.grey,
+          ),
+          SizedBox(width: 8.w),
+          Text(
+            enforce ? "Enabled" : "Disabled",
+            style: enforce
+                ? context.fonts.grey12w600.copyWith(color: CustomColors.green)
+                : context.fonts.grey12w600,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _actionsCell(ProductModel product) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        children: [
+          IconButton(
+            tooltip: "Edit Template",
+            icon: Icon(Icons.edit_road_rounded, color: CustomColors.purple, size: 20.sp),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => ProductDialogBox(product: product),
+              ).then((_) => setState(() {}));
+            },
+          ),
+          IconButton(
+            tooltip: "Archive",
+            icon: Icon(Icons.archive_outlined, color: CustomColors.red, size: 20.sp),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Archived "${product.name}" globally.'),
+                  backgroundColor: CustomColors.black,
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

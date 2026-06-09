@@ -12,6 +12,7 @@ class TreatmentModel {
   String? icon;
   String? image;
   double? basePrice;
+  Map<String, double>? unitPrices;
   bool? isArea;
   List<SideAreaModel>? sideAreas;
   String status; // draft | active | deactive
@@ -80,6 +81,7 @@ class TreatmentModel {
     this.icon,
     this.image,
     this.basePrice,
+    this.unitPrices,
     this.isArea,
     this.sideAreas,
     this.status = 'active',
@@ -151,6 +153,12 @@ class TreatmentModel {
     icon = json['icon'];
     image = json['image'];
     basePrice = json['base_price']?.toDouble();
+    if (json['unit_prices'] != null) {
+      unitPrices = {};
+      (json['unit_prices'] as Map).forEach((key, value) {
+        unitPrices![key.toString()] = (value as num).toDouble();
+      });
+    }
     isArea = json['is_area'];
     sideAreas = json['side_areas'] != null
         ? (json['side_areas'] as List)
@@ -208,6 +216,7 @@ class TreatmentModel {
     String? icon,
     String? image,
     double? basePrice,
+    Map<String, double>? unitPrices,
     bool? isArea,
     List<SideAreaModel>? sideAreas,
     String? status,
@@ -259,6 +268,7 @@ class TreatmentModel {
       icon: icon ?? this.icon,
       image: image ?? this.image,
       basePrice: basePrice ?? this.basePrice,
+      unitPrices: unitPrices ?? this.unitPrices,
       isArea: isArea ?? this.isArea,
       sideAreas: sideAreas ?? this.sideAreas,
       status: status ?? this.status,
@@ -313,6 +323,7 @@ class TreatmentModel {
       'icon': icon,
       'image': image,
       'base_price': basePrice,
+      'unit_prices': unitPrices,
       'side_areas': sideAreas?.map((sideArea) => sideArea.toJson()).toList(),
       'status': status,
       'is_active': status == 'active',
