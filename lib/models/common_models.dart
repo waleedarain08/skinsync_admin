@@ -56,19 +56,28 @@ class SessionConfig {
 }
 
 class NotificationConfig {
+  String? title;
   String? message;
   int? timing; // in minutes/hours/days - we should standardize to minutes internal
+  String? timingUnit;
+  String? type;
 
-  NotificationConfig({this.message, this.timing});
+  NotificationConfig({this.title, this.message, this.timing, this.timingUnit, this.type});
 
   factory NotificationConfig.fromJson(Map<String, dynamic> json) => NotificationConfig(
+    title: json['title'],
     message: json['message'],
     timing: json['timing'],
+    timingUnit: json['timing_unit'],
+    type: json['type'],
   );
 
   Map<String, dynamic> toJson() => {
+    'title': title,
     'message': message,
     'timing': timing,
+    'timing_unit': timingUnit,
+    'type': type,
   };
 }
 

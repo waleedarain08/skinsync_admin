@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../models/treatment_data_models.dart';
 import '../models/treatment_model.dart';
 import '../models/common_models.dart';
+import '../models/notification_entry.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
 import '../utils/dummy_data.dart';
@@ -54,6 +55,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   // Step - Follow-Up Controllers
   final totalFollowUpsController = TextEditingController();
+  final totalSessionsController = TextEditingController();
   final followUpDurationValueController = TextEditingController();
   final followUpNotesController = TextEditingController();
 
@@ -96,6 +98,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     postNotificationTitleController.dispose();
     postNotificationDescriptionController.dispose();
     totalFollowUpsController.dispose();
+    totalSessionsController.dispose();
     followUpDurationValueController.dispose();
     followUpNotesController.dispose();
     protocolNameController.dispose();
@@ -163,6 +166,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     postNotificationTitleController.clear();
     postNotificationDescriptionController.clear();
     totalFollowUpsController.clear();
+    totalSessionsController.clear();
     followUpDurationValueController.clear();
     followUpNotesController.clear();
     protocolNameController.clear();
@@ -194,6 +198,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       existingConsentForm: null,
       preNotificationSource: 'category',
       postNotificationSource: 'category',
+      preNotificationEntries: [],
+      postNotificationEntries: [],
       downtimeLevel: 'None',
       providerRolesSource: 'category',
       selectedRoles: [],
@@ -264,6 +270,30 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     preNotificationDescriptionController.text = treatment.preTreatmentNotificationDescription ?? '';
     postNotificationTitleController.text = treatment.postTreatmentNotificationTitle ?? '';
     postNotificationDescriptionController.text = treatment.postTreatmentNotificationDescription ?? '';
+
+    // Dispose old notification entries
+    for (var entry in state.preNotificationEntries) {
+      entry.dispose();
+    }
+    for (var entry in state.postNotificationEntries) {
+      entry.dispose();
+    }
+
+    final List<NotificationEntry> newPreNotifications = treatment.preNotifications.map((config) => NotificationEntry(
+      titleController: TextEditingController(text: config.title),
+      messageController: TextEditingController(text: config.message),
+      timingValueController: TextEditingController(text: config.timing?.toString()),
+      timingUnit: config.timingUnit ?? 'hours',
+      type: config.type ?? 'reminder',
+    )).toList();
+
+    final List<NotificationEntry> newPostNotifications = treatment.postNotifications.map((config) => NotificationEntry(
+      titleController: TextEditingController(text: config.title),
+      messageController: TextEditingController(text: config.message),
+      timingValueController: TextEditingController(text: config.timing?.toString()),
+      timingUnit: config.timingUnit ?? 'hours',
+      type: config.type ?? 'care',
+    )).toList();
 
     // Sessions and Follow Ups
     for (var entry in state.sessions) {
@@ -354,6 +384,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       existingConsentForm: treatment.preTreatmentConsentForm,
       preNotificationSource: treatment.preNotificationSource,
       postNotificationSource: treatment.postNotificationSource,
+      preNotificationEntries: newPreNotifications,
+      postNotificationEntries: newPostNotifications,
       downtimeLevel: treatment.downtimeLevel,
       providerRolesSource: treatment.providerRolesSource,
       selectedRoles: treatment.allowedRoles,
@@ -377,8 +409,35 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     );
   }
 
-  void setPreNotificationSource(String source) => state = state.copyWith(preNotificationSource: source);
-  void setPostNotificationSource(String source) => state = state.copyWith(postNotificationSource: source);
+  void setPreNotificationSource(String source, {CategoryItem? category}) {
+    state = state.copyWith(preNotificationSource: source);
+    if (source == 'category' && category != null) {
+      state = state.copyWith(
+        preNotificationEntries: (category.preNotifications).map((config) => NotificationEntry(
+          titleController: TextEditingController(text: config.title),
+          messageController: TextEditingController(text: config.message),
+          timingValueController: TextEditingController(text: config.timing?.toString()),
+          timingUnit: config.timingUnit ?? 'hours',
+          type: config.type ?? 'reminder',
+        )).toList(),
+      );
+    }
+  }
+
+  void setPostNotificationSource(String source, {CategoryItem? category}) {
+    state = state.copyWith(postNotificationSource: source);
+    if (source == 'category' && category != null) {
+      state = state.copyWith(
+        postNotificationEntries: (category.postNotifications).map((config) => NotificationEntry(
+          titleController: TextEditingController(text: config.title),
+          messageController: TextEditingController(text: config.message),
+          timingValueController: TextEditingController(text: config.timing?.toString()),
+          timingUnit: config.timingUnit ?? 'hours',
+          type: config.type ?? 'care',
+        )).toList(),
+      );
+    }
+  }
   void setDowntimeLevel(String level) => state = state.copyWith(downtimeLevel: level);
   void setProviderRolesSource(String source) => state = state.copyWith(providerRolesSource: source);
   
@@ -570,6 +629,31 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     } else {
       state = state.copyWith();
     }
+
+    // Sync Notifications
+    if (state.preNotificationSource == 'category') {
+      state = state.copyWith(
+        preNotificationEntries: (category.preNotifications).map((config) => NotificationEntry(
+          titleController: TextEditingController(text: config.title),
+          messageController: TextEditingController(text: config.message),
+          timingValueController: TextEditingController(text: config.timing?.toString()),
+          timingUnit: config.timingUnit ?? 'hours',
+          type: config.type ?? 'reminder',
+        )).toList(),
+      );
+    }
+    
+    if (state.postNotificationSource == 'category') {
+      state = state.copyWith(
+        postNotificationEntries: (category.postNotifications).map((config) => NotificationEntry(
+          titleController: TextEditingController(text: config.title),
+          messageController: TextEditingController(text: config.message),
+          timingValueController: TextEditingController(text: config.timing?.toString()),
+          timingUnit: config.timingUnit ?? 'hours',
+          type: config.type ?? 'care',
+        )).toList(),
+      );
+    }
   }
 
   void selectCategoryAtLevel(int level, CategoryItem category, List<CategoryItem> allCategories) {
@@ -656,6 +740,46 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     updatedAreas[areaIndex].subAreas = 
         updatedAreas[areaIndex].subAreas.where((s) => s.name != subAreaName).toList();
     state = state.copyWith(areas: updatedAreas);
+  }
+
+  void addPreNotificationEntry() {
+    state = state.copyWith(preNotificationEntries: [
+      ...state.preNotificationEntries,
+      NotificationEntry(
+        titleController: TextEditingController(),
+        messageController: TextEditingController(),
+        timingValueController: TextEditingController(),
+        timingUnit: 'hours',
+        type: 'reminder',
+      ),
+    ]);
+  }
+
+  void removePreNotificationEntry(int index) {
+    final list = List<NotificationEntry>.from(state.preNotificationEntries);
+    final removed = list.removeAt(index);
+    removed.dispose();
+    state = state.copyWith(preNotificationEntries: list);
+  }
+
+  void addPostNotificationEntry() {
+    state = state.copyWith(postNotificationEntries: [
+      ...state.postNotificationEntries,
+      NotificationEntry(
+        titleController: TextEditingController(),
+        messageController: TextEditingController(),
+        timingValueController: TextEditingController(),
+        timingUnit: 'hours',
+        type: 'care',
+      ),
+    ]);
+  }
+
+  void removePostNotificationEntry(int index) {
+    final list = List<NotificationEntry>.from(state.postNotificationEntries);
+    final removed = list.removeAt(index);
+    removed.dispose();
+    state = state.copyWith(postNotificationEntries: list);
   }
 
   // Step 4 Actions
@@ -875,6 +999,26 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     return await runSafely<void>(showLoading: true, () async {
       List<SessionConfig> effectiveSessions = [];
       
+      List<NotificationConfig> effectivePreNotifications = [];
+      if (state.preNotificationSource == 'category') {
+        final selectedCategory = findCategoryById(categories, categoryIdController.text);
+        if (selectedCategory != null) {
+          effectivePreNotifications = selectedCategory.preNotifications;
+        }
+      } else {
+        effectivePreNotifications = state.preNotificationEntries.map((e) => e.toConfig()).toList();
+      }
+
+      List<NotificationConfig> effectivePostNotifications = [];
+      if (state.postNotificationSource == 'category') {
+        final selectedCategory = findCategoryById(categories, categoryIdController.text);
+        if (selectedCategory != null) {
+          effectivePostNotifications = selectedCategory.postNotifications;
+        }
+      } else {
+        effectivePostNotifications = state.postNotificationEntries.map((e) => e.toConfig()).toList();
+      }
+      
       if (state.sessionSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null && selectedCategory.defaultSessions != null && selectedCategory.defaultSessions!.isNotEmpty) {
@@ -965,6 +1109,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         postTreatmentNotificationTitle: postNotificationTitleController.text,
         postTreatmentNotificationDescription: postNotificationDescriptionController.text,
         postTreatmentNotificationOffset: state.postNotificationOffset,
+        preNotifications: effectivePreNotifications,
+        postNotifications: effectivePostNotifications,
         sessionSource: state.sessionSource,
         totalSessions: state.totalSessions,
         sessions: effectiveSessions,
@@ -1047,6 +1193,26 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   Future<void> updateTreatment(BuildContext context, {List<CategoryItem> categories = const []}) async {
     return await runSafely<void>(showLoading: true, () async {
       List<SessionConfig> effectiveSessions = [];
+
+      List<NotificationConfig> effectivePreNotifications = [];
+      if (state.preNotificationSource == 'category') {
+        final selectedCategory = findCategoryById(categories, categoryIdController.text);
+        if (selectedCategory != null) {
+          effectivePreNotifications = selectedCategory.preNotifications;
+        }
+      } else {
+        effectivePreNotifications = state.preNotificationEntries.map((e) => e.toConfig()).toList();
+      }
+
+      List<NotificationConfig> effectivePostNotifications = [];
+      if (state.postNotificationSource == 'category') {
+        final selectedCategory = findCategoryById(categories, categoryIdController.text);
+        if (selectedCategory != null) {
+          effectivePostNotifications = selectedCategory.postNotifications;
+        }
+      } else {
+        effectivePostNotifications = state.postNotificationEntries.map((e) => e.toConfig()).toList();
+      }
       
       if (state.sessionSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
@@ -1157,6 +1323,8 @@ class TreatmentState extends BaseStateModel {
   final String sessionSource; // category | custom
   final int totalSessions;
   final List<ProductUsageEntry> productUsageEntries;
+  final List<NotificationEntry> preNotificationEntries;
+  final List<NotificationEntry> postNotificationEntries;
 
   // Follow-Up fields
   final bool isFollowUpRequired;
@@ -1208,6 +1376,8 @@ class TreatmentState extends BaseStateModel {
     this.sessionSource = 'category',
     this.totalSessions = 1,
     this.productUsageEntries = const [],
+    this.preNotificationEntries = const [],
+    this.postNotificationEntries = const [],
     this.isFollowUpRequired = false,
     this.useInAiSimulator = false,
     this.enableByDefault = false,
@@ -1240,6 +1410,8 @@ class TreatmentState extends BaseStateModel {
     String? status,
     int? preNotificationOffset,
     int? postNotificationOffset,
+    List<NotificationEntry>? preNotificationEntries,
+    List<NotificationEntry>? postNotificationEntries,
     List<PlatformFile>? preTreatmentAttachments,
     List<PlatformFile>? postTreatmentAttachments,
     List<Attachment>? existingPreAttachments,
@@ -1286,6 +1458,8 @@ class TreatmentState extends BaseStateModel {
       status: status ?? this.status,
       preNotificationOffset: preNotificationOffset ?? this.preNotificationOffset,
       postNotificationOffset: postNotificationOffset ?? this.postNotificationOffset,
+      preNotificationEntries: preNotificationEntries ?? this.preNotificationEntries,
+      postNotificationEntries: postNotificationEntries ?? this.postNotificationEntries,
       preTreatmentAttachments: preTreatmentAttachments ?? this.preTreatmentAttachments,
       postTreatmentAttachments: postTreatmentAttachments ?? this.postTreatmentAttachments,
       existingPreAttachments: existingPreAttachments ?? this.existingPreAttachments,

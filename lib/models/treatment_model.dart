@@ -47,6 +47,8 @@ class TreatmentModel {
   String? postTreatmentNotificationTitle;
   String? postTreatmentNotificationDescription;
   int? postTreatmentNotificationOffset; // in minutes
+  List<NotificationConfig> preNotifications;
+  List<NotificationConfig> postNotifications;
   
   // Sessions
   String sessionSource; // category | custom
@@ -109,6 +111,8 @@ class TreatmentModel {
     this.postTreatmentNotificationTitle,
     this.postTreatmentNotificationDescription,
     this.postTreatmentNotificationOffset,
+    this.preNotifications = const [],
+    this.postNotifications = const [],
     this.sessionSource = 'category',
     this.totalSessions = 1,
     this.sessions,
@@ -136,6 +140,8 @@ class TreatmentModel {
         maximumDaysInAdvance = json['maximum_days_in_advance'] ?? 90,
         preNotificationSource = json['pre_notification_source'] ?? 'category',
         postNotificationSource = json['post_notification_source'] ?? 'category',
+        preNotifications = (json['pre_notifications'] as List?)?.map((e) => NotificationConfig.fromJson(e)).toList() ?? [],
+        postNotifications = (json['post_notifications'] as List?)?.map((e) => NotificationConfig.fromJson(e)).toList() ?? [],
         sessionSource = json['session_source'] ?? 'category',
         totalSessions = json['total_sessions'] ?? 1,
         downtimeLevel = json['downtime_level'] ?? 'None',
@@ -244,6 +250,8 @@ class TreatmentModel {
     String? postTreatmentNotificationTitle,
     String? postTreatmentNotificationDescription,
     int? postTreatmentNotificationOffset,
+    List<NotificationConfig>? preNotifications,
+    List<NotificationConfig>? postNotifications,
     String? sessionSource,
     int? totalSessions,
     List<SessionConfig>? sessions,
@@ -296,6 +304,8 @@ class TreatmentModel {
       postTreatmentNotificationTitle: postTreatmentNotificationTitle ?? this.postTreatmentNotificationTitle,
       postTreatmentNotificationDescription: postTreatmentNotificationDescription ?? this.postTreatmentNotificationDescription,
       postTreatmentNotificationOffset: postTreatmentNotificationOffset ?? this.postTreatmentNotificationOffset,
+      preNotifications: preNotifications ?? this.preNotifications,
+      postNotifications: postNotifications ?? this.postNotifications,
       sessionSource: sessionSource ?? this.sessionSource,
       totalSessions: totalSessions ?? this.totalSessions,
       sessions: sessions ?? this.sessions,
@@ -351,6 +361,8 @@ class TreatmentModel {
       'post_treatment_notification_title': postTreatmentNotificationTitle,
       'post_treatment_notification_description': postTreatmentNotificationDescription,
       'post_treatment_notification_offset': postTreatmentNotificationOffset,
+      'pre_notifications': preNotifications.map((e) => e.toJson()).toList(),
+      'post_notifications': postNotifications.map((e) => e.toJson()).toList(),
       'session_source': sessionSource,
       'total_sessions': totalSessions,
       'sessions': sessions?.map((e) => e.toJson()).toList(),

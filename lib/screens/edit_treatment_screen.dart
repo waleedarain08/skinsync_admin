@@ -350,8 +350,12 @@ class EditTreatmentScreen extends ConsumerWidget {
                   _buildNotificationPreview(
                     context,
                     title: "Category Default",
-                    message: selectedCategory?.preNotification?.message ?? "No message defined in category.",
-                    timing: selectedCategory?.preNotification?.timing != null ? "${selectedCategory!.preNotification!.timing} Hours Before" : "Not set",
+                    message: (selectedCategory?.preNotifications.isNotEmpty ?? false) 
+                        ? selectedCategory!.preNotifications.first.message ?? "No message defined in category." 
+                        : "No message defined in category.",
+                    timing: (selectedCategory?.preNotifications.isNotEmpty ?? false) 
+                        ? "${selectedCategory!.preNotifications.first.timing ?? 0} Hours Before" 
+                        : "Not set",
                   ),
                 ] else ...[
                   BuildTextField(
@@ -408,8 +412,12 @@ class EditTreatmentScreen extends ConsumerWidget {
                   _buildNotificationPreview(
                     context,
                     title: "Category Default",
-                    message: selectedCategory?.postNotification?.message ?? "No message defined in category.",
-                    timing: selectedCategory?.postNotification?.timing != null ? "${selectedCategory!.postNotification!.timing} Hours After" : "Not set",
+                    message: (selectedCategory?.postNotifications.isNotEmpty ?? false) 
+                        ? selectedCategory!.postNotifications.first.message ?? "No message defined in category." 
+                        : "No message defined in category.",
+                    timing: (selectedCategory?.postNotifications.isNotEmpty ?? false) 
+                        ? "${selectedCategory!.postNotifications.first.timing ?? 0} Hours After" 
+                        : "Not set",
                   ),
                 ] else ...[
                   BuildTextField(
@@ -617,7 +625,7 @@ class EditTreatmentScreen extends ConsumerWidget {
             context.verticalSpace(32),
             BuildTextField(
               label: "Total Sessions",
-              controller: TextEditingController(text: state.totalSessions.toString()),
+              controller: viewModel.totalSessionsController,
               hintText: "e.g. 3",
               keyboardType: TextInputType.number,
               onChanged: (val) => viewModel.setTotalSessions(val ?? '1'),

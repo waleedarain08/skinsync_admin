@@ -21,6 +21,8 @@ import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
 
+import '../models/notification_entry.dart';
+
 class CreateTreatmentScreen extends ConsumerWidget {
   const CreateTreatmentScreen({super.key});
 
@@ -688,18 +690,22 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final isPreCategory = state.preNotificationSource == 'category';
     final isPostCategory = state.postNotificationSource == 'category';
 
-    String preTiming = "Not configured";
+    String preSummary = "Not configured";
     if (isPreCategory) {
-      preTiming = selectedCategory?.preNotification?.timing != null ? "${selectedCategory!.preNotification!.timing} Hours Before" : "Category Default";
-    } else if (state.preNotificationOffset != null) {
-      preTiming = "${state.preNotificationOffset} Hours Before";
+      preSummary = (selectedCategory?.preNotifications.isNotEmpty ?? false) 
+          ? "${selectedCategory!.preNotifications.length} Category Defaults" 
+          : "Category Default";
+    } else {
+      preSummary = "${state.preNotificationEntries.length} Custom Notifications";
     }
 
-    String postTiming = "Not configured";
+    String postSummary = "Not configured";
     if (isPostCategory) {
-      postTiming = selectedCategory?.postNotification?.timing != null ? "${selectedCategory!.postNotification!.timing} Hours After" : "Category Default";
-    } else if (state.postNotificationOffset != null) {
-      postTiming = "${state.postNotificationOffset} Hours After";
+      postSummary = (selectedCategory?.postNotifications.isNotEmpty ?? false) 
+          ? "${selectedCategory!.postNotifications.length} Category Defaults" 
+          : "Category Default";
+    } else {
+      postSummary = "${state.postNotificationEntries.length} Custom Notifications";
     }
 
     return _blueprintSection(
@@ -709,9 +715,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _blueprintRow(context, "Pre-Notification Source", isPreCategory ? "Category Default" : "Custom"),
-          _blueprintRow(context, "Pre-Notification Timing", preTiming),
+          _blueprintRow(context, "Pre-Notifications", preSummary),
           _blueprintRow(context, "Post-Notification Source", isPostCategory ? "Category Default" : "Custom"),
-          _blueprintRow(context, "Post-Notification Timing", postTiming),
+          _blueprintRow(context, "Post-Notifications", postSummary),
         ],
       ),
     );
@@ -1333,123 +1339,292 @@ class CreateTreatmentScreen extends ConsumerWidget {
       selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
     }
 
-    return Column(
-      children: [
-        _expandableSection(
-          context,
-          title: "Pre-Treatment Notification",
-          icon: Icons.notifications_none_rounded,
-          content: Column(
+    return StatefulBuilder(
+      builder: (context, setState) {
+        Widget buildCategoryDefaultPreviews(List<NotificationConfig> notifications, bool isPre) {
+          if (notifications.isEmpty) {
+            return Container(
+              padding: context.appEdgeInsets(all: 16),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(color: CustomColors.border),
+              ),
+              child: Text("No default notifications defined in this category.", style: context.fonts.grey14w400),
+            );
+          }
+          return ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: notifications.length,
+            separatorBuilder: (_, __) => context.verticalSpace(12),
+            itemBuilder: (context, idx) {
+              final config = notifications[idx];
+              final typeText = config.type != null ? " [${config.type![0].toUpperCase()}${config.type!.substring(1)}]" : "";
+              return _buildNotificationPreview(
+                context,
+                title: "${config.title ?? 'Notification'} $typeText (Read-only)",
+                message: config.message ?? "",
+                timing: "${config.timing ?? 0} ${config.timingUnit ?? 'hours'} ${isPre ? 'Before' : 'After'}",
+              );
+            },
+          );
+        }
+
+        Widget buildCustomNotificationBuilder(List<NotificationEntry> entries, bool isPre) {
+          final types = isPre 
+              ? ['reminder', 'warning', 'instruction'] 
+              : ['recovery', 'care', 'follow-up reminder'];
+
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Notification Source", style: context.fonts.black14w600),
-              context.verticalSpace(12),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _radioOption(context, "Use Category Default", state.preNotificationSource == 'category', () => viewModel.setPreNotificationSource('category')),
-                  context.horizontalSpace(32),
-                  _radioOption(context, "Create Custom", state.preNotificationSource == 'custom', () => viewModel.setPreNotificationSource('custom')),
+                  Text(isPre ? "Custom Pre Notifications" : "Custom Post Notifications", style: context.fonts.black14w600),
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        if (isPre) {
+                          viewModel.addPreNotificationEntry();
+                        } else {
+                          viewModel.addPostNotificationEntry();
+                        }
+                      });
+                    },
+                    icon: const Icon(Icons.add_circle_outline, color: CustomColors.purple),
+                    label: const Text("Add Notification"),
+                  ),
                 ],
               ),
-              context.verticalSpace(24),
-              if (state.preNotificationSource == 'category') ...[
-                _buildNotificationPreview(
-                  context,
-                  title: "Category Default (Read-only)",
-                  message: selectedCategory?.preNotification?.message ?? "No message defined in category.",
-                  timing: selectedCategory?.preNotification?.timing != null ? "${selectedCategory!.preNotification!.timing} Hours Before" : "Not set",
-                ),
-              ] else ...[
-                BuildTextField(
-                  label: "Notification Title",
-                  controller: viewModel.preNotificationTitleController,
-                  hintText: "e.g. Appointment Reminder",
-                ),
-                context.verticalSpace(20),
-                BuildTextField(
-                  label: "Notification Description",
-                  controller: viewModel.preNotificationDescriptionController,
-                  hintText: "Body of the notification",
-                  maxLines: 3,
-                ),
-                context.verticalSpace(20),
-                _buildOffsetDropdown(
-                  context,
-                  label: "Reminder Timing (Minutes Before)",
-                  value: state.preNotificationOffset,
-                  options: {
-                    15: "15 Minutes Before",
-                    30: "30 Minutes Before",
-                    60: "1 Hour Before",
-                    120: "2 Hours Before",
-                    360: "6 Hours Before",
-                    720: "12 Hours Before",
-                    1440: "24 Hours Before",
-                  },
-                  onChanged: (val) => viewModel.setPreNotificationOffset(val),
-                ),
-              ],
-            ],
-          ),
-        ),
-        context.verticalSpace(24),
-        _expandableSection(
-          context,
-          title: "Post-Treatment Notification",
-          icon: Icons.notifications_active_outlined,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Notification Source", style: context.fonts.black14w600),
               context.verticalSpace(12),
-              Row(
+              if (entries.isEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: context.appEdgeInsets(all: 16),
+                  decoration: BoxDecoration(
+                    color: CustomColors.whiteGrey,
+                    borderRadius: context.appBorderRadius(all: 12),
+                    border: Border.all(color: CustomColors.border),
+                  ),
+                  child: Text("No custom notifications added. Tap 'Add Notification' to create one.", style: context.fonts.grey13w500),
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: entries.length,
+                  separatorBuilder: (_, __) => context.verticalSpace(16),
+                  itemBuilder: (context, idx) {
+                    final entry = entries[idx];
+                    return Container(
+                      padding: context.appEdgeInsets(all: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: context.appBorderRadius(all: 12),
+                        border: Border.all(color: CustomColors.border),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Notification #${idx + 1}", style: context.fonts.purple14w700),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline, color: CustomColors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    if (isPre) {
+                                      viewModel.removePreNotificationEntry(idx);
+                                    } else {
+                                      viewModel.removePostNotificationEntry(idx);
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          context.verticalSpace(12),
+                          BuildTextField(
+                            label: "Title",
+                            controller: entry.titleController,
+                            hintText: "e.g. Avoid alcohol",
+                          ),
+                          context.verticalSpace(12),
+                          BuildTextField(
+                            label: "Message Content",
+                            controller: entry.messageController,
+                            hintText: "Enter notification message...",
+                            maxLines: 2,
+                          ),
+                          context.verticalSpace(12),
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: BuildTextField(
+                                  label: "Timing Value",
+                                  controller: entry.timingValueController,
+                                  hintText: "e.g. 24",
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                              context.horizontalSpace(12),
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Timing Unit", style: context.fonts.black14w600),
+                                    context.verticalSpace(8),
+                                    DropdownButtonHideUnderline(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: CustomColors.border),
+                                        ),
+                                        child: DropdownButton<String>(
+                                          value: entry.timingUnit,
+                                          isExpanded: true,
+                                          items: const [
+                                            DropdownMenuItem(value: 'minutes', child: Text("Minutes")),
+                                            DropdownMenuItem(value: 'hours', child: Text("Hours")),
+                                            DropdownMenuItem(value: 'days', child: Text("Days")),
+                                          ],
+                                          onChanged: (v) {
+                                            if (v != null) {
+                                              setState(() {
+                                                entry.timingUnit = v;
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          context.verticalSpace(12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Type (Optional)", style: context.fonts.black14w600),
+                              context.verticalSpace(8),
+                              DropdownButtonHideUnderline(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: CustomColors.border),
+                                  ),
+                                  child: DropdownButton<String>(
+                                    value: entry.type,
+                                    isExpanded: true,
+                                    items: types.map((t) => DropdownMenuItem(
+                                      value: t,
+                                      child: Text(t[0].toUpperCase() + t.substring(1)),
+                                    )).toList(),
+                                    onChanged: (v) {
+                                      if (v != null) {
+                                        setState(() {
+                                          entry.type = v;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            _expandableSection(
+              context,
+              title: "Pre-Treatment Notifications",
+              icon: Icons.notifications_none_rounded,
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _radioOption(context, "Use Category Default", state.postNotificationSource == 'category', () => viewModel.setPostNotificationSource('category')),
-                  context.horizontalSpace(32),
-                  _radioOption(context, "Create Custom", state.postNotificationSource == 'custom', () => viewModel.setPostNotificationSource('custom')),
+                  Text("Notification Source", style: context.fonts.black14w600),
+                  context.verticalSpace(12),
+                  Row(
+                    children: [
+                      _radioOption(context, "Use Category Default", state.preNotificationSource == 'category', () {
+                        setState(() {
+                          viewModel.setPreNotificationSource('category', category: selectedCategory);
+                        });
+                      }),
+                      context.horizontalSpace(32),
+                      _radioOption(context, "Create Custom", state.preNotificationSource == 'custom', () {
+                        setState(() {
+                          viewModel.setPreNotificationSource('custom');
+                        });
+                      }),
+                    ],
+                  ),
+                  context.verticalSpace(24),
+                  if (state.preNotificationSource == 'category') ...[
+                    buildCategoryDefaultPreviews(selectedCategory?.preNotifications ?? [], true),
+                  ] else ...[
+                    buildCustomNotificationBuilder(state.preNotificationEntries, true),
+                  ],
                 ],
               ),
-              context.verticalSpace(24),
-              if (state.postNotificationSource == 'category') ...[
-                _buildNotificationPreview(
-                  context,
-                  title: "Category Default (Read-only)",
-                  message: selectedCategory?.postNotification?.message ?? "No message defined in category.",
-                  timing: selectedCategory?.postNotification?.timing != null ? "${selectedCategory!.postNotification!.timing} Hours After" : "Not set",
-                ),
-              ] else ...[
-                BuildTextField(
-                  label: "Notification Title",
-                  controller: viewModel.postNotificationTitleController,
-                  hintText: "e.g. Aftercare Reminder",
-                ),
-                context.verticalSpace(20),
-                BuildTextField(
-                  label: "Notification Description",
-                  controller: viewModel.postNotificationDescriptionController,
-                  hintText: "Body of the notification",
-                  maxLines: 3,
-                ),
-                context.verticalSpace(20),
-                _buildOffsetDropdown(
-                  context,
-                  label: "Engagement Timing (Minutes After)",
-                  value: state.postNotificationOffset,
-                  options: {
-                    0: "Immediately After",
-                    60: "1 Hour After",
-                    360: "6 Hours After",
-                    1440: "24 Hours After",
-                    2880: "2 Days After",
-                    10080: "7 Days After",
-                  },
-                  onChanged: (val) => viewModel.setPostNotificationOffset(val),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
+            ),
+            context.verticalSpace(24),
+            _expandableSection(
+              context,
+              title: "Post-Treatment Notifications",
+              icon: Icons.notifications_active_outlined,
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Notification Source", style: context.fonts.black14w600),
+                  context.verticalSpace(12),
+                  Row(
+                    children: [
+                      _radioOption(context, "Use Category Default", state.postNotificationSource == 'category', () {
+                        setState(() {
+                          viewModel.setPostNotificationSource('category', category: selectedCategory);
+                        });
+                      }),
+                      context.horizontalSpace(32),
+                      _radioOption(context, "Create Custom", state.postNotificationSource == 'custom', () {
+                        setState(() {
+                          viewModel.setPostNotificationSource('custom');
+                        });
+                      }),
+                    ],
+                  ),
+                  context.verticalSpace(24),
+                  if (state.postNotificationSource == 'category') ...[
+                    buildCategoryDefaultPreviews(selectedCategory?.postNotifications ?? [], false),
+                  ] else ...[
+                    buildCustomNotificationBuilder(state.postNotificationEntries, false),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

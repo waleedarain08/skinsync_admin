@@ -17,8 +17,8 @@ class CategoryItem {
   final int totalSessions;
   
   // New operational rule defaults
-  final NotificationConfig? preNotification;
-  final NotificationConfig? postNotification;
+  final List<NotificationConfig> preNotifications;
+  final List<NotificationConfig> postNotifications;
   final DowntimePresets downtimePresets;
   final List<String> defaultRoles;
 
@@ -34,8 +34,8 @@ class CategoryItem {
     this.defaultSessions,
     this.defaultFollowUps,
     this.totalSessions = 1,
-    this.preNotification,
-    this.postNotification,
+    this.preNotifications = const [],
+    this.postNotifications = const [],
     DowntimePresets? downtimePresets,
     this.defaultRoles = const [],
   }) : downtimePresets = downtimePresets ?? DowntimePresets();
@@ -52,8 +52,8 @@ class CategoryItem {
     List<SessionConfig>? defaultSessions,
     List<FollowUpConfig>? defaultFollowUps,
     int? totalSessions,
-    NotificationConfig? preNotification,
-    NotificationConfig? postNotification,
+    List<NotificationConfig>? preNotifications,
+    List<NotificationConfig>? postNotifications,
     DowntimePresets? downtimePresets,
     List<String>? defaultRoles,
   }) {
@@ -69,8 +69,8 @@ class CategoryItem {
       defaultSessions: defaultSessions ?? this.defaultSessions,
       defaultFollowUps: defaultFollowUps ?? this.defaultFollowUps,
       totalSessions: totalSessions ?? this.totalSessions,
-      preNotification: preNotification ?? this.preNotification,
-      postNotification: postNotification ?? this.postNotification,
+      preNotifications: preNotifications ?? this.preNotifications,
+      postNotifications: postNotifications ?? this.postNotifications,
       downtimePresets: downtimePresets ?? this.downtimePresets,
       defaultRoles: defaultRoles ?? this.defaultRoles,
     );
