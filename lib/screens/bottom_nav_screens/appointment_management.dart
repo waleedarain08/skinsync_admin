@@ -10,6 +10,7 @@ import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/number_paginator.dart';
 
 class AppointmentDummyModel {
   final String patientName;
@@ -48,6 +49,9 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
   String _selectedProviderFilter = "All Providers";
   String _selectedTypeFilter = "All Types";
   String _selectedStatusFilter = "All Statuses";
+
+  int _currentPage = 0;
+  static const int _itemsPerPage = 5;
 
   final List<AppointmentDummyModel> _appointments = [
     AppointmentDummyModel(
@@ -132,6 +136,9 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
       return matchesQuery && matchesClinic && matchesProvider && matchesType && matchesStatus;
     }).toList();
 
+    final totalPages = (filteredAppointments.length / _itemsPerPage).ceil();
+    final paginatedAppointments = filteredAppointments.skip(_currentPage * _itemsPerPage).take(_itemsPerPage).toList();
+
     return GradientScaffold(
       body: SingleChildScrollView(
         padding: context.appEdgeInsets(
@@ -147,7 +154,22 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
             context.verticalSpace(32),
             _buildFilters(),
             context.verticalSpace(24),
-            _buildAppointmentTable(filteredAppointments),
+            _buildAppointmentTable(paginatedAppointments),
+            if (totalPages > 1)
+              Padding(
+                padding: context.appEdgeInsets(vertical: 24),
+                child: Center(
+                  child: NumberPaginator(
+                    totalPages: totalPages,
+                    currentPage: _currentPage,
+                    onPageChanged: (pageIndex) {
+                      setState(() {
+                        _currentPage = pageIndex;
+                      });
+                    },
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -233,10 +255,16 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
             child: AppSearchField(
               controller: _searchController,
               hintText: "Search appointments by patient or treatment name...",
-              onChanged: (val) => setState(() {}),
+              onChanged: (val) {
+                setState(() {
+                  _currentPage = 0;
+                });
+              },
               onClear: () {
                 _searchController.clear();
-                setState(() {});
+                setState(() {
+                  _currentPage = 0;
+                });
               },
             ),
           ),
@@ -252,6 +280,7 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedClinicFilter = val ?? "All Clinics";
+                  _currentPage = 0;
                 });
               },
             ),
@@ -268,6 +297,7 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedProviderFilter = val ?? "All Providers";
+                  _currentPage = 0;
                 });
               },
             ),
@@ -284,6 +314,7 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedTypeFilter = val ?? "All Types";
+                  _currentPage = 0;
                 });
               },
             ),
@@ -300,6 +331,7 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedStatusFilter = val ?? "All Statuses";
+                  _currentPage = 0;
                 });
               },
             ),

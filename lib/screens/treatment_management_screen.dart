@@ -16,7 +16,7 @@ import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-import 'package:skinsync_admin/widgets/pagination_footer.dart';
+import 'package:skinsync_admin/widgets/number_paginator.dart';
 import '../../widgets/custom_dropdown_widget.dart';
 
 class TreatmentManagementScreen extends ConsumerStatefulWidget {
@@ -96,13 +96,19 @@ class _TreatmentManagementScreenState extends ConsumerState<TreatmentManagementS
             _buildFilters(viewModel, parentCategories, subCategories),
             context.verticalSpace(24),
             _buildTreatmentTable(filteredTreatments, viewModel),
-            PaginationFooter(
-              currentPage: state.currentPage,
-              totalPages: state.totalPages,
-              onPageChanged: (page) {
-                viewModel.getTreatments(page: page + 1);
-              },
-            ),
+            if (state.totalPages > 1)
+              Padding(
+                padding: context.appEdgeInsets(vertical: 24),
+                child: Center(
+                  child: NumberPaginator(
+                    totalPages: state.totalPages,
+                    currentPage: state.currentPage - 1,
+                    onPageChanged: (pageIndex) {
+                      viewModel.getTreatments(page: pageIndex + 1);
+                    },
+                  ),
+                ),
+              ),
           ],
         ),
       ),

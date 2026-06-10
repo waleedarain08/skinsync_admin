@@ -10,6 +10,7 @@ import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/number_paginator.dart';
 
 class PatientDummyModel {
   final String name;
@@ -44,6 +45,9 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
 
   String _selectedClinicFilter = "All Clinics";
   String _selectedStatusFilter = "All Statuses";
+
+  int _currentPage = 0;
+  static const int _itemsPerPage = 5;
 
   final List<PatientDummyModel> _patients = [
     PatientDummyModel(
@@ -118,6 +122,9 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
       return matchesQuery && matchesClinic && matchesStatus;
     }).toList();
 
+    final totalPages = (filteredPatients.length / _itemsPerPage).ceil();
+    final paginatedPatients = filteredPatients.skip(_currentPage * _itemsPerPage).take(_itemsPerPage).toList();
+
     return GradientScaffold(
       body: SingleChildScrollView(
         padding: context.appEdgeInsets(
@@ -133,7 +140,22 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
             context.verticalSpace(32),
             _buildFilters(),
             context.verticalSpace(24),
-            _buildPatientsTable(filteredPatients),
+            _buildPatientsTable(paginatedPatients),
+            if (totalPages > 1)
+              Padding(
+                padding: context.appEdgeInsets(vertical: 24),
+                child: Center(
+                  child: NumberPaginator(
+                    totalPages: totalPages,
+                    currentPage: _currentPage,
+                    onPageChanged: (pageIndex) {
+                      setState(() {
+                        _currentPage = pageIndex;
+                      });
+                    },
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -220,10 +242,16 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
             child: AppSearchField(
               controller: _searchController,
               hintText: "Search patients by name, email or phone...",
-              onChanged: (val) => setState(() {}),
+              onChanged: (val) {
+                setState(() {
+                  _currentPage = 0;
+                });
+              },
               onClear: () {
                 _searchController.clear();
-                setState(() {});
+                setState(() {
+                  _currentPage = 0;
+                });
               },
             ),
           ),
@@ -239,6 +267,7 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedClinicFilter = val ?? "All Clinics";
+                  _currentPage = 0;
                 });
               },
             ),
@@ -255,6 +284,7 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedStatusFilter = val ?? "All Statuses";
+                  _currentPage = 0;
                 });
               },
             ),

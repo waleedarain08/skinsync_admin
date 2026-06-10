@@ -11,6 +11,7 @@ import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/number_paginator.dart';
 import '../../widgets/custom_dropdown_widget.dart';
 
 class ProductManagement extends ConsumerStatefulWidget {
@@ -25,6 +26,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedPurposeFilter = "All Purposes";
   String _selectedTrackingFilter = "All Statuses";
+
+  int _currentPage = 0;
+  static const int _itemsPerPage = 5;
 
   late List<ProductModel> _catalogProducts;
 
@@ -60,6 +64,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
       return matchesQuery && matchesPurpose && matchesTracking;
     }).toList();
 
+    final totalPages = (filteredProducts.length / _itemsPerPage).ceil();
+    final paginatedProducts = filteredProducts.skip(_currentPage * _itemsPerPage).take(_itemsPerPage).toList();
+
     return GradientScaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
@@ -72,7 +79,22 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             SizedBox(height: 32.h),
             _buildFilters(),
             SizedBox(height: 24.h),
-            _buildCatalogTable(filteredProducts),
+            _buildCatalogTable(paginatedProducts),
+            if (totalPages > 1)
+              Padding(
+                padding: context.appEdgeInsets(vertical: 24),
+                child: Center(
+                  child: NumberPaginator(
+                    totalPages: totalPages,
+                    currentPage: _currentPage,
+                    onPageChanged: (pageIndex) {
+                      setState(() {
+                        _currentPage = pageIndex;
+                      });
+                    },
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -174,7 +196,11 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             child: AppSearchField(
               controller: _searchController,
               hintText: "Search master catalog by product name, SKU or brand manufacturer...",
-              onChanged: (val) => setState(() {}),
+              onChanged: (val) {
+                setState(() {
+                  _currentPage = 0;
+                });
+              },
             ),
           ),
           SizedBox(width: 16.w),
@@ -189,6 +215,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedPurposeFilter = val ?? "All Purposes";
+                  _currentPage = 0;
                 });
               },
             ),
@@ -205,6 +232,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedTrackingFilter = val ?? "All Statuses";
+                  _currentPage = 0;
                 });
               },
             ),

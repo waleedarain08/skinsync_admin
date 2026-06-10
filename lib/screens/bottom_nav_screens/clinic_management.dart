@@ -16,6 +16,7 @@ import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
 import '../../widgets/dailogbox/clinic_dailogbox.dart';
 import '../invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/number_paginator.dart';
 
 class ClinicManagement extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-management';
@@ -32,6 +33,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   String _selectedRegionFilter = "All Regions";
   String _selectedPlanFilter = "All Plans";
   String _selectedStatusFilter = "All Statuses";
+
+  int _activePage = 0;
+  int _invitePage = 0;
+  static const int _itemsPerPage = 5;
 
   @override
   void initState() {
@@ -205,10 +210,18 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             child: AppSearchField(
               controller: _searchController,
               hintText: "Search clinics by name, email or location...",
-              onChanged: (val) => setState(() {}),
+              onChanged: (val) {
+                setState(() {
+                  _activePage = 0;
+                  _invitePage = 0;
+                });
+              },
               onClear: () {
                 _searchController.clear();
-                setState(() {});
+                setState(() {
+                  _activePage = 0;
+                  _invitePage = 0;
+                });
               },
             ),
           ),
@@ -224,6 +237,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
               onChanged: (val) {
                 setState(() {
                   _selectedRegionFilter = val ?? "All Regions";
+                  _activePage = 0;
+                  _invitePage = 0;
                 });
               },
             ),
@@ -240,6 +255,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
               onChanged: (val) {
                 setState(() {
                   _selectedPlanFilter = val ?? "All Plans";
+                  _activePage = 0;
+                  _invitePage = 0;
                 });
               },
             ),
@@ -256,6 +273,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
               onChanged: (val) {
                 setState(() {
                   _selectedStatusFilter = val ?? "All Statuses";
+                  _activePage = 0;
+                  _invitePage = 0;
                 });
               },
             ),
@@ -290,58 +309,82 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       return _buildEmptyState();
     }
 
-    return BorderdContainerWidget(
-      padding: EdgeInsets.zero,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
-        child: Table(
-          columnWidths: const {
-            0: FlexColumnWidth(4), // Clinic Name / logo
-            1: FlexColumnWidth(3), // Contact / Location
-            2: FlexColumnWidth(2), // Subscription Plan
-            3: FlexColumnWidth(2), // Total Appointments (or Providers)
-            4: FlexColumnWidth(2), // Total Treatments
-            5: FlexColumnWidth(2), // Status
-            6: FlexColumnWidth(2), // Actions
-          },
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          children: [
-            // Header Row
-            TableRow(
-              decoration: const BoxDecoration(
-                color: CustomColors.whiteGrey,
-                border: Border(bottom: BorderSide(color: CustomColors.border)),
-              ),
-              children: [
-                _tableHeaderCell("CLINIC PARTNER"),
-                _tableHeaderCell("CONTACT & REGION"),
-                _tableHeaderCell("PLAN"),
-                _tableHeaderCell("APPOINTMENTS"),
-                _tableHeaderCell("TREATMENTS"),
-                _tableHeaderCell("STATUS"),
-                _tableHeaderCell("ACTIONS"),
-              ],
-            ),
-            // Data Rows
-            ...clinics.map((clinic) {
-              return TableRow(
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: CustomColors.border)),
-                ),
+    final totalPages = (clinics.length / _itemsPerPage).ceil();
+    final paginatedClinics = clinics.skip(_activePage * _itemsPerPage).take(_itemsPerPage).toList();
+
+    return Column(
+      children: [
+        Expanded(
+          child: BorderdContainerWidget(
+            padding: EdgeInsets.zero,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: Table(
+                columnWidths: const {
+                  0: FlexColumnWidth(4), // Clinic Name / logo
+                  1: FlexColumnWidth(3), // Contact / Location
+                  2: FlexColumnWidth(2), // Subscription Plan
+                  3: FlexColumnWidth(2), // Total Appointments (or Providers)
+                  4: FlexColumnWidth(2), // Total Treatments
+                  5: FlexColumnWidth(2), // Status
+                  6: FlexColumnWidth(2), // Actions
+                },
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 children: [
-                  _clinicNameCell(clinic.name, clinic.logo),
-                  _clinicContactCell(clinic.email, clinic.phone, clinic.address),
-                  _tableTextCell(clinic.subscriptionPlan ?? "Standard", style: context.fonts.black14w600),
-                  _tableTextCell("${clinic.totalAppointments ?? 0} Appts", style: context.fonts.grey14w400),
-                  _tableTextCell("${clinic.totalTreatments ?? 0} Proc", style: context.fonts.grey14w400),
-                  _statusBadgeCell(clinic.status ?? "Active"),
-                  _activeActionsCell(clinic),
+                  // Header Row
+                  TableRow(
+                    decoration: const BoxDecoration(
+                      color: CustomColors.whiteGrey,
+                      border: Border(bottom: BorderSide(color: CustomColors.border)),
+                    ),
+                    children: [
+                      _tableHeaderCell("CLINIC PARTNER"),
+                      _tableHeaderCell("CONTACT & REGION"),
+                      _tableHeaderCell("PLAN"),
+                      _tableHeaderCell("APPOINTMENTS"),
+                      _tableHeaderCell("TREATMENTS"),
+                      _tableHeaderCell("STATUS"),
+                      _tableHeaderCell("ACTIONS"),
+                    ],
+                  ),
+                  // Data Rows
+                  ...paginatedClinics.map((clinic) {
+                    return TableRow(
+                      decoration: const BoxDecoration(
+                        border: Border(bottom: BorderSide(color: CustomColors.border)),
+                      ),
+                      children: [
+                        _clinicNameCell(clinic.name, clinic.logo),
+                        _clinicContactCell(clinic.email, clinic.phone, clinic.address),
+                        _tableTextCell(clinic.subscriptionPlan ?? "Standard", style: context.fonts.black14w600),
+                        _tableTextCell("${clinic.totalAppointments ?? 0} Appts", style: context.fonts.grey14w400),
+                        _tableTextCell("${clinic.totalTreatments ?? 0} Proc", style: context.fonts.grey14w400),
+                        _statusBadgeCell(clinic.status ?? "Active"),
+                        _activeActionsCell(clinic),
+                      ],
+                    );
+                  }),
                 ],
-              );
-            }),
-          ],
+              ),
+            ),
+          ),
         ),
-      ),
+        if (totalPages > 1)
+          Padding(
+            padding: context.appEdgeInsets(vertical: 24),
+            child: Center(
+              child: NumberPaginator(
+                totalPages: totalPages,
+                currentPage: _activePage,
+                onPageChanged: (pageIndex) {
+                  setState(() {
+                    _activePage = pageIndex;
+                  });
+                },
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -354,52 +397,76 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
       return _buildEmptyState();
     }
 
-    return BorderdContainerWidget(
-      padding: EdgeInsets.zero,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
-        child: Table(
-          columnWidths: const {
-            0: FlexColumnWidth(4), // Clinic Name / logo
-            1: FlexColumnWidth(4), // Contact / Location
-            2: FlexColumnWidth(3), // Region / Address
-            3: FlexColumnWidth(2), // Status
-            4: FlexColumnWidth(2), // Actions
-          },
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          children: [
-            // Header Row
-            TableRow(
-              decoration: const BoxDecoration(
-                color: CustomColors.whiteGrey,
-                border: Border(bottom: BorderSide(color: CustomColors.border)),
-              ),
-              children: [
-                _tableHeaderCell("PROSPECT CLINIC"),
-                _tableHeaderCell("CONTACT DETAIL"),
-                _tableHeaderCell("LOCATION"),
-                _tableHeaderCell("STATUS"),
-                _tableHeaderCell("ACTIONS"),
-              ],
-            ),
-            // Data Rows
-            ...invites.map((clinic) {
-              return TableRow(
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: CustomColors.border)),
-                ),
+    final totalPages = (invites.length / _itemsPerPage).ceil();
+    final paginatedInvites = invites.skip(_invitePage * _itemsPerPage).take(_itemsPerPage).toList();
+
+    return Column(
+      children: [
+        Expanded(
+          child: BorderdContainerWidget(
+            padding: EdgeInsets.zero,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: Table(
+                columnWidths: const {
+                  0: FlexColumnWidth(4), // Clinic Name / logo
+                  1: FlexColumnWidth(4), // Contact / Location
+                  2: FlexColumnWidth(3), // Region / Address
+                  3: FlexColumnWidth(2), // Status
+                  4: FlexColumnWidth(2), // Actions
+                },
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 children: [
-                  _clinicNameCell(clinic.name, clinic.logo),
-                  _clinicContactCell(clinic.email, clinic.phone, null),
-                  _tableTextCell(clinic.address, style: context.fonts.grey14w400),
-                  _invitationStatusBadgeCell(clinic.invitationStatus),
-                  _inviteActionsCell(clinic),
+                  // Header Row
+                  TableRow(
+                    decoration: const BoxDecoration(
+                      color: CustomColors.whiteGrey,
+                      border: Border(bottom: BorderSide(color: CustomColors.border)),
+                    ),
+                    children: [
+                      _tableHeaderCell("PROSPECT CLINIC"),
+                      _tableHeaderCell("CONTACT DETAIL"),
+                      _tableHeaderCell("LOCATION"),
+                      _tableHeaderCell("STATUS"),
+                      _tableHeaderCell("ACTIONS"),
+                    ],
+                  ),
+                  // Data Rows
+                  ...paginatedInvites.map((clinic) {
+                    return TableRow(
+                      decoration: const BoxDecoration(
+                        border: Border(bottom: BorderSide(color: CustomColors.border)),
+                      ),
+                      children: [
+                        _clinicNameCell(clinic.name, clinic.logo),
+                        _clinicContactCell(clinic.email, clinic.phone, null),
+                        _tableTextCell(clinic.address, style: context.fonts.grey14w400),
+                        _invitationStatusBadgeCell(clinic.invitationStatus),
+                        _inviteActionsCell(clinic),
+                      ],
+                    );
+                  }),
                 ],
-              );
-            }),
-          ],
+              ),
+            ),
+          ),
         ),
-      ),
+        if (totalPages > 1)
+          Padding(
+            padding: context.appEdgeInsets(vertical: 24),
+            child: Center(
+              child: NumberPaginator(
+                totalPages: totalPages,
+                currentPage: _invitePage,
+                onPageChanged: (pageIndex) {
+                  setState(() {
+                    _invitePage = pageIndex;
+                  });
+                },
+              ),
+            ),
+          ),
+      ],
     );
   }
 
