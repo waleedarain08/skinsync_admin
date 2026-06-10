@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final TreatmentRepository _treatmentRepository = locator<TreatmentRepository>();
 
   // Step 1 Controllers
+  final globalSkuController = TextEditingController();
   final internalNameController = TextEditingController();
   final displayNameController = TextEditingController();
   final fullDescriptionController = TextEditingController();
@@ -79,6 +81,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   @override
   void dispose() {
+    globalSkuController.dispose();
     internalNameController.dispose();
     displayNameController.dispose();
     fullDescriptionController.dispose();
@@ -147,6 +150,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   }
 
   void resetForm() {
+    globalSkuController.clear();
     internalNameController.clear();
     displayNameController.clear();
     fullDescriptionController.clear();
@@ -243,6 +247,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(selectedTreatment: treatment);
     
     // Populate controllers for editing
+    globalSkuController.text = treatment.globalSku ?? '';
     internalNameController.text = treatment.name ?? '';
     displayNameController.text = treatment.patientDisplayName ?? '';
     fullDescriptionController.text = treatment.description ?? '';
@@ -997,6 +1002,14 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   Future<void> submitTreatment(BuildContext context, {List<CategoryItem> categories = const []}) async {
     return await runSafely<void>(showLoading: true, () async {
+      final skuError = validateGlobalSku(globalSkuController.text.trim());
+      if (skuError != null) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(skuError)));
+        }
+        return;
+      }
+
       List<SessionConfig> effectiveSessions = [];
       
       List<NotificationConfig> effectivePreNotifications = [];
@@ -1068,6 +1081,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
       // ignore: unused_local_variable
       final treatment = TreatmentModel(
+        globalSku: globalSkuController.text.trim(),
         name: internalNameController.text,
         patientDisplayName: displayNameController.text,
         description: fullDescriptionController.text,
@@ -1192,6 +1206,14 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   Future<void> updateTreatment(BuildContext context, {List<CategoryItem> categories = const []}) async {
     return await runSafely<void>(showLoading: true, () async {
+      final skuError = validateGlobalSku(globalSkuController.text.trim(), currentTreatmentId: state.selectedTreatment?.id);
+      if (skuError != null) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(skuError)));
+        }
+        return;
+      }
+
       List<SessionConfig> effectiveSessions = [];
 
       List<NotificationConfig> effectivePreNotifications = [];
@@ -1261,12 +1283,161 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         )).toList();
       }
 
-      // Logic for updating the treatment
-      // await _treatmentRepository.updateTreatment(state.selectedTreatmentId!, treatment.toRequest());
+      final treatment = TreatmentModel(
+        id: state.selectedTreatment?.id,
+        globalSku: globalSkuController.text.trim(),
+        name: internalNameController.text,
+        patientDisplayName: displayNameController.text,
+        description: fullDescriptionController.text,
+        shortDescription: shortDescriptionController.text,
+        basePrice: double.tryParse(basePriceController.text),
+        unitPrices: (() {
+          final Map<String, double> up = {};
+          unitPriceControllers.forEach((unit, controller) {
+            final val = double.tryParse(controller.text);
+            if (val != null) {
+              up[unit] = val;
+            }
+          });
+          return up.isNotEmpty ? up : null;
+        })(),
+        baseDurationHours: (int.tryParse(treatmentDurationController.text) ?? 0) ~/ 60,
+        baseDurationMinutes: (int.tryParse(treatmentDurationController.text) ?? 0) % 60,
+        prepTime: int.tryParse(prepTimeController.text) ?? 0,
+        cleanupTime: int.tryParse(cleanupTimeController.text) ?? 0,
+        allowClinicOverride: state.allowClinicOverride,
+        allowProviderOverride: state.allowProviderOverride,
+        onlineBookable: state.onlineBookable,
+        manualApprovalRequired: state.manualApprovalRequired,
+        minimumBookingNotice: int.tryParse(minimumBookingNoticeController.text) ?? 24,
+        maximumDaysInAdvance: int.tryParse(maximumDaysInAdvanceController.text) ?? 90,
+        categoryId: categoryIdController.text,
+        categoryName: categoryNameController.text,
+        categoryPath: categoryPathController.text,
+        status: state.status,
+        useInAiSimulator: state.useInAiSimulator,
+        protocolIds: state.selectedProtocolIds,
+        preTreatmentInstructions: preTreatmentInstructionsController.text,
+        postTreatmentInstructions: postTreatmentInstructionsController.text,
+        preNotificationSource: state.preNotificationSource,
+        postNotificationSource: state.postNotificationSource,
+        preTreatmentNotificationTitle: preNotificationTitleController.text,
+        preTreatmentNotificationDescription: preNotificationDescriptionController.text,
+        preTreatmentNotificationOffset: state.preNotificationOffset,
+        postTreatmentNotificationTitle: postNotificationTitleController.text,
+        postTreatmentNotificationDescription: postNotificationDescriptionController.text,
+        postTreatmentNotificationOffset: state.postNotificationOffset,
+        preNotifications: effectivePreNotifications,
+        postNotifications: effectivePostNotifications,
+        sessionSource: state.sessionSource,
+        totalSessions: state.totalSessions,
+        sessions: effectiveSessions,
+        downtimeLevel: state.downtimeLevel,
+        providerRolesSource: state.providerRolesSource,
+        allowedRoles: state.selectedRoles,
+        preTreatmentAttachments: [
+          ...state.existingPreAttachments,
+          ...state.preTreatmentAttachments.map((f) => Attachment(url: f.path ?? '', type: _getFileType(f), name: f.name)),
+        ],
+        postTreatmentAttachments: [
+          ...state.existingPostAttachments,
+          ...state.postTreatmentAttachments.map((f) => Attachment(url: f.path ?? '', type: _getFileType(f), name: f.name)),
+        ],
+        preTreatmentConsentForm: state.consentType == 'custom' 
+            ? (state.preTreatmentConsentForm != null 
+                ? Attachment(url: state.preTreatmentConsentForm!.path ?? '', type: 'pdf', name: state.preTreatmentConsentForm!.name)
+                : state.existingConsentForm)
+            : null,
+        isFollowUpRequired: state.isFollowUpRequired,
+        productUsages: state.productUsageEntries.map((e) {
+          final List<SubAreaConsumption> subAreaConsumptions = [];
+          e.subAreaControllers.forEach((subName, controllers) {
+            final minVal = double.tryParse(controllers.minController.text) ?? 0.0;
+            final maxVal = double.tryParse(controllers.maxController.text) ?? 0.0;
+            subAreaConsumptions.add(SubAreaConsumption(
+              subAreaName: subName,
+              minQuantity: minVal,
+              maxQuantity: maxVal,
+            ));
+          });
+          return ProductUsageModel(
+            productId: e.productId,
+            productName: e.productName,
+            usageType: e.usageType,
+            minQuantity: double.tryParse(e.minQuantityController.text),
+            maxQuantity: double.tryParse(e.maxQuantityController.text),
+            deductionTiming: e.deductionTiming,
+            allowSubstitution: e.allowSubstitution,
+            notes: e.notesController.text,
+            unit: e.unit,
+            subAreaConsumptions: subAreaConsumptions,
+          );
+        }).toList(),
+        sideAreas: state.areas.map((a) => SideAreaModel(
+          name: a.areaController.text,
+          subAreas: a.subAreas.map((s) {
+            final Map<String, double> unitPrices = {};
+            s.unitPriceControllers.forEach((unit, controller) {
+              final val = double.tryParse(controller.text);
+              if (val != null) {
+                unitPrices[unit] = val;
+              }
+            });
+            return SubAreaModel(
+              name: s.name,
+              basePrice: double.tryParse(s.basePriceController.text),
+              unitPrices: unitPrices,
+            );
+          }).toList(),
+        )).toList(),
+      );
+
+      final updatedTreatments = state.treatments.map((t) {
+        if (t.id == state.selectedTreatment!.id) {
+          return treatment;
+        }
+        return t;
+      }).toList();
+
+      state = state.copyWith(
+        treatments: updatedTreatments,
+        filteredTreatments: _getFilteredList(updatedTreatments),
+      );
 
       await Future.delayed(const Duration(seconds: 1));
       await getTreatments();
     });
+  }
+
+  String? validateGlobalSku(String? sku, {int? currentTreatmentId}) {
+    if (sku == null || sku.isEmpty) {
+      return "Global SKU is required";
+    }
+    if (sku.contains(' ')) {
+      return "No spaces allowed";
+    }
+    final regex = RegExp(r'^TRT-[A-Z0-9]{4}-[A-Z0-9]{4}$');
+    if (!regex.hasMatch(sku)) {
+      return "Invalid format. Must be TRT-XXXX-XXXX.";
+    }
+    final isUnique = !state.treatments.any((t) => t.globalSku == sku && t.id != currentTreatmentId);
+    if (!isUnique) {
+      return "SKU already exists.";
+    }
+    return null;
+  }
+
+  void generateSku() {
+    final rand = math.Random();
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    String generated;
+    final currentId = state.selectedTreatment?.id;
+    do {
+      final seg1 = String.fromCharCodes(Iterable.generate(4, (_) => chars.codeUnitAt(rand.nextInt(chars.length))));
+      final seg2 = String.fromCharCodes(Iterable.generate(4, (_) => chars.codeUnitAt(rand.nextInt(chars.length))));
+      generated = 'TRT-$seg1-$seg2';
+    } while (state.treatments.any((t) => t.globalSku == generated && t.id != currentId));
+    globalSkuController.text = generated;
   }
 }
 

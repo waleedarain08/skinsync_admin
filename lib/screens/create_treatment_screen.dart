@@ -426,7 +426,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildValidationIndicators(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, CategoryItem? selectedCategory) {
-    final basicOk = viewModel.internalNameController.text.isNotEmpty && viewModel.categoryIdController.text.isNotEmpty;
+    final basicOk = viewModel.validateGlobalSku(viewModel.globalSkuController.text.trim()) == null && viewModel.categoryIdController.text.isNotEmpty;
     final schedOk = viewModel.treatmentDurationController.text.isNotEmpty && (int.tryParse(viewModel.treatmentDurationController.text) ?? 0) > 0;
     final areasOk = state.areas.any((a) => a.areaController.text.isNotEmpty);
     final sessionsOk = state.totalSessions > 0;
@@ -489,8 +489,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _blueprintRow(context, "Treatment Name", viewModel.internalNameController.text.isEmpty ? "Not set" : viewModel.internalNameController.text),
-          _blueprintRow(context, "Display Name", viewModel.displayNameController.text.isEmpty ? "Not set" : viewModel.displayNameController.text),
+          _blueprintRow(context, "Global SKU", viewModel.globalSkuController.text.isEmpty ? "Not set" : viewModel.globalSkuController.text),
+          _blueprintRow(context, "Treatment Name", viewModel.displayNameController.text.isEmpty ? "Not set" : viewModel.displayNameController.text),
           _blueprintRow(context, "Description", viewModel.shortDescriptionController.text.isEmpty ? "Not set" : viewModel.shortDescriptionController.text),
           _blueprintRow(context, "Category", viewModel.categoryNameController.text.isEmpty ? "Not set" : viewModel.categoryNameController.text),
           _blueprintRow(context, "Status", state.status.toUpperCase()),
@@ -2811,10 +2811,15 @@ class CreateTreatmentScreen extends ConsumerWidget {
           children: [
             Expanded(
               child: BuildTextField(
-                label: "Internal Treatment Name",
-                controller: viewModel.internalNameController,
-                hintText: "e.g. Botox Cosmetic",
-                validator: Validators.empty,
+                label: "Global SKU (Treatment Identifier)",
+                controller: viewModel.globalSkuController,
+                hintText: "e.g. TRT-XXXX-XXXX",
+                validator: (val) => viewModel.validateGlobalSku(val),
+                tooltip: "Global SKU is a unique identifier used across all clinics and systems.",
+                suffixIcon: TextButton(
+                  onPressed: () => viewModel.generateSku(),
+                  child: Text("Generate SKU", style: context.fonts.purple12w700),
+                ),
               ),
             ),
             context.horizontalSpace(24),
@@ -3911,10 +3916,16 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   bool _validateStepDetails(BuildContext context, TreatmentViewModel viewModel) {
-    if (viewModel.internalNameController.text.isEmpty ||
-        viewModel.displayNameController.text.isEmpty) {
+    final skuError = viewModel.validateGlobalSku(viewModel.globalSkuController.text.trim());
+    if (skuError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.red),
+        SnackBar(content: Text(skuError), backgroundColor: CustomColors.red),
+      );
+      return false;
+    }
+    if (viewModel.displayNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter Patient Display Name"), backgroundColor: CustomColors.red),
       );
       return false;
     }

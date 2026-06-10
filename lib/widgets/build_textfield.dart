@@ -16,6 +16,7 @@ class BuildTextField extends StatelessWidget {
   final bool readOnly;
   final bool obscureText;
   final double? width;
+  final String? tooltip;
 
   const BuildTextField({
     super.key,
@@ -31,6 +32,7 @@ class BuildTextField extends StatelessWidget {
     this.readOnly = false,
     this.obscureText = false,
     this.width,
+    this.tooltip,
   });
 
   @override
@@ -41,7 +43,18 @@ class BuildTextField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: context.fonts.black14w600),
+          Row(
+            children: [
+              Text(label, style: context.fonts.black14w600),
+              if (tooltip != null) ...[
+                context.horizontalSpace(6),
+                Tooltip(
+                  message: tooltip!,
+                  child: const Icon(Icons.info_outline_rounded, size: 16, color: CustomColors.grey),
+                ),
+              ],
+            ],
+          ),
           context.verticalSpace(8),
           TextFormField(
             controller: controller,

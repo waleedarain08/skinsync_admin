@@ -160,6 +160,7 @@ class TreatmentData {
   static final List<TreatmentModel> dummyTreatments = [
     TreatmentModel(
       id: 1,
+      globalSku: "TRT-A1B2-C3D4",
       name: "Botox Cosmetic",
       patientDisplayName: "Wrinkle Relaxer",
       description: "Smooth fine lines and wrinkles in the upper face.",
@@ -183,6 +184,7 @@ class TreatmentData {
     ),
     TreatmentModel(
       id: 2,
+      globalSku: "TRT-9X8Y-Z7W6",
       name: "Juvederm Voluma",
       patientDisplayName: "Cheek Filler",
       description: "Dermal filler for cheek augmentation.",
@@ -205,6 +207,7 @@ class TreatmentData {
     ),
     TreatmentModel(
       id: 3,
+      globalSku: "TRT-AB12-CD34",
       name: "HydraFacial",
       patientDisplayName: "Deep Cleansing Facial",
       description: "Cleanse, extract, and hydrate the skin.",
@@ -219,6 +222,7 @@ class TreatmentData {
     ),
     TreatmentModel(
       id: 4,
+      globalSku: "TRT-5Y6Z-W4V3",
       name: "Laser Hair Removal",
       patientDisplayName: "Permanent Hair Reduction",
       description: "Permanent hair reduction for smooth skin.",

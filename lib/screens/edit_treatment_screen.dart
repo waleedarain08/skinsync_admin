@@ -103,8 +103,14 @@ class EditTreatmentScreen extends ConsumerWidget {
   }
 
   bool _validateForm(BuildContext context, TreatmentViewModel viewModel, TreatmentState state) {
-    if (viewModel.internalNameController.text.isEmpty ||
-        viewModel.displayNameController.text.isEmpty ||
+    final skuError = viewModel.validateGlobalSku(viewModel.globalSkuController.text.trim(), currentTreatmentId: state.selectedTreatment?.id);
+    if (skuError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(skuError), backgroundColor: CustomColors.red),
+      );
+      return false;
+    }
+    if (viewModel.displayNameController.text.isEmpty ||
         viewModel.basePriceController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill all required fields"), backgroundColor: CustomColors.red),
@@ -126,10 +132,11 @@ class EditTreatmentScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: BuildTextField(
-                  label: "Internal Name",
-                  controller: viewModel.internalNameController,
-                  hintText: "e.g. Botox Cosmetic",
-                  validator: Validators.empty,
+                  label: "Global SKU (Treatment Identifier)",
+                  controller: viewModel.globalSkuController,
+                  hintText: "e.g. TRT-XXXX-XXXX",
+                  readOnly: true,
+                  tooltip: "Global SKU is a unique identifier used across all clinics and systems and cannot be changed after creation.",
                 ),
               ),
               context.horizontalSpace(24),

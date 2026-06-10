@@ -2,6 +2,7 @@ import 'common_models.dart';
 
 class TreatmentModel {
   int? id;
+  String? globalSku;
   String? name;
   String? patientDisplayName;
   String? description;
@@ -73,6 +74,7 @@ class TreatmentModel {
 
   TreatmentModel({
     this.id,
+    this.globalSku,
     this.name,
     this.patientDisplayName,
     this.description,
@@ -149,6 +151,7 @@ class TreatmentModel {
         allowedRoles = json['allowed_roles'] != null ? List<String>.from(json['allowed_roles']) : [],
         isFollowUpRequired = json['is_follow_up_required'] ?? false {
     id = json['id'];
+    globalSku = json['global_sku'];
     name = json['name'];
     patientDisplayName = json['patient_display_name'];
     description = json['description'];
@@ -212,6 +215,7 @@ class TreatmentModel {
 
   TreatmentModel copyWith({
     int? id,
+    String? globalSku,
     String? name,
     String? patientDisplayName,
     String? description,
@@ -266,6 +270,7 @@ class TreatmentModel {
   }) {
     return TreatmentModel(
       id: id ?? this.id,
+      globalSku: globalSku ?? this.globalSku,
       name: name ?? this.name,
       patientDisplayName: patientDisplayName ?? this.patientDisplayName,
       description: description ?? this.description,
@@ -323,6 +328,7 @@ class TreatmentModel {
   Map<String, dynamic> toRequest() {
     return {
       'treatment_id': id,
+      'global_sku': globalSku,
       'name': name,
       'patient_display_name': patientDisplayName,
       'description': description,
