@@ -511,17 +511,37 @@ class CreateTreatmentScreen extends ConsumerWidget {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: activeAreas.map((area) {
+                final Map<String, List<String>> grouped = {};
+                final List<String> direct = [];
+
+                for (var s in area.subAreas) {
+                  if (s.name.contains(": ")) {
+                    final parts = s.name.split(": ");
+                    grouped.putIfAbsent(parts[0], () => []).add(parts[1]);
+                  } else {
+                    direct.add(s.name);
+                  }
+                }
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("• ${area.areaController.text}", style: context.fonts.black12w600),
-                      if (area.subAreas.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 16, top: 4),
+                      if (grouped.isNotEmpty)
+                        ...grouped.entries.map((g) => Padding(
+                          padding: const EdgeInsets.only(left: 12, top: 2),
                           child: Text(
-                            area.subAreas.map((s) => s.name).join(", "),
+                            "- ${g.key}: ${g.value.join(', ')}",
+                            style: context.fonts.grey12w400,
+                          ),
+                        )),
+                      if (direct.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12, top: 2),
+                          child: Text(
+                            "- ${direct.join(', ')}",
                             style: context.fonts.grey12w400,
                           ),
                         ),
@@ -1198,7 +1218,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 0: return _buildStepCategory(context, state, viewModel, dataState);
       case 1: return _buildStepDetails(context, state, viewModel);
       case 2: return _buildStepScheduling(context, state, viewModel);
-      case 3: return _buildStepAreas(context, state, viewModel, dataState);
+      case 3: return _buildStepAreas(context, state, viewModel, dataState, ref);
       case 4: return _buildStepProtocolsStep(context, state, viewModel, dataState, ref);
       case 5: return _buildStepPreInstructions(context, state, viewModel);
       case 6: return _buildStepPostInstructions(context, state, viewModel);
@@ -2956,32 +2976,136 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStepAreas(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
+  void _handleAreaToggle(String areaName, TreatmentState state, TreatmentViewModel viewModel) {
+    final cleanAreas = state.areas.where((a) => a.areaController.text.isNotEmpty).toList();
+    final index = cleanAreas.indexWhere((a) => a.areaController.text == areaName);
+    if (index == -1) {
+      final newEntry = AreaViewModelEntry();
+      newEntry.areaController.text = areaName;
+      viewModel.state = viewModel.state.copyWith(areas: [...cleanAreas, newEntry]);
+    } else {
+      final updated = [...cleanAreas];
+      updated[index].dispose();
+      updated.removeAt(index);
+      viewModel.state = viewModel.state.copyWith(areas: updated.isEmpty ? [AreaViewModelEntry()] : updated);
+    }
+  }
+
+  void _handleSubAreaToggle(String areaName, String subAreaName, TreatmentState state, TreatmentViewModel viewModel) {
+    final cleanAreas = state.areas.where((a) => a.areaController.text.isNotEmpty).toList();
+    final index = cleanAreas.indexWhere((a) => a.areaController.text == areaName);
+    if (index != -1) {
+      final areaEntry = cleanAreas[index];
+      final subIndex = areaEntry.subAreas.indexWhere((s) => s.name == subAreaName);
+      if (subIndex == -1) {
+        areaEntry.subAreas = [...areaEntry.subAreas, SubAreaConfig(name: subAreaName)];
+      } else {
+        areaEntry.subAreas = areaEntry.subAreas.where((s) => s.name != subAreaName).toList();
+      }
+      viewModel.state = viewModel.state.copyWith(areas: cleanAreas);
+    } else {
+      final newEntry = AreaViewModelEntry();
+      newEntry.areaController.text = areaName;
+      newEntry.subAreas = [SubAreaConfig(name: subAreaName)];
+      viewModel.state = viewModel.state.copyWith(areas: [...cleanAreas, newEntry]);
+    }
+  }
+
+  void _showAreaCreationDialog({
+    required BuildContext context,
+    required String title,
+    String? initialName,
+    bool showIconField = true,
+    required Function(String, String?) onConfirm,
+  }) {
+    final nameController = TextEditingController(text: initialName);
+    final iconController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => StandardDialog(
+        title: title,
+        width: context.w(450),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            BuildTextField(
+              label: "Name",
+              controller: nameController,
+              hintText: "Enter name...",
+            ),
+            if (showIconField) ...[
+              context.verticalSpace(20),
+              BuildTextField(
+                label: "Icon Key (e.g. face, neck, hands, body, scalp)",
+                controller: iconController,
+                hintText: "face",
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          CustomPrimaryButton(
+            onTap: () {
+              if (nameController.text.trim().isNotEmpty) {
+                onConfirm(nameController.text.trim(), iconController.text.trim().isEmpty ? null : iconController.text.trim());
+                Navigator.pop(context);
+              }
+            },
+            label: "Confirm",
+            width: context.w(120),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepAreas(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _sectionTitle(context, "Treatment Areas"),
-            CustomPrimaryButton(
-              onTap: () => viewModel.addArea(),
-              icon: Icons.add_location_alt_outlined,
-              label: "Add New Area",
-              width: context.w(200),
-            ),
-          ],
-        ),
+        _sectionTitle(context, "Body Areas Selection"),
         context.verticalSpace(8),
-        Text("Select areas and mandatory sub-areas for this treatment.", style: context.fonts.grey14w400),
+        Text("Select body areas and sub-areas for this treatment journey.", style: context.fonts.grey14w400),
         context.verticalSpace(32),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: state.areas.length,
-          separatorBuilder: (_, _) => context.verticalSpace(24),
-          itemBuilder: (context, index) {
-            return _buildAreaRow(context, index, state.areas[index], viewModel, dataState);
+        NestedAreaSelector(
+          areas: dataState.areas,
+          selectedAreas: state.areas,
+          onAreaToggle: (areaName) => _handleAreaToggle(areaName, state, viewModel),
+          onSubAreaToggle: (areaName, subAreaName) => _handleSubAreaToggle(areaName, subAreaName, state, viewModel),
+          onAddArea: () {
+            _showAreaCreationDialog(
+              context: context,
+              title: "Add Body Area",
+              showIconField: true,
+              onConfirm: (name, icon) {
+                if (dataState.areas.any((a) => a.name.toLowerCase() == name.toLowerCase())) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Area name must be unique"), backgroundColor: CustomColors.red),
+                  );
+                  return;
+                }
+                ref.read(treatmentDataViewModelProvider.notifier).addArea(name, icon: icon);
+              },
+            );
+          },
+          onAddSubArea: (areaName) {
+            _showAreaCreationDialog(
+              context: context,
+              title: "Add Sub-Area to $areaName",
+              showIconField: false,
+              onConfirm: (name, _) {
+                final area = dataState.areas.firstWhere((a) => a.name == areaName);
+                if (area.subAreas.any((s) => s.name.toLowerCase() == name.toLowerCase())) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Sub-Area name must be unique"), backgroundColor: CustomColors.red),
+                  );
+                  return;
+                }
+                ref.read(treatmentDataViewModelProvider.notifier).addSubArea(areaName, name);
+              },
+            );
           },
         ),
       ],
@@ -3652,5 +3776,418 @@ class CreateTreatmentScreen extends ConsumerWidget {
       }
     }
     return true;
+  }
+}
+
+class NestedAreaSelector extends StatefulWidget {
+  final List<AreaItem> areas;
+  final List<AreaViewModelEntry> selectedAreas;
+  final Function(String areaName) onAreaToggle;
+  final Function(String areaName, String subAreaName) onSubAreaToggle;
+  final VoidCallback onAddArea;
+  final Function(String areaName) onAddSubArea;
+
+  const NestedAreaSelector({
+    super.key,
+    required this.areas,
+    required this.selectedAreas,
+    required this.onAreaToggle,
+    required this.onSubAreaToggle,
+    required this.onAddArea,
+    required this.onAddSubArea,
+  });
+
+  @override
+  State<NestedAreaSelector> createState() => _NestedAreaSelectorState();
+}
+
+class _NestedAreaSelectorState extends State<NestedAreaSelector> {
+  String? _focusedAreaName;
+
+  static const Map<String, List<String>> groupedSubAreas = {
+    "Upper Face": ["Forehead", "Glabella", "Temples", "Brows"],
+    "Mid Face": ["Cheeks", "Under Eyes", "Nose", "Nasolabial Folds"],
+    "Lower Face": ["Lips", "Chin", "Jawline", "Marionette Lines"],
+    "Upper Body": ["Arms", "Shoulders", "Upper Back", "Chest"],
+    "Mid Body": ["Abdomen", "Flanks", "Waist"],
+    "Lower Body": ["Hips", "Thighs", "Knees", "Calves", "Buttocks"],
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.areas.isNotEmpty) {
+      _focusedAreaName = widget.areas.first.name;
+    }
+  }
+
+  Widget _countBadge(BuildContext context, String label, int count) {
+    return Container(
+      padding: context.appEdgeInsets(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: CustomColors.purple.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        "$label: $count",
+        style: context.fonts.purple12w700,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_focusedAreaName == null || !widget.areas.any((a) => a.name == _focusedAreaName)) {
+      _focusedAreaName = widget.areas.isNotEmpty ? widget.areas.first.name : null;
+    }
+
+    final focusedArea = widget.areas.firstWhere(
+      (a) => a.name == _focusedAreaName,
+      orElse: () => widget.areas.first,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text("Main Body Areas", style: context.fonts.black14w600),
+            context.horizontalSpace(12),
+            IconButton(
+              onPressed: widget.onAddArea,
+              icon: const Icon(Icons.add_circle_outline_rounded, size: 20, color: CustomColors.purple),
+              tooltip: "Add New Area",
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ],
+        ),
+        context.verticalSpace(16),
+        Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: widget.areas.map((area) {
+            final isSelected = widget.selectedAreas.any((a) => a.areaController.text == area.name);
+            final isFocused = _focusedAreaName == area.name;
+
+            return _AreaCard(
+              name: area.name,
+              icon: area.icon,
+              isSelected: isSelected,
+              isFocused: isFocused,
+              onTap: () {
+                setState(() {
+                  _focusedAreaName = area.name;
+                });
+                widget.onAreaToggle(area.name);
+              },
+            );
+          }).toList(),
+        ),
+        if (focusedArea != null) ...[
+          context.verticalSpace(32),
+          const Divider(),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              Text("Sub-Areas of ${focusedArea.name}", style: context.fonts.black14w600),
+              context.horizontalSpace(12),
+              IconButton(
+                onPressed: () => widget.onAddSubArea(focusedArea.name),
+                icon: const Icon(Icons.add_circle_outline_rounded, size: 20, color: CustomColors.purple),
+                tooltip: "Add Sub-Area to ${focusedArea.name}",
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          ),
+          context.verticalSpace(16),
+          if (focusedArea.subAreas.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: context.appEdgeInsets(all: 20),
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(color: CustomColors.border),
+              ),
+              child: Text("No sub-areas defined for ${focusedArea.name}.", style: context.fonts.grey13w500),
+            )
+          else
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: focusedArea.subAreas.map((subArea) {
+                final isGroup = groupedSubAreas.containsKey(subArea.name);
+                final areaEntry = widget.selectedAreas.firstWhere(
+                  (a) => a.areaController.text == focusedArea.name,
+                  orElse: () => AreaViewModelEntry(),
+                );
+
+                if (isGroup) {
+                  final children = groupedSubAreas[subArea.name]!;
+                  final selectedChildren = areaEntry.subAreas
+                      .where((s) => s.name.startsWith("${subArea.name}: "))
+                      .map((s) => s.name.substring(subArea.name.length + 2))
+                      .toList();
+
+                  return Container(
+                    width: double.infinity,
+                    padding: context.appEdgeInsets(all: 20),
+                    decoration: BoxDecoration(
+                      color: CustomColors.whiteGrey.withValues(alpha: 0.3),
+                      borderRadius: context.appBorderRadius(all: 12),
+                      border: Border.all(color: CustomColors.border),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.folder_open_outlined, color: CustomColors.purple, size: 18),
+                            context.horizontalSpace(8),
+                            Text(subArea.name, style: context.fonts.black14w600),
+                          ],
+                        ),
+                        context.verticalSpace(12),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: children.map((childName) {
+                            final isChildSelected = selectedChildren.contains(childName);
+                            return _SubAreaCard(
+                              name: childName,
+                              isSelected: isChildSelected,
+                              onTap: () {
+                                widget.onSubAreaToggle(focusedArea.name, "${subArea.name}: $childName");
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  final isSelected = areaEntry.subAreas.any((s) => s.name == subArea.name);
+                  return _SubAreaCard(
+                    name: subArea.name,
+                    isSelected: isSelected,
+                    onTap: () {
+                      widget.onSubAreaToggle(focusedArea.name, subArea.name);
+                    },
+                  );
+                }
+              }).toList(),
+            ),
+        ],
+        if (widget.selectedAreas.any((a) => a.areaController.text.isNotEmpty)) ...[
+          context.verticalSpace(32),
+          const Divider(),
+          context.verticalSpace(24),
+          Container(
+            width: double.infinity,
+            padding: context.appEdgeInsets(all: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(color: CustomColors.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Selected Areas & Sub-Areas", style: context.fonts.black16w700),
+                    Row(
+                      children: [
+                        _countBadge(context, "Areas", widget.selectedAreas.where((a) => a.areaController.text.isNotEmpty).length),
+                        context.horizontalSpace(8),
+                        _countBadge(context, "Sub-Areas", widget.selectedAreas.fold(0, (sum, a) => sum + a.subAreas.length)),
+                      ],
+                    ),
+                  ],
+                ),
+                context.verticalSpace(16),
+                ...widget.selectedAreas.where((a) => a.areaController.text.isNotEmpty).map((area) {
+                  final Map<String, List<String>> grouped = {};
+                  final List<String> direct = [];
+
+                  for (var s in area.subAreas) {
+                    if (s.name.contains(": ")) {
+                      final parts = s.name.split(": ");
+                      grouped.putIfAbsent(parts[0], () => []).add(parts[1]);
+                    } else {
+                      direct.add(s.name);
+                    }
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(area.areaController.text, style: context.fonts.purple14w700),
+                        context.verticalSpace(4),
+                        if (grouped.isNotEmpty)
+                          ...grouped.entries.map((g) => Padding(
+                            padding: const EdgeInsets.only(left: 16, top: 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("• ${g.key}", style: context.fonts.black13w600),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Text(g.value.join(", "), style: context.fonts.grey12w400),
+                                ),
+                              ],
+                            ),
+                          )),
+                        if (direct.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16, top: 4),
+                            child: Text(
+                              "• " + direct.join(", "),
+                              style: context.fonts.black13w500,
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _AreaCard extends StatelessWidget {
+  final String name;
+  final String? icon;
+  final bool isSelected;
+  final bool isFocused;
+  final VoidCallback onTap;
+
+  const _AreaCard({
+    required this.name,
+    required this.icon,
+    required this.isSelected,
+    required this.isFocused,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: context.appBorderRadius(all: 16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: context.w(180),
+        padding: context.appEdgeInsets(all: 16),
+        decoration: BoxDecoration(
+          color: isFocused ? CustomColors.purple : (isSelected ? CustomColors.purple.withValues(alpha: 0.1) : Colors.white),
+          borderRadius: context.appBorderRadius(all: 16),
+          border: Border.all(
+            color: isFocused ? CustomColors.purple : (isSelected ? CustomColors.purple.withValues(alpha: 0.3) : CustomColors.border),
+            width: isFocused ? 2 : 1,
+          ),
+          boxShadow: isFocused 
+              ? [BoxShadow(color: CustomColors.purple.withValues(alpha: 0.2), blurRadius: 12, offset: const Offset(0, 4))]
+              : AppShadows.xs(context),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(
+                  _getIconData(icon),
+                  size: context.sp(22),
+                  color: isFocused ? Colors.white : CustomColors.purple,
+                ),
+                if (isSelected)
+                  Icon(
+                    Icons.check_circle_rounded,
+                    size: 18,
+                    color: isFocused ? Colors.white : CustomColors.purple,
+                  ),
+              ],
+            ),
+            context.verticalSpace(16),
+            Text(
+              name,
+              style: isFocused 
+                  ? context.fonts.white14w600 
+                  : (isSelected ? context.fonts.purple14w600 : context.fonts.black14w600),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getIconData(String? iconName) {
+    switch (iconName?.toLowerCase()) {
+      case 'face': return Icons.face_retouching_natural_rounded;
+      case 'neck': return Icons.line_weight_rounded;
+      case 'hands': return Icons.back_hand_outlined;
+      case 'body': return Icons.accessibility_new_outlined;
+      case 'scalp': return Icons.spa_outlined;
+      default: return Icons.location_on_outlined;
+    }
+  }
+}
+
+class _SubAreaCard extends StatelessWidget {
+  final String name;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _SubAreaCard({
+    required this.name,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: context.appBorderRadius(all: 12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: context.appEdgeInsets(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? CustomColors.purple.withValues(alpha: 0.08) : Colors.white,
+          borderRadius: context.appBorderRadius(all: 12),
+          border: Border.all(
+            color: isSelected ? CustomColors.purple : CustomColors.border,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
+              size: 18,
+              color: isSelected ? CustomColors.purple : CustomColors.grey,
+            ),
+            context.horizontalSpace(12),
+            Text(
+              name,
+              style: isSelected ? context.fonts.purple14w600 : context.fonts.black14w400,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

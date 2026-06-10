@@ -130,14 +130,11 @@ class TreatmentData {
 
   // Area Hierarchy
   static const Map<String, List<String>> areasWithSubAreas = {
-    "Upper Face": ["Forehead", "Glabella (Frown Lines)", "Crow's Feet"],
-    "Mid Face": ["Cheeks", "Under Eye (Tear Trough)", "Nose"],
-    "Lower Face": ["Lips", "Chin", "Jawline", "Marionette Lines"],
-    "Neck": ["Neck Bands"],
-    "Abdomen": [],
-    "Arms": [],
-    "Thighs": [],
-    "Flanks": [],
+    "Face": ["Upper Face", "Mid Face", "Lower Face", "Full Face"],
+    "Neck": ["Full Neck", "Neck Bands", "Neck Tightening Area"],
+    "Scalp": ["Hairline", "Crown", "Full Scalp"],
+    "Hands": ["Left Hand", "Right Hand", "Full Hands"],
+    "Body": ["Upper Body", "Mid Body", "Lower Body"],
   };
 
   static List<String> get suggestedAreas => areasWithSubAreas.keys.toList();
