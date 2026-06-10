@@ -387,13 +387,17 @@ class TreatmentModel {
 class SideAreaModel {
   int? id;
   String? name;
+  String? globalSku;
+  String? icon;
   List<SubAreaModel>? subAreas;
 
-  SideAreaModel({this.id, this.name, this.subAreas});
+  SideAreaModel({this.id, this.name, this.globalSku, this.icon, this.subAreas});
 
   SideAreaModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
+    globalSku = json['global_sku'];
+    icon = json['icon'];
     subAreas = json['sub_areas'] != null
         ? (json['sub_areas'] as List)
             .map((e) => SubAreaModel.fromJson(e))
@@ -404,6 +408,8 @@ class SideAreaModel {
     return {
       "id": id,
       "name": name,
+      "global_sku": globalSku,
+      "icon": icon,
       "sub_areas": subAreas?.map((e) => e.toJson()).toList(),
     };
   }
@@ -412,14 +418,27 @@ class SideAreaModel {
 class SubAreaModel {
   int? id;
   String? name;
+  String? globalSku;
+  String? icon;
   double? basePrice;
   Map<String, double>? unitPrices;
+  List<SubAreaModel>? children;
 
-  SubAreaModel({this.id, this.name, this.basePrice, this.unitPrices});
+  SubAreaModel({
+    this.id,
+    this.name,
+    this.globalSku,
+    this.icon,
+    this.basePrice,
+    this.unitPrices,
+    this.children,
+  });
 
   SubAreaModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
+    globalSku = json['global_sku'];
+    icon = json['icon'];
     basePrice = json['base_price']?.toDouble();
     if (json['unit_prices'] != null) {
       unitPrices = {};
@@ -427,14 +446,22 @@ class SubAreaModel {
         unitPrices![key.toString()] = (value as num).toDouble();
       });
     }
+    children = json['children'] != null
+        ? (json['children'] as List)
+            .map((e) => SubAreaModel.fromJson(e))
+            .toList()
+        : null;
   }
 
   Map<String, dynamic> toJson() {
     return {
       "id": id,
       "name": name,
+      "global_sku": globalSku,
+      "icon": icon,
       "base_price": basePrice,
       if (unitPrices != null) "unit_prices": unitPrices,
+      "children": children?.map((e) => e.toJson()).toList(),
     };
   }
 }

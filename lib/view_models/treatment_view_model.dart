@@ -1183,6 +1183,20 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               name: s.name,
               basePrice: double.tryParse(s.basePriceController.text),
               unitPrices: unitPrices,
+              children: s.children.map((c) {
+                final Map<String, double> childUnitPrices = {};
+                c.unitPriceControllers.forEach((unit, controller) {
+                  final val = double.tryParse(controller.text);
+                  if (val != null) {
+                    childUnitPrices[unit] = val;
+                  }
+                });
+                return SubAreaModel(
+                  name: c.name,
+                  basePrice: double.tryParse(c.basePriceController.text),
+                  unitPrices: childUnitPrices,
+                );
+              }).toList(),
             );
           }).toList(),
         )).toList(),
@@ -1387,6 +1401,20 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               name: s.name,
               basePrice: double.tryParse(s.basePriceController.text),
               unitPrices: unitPrices,
+              children: s.children.map((c) {
+                final Map<String, double> childUnitPrices = {};
+                c.unitPriceControllers.forEach((unit, controller) {
+                  final val = double.tryParse(controller.text);
+                  if (val != null) {
+                    childUnitPrices[unit] = val;
+                  }
+                });
+                return SubAreaModel(
+                  name: c.name,
+                  basePrice: double.tryParse(c.basePriceController.text),
+                  unitPrices: childUnitPrices,
+                );
+              }).toList(),
             );
           }).toList(),
         )).toList(),
@@ -1811,12 +1839,12 @@ class ProductUsageEntry {
   }
 }
 
-class SubAreaConfig {
+class SubAreaChildConfig {
   final String name;
   final basePriceController = TextEditingController(text: '0');
   final Map<String, TextEditingController> unitPriceControllers = {};
 
-  SubAreaConfig({required this.name, String? basePrice, Map<String, double>? unitPrices}) {
+  SubAreaChildConfig({required this.name, String? basePrice, Map<String, double>? unitPrices}) {
     if (basePrice != null) basePriceController.text = basePrice;
     if (unitPrices != null) {
       unitPrices.forEach((unit, price) {
@@ -1833,6 +1861,39 @@ class SubAreaConfig {
     basePriceController.dispose();
     for (var controller in unitPriceControllers.values) {
       controller.dispose();
+    }
+  }
+}
+
+class SubAreaConfig {
+  final String name;
+  final basePriceController = TextEditingController(text: '0');
+  final Map<String, TextEditingController> unitPriceControllers = {};
+  List<SubAreaChildConfig> children = [];
+
+  SubAreaConfig({required this.name, String? basePrice, Map<String, double>? unitPrices, List<SubAreaChildConfig>? children}) {
+    if (basePrice != null) basePriceController.text = basePrice;
+    if (unitPrices != null) {
+      unitPrices.forEach((unit, price) {
+        unitPriceControllers[unit] = TextEditingController(text: price.toString());
+      });
+    }
+    if (children != null) {
+      this.children = children;
+    }
+  }
+
+  TextEditingController getControllerForUnit(String unit) {
+    return unitPriceControllers.putIfAbsent(unit, () => TextEditingController(text: '0'));
+  }
+
+  void dispose() {
+    basePriceController.dispose();
+    for (var controller in unitPriceControllers.values) {
+      controller.dispose();
+    }
+    for (var child in children) {
+      child.dispose();
     }
   }
 }

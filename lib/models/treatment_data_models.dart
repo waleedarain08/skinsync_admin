@@ -77,40 +77,82 @@ class CategoryItem {
   }
 }
 
-class AreaItem {
+class SubAreaChildItem {
   final String name;
+  final String globalSku;
   final String? icon;
-  final List<SubAreaItem> subAreas;
 
-  AreaItem({
+  SubAreaChildItem({
     required this.name,
+    required this.globalSku,
     this.icon,
-    this.subAreas = const [],
   });
 
-  AreaItem copyWith({
+  SubAreaChildItem copyWith({
     String? name,
+    String? globalSku,
     String? icon,
-    List<SubAreaItem>? subAreas,
   }) {
-    return AreaItem(
+    return SubAreaChildItem(
       name: name ?? this.name,
+      globalSku: globalSku ?? this.globalSku,
       icon: icon ?? this.icon,
-      subAreas: subAreas ?? this.subAreas,
     );
   }
 }
 
 class SubAreaItem {
   final String name;
+  final String globalSku;
   final String? icon;
+  final List<SubAreaChildItem> children;
 
-  SubAreaItem({required this.name, this.icon});
+  SubAreaItem({
+    required this.name,
+    required this.globalSku,
+    this.icon,
+    this.children = const [],
+  });
 
-  SubAreaItem copyWith({String? name, String? icon}) {
+  SubAreaItem copyWith({
+    String? name,
+    String? globalSku,
+    String? icon,
+    List<SubAreaChildItem>? children,
+  }) {
     return SubAreaItem(
       name: name ?? this.name,
+      globalSku: globalSku ?? this.globalSku,
       icon: icon ?? this.icon,
+      children: children ?? this.children,
+    );
+  }
+}
+
+class AreaItem {
+  final String name;
+  final String globalSku;
+  final String? icon;
+  final List<SubAreaItem> subAreas;
+
+  AreaItem({
+    required this.name,
+    required this.globalSku,
+    this.icon,
+    this.subAreas = const [],
+  });
+
+  AreaItem copyWith({
+    String? name,
+    String? globalSku,
+    String? icon,
+    List<SubAreaItem>? subAreas,
+  }) {
+    return AreaItem(
+      name: name ?? this.name,
+      globalSku: globalSku ?? this.globalSku,
+      icon: icon ?? this.icon,
+      subAreas: subAreas ?? this.subAreas,
     );
   }
 }

@@ -52,14 +52,14 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
       final matchesQuery = query.isEmpty ||
           p.name.toLowerCase().contains(query) ||
           (p.brand?.toLowerCase().contains(query) ?? false) ||
-          (p.global_sku?.toLowerCase().contains(query) ?? false);
+          (p.globalSku?.toLowerCase().contains(query) ?? false);
 
       final matchesPurpose = _selectedPurposeFilter == "All Purposes" ||
-          p.product_purpose == _selectedPurposeFilter.toLowerCase();
+          p.productPurpose == _selectedPurposeFilter.toLowerCase();
 
       final matchesTracking = _selectedTrackingFilter == "All Statuses" ||
-          (_selectedTrackingFilter == "Tracking Enabled" && (p.enforce_lot_tracking ?? false)) ||
-          (_selectedTrackingFilter == "Tracking Disabled" && !(p.enforce_lot_tracking ?? false));
+          (_selectedTrackingFilter == "Tracking Enabled" && (p.enforceLotTracking ?? false)) ||
+          (_selectedTrackingFilter == "Tracking Disabled" && !(p.enforceLotTracking ?? false));
 
       return matchesQuery && matchesPurpose && matchesTracking;
     }).toList();
@@ -140,8 +140,8 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   Widget _buildCatalogOverview() {
     final totalSkus = _catalogProducts.length;
     final totalBrands = _catalogProducts.map((p) => p.brand).toSet().length;
-    final lotTrackingEnabled = _catalogProducts.where((p) => p.enforce_lot_tracking ?? false).length;
-    final devicesCount = _catalogProducts.where((p) => p.product_purpose == 'device').length;
+    final lotTrackingEnabled = _catalogProducts.where((p) => p.enforceLotTracking ?? false).length;
+    final devicesCount = _catalogProducts.where((p) => p.productPurpose == 'device').length;
 
     return Row(
       children: [
@@ -298,10 +298,10 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                 ),
                 children: [
                   _productNameCell(p),
-                  _tableTextCell(p.global_sku ?? p.sku ?? "N/A", style: context.fonts.grey14w400),
-                  _purposeBadgeCell(p.product_purpose ?? p.category ?? "variable"),
-                  _tableTextCell((p.unit_type ?? p.unit).toUpperCase(), style: context.fonts.black14w600),
-                  _lotTrackingCell(p.enforce_lot_tracking ?? true),
+                  _tableTextCell(p.globalSku ?? p.sku ?? "N/A", style: context.fonts.grey14w400),
+                  _purposeBadgeCell(p.productPurpose ?? p.category ?? "variable"),
+                  _tableTextCell((p.unitType ?? p.unit).toUpperCase(), style: context.fonts.black14w600),
+                  _lotTrackingCell(p.enforceLotTracking ?? true),
                   _actionsCell(p),
                 ],
               );

@@ -63,14 +63,14 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.product?.name);
-    _skuController = TextEditingController(text: widget.product?.sku ?? widget.product?.global_sku);
+    _skuController = TextEditingController(text: widget.product?.sku ?? widget.product?.globalSku);
     _barcodeController = TextEditingController();
     _descriptionController = TextEditingController(text: widget.product?.description);
 
     _selectedBrand = widget.product?.brand ?? 'Allergan';
-    _selectedPurpose = widget.product?.product_purpose ?? 'variable';
-    _selectedUnitType = widget.product?.unit_type ?? 'units';
-    _enforceLotTracking = widget.product?.enforce_lot_tracking ?? true;
+    _selectedPurpose = widget.product?.productPurpose ?? 'variable';
+    _selectedUnitType = widget.product?.unitType ?? 'units';
+    _enforceLotTracking = widget.product?.enforceLotTracking ?? true;
   }
 
   @override
@@ -264,10 +264,10 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                   quantity: 0,
                   status: "Active",
                   brand: _selectedBrand,
-                  global_sku: _skuController.text,
-                  product_purpose: _selectedPurpose,
-                  unit_type: _selectedUnitType,
-                  enforce_lot_tracking: _enforceLotTracking,
+                  globalSku: _skuController.text,
+                  productPurpose: _selectedPurpose,
+                  unitType: _selectedUnitType,
+                  enforceLotTracking: _enforceLotTracking,
                 );
                 
                 final notifier = ref.read(productViewModelProvider.notifier);

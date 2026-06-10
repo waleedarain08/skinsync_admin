@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/treatment_data_models.dart';
 import '../utils/dummy_data.dart';
@@ -54,12 +55,47 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
       ));
     });
 
-    final areas = TreatmentData.areasWithSubAreas.entries.map((e) {
-      return AreaItem(
-        name: e.key,
-        subAreas: e.value.map((s) => SubAreaItem(name: s)).toList(),
-      );
-    }).toList();
+    final areas = [
+      AreaItem(
+        name: "Face",
+        globalSku: "FACE-1000",
+        subAreas: [
+          SubAreaItem(
+            name: "Upper Face",
+            globalSku: "FACE-1100",
+            children: [
+              SubAreaChildItem(name: "Forehead", globalSku: "FACE-1110"),
+              SubAreaChildItem(name: "Glabella", globalSku: "FACE-1120"),
+            ],
+          ),
+          SubAreaItem(
+            name: "Mid Face",
+            globalSku: "FACE-1200",
+            children: [
+              SubAreaChildItem(name: "Cheeks", globalSku: "FACE-1210"),
+              SubAreaChildItem(name: "Under Eyes", globalSku: "FACE-1220"),
+            ],
+          ),
+          SubAreaItem(
+            name: "Forehead",
+            globalSku: "FORE-5000",
+            children: [
+              SubAreaChildItem(name: "Left Forehead", globalSku: "FORE-5100"),
+              SubAreaChildItem(name: "Right Forehead", globalSku: "FORE-5200"),
+              SubAreaChildItem(name: "Central Forehead", globalSku: "FORE-5300"),
+            ],
+          ),
+        ],
+      ),
+      AreaItem(
+        name: "Neck",
+        globalSku: "NECK-2000",
+        subAreas: [
+          SubAreaItem(name: "Full Neck", globalSku: "NECK-2100"),
+          SubAreaItem(name: "Neck Bands", globalSku: "NECK-2200"),
+        ],
+      ),
+    ];
 
     return TreatmentDataState(
       categories: categories,
@@ -275,16 +311,50 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
   }
 
   // --- Area Actions ---
-  void addArea(String name, {String? icon}) {
-    if (name.isEmpty) return;
-    state = state.copyWith(areas: [...state.areas, AreaItem(name: name, icon: icon)]);
+  bool validateAreaSku(String sku) {
+    final regex = RegExp(r'^[A-Z]{4}-[0-9]{4}$');
+    return regex.hasMatch(sku);
   }
 
-  void editArea(String oldName, String newName, {String? icon}) {
+  bool isAreaSkuUnique(String sku) {
+    for (var a in state.areas) {
+      if (a.globalSku == sku) return false;
+      for (var s in a.subAreas) {
+        if (s.globalSku == sku) return false;
+        for (var c in s.children) {
+          if (c.globalSku == sku) return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  String _generateUniqueAreaSku() {
+    final rand = math.Random();
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    String generated;
+    do {
+      final letters = String.fromCharCodes(Iterable.generate(4, (_) => chars.codeUnitAt(rand.nextInt(chars.length))));
+      final digits = String.fromCharCodes(Iterable.generate(4, (_) => '0123456789'.codeUnitAt(rand.nextInt(10))));
+      generated = '$letters-$digits';
+    } while (!isAreaSkuUnique(generated));
+    return generated;
+  }
+
+  void addArea(String name, {String? sku, String? icon}) {
+    if (name.isEmpty) return;
+    final finalSku = (sku == null || sku.isEmpty) ? _generateUniqueAreaSku() : sku;
+    state = state.copyWith(
+      areas: [...state.areas, AreaItem(name: name, globalSku: finalSku, icon: icon)],
+    );
+  }
+
+  void editArea(String oldName, String newName, {String? sku, String? icon}) {
     state = state.copyWith(
       areas: state.areas.map((a) {
         if (a.name == oldName) {
-          return a.copyWith(name: newName, icon: icon ?? a.icon);
+          final finalSku = (sku == null || sku.isEmpty) ? (a.globalSku.isEmpty ? _generateUniqueAreaSku() : a.globalSku) : sku;
+          return a.copyWith(name: newName, globalSku: finalSku, icon: icon ?? a.icon);
         }
         return a;
       }).toList(),
@@ -295,25 +365,27 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     state = state.copyWith(areas: state.areas.where((a) => a.name != name).toList());
   }
 
-  void addSubArea(String areaName, String name, {String? icon}) {
+  void addSubArea(String areaName, String name, {String? sku, String? icon}) {
+    final finalSku = (sku == null || sku.isEmpty) ? _generateUniqueAreaSku() : sku;
     state = state.copyWith(
       areas: state.areas.map((a) {
         if (a.name == areaName) {
-          return a.copyWith(subAreas: [...a.subAreas, SubAreaItem(name: name, icon: icon)]);
+          return a.copyWith(subAreas: [...a.subAreas, SubAreaItem(name: name, globalSku: finalSku, icon: icon)]);
         }
         return a;
       }).toList(),
     );
   }
 
-  void editSubArea(String areaName, String oldName, String newName, {String? icon}) {
+  void editSubArea(String areaName, String oldName, String newName, {String? sku, String? icon}) {
     state = state.copyWith(
       areas: state.areas.map((a) {
         if (a.name == areaName) {
           return a.copyWith(
             subAreas: a.subAreas.map((s) {
               if (s.name == oldName) {
-                return s.copyWith(name: newName, icon: icon ?? s.icon);
+                final finalSku = (sku == null || sku.isEmpty) ? (s.globalSku.isEmpty ? _generateUniqueAreaSku() : s.globalSku) : sku;
+                return s.copyWith(name: newName, globalSku: finalSku, icon: icon ?? s.icon);
               }
               return s;
             }).toList(),
@@ -329,6 +401,69 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
       areas: state.areas.map((a) {
         if (a.name == areaName) {
           return a.copyWith(subAreas: a.subAreas.where((s) => s.name != name).toList());
+        }
+        return a;
+      }).toList(),
+    );
+  }
+
+  void addSubAreaChild(String areaName, String subAreaName, String name, {String? sku, String? icon}) {
+    final finalSku = (sku == null || sku.isEmpty) ? _generateUniqueAreaSku() : sku;
+    state = state.copyWith(
+      areas: state.areas.map((a) {
+        if (a.name == areaName) {
+          return a.copyWith(
+            subAreas: a.subAreas.map((s) {
+              if (s.name == subAreaName) {
+                return s.copyWith(children: [...s.children, SubAreaChildItem(name: name, globalSku: finalSku, icon: icon)]);
+              }
+              return s;
+            }).toList(),
+          );
+        }
+        return a;
+      }).toList(),
+    );
+  }
+
+  void editSubAreaChild(String areaName, String subAreaName, String oldName, String newName, {String? sku, String? icon}) {
+    state = state.copyWith(
+      areas: state.areas.map((a) {
+        if (a.name == areaName) {
+          return a.copyWith(
+            subAreas: a.subAreas.map((s) {
+              if (s.name == subAreaName) {
+                return s.copyWith(
+                  children: s.children.map((c) {
+                    if (c.name == oldName) {
+                      final finalSku = (sku == null || sku.isEmpty) ? (c.globalSku.isEmpty ? _generateUniqueAreaSku() : c.globalSku) : sku;
+                      return c.copyWith(name: newName, globalSku: finalSku, icon: icon ?? c.icon);
+                    }
+                    return c;
+                  }).toList(),
+                );
+              }
+              return s;
+            }).toList(),
+          );
+        }
+        return a;
+      }).toList(),
+    );
+  }
+
+  void deleteSubAreaChild(String areaName, String subAreaName, String name) {
+    state = state.copyWith(
+      areas: state.areas.map((a) {
+        if (a.name == areaName) {
+          return a.copyWith(
+            subAreas: a.subAreas.map((s) {
+              if (s.name == subAreaName) {
+                return s.copyWith(children: s.children.where((c) => c.name != name).toList());
+              }
+              return s;
+            }).toList(),
+          );
         }
         return a;
       }).toList(),

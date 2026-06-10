@@ -112,7 +112,7 @@ class ProductDetailScreen extends ConsumerWidget {
                   spacing: 12.w,
                   runSpacing: 12.h,
                   children: [
-                    _infoChip(context, Icons.tag_rounded, "SKU: ${product.global_sku ?? product.sku ?? 'N/A'}"),
+                    _infoChip(context, Icons.tag_rounded, "SKU: ${product.globalSku ?? product.sku ?? 'N/A'}"),
                     _infoChip(context, Icons.category_outlined, "Category: ${product.category ?? 'Clinical'}"),
                   ],
                 ),
@@ -130,14 +130,14 @@ class ProductDetailScreen extends ConsumerWidget {
         _infoSection(context, "Basic Information", [
           _detailRow(context, "Product Name", product.name),
           _detailRow(context, "Brand / Manufacturer", product.brand ?? "N/A"),
-          _detailRow(context, "Global SKU / Reference", product.global_sku ?? product.sku ?? "N/A"),
+          _detailRow(context, "Global SKU / Reference", product.globalSku ?? product.sku ?? "N/A"),
           _detailRow(context, "Classification Group", product.category ?? "General Catalog"),
         ]),
         context.verticalSpace(24),
         _infoSection(context, "Usage & Configuration", [
-          _detailRow(context, "Product Purpose", product.product_purpose ?? "Variable Usage"),
-          _detailRow(context, "UOM Base Unit", product.unit_type ?? product.unit),
-          _detailRow(context, "Enforce Lot Tracking", (product.enforce_lot_tracking ?? false) ? "Yes (Mandatory)" : "No (Optional)"),
+          _detailRow(context, "Product Purpose", product.productPurpose ?? "Variable Usage"),
+          _detailRow(context, "UOM Base Unit", product.unitType ?? product.unit),
+          _detailRow(context, "Enforce Lot Tracking", (product.enforceLotTracking ?? false) ? "Yes (Mandatory)" : "No (Optional)"),
         ]),
         context.verticalSpace(24),
         _infoSection(context, "Description / Notes", [
@@ -160,7 +160,7 @@ class ProductDetailScreen extends ConsumerWidget {
         ]),
         context.verticalSpace(24),
         _infoSection(context, "Compliance", [
-          _statRow(context, Icons.security_rounded, "Lot & Expiration Tracking", (product.enforce_lot_tracking ?? false) ? "Enforced" : "Standard"),
+          _statRow(context, Icons.security_rounded, "Lot & Expiration Tracking", (product.enforceLotTracking ?? false) ? "Enforced" : "Standard"),
           _statRow(context, Icons.gavel_rounded, "Quality Standard", "FDA Approved"),
         ]),
       ],

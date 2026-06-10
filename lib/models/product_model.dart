@@ -11,10 +11,10 @@ class ProductModel {
 
   // Refined Global Product Catalog fields
   final String? brand;
-  final String? global_sku;
-  final String? product_purpose;
-  final String? unit_type;
-  final bool? enforce_lot_tracking;
+  final String? globalSku;
+  final String? productPurpose;
+  final String? unitType;
+  final bool? enforceLotTracking;
 
   ProductModel({
     this.id,
@@ -27,10 +27,10 @@ class ProductModel {
     this.quantity,
     this.status,
     this.brand,
-    this.global_sku,
-    this.product_purpose,
-    this.unit_type,
-    this.enforce_lot_tracking,
+    this.globalSku,
+    this.productPurpose,
+    this.unitType,
+    this.enforceLotTracking,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -45,10 +45,10 @@ class ProductModel {
       quantity: json['quantity'],
       status: json['status'],
       brand: json['brand'],
-      global_sku: json['global_sku'],
-      product_purpose: json['product_purpose'],
-      unit_type: json['unit_type'],
-      enforce_lot_tracking: json['enforce_lot_tracking'],
+      globalSku: json['global_sku'],
+      productPurpose: json['product_purpose'],
+      unitType: json['unit_type'],
+      enforceLotTracking: json['enforce_lot_tracking'],
     );
   }
 
@@ -64,10 +64,10 @@ class ProductModel {
       'quantity': quantity,
       'status': status,
       'brand': brand,
-      'global_sku': global_sku,
-      'product_purpose': product_purpose,
-      'unit_type': unit_type,
-      'enforce_lot_tracking': enforce_lot_tracking,
+      'global_sku': globalSku,
+      'product_purpose': productPurpose,
+      'unit_type': unitType,
+      'enforce_lot_tracking': enforceLotTracking,
     };
   }
 }
