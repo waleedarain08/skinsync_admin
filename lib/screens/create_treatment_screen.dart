@@ -101,8 +101,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final steps = [
       "Categories",
       "Basic Information",
-      "Scheduling",
       "Treatment Areas",
+      "Inventory Products",
+      "Pricing",
+      "Scheduling",
       "Protocols",
       "Pre-Treatment Instructions",
       "Post-Treatment Instructions",
@@ -112,8 +114,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Sessions Setup",
       "Follow-Up Setup",
       "Patient Consent",
-      "Inventory Products",
-      "Pricing",
       "Business Logic"
     ];
 
@@ -209,8 +209,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
     final titles = [
       "Categorization",
       "Basic Information",
-      "Scheduling",
       "Body Areas",
+      "Inventory Products",
+      "Pricing Setup",
+      "Scheduling",
       "Clinical Protocols",
       "Pre-Treatment Instructions",
       "Post-Treatment Instructions",
@@ -220,15 +222,15 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Sessions Setup",
       "Follow-Up Configuration",
       "Patient Consent Form",
-      "Inventory Products",
-      "Pricing Setup",
       "Business Logic"
     ];
     final descriptions = [
       "Organize treatments to help patients and staff find them easily.",
       "Core identification details including status.",
-      "Centralize appointment duration, preparation times, and booking permissions.",
       "Define mandatory sub-areas.",
+      "Configure required products from inventory and area-wise consumption.",
+      "Finalize treatment base price and sub-area pricing adjustments.",
+      "Centralize appointment duration, preparation times, and booking permissions.",
       "Standardize procedures with checklists and required text fields.",
       "Detailed instructions and supporting media for patients before the procedure.",
       "Aftercare guidelines and recovery media for patients after the procedure.",
@@ -238,15 +240,15 @@ class CreateTreatmentScreen extends ConsumerWidget {
       "Manage total sessions and procedural frequency.",
       "Manage rules and scheduling for post-procedure clinical check-ins.",
       "Upload and manage legal procedural consent documentation.",
-      "Configure required products from inventory and area-wise consumption.",
-      "Finalize treatment base price and sub-area pricing adjustments.",
       "Manage system-wide treatment behaviors and onboarding settings."
     ];
     final icons = [
       Icons.category_outlined,
       Icons.description_outlined,
-      Icons.schedule_outlined,
       Icons.accessibility_new_outlined,
+      Icons.inventory_2_outlined,
+      Icons.payments_outlined,
+      Icons.schedule_outlined,
       Icons.assignment_turned_in_outlined,
       Icons.login_rounded,
       Icons.logout_rounded,
@@ -256,8 +258,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
       Icons.event_repeat_rounded,
       Icons.replay_outlined,
       Icons.fact_check_outlined,
-      Icons.inventory_2_outlined,
-      Icons.payments_outlined,
       Icons.settings_suggest_outlined
     ];
 
@@ -346,16 +346,16 @@ class CreateTreatmentScreen extends ConsumerWidget {
       children: [
         _buildValidationIndicators(context, state, viewModel, selectedCategory),
         _buildBasicInfoSummary(context, state, viewModel, selectedCategory),
-        _buildSchedulingSummary(context, state, viewModel),
         _buildAreasSummary(context, state, dataState),
+        _buildProductsSummary(context, state),
+        _buildPricingSummary(context, state, viewModel),
+        _buildSchedulingSummary(context, state, viewModel),
         _buildSessionsSummary(context, state, selectedCategory),
         _buildConsentSummary(context, state, selectedCategory),
         _buildPreTreatmentInstructionsSummary(context, state, viewModel),
         _buildNotificationsSummary(context, state, selectedCategory),
         _buildDowntimeSummary(context, state, selectedCategory),
         _buildProviderRolesSummary(context, state, selectedCategory),
-        _buildProductsSummary(context, state),
-        _buildPricingSummary(context, state, viewModel),
         _buildInheritanceSummary(context, state),
       ],
     );
@@ -364,7 +364,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   Widget _buildSchedulingSummary(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
     return _blueprintSection(
       context,
-      "Scheduling Configuration",
+      "5. Scheduling Configuration",
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -445,15 +445,15 @@ class CreateTreatmentScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _validationRow(context, "Basic Information", basicOk),
-          _validationRow(context, "Scheduling Configuration", schedOk),
           _validationRow(context, "Areas & Sub Areas", areasOk),
+          _validationRow(context, "Products", productsOk),
+          _validationRow(context, "Pricing", pricingOk),
+          _validationRow(context, "Scheduling Configuration", schedOk),
+          _validationRow(context, "Notifications", notifOk),
+          rolesOk ? _validationRow(context, "Provider Roles", true) : _validationRow(context, "Missing Provider Roles", false, warning: true),
           _validationRow(context, "Sessions Setup", sessionsOk),
           _validationRow(context, "Follow-Ups", followUpsOk),
           _validationRow(context, "Consent Form", consentOk),
-          _validationRow(context, "Notifications", notifOk),
-          _validationRow(context, "Products", productsOk),
-          _validationRow(context, "Pricing", pricingOk),
-          rolesOk ? _validationRow(context, "Provider Roles", true) : _validationRow(context, "Missing Provider Roles", false, warning: true),
         ],
       ),
     );
@@ -546,7 +546,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     
     return _blueprintSection(
       context,
-      "3. Sessions Overview",
+      "6. Sessions Overview",
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -625,7 +625,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     return _blueprintSection(
       context,
-      "4. Consent Form",
+      "7. Consent Form",
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -659,7 +659,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     return _blueprintSection(
       context,
-      "5. Pre-Treatment Instructions",
+      "8. Pre-Treatment Instructions",
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -696,7 +696,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     return _blueprintSection(
       context,
-      "6. Patient Notifications",
+      "9. Patient Notifications",
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -725,7 +725,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     return _blueprintSection(
       context,
-      "7. Downtime Configuration",
+      "10. Downtime Configuration",
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -742,7 +742,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     return _blueprintSection(
       context,
-      "8. Allowed Provider Roles",
+      "11. Allowed Provider Roles",
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -756,7 +756,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   Widget _buildProductsSummary(BuildContext context, TreatmentState state) {
     return _blueprintSection(
       context,
-      "9. Products Configuration",
+      "3. Products Configuration",
       state.productUsageEntries.isEmpty
           ? Text("No products configured", style: context.fonts.grey12w400)
           : Column(
@@ -823,7 +823,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     return _blueprintSection(
       context,
-      "10. Pricing & Financial Rules",
+      "4. Pricing & Financial Rules",
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -884,7 +884,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       children: [
         _blueprintSection(
           context,
-          "11. Inherited From Category",
+          "12. Inherited From Category",
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: inherited.map((item) => Padding(
@@ -901,7 +901,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ),
         _blueprintSection(
           context,
-          "12. Treatment Overrides",
+          "13. Treatment Overrides",
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: overrides.isEmpty
@@ -1209,19 +1209,19 @@ class CreateTreatmentScreen extends ConsumerWidget {
     switch (state.currentStep) {
       case 0: return _buildStepCategory(context, state, viewModel, dataState);
       case 1: return _buildStepDetails(context, state, viewModel);
-      case 2: return _buildStepScheduling(context, state, viewModel);
-      case 3: return _buildStepAreas(context, state, viewModel, dataState, ref);
-      case 4: return _buildStepProtocolsStep(context, state, viewModel, dataState, ref);
-      case 5: return _buildStepPreInstructions(context, state, viewModel);
-      case 6: return _buildStepPostInstructions(context, state, viewModel);
-      case 7: return _buildStepNotifications(context, state, viewModel, dataState);
-      case 8: return _buildStepDowntime(context, state, viewModel, dataState);
-      case 9: return _buildStepRoles(context, state, viewModel, dataState);
-      case 10: return _buildStepSessions(context, state, viewModel, dataState);
-      case 11: return _buildStepFollowUp(context, state, viewModel, dataState);
-      case 12: return _buildStepConsent(context, state, viewModel, ref);
-      case 13: return _buildStepMaterials(context, state, viewModel, dataState, ref);
-      case 14: return _buildStepPricing(context, state, viewModel);
+      case 2: return _buildStepAreas(context, state, viewModel, dataState, ref);
+      case 3: return _buildStepMaterials(context, state, viewModel, dataState, ref);
+      case 4: return _buildStepPricing(context, state, viewModel);
+      case 5: return _buildStepScheduling(context, state, viewModel);
+      case 6: return _buildStepProtocolsStep(context, state, viewModel, dataState, ref);
+      case 7: return _buildStepPreInstructions(context, state, viewModel);
+      case 8: return _buildStepPostInstructions(context, state, viewModel);
+      case 9: return _buildStepNotifications(context, state, viewModel, dataState);
+      case 10: return _buildStepDowntime(context, state, viewModel, dataState);
+      case 11: return _buildStepRoles(context, state, viewModel, dataState);
+      case 12: return _buildStepSessions(context, state, viewModel, dataState);
+      case 13: return _buildStepFollowUp(context, state, viewModel, dataState);
+      case 14: return _buildStepConsent(context, state, viewModel, ref);
       case 15: return _buildStepLogic(context, state, viewModel);
       default: return const SizedBox.shrink();
     }
@@ -3844,10 +3844,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 if (!_validateStepDetails(context, viewModel)) return;
               }
               if (state.currentStep == 2) {
-                if (!_validateScheduling(context, viewModel)) return;
-              }
-              if (state.currentStep == 3) {
                 if (!_validateSubAreas(context, state)) return;
+              }
+              if (state.currentStep == 5) {
+                if (!_validateScheduling(context, viewModel)) return;
               }
               
               if (state.currentStep < 15) {
