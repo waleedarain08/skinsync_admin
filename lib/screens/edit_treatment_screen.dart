@@ -117,7 +117,100 @@ class EditTreatmentScreen extends ConsumerWidget {
       );
       return false;
     }
+    if (!_validateProductQuantities(context, state)) {
+      return false;
+    }
     return true;
+  }
+
+  bool _validateProductQuantities(BuildContext context, TreatmentState state) {
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+    for (var entry in state.productUsageEntries) {
+      if (allSubAreas.isNotEmpty) {
+        for (var subArea in allSubAreas) {
+          final controllers = entry.getControllersForSubArea(subArea.name);
+          final minVal = double.tryParse(controllers.minController.text) ?? 0.0;
+          final maxVal = double.tryParse(controllers.maxController.text) ?? 0.0;
+          if (minVal < 1 || maxVal < 1) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Quantity for ${entry.productName} in ${subArea.name} must be greater than or equal to 1."),
+                backgroundColor: CustomColors.red,
+              ),
+            );
+            return false;
+          }
+          if (maxVal < minVal) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Maximum Quantity must be greater than or equal to Minimum Quantity for ${entry.productName} in ${subArea.name}."),
+                backgroundColor: CustomColors.red,
+              ),
+            );
+            return false;
+          }
+        }
+      } else {
+        final minVal = double.tryParse(entry.minQuantityController.text) ?? 0.0;
+        final maxVal = double.tryParse(entry.maxQuantityController.text) ?? 0.0;
+        if (minVal < 1 || maxVal < 1) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Quantity for ${entry.productName} must be greater than or equal to 1."),
+              backgroundColor: CustomColors.red,
+            ),
+          );
+          return false;
+        }
+        if (maxVal < minVal) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Maximum Quantity must be greater than or equal to Minimum Quantity for ${entry.productName}."),
+              backgroundColor: CustomColors.red,
+            ),
+          );
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  double _getProductMinQuantity(ProductUsageEntry entry, List<SubAreaConfig> allSubAreas) {
+    if (allSubAreas.isNotEmpty) {
+      double sum = 0.0;
+      for (var subArea in allSubAreas) {
+        final controllers = entry.getControllersForSubArea(subArea.name);
+        sum += double.tryParse(controllers.minController.text) ?? 0.0;
+      }
+      return sum;
+    } else {
+      return double.tryParse(entry.minQuantityController.text) ?? 0.0;
+    }
+  }
+
+  double _getProductMaxQuantity(ProductUsageEntry entry, List<SubAreaConfig> allSubAreas) {
+    if (allSubAreas.isNotEmpty) {
+      double sum = 0.0;
+      for (var subArea in allSubAreas) {
+        final controllers = entry.getControllersForSubArea(subArea.name);
+        sum += double.tryParse(controllers.maxController.text) ?? 0.0;
+      }
+      return sum;
+    } else {
+      return double.tryParse(entry.maxQuantityController.text) ?? 0.0;
+    }
+  }
+
+  double _calculateProductUsageDuration(TreatmentState state) {
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+    double total = 0.0;
+    for (var entry in state.productUsageEntries) {
+      final minQty = _getProductMinQuantity(entry, allSubAreas);
+      final perUnit = double.tryParse(entry.perUnitDurationController.text) ?? 0.0;
+      total += minQty * perUnit;
+    }
+    return total;
   }
 
   Widget _buildBasicDetailsSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
@@ -161,6 +254,9 @@ class EditTreatmentScreen extends ConsumerWidget {
                   controller: viewModel.durationHoursController,
                   hintText: "0",
                   keyboardType: TextInputType.number,
+                  onChanged: (val) {
+                    viewModel.updateProductPerUnitDuration(0, "");
+                  },
                 ),
               ),
               context.horizontalSpace(24),
@@ -170,9 +266,109 @@ class EditTreatmentScreen extends ConsumerWidget {
                   controller: viewModel.durationMinutesController,
                   hintText: "0",
                   keyboardType: TextInputType.number,
+                  onChanged: (val) {
+                    viewModel.updateProductPerUnitDuration(0, "");
+                  },
                 ),
               ),
             ],
+          ),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: "Preparation Time (Minutes)",
+                  controller: viewModel.prepTimeController,
+                  hintText: "e.g. 10",
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) {
+                    viewModel.updateProductPerUnitDuration(0, "");
+                  },
+                ),
+              ),
+              context.horizontalSpace(24),
+              Expanded(
+                child: BuildTextField(
+                  label: "Finish / Cleanup Time (Minutes)",
+                  controller: viewModel.cleanupTimeController,
+                  hintText: "e.g. 5",
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) {
+                    viewModel.updateProductPerUnitDuration(0, "");
+                  },
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(24),
+          // Display Calculated Total Duration
+          Builder(
+            builder: (context) {
+              final hours = double.tryParse(viewModel.durationHoursController.text) ?? 0.0;
+              final minutes = double.tryParse(viewModel.durationMinutesController.text) ?? 0.0;
+              final baseDuration = hours * 60 + minutes;
+              final productDuration = _calculateProductUsageDuration(state);
+              final prepTime = double.tryParse(viewModel.prepTimeController.text) ?? 0.0;
+              final cleanupTime = double.tryParse(viewModel.cleanupTimeController.text) ?? 0.0;
+              final totalDuration = baseDuration + productDuration + prepTime + cleanupTime;
+              
+              return Container(
+                padding: context.appEdgeInsets(all: 16),
+                decoration: BoxDecoration(
+                  color: CustomColors.purple.withValues(alpha: 0.05),
+                  borderRadius: context.appBorderRadius(all: 10),
+                  border: Border.all(color: CustomColors.purple.withValues(alpha: 0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Base Duration:", style: context.fonts.black14w600),
+                        Text("${baseDuration.toStringAsFixed(baseDuration % 1 == 0 ? 0 : 1)} Minutes", style: context.fonts.black14w600),
+                      ],
+                    ),
+                    context.verticalSpace(8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Product Usage Duration:", style: context.fonts.black14w400),
+                        Text("${productDuration.toStringAsFixed(productDuration % 1 == 0 ? 0 : 1)} Minutes", style: context.fonts.purple14w700),
+                      ],
+                    ),
+                    context.verticalSpace(8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Preparation Time:", style: context.fonts.black14w400),
+                        Text("${prepTime.toStringAsFixed(prepTime % 1 == 0 ? 0 : 1)} Minutes", style: context.fonts.black14w600),
+                      ],
+                    ),
+                    context.verticalSpace(8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Cleanup Time:", style: context.fonts.black14w400),
+                        Text("${cleanupTime.toStringAsFixed(cleanupTime % 1 == 0 ? 0 : 1)} Minutes", style: context.fonts.black14w600),
+                      ],
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Divider(),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Calculated Total Duration:", style: context.fonts.purple14w700),
+                        Text("${totalDuration.toStringAsFixed(totalDuration % 1 == 0 ? 0 : 1)} Minutes", style: context.fonts.purple16w700),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }
           ),
           context.verticalSpace(24),
           Row(
@@ -1097,6 +1293,16 @@ class EditTreatmentScreen extends ConsumerWidget {
           ),
           context.verticalSpace(20),
           BuildTextField(
+            label: "Per ${entry.unit} Duration (Minutes)",
+            controller: entry.perUnitDurationController,
+            hintText: "e.g. 0.5",
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onChanged: (val) {
+              viewModel.updateProductPerUnitDuration(index, val ?? "");
+            },
+          ),
+          context.verticalSpace(20),
+          BuildTextField(
             label: "Usage Notes (Optional)",
             controller: entry.notesController,
             hintText: "Clinical instructions or restrictions...",
@@ -1139,8 +1345,11 @@ class EditTreatmentScreen extends ConsumerWidget {
                             child: BuildTextField(
                               label: "Min $pluralUnit",
                               controller: controllers.minController,
-                              hintText: "0",
+                              hintText: "1",
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              onChanged: (val) {
+                                viewModel.updateProductPerUnitDuration(index, "");
+                              },
                             ),
                           ),
                           context.horizontalSpace(16),
@@ -1148,17 +1357,103 @@ class EditTreatmentScreen extends ConsumerWidget {
                             child: BuildTextField(
                               label: "Max $pluralUnit",
                               controller: controllers.maxController,
-                              hintText: "0",
+                              hintText: "1",
                               keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              onChanged: (val) {
+                                viewModel.updateProductPerUnitDuration(index, "");
+                              },
                             ),
                           ),
                         ],
+                      ),
+                      Builder(
+                        builder: (context) {
+                          final minVal = double.tryParse(controllers.minController.text) ?? 0.0;
+                          final maxVal = double.tryParse(controllers.maxController.text) ?? 0.0;
+                          if (minVal < 1 || maxVal < 1) {
+                            return const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Quantity must be greater than or equal to 1.",
+                                style: TextStyle(color: CustomColors.red, fontSize: 12),
+                              ),
+                            );
+                          }
+                          if (maxVal < minVal) {
+                            return const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Maximum Quantity must be greater than or equal to Minimum Quantity.",
+                                style: TextStyle(color: CustomColors.red, fontSize: 12),
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        }
                       ),
                     ],
                   ),
                 ),
               );
             }).toList(),
+          ] else ...[
+            context.verticalSpace(24),
+            const Divider(),
+            context.verticalSpace(16),
+            Text("Product Consumption Range", style: context.fonts.black14w600),
+            context.verticalSpace(16),
+            Row(
+              children: [
+                Expanded(
+                  child: BuildTextField(
+                    label: "Min ${formatUnitPlural(entry.unit)}",
+                    controller: entry.minQuantityController,
+                    hintText: "1",
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (val) {
+                      viewModel.updateProductPerUnitDuration(index, "");
+                    },
+                  ),
+                ),
+                context.horizontalSpace(16),
+                Expanded(
+                  child: BuildTextField(
+                    label: "Max ${formatUnitPlural(entry.unit)}",
+                    controller: entry.maxQuantityController,
+                    hintText: "1",
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (val) {
+                      viewModel.updateProductPerUnitDuration(index, "");
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Builder(
+              builder: (context) {
+                final minVal = double.tryParse(entry.minQuantityController.text) ?? 0.0;
+                final maxVal = double.tryParse(entry.maxQuantityController.text) ?? 0.0;
+                if (minVal < 1 || maxVal < 1) {
+                  return const Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      "Quantity must be greater than or equal to 1.",
+                      style: TextStyle(color: CustomColors.red, fontSize: 12),
+                    ),
+                  );
+                }
+                if (maxVal < minVal) {
+                  return const Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      "Maximum Quantity must be greater than or equal to Minimum Quantity.",
+                      style: TextStyle(color: CustomColors.red, fontSize: 12),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }
+            ),
           ],
         ],
       ),

@@ -343,6 +343,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           minQuantityController: TextEditingController(text: usage.minQuantity?.toString() ?? '0'),
           maxQuantityController: TextEditingController(text: usage.maxQuantity?.toString() ?? '0'),
           notesController: TextEditingController(text: usage.notes ?? ''),
+          perUnitDurationController: TextEditingController(text: usage.perUnitDuration?.toString() ?? '0.0'),
           initialSubAreaConsumptions: usage.subAreaConsumptions,
         ));
       }
@@ -818,6 +819,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(productUsageEntries: updatedEntries);
   }
 
+  void updateProductPerUnitDuration(int index, String durationVal) {
+    state = state.copyWith(productUsageEntries: [...state.productUsageEntries]);
+  }
+
   void removeProductUsage(int productId) {
     final entry = state.productUsageEntries.firstWhere((e) => e.productId == productId);
     entry.dispose();
@@ -1166,6 +1171,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             allowSubstitution: e.allowSubstitution,
             notes: e.notesController.text,
             unit: e.unit,
+            perUnitDuration: double.tryParse(e.perUnitDurationController.text),
             subAreaConsumptions: subAreaConsumptions,
           );
         }).toList(),
@@ -1384,6 +1390,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             allowSubstitution: e.allowSubstitution,
             notes: e.notesController.text,
             unit: e.unit,
+            perUnitDuration: double.tryParse(e.perUnitDurationController.text),
             subAreaConsumptions: subAreaConsumptions,
           );
         }).toList(),
@@ -1750,8 +1757,8 @@ class FollowUpEntry {
 }
 
 class SubAreaConsumptionControllers {
-  final minController = TextEditingController(text: '0');
-  final maxController = TextEditingController(text: '0');
+  final minController = TextEditingController(text: '1');
+  final maxController = TextEditingController(text: '1');
 
   SubAreaConsumptionControllers({String? min, String? max}) {
     if (min != null) minController.text = min;
@@ -1774,6 +1781,7 @@ class ProductUsageEntry {
   final TextEditingController minQuantityController;
   final TextEditingController maxQuantityController;
   final TextEditingController notesController;
+  final TextEditingController perUnitDurationController;
   final Map<String, SubAreaConsumptionControllers> subAreaControllers = {};
 
   ProductUsageEntry({
@@ -1786,10 +1794,12 @@ class ProductUsageEntry {
     TextEditingController? minQuantityController,
     TextEditingController? maxQuantityController,
     TextEditingController? notesController,
+    TextEditingController? perUnitDurationController,
     List<SubAreaConsumption>? initialSubAreaConsumptions,
-  }) : minQuantityController = minQuantityController ?? TextEditingController(text: '0'),
-       maxQuantityController = maxQuantityController ?? TextEditingController(text: '0'),
-       notesController = notesController ?? TextEditingController() {
+  }) : minQuantityController = minQuantityController ?? TextEditingController(text: '1'),
+       maxQuantityController = maxQuantityController ?? TextEditingController(text: '1'),
+       notesController = notesController ?? TextEditingController(),
+       perUnitDurationController = perUnitDurationController ?? TextEditingController(text: '0.0') {
     if (initialSubAreaConsumptions != null) {
       for (var sac in initialSubAreaConsumptions) {
         subAreaControllers[sac.subAreaName] = SubAreaConsumptionControllers(
@@ -1819,6 +1829,7 @@ class ProductUsageEntry {
       minQuantityController: minQuantityController,
       maxQuantityController: maxQuantityController,
       notesController: notesController,
+      perUnitDurationController: perUnitDurationController,
     );
     subAreaControllers.forEach((key, val) {
       entry.subAreaControllers[key] = SubAreaConsumptionControllers(
@@ -1833,6 +1844,7 @@ class ProductUsageEntry {
     minQuantityController.dispose();
     maxQuantityController.dispose();
     notesController.dispose();
+    perUnitDurationController.dispose();
     for (var controller in subAreaControllers.values) {
       controller.dispose();
     }

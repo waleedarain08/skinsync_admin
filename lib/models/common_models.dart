@@ -143,6 +143,7 @@ class ProductUsageModel {
   bool allowSubstitution;
   String? notes;
   String unit;
+  double? perUnitDuration;
   List<SubAreaConsumption>? subAreaConsumptions;
 
   ProductUsageModel({
@@ -155,6 +156,7 @@ class ProductUsageModel {
     this.allowSubstitution = false,
     this.notes,
     this.unit = 'Units',
+    this.perUnitDuration,
     this.subAreaConsumptions,
   });
 
@@ -168,6 +170,7 @@ class ProductUsageModel {
     allowSubstitution: json['allow_substitution'] ?? false,
     notes: json['notes'],
     unit: json['unit'] ?? 'Units',
+    perUnitDuration: json['per_unit_duration']?.toDouble(),
     subAreaConsumptions: json['sub_area_consumptions'] != null
         ? (json['sub_area_consumptions'] as List)
             .map((e) => SubAreaConsumption.fromJson(e))
@@ -185,6 +188,7 @@ class ProductUsageModel {
     'allow_substitution': allowSubstitution,
     'notes': notes,
     'unit': unit,
+    'per_unit_duration': perUnitDuration,
     if (subAreaConsumptions != null)
       'sub_area_consumptions': subAreaConsumptions!.map((e) => e.toJson()).toList(),
   };

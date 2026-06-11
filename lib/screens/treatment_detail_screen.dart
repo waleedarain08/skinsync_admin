@@ -77,6 +77,8 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 _buildRolesSection(context, treatment),
                 context.verticalSpace(32),
                 _buildAreasAndLogic(context, treatment),
+                context.verticalSpace(32),
+                _buildSchedulingSection(context, treatment),
                 if (treatment.productUsages != null && treatment.productUsages!.isNotEmpty) ...[
                   context.verticalSpace(32),
                   _buildProductUsages(context, treatment),
@@ -95,6 +97,22 @@ class TreatmentDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildProfileHeader(BuildContext context, TreatmentModel treatment) {
+    double productDuration = 0.0;
+    if (treatment.productUsages != null) {
+      for (var usage in treatment.productUsages!) {
+        final double perUnit = usage.perUnitDuration ?? 0.0;
+        double minQty = usage.minQuantity ?? 0.0;
+        if (usage.subAreaConsumptions != null && usage.subAreaConsumptions!.isNotEmpty) {
+          minQty = usage.subAreaConsumptions!.fold(0.0, (sum, sub) => sum + (sub.minQuantity ?? 0.0));
+        }
+        productDuration += minQty * perUnit;
+      }
+    }
+    final int baseMin = (treatment.baseDurationHours ?? 0) * 60 + (treatment.baseDurationMinutes ?? 0);
+    final int prepTime = treatment.prepTime;
+    final int cleanupTime = treatment.cleanupTime;
+    final double totalDuration = baseMin + productDuration + prepTime + cleanupTime;
+
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 32),
       child: Row(
@@ -140,7 +158,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
                   children: [
                     _headerMeta(context, Icons.tag_rounded, "SKU: ${treatment.globalSku ?? 'N/A'}"),
                     context.horizontalSpace(24),
-                    _headerMeta(context, Icons.timer_outlined, "${treatment.baseDurationHours ?? 0}h ${treatment.baseDurationMinutes ?? 0}m"),
+                    _headerMeta(context, Icons.timer_outlined, "${totalDuration.toStringAsFixed(totalDuration % 1 == 0 ? 0 : 1)} Min Total"),
                     context.horizontalSpace(24),
                     _headerMeta(context, Icons.payments_outlined, "Base \$${treatment.basePrice?.toStringAsFixed(2) ?? '0.00'}"),
                   ],
@@ -634,7 +652,35 @@ class TreatmentDetailScreen extends ConsumerWidget {
                           ],
                         ),
                         context.verticalSpace(8),
-                        Text("Min: ${usage.minQuantity ?? 0} • Max: ${usage.maxQuantity ?? 0} ${usage.unit}", style: context.fonts.grey12w400),
+                        Builder(
+                          builder: (context) {
+                            double minQty = usage.minQuantity ?? 1.0;
+                            double maxQty = usage.maxQuantity ?? 1.0;
+                            if (usage.subAreaConsumptions != null && usage.subAreaConsumptions!.isNotEmpty) {
+                              minQty = usage.subAreaConsumptions!.fold(0.0, (sum, sub) => sum + (sub.minQuantity ?? 0.0));
+                              maxQty = usage.subAreaConsumptions!.fold(0.0, (sum, sub) => sum + (sub.maxQuantity ?? 0.0));
+                            }
+                            
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Min Quantity: ${minQty.toStringAsFixed(minQty % 1 == 0 ? 0 : 1)} ${usage.unit}, Max Quantity: ${maxQty.toStringAsFixed(maxQty % 1 == 0 ? 0 : 1)} ${usage.unit}",
+                                  style: context.fonts.grey12w400,
+                                ),
+                                if (usage.subAreaConsumptions != null && usage.subAreaConsumptions!.isNotEmpty) ...[
+                                  context.verticalSpace(4),
+                                  Text(
+                                    "Sub-Areas: " + usage.subAreaConsumptions!.map((sub) {
+                                      return "${sub.subAreaName} (Min ${sub.minQuantity?.toStringAsFixed(sub.minQuantity! % 1 == 0 ? 0 : 1)} / Max ${sub.maxQuantity?.toStringAsFixed(sub.maxQuantity! % 1 == 0 ? 0 : 1)})";
+                                    }).join(", "),
+                                    style: context.fonts.grey11w400,
+                                  ),
+                                ],
+                              ],
+                            );
+                          }
+                        ),
                         if (usage.notes != null && usage.notes!.isNotEmpty) ...[
                           context.verticalSpace(8),
                           Text("Notes: ${usage.notes}", style: context.fonts.grey12w400.copyWith(fontStyle: FontStyle.italic)),
@@ -743,6 +789,110 @@ class TreatmentDetailScreen extends ConsumerWidget {
         Expanded(child: Text(label, style: context.fonts.black13w600)),
         Text(value, style: isOk ? context.fonts.purple12w700 : context.fonts.grey14w400),
       ],
+    );
+  }
+
+  Widget _buildSchedulingSection(BuildContext context, TreatmentModel treatment) {
+    final int baseMin = (treatment.baseDurationHours ?? 0) * 60 + (treatment.baseDurationMinutes ?? 0);
+    
+    double productDuration = 0.0;
+    final List<Widget> productDurationRows = [];
+    
+    if (treatment.productUsages != null) {
+      for (var usage in treatment.productUsages!) {
+        final double perUnit = usage.perUnitDuration ?? 0.0;
+        double minQty = usage.minQuantity ?? 0.0;
+        if (usage.subAreaConsumptions != null && usage.subAreaConsumptions!.isNotEmpty) {
+          minQty = usage.subAreaConsumptions!.fold(0.0, (sum, sub) => sum + (sub.minQuantity ?? 0.0));
+        }
+        
+        final double usageDuration = minQty * perUnit;
+        if (perUnit > 0) {
+          productDuration += usageDuration;
+          productDurationRows.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("• ${usage.productName}", style: context.fonts.black13w500),
+                  Text(
+                    "${perUnit.toStringAsFixed(perUnit % 1 == 0 ? 0 : 1)} Min per ${usage.unit} (Total: ${usageDuration.toStringAsFixed(usageDuration % 1 == 0 ? 0 : 1)} Min)",
+                    style: context.fonts.grey13w500,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      }
+    }
+
+    final int prepTime = treatment.prepTime;
+    final int cleanupTime = treatment.cleanupTime;
+    final double totalDuration = baseMin + productDuration + prepTime + cleanupTime;
+
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.schedule_outlined, color: CustomColors.purple, size: 20),
+              context.horizontalSpace(12),
+              Text("Scheduling & Duration Breakdown", style: context.fonts.black16w600),
+            ],
+          ),
+          context.verticalSpace(16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Base Duration", style: context.fonts.black14w500),
+              Text("$baseMin Minutes", style: context.fonts.black14w700),
+            ],
+          ),
+          if (productDurationRows.isNotEmpty) ...[
+            context.verticalSpace(16),
+            const Divider(),
+            context.verticalSpace(12),
+            Text("Product Usage Duration", style: context.fonts.purple12w700),
+            context.verticalSpace(8),
+            ...productDurationRows,
+          ],
+          context.verticalSpace(16),
+          const Divider(),
+          context.verticalSpace(12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Preparation Time", style: context.fonts.black14w500),
+              Text("$prepTime Minutes", style: context.fonts.black14w700),
+            ],
+          ),
+          context.verticalSpace(12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Cleanup Time", style: context.fonts.black14w500),
+              Text("$cleanupTime Minutes", style: context.fonts.black14w700),
+            ],
+          ),
+          context.verticalSpace(16),
+          const Divider(),
+          context.verticalSpace(12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Calculated Total Duration", style: context.fonts.black14w700),
+              Text(
+                "${totalDuration.toStringAsFixed(totalDuration % 1 == 0 ? 0 : 1)} Minutes",
+                style: context.fonts.purple16w700,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
