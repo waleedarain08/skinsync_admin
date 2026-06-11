@@ -197,33 +197,36 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
             separatorBuilder: (context, index) => context.verticalSpace(12),
             itemBuilder: (context, index) {
               final protocol = filteredProtocols[index];
-              return BorderdContainerWidget(
-                padding: context.appEdgeInsets(horizontal: 20, vertical: 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      type == ProtocolType.checkbox ? Icons.check_box_outlined : Icons.text_fields_rounded,
-                      color: CustomColors.purple,
-                      size: 20,
-                    ),
-                    context.horizontalSpace(16),
-                    Expanded(
-                      child: Text(protocol.title, style: context.fonts.black14w600),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 20),
-                      onPressed: () => _showProtocolDialog(
-                        context: context,
-                        title: "Edit Protocol",
-                        initialValue: protocol.title,
-                        onConfirm: (val) => viewModel.editProtocol(protocol.id, val),
+              return InkWell(
+                onTap: () => _showProtocolDetailDialog(context: context, protocol: protocol),
+                borderRadius: context.appBorderRadius(all: 12),
+                child: BorderdContainerWidget(
+                  padding: context.appEdgeInsets(horizontal: 20, vertical: 12),
+                  child: Row(
+                    children: [
+                      Icon(
+                        type == ProtocolType.checkbox ? Icons.check_box_outlined : Icons.text_fields_rounded,
+                        color: CustomColors.purple,
+                        size: 20,
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.red),
-                      onPressed: () => _showDeleteConfirm(context, protocol.title, () => viewModel.deleteProtocol(protocol.id)),
-                    ),
-                  ],
+                      context.horizontalSpace(16),
+                      Expanded(
+                        child: Text(protocol.title, style: context.fonts.black14w600),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, size: 20),
+                        onPressed: () => _showEnhancedProtocolDialog(
+                          context: context,
+                          protocol: protocol,
+                          onSave: (updated) => viewModel.saveProtocol(updated),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, size: 20, color: CustomColors.red),
+                        onPressed: () => _showDeleteConfirm(context, protocol.title, () => viewModel.deleteProtocol(protocol.id)),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -474,6 +477,278 @@ class ManageTreatmentDataScreen extends ConsumerWidget {
               }
             },
             label: "Confirm",
+            width: context.w(120),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void _showEnhancedProtocolDialog({
+    required BuildContext context,
+    required ProtocolItem protocol,
+    required Function(ProtocolItem) onSave,
+  }) {
+    final titleController = TextEditingController(text: protocol.title);
+    final List<Map<String, dynamic>> descGroups = protocol.descriptions.map((d) => {
+      'title': TextEditingController(text: d.title),
+      'text': TextEditingController(text: d.text),
+    }).toList();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return StandardDialog(
+              title: "Edit Protocol",
+              width: context.w(500),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: context.h(600)),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      BuildTextField(
+                        label: "Protocol Title",
+                        controller: titleController,
+                        hintText: "Enter protocol title...",
+                      ),
+                      context.verticalSpace(24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Protocol Descriptions", style: context.fonts.black14w700),
+                          TextButton.icon(
+                            onPressed: () {
+                              setDialogState(() {
+                                descGroups.add({
+                                  'title': TextEditingController(),
+                                  'text': TextEditingController(),
+                                });
+                              });
+                            },
+                            icon: const Icon(Icons.add_circle_outline, size: 18),
+                            label: const Text("Add Description"),
+                          ),
+                        ],
+                      ),
+                      context.verticalSpace(12),
+                      if (descGroups.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text("No descriptions added yet. Click 'Add Description' to add structured steps.", style: context.fonts.grey13w500),
+                        )
+                      else
+                        ...descGroups.asMap().entries.map((entry) {
+                          final idx = entry.key;
+                          final group = entry.value;
+                          final titleCtrl = group['title'] as TextEditingController;
+                          final textCtrl = group['text'] as TextEditingController;
+
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: CustomColors.whiteGrey,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: CustomColors.border),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Description #${idx + 1}", style: context.fonts.black14w700),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.arrow_upward, size: 16),
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                          onPressed: idx > 0 ? () {
+                                            setDialogState(() {
+                                              final temp = descGroups[idx];
+                                              descGroups[idx] = descGroups[idx - 1];
+                                              descGroups[idx - 1] = temp;
+                                            });
+                                          } : null,
+                                        ),
+                                        context.horizontalSpace(8),
+                                        IconButton(
+                                          icon: const Icon(Icons.arrow_downward, size: 16),
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                          onPressed: idx < descGroups.length - 1 ? () {
+                                            setDialogState(() {
+                                              final temp = descGroups[idx];
+                                              descGroups[idx] = descGroups[idx + 1];
+                                              descGroups[idx + 1] = temp;
+                                            });
+                                          } : null,
+                                        ),
+                                        context.horizontalSpace(8),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete_outline, size: 16, color: CustomColors.red),
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                          onPressed: () {
+                                            setDialogState(() {
+                                              descGroups.removeAt(idx);
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                context.verticalSpace(12),
+                                BuildTextField(
+                                  label: "Title (Optional)",
+                                  controller: titleCtrl,
+                                  hintText: "e.g. Pre Care",
+                                ),
+                                context.verticalSpace(12),
+                                BuildTextField(
+                                  label: "Description Text",
+                                  controller: textCtrl,
+                                  hintText: "Enter description text...",
+                                  maxLines: 2,
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+                CustomPrimaryButton(
+                  onTap: () {
+                    if (titleController.text.trim().isNotEmpty) {
+                      final List<ProtocolDescription> updatedDescs = [];
+                      for (int i = 0; i < descGroups.length; i++) {
+                        final titleCtrl = descGroups[i]['title'] as TextEditingController;
+                        final textCtrl = descGroups[i]['text'] as TextEditingController;
+                        updatedDescs.add(ProtocolDescription(
+                          title: titleCtrl.text.trim(),
+                          text: textCtrl.text.trim(),
+                          order: i + 1,
+                        ));
+                      }
+                      final updatedProtocol = protocol.copyWith(
+                        title: titleController.text.trim(),
+                        descriptions: updatedDescs,
+                      );
+                      onSave(updatedProtocol);
+                      Navigator.pop(context);
+                    }
+                  },
+                  label: "Save",
+                  width: context.w(120),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  static void _showProtocolDetailDialog({
+    required BuildContext context,
+    required ProtocolItem protocol,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => StandardDialog(
+        title: "Protocol Details",
+        width: context.w(500),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(protocol.title, style: context.fonts.black18w600),
+            context.verticalSpace(8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: CustomColors.purple.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                protocol.type == ProtocolType.checkbox ? "CHECKBOX PROTOCOL" : "TEXT PROTOCOL",
+                style: context.fonts.purple12w700,
+              ),
+            ),
+            context.verticalSpace(20),
+            const Divider(),
+            context.verticalSpace(16),
+            if (protocol.descriptions.isEmpty)
+              Text("No clinical descriptions configured for this protocol.", style: context.fonts.grey14w400)
+            else
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: context.h(400)),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: protocol.descriptions.map((desc) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(
+                                    color: CustomColors.purple,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    "${desc.order}",
+                                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                context.horizontalSpace(12),
+                                if (desc.title != null && desc.title!.isNotEmpty)
+                                  Expanded(
+                                    child: Text(
+                                      desc.title!,
+                                      style: context.fonts.black14w700,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            context.verticalSpace(8),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 34.0),
+                              child: Text(
+                                desc.text,
+                                style: context.fonts.grey14w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        actions: [
+          CustomPrimaryButton(
+            onTap: () => Navigator.pop(context),
+            label: "Close",
             width: context.w(120),
           ),
         ],

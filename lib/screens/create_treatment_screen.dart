@@ -11,6 +11,7 @@ import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
@@ -319,7 +320,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             context.verticalSpace(32),
             Text("Clinical Protocol Form Preview", style: context.fonts.black16w600),
             context.verticalSpace(16),
-            _buildProtocolFormPreview(context, state, dataState),
+            _buildProtocolFormPreview(context, state, viewModel, dataState),
             context.verticalSpace(32),
             Text("Patient Journey Preview", style: context.fonts.black16w600),
             context.verticalSpace(20),
@@ -332,6 +333,31 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  List<TreatmentProtocolNoteItem> _getCategoryDefaultNotes(CategoryItem? category) {
+    if (category == null) return [];
+    if (category.name.toLowerCase().contains("inject") || category.name.toLowerCase().contains("fill")) {
+      return [
+        TreatmentProtocolNoteItem(
+          title: "Category Pre Care Instructions",
+          description: "Avoid aspirin, ibuprofen, and alcohol 24 hours prior to injections to minimize bruising.",
+          order: 1,
+        ),
+        TreatmentProtocolNoteItem(
+          title: "Category Post Care Instructions",
+          description: "Do not massage, rub, or apply pressure to the injected areas for at least 4 hours.",
+          order: 2,
+        ),
+      ];
+    }
+    return [
+      TreatmentProtocolNoteItem(
+        title: "Category General Care Instructions",
+        description: "Follow all general clinical skin sync instructions provided by your clinician.",
+        order: 1,
+      ),
+    ];
   }
 
   Widget _buildCompleteTreatmentBlueprint(
@@ -969,10 +995,44 @@ class CreateTreatmentScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProtocolFormPreview(BuildContext context, TreatmentState state, TreatmentDataState dataState) {
+  Widget _buildProtocolFormPreview(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState) {
     final selectedProtocols = dataState.protocols.where((p) => state.selectedProtocolIds.contains(p.id)).toList();
     final checkboxes = selectedProtocols.where((p) => p.type == ProtocolType.checkbox).toList();
     final textFields = selectedProtocols.where((p) => p.type == ProtocolType.text).toList();
+
+    CategoryItem? selectedCategory;
+    if (viewModel.categoryIdController.text.isNotEmpty) {
+      selectedCategory = viewModel.findCategoryById(dataState.categories, viewModel.categoryIdController.text);
+    }
+    
+    List<TreatmentProtocolNoteItem> notesToShow = [];
+    if (state.standaloneNotes.isNotEmpty) {
+      notesToShow = state.standaloneNotes;
+    } else if (selectedCategory != null) {
+      notesToShow = _getCategoryDefaultNotes(selectedCategory);
+    }
+
+    final hasProtocols = selectedProtocols.isNotEmpty;
+    final hasNotes = notesToShow.isNotEmpty;
+
+    if (!hasProtocols && !hasNotes) {
+      return Container(
+        width: double.infinity,
+        padding: context.appEdgeInsets(all: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: context.appBorderRadius(all: 12),
+          border: Border.all(color: CustomColors.border),
+        ),
+        child: Center(
+          child: Text(
+            "No clinical protocols configured yet.",
+            style: context.fonts.grey12w400,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
 
     return Container(
       width: double.infinity,
@@ -982,64 +1042,157 @@ class CreateTreatmentScreen extends ConsumerWidget {
         borderRadius: context.appBorderRadius(all: 12),
         border: Border.all(color: CustomColors.border),
       ),
-      child: selectedProtocols.isEmpty
-          ? Center(
-              child: Text(
-                "No clinical protocols configured yet.",
-                style: context.fonts.grey12w400,
-                textAlign: TextAlign.center,
-              ),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (checkboxes.isNotEmpty) ...[
-                  Text("CHECKLIST", style: context.fonts.grey10w700ls1),
-                  context.verticalSpace(12),
-                  ...checkboxes.map((p) => Padding(
-                        padding: context.appEdgeInsets(bottom: 12),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: context.w(18),
-                              height: context.w(18),
-                              decoration: BoxDecoration(
-                                borderRadius: context.appBorderRadius(all: 4),
-                                border: Border.all(color: CustomColors.border, width: 1.5),
-                              ),
-                            ),
-                            context.horizontalSpace(12),
-                            Expanded(child: Text(p.title, style: context.fonts.black13w400)),
-                          ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (checkboxes.isNotEmpty) ...[
+            Text("CHECKLIST", style: context.fonts.grey10w700ls1),
+            context.verticalSpace(12),
+            ...checkboxes.map((p) => Padding(
+                  padding: context.appEdgeInsets(bottom: 12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2.0),
+                        child: Container(
+                          width: context.w(18),
+                          height: context.w(18),
+                          decoration: BoxDecoration(
+                            borderRadius: context.appBorderRadius(all: 4),
+                            border: Border.all(color: CustomColors.border, width: 1.5),
+                          ),
                         ),
-                      )),
-                ],
-                if (checkboxes.isNotEmpty && textFields.isNotEmpty) context.verticalSpace(12),
-                if (textFields.isNotEmpty) ...[
-                  Text("NOTES", style: context.fonts.grey10w700ls1),
-                  context.verticalSpace(12),
-                  ...textFields.map((p) => Padding(
-                        padding: context.appEdgeInsets(bottom: 16),
+                      ),
+                      context.horizontalSpace(12),
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(p.title, style: context.fonts.black12w600),
-                            context.verticalSpace(8),
-                            Container(
-                              height: context.h(40),
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: CustomColors.whiteGrey,
-                                borderRadius: context.appBorderRadius(all: 8),
-                                border: Border.all(color: CustomColors.border),
-                              ),
+                            Text(p.title, style: context.fonts.black13w400),
+                            Builder(
+                              builder: (context) {
+                                final pNote = state.selectedProtocolNotes.firstWhere(
+                                  (n) => n.protocolName == p.title,
+                                  orElse: () => TreatmentProtocolNote(protocolName: p.title, notes: []),
+                                );
+                                if (pNote.notes.isNotEmpty) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      context.verticalSpace(6),
+                                      Text("Notes:", style: context.fonts.black12w600),
+                                      ...pNote.notes.map((note) => Padding(
+                                        padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                                        child: Text(
+                                          "• ${note.title != null && note.title!.isNotEmpty ? '${note.title}: ' : ''}${note.description}",
+                                          style: context.fonts.grey11w400,
+                                        ),
+                                      )).toList(),
+                                    ],
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }
                             ),
                           ],
                         ),
-                      )),
-                ],
-              ],
-            ),
+                      ),
+                    ],
+                  ),
+                )),
+          ],
+          if (checkboxes.isNotEmpty && textFields.isNotEmpty) context.verticalSpace(12),
+          if (textFields.isNotEmpty) ...[
+            Text("NOTES", style: context.fonts.grey10w700ls1),
+            context.verticalSpace(12),
+            ...textFields.map((p) => Padding(
+                  padding: context.appEdgeInsets(bottom: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(p.title, style: context.fonts.black12w600),
+                      context.verticalSpace(8),
+                      Container(
+                        height: context.h(40),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: CustomColors.whiteGrey,
+                          borderRadius: context.appBorderRadius(all: 8),
+                          border: Border.all(color: CustomColors.border),
+                        ),
+                      ),
+                      Builder(
+                        builder: (context) {
+                          final pNote = state.selectedProtocolNotes.firstWhere(
+                            (n) => n.protocolName == p.title,
+                            orElse: () => TreatmentProtocolNote(protocolName: p.title, notes: []),
+                          );
+                          if (pNote.notes.isNotEmpty) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                context.verticalSpace(8),
+                                Text("Notes:", style: context.fonts.black12w600),
+                                ...pNote.notes.map((note) => Padding(
+                                  padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                                  child: Text(
+                                    "• ${note.title != null && note.title!.isNotEmpty ? '${note.title}: ' : ''}${note.description}",
+                                    style: context.fonts.grey11w400,
+                                  ),
+                                )).toList(),
+                              ],
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        }
+                      ),
+                    ],
+                  ),
+                )),
+          ],
+          if (hasNotes) ...[
+            if (hasProtocols) ...[
+              context.verticalSpace(24),
+              const Divider(),
+              context.verticalSpace(16),
+            ],
+            Text("NOTES / INSTRUCTIONS", style: context.fonts.grey10w700ls1),
+            context.verticalSpace(12),
+            ...notesToShow.map((note) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.info_outline, size: 14, color: CustomColors.purple),
+                        context.horizontalSpace(8),
+                        if (note.title != null && note.title!.isNotEmpty)
+                          Expanded(
+                            child: Text(
+                              note.title!,
+                              style: context.fonts.black13w600,
+                            ),
+                          ),
+                      ],
+                    ),
+                    context.verticalSpace(4),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 22.0),
+                      child: Text(
+                        note.description,
+                        style: context.fonts.grey12w400,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
+        ],
+      ),
     );
   }
 
@@ -2290,11 +2443,210 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   Widget _buildStepProtocolsStep(BuildContext context, TreatmentState state, TreatmentViewModel viewModel, TreatmentDataState dataState, WidgetRef ref) {
+    final selectedProtocols = dataState.protocols.where((p) => state.selectedProtocolIds.contains(p.id)).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildJourneyProtocols(context, dataState, ref, state.selectedProtocolIds, (id) => viewModel.toggleProtocolSelection(id)),
+        _buildJourneyProtocols(context, dataState, ref, state.selectedProtocolIds, (id) {
+          final pItem = dataState.protocols.firstWhere((p) => p.id == id);
+          viewModel.toggleProtocolSelection(id, protocolName: pItem.title, masterProtocols: dataState.protocols);
+        }),
+        if (selectedProtocols.isNotEmpty) ...[
+          context.verticalSpace(32),
+          _sectionTitle(context, "Protocol Notes & Instructions"),
+          context.verticalSpace(8),
+          Text("Add custom step-by-step notes and clinical guidelines for each selected protocol.", style: context.fonts.grey14w400),
+          context.verticalSpace(16),
+          ...selectedProtocols.map((protocol) {
+            final noteEntry = state.selectedProtocolNotes.firstWhere(
+              (n) => n.protocolName == protocol.title,
+              orElse: () => TreatmentProtocolNote(protocolName: protocol.title, notes: []),
+            );
+            return ProtocolNotesCard(
+              key: ValueKey("note_${protocol.id}_${noteEntry.notes.length}"),
+              protocol: protocol,
+              initialNotes: noteEntry.notes,
+              onNotesChanged: (updatedNotes) {
+                viewModel.updateProtocolNotes(protocol.title, updatedNotes);
+              },
+            );
+          }).toList(),
+        ],
+        context.verticalSpace(40),
+        _buildStandaloneNotesSection(context, state, viewModel),
       ],
+    );
+  }
+
+  Widget _buildStandaloneNotesSection(BuildContext context, TreatmentState state, TreatmentViewModel viewModel) {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _sectionTitle(context, "Notes / Instructions"),
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline, color: CustomColors.purple, size: 24),
+                onPressed: () => _showStandaloneNoteEditDialog(context, null, null, viewModel, state.standaloneNotes),
+              ),
+            ],
+          ),
+          if (state.standaloneNotes.isEmpty) ...[
+            context.verticalSpace(16),
+            Text("No notes or custom instructions configured yet.", style: context.fonts.grey14w400),
+          ] else ...[
+            context.verticalSpace(16),
+            const Divider(),
+            context.verticalSpace(16),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: state.standaloneNotes.length,
+              separatorBuilder: (context, index) => const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.0),
+                child: Divider(),
+              ),
+              itemBuilder: (context, index) {
+                final note = state.standaloneNotes[index];
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (note.title != null && note.title!.isNotEmpty) ...[
+                            Text(note.title!, style: context.fonts.black14w700),
+                            context.verticalSpace(4),
+                          ],
+                          Text(note.description, style: context.fonts.grey14w400),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_upward, size: 16),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: index > 0 ? () {
+                            final updated = List<TreatmentProtocolNoteItem>.from(state.standaloneNotes);
+                            final temp = updated[index];
+                            updated[index] = updated[index - 1];
+                            updated[index - 1] = temp;
+                            viewModel.updateStandaloneNotes(updated);
+                          } : null,
+                        ),
+                        context.horizontalSpace(8),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_downward, size: 16),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: index < state.standaloneNotes.length - 1 ? () {
+                            final updated = List<TreatmentProtocolNoteItem>.from(state.standaloneNotes);
+                            final temp = updated[index];
+                            updated[index] = updated[index + 1];
+                            updated[index + 1] = temp;
+                            viewModel.updateStandaloneNotes(updated);
+                          } : null,
+                        ),
+                        context.horizontalSpace(12),
+                        IconButton(
+                          icon: const Icon(Icons.edit_outlined, size: 18),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => _showStandaloneNoteEditDialog(context, index, note, viewModel, state.standaloneNotes),
+                        ),
+                        context.horizontalSpace(12),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, size: 18, color: CustomColors.red),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () {
+                            final updated = List<TreatmentProtocolNoteItem>.from(state.standaloneNotes);
+                            updated.removeAt(index);
+                            viewModel.updateStandaloneNotes(updated);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showStandaloneNoteEditDialog(
+    BuildContext context,
+    int? editIndex,
+    TreatmentProtocolNoteItem? existingNote,
+    TreatmentViewModel viewModel,
+    List<TreatmentProtocolNoteItem> currentNotes,
+  ) {
+    final titleController = TextEditingController(text: existingNote?.title);
+    final descController = TextEditingController(text: existingNote?.description);
+
+    showDialog(
+      context: context,
+      builder: (context) => StandardDialog(
+        title: editIndex == null ? "Add Note / Instruction" : "Edit Note / Instruction",
+        width: context.w(450),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            BuildTextField(
+              label: "Title (Optional)",
+              controller: titleController,
+              hintText: "e.g. Pre Care Instructions",
+            ),
+            context.verticalSpace(16),
+            BuildTextField(
+              label: "Note / Description",
+              controller: descController,
+              hintText: "e.g. Avoid retinol 3 days before treatment",
+              maxLines: 4,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          CustomPrimaryButton(
+            onTap: () {
+              if (descController.text.trim().isNotEmpty) {
+                final updated = List<TreatmentProtocolNoteItem>.from(currentNotes);
+                final newNote = TreatmentProtocolNoteItem(
+                  title: titleController.text.trim().isEmpty ? null : titleController.text.trim(),
+                  description: descController.text.trim(),
+                  order: editIndex == null ? currentNotes.length + 1 : existingNote!.order,
+                );
+                
+                if (editIndex == null) {
+                  updated.add(newNote);
+                } else {
+                  updated[editIndex] = newNote;
+                }
+                
+                viewModel.updateStandaloneNotes(updated);
+                Navigator.pop(context);
+              }
+            },
+            label: "Save",
+            width: context.w(120),
+          ),
+        ],
+      ),
     );
   }
 
@@ -4897,5 +5249,188 @@ class _SelectedSummaryCard extends StatelessWidget {
       case 'scalp': return Icons.spa_outlined;
       default: return Icons.location_on_outlined;
     }
+  }
+}
+
+class ProtocolNotesCard extends StatefulWidget {
+  final ProtocolItem protocol;
+  final List<TreatmentProtocolNoteItem> initialNotes;
+  final Function(List<TreatmentProtocolNoteItem>) onNotesChanged;
+
+  const ProtocolNotesCard({
+    super.key,
+    required this.protocol,
+    required this.initialNotes,
+    required this.onNotesChanged,
+  });
+
+  @override
+  State<ProtocolNotesCard> createState() => _ProtocolNotesCardState();
+}
+
+class _ProtocolNotesCardState extends State<ProtocolNotesCard> {
+  late List<Map<String, TextEditingController>> _noteControllers;
+
+  @override
+  void initState() {
+    super.initState();
+    _noteControllers = widget.initialNotes.map((note) => {
+      'title': TextEditingController(text: note.title),
+      'description': TextEditingController(text: note.description),
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    for (var note in _noteControllers) {
+      note['title']?.dispose();
+      note['description']?.dispose();
+    }
+    super.dispose();
+  }
+
+  void _notify() {
+    final List<TreatmentProtocolNoteItem> updatedNotes = [];
+    for (int i = 0; i < _noteControllers.length; i++) {
+      final title = _noteControllers[i]['title']!.text.trim();
+      final desc = _noteControllers[i]['description']!.text.trim();
+      updatedNotes.add(TreatmentProtocolNoteItem(
+        title: title.isEmpty ? null : title,
+        description: desc,
+        order: i + 1,
+      ));
+    }
+    widget.onNotesChanged(updatedNotes);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BorderdContainerWidget(
+      margin: const EdgeInsets.only(top: 16),
+      padding: context.appEdgeInsets(all: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.assignment_turned_in_outlined, color: CustomColors.purple, size: 20),
+                  context.horizontalSpace(12),
+                  Text(widget.protocol.title, style: context.fonts.black16w600),
+                ],
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _noteControllers.add({
+                      'title': TextEditingController(),
+                      'description': TextEditingController(),
+                    });
+                  });
+                  _notify();
+                },
+                icon: const Icon(Icons.add, size: 16),
+                label: const Text("Add Protocol Note"),
+                style: TextButton.styleFrom(foregroundColor: CustomColors.purple),
+              ),
+            ],
+          ),
+          if (_noteControllers.isNotEmpty) ...[
+            context.verticalSpace(16),
+            const Divider(),
+            context.verticalSpace(16),
+            ..._noteControllers.asMap().entries.map((entry) {
+              final idx = entry.key;
+              final controllers = entry.value;
+              final titleCtrl = controllers['title']!;
+              final descCtrl = controllers['description']!;
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: context.appEdgeInsets(all: 16),
+                decoration: BoxDecoration(
+                  color: CustomColors.whiteGrey,
+                  borderRadius: context.appBorderRadius(all: 10),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Note #${idx + 1}", style: context.fonts.black14w600),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_upward, size: 16),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: idx > 0 ? () {
+                                setState(() {
+                                  final temp = _noteControllers[idx];
+                                  _noteControllers[idx] = _noteControllers[idx - 1];
+                                  _noteControllers[idx - 1] = temp;
+                                });
+                                _notify();
+                              } : null,
+                            ),
+                            context.horizontalSpace(8),
+                            IconButton(
+                              icon: const Icon(Icons.arrow_downward, size: 16),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: idx < _noteControllers.length - 1 ? () {
+                                setState(() {
+                                  final temp = _noteControllers[idx];
+                                  _noteControllers[idx] = _noteControllers[idx + 1];
+                                  _noteControllers[idx + 1] = temp;
+                                });
+                                _notify();
+                              } : null,
+                            ),
+                            context.horizontalSpace(12),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline, size: 18, color: CustomColors.red),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () {
+                                setState(() {
+                                  _noteControllers[idx]['title']!.dispose();
+                                  _noteControllers[idx]['description']!.dispose();
+                                  _noteControllers.removeAt(idx);
+                                });
+                                _notify();
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(12),
+                    BuildTextField(
+                      label: "Title (Optional)",
+                      controller: titleCtrl,
+                      hintText: "e.g. Pre Care",
+                      onChanged: (_) => _notify(),
+                    ),
+                    context.verticalSpace(12),
+                    BuildTextField(
+                      label: "Description (Required)",
+                      controller: descCtrl,
+                      hintText: "Enter protocol instruction notes...",
+                      maxLines: 2,
+                      onChanged: (_) => _notify(),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
+        ],
+      ),
+    );
   }
 }

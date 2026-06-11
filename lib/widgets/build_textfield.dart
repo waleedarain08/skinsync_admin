@@ -45,7 +45,9 @@ class BuildTextField extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(label, style: context.fonts.black14w600),
+              Flexible(
+                child: Text(label, style: context.fonts.black14w600),
+              ),
               if (tooltip != null) ...[
                 context.horizontalSpace(6),
                 Tooltip(

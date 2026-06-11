@@ -78,6 +78,8 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 context.verticalSpace(32),
                 _buildAreasAndLogic(context, treatment),
                 context.verticalSpace(32),
+                _buildProtocolsSection(context, treatment),
+                context.verticalSpace(32),
                 _buildSchedulingSection(context, treatment),
                 if (treatment.productUsages != null && treatment.productUsages!.isNotEmpty) ...[
                   context.verticalSpace(32),
@@ -893,6 +895,116 @@ class TreatmentDetailScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProtocolsSection(BuildContext context, TreatmentModel treatment) {
+    final List<TreatmentProtocolNote> notes = treatment.protocolNotes ?? [];
+    final List<TreatmentProtocolNoteItem> standalone = treatment.standaloneNotes ?? [];
+    
+    return Column(
+      children: [
+        CollapsibleSection(
+          title: "Clinical Protocols & Patient Guidance",
+          icon: Icons.assignment_turned_in_outlined,
+          content: notes.isEmpty
+              ? Text("No clinical protocols configured for this treatment.", style: context.fonts.grey14w400)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: notes.map((pNote) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: BorderdContainerWidget(
+                        padding: context.appEdgeInsets(all: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.assignment_turned_in_outlined, color: CustomColors.purple, size: 18),
+                                context.horizontalSpace(12),
+                                Text(pNote.protocolName, style: context.fonts.black14w700),
+                              ],
+                            ),
+                            if (pNote.notes.isNotEmpty) ...[
+                              context.verticalSpace(12),
+                              const Divider(),
+                              context.verticalSpace(12),
+                              ...pNote.notes.map((note) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(Icons.arrow_right_rounded, color: CustomColors.purple, size: 18),
+                                    context.horizontalSpace(8),
+                                    Expanded(
+                                      child: RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            if (note.title != null && note.title!.isNotEmpty)
+                                              TextSpan(
+                                                text: "${note.title}: ",
+                                                style: context.fonts.black13w600,
+                                              ),
+                                            TextSpan(
+                                              text: note.description,
+                                              style: context.fonts.grey13w500,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )).toList(),
+                            ],
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+        ),
+        context.verticalSpace(32),
+        CollapsibleSection(
+          title: "Notes / Instructions",
+          icon: Icons.notes_rounded,
+          content: standalone.isEmpty
+              ? Text("No custom notes or instructions configured for this treatment.", style: context.fonts.grey14w400)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: standalone.map((note) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: BorderdContainerWidget(
+                        padding: context.appEdgeInsets(all: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (note.title != null && note.title!.isNotEmpty) ...[
+                              Row(
+                                children: [
+                                  const Icon(Icons.info_outline, color: CustomColors.purple, size: 18),
+                                  context.horizontalSpace(12),
+                                  Text(note.title!, style: context.fonts.black14w700),
+                                ],
+                              ),
+                              context.verticalSpace(8),
+                              const Divider(),
+                              context.verticalSpace(8),
+                            ],
+                            Padding(
+                              padding: EdgeInsets.only(left: note.title != null && note.title!.isNotEmpty ? 30.0 : 0.0),
+                              child: Text(note.description, style: context.fonts.grey14w400),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+        ),
+      ],
     );
   }
 }

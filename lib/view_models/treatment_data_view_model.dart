@@ -101,12 +101,57 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
       categories: categories,
       areas: areas,
       protocols: [
-        ProtocolItem(id: '1', title: 'Cleanse treatment area', type: ProtocolType.checkbox),
-        ProtocolItem(id: '2', title: 'Review contraindications', type: ProtocolType.checkbox),
-        ProtocolItem(id: '3', title: 'Mark injection sites', type: ProtocolType.checkbox),
-        ProtocolItem(id: '4', title: 'Pre-Treatment Instructions', type: ProtocolType.text),
-        ProtocolItem(id: '5', title: 'Post-Treatment Notes', type: ProtocolType.text),
-        ProtocolItem(id: '6', title: 'Recovery Instructions', type: ProtocolType.text),
+        ProtocolItem(
+          id: '1',
+          title: 'Cleanse treatment area',
+          type: ProtocolType.checkbox,
+          descriptions: [
+            ProtocolDescription(title: "Step 1", text: "Cleanse the skin surface with antiseptic agent.", order: 1),
+            ProtocolDescription(title: "Step 2", text: "Pat dry with sterile gauze.", order: 2),
+          ],
+        ),
+        ProtocolItem(
+          id: '2',
+          title: 'Review contraindications',
+          type: ProtocolType.checkbox,
+          descriptions: [
+            ProtocolDescription(title: "Allergies", text: "Confirm patient has no lidocaine or product allergies.", order: 1),
+            ProtocolDescription(title: "Pregnancy", text: "Verify patient is not pregnant or breastfeeding.", order: 2),
+          ],
+        ),
+        ProtocolItem(
+          id: '3',
+          title: 'Mark injection sites',
+          type: ProtocolType.checkbox,
+          descriptions: [
+            ProtocolDescription(title: "Mapping", text: "Use surgical marker to outline the target injection points.", order: 1),
+          ],
+        ),
+        ProtocolItem(
+          id: '4',
+          title: 'Pre-Treatment Instructions',
+          type: ProtocolType.text,
+          descriptions: [
+            ProtocolDescription(title: "Pre Care", text: "Avoid blood thinners and alcohol 24 hours before treatment.", order: 1),
+          ],
+        ),
+        ProtocolItem(
+          id: '5',
+          title: 'Post-Treatment Notes',
+          type: ProtocolType.text,
+          descriptions: [
+            ProtocolDescription(title: "Aftercare", text: "Apply cold compress to reduce swelling.", order: 1),
+            ProtocolDescription(title: "Restrictions", text: "Do not touch or massage treated areas for 6 hours.", order: 2),
+          ],
+        ),
+        ProtocolItem(
+          id: '6',
+          title: 'Recovery Instructions',
+          type: ProtocolType.text,
+          descriptions: [
+            ProtocolDescription(title: "Follow-up", text: "Contact clinic if redness persists past 72 hours.", order: 1),
+          ],
+        ),
       ],
     );
   }
@@ -128,6 +173,17 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
       protocols: state.protocols.map((p) {
         if (p.id == id) {
           return p.copyWith(title: newTitle);
+        }
+        return p;
+      }).toList(),
+    );
+  }
+
+  void saveProtocol(ProtocolItem updatedProtocol) {
+    state = state.copyWith(
+      protocols: state.protocols.map((p) {
+        if (p.id == updatedProtocol.id) {
+          return updatedProtocol;
         }
         return p;
       }).toList(),

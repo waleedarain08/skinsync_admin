@@ -24,6 +24,8 @@ class TreatmentModel {
 
   List<int>? combinableTreatmentIds;
   List<String>? protocolIds;
+  List<TreatmentProtocolNote>? protocolNotes;
+  List<TreatmentProtocolNoteItem>? standaloneNotes;
   int? baseDurationHours;
   int? baseDurationMinutes;
   String? preTreatmentInstructions;
@@ -93,6 +95,8 @@ class TreatmentModel {
     this.enableByDefault = false,
     this.combinableTreatmentIds,
     this.protocolIds,
+    this.protocolNotes,
+    this.standaloneNotes,
     this.baseDurationHours,
     this.baseDurationMinutes,
     this.preTreatmentInstructions,
@@ -180,6 +184,12 @@ class TreatmentModel {
     protocolIds = json['protocol_ids'] != null
         ? List<String>.from(json['protocol_ids'])
         : null;
+    protocolNotes = json['protocol_notes'] != null
+        ? (json['protocol_notes'] as List).map((e) => TreatmentProtocolNote.fromJson(e)).toList()
+        : null;
+    standaloneNotes = json['notes'] != null
+        ? (json['notes'] as List).map((e) => TreatmentProtocolNoteItem.fromJson(e)).toList()
+        : null;
     baseDurationHours = json['base_duration_hours'];
     baseDurationMinutes = json['base_duration_minutes'];
     preTreatmentInstructions = json['pre_treatment_instructions'];
@@ -242,6 +252,8 @@ class TreatmentModel {
     int? maximumDaysInAdvance,
     List<int>? combinableTreatmentIds,
     List<String>? protocolIds,
+    List<TreatmentProtocolNote>? protocolNotes,
+    List<TreatmentProtocolNoteItem>? standaloneNotes,
     int? baseDurationHours,
     int? baseDurationMinutes,
     String? preTreatmentInstructions,
@@ -297,6 +309,8 @@ class TreatmentModel {
       maximumDaysInAdvance: maximumDaysInAdvance ?? this.maximumDaysInAdvance,
       combinableTreatmentIds: combinableTreatmentIds ?? this.combinableTreatmentIds,
       protocolIds: protocolIds ?? this.protocolIds,
+      protocolNotes: protocolNotes ?? this.protocolNotes,
+      standaloneNotes: standaloneNotes ?? this.standaloneNotes,
       baseDurationHours: baseDurationHours ?? this.baseDurationHours,
       baseDurationMinutes: baseDurationMinutes ?? this.baseDurationMinutes,
       preTreatmentInstructions: preTreatmentInstructions ?? this.preTreatmentInstructions,
@@ -355,6 +369,8 @@ class TreatmentModel {
       'maximum_days_in_advance': maximumDaysInAdvance,
       'combinable_treatment_ids': combinableTreatmentIds,
       'protocol_ids': protocolIds,
+      'protocol_notes': protocolNotes?.map((e) => e.toJson()).toList(),
+      'notes': standaloneNotes?.map((e) => e.toJson()).toList(),
       'base_duration_hours': baseDurationHours,
       'base_duration_minutes': baseDurationMinutes,
       'pre_treatment_instructions': preTreatmentInstructions,
@@ -464,4 +480,50 @@ class SubAreaModel {
       "children": children?.map((e) => e.toJson()).toList(),
     };
   }
+}
+
+class TreatmentProtocolNoteItem {
+  final String? title;
+  final String description;
+  final int order;
+
+  TreatmentProtocolNoteItem({
+    this.title,
+    required this.description,
+    required this.order,
+  });
+
+  factory TreatmentProtocolNoteItem.fromJson(Map<String, dynamic> json) => TreatmentProtocolNoteItem(
+    title: json['title'],
+    description: json['description'] ?? '',
+    order: json['order'] ?? 0,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'description': description,
+    'order': order,
+  };
+}
+
+class TreatmentProtocolNote {
+  final String protocolName;
+  final List<TreatmentProtocolNoteItem> notes;
+
+  TreatmentProtocolNote({
+    required this.protocolName,
+    required this.notes,
+  });
+
+  factory TreatmentProtocolNote.fromJson(Map<String, dynamic> json) => TreatmentProtocolNote(
+    protocolName: json['protocolName'] ?? '',
+    notes: json['notes'] != null
+        ? (json['notes'] as List).map((e) => TreatmentProtocolNoteItem.fromJson(e)).toList()
+        : [],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'protocolName': protocolName,
+    'notes': notes.map((e) => e.toJson()).toList(),
+  };
 }

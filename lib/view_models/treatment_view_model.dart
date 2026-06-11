@@ -221,14 +221,60 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     );
   }
 
-  void toggleProtocolSelection(String protocolId) {
+  void toggleProtocolSelection(String protocolId, {String? protocolName, List<ProtocolItem>? masterProtocols}) {
     final List<String> currentSelected = List.from(state.selectedProtocolIds);
+    final List<TreatmentProtocolNote> currentNotes = List.from(state.selectedProtocolNotes);
+    final actualName = protocolName ?? protocolId;
+    
     if (currentSelected.contains(protocolId)) {
       currentSelected.remove(protocolId);
+      currentNotes.removeWhere((note) => note.protocolName == actualName);
     } else {
       currentSelected.add(protocolId);
+      if (!currentNotes.any((n) => n.protocolName == actualName)) {
+        List<TreatmentProtocolNoteItem> initialNotes = [];
+        if (masterProtocols != null && masterProtocols.isNotEmpty) {
+          final matchingProtocol = masterProtocols.firstWhere(
+            (p) => p.id == protocolId,
+            orElse: () => masterProtocols.first,
+          );
+          if (matchingProtocol.id == protocolId && matchingProtocol.descriptions.isNotEmpty) {
+            initialNotes = matchingProtocol.descriptions.map((desc) => TreatmentProtocolNoteItem(
+              title: desc.title,
+              description: desc.text,
+              order: 1,
+            )).toList();
+          }
+        }
+        currentNotes.add(TreatmentProtocolNote(protocolName: actualName, notes: initialNotes));
+      }
     }
-    state = state.copyWith(selectedProtocolIds: currentSelected);
+    state = state.copyWith(
+      selectedProtocolIds: currentSelected,
+      selectedProtocolNotes: currentNotes,
+    );
+  }
+
+  void updateProtocolNotes(String protocolName, List<TreatmentProtocolNoteItem> notes) {
+    final List<TreatmentProtocolNote> currentNotes = List.from(state.selectedProtocolNotes);
+    final index = currentNotes.indexWhere((n) => n.protocolName == protocolName);
+    
+    if (index != -1) {
+      currentNotes[index] = TreatmentProtocolNote(
+        protocolName: protocolName,
+        notes: notes,
+      );
+    } else {
+      currentNotes.add(TreatmentProtocolNote(
+        protocolName: protocolName,
+        notes: notes,
+      ));
+    }
+    state = state.copyWith(selectedProtocolNotes: currentNotes);
+  }
+
+  void updateStandaloneNotes(List<TreatmentProtocolNoteItem> notes) {
+    state = state.copyWith(standaloneNotes: notes);
   }
 
   void setStatus(String status) {
@@ -382,6 +428,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       treatmentImage: null, 
       treatmentIcon: null,
       selectedProtocolIds: treatment.protocolIds ?? [],
+      selectedProtocolNotes: treatment.protocolNotes ?? [],
+      standaloneNotes: treatment.standaloneNotes ?? [],
       preTreatmentAttachments: [], 
       postTreatmentAttachments: [],
       existingPreAttachments: treatment.preTreatmentAttachments ?? [],
@@ -1118,6 +1166,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         status: state.status,
         useInAiSimulator: state.useInAiSimulator,
         protocolIds: state.selectedProtocolIds,
+        protocolNotes: state.selectedProtocolNotes,
+        standaloneNotes: state.standaloneNotes,
         preTreatmentInstructions: preTreatmentInstructionsController.text,
         postTreatmentInstructions: postTreatmentInstructionsController.text,
         preNotificationSource: state.preNotificationSource,
@@ -1337,6 +1387,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         status: state.status,
         useInAiSimulator: state.useInAiSimulator,
         protocolIds: state.selectedProtocolIds,
+        protocolNotes: state.selectedProtocolNotes,
+        standaloneNotes: state.standaloneNotes,
         preTreatmentInstructions: preTreatmentInstructionsController.text,
         postTreatmentInstructions: postTreatmentInstructionsController.text,
         preNotificationSource: state.preNotificationSource,
@@ -1506,6 +1558,8 @@ class TreatmentState extends BaseStateModel {
   final List<AreaViewModelEntry> areas;
   final List<String> selectedCategoryPath;
   final List<String> selectedProtocolIds;
+  final List<TreatmentProtocolNote> selectedProtocolNotes;
+  final List<TreatmentProtocolNoteItem> standaloneNotes;
   final String status; // draft | active | deactive
   
   final int? preNotificationOffset;
@@ -1563,6 +1617,8 @@ class TreatmentState extends BaseStateModel {
     this.treatmentIcon,
     this.selectedCategoryPath = const [],
     this.selectedProtocolIds = const [],
+    this.selectedProtocolNotes = const [],
+    this.standaloneNotes = const [],
     this.status = 'active',
     this.preNotificationOffset,
     this.postNotificationOffset,
@@ -1613,6 +1669,8 @@ class TreatmentState extends BaseStateModel {
     List<AreaViewModelEntry>? areas,
     List<String>? selectedCategoryPath,
     List<String>? selectedProtocolIds,
+    List<TreatmentProtocolNote>? selectedProtocolNotes,
+    List<TreatmentProtocolNoteItem>? standaloneNotes,
     String? status,
     int? preNotificationOffset,
     int? postNotificationOffset,
@@ -1661,6 +1719,8 @@ class TreatmentState extends BaseStateModel {
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
       selectedProtocolIds: selectedProtocolIds ?? this.selectedProtocolIds,
+      selectedProtocolNotes: selectedProtocolNotes ?? this.selectedProtocolNotes,
+      standaloneNotes: standaloneNotes ?? this.standaloneNotes,
       status: status ?? this.status,
       preNotificationOffset: preNotificationOffset ?? this.preNotificationOffset,
       postNotificationOffset: postNotificationOffset ?? this.postNotificationOffset,
