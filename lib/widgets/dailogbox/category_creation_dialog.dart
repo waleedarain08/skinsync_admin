@@ -272,7 +272,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Notification #\${idx + 1}", style: context.fonts.purple14w700),
+                        Text("Notification #${idx + 1}", style: context.fonts.purple14w700),
                         IconButton(
                           icon: const Icon(Icons.delete_outline, color: CustomColors.red),
                           onPressed: () {
@@ -405,7 +405,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Follow-Up \${fuIdx + 1}", style: context.fonts.purple12w700),
+          Text("Follow-Up ${fuIdx + 1}", style: context.fonts.purple12w700),
           context.verticalSpace(12),
           Row(
             children: [
@@ -517,7 +517,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     return StandardDialog(
       title: widget.initialName != null 
           ? "Edit Category" 
-          : (widget.parentName == null ? "Create New Category" : "Add Subcategory to \${widget.parentName}"),
+          : (widget.parentName == null ? "Create New Category" : "Add Subcategory to ${widget.parentName}"),
       width: context.w(700),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -592,7 +592,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                       children: [
                         const Icon(Icons.event_note_rounded, color: CustomColors.purple),
                         context.horizontalSpace(12),
-                        Text("SESSION \${session.sessionNumber}", style: context.fonts.purple14w700),
+                        Text("SESSION ${session.sessionNumber}", style: context.fonts.purple14w700),
                         const Spacer(),
                         SizedBox(
                           width: context.w(150),
