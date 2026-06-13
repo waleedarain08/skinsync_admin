@@ -3,6 +3,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:skinsync_admin/route_generator.dart';
+import 'package:skinsync_admin/widgets/app_loader.dart';
+
 import 'utils/screen_size.dart';
 import 'utils/theme.dart';
 
@@ -23,6 +25,7 @@ class AppInit extends StatelessWidget {
       ..indicatorColor = CustomColors.green
       ..textColor = CustomColors.white
       ..maskColor = CustomColors.black.withValues(alpha: 0.4)
+      ..indicatorWidget = AppLoader(size: 50)
       ..userInteractions = true
       ..dismissOnTap = false;
   }
@@ -51,14 +54,10 @@ class AppInit extends StatelessWidget {
                 const Breakpoint(start: 0, end: 480, name: MOBILE),
                 const Breakpoint(start: 481, end: 1024, name: TABLET),
                 const Breakpoint(start: 1025, end: 1920, name: DESKTOP),
-                const Breakpoint(
-                  start: 1921,
-                  end: double.infinity,
-                  name: '4K',
-                ),
+                const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
               ],
             );
-            
+
             return easyLoadingBuilder(context, responsiveBuilder);
           },
         );

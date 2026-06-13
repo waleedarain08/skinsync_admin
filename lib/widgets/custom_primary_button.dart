@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../utils/theme.dart';
+import 'app_loader.dart';
 
 class CustomPrimaryButton extends StatefulWidget {
   final String label;
@@ -32,7 +34,7 @@ class _CustomPrimaryButtonState extends State<CustomPrimaryButton> {
   @override
   Widget build(BuildContext context) {
     final bool enabled = widget.onTap != null && !widget.isLoading;
-    
+
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
@@ -53,37 +55,41 @@ class _CustomPrimaryButtonState extends State<CustomPrimaryButton> {
               width: widget.width,
               height: widget.height ?? AppTheme.buttonHeight,
               decoration: BoxDecoration(
-                color: enabled 
-                    ? CustomColors.purple 
+                color: enabled
+                    ? CustomColors.purple
                     : CustomColors.lightGrey.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-                boxShadow: enabled && _hovered 
-                  ? [BoxShadow(color: CustomColors.purple.withValues(alpha: 0.25), blurRadius: 12, offset: const Offset(0, 4))]
-                  : [],
+                boxShadow: enabled && _hovered
+                    ? [
+                        BoxShadow(
+                          color: CustomColors.purple.withValues(alpha: 0.25),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : [],
               ),
               child: Padding(
-                padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 16.w),
+                padding:
+                    widget.padding ?? EdgeInsets.symmetric(horizontal: 16.w),
                 child: Center(
                   child: widget.isLoading
-                      ? SizedBox(
-                          width: 20.w,
-                          height: 20.w,
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: CustomColors.white,
-                          ),
-                        )
+                      ? AppLoader(size: 20.w, color: CustomColors.white)
                       : Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             if (widget.icon != null) ...[
-                              Icon(widget.icon, color: CustomColors.white, size: 18.sp),
+                              Icon(
+                                widget.icon,
+                                color: CustomColors.white,
+                                size: 18.sp,
+                              ),
                               SizedBox(width: 10.w),
                             ],
                             Flexible(
                               child: Text(
-                                widget.label, 
+                                widget.label,
                                 style: CustomFonts.white14w600,
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,

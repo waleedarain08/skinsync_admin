@@ -4,20 +4,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
-import 'package:skinsync_admin/view_models/clinic_view_model.dart';
-import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
-import 'package:skinsync_admin/widgets/app_search_field.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
-import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
-import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
+import '../../widgets/app_loader.dart';
 import '../../widgets/dailogbox/clinic_dailogbox.dart';
 import '../../widgets/dailogbox/standard_dialog.dart';
 import '../invite_clinic_detail_screen.dart';
-
-import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class ClinicManagement extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-management';
@@ -27,7 +28,8 @@ class ClinicManagement extends ConsumerStatefulWidget {
   ConsumerState<ClinicManagement> createState() => _ClinicManagementState();
 }
 
-class _ClinicManagementState extends ConsumerState<ClinicManagement> with SingleTickerProviderStateMixin {
+class _ClinicManagementState extends ConsumerState<ClinicManagement>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _activeScrollController;
   late ScrollController _inviteScrollController;
@@ -42,7 +44,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     _inviteScrollController = ScrollController();
     _activeSearchController = TextEditingController();
     _inviteSearchController = TextEditingController();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(clinicViewModelProvider.notifier).initialize();
     });
@@ -118,18 +120,43 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _buildStatsSummary() {
     return Row(
       children: [
-        _buildMiniStat("Total Clinics", "48", Icons.business_rounded, CustomColors.purple),
+        _buildMiniStat(
+          "Total Clinics",
+          "48",
+          Icons.business_rounded,
+          CustomColors.purple,
+        ),
         SizedBox(width: AppSpacing.md),
-        _buildMiniStat("Active Partners", "42", Icons.bolt_rounded, CustomColors.green),
+        _buildMiniStat(
+          "Active Partners",
+          "42",
+          Icons.bolt_rounded,
+          CustomColors.green,
+        ),
         SizedBox(width: AppSpacing.md),
-        _buildMiniStat("Network Revenue", "\$245K", Icons.payments_rounded, CustomColors.green),
+        _buildMiniStat(
+          "Network Revenue",
+          "\$245K",
+          Icons.payments_rounded,
+          CustomColors.green,
+        ),
         SizedBox(width: AppSpacing.md),
-        _buildMiniStat("Avg Patient Rating", "4.8", Icons.star_rounded, Colors.amber),
+        _buildMiniStat(
+          "Avg Patient Rating",
+          "4.8",
+          Icons.star_rounded,
+          Colors.amber,
+        ),
       ],
     );
   }
 
-  Widget _buildMiniStat(String title, String value, IconData icon, Color color) {
+  Widget _buildMiniStat(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Expanded(
       child: BorderdContainerWidget(
         padding: EdgeInsets.all(AppSpacing.lg),
@@ -178,7 +205,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     final clinics = state.clinics ?? [];
     return Column(
       children: [
-        _buildSearchAndFilterBar(_activeSearchController, "Search by name, email or location..."),
+        _buildSearchAndFilterBar(
+          _activeSearchController,
+          "Search by name, email or location...",
+        ),
         SizedBox(height: AppSpacing.md),
         Expanded(
           child: _buildUnifiedTable<ClinicModel>(
@@ -207,7 +237,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     final inviteClinics = state.inviteClinics ?? [];
     return Column(
       children: [
-        _buildSearchAndFilterBar(_inviteSearchController, "Search prospect clinics..."),
+        _buildSearchAndFilterBar(
+          _inviteSearchController,
+          "Search prospect clinics...",
+        ),
         SizedBox(height: AppSpacing.md),
         Expanded(
           child: _buildUnifiedTable<InviteClinicModel>(
@@ -229,7 +262,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     );
   }
 
-  Widget _buildSearchAndFilterBar(TextEditingController controller, String hint) {
+  Widget _buildSearchAndFilterBar(
+    TextEditingController controller,
+    String hint,
+  ) {
     return Row(
       children: [
         AppSearchField(
@@ -266,9 +302,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
                   child: CustomDropdown<String>(
                     label: "Region",
                     hintText: "All Regions",
-                    items: const ["East Coast", "West Coast", "Midwest", "South"]
-                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                        .toList(),
+                    items:
+                        const ["East Coast", "West Coast", "Midwest", "South"]
+                            .map(
+                              (s) => DropdownMenuItem(value: s, child: Text(s)),
+                            )
+                            .toList(),
                     onChanged: (val) {},
                   ),
                 ),
@@ -289,9 +328,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
             CustomDropdown<String>(
               label: "Subscription Plan",
               hintText: "All Plans",
-              items: const ["Basic", "Standard", "Premium", "Enterprise"]
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
+              items: const [
+                "Basic",
+                "Standard",
+                "Premium",
+                "Enterprise",
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (val) {},
             ),
           ],
@@ -325,44 +367,56 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.md),
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              AppSpacing.xl,
+              AppSpacing.xl,
+              AppSpacing.md,
+            ),
             child: Text(title, style: CustomFonts.black18w600),
           ),
           Expanded(
             child: isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: AppLoader())
                 : items.isEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(AppSpacing.xxl),
-                          child: Text("No entries found", style: CustomFonts.grey13w500),
-                        ),
-                      )
-                    : Scrollbar(
-                        controller: controller,
-                        thumbVisibility: true,
-                        child: SingleChildScrollView(
-                          controller: controller,
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              return SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                                  child: DataTable(
-                                    headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
-                                    rows: List.generate(
-                                      items.length,
-                                      (index) => rowBuilder(items[index]),
-                                    ),
-                                    columns: columns,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                ? Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(AppSpacing.xxl),
+                      child: Text(
+                        "No entries found",
+                        style: CustomFonts.grey13w500,
                       ),
+                    ),
+                  )
+                : Scrollbar(
+                    controller: controller,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      controller: controller,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minWidth: constraints.maxWidth,
+                              ),
+                              child: DataTable(
+                                headingRowColor: WidgetStateProperty.all(
+                                  CustomColors.whiteGrey,
+                                ),
+                                rows: List.generate(
+                                  items.length,
+                                  (index) => rowBuilder(items[index]),
+                                ),
+                                columns: columns,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
           ),
         ],
       ),
@@ -376,22 +430,39 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         DataCell(_buildContactCell(clinic.email, clinic.phone)),
         DataCell(Text(clinic.address ?? 'N/A', style: CustomFonts.grey13w500)),
         DataCell(_buildPlanBadge(clinic.subscriptionPlan ?? "Standard")),
-        DataCell(_buildStatsCell(clinic.totalAppointments?.toString() ?? "0", Icons.people_outline_rounded, clinic.rating?.toString() ?? "0", Icons.star_outline_rounded)),
+        DataCell(
+          _buildStatsCell(
+            clinic.totalAppointments?.toString() ?? "0",
+            Icons.people_outline_rounded,
+            clinic.rating?.toString() ?? "0",
+            Icons.star_outline_rounded,
+          ),
+        ),
         DataCell(_statusBadge(clinic.status ?? 'Active')),
         DataCell(
           Row(
             children: [
               IconButton(
                 tooltip: 'View Details',
-                icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.grey),
+                icon: Icon(
+                  Icons.visibility_outlined,
+                  size: 20.sp,
+                  color: CustomColors.grey,
+                ),
                 onPressed: () {
-                  ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
+                  ref
+                      .read(clinicViewModelProvider.notifier)
+                      .selectClinic(clinic);
                   context.push(ClinicDetailScreen.routeName);
                 },
               ),
               IconButton(
                 tooltip: 'Edit Partner',
-                icon: Icon(Icons.edit_outlined, size: 20.sp, color: CustomColors.grey),
+                icon: Icon(
+                  Icons.edit_outlined,
+                  size: 20.sp,
+                  color: CustomColors.grey,
+                ),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -416,9 +487,15 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         DataCell(
           IconButton(
             tooltip: 'View Prospect',
-            icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.grey),
+            icon: Icon(
+              Icons.visibility_outlined,
+              size: 20.sp,
+              color: CustomColors.grey,
+            ),
             onPressed: () {
-              ref.read(clinicViewModelProvider.notifier).selectInviteClinic(clinic);
+              ref
+                  .read(clinicViewModelProvider.notifier)
+                  .selectInviteClinic(clinic);
               context.push(InviteClinicDetailScreen.routeName);
             },
           ),
@@ -433,7 +510,9 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
         CircleAvatar(
           radius: 16.r,
           backgroundColor: CustomColors.palePurple,
-          backgroundImage: (logo != null && logo.isNotEmpty) ? NetworkImage(logo) : null,
+          backgroundImage: (logo != null && logo.isNotEmpty)
+              ? NetworkImage(logo)
+              : null,
           child: (logo == null || logo.isEmpty)
               ? Text(name?[0] ?? "C", style: CustomFonts.purple12w700)
               : null,
@@ -459,7 +538,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
     return AppBadge(label: plan, variant: AppBadgeVariant.secondary);
   }
 
-  Widget _buildStatsCell(String val1, IconData icon1, String val2, IconData icon2) {
+  Widget _buildStatsCell(
+    String val1,
+    IconData icon1,
+    String val2,
+    IconData icon2,
+  ) {
     return Row(
       children: [
         _miniIconStat(icon1, val1),
@@ -490,10 +574,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement> with Single
   Widget _invitationStatusBadge(String status) {
     AppBadgeVariant variant = AppBadgeVariant.info;
     String cleanStatus = status.toLowerCase();
-    
-    if (cleanStatus.contains('sent') || cleanStatus.contains('invited') || cleanStatus.contains('awaiting')) {
+
+    if (cleanStatus.contains('sent') ||
+        cleanStatus.contains('invited') ||
+        cleanStatus.contains('awaiting')) {
       variant = AppBadgeVariant.info;
-    } else if (cleanStatus.contains('interested') || cleanStatus.contains('pending')) {
+    } else if (cleanStatus.contains('interested') ||
+        cleanStatus.contains('pending')) {
       variant = AppBadgeVariant.success;
     } else if (cleanStatus.contains('expired')) {
       variant = AppBadgeVariant.error;
