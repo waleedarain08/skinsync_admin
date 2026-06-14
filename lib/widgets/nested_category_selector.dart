@@ -79,11 +79,34 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
           items: widget.categories,
           selectedId: _selectedPath.isNotEmpty ? _selectedPath[0] : null,
           onSelect: (item) => _onLevelSelect(0, item),
-          onAddChild: (parent) => _showCreationDialog(context, parent.name, (name, icon, consentFile, sessions) {
-            dataViewModel.addCategory(name, icon: icon, parentId: parent.id, consentFormName: consentFile?.name, consentFormUrl: consentFile?.path, defaultSessions: sessions);
+          onAddChild: (parent) => _showCreationDialog(context, parent.name, (result) {
+            dataViewModel.addCategory(
+              result['name'], 
+              icon: result['icon'], 
+              parentId: parent.id, 
+              consentFormName: result['consentFile']?.name, 
+              consentFormUrl: result['consentFile']?.path, 
+              defaultSessions: result['sessions'],
+              totalSessions: result['totalSessions'],
+              preNotifications: result['preNotifications'],
+              postNotifications: result['postNotifications'],
+              downtimePresets: result['downtimePresets'],
+              defaultRoles: result['defaultRoles'],
+            );
           }),
-          onAddRoot: () => _showCreationDialog(context, null, (name, icon, consentFile, sessions) {
-            dataViewModel.addCategory(name, icon: icon, consentFormName: consentFile?.name, consentFormUrl: consentFile?.path, defaultSessions: sessions);
+          onAddRoot: () => _showCreationDialog(context, null, (result) {
+            dataViewModel.addCategory(
+              result['name'], 
+              icon: result['icon'], 
+              consentFormName: result['consentFile']?.name, 
+              consentFormUrl: result['consentFile']?.path, 
+              defaultSessions: result['sessions'],
+              totalSessions: result['totalSessions'],
+              preNotifications: result['preNotifications'],
+              postNotifications: result['postNotifications'],
+              downtimePresets: result['downtimePresets'],
+              defaultRoles: result['defaultRoles'],
+            );
           }),
         ),
 
@@ -102,8 +125,20 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
               items: parentNode.children,
               selectedId: _selectedPath.length > index + 1 ? _selectedPath[index + 1] : null,
               onSelect: (item) => _onLevelSelect(index + 1, item),
-            onAddChild: (parent) => _showCreationDialog(context, parent.name, (name, icon, consentFile, sessions) {
-                dataViewModel.addCategory(name, icon: icon, parentId: parent.id, consentFormName: consentFile?.name, consentFormUrl: consentFile?.path, defaultSessions: sessions);
+              onAddChild: (parent) => _showCreationDialog(context, parent.name, (result) {
+                dataViewModel.addCategory(
+                  result['name'], 
+                  icon: result['icon'], 
+                  parentId: parent.id, 
+                  consentFormName: result['consentFile']?.name, 
+                  consentFormUrl: result['consentFile']?.path, 
+                  defaultSessions: result['sessions'],
+                  totalSessions: result['totalSessions'],
+                  preNotifications: result['preNotifications'],
+                  postNotifications: result['postNotifications'],
+                  downtimePresets: result['downtimePresets'],
+                  defaultRoles: result['defaultRoles'],
+                );
               }),
             ),
           );
@@ -157,14 +192,14 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
     );
   }
 
-  void _showCreationDialog(BuildContext context, String? parentName, Function(String, String, PlatformFile?, List<SessionConfig>?) onSave) async {
+  void _showCreationDialog(BuildContext context, String? parentName, Function(Map<String, dynamic>) onSave) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => CategoryCreationDialog(parentName: parentName),
     );
 
     if (result != null) {
-      onSave(result['name'], result['icon'], result['consentFile'], result['sessions']);
+      onSave(result);
     }
   }
 

@@ -12,6 +12,7 @@ import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/number_paginator.dart';
+import '../../view_models/product_view_model.dart';
 import '../../widgets/custom_dropdown_widget.dart';
 
 class ProductManagement extends ConsumerStatefulWidget {
@@ -30,12 +31,12 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   int _currentPage = 0;
   static const int _itemsPerPage = 5;
 
-  late List<ProductModel> _catalogProducts;
-
   @override
   void initState() {
     super.initState();
-    _catalogProducts = List.from(dummyProducts);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(productViewModelProvider.notifier).getProducts();
+    });
   }
 
   @override
@@ -46,8 +47,11 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(productViewModelProvider);
+    final catalogProducts = state.products ?? [];
+
     // Filter products dynamically
-    final filteredProducts = _catalogProducts.where((p) {
+    final filteredProducts = catalogProducts.where((p) {
       final query = _searchController.text.toLowerCase();
       final matchesQuery = query.isEmpty ||
           p.name.toLowerCase().contains(query) ||
@@ -120,14 +124,10 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           onTap: () {
             showDialog(
               context: context,
-              builder: (context) => ProductDialogBox(
+              builder: (context) => const ProductDialogBox(
                 product: null,
               ),
-            ).then((_) {
-              // Normally, Riverpod state updates automatically.
-              // To ensure the dummy state is updated for demonstration:
-              setState(() {});
-            });
+            );
           },
           icon: Icons.add_circle_outline,
           label: 'Create Catalog Product',
@@ -138,10 +138,13 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   }
 
   Widget _buildCatalogOverview() {
-    final totalSkus = _catalogProducts.length;
-    final totalBrands = _catalogProducts.map((p) => p.brand).toSet().length;
-    final lotTrackingEnabled = _catalogProducts.where((p) => p.enforceLotTracking ?? false).length;
-    final devicesCount = _catalogProducts.where((p) => p.productPurpose == 'device').length;
+    final state = ref.watch(productViewModelProvider);
+    final catalogProducts = state.products ?? [];
+    
+    final totalSkus = catalogProducts.length;
+    final totalBrands = catalogProducts.map((p) => p.brand).toSet().length;
+    final lotTrackingEnabled = catalogProducts.where((p) => p.enforceLotTracking ?? false).length;
+    final devicesCount = catalogProducts.where((p) => p.productPurpose == 'device').length;
 
     return Row(
       children: [
@@ -461,19 +464,16 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               showDialog(
                 context: context,
                 builder: (context) => ProductDialogBox(product: product),
-              ).then((_) => setState(() {}));
+              );
             },
           ),
           IconButton(
             tooltip: "Archive",
             icon: Icon(Icons.archive_outlined, color: CustomColors.red, size: 20.sp),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Archived "${product.name}" globally.'),
-                  backgroundColor: CustomColors.black,
-                ),
-              );
+              if (product.id != null) {
+                ref.read(productViewModelProvider.notifier).deleteProduct(product.id!);
+              }
             },
           ),
         ],
