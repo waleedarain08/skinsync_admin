@@ -130,8 +130,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       'Treatment Areas',
       'Inventory Products',
       'Post Treatment Photos',
-      'Pricing',
       'Scheduling',
+      'Pricing',
       'Protocols',
       'Pre-Treatment Instructions',
       'Post-Treatment Instructions',
@@ -282,8 +282,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       'Body Areas',
       'Inventory Products',
       'Post Treatment Photos',
-      'Pricing Setup',
       'Scheduling',
+      'Pricing Setup',
       'Clinical Protocols',
       'Pre-Treatment Instructions',
       'Post-Treatment Instructions',
@@ -301,8 +301,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       'Define mandatory sub-areas.',
       'Configure required products from inventory and area-wise consumption.',
       'Configure how many post-treatment photos should be captured for this treatment.',
-      'Finalize treatment base price and sub-area pricing adjustments.',
       'Centralize appointment duration, preparation times, and booking permissions.',
+      'Finalize treatment base price and sub-area pricing adjustments.',
       'Standardize procedures with checklists and required text fields.',
       'Detailed instructions and supporting media for patients before the procedure.',
       'Aftercare guidelines and recovery media for patients after the procedure.',
@@ -320,8 +320,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
       Icons.accessibility_new_outlined,
       Icons.inventory_2_outlined,
       Icons.add_a_photo_outlined,
-      Icons.payments_outlined,
       Icons.schedule_outlined,
+      Icons.payments_outlined,
       Icons.assignment_turned_in_outlined,
       Icons.login_rounded,
       Icons.logout_rounded,
@@ -482,8 +482,8 @@ class CreateTreatmentScreen extends ConsumerWidget {
         _buildBasicInfoSummary(context, state, viewModel, selectedCategory),
         _buildAreasSummary(context, state, dataState),
         _buildProductsSummary(context, state),
-        _buildPricingSummary(context, state, viewModel),
         _buildSchedulingSummary(context, state, viewModel),
+        _buildPricingSummary(context, state, viewModel),
         _buildSessionsSummary(context, state, selectedCategory),
         _buildConsentSummary(context, state, selectedCategory),
         _buildPreTreatmentInstructionsSummary(context, state, viewModel),
@@ -511,7 +511,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     return _blueprintSection(
       context,
-      '5. Scheduling Configuration',
+      '4. Scheduling Configuration',
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -659,10 +659,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _validationRow(context, 'Basic Information', basicOk),
-          _validationRow(context, 'Areas & Sub Areas', areasOk),
           _validationRow(context, 'Products', productsOk),
-          _validationRow(context, 'Pricing', pricingOk),
           _validationRow(context, 'Scheduling Configuration', schedOk),
+          _validationRow(context, 'Pricing', pricingOk),
+          _validationRow(context, 'Areas & Sub Areas', areasOk),
           _validationRow(context, 'Notifications', notifOk),
           rolesOk
               ? _validationRow(context, 'Provider Roles', true)
@@ -1208,7 +1208,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
 
     return _blueprintSection(
       context,
-      '4. Pricing & Financial Rules',
+      '5. Pricing & Financial Rules',
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1946,9 +1946,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 4:
         return _buildPostTreatmentPhotosStep(context, state, viewModel);
       case 5:
-        return _buildStepPricing(context, state, viewModel);
-      case 6:
         return _buildStepScheduling(context, state, viewModel);
+      case 6:
+        return _buildStepPricing(context, state, viewModel);
       case 7:
         return _buildStepProtocolsStep(
           context,
@@ -6121,7 +6121,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
               if (state.currentStep == 4) {
                 if (!_validatePostPhotos(context, state)) return;
               }
-              if (state.currentStep == 6) {
+              if (state.currentStep == 5) {
                 if (!_validateScheduling(context, viewModel)) return;
               }
 
