@@ -1,0 +1,80 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final masterDataViewModelProvider = NotifierProvider<MasterDataViewModel, MasterDataState>(
+  MasterDataViewModel.new,
+);
+
+class MasterDataState {
+  final List<String> brands;
+  final List<String> manufacturers;
+  final List<String> usageTypes;
+  final List<String> units;
+  final List<String> packageTypes;
+
+  MasterDataState({
+    this.brands = const [],
+    this.manufacturers = const [],
+    this.usageTypes = const [],
+    this.units = const [],
+    this.packageTypes = const [],
+  });
+
+  MasterDataState copyWith({
+    List<String>? brands,
+    List<String>? manufacturers,
+    List<String>? usageTypes,
+    List<String>? units,
+    List<String>? packageTypes,
+  }) {
+    return MasterDataState(
+      brands: brands ?? this.brands,
+      manufacturers: manufacturers ?? this.manufacturers,
+      usageTypes: usageTypes ?? this.usageTypes,
+      units: units ?? this.units,
+      packageTypes: packageTypes ?? this.packageTypes,
+    );
+  }
+}
+
+class MasterDataViewModel extends Notifier<MasterDataState> {
+  @override
+  MasterDataState build() {
+    return MasterDataState(
+      brands: ['Allergan', 'Bella Medical', 'McKesson', 'Regimen MD', 'Candela', 'Galderma', 'Merz', 'Nestle', 'Loreal', 'Unilever', 'Johnson & Johnson'],
+      manufacturers: ['Allergan PLC', 'Nestle Pakistan', 'Loreal Paris Factory', 'ABC Medical Industries', 'XYZ Pharmaceuticals'],
+      usageTypes: ['Treatment', 'Retail Sale', 'Consumable', 'Injection', 'Cleaning', 'Procedure', 'Medication', 'Laboratory', 'Variable', 'Required', 'Setup/Supply', 'Device'],
+      units: ['Piece', 'ML', 'MG', 'Gram', 'KG', 'Liter', 'Tablet', 'Capsule', 'Unit', 'Syringe', 'Vial', 'Box'],
+      packageTypes: ['Box', 'Pack', 'Bottle', 'Carton', 'Tube', 'Bag', 'Piece', 'Tray', 'Custom'],
+    );
+  }
+
+  void addBrand(String name) {
+    if (name.isNotEmpty && !state.brands.contains(name)) {
+      state = state.copyWith(brands: [...state.brands, name]);
+    }
+  }
+
+  void addManufacturer(String name) {
+    if (name.isNotEmpty && !state.manufacturers.contains(name)) {
+      state = state.copyWith(manufacturers: [...state.manufacturers, name]);
+    }
+  }
+
+  void addUsageType(String name) {
+    if (name.isNotEmpty && !state.usageTypes.contains(name)) {
+      state = state.copyWith(usageTypes: [...state.usageTypes, name]);
+    }
+  }
+
+  void addUnit(String name) {
+    if (name.isNotEmpty && !state.units.contains(name)) {
+      state = state.copyWith(units: [...state.units, name]);
+    }
+  }
+
+  void addPackageType(String name) {
+    if (name.isNotEmpty && !state.packageTypes.contains(name)) {
+      state = state.copyWith(packageTypes: [...state.packageTypes, name]);
+    }
+  }
+}
