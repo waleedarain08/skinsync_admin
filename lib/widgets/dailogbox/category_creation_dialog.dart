@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../models/common_models.dart';
 import '../../models/notification_entry.dart';
@@ -45,6 +49,8 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   late final TextEditingController _totalSessionsController;
   final List<TextEditingController> _sessionFollowUpsCountControllers = [];
   late String _selectedIcon;
+  final ImagePicker _imagePicker = ImagePicker();
+  XFile? _selectedIconFile;
   PlatformFile? _consentFile;
   String? _existingConsentName;
   List<SessionConfig> _sessions = [];
@@ -145,16 +151,6 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
         : [];
   }
 
-  final List<Map<String, dynamic>> _icons = [
-    {'name': 'Category', 'icon': Icons.category_outlined},
-    {'name': 'Spa', 'icon': Icons.spa_outlined},
-    {'name': 'Cut', 'icon': Icons.content_cut_rounded},
-    {'name': 'Face', 'icon': Icons.face_retouching_natural_rounded},
-    {'name': 'Medical', 'icon': Icons.medical_services_outlined},
-    {'name': 'Wash', 'icon': Icons.dry_cleaning_outlined},
-    {'name': 'Skin', 'icon': Icons.clean_hands_outlined},
-  ];
-
   void _syncFollowUpsCountControllers() {
     while (_sessionFollowUpsCountControllers.length < _sessions.length) {
       final sIdx = _sessionFollowUpsCountControllers.length;
@@ -234,6 +230,18 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
       setState(() {
         _consentFile = result.files.first;
         _existingConsentName = null;
+      });
+    }
+  }
+
+  Future<void> _pickIcon() async {
+    final XFile? image = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+    );
+    if (image != null) {
+      setState(() {
+        _selectedIconFile = image;
+        _selectedIcon = image.path;
       });
     }
   }
@@ -627,39 +635,55 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
           context.verticalSpace(24),
           Text('Select Category Icon', style: context.fonts.black14w600),
           context.verticalSpace(12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: _icons.map((item) {
-              final isSelected =
-                  _selectedIcon == (item['name'] as String).toLowerCase();
-              return InkWell(
-                onTap: () => setState(
-                  () => _selectedIcon = (item['name'] as String).toLowerCase(),
-                ),
-                borderRadius: context.appBorderRadius(all: 10),
-                child: Container(
-                  width: context.w(54),
-                  height: context.w(54),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? CustomColors.purple
-                        : CustomColors.softGrey,
-                    borderRadius: context.appBorderRadius(all: 10),
-                    border: Border.all(
-                      color: isSelected
-                          ? CustomColors.purple
-                          : CustomColors.border,
-                    ),
-                  ),
-                  child: Icon(
-                    item['icon'],
-                    color: isSelected ? Colors.white : CustomColors.grey,
-                    size: context.sp(24),
-                  ),
-                ),
-              );
-            }).toList(),
+          GestureDetector(
+            onTap: _pickIcon,
+            child: Container(
+              width: 120.w,
+              height: 120.w,
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(color: CustomColors.border),
+                image: _selectedIconFile != null
+                    ? DecorationImage(
+                        image: kIsWeb
+                            ? NetworkImage(_selectedIconFile!.path)
+                            : FileImage(File(_selectedIconFile!.path))
+                                as ImageProvider,
+                        fit: BoxFit.cover,
+                      )
+                    : (_selectedIcon.isNotEmpty &&
+                            (_selectedIcon.startsWith('http') ||
+                                _selectedIcon.contains('/')))
+                        ? DecorationImage(
+                            image: _selectedIcon.startsWith('http')
+                                ? NetworkImage(_selectedIcon)
+                                : FileImage(File(_selectedIcon))
+                                    as ImageProvider,
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+              ),
+              child: (_selectedIconFile == null &&
+                      !_selectedIcon.startsWith('http') &&
+                      !_selectedIcon.contains('/'))
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add_a_photo_outlined,
+                          size: 32.sp,
+                          color: CustomColors.purple,
+                        ),
+                        context.verticalSpace(8),
+                        Text(
+                          'Tap to upload',
+                          style: context.fonts.purple12w700,
+                        ),
+                      ],
+                    )
+                  : null,
+            ),
           ),
           context.verticalSpace(32),
           const Divider(),

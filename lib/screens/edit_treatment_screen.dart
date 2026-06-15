@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../models/treatment_data_models.dart';
 import '../utils/dummy_data.dart';
@@ -2234,7 +2235,7 @@ class EditTreatmentScreen extends ConsumerWidget {
   Widget _buildImageTile(
     BuildContext context,
     String label,
-    File? file,
+    XFile? file,
     VoidCallback onTap,
   ) {
     return Column(
@@ -2587,7 +2588,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     required String hint,
     required TextEditingController controller,
     required List<String> suggestions,
-    required Function(String) onSelected,
+    required void Function(String) onSelected,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2701,7 +2702,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     required String label,
     required int? value,
     required Map<int, String> options,
-    required Function(int?) onChanged,
+    required void Function(int?) onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -14,7 +14,7 @@ class BaseApiResponseModel<T> {
     T Function(Object? json) fromJsonT,
   ) {
     return BaseApiResponseModel<T>(
-      isSuccess: json['is_success'] ?? false,
+      isSuccess: json['is_success'] ?? json['status'] ?? false,
       message: json['message'] ?? '',
       data: json['data'] != null ? fromJsonT(json['data']) : null,
     );

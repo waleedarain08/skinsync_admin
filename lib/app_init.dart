@@ -20,8 +20,8 @@ class AppInit extends StatelessWidget {
       ..radius = 12.0
       ..progressColor = CustomColors.white
       ..backgroundColor = CustomColors.white
-      ..indicatorColor = CustomColors.white
-      ..textColor = CustomColors.white
+      ..indicatorColor = CustomColors.purple
+      ..textColor = CustomColors.black
       ..maskColor = CustomColors.black.withValues(alpha: 0.4)
       ..indicatorWidget = const AppLoader(size: 50)
       ..userInteractions = true
