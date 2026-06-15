@@ -172,11 +172,11 @@ class ApiBaseHelper {
     }
     final refreshExpiry = await _storage.getRefreshTokenExpiry();
     if (refreshExpiry?.isBefore(now) ?? true) {
-      throw UnauthorizedException('Unauthorized');
+      throw const UnauthorizedException('Unauthorized');
     }
     final refreshToken = await _storage.getRefreshToken();
     if (refreshToken == null) {
-      throw UnauthorizedException('Unauthorized');
+      throw const UnauthorizedException('Unauthorized');
     }
     log('EXPIRY: $expiry');
     log('REFRESH EXPIRY: $refreshExpiry');
@@ -188,19 +188,19 @@ class ApiBaseHelper {
     log('RESPONSE: ${json.body}');
     final response = RefreshTokenResponse.fromJson(_processResponse(json));
     if (!response.isSuccess) {
-      throw UnauthorizedException('Unauthorized');
+      throw const UnauthorizedException('Unauthorized');
     }
     final secureStorage = locator<SecureStorageService>();
-    await secureStorage.saveToken(response.data!.accessToken!);
-    await secureStorage.saveRefreshToken(response.data!.refreshToken!);
+    await secureStorage.saveToken(response.data!.accessToken);
+    await secureStorage.saveRefreshToken(response.data!.refreshToken);
     await secureStorage.saveAccessTokenExpiry(
       DateTime.fromMillisecondsSinceEpoch(
-        response.data!.accessExpiresAt! * 1000,
+        response.data!.accessExpiresAt * 1000,
       ),
     );
     await secureStorage.saveRefreshTokenExpiry(
       DateTime.fromMillisecondsSinceEpoch(
-        response.data!.refreshExpiresAt! * 1000,
+        response.data!.refreshExpiresAt * 1000,
       ),
     );
     log('TOKEN REFRESHED');
@@ -222,7 +222,7 @@ class ApiBaseHelper {
         throw UnauthorizedException(_message(response));
 
       case 404:
-        throw NotFoundException('Endpoint not found');
+        throw const NotFoundException('Endpoint not found');
 
       default:
         throw ServerException(_message(response));
@@ -240,7 +240,7 @@ class ApiBaseHelper {
   String _message(http.Response response) {
     try {
       final body = jsonDecode(response.body);
-      return body['message'] ?? 'Something went wrong';
+      return (body['message'] as String?) ?? 'Something went wrong';
     } catch (_) {
       return 'Something went wrong';
     }

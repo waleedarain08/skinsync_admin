@@ -6,8 +6,8 @@ List<Map<String, String>> getNextNDays(int n) {
     final date = now.add(Duration(days: i));
     final dayInitial = _getDayString(date.weekday);
     dates.add({
-      "date": date.day.toString().padLeft(2, '0'),
-      "day": dayInitial, // or dayInitial if you want short "Mon", "Tue"
+      'date': date.day.toString().padLeft(2, '0'),
+      'day': dayInitial, // or dayInitial if you want short "Mon", "Tue"
     });
   }
 
@@ -17,20 +17,20 @@ List<Map<String, String>> getNextNDays(int n) {
 String _getDayString(int weekday) {
   switch (weekday) {
     case DateTime.monday:
-      return "Mon";
+      return 'Mon';
     case DateTime.tuesday:
-      return "Tue";
+      return 'Tue';
     case DateTime.wednesday:
-      return "Wed";
+      return 'Wed';
     case DateTime.thursday:
-      return "Thu";
+      return 'Thu';
     case DateTime.friday:
-      return "Fri";
+      return 'Fri';
     case DateTime.saturday:
-      return "Sat";
+      return 'Sat';
     case DateTime.sunday:
-      return "Sun";
+      return 'Sun';
     default:
-      return "";
+      return '';
   }
 }

@@ -12,14 +12,14 @@ class PngAssets {
   static const String apple = '${_assets}apple.png';
   static const String google = '${_assets}google.png';
   static const String signupVector = '${_assets}signup_vector.png';
-  static const String email = "${_assets}email.png";
+  static const String email = '${_assets}email.png';
   static const String notification = '${_assets}notification.png';
   static const String getNotified = '${_assets}getnotified.png';
   static const String image = '${_assets}image.png';
   static const String laserTreatment = '${_assets}laser_treatment.png';
-  static const String beforeAfter = "${_assets}before_after.png";
-  static const String syringe = "${_assets}syringe.png";
-  static const String hand = "${_assets}hand.png";
+  static const String beforeAfter = '${_assets}before_after.png';
+  static const String syringe = '${_assets}syringe.png';
+  static const String hand = '${_assets}hand.png';
   static const String logo = '${_assets}logo.png';
   static const String signup = '${_assets}signup.png';
   static const String empty = '${_assets}empty.png';
@@ -29,7 +29,7 @@ class SvgAssets {
   static const String _assets = 'assets/svg/';
   static const String apple = '${_assets}apple.svg';
   static const String google = '${_assets}google.svg';
-  static const String mail = "${_assets}mail.svg";
+  static const String mail = '${_assets}mail.svg';
   static const String appointment = '${_assets}appointment.svg';
   static const String home = '${_assets}home.svg';
   static const String profile = '${_assets}profile.svg';
@@ -41,23 +41,23 @@ class SvgAssets {
   static const String profilefilled = '${_assets}profilefilled.svg';
   static const String progressfilled = '${_assets}progressfilled.svg';
   static const String mappin = '${_assets}mappin.svg';
-  static const String appointments = "${_assets}appointments.svg";
-  static const String treatments = "${_assets}treatments.svg";
-  static const String profileIcon = "${_assets}profile_icon.svg";
-  static const String logOut = "${_assets}logout.svg";
-  static const String loyalty = "${_assets}loyalty.svg";
-  static const String medical = "${_assets}medical.svg";
-  static const String receipts = "${_assets}receipts.svg";
-  static const String saveTreatment = "${_assets}save_treatment.svg";
-  static const String myProfile = "${_assets}my_profile.svg";
-  static const String authentication = "${_assets}authentication.svg";
-  static const String biometric = "${_assets}biometric.svg";
-  static const String card = "${_assets}card.svg";
-  static const String face = "${_assets}face.svg";
-  static const String eye = "${_assets}eye.svg";
-  static const String glasses = "${_assets}glasses.svg";
-  static const String tick = "${_assets}trick.svg";
-  static const String flame = "${_assets}flame.svg";
+  static const String appointments = '${_assets}appointments.svg';
+  static const String treatments = '${_assets}treatments.svg';
+  static const String profileIcon = '${_assets}profile_icon.svg';
+  static const String logOut = '${_assets}logout.svg';
+  static const String loyalty = '${_assets}loyalty.svg';
+  static const String medical = '${_assets}medical.svg';
+  static const String receipts = '${_assets}receipts.svg';
+  static const String saveTreatment = '${_assets}save_treatment.svg';
+  static const String myProfile = '${_assets}my_profile.svg';
+  static const String authentication = '${_assets}authentication.svg';
+  static const String biometric = '${_assets}biometric.svg';
+  static const String card = '${_assets}card.svg';
+  static const String face = '${_assets}face.svg';
+  static const String eye = '${_assets}eye.svg';
+  static const String glasses = '${_assets}glasses.svg';
+  static const String tick = '${_assets}trick.svg';
+  static const String flame = '${_assets}flame.svg';
   static const String user = '${_assets}user.svg';
   static const String patient = '${_assets}patient.svg';
   static const String clinic = '${_assets}clinic.svg';
@@ -67,13 +67,13 @@ class SvgAssets {
   static const String pushNotification = '${_assets}push_notifications.svg';
 
   // bottom nav icons
-  static const String notification = "${_assets}notification.svg";
-  static const String faceId = "${_assets}face_id.svg";
-  static const String dail = "${_assets}dail.svg";
-  static const String disputeManagement = "${_assets}dispute_management.svg";
-  static const String paymentManagement = "${_assets}payment_management.svg";
-  static const String product = "${_assets}product.svg";
-  static const String setting = "${_assets}setting.svg";
+  static const String notification = '${_assets}notification.svg';
+  static const String faceId = '${_assets}face_id.svg';
+  static const String dail = '${_assets}dail.svg';
+  static const String disputeManagement = '${_assets}dispute_management.svg';
+  static const String paymentManagement = '${_assets}payment_management.svg';
+  static const String product = '${_assets}product.svg';
+  static const String setting = '${_assets}setting.svg';
 }
 
 class LottieAssets {
@@ -89,7 +89,7 @@ class GifAssets {
 class DummyAssets {
   static const String _assets = 'assets/dummyassets/';
   static const String acen = '${_assets}acne.png';
-  static const String profile = "${_assets}profile.png";
-  static const String treatmentimage = "${_assets}treatmentimage.png";
-  static const String doctorImage = "${_assets}doctor_image.png";
+  static const String profile = '${_assets}profile.png';
+  static const String treatmentimage = '${_assets}treatmentimage.png';
+  static const String doctorImage = '${_assets}doctor_image.png';
 }

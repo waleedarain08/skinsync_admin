@@ -1,77 +1,158 @@
+import 'common_models.dart';
 
+export 'common_models.dart';
+export 'treatment_model.dart';
 
 class CategoryItem {
+  final String id;
   final String name;
   final String? icon;
-  final List<SubcategoryItem> subcategories;
+  final String? parentId;
+  final List<CategoryItem> children;
+  final int sortOrder;
+  final String? consentFormUrl;
+  final String? consentFormName;
+  final List<SessionConfig>? defaultSessions;
+  final List<FollowUpConfig>? defaultFollowUps;
+  final int totalSessions;
+  
+  // New operational rule defaults
+  final List<NotificationConfig> preNotifications;
+  final List<NotificationConfig> postNotifications;
+  final DowntimePresets downtimePresets;
+  final List<String> defaultRoles;
 
   CategoryItem({
+    required this.id,
     required this.name,
     this.icon,
-    this.subcategories = const [],
-  });
+    this.parentId,
+    this.children = const [],
+    this.sortOrder = 0,
+    this.consentFormUrl,
+    this.consentFormName,
+    this.defaultSessions,
+    this.defaultFollowUps,
+    this.totalSessions = 1,
+    this.preNotifications = const [],
+    this.postNotifications = const [],
+    DowntimePresets? downtimePresets,
+    this.defaultRoles = const [],
+  }) : downtimePresets = downtimePresets ?? DowntimePresets();
 
   CategoryItem copyWith({
+    String? id,
     String? name,
     String? icon,
-    List<SubcategoryItem>? subcategories,
+    String? parentId,
+    List<CategoryItem>? children,
+    int? sortOrder,
+    String? consentFormUrl,
+    String? consentFormName,
+    List<SessionConfig>? defaultSessions,
+    List<FollowUpConfig>? defaultFollowUps,
+    int? totalSessions,
+    List<NotificationConfig>? preNotifications,
+    List<NotificationConfig>? postNotifications,
+    DowntimePresets? downtimePresets,
+    List<String>? defaultRoles,
   }) {
     return CategoryItem(
+      id: id ?? this.id,
       name: name ?? this.name,
       icon: icon ?? this.icon,
-      subcategories: subcategories ?? this.subcategories,
+      parentId: parentId ?? this.parentId,
+      children: children ?? this.children,
+      sortOrder: sortOrder ?? this.sortOrder,
+      consentFormUrl: consentFormUrl ?? this.consentFormUrl,
+      consentFormName: consentFormName ?? this.consentFormName,
+      defaultSessions: defaultSessions ?? this.defaultSessions,
+      defaultFollowUps: defaultFollowUps ?? this.defaultFollowUps,
+      totalSessions: totalSessions ?? this.totalSessions,
+      preNotifications: preNotifications ?? this.preNotifications,
+      postNotifications: postNotifications ?? this.postNotifications,
+      downtimePresets: downtimePresets ?? this.downtimePresets,
+      defaultRoles: defaultRoles ?? this.defaultRoles,
     );
   }
 }
 
-class SubcategoryItem {
+class SubAreaChildItem {
   final String name;
+  final String globalSku;
   final String? icon;
 
-  SubcategoryItem({required this.name, this.icon});
-
-  SubcategoryItem copyWith({String? name, String? icon}) {
-    return SubcategoryItem(
-      name: name ?? this.name,
-      icon: icon ?? this.icon,
-    );
-  }
-}
-
-class AreaItem {
-  final String name;
-  final String? icon;
-  final List<SubAreaItem> subAreas;
-
-  AreaItem({
+  SubAreaChildItem({
     required this.name,
+    required this.globalSku,
     this.icon,
-    this.subAreas = const [],
   });
 
-  AreaItem copyWith({
+  SubAreaChildItem copyWith({
     String? name,
+    String? globalSku,
     String? icon,
-    List<SubAreaItem>? subAreas,
   }) {
-    return AreaItem(
+    return SubAreaChildItem(
       name: name ?? this.name,
+      globalSku: globalSku ?? this.globalSku,
       icon: icon ?? this.icon,
-      subAreas: subAreas ?? this.subAreas,
     );
   }
 }
 
 class SubAreaItem {
   final String name;
+  final String globalSku;
   final String? icon;
+  final List<SubAreaChildItem> children;
 
-  SubAreaItem({required this.name, this.icon});
+  SubAreaItem({
+    required this.name,
+    required this.globalSku,
+    this.icon,
+    this.children = const [],
+  });
 
-  SubAreaItem copyWith({String? name, String? icon}) {
+  SubAreaItem copyWith({
+    String? name,
+    String? globalSku,
+    String? icon,
+    List<SubAreaChildItem>? children,
+  }) {
     return SubAreaItem(
       name: name ?? this.name,
+      globalSku: globalSku ?? this.globalSku,
       icon: icon ?? this.icon,
+      children: children ?? this.children,
+    );
+  }
+}
+
+class AreaItem {
+  final String name;
+  final String globalSku;
+  final String? icon;
+  final List<SubAreaItem> subAreas;
+
+  AreaItem({
+    required this.name,
+    required this.globalSku,
+    this.icon,
+    this.subAreas = const [],
+  });
+
+  AreaItem copyWith({
+    String? name,
+    String? globalSku,
+    String? icon,
+    List<SubAreaItem>? subAreas,
+  }) {
+    return AreaItem(
+      name: name ?? this.name,
+      globalSku: globalSku ?? this.globalSku,
+      icon: icon ?? this.icon,
+      subAreas: subAreas ?? this.subAreas,
     );
   }
 }
@@ -98,4 +179,97 @@ class CombinationGroup {
       treatmentNames: treatmentNames ?? this.treatmentNames,
     );
   }
+}
+
+enum ProtocolType {
+  checkbox,
+  text,
+}
+
+class ProtocolDescription {
+  final String? title;
+  final String text;
+  final int order;
+
+  ProtocolDescription({
+    this.title,
+    required this.text,
+    required this.order,
+  });
+
+  factory ProtocolDescription.fromJson(Map<String, dynamic> json) => ProtocolDescription(
+    title: json['title'],
+    text: json['text'] ?? '',
+    order: json['order'] ?? 0,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'text': text,
+    'order': order,
+  };
+
+  ProtocolDescription copyWith({
+    String? title,
+    String? text,
+    int? order,
+  }) {
+    return ProtocolDescription(
+      title: title ?? this.title,
+      text: text ?? this.text,
+      order: order ?? this.order,
+    );
+  }
+}
+
+class ProtocolItem {
+  final String id;
+  final String title;
+  final ProtocolType type;
+  final List<ProtocolDescription> descriptions;
+
+  ProtocolItem({
+    required this.id,
+    required this.title,
+    required this.type,
+    this.descriptions = const [],
+  });
+
+  ProtocolItem copyWith({
+    String? id,
+    String? title,
+    ProtocolType? type,
+    List<ProtocolDescription>? descriptions,
+  }) {
+    return ProtocolItem(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      type: type ?? this.type,
+      descriptions: descriptions ?? this.descriptions,
+    );
+  }
+
+  factory ProtocolItem.fromJson(Map<String, dynamic> json) {
+    List<ProtocolDescription> descs = [];
+    if (json['descriptions'] != null) {
+      descs = (json['descriptions'] as List).map((e) => ProtocolDescription.fromJson(e)).toList();
+    } else if (json['description'] != null && (json['description'] as String).isNotEmpty) {
+      descs = [
+        ProtocolDescription(title: 'Description 1', text: json['description'], order: 1),
+      ];
+    }
+    return ProtocolItem(
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      type: json['type'] == 'checkbox' ? ProtocolType.checkbox : ProtocolType.text,
+      descriptions: descs,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'type': type == ProtocolType.checkbox ? 'checkbox' : 'text',
+    'descriptions': descriptions.map((e) => e.toJson()).toList(),
+  };
 }

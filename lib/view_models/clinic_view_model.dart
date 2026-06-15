@@ -9,7 +9,7 @@ import 'base_state_model.dart';
 import 'base_view_model.dart';
 
 final clinicViewModelProvider = NotifierProvider<ClinicViewModel, ClinicState>(
-  () => ClinicViewModel._(),
+  ClinicViewModel._,
 );
 
 class ClinicViewModel extends BaseViewModel<ClinicState> {

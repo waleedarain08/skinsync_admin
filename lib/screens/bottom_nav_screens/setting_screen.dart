@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/models/requests/app_version_request_model.dart';
 import 'package:skinsync_admin/view_models/setting_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
-import '../../utils/theme.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+
+import '../../utils/theme.dart';
 
 class SettingScreen extends ConsumerStatefulWidget {
   static const String routeName = '/setting-screen';
@@ -58,17 +57,17 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20.h),
-            Text("Settings", style: CustomFonts.black30w600),
+            Text('Settings', style: context.fonts.black30w600),
             SizedBox(height: 10.h),
             Text(
-              "Manage application versions for Customer and Clinic apps.",
-              style: CustomFonts.grey18w400,
+              'Manage application versions for Customer and Clinic apps.',
+              style: context.fonts.grey18w400,
             ),
             SizedBox(height: 30.h),
             Theme(
               data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
-                title: Text("Customer App", style: CustomFonts.black20w500),
+                title: Text('Customer App', style: context.fonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
                 collapsedBackgroundColor: CustomColors.white,
                 backgroundColor: CustomColors.white,
@@ -82,20 +81,20 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                 ),
                 children: [
                   _buildVersionSection(
-                    title: "Android",
+                    title: 'Android',
                     formKey: _customerAndroidFormKey,
                     versionController: _customerAndroidVersionCtrl,
                     buildController: _customerAndroidBuildCtrl,
-                    type: "android",
+                    type: 'android',
                     isCustomer: true,
                   ),
                   SizedBox(height: 20.h),
                   _buildVersionSection(
-                    title: "IOS",
+                    title: 'IOS',
                     formKey: _customerIosFormKey,
                     versionController: _customerIosVersionCtrl,
                     buildController: _customerIosBuildCtrl,
-                    type: "ios",
+                    type: 'ios',
                     isCustomer: true,
                   ),
                 ],
@@ -105,7 +104,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             Theme(
               data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
-                title: Text("Clinic App", style: CustomFonts.black20w500),
+                title: Text('Clinic App', style: context.fonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
                 collapsedBackgroundColor: CustomColors.white,
                 backgroundColor: CustomColors.white,
@@ -119,20 +118,20 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                 ),
                 children: [
                   _buildVersionSection(
-                    title: "Android",
+                    title: 'Android',
                     formKey: _clinicAndroidFormKey,
                     versionController: _clinicAndroidVersionCtrl,
                     buildController: _clinicAndroidBuildCtrl,
-                    type: "android",
+                    type: 'android',
                     isCustomer: false,
                   ),
                   SizedBox(height: 20.h),
                   _buildVersionSection(
-                    title: "IOS",
+                    title: 'IOS',
                     formKey: _clinicIosFormKey,
                     versionController: _clinicIosVersionCtrl,
                     buildController: _clinicIosBuildCtrl,
-                    type: "ios",
+                    type: 'ios',
                     isCustomer: false,
                   ),
                 ],
@@ -164,16 +163,16 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: CustomFonts.black18w600),
+            Text(title, style: context.fonts.black18w600),
             SizedBox(height: 15.h),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: BuildTextField(
-                    label: "Version Number",
+                    label: 'Version Number',
                     controller: versionController,
-                    hintText: "e.g. 1.2.0",
+                    hintText: 'e.g. 1.2.0',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Required';
@@ -185,9 +184,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                 SizedBox(width: 15.w),
                 Expanded(
                   child: BuildTextField(
-                    label: "Build Number",
+                    label: 'Build Number',
                     controller: buildController,
-                    hintText: "e.g. 5",
+                    hintText: 'e.g. 5',
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -212,7 +211,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                     isCustomer: isCustomer,
                   );
                 },
-                label: "Submit",
+                label: 'Submit',
                 width: 140.w,
               ),
             ),

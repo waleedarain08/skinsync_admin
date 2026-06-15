@@ -1,28 +1,157 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
-#
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
+# =============================================================================
+# Dart Analysis Options
+# Enforces formatting, style, and correctness rules as errors/warnings.
+# Place this file at the root of your Dart/Flutter project.
+# =============================================================================
 
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
+# If not using Flutter, use: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+  errors:
+    # --- Formatting & Style (elevated to errors) ---
+    require_trailing_commas: error
+    prefer_const_constructors: error
+    prefer_const_constructors_in_immutables: error
+    prefer_const_declarations: error
+    prefer_const_literals_to_create_immutables: error
+    unnecessary_const: error
+
+    # --- Dead Code & Unnecessary Code ---
+    dead_code: error
+    unnecessary_statements: error
+    unused_import: error
+    unused_local_variable: error
+    unused_element: warning
+
+    # --- Type Safety ---
+    always_specify_types: warning
+    avoid_dynamic_calls: warning
+    argument_type_not_assignable: ignore
+    inference_failure_on_function_invocation: ignore
+
+    # --- Null Safety ---
+    cast_nullable_to_non_nullable: error
+    null_check_on_nullable_type_parameter: error
+    avoid_print: warning
 
 linter:
-  # The lint rules applied to this project can be customized in the
-  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
-  # included above or to enable additional rules. A list of all available lints
-  # and their documentation is published at https://dart.dev/lints.
-  #
-  # Instead of disabling a lint rule for the entire project in the
-  # section below, it can also be suppressed for a single line of code
-  # or a specific dart file by using the `// ignore: name_of_lint` and
-  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
-  # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    # -------------------------------------------------------------------------
+    # FORMATTING & STYLE
+    # -------------------------------------------------------------------------
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+    # Trailing commas — keeps dart format from collapsing argument lists
+    require_trailing_commas: true
+
+    # Const usage — use const wherever the value is known at compile time
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    unnecessary_const: true
+
+    # Prefer single quotes for strings
+    prefer_single_quotes: true
+
+    # Curly braces for all control flow structures
+    curly_braces_in_flow_control_structures: true
+
+
+    # -------------------------------------------------------------------------
+    # IMPORTS & DECLARATIONS
+    # -------------------------------------------------------------------------
+    always_use_package_imports: false
+    directives_ordering: true
+    no_duplicate_case_values: true
+    no_logic_in_create_state: true
+    unnecessary_underscores: true
+
+    # -------------------------------------------------------------------------
+    # TYPE ANNOTATIONS
+    # -------------------------------------------------------------------------
+    always_declare_return_types: true
+    avoid_dynamic_calls: true
+    type_annotate_public_apis: true
+    prefer_typing_uninitialized_variables: true
+
+    # -------------------------------------------------------------------------
+    # NAMING CONVENTIONS
+    # -------------------------------------------------------------------------
+    camel_case_types: true
+    camel_case_extensions: true
+    constant_identifier_names: true
+    file_names: true
+    library_names: true
+    library_prefixes: true
+    non_constant_identifier_names: true
+    package_names: true
+
+    # -------------------------------------------------------------------------
+    # CLASSES & MEMBERS
+    # -------------------------------------------------------------------------
+    annotate_overrides: true
+    avoid_implementing_value_types: true
+    hash_and_equals: true
+    no_runtimeType_toString: true
+    one_member_abstracts: true
+    prefer_final_fields: true
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+    sort_constructors_first: false
+    sort_unnamed_constructors_first: true
+    use_super_parameters: true
+
+    # -------------------------------------------------------------------------
+    # ASYNC & FUTURES
+    # -------------------------------------------------------------------------
+    avoid_void_async: true
+    unawaited_futures: true
+
+    # -------------------------------------------------------------------------
+    # COLLECTIONS
+    # -------------------------------------------------------------------------
+    prefer_collection_literals: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true
+    prefer_iterable_whereType: true
+
+    # -------------------------------------------------------------------------
+    # NULL & EQUALITY
+    # -------------------------------------------------------------------------
+    avoid_null_checks_in_equality_operators: true
+    prefer_null_aware_operators: true
+    use_if_null_to_convert_nulls_to_bools: false
+
+    # -------------------------------------------------------------------------
+    # STRINGS
+    # -------------------------------------------------------------------------
+    prefer_adjacent_string_concatenation: true
+    prefer_interpolation_to_compose_strings: true
+
+    # -------------------------------------------------------------------------
+    # FUNCTIONS & PARAMETERS
+    # -------------------------------------------------------------------------
+    avoid_positional_boolean_parameters: true
+    prefer_function_declarations_over_variables: true
+    unnecessary_lambdas: true
+
+    # -------------------------------------------------------------------------
+    # DEAD CODE & UNUSED ELEMENTS
+    # -------------------------------------------------------------------------
+    dead_code: true
+
+    # -------------------------------------------------------------------------
+    # FLUTTER-SPECIFIC
+    # -------------------------------------------------------------------------
+    avoid_print: true
+    use_build_context_synchronously: true
+    use_colored_box: true
+    use_decorated_box: true
+    sized_box_for_whitespace: true
+    sized_box_shrink_expand: true

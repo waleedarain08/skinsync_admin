@@ -9,6 +9,13 @@ class ProductModel {
   final int? quantity;
   final String? status; // Active/Inactive
 
+  // Refined Global Product Catalog fields
+  final String? brand;
+  final String? globalSku;
+  final String? productPurpose;
+  final String? unitType;
+  final bool? enforceLotTracking;
+
   ProductModel({
     this.id,
     required this.image,
@@ -19,6 +26,11 @@ class ProductModel {
     this.category,
     this.quantity,
     this.status,
+    this.brand,
+    this.globalSku,
+    this.productPurpose,
+    this.unitType,
+    this.enforceLotTracking,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +44,11 @@ class ProductModel {
       category: json['category'],
       quantity: json['quantity'],
       status: json['status'],
+      brand: json['brand'],
+      globalSku: json['global_sku'],
+      productPurpose: json['product_purpose'],
+      unitType: json['unit_type'],
+      enforceLotTracking: json['enforce_lot_tracking'],
     );
   }
 
@@ -46,6 +63,11 @@ class ProductModel {
       'category': category,
       'quantity': quantity,
       'status': status,
+      'brand': brand,
+      'global_sku': globalSku,
+      'product_purpose': productPurpose,
+      'unit_type': unitType,
+      'enforce_lot_tracking': enforceLotTracking,
     };
   }
 }

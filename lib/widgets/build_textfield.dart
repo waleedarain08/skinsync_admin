@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/theme.dart';
 
 class BuildTextField extends StatelessWidget {
@@ -16,6 +15,7 @@ class BuildTextField extends StatelessWidget {
   final bool readOnly;
   final bool obscureText;
   final double? width;
+  final String? tooltip;
 
   const BuildTextField({
     super.key,
@@ -31,6 +31,7 @@ class BuildTextField extends StatelessWidget {
     this.readOnly = false,
     this.obscureText = false,
     this.width,
+    this.tooltip,
   });
 
   @override
@@ -41,13 +42,26 @@ class BuildTextField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: CustomFonts.black14w600),
-          SizedBox(height: 8.h),
+          Row(
+            children: [
+              Flexible(
+                child: Text(label, style: context.fonts.black14w600),
+              ),
+              if (tooltip != null) ...[
+                context.horizontalSpace(6),
+                Tooltip(
+                  message: tooltip!,
+                  child: const Icon(Icons.info_outline_rounded, size: 16, color: CustomColors.grey),
+                ),
+              ],
+            ],
+          ),
+          context.verticalSpace(8),
           TextFormField(
             controller: controller,
             maxLines: maxLines,
             obscureText: obscureText,
-            style: CustomFonts.black14w400,
+            style: context.fonts.black14w400,
             keyboardType: keyboardType,
             validator: validator,
             readOnly: readOnly,
@@ -57,9 +71,11 @@ class BuildTextField extends StatelessWidget {
             ],
             onChanged: onChanged,
             decoration: AppDecorations.input(
+              context,
               hint: hintText, 
               prefixIcon: prefixIcon,
               suffixIcon: suffixIcon,
+              maxLines: maxLines,
             ),
           ),
         ],

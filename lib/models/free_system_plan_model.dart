@@ -15,7 +15,7 @@ class FreeSystemPlanModel {
 
   FreeSystemPlanModel({
     this.id,
-    this.name = "Free System Plan",
+    this.name = 'Free System Plan',
     this.durationMonths = 2,
     this.doctorSeats = 0,
     this.unlimitedDoctors = false,
@@ -30,7 +30,7 @@ class FreeSystemPlanModel {
   factory FreeSystemPlanModel.fromJson(Map<String, dynamic> json) {
     return FreeSystemPlanModel(
       id: json['id'],
-      name: json['name'] ?? "Free System Plan",
+      name: json['name'] ?? 'Free System Plan',
       durationMonths: json['duration_months'] ?? 2,
       doctorSeats: json['doctor_seats'] ?? 0,
       unlimitedDoctors: json['unlimited_doctors'] ?? false,

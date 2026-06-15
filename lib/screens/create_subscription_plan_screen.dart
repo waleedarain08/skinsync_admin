@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
-import 'package:skinsync_admin/view_models/clinic_view_model.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/models/subscription_plan_model.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
+import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
-import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-import 'package:skinsync_admin/utils/theme.dart';
-
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class CreateSubscriptionPlanScreen extends ConsumerStatefulWidget {
@@ -44,20 +41,20 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
 
   bool _unlimitedDoctors = false;
   bool _unlimitedStaff = false;
-  String _visibilityType = "All Clinics";
+  String _visibilityType = 'All Clinics';
   List<String> _selectedClinics = [];
-  String _clinicSearchQuery = "";
+  String _clinicSearchQuery = '';
   bool _isActive = true;
 
   final List<String> _predefinedFeatures = [
-    "AI consultation and treatment recommendation tools",
-    "Before/after simulations",
-    "Patient records and treatment history",
-    "Payments dashboard",
-    "Automated invoices",
-    "Dynamic pricing system",
-    "Multi-user clinic access",
-    "Priority onboarding and support",
+    'AI consultation and treatment recommendation tools',
+    'Before/after simulations',
+    'Patient records and treatment history',
+    'Payments dashboard',
+    'Automated invoices',
+    'Dynamic pricing system',
+    'Multi-user clinic access',
+    'Priority onboarding and support',
   ];
 
   List<PlanBenefit> _planBenefits = [];
@@ -84,7 +81,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
 
   void _initFromFreePlan(FreeSystemPlanModel plan) {
     _nameController = TextEditingController(text: plan.name);
-    _priceController = TextEditingController(text: "0.00");
+    _priceController = TextEditingController(text: '0.00');
     _doctorSeatsController = TextEditingController(text: plan.doctorSeats.toString());
     _staffSeatsController = TextEditingController(text: plan.staffSeats.toString());
     _standardCommissionController = TextEditingController(text: plan.standardBookingCommissionPercent.toString());
@@ -95,26 +92,26 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     _unlimitedDoctors = plan.unlimitedDoctors;
     _unlimitedStaff = plan.unlimitedStaff;
     _isActive = true;
-    _visibilityType = "All Clinics"; // System plans usually for all
+    _visibilityType = 'All Clinics'; // System plans usually for all
     _selectedClinics = [];
   }
 
   void _initFromNormalPlan(SubscriptionPlanModel? plan) {
     _nameController = TextEditingController(text: plan?.name);
     _priceController = TextEditingController(text: plan?.basePrice?.toString());
-    _doctorSeatsController = TextEditingController(text: plan?.doctorSeats.toString() ?? "0");
-    _staffSeatsController = TextEditingController(text: plan?.staffSeats.toString() ?? "0");
-    _standardCommissionController = TextEditingController(text: plan?.standardBookingCommissionPercent.toString() ?? "0");
-    _dynamicCommissionController = TextEditingController(text: plan?.dynamicBookingCommissionPercent.toString() ?? "0");
-    _techFeeController = TextEditingController(text: plan?.technologyFeePerTreatment.toString() ?? "0");
-    _durationController = TextEditingController(text: "1");
+    _doctorSeatsController = TextEditingController(text: plan?.doctorSeats.toString() ?? '0');
+    _staffSeatsController = TextEditingController(text: plan?.staffSeats.toString() ?? '0');
+    _standardCommissionController = TextEditingController(text: plan?.standardBookingCommissionPercent.toString() ?? '0');
+    _dynamicCommissionController = TextEditingController(text: plan?.dynamicBookingCommissionPercent.toString() ?? '0');
+    _techFeeController = TextEditingController(text: plan?.technologyFeePerTreatment.toString() ?? '0');
+    _durationController = TextEditingController(text: '1');
     
     _unlimitedDoctors = plan?.unlimitedDoctors ?? false;
     _unlimitedStaff = plan?.unlimitedStaff ?? false;
     _isActive = plan?.isActive ?? true;
 
     _selectedClinics = plan?.assignedClinics ?? [];
-    _visibilityType = _selectedClinics.isEmpty ? "All Clinics" : "Specific Clinics";
+    _visibilityType = _selectedClinics.isEmpty ? 'All Clinics' : 'Specific Clinics';
   }
 
   void _initializeBenefits() {
@@ -128,7 +125,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
       return PlanBenefit(title: title, enabled: existing.enabled);
     }).toList();
 
-    for (var benefit in existingBenefits) {
+    for (final benefit in existingBenefits) {
       if (!_predefinedFeatures.contains(benefit.title)) {
         _planBenefits.add(PlanBenefit(title: benefit.title, enabled: benefit.enabled));
       }
@@ -163,23 +160,10 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
       if (isSystemPlan) {
-        final plan = FreeSystemPlanModel(
-          id: widget.freePlanToEdit?.id,
-          name: _nameController.text,
-          durationMonths: int.tryParse(_durationController.text) ?? 1,
-          doctorSeats: _unlimitedDoctors ? 0 : (int.tryParse(_doctorSeatsController.text) ?? 0),
-          unlimitedDoctors: _unlimitedDoctors,
-          staffSeats: _unlimitedStaff ? 0 : (int.tryParse(_staffSeatsController.text) ?? 0),
-          unlimitedStaff: _unlimitedStaff,
-          standardBookingCommissionPercent: double.tryParse(_standardCommissionController.text) ?? 0.0,
-          dynamicBookingCommissionPercent: double.tryParse(_dynamicCommissionController.text) ?? 0.0,
-          technologyFeePerTreatment: double.tryParse(_techFeeController.text) ?? 0.0,
-          benefits: _planBenefits,
-        );
         // Specialized update logic for system plan
-        // final success = await ref.read(subscriptionViewModelProvider.notifier).updateFreeSystemPlan(plan);
-        // Mock success for design
-        context.pop();
+        // final plan = FreeSystemPlanModel(...);
+        // await ref.read(subscriptionViewModelProvider.notifier).updateFreeSystemPlan(plan);
+        Navigator.pop(context);
       } else {
         final plan = SubscriptionPlanModel(
           id: widget.planToEdit?.id,
@@ -193,19 +177,21 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
           dynamicBookingCommissionPercent: double.tryParse(_dynamicCommissionController.text) ?? 0.0,
           technologyFeePerTreatment: double.tryParse(_techFeeController.text) ?? 0.0,
           benefits: _planBenefits,
-          assignedClinics: _visibilityType == "All Clinics" ? [] : _selectedClinics,
+          assignedClinics: _visibilityType == 'All Clinics' ? [] : _selectedClinics,
           isActive: _isActive,
         );
 
         final success = await ref.read(subscriptionViewModelProvider.notifier).createSubscriptionPlan(plan);
         if (success && mounted) {
-          context.pop();
+          Navigator.pop(context);
         }
       }
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(isEditMode ? "Plan updated successfully" : "Plan created successfully")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(isEditMode ? 'Plan updated successfully' : 'Plan created successfully')),
+        );
+      }
     }
   }
 
@@ -214,7 +200,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
     return GradientScaffold(
       appBar: AppBar(
         flexibleSpace: AppDecorations.appBarGradient,
-        title: Text(isSystemPlan ? "Edit System Default Plan" : (isEditMode ? "Edit Subscription Plan" : "Create Subscription Plan"), style: CustomFonts.black18w600),
+        title: Text(isSystemPlan ? 'Edit System Default Plan' : (isEditMode ? 'Edit Subscription Plan' : 'Create Subscription Plan'), style: context.fonts.black18w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
@@ -222,41 +208,41 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 900.w),
+            constraints: BoxConstraints(maxWidth: context.w(900)),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (isSystemPlan) ...[
-                    _sectionHeader("System Onboarding Settings"),
+                    _sectionHeader('System Onboarding Settings'),
                     _formContainer(
                       backgroundColor: CustomColors.purple.withValues(alpha: 0.05),
                       child: Column(
                         children: [
-                          Text("Configure the default free tier duration for newly onboarded clinics.", style: CustomFonts.grey14w400),
-                          SizedBox(height: 20.h),
+                          Text('Configure the default free tier duration for newly onboarded clinics.', style: context.fonts.grey14w400),
+                          context.verticalSpace(20),
                           BuildTextField(
-                            label: "Trial Duration (Months)",
+                            label: 'Trial Duration (Months)',
                             controller: _durationController,
-                            hintText: "e.g. 2",
+                            hintText: 'e.g. 2',
                             keyboardType: TextInputType.number,
                             validator: Validators.empty,
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 32.h),
+                    context.verticalSpace(32),
                   ] else ...[
-                    _sectionHeader("Plan Visibility"),
+                    _sectionHeader('Plan Visibility'),
                     _buildVisibilitySection(),
-                    SizedBox(height: 32.h),
+                    context.verticalSpace(32),
                   ],
                   
-                  _sectionHeader("Basic Information"),
+                  _sectionHeader('Basic Information'),
                   _formContainer(
                     child: Column(
                       children: [
@@ -264,19 +250,19 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                           children: [
                             Expanded(
                               child: BuildTextField(
-                                label: "Plan Name",
+                                label: 'Plan Name',
                                 controller: _nameController,
-                                hintText: "e.g. Premium Plan",
+                                hintText: 'e.g. Premium Plan',
                                 validator: Validators.empty,
                                 readOnly: isSystemPlan,
                               ),
                             ),
-                            SizedBox(width: 24.w),
+                            context.horizontalSpace(24),
                             Expanded(
                               child: BuildTextField(
-                                label: "Base Price (\$)",
+                                label: 'Base Price (\$)',
                                 controller: _priceController,
-                                hintText: "0.00",
+                                hintText: '0.00',
                                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                 validator: Validators.empty,
                                 readOnly: isSystemPlan,
@@ -285,24 +271,24 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                           ],
                         ),
                         if (!isSystemPlan) ...[
-                           SizedBox(height: 24.h),
+                           context.verticalSpace(24),
                            Row(
                              children: [
-                               Text("Plan Status: ", style: CustomFonts.black14w600),
+                               Text('Plan Status: ', style: context.fonts.black14w600),
                                Switch.adaptive(
                                  value: _isActive, 
                                  onChanged: (val) => setState(() => _isActive = val),
                                  activeTrackColor: CustomColors.green,
                                ),
-                               Text(_isActive ? "Active" : "Inactive", style: _isActive ? CustomFonts.green13w500 : CustomFonts.red13w500),
+                               Text(_isActive ? 'Active' : 'Inactive', style: _isActive ? context.fonts.green13w500 : context.fonts.red13w500),
                              ],
                            ),
                         ],
                       ],
                     ),
                   ),
-                  SizedBox(height: 32.h),
-                  _sectionHeader("Plan Limits"),
+                  context.verticalSpace(32),
+                  _sectionHeader('Plan Limits'),
                   _formContainer(
                     child: Column(
                       children: [
@@ -312,29 +298,29 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                             Expanded(
                               flex: 2,
                               child: BuildTextField(
-                                label: "Doctor/Injector Seats",
+                                label: 'Doctor/Injector Seats',
                                 controller: _doctorSeatsController,
-                                hintText: "0",
+                                hintText: '0',
                                 keyboardType: TextInputType.number,
                                 readOnly: _unlimitedDoctors,
                                 onChanged: (val) {
-                                  if (val != null && val.isNotEmpty && val != "0") {
+                                  if (val != null && val.isNotEmpty && val != '0') {
                                     setState(() => _unlimitedDoctors = false);
                                   }
                                 },
                               ),
                             ),
-                            SizedBox(width: 24.w),
+                            context.horizontalSpace(24),
                             Expanded(
                               child: Padding(
-                                padding: EdgeInsets.only(bottom: 8.h),
+                                padding: context.appEdgeInsets(bottom: 8),
                                 child: _unlimitedToggle(
-                                  "Unlimited", 
+                                  'Unlimited', 
                                   _unlimitedDoctors, 
                                   (val) {
                                     setState(() {
                                       _unlimitedDoctors = val;
-                                      if (val) _doctorSeatsController.text = "0";
+                                      if (val) _doctorSeatsController.text = '0';
                                     });
                                   }
                                 ),
@@ -342,36 +328,36 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                             ),
                           ],
                         ),
-                        SizedBox(height: 24.h),
+                        context.verticalSpace(24),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Expanded(
                               flex: 2,
                               child: BuildTextField(
-                                label: "Staff Seats",
+                                label: 'Staff Seats',
                                 controller: _staffSeatsController,
-                                hintText: "0",
+                                hintText: '0',
                                 keyboardType: TextInputType.number,
                                 readOnly: _unlimitedStaff,
                                 onChanged: (val) {
-                                  if (val != null && val.isNotEmpty && val != "0") {
+                                  if (val != null && val.isNotEmpty && val != '0') {
                                     setState(() => _unlimitedStaff = false);
                                   }
                                 },
                               ),
                             ),
-                            SizedBox(width: 24.w),
+                            context.horizontalSpace(24),
                             Expanded(
                               child: Padding(
-                                padding: EdgeInsets.only(bottom: 8.h),
+                                padding: context.appEdgeInsets(bottom: 8),
                                 child: _unlimitedToggle(
-                                  "Unlimited", 
+                                  'Unlimited', 
                                   _unlimitedStaff, 
                                   (val) {
                                     setState(() {
                                       _unlimitedStaff = val;
-                                      if (val) _staffSeatsController.text = "0";
+                                      if (val) _staffSeatsController.text = '0';
                                     });
                                   }
                                 ),
@@ -382,8 +368,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       ],
                     ),
                   ),
-                  SizedBox(height: 32.h),
-                  _sectionHeader("Commission & Fees"),
+                  context.verticalSpace(32),
+                  _sectionHeader('Commission & Fees'),
                   _formContainer(
                     child: Column(
                       children: [
@@ -391,44 +377,44 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                           children: [
                             Expanded(
                               child: BuildTextField(
-                                label: "Standard Booking Commission (%)",
+                                label: 'Standard Booking Commission (%)',
                                 controller: _standardCommissionController,
-                                hintText: "0",
+                                hintText: '0',
                                 keyboardType: TextInputType.number,
                                 validator: Validators.empty,
                               ),
                             ),
-                            SizedBox(width: 24.w),
+                            context.horizontalSpace(24),
                             Expanded(
                               child: BuildTextField(
-                                label: "Dynamic Pricing Commission (%)",
+                                label: 'Dynamic Pricing Commission (%)',
                                 controller: _dynamicCommissionController,
-                                hintText: "0",
+                                hintText: '0',
                                 keyboardType: TextInputType.number,
                                 validator: Validators.empty,
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 24.h),
+                        context.verticalSpace(24),
                         BuildTextField(
-                          label: "Technology Fee Per Booked Treatment (\$)",
+                          label: 'Technology Fee Per Booked Treatment (\$)',
                           controller: _techFeeController,
-                          hintText: "0.00",
+                          hintText: '0.00',
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           validator: Validators.empty,
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 32.h),
-                  _sectionHeader("Plan Features & Benefits"),
+                  context.verticalSpace(32),
+                  _sectionHeader('Plan Features & Benefits'),
                   _formContainer(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ..._planBenefits.map((benefit) => CheckboxListTile(
-                          title: Text(benefit.title ?? "", style: CustomFonts.grey14w400),
+                          title: Text(benefit.title ?? '', style: context.fonts.grey14w400),
                           value: benefit.enabled,
                           onChanged: (val) {
                             setState(() {
@@ -441,23 +427,23 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                           contentPadding: EdgeInsets.zero,
                           dense: true,
                         )),
-                        SizedBox(height: 24.h),
+                        context.verticalSpace(24),
                         Row(
                           children: [
                             Expanded(
                               child: BuildTextField(
-                                label: "Add Custom Feature",
+                                label: 'Add Custom Feature',
                                 controller: _customBenefitController,
-                                hintText: "e.g. Free marketing kit",
+                                hintText: 'e.g. Free marketing kit',
                               ),
                             ),
-                            SizedBox(width: 16.w),
+                            context.horizontalSpace(16),
                             Padding(
-                              padding: EdgeInsets.only(top: 28.h),
+                              padding: context.appEdgeInsets(top: 28),
                               child: CustomPrimaryButton(
                                 onTap: _addCustomBenefit,
-                                label: "Add Feature",
-                                width: 160.w,
+                                label: 'Add Feature',
+                                width: context.w(160),
                               ),
                             ),
                           ],
@@ -465,28 +451,28 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       ],
                     ),
                   ),
-                  SizedBox(height: 48.h),
+                  context.verticalSpace(48),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      SizedBox(
-                        width: 160.w,
-                        child: OutlinedButton(
-                          onPressed: () => context.pop(),
-                          child: Text("Cancel", style: CustomFonts.grey14w400),
-                        ),
+                      CustomOutlinedButton(
+                        onTap: () => context.pop(),
+                        label: 'Cancel',
+                        width: context.w(160),
+                        textColor: CustomColors.grey,
+                        color: CustomColors.border,
                       ),
-                      SizedBox(width: 24.w),
+                      context.horizontalSpace(24),
                       SizedBox(
-                        width: 240.w,
+                        width: context.w(240),
                         child: CustomPrimaryButton(
                           onTap: _submit,
-                          label: isEditMode ? "Update Plan" : "Create Plan",
+                          label: isEditMode ? 'Update Plan' : 'Create Plan',
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 60.h),
+                  context.verticalSpace(60),
                 ],
               ),
             ),
@@ -501,37 +487,37 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Target Availability", style: CustomFonts.black14w600),
-          SizedBox(height: 12.h),
+          Text('Target Availability', style: context.fonts.black14w600),
+          context.verticalSpace(12),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            padding: context.appEdgeInsets(horizontal: 16),
             decoration: BoxDecoration(
               border: Border.all(color: CustomColors.border),
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: context.borderRadius(all: 12),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: _visibilityType,
                 isExpanded: true,
-                items: ["All Clinics", "Specific Clinics"].map((String value) {
+                items: ['All Clinics', 'Specific Clinics'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value, style: CustomFonts.grey14w400),
+                    child: Text(value, style: context.fonts.grey14w400),
                   );
                 }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _visibilityType = val!;
-                    if (_visibilityType == "All Clinics") _selectedClinics = [];
+                    if (_visibilityType == 'All Clinics') _selectedClinics = [];
                   });
                 },
               ),
             ),
           ),
-          if (_visibilityType == "Specific Clinics") ...[
-            SizedBox(height: 24.h),
-            Text("Assign to Clinics", style: CustomFonts.black14w600),
-            SizedBox(height: 12.h),
+          if (_visibilityType == 'Specific Clinics') ...[
+            context.verticalSpace(24),
+            Text('Assign to Clinics', style: context.fonts.black14w600),
+            context.verticalSpace(12),
             _buildClinicSelector(),
           ],
         ],
@@ -542,8 +528,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
   Widget _buildClinicSelector() {
     final clinics = ref.watch(clinicViewModelProvider).clinics ?? [];
     final filteredClinics = clinics.where((c) {
-      final name = c.name?.toLowerCase() ?? "";
-      final email = c.email?.toLowerCase() ?? "";
+      final name = c.name?.toLowerCase() ?? '';
+      final email = c.email?.toLowerCase() ?? '';
       final query = _clinicSearchQuery.toLowerCase();
       return name.contains(query) || email.contains(query);
     }).toList();
@@ -554,34 +540,34 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
         AppSearchField(
           controller: _clinicSearchController,
           onChanged: (val) => setState(() => _clinicSearchQuery = val),
-          hintText: "Search clinics by name or email...",
+          hintText: 'Search clinics by name or email...',
         ),
-        SizedBox(height: 16.h),
+        context.verticalSpace(16),
         if (_selectedClinics.isNotEmpty) ...[
           Wrap(
-            spacing: 8.w,
-            runSpacing: 8.h,
+            spacing: context.w(8),
+            runSpacing: context.h(8),
             children: _selectedClinics.map((email) {
               final clinic = clinics.firstWhere((c) => c.email == email, orElse: () => clinics.first);
               return Chip(
-                label: Text(clinic.name ?? email, style: CustomFonts.black13w500),
+                label: Text(clinic.name ?? email, style: context.fonts.black13w500),
                 backgroundColor: CustomColors.green.withValues(alpha: 0.1),
                 deleteIcon: const Icon(Icons.close, size: 14),
                 onDeleted: () => setState(() => _selectedClinics.remove(email)),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r), side: BorderSide.none),
+                shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 8), side: BorderSide.none),
               );
             }).toList(),
           ),
-          SizedBox(height: 16.h),
+          context.verticalSpace(16),
         ],
         Container(
-          constraints: BoxConstraints(maxHeight: 250.h),
+          constraints: BoxConstraints(maxHeight: context.h(250)),
           decoration: BoxDecoration(
             border: Border.all(color: CustomColors.border),
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: context.borderRadius(all: 12),
           ),
           child: filteredClinics.isEmpty
-              ? Center(child: Padding(padding: EdgeInsets.all(16.w), child: Text("No clinics found", style: CustomFonts.grey14w400)))
+              ? Center(child: Padding(padding: context.appEdgeInsets(all: 16), child: Text('No clinics found', style: context.fonts.grey14w400)))
               : Scrollbar(
                   child: ListView.separated(
                     shrinkWrap: true,
@@ -591,8 +577,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       final clinic = filteredClinics[index];
                       final isSelected = _selectedClinics.contains(clinic.email);
                       return CheckboxListTile(
-                        title: Text(clinic.name ?? "N/A", style: CustomFonts.grey14w600),
-                        subtitle: Text(clinic.email ?? "N/A", style: CustomFonts.grey13w500),
+                        title: Text(clinic.name ?? 'N/A', style: context.fonts.grey14w600),
+                        subtitle: Text(clinic.email ?? 'N/A', style: context.fonts.grey13w500),
                         value: isSelected,
                         onChanged: (val) {
                           setState(() {
@@ -606,7 +592,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                         activeColor: CustomColors.green,
                         checkColor: CustomColors.black,
                         controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                        contentPadding: context.appEdgeInsets(horizontal: 16),
                       );
                     },
                   ),
@@ -618,14 +604,14 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
 
   Widget _sectionHeader(String title) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
-      child: Text(title, style: CustomFonts.black16w700),
+      padding: context.appEdgeInsets(bottom: 16),
+      child: Text(title, style: context.fonts.black16w700),
     );
   }
 
   Widget _formContainer({required Widget child, Color? backgroundColor}) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       backgroundColor: backgroundColor ?? Colors.white,
       child: child,
     );
@@ -640,8 +626,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
           onChanged: onChanged,
           activeTrackColor: CustomColors.green,
         ),
-        SizedBox(width: 8.w),
-        Text(label, style: CustomFonts.grey13w600),
+        context.horizontalSpace(8),
+        Text(label, style: context.fonts.grey13w600),
       ],
     );
   }

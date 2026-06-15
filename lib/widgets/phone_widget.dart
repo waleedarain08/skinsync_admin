@@ -2,7 +2,6 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import '../view_models/auth_view_model.dart';
 
@@ -38,13 +37,13 @@ class PhoneWidget extends StatelessWidget {
         }
         return null;
       },
-      style: CustomFonts.black14w400,
+      style: context.fonts.black14w400,
       keyboardType: TextInputType.phone,
       decoration: InputDecoration(
         filled: filled,
         fillColor: CustomColors.white,
         hintText: 'Enter phone number',
-        hintStyle: CustomFonts.grey14w400,
+        hintStyle: context.fonts.grey14w400,
         prefixIcon: _buildPhoneNumberPicker(context: context),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         border: OutlineInputBorder(
@@ -74,12 +73,10 @@ class PhoneWidget extends StatelessWidget {
             return AbsorbPointer(
               absorbing: readOnly,
               child: CountryCodePicker(
-                onChanged: (country) {
-                  authNotifier.setCountry(country);
-                },
+                onChanged: authNotifier.setCountry,
                 dialogSize: Size(400.w, 500.h),
-                textStyle: CustomFonts.black14w400,
-                initialSelection: authState.country?.code ?? "US",
+                textStyle: context.fonts.black14w400,
+                initialSelection: authState.country?.code ?? 'US',
                 showCountryOnly: false,
                 showOnlyCountryWhenClosed: false,
                 alignLeft: false,

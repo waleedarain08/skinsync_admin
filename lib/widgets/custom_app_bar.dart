@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+
 import '../screens/sign_in_screen.dart';
 import '../services/locator.dart';
 import '../services/storage_service.dart';
-import '../utils/theme.dart';
 import '../utils/responsive.dart';
+import '../utils/theme.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
@@ -13,26 +13,27 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: AppSpacing.topBarHeight,
+      height: AppSpacing.topBarHeight(context),
       decoration: const BoxDecoration(
         gradient: CustomColors.purpleWhiteStateBlueLightGradient,
         border: Border(bottom: BorderSide(color: CustomColors.border, width: 1)),
       ),
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: context.appEdgeInsets(horizontal: 24),
       child: Row(
         children: [
           Responsive.when(
+            context,
             defaultValue: const SizedBox.shrink(),
             mobile: () => _MenuButton(context: context),
             tablet: () => _MenuButton(context: context), // Show hamburger on tablet too
           ),
           const Spacer(),
           const _TopBarAction(icon: Icons.notifications_none_rounded, tooltip: 'Notifications', hasBadge: true),
-          SizedBox(width: AppSpacing.lg),
+          context.horizontalSpace(20),
           const _TopBarAction(icon: Icons.help_outline_rounded, tooltip: 'Documentation'),
-          SizedBox(width: AppSpacing.lg),
+          context.horizontalSpace(20),
           const VerticalDivider(width: 1, indent: 20, endIndent: 20),
-          SizedBox(width: AppSpacing.lg),
+          context.horizontalSpace(20),
           _UserProfile(context: context),
         ],
       ),
@@ -40,7 +41,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size(double.infinity, AppSpacing.topBarHeight);
+  Size get preferredSize => const Size(double.infinity, 72); // Static height for preferredSize
 }
 
 class _MenuButton extends StatelessWidget {
@@ -50,13 +51,13 @@ class _MenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(right: AppSpacing.sm),
+      padding: context.appEdgeInsets(right: 12),
       child: IconButton(
         onPressed: () => Scaffold.of(context).openDrawer(),
-        icon: Icon(Icons.menu_rounded, color: CustomColors.black, size: 26.sp),
+        icon: Icon(Icons.menu_rounded, color: CustomColors.black, size: context.sp(26)),
         style: IconButton.styleFrom(
           backgroundColor: CustomColors.whiteGrey,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+          shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 8)),
         ),
       ),
     );
@@ -93,12 +94,12 @@ class _TopBarActionState extends State<_TopBarAction> {
           children: [
             IconButton(
               onPressed: () {},
-              icon: Icon(widget.icon, size: 24.sp),
+              icon: Icon(widget.icon, size: context.sp(24)),
               color: _hovered ? CustomColors.purple : CustomColors.grey,
               style: IconButton.styleFrom(
                 backgroundColor: _hovered ? CustomColors.palePurple : Colors.transparent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
+                  borderRadius: context.borderRadius(all: 8),
                 ),
               ),
             ),
@@ -107,8 +108,8 @@ class _TopBarActionState extends State<_TopBarAction> {
                 right: 8,
                 top: 8,
                 child: Container(
-                  width: 7.w,
-                  height: 7.w,
+                  width: context.w(7),
+                  height: context.w(7),
                   decoration: BoxDecoration(
                     color: CustomColors.red,
                     shape: BoxShape.circle,
@@ -130,17 +131,17 @@ class _UserProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      offset: Offset(0, 48.h),
+      offset: Offset(0, context.h(48)),
       surfaceTintColor: Colors.transparent,
       elevation: 8,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: context.borderRadius(all: 12),
         side: const BorderSide(color: CustomColors.border),
       ),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        padding: context.appEdgeInsets(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: context.borderRadius(all: 8),
         ),
         child: Row(
           children: [
@@ -148,22 +149,22 @@ class _UserProfile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('Alex MedSpa', style: CustomFonts.black12w600),
-                Text('Super Admin', style: CustomFonts.grey10w400),
+                Text('Alex MedSpa', style: context.fonts.black12w600),
+                Text('Super Admin', style: context.fonts.grey10w400),
               ],
             ),
-            SizedBox(width: AppSpacing.sm),
+            context.horizontalSpace(12),
             Container(
-              width: 40.w,
-              height: 40.w,
+              width: context.w(40),
+              height: context.w(40),
               decoration: BoxDecoration(
                 color: CustomColors.purple,
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: context.borderRadius(all: 8),
               ),
-              child: Icon(Icons.person_rounded, size: 22.sp, color: CustomColors.white),
+              child: Icon(Icons.person_rounded, size: context.sp(22), color: CustomColors.white),
             ),
-            SizedBox(width: 4.w),
-            Icon(Icons.keyboard_arrow_down_rounded, size: 16.sp, color: CustomColors.lightGrey),
+            context.horizontalSpace(4),
+            Icon(Icons.keyboard_arrow_down_rounded, size: context.sp(16), color: CustomColors.lightGrey),
           ],
         ),
       ),
@@ -173,8 +174,8 @@ class _UserProfile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Alex MedSpa', style: CustomFonts.black14w600),
-              Text('admin@skinsync.ai', style: CustomFonts.grey12w400),
+              Text('Alex MedSpa', style: context.fonts.black14w600),
+              Text('admin@skinsync.ai', style: context.fonts.grey12w400),
             ],
           ),
         ),
@@ -183,8 +184,8 @@ class _UserProfile extends StatelessWidget {
           onTap: () {},
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18.sp, color: CustomColors.grey),
-              SizedBox(width: AppSpacing.md),
+              Icon(Icons.person_outline_rounded, size: context.sp(18), color: CustomColors.grey),
+              context.horizontalSpace(16),
               const Text('Account Profile'),
             ],
           ),
@@ -198,8 +199,8 @@ class _UserProfile extends StatelessWidget {
           },
           child: Row(
             children: [
-              Icon(Icons.logout_rounded, color: CustomColors.red, size: 18.sp),
-              SizedBox(width: AppSpacing.md),
+              Icon(Icons.logout_rounded, color: CustomColors.red, size: context.sp(18)),
+              context.horizontalSpace(16),
               const Text('Logout', style: TextStyle(color: CustomColors.red, fontWeight: FontWeight.w600)),
             ],
           ),

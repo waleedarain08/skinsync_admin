@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -18,22 +18,19 @@ class TopTreatmentsChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 255.h,
-      
+
       child: SfCartesianChart(
-      
         primaryXAxis: CategoryAxis(
           majorGridLines: const MajorGridLines(width: 0),
-          labelStyle: CustomFonts.grey14w400  ,
+          labelStyle: context.fonts.grey14w400,
         ),
-        primaryYAxis: NumericAxis(
+        primaryYAxis: const NumericAxis(
           minimum: 0,
           maximum: 340,
           interval: 85,
-          majorGridLines: const MajorGridLines(
-            dashArray: [5, 5],
-          ),
+          majorGridLines: MajorGridLines(dashArray: [5, 5]),
         ),
-        series: <CartesianSeries>[
+        series: [
           ColumnSeries<TreatmentData, String>(
             dataSource: chartData,
             xValueMapper: (TreatmentData data, _) => data.treatment,
@@ -46,6 +43,7 @@ class TopTreatmentsChart extends StatelessWidget {
     );
   }
 }
+
 class TreatmentData {
   final String treatment;
   final double volume;

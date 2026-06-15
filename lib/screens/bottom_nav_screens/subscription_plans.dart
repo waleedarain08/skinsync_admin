@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/free_system_plan_model.dart';
-import 'package:skinsync_admin/models/subscription_plan_model.dart';
-import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
-import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/view_models/subscription_view_model.dart';
-import 'package:skinsync_admin/widgets/app_badge.dart';
-import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
-import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
-import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
+import '../../models/free_system_plan_model.dart';
+import '../../models/subscription_plan_model.dart';
+import '../../utils/theme.dart';
+import '../../view_models/subscription_view_model.dart';
+import '../../widgets/app_badge.dart';
 import '../../widgets/app_loader.dart';
+import '../../widgets/borderd_container_widget.dart';
+import '../../widgets/custom_outlined_button.dart';
+import '../../widgets/custom_primary_button.dart';
+import '../../widgets/dailogbox/standard_dialog.dart';
+import '../../widgets/gradient_scaffold.dart';
+import '../create_subscription_plan_screen.dart';
 
 class SubscriptionPlansTab extends ConsumerStatefulWidget {
   static const String routeName = '/subscription-plans';
@@ -39,19 +39,16 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
 
     return GradientScaffold(
       body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.pagePaddingH,
-          vertical: AppSpacing.pagePaddingV,
-        ),
+        padding: context.appEdgeInsets(horizontal: 28, vertical: 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            SizedBox(height: AppSpacing.xxl),
+            _buildHeader(context),
+            context.verticalSpace(32),
             Expanded(
               child: state.loading
                   ? const Center(child: AppLoader())
-                  : _buildContent(state),
+                  : _buildContent(context, state),
             ),
           ],
         ),
@@ -59,18 +56,18 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Subscription Models", style: CustomFonts.black26w700),
-            SizedBox(height: 6.h),
+            Text('Subscription Models', style: context.fonts.black26w700),
+            context.verticalSpace(6),
             Text(
-              "Define tiers, commissions, and capacity limits for your clinic network.",
-              style: CustomFonts.grey13w500,
+              'Define tiers, commissions, and capacity limits for your clinic network.',
+              style: context.fonts.grey13w500,
             ),
           ],
         ),
@@ -78,33 +75,33 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           onTap: () => context.push(CreateSubscriptionPlanScreen.routeName),
           icon: Icons.add_rounded,
           label: 'Create New Tier',
-          width: 200.w,
+          width: context.w(200),
         ),
       ],
     );
   }
 
-  Widget _buildContent(SubscriptionState state) {
+  Widget _buildContent(BuildContext context, SubscriptionState state) {
     final freePlan = state.freeSystemPlan;
     final paidPlans = state.plans ?? [];
 
     return ListView(
       children: [
         if (freePlan != null) ...[
-          Text("System Default Tier", style: CustomFonts.purple14w600),
-          SizedBox(height: AppSpacing.md),
-          _buildFreePlanCard(freePlan),
-          SizedBox(height: AppSpacing.xxxl),
+          Text('System Default Tier', style: context.fonts.purple14w600),
+          context.verticalSpace(16),
+          _buildFreePlanCard(context, freePlan),
+          context.verticalSpace(40),
         ],
-        Text("Custom Subscription Tiers", style: CustomFonts.black14w600),
-        SizedBox(height: AppSpacing.md),
+        Text('Custom Subscription Tiers', style: context.fonts.black14w600),
+        context.verticalSpace(16),
         if (paidPlans.isEmpty)
           BorderdContainerWidget(
-            padding: EdgeInsets.all(AppSpacing.xxxl),
+            padding: context.appEdgeInsets(all: 40),
             child: Center(
               child: Text(
-                "No custom tiers configured.",
-                style: CustomFonts.grey13w500,
+                'No custom tiers configured.',
+                style: context.fonts.grey13w500,
               ),
             ),
           )
@@ -113,26 +110,26 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: MediaQuery.of(context).size.width > 1200 ? 3 : 2,
-              crossAxisSpacing: AppSpacing.xl,
-              mainAxisSpacing: AppSpacing.xl,
+              crossAxisCount: MediaQuery.sizeOf(context).width > 1200 ? 3 : 2,
+              crossAxisSpacing: context.w(24),
+              mainAxisSpacing: context.w(24),
               childAspectRatio: 0.65,
             ),
             itemCount: paidPlans.length,
             itemBuilder: (context, index) =>
-                _buildPaidPlanCard(paidPlans[index]),
+                _buildPaidPlanCard(context, paidPlans[index]),
           ),
       ],
     );
   }
 
-  Widget _buildFreePlanCard(FreeSystemPlanModel plan) {
+  Widget _buildFreePlanCard(BuildContext context, FreeSystemPlanModel plan) {
     final activeBenefits =
         plan.benefits?.where((b) => b.enabled).toList() ?? [];
 
     return BorderdContainerWidget(
       enableHover: true,
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: context.appEdgeInsets(all: 24),
       backgroundColor: CustomColors.purple.withValues(alpha: 0.02),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,29 +137,35 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(plan.name, style: CustomFonts.black18w600),
+              Text(plan.name, style: context.fonts.black18w600),
               const AppBadge(
-                label: "SYSTEM DEFAULT",
+                label: 'SYSTEM DEFAULT',
                 variant: AppBadgeVariant.info,
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.md),
+          context.verticalSpace(16),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text("\$0.00", style: CustomFonts.purple32w700),
-              SizedBox(width: 4.w),
               Text(
-                " / ${plan.durationMonths} months introductory",
-                style: CustomFonts.grey12w400,
+                '\$0.00',
+                style: context.fonts.black32w700.copyWith(
+                  color: CustomColors.purple,
+                  fontSize: context.sp(32),
+                ),
+              ),
+              context.horizontalSpace(4),
+              Text(
+                ' / ${plan.durationMonths} months introductory',
+                style: context.fonts.grey12w400,
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.xl),
+          context.verticalSpace(24),
           const Divider(),
-          SizedBox(height: AppSpacing.xl),
+          context.verticalSpace(24),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -170,57 +173,61 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("CAPACITY LIMITS", style: CustomFonts.green9w600),
-                    SizedBox(height: 12.h),
+                    Text('CAPACITY LIMITS', style: context.fonts.green9w600),
+                    context.verticalSpace(12),
                     _limitRow(
+                      context,
                       Icons.person_pin_rounded,
-                      "Doctor Seats:",
+                      'Doctor Seats:',
                       plan.unlimitedDoctors
-                          ? "Unlimited"
-                          : "${plan.doctorSeats}",
+                          ? 'Unlimited'
+                          : '${plan.doctorSeats}',
                     ),
-                    SizedBox(height: 8.h),
+                    context.verticalSpace(8),
                     _limitRow(
+                      context,
                       Icons.people_alt_rounded,
-                      "Staff Seats:",
-                      plan.unlimitedStaff ? "Unlimited" : "${plan.staffSeats}",
+                      'Staff Seats:',
+                      plan.unlimitedStaff ? 'Unlimited' : '${plan.staffSeats}',
                     ),
                   ],
                 ),
               ),
-              SizedBox(width: 48.w),
+              context.horizontalSpace(48),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("COMMISSION & FEES", style: CustomFonts.green9w600),
-                    SizedBox(height: 12.h),
+                    Text('COMMISSION & FEES', style: context.fonts.green9w600),
+                    context.verticalSpace(12),
                     _limitRow(
+                      context,
                       Icons.percent_rounded,
-                      "Standard Comm:",
-                      "${plan.standardBookingCommissionPercent}%",
+                      'Standard Comm:',
+                      '${plan.standardBookingCommissionPercent}%',
                     ),
-                    SizedBox(height: 8.h),
+                    context.verticalSpace(8),
                     _limitRow(
+                      context,
                       Icons.terminal_rounded,
-                      "Technology Fee:",
-                      "\$${plan.technologyFeePerTreatment}",
+                      'Technology Fee:',
+                      '\$${plan.technologyFeePerTreatment}',
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.xl),
-          Text("INCLUDED FEATURES", style: CustomFonts.green9w600),
-          SizedBox(height: AppSpacing.md),
+          context.verticalSpace(24),
+          Text('INCLUDED FEATURES', style: context.fonts.green9w600),
+          context.verticalSpace(16),
           Wrap(
-            spacing: 24.w,
-            runSpacing: 10.h,
+            spacing: context.w(24),
+            runSpacing: context.h(10),
             children: activeBenefits
                 .map(
                   (benefit) => SizedBox(
-                    width: 280.w,
+                    width: context.w(280),
                     child: Row(
                       children: [
                         const Icon(
@@ -228,11 +235,11 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                           color: CustomColors.green,
                           size: 16,
                         ),
-                        SizedBox(width: 8.w),
+                        context.horizontalSpace(8),
                         Expanded(
                           child: Text(
-                            benefit.title ?? "",
-                            style: CustomFonts.grey13w500,
+                            benefit.title ?? '',
+                            style: context.fonts.grey13w500,
                           ),
                         ),
                       ],
@@ -241,84 +248,91 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                 )
                 .toList(),
           ),
-          SizedBox(height: AppSpacing.xl),
-          OutlinedButton.icon(
-            onPressed: () {
+          context.verticalSpace(24),
+          CustomOutlinedButton(
+            onTap: () {
               context.push(CreateSubscriptionPlanScreen.routeName, extra: plan);
             },
-            icon: const Icon(Icons.tune_rounded, size: 18),
-            label: const Text("Configure Default Model"),
+            icon: Icons.tune_rounded,
+            label: 'Configure Default Model',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPaidPlanCard(SubscriptionPlanModel plan) {
+  Widget _buildPaidPlanCard(BuildContext context, SubscriptionPlanModel plan) {
     final activeBenefits =
         plan.benefits?.where((b) => b.enabled).toList() ?? [];
 
     return BorderdContainerWidget(
       enableHover: true,
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(plan.name ?? "N/A", style: CustomFonts.black18w600),
+              Text(plan.name ?? 'N/A', style: context.fonts.black18w600),
               _statusBadge(plan.isActive),
             ],
           ),
-          SizedBox(height: AppSpacing.md),
+          context.verticalSpace(16),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
                 "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
-                style: CustomFonts.purple32w700,
+                style: context.fonts.black32w700.copyWith(
+                  color: CustomColors.purple,
+                  fontSize: context.sp(32),
+                ),
               ),
-              SizedBox(width: 4.w),
-              Text("/ month", style: CustomFonts.grey12w400),
+              context.horizontalSpace(4),
+              Text('/ month', style: context.fonts.grey12w400),
             ],
           ),
-          SizedBox(height: AppSpacing.xl),
+          context.verticalSpace(24),
           const Divider(),
-          SizedBox(height: AppSpacing.xl),
-          Text("CAPACITY & FEES", style: CustomFonts.green9w600),
-          SizedBox(height: 12.h),
+          context.verticalSpace(24),
+          Text('CAPACITY & FEES', style: context.fonts.green9w600),
+          context.verticalSpace(12),
           _limitRow(
+            context,
             Icons.person_pin_rounded,
-            "Doctor Seats:",
-            plan.unlimitedDoctors ? "Unlimited" : "${plan.doctorSeats}",
+            'Doctor Seats:',
+            plan.unlimitedDoctors ? 'Unlimited' : '${plan.doctorSeats}',
           ),
-          SizedBox(height: 8.h),
+          context.verticalSpace(8),
           _limitRow(
+            context,
             Icons.people_alt_rounded,
-            "Staff Seats:",
-            plan.unlimitedStaff ? "Unlimited" : "${plan.staffSeats}",
+            'Staff Seats:',
+            plan.unlimitedStaff ? 'Unlimited' : '${plan.staffSeats}',
           ),
-          SizedBox(height: 8.h),
+          context.verticalSpace(8),
           _limitRow(
+            context,
             Icons.percent_rounded,
-            "Commission Rate:",
-            "${plan.standardBookingCommissionPercent}%",
+            'Commission Rate:',
+            '${plan.standardBookingCommissionPercent}%',
           ),
-          SizedBox(height: 8.h),
+          context.verticalSpace(8),
           _limitRow(
+            context,
             Icons.terminal_rounded,
-            "Tech Fee:",
-            "\$${plan.technologyFeePerTreatment}",
+            'Tech Fee:',
+            '\$${plan.technologyFeePerTreatment}',
           ),
-          SizedBox(height: AppSpacing.xl),
-          Text("INCLUDED FEATURES", style: CustomFonts.green9w600),
-          SizedBox(height: AppSpacing.md),
+          context.verticalSpace(24),
+          Text('INCLUDED FEATURES', style: context.fonts.green9w600),
+          context.verticalSpace(16),
           Expanded(
             child: ListView.separated(
               itemCount: activeBenefits.length,
-              separatorBuilder: (_, _) => SizedBox(height: 10.h),
+              separatorBuilder: (_, _) => context.verticalSpace(10),
               itemBuilder: (context, i) {
                 final benefit = activeBenefits[i];
                 return Row(
@@ -328,11 +342,11 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                       color: CustomColors.green,
                       size: 16,
                     ),
-                    SizedBox(width: 8.w),
+                    context.horizontalSpace(8),
                     Expanded(
                       child: Text(
-                        benefit.title ?? "",
-                        style: CustomFonts.grey13w500,
+                        benefit.title ?? '',
+                        style: context.fonts.grey13w500,
                       ),
                     ),
                   ],
@@ -340,23 +354,23 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
               },
             ),
           ),
-          SizedBox(height: AppSpacing.xl),
+          context.verticalSpace(24),
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
+                child: CustomOutlinedButton(
+                  onTap: () {
                     context.push(
                       CreateSubscriptionPlanScreen.routeName,
                       extra: plan,
                     );
                   },
-                  child: const Text("Edit Tier"),
+                  label: 'Edit Tier',
                 ),
               ),
-              SizedBox(width: AppSpacing.sm),
+              context.horizontalSpace(12),
               IconButton(
-                onPressed: () => _confirmDelete(plan),
+                onPressed: () => _confirmDelete(context, plan),
                 icon: const Icon(
                   Icons.delete_outline_rounded,
                   color: CustomColors.red,
@@ -372,25 +386,25 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     );
   }
 
-  void _confirmDelete(SubscriptionPlanModel plan) async {
+  Future<void> _confirmDelete(BuildContext context, SubscriptionPlanModel plan) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => StandardDialog(
-        title: "Remove Tier",
-        width: 400.w,
+        title: 'Remove Tier',
+        width: context.w(400),
         content: Text(
           "Are you sure you want to remove the '${plan.name}' tier from your catalog?",
-          style: CustomFonts.grey14w400,
+          style: context.fonts.grey14w400,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text("Cancel"),
+            child: const Text('Cancel'),
           ),
           CustomPrimaryButton(
             onTap: () => Navigator.pop(context, true),
-            label: "Remove",
-            width: 120.w,
+            label: 'Remove',
+            width: context.w(120),
           ),
         ],
       ),
@@ -402,21 +416,26 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     }
   }
 
-  Widget _limitRow(IconData icon, String label, String value) {
+  Widget _limitRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Row(
       children: [
-        Icon(icon, size: 14.sp, color: CustomColors.lightGrey),
-        SizedBox(width: 8.w),
-        Text(label, style: CustomFonts.grey12w400),
+        Icon(icon, size: context.sp(14), color: CustomColors.lightGrey),
+        context.horizontalSpace(8),
+        Text(label, style: context.fonts.grey12w400),
         const Spacer(),
-        Text(value, style: CustomFonts.black12w600),
+        Text(value, style: context.fonts.black12w600),
       ],
     );
   }
 
   Widget _statusBadge(bool isActive) {
     return AppBadge(
-      label: isActive ? "Active" : "Inactive",
+      label: isActive ? 'Active' : 'Inactive',
       variant: isActive ? AppBadgeVariant.success : AppBadgeVariant.neutral,
     );
   }

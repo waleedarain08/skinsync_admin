@@ -9,7 +9,7 @@ import 'package:skinsync_admin/view_models/base_view_model.dart';
 
 final settingViewModelProvider =
     NotifierProvider<SettingViewModel, SettingState>(
-      () => SettingViewModel._(),
+      SettingViewModel._,
     );
 
 class SettingViewModel extends BaseViewModel<SettingState> {
@@ -30,7 +30,7 @@ class SettingViewModel extends BaseViewModel<SettingState> {
             );
             if (response.isSuccess) {
               EasyLoading.showSuccess(
-                response.message.isNotEmpty ? response.message : "Success",
+                response.message.isNotEmpty ? response.message : 'Success',
               );
               debugPrint(response.message.toString());
               return true;
@@ -38,7 +38,7 @@ class SettingViewModel extends BaseViewModel<SettingState> {
               EasyLoading.showError(
                 response.message.isNotEmpty
                     ? response.message
-                    : "Failed to update version",
+                    : 'Failed to update version',
               );
               return false;
             }
@@ -62,14 +62,14 @@ class SettingViewModel extends BaseViewModel<SettingState> {
             );
             if (response.isSuccess) {
               EasyLoading.showSuccess(
-                response.message.isNotEmpty ? response.message : "Success",
+                response.message.isNotEmpty ? response.message : 'Success',
               );
               return true;
             } else {
               EasyLoading.showError(
                 response.message.isNotEmpty
                     ? response.message
-                    : "Failed to update version",
+                    : 'Failed to update version',
               );
               return false;
             }

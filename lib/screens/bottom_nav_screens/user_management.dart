@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:skinsync_admin/utils/color_constant.dart';
 import 'package:skinsync_admin/utils/custom_fonts.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
@@ -51,11 +51,11 @@ class _UserManagementState extends State<UserManagement> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("User Management", style: CustomFonts.black32w700),
+        Text('User Management', style: context.fonts.black32w700),
         SizedBox(height: 4.h),
         Text(
-          "Manage system access, roles, and status for all participants.",
-          style: CustomFonts.grey14w400,
+          'Manage system access, roles, and status for all participants.',
+          style: context.fonts.grey14w400,
         ),
       ],
     );
@@ -64,13 +64,13 @@ class _UserManagementState extends State<UserManagement> {
   Widget _buildQuickMetrics() {
     return Row(
       children: [
-        _buildMetricCard("Total Users", "15,240", Icons.group_rounded, CustomColors.purple),
+        _buildMetricCard('Total Users', '15,240', Icons.group_rounded, CustomColors.purple),
         SizedBox(width: 16.w),
-        _buildMetricCard("Active Staff", "84", Icons.admin_panel_settings_rounded, CustomColors.green),
+        _buildMetricCard('Active Staff', '84', Icons.admin_panel_settings_rounded, CustomColors.green),
         SizedBox(width: 16.w),
-        _buildMetricCard("New Signups", "+120", Icons.person_add_rounded, CustomColors.purple),
+        _buildMetricCard('New Signups', '+120', Icons.person_add_rounded, CustomColors.purple),
         SizedBox(width: 16.w),
-        _buildMetricCard("Reported", "3", Icons.report_problem_rounded, CustomColors.red),
+        _buildMetricCard('Reported', '3', Icons.report_problem_rounded, CustomColors.red),
       ],
     );
   }
@@ -90,8 +90,8 @@ class _UserManagementState extends State<UserManagement> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: CustomFonts.black20w600),
-                Text(title, style: CustomFonts.grey12w400),
+                Text(value, style: context.fonts.black20w600),
+                Text(title, style: context.fonts.grey12w400),
               ],
             ),
           ],
@@ -110,8 +110,8 @@ class _UserManagementState extends State<UserManagement> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _tabItem("Patients", 0),
-          _tabItem("Clinics", 1),
+          _tabItem('Patients', 0),
+          _tabItem('Clinics', 1),
         ],
       ),
     );
@@ -130,7 +130,7 @@ class _UserManagementState extends State<UserManagement> {
         ),
         child: Text(
           label,
-          style: isSelected ? CustomFonts.black14w600 : CustomFonts.grey13w500,
+          style: isSelected ? context.fonts.black14w600 : context.fonts.grey13w500,
         ),
       ),
     );
@@ -146,11 +146,11 @@ class _UserManagementState extends State<UserManagement> {
             padding: EdgeInsets.all(20.w),
             child: Row(
               children: [
-                Text(_selectedTab == 0 ? "Patient Users" : "Clinic Admins", style: CustomFonts.black20w600),
+                Text(_selectedTab == 0 ? 'Patient Users' : 'Clinic Admins', style: context.fonts.black20w600),
                 const Spacer(),
                 AppSearchField(
                   controller: _searchController,
-                  hintText: "Search by name or email...",
+                  hintText: 'Search by name or email...',
                   onChanged: (val) => setState(() {}),
                   maxWidth: 300.w,
                 ),
@@ -171,7 +171,7 @@ class UserDataTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return DataTable(
       headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
-      headingTextStyle: CustomFonts.grey12w700,
+      headingTextStyle: context.fonts.grey12w700,
       columnSpacing: 40.w,
       columns: const [
         DataColumn(label: Text('User')),
@@ -192,17 +192,17 @@ class UserDataTable extends StatelessWidget {
             children: [
               CircleAvatar(radius: 16.r, backgroundColor: CustomColors.green.withValues(alpha: 0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.purple)),
               SizedBox(width: 12.w),
-              Text("Courtney Henry", style: CustomFonts.black14w600),
+              Text('Courtney Henry', style: context.fonts.black14w600),
             ],
           ),
         ),
-        DataCell(Text("courtney.h@example.com", style: CustomFonts.black14w400)),
-        DataCell(Text("Oct 24, 2023", style: CustomFonts.black14w400)),
+        DataCell(Text('courtney.h@example.com', style: context.fonts.black14w400)),
+        DataCell(Text('Oct 24, 2023', style: context.fonts.black14w400)),
         DataCell(
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
             decoration: BoxDecoration(color: CustomColors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
-            child: Text("Active", style: CustomFonts.green10w700),
+            child: Text('Active', style: context.fonts.green10w700),
           ),
         ),
         DataCell(

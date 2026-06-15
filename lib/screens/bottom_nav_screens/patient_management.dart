@@ -1,22 +1,100 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/screens/patient_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
-import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-
+import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/number_paginator.dart';
 
-class PatientManagement extends StatefulWidget {
+class PatientDummyModel {
+  final String name;
+  final String email;
+  final String phone;
+  final String clinic;
+  final String lastAppointment;
+  final int totalTreatments;
+  final String status;
+
+  PatientDummyModel({
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.clinic,
+    required this.lastAppointment,
+    required this.totalTreatments,
+    required this.status,
+  });
+}
+
+class PatientManagement extends ConsumerStatefulWidget {
   static const String routeName = '/patient-management';
   const PatientManagement({super.key});
 
   @override
-  State<PatientManagement> createState() => _PatientManagementState();
+  ConsumerState<PatientManagement> createState() => _PatientManagementState();
 }
 
-class _PatientManagementState extends State<PatientManagement> {
+class _PatientManagementState extends ConsumerState<PatientManagement> {
   final TextEditingController _searchController = TextEditingController();
+
+  String _selectedClinicFilter = 'All Clinics';
+  String _selectedStatusFilter = 'All Statuses';
+
+  int _currentPage = 0;
+  static const int _itemsPerPage = 5;
+
+  final List<PatientDummyModel> _patients = [
+    PatientDummyModel(
+      name: 'Bessie Cooper',
+      email: 'bessie.c@example.com',
+      phone: '(406) 555-0120',
+      clinic: 'Glow MedSpa NY',
+      lastAppointment: 'Oct 28, 2023',
+      totalTreatments: 12,
+      status: 'Active',
+    ),
+    PatientDummyModel(
+      name: 'Eleanor Pena',
+      email: 'eleanor.pena@example.com',
+      phone: '(206) 555-0154',
+      clinic: 'Glow MedSpa NY',
+      lastAppointment: 'Oct 28, 2023',
+      totalTreatments: 8,
+      status: 'Active',
+    ),
+    PatientDummyModel(
+      name: 'Albert Flores',
+      email: 'albert.f@example.com',
+      phone: '(312) 555-0199',
+      clinic: 'Skinsync LA',
+      lastAppointment: 'Oct 29, 2023',
+      totalTreatments: 5,
+      status: 'New',
+    ),
+    PatientDummyModel(
+      name: 'Jane Cooper',
+      email: 'jane.cooper@example.com',
+      phone: '(212) 555-0143',
+      clinic: 'Aesthetic Chicago',
+      lastAppointment: 'Oct 25, 2023',
+      totalTreatments: 2,
+      status: 'Inactive',
+    ),
+    PatientDummyModel(
+      name: 'Wade Warren',
+      email: 'wade.warren@example.com',
+      phone: '(310) 555-0188',
+      clinic: 'Skinsync LA',
+      lastAppointment: 'Oct 12, 2023',
+      totalTreatments: 1,
+      status: 'Archived',
+    ),
+  ];
 
   @override
   void dispose() {
@@ -26,200 +104,407 @@ class _PatientManagementState extends State<PatientManagement> {
 
   @override
   Widget build(BuildContext context) {
+    // Dynamic real-time filter logic
+    final filteredPatients = _patients.where((p) {
+      final query = _searchController.text.toLowerCase();
+      final matchesQuery = query.isEmpty ||
+          p.name.toLowerCase().contains(query) ||
+          p.email.toLowerCase().contains(query) ||
+          p.phone.contains(query);
+
+      final matchesClinic = _selectedClinicFilter == 'All Clinics' ||
+          p.clinic == _selectedClinicFilter;
+
+      final matchesStatus = _selectedStatusFilter == 'All Statuses' ||
+          p.status == _selectedStatusFilter;
+
+      return matchesQuery && matchesClinic && matchesStatus;
+    }).toList();
+
+    final totalPages = (filteredPatients.length / _itemsPerPage).ceil();
+    final paginatedPatients = filteredPatients.skip(_currentPage * _itemsPerPage).take(_itemsPerPage).toList();
+
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.pagePaddingH,
-          vertical: AppSpacing.pagePaddingV,
+        padding: context.appEdgeInsets(
+          horizontal: 28,
+          vertical: 28,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            SizedBox(height: AppSpacing.xxl),
-            _buildQuickMetrics(),
-            SizedBox(height: AppSpacing.xxl),
-            _buildSearchAndFilters(),
-            SizedBox(height: AppSpacing.xl),
-            _buildPatientsTable(),
+            _buildHeader(context),
+            context.verticalSpace(32),
+            _buildQuickMetrics(context),
+            context.verticalSpace(32),
+            _buildFilters(),
+            context.verticalSpace(24),
+            _buildPatientsTable(paginatedPatients),
+            if (totalPages > 1)
+              Padding(
+                padding: context.appEdgeInsets(vertical: 24),
+                child: Center(
+                  child: NumberPaginator(
+                    totalPages: totalPages,
+                    currentPage: _currentPage,
+                    onPageChanged: (pageIndex) {
+                      setState(() {
+                        _currentPage = pageIndex;
+                      });
+                    },
+                  ),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildHeader(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text("Client Database", style: CustomFonts.black26w700),
-        SizedBox(height: 6.h),
-        Text(
-          "Unified view of all patients across your clinic network.",
-          style: CustomFonts.grey13w500,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Client Database', style: context.fonts.black26w700),
+            context.verticalSpace(6),
+            Text(
+              'Unified view of all patients across your clinic network.',
+              style: context.fonts.grey13w500,
+            ),
+          ],
+        ),
+        CustomPrimaryButton(
+          onTap: () {},
+          icon: Icons.file_download_outlined,
+          label: 'Export Registry',
+          width: context.w(180),
         ),
       ],
     );
   }
 
-  Widget _buildQuickMetrics() {
+  Widget _buildQuickMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard("Total Patients", "12,840", Icons.people_rounded, CustomColors.purple),
-        SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Verified Profiles", "8,200", Icons.verified_user_rounded, CustomColors.green),
-        SizedBox(width: AppSpacing.md),
-        _buildMetricCard("App Users", "9,450", Icons.smartphone_rounded, CustomColors.green),
-        SizedBox(width: AppSpacing.md),
-        _buildMetricCard("Active Network", "3,390", Icons.hub_rounded, CustomColors.purple),
+        _buildMetricCard(context, 'Total Patients', '12,840', Icons.people_rounded, CustomColors.purple),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, 'Verified Profiles', '8,200', Icons.verified_user_rounded, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, 'App Users', '9,450', Icons.smartphone_rounded, CustomColors.green),
+        context.horizontalSpace(16),
+        _buildMetricCard(context, 'Active Network', '3,390', Icons.hub_rounded, CustomColors.purple),
       ],
     );
   }
 
-  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(BuildContext context, String title, String value, IconData icon, Color color) {
     return Expanded(
       child: BorderdContainerWidget(
-        padding: EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: context.appEdgeInsets(all: 16),
+        child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(10.w),
+              padding: context.appEdgeInsets(all: 10),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
+                borderRadius: context.borderRadius(all: 8),
               ),
-              child: Icon(icon, color: color, size: 20.sp),
+              child: Icon(icon, color: color, size: context.sp(20)),
             ),
-            SizedBox(height: AppSpacing.md),
-            Text(value, style: CustomFonts.black20w600),
-            Text(title, style: CustomFonts.grey12w400),
+            context.horizontalSpace(14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(value, style: context.fonts.black18w600, overflow: TextOverflow.ellipsis),
+                  context.verticalSpace(2),
+                  Text(title, style: context.fonts.grey11w400, overflow: TextOverflow.ellipsis),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSearchAndFilters() {
-    return Row(
-      children: [
-        AppSearchField(
-          controller: _searchController,
-          hintText: "Search by name, ID, or phone...",
-          onChanged: (val) => setState(() {}),
-        ),
-        SizedBox(width: AppSpacing.md),
-        _filterDropdown("Select Clinic"),
-        SizedBox(width: AppSpacing.sm),
-        _filterDropdown("Registration Source"),
-        const Spacer(),
-        TextButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.tune_rounded, size: 18),
-          label: const Text("Advanced Search"),
-        ),
-      ],
-    );
-  }
-
-  Widget _filterDropdown(String label) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: CustomColors.border),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
+  Widget _buildFilters() {
+    return BorderdContainerWidget(
+      padding: EdgeInsets.all(16.w),
       child: Row(
         children: [
-          Text(label, style: CustomFonts.black14w600.copyWith(fontSize: 12.sp, fontWeight: FontWeight.w500)),
-          SizedBox(width: 8.w),
-          const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: CustomColors.lightGrey),
+          Expanded(
+            flex: 3,
+            child: AppSearchField(
+              controller: _searchController,
+              hintText: 'Search patients by name, email or phone...',
+              onChanged: (val) {
+                setState(() {
+                  _currentPage = 0;
+                });
+              },
+              onClear: () {
+                _searchController.clear();
+                setState(() {
+                  _currentPage = 0;
+                });
+              },
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: 'Assigned Clinic',
+              hintText: 'All Clinics',
+              value: _selectedClinicFilter,
+              items: const ['All Clinics', 'Glow MedSpa NY', 'Skinsync LA', 'Aesthetic Chicago']
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedClinicFilter = val ?? 'All Clinics';
+                  _currentPage = 0;
+                });
+              },
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: 'Status',
+              hintText: 'All Statuses',
+              value: _selectedStatusFilter,
+              items: const ['All Statuses', 'Active', 'Inactive', 'New', 'Archived']
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedStatusFilter = val ?? 'All Statuses';
+                  _currentPage = 0;
+                });
+              },
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildPatientsTable() {
+  Widget _buildPatientsTable(List<PatientDummyModel> list) {
+    if (list.isEmpty) {
+      return _buildEmptyState();
+    }
+
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: EdgeInsets.all(AppSpacing.xl),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: Table(
+          columnWidths: const {
+            0: FlexColumnWidth(4), // Patient Name / Email
+            1: FlexColumnWidth(3), // Phone
+            2: FlexColumnWidth(3), // Assigned Clinic
+            3: FlexColumnWidth(3), // Last Appointment
+            4: FlexColumnWidth(2), // Total Treatments
+            5: FlexColumnWidth(2), // Status
+            6: FlexColumnWidth(2), // Actions
+          },
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          children: [
+            // Header Row
+            TableRow(
+              decoration: const BoxDecoration(
+                color: CustomColors.whiteGrey,
+                border: Border(bottom: BorderSide(color: CustomColors.border)),
+              ),
               children: [
-                Text("Patient Records", style: CustomFonts.black18w600),
-                OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.file_download_outlined, size: 18),
-                  label: const Text("Export Registry"),
+                _tableHeaderCell('PATIENT RECORD'),
+                _tableHeaderCell('PHONE NUMBER'),
+                _tableHeaderCell('ASSIGNED CLINIC'),
+                _tableHeaderCell('LAST APPOINTMENT'),
+                _tableHeaderCell('TREATMENTS'),
+                _tableHeaderCell('STATUS'),
+                _tableHeaderCell('ACTIONS'),
+              ],
+            ),
+            // Data Rows
+            ...list.map((p) {
+              return TableRow(
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: CustomColors.border)),
+                ),
+                children: [
+                  _patientNameCell(p.name, p.email),
+                  _tableTextCell(p.phone, style: context.fonts.grey14w400),
+                  _tableTextCell(p.clinic, style: context.fonts.grey14w400),
+                  _tableTextCell(p.lastAppointment, style: context.fonts.black14w600),
+                  _tableTextCell('${p.totalTreatments} Proc', style: context.fonts.grey14w400),
+                  _statusBadgeCell(p.status),
+                  _actionsCell(p),
+                ],
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _tableHeaderCell(String label) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Text(
+        label,
+        style: context.fonts.grey12w600.copyWith(letterSpacing: 1),
+      ),
+    );
+  }
+
+  Widget _patientNameCell(String name, String email) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 18.r,
+            backgroundColor: CustomColors.palePurple,
+            child: Text(name[0], style: context.fonts.purple12w700),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: context.fonts.black14w600,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  email,
+                  style: context.fonts.grey11w400,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          DataTable(
-            columnSpacing: 40.w,
-            headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
-            columns: const [
-              DataColumn(label: Text('PATIENT')),
-              DataColumn(label: Text('JOINED DATE')),
-              DataColumn(label: Text('HOME CLINIC')),
-              DataColumn(label: Text('CHANNEL')),
-              DataColumn(label: Text('STATUS')),
-              DataColumn(label: Text('ACTIONS')),
-            ],
-            rows: List.generate(5, (index) => _buildPatientRow(index)),
+        ],
+      ),
+    );
+  }
+
+  Widget _tableTextCell(String text, {required TextStyle style}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Text(
+        text,
+        style: style,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  Widget _statusBadgeCell(String status) {
+    final String cleanStatus = status.toLowerCase();
+    Color badgeColor = CustomColors.green;
+
+    if (cleanStatus == 'archived') {
+      badgeColor = CustomColors.grey;
+    } else if (cleanStatus == 'inactive') {
+      badgeColor = CustomColors.red;
+    } else if (cleanStatus == 'new') {
+      badgeColor = Colors.blue;
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: badgeColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20.r),
+              border: Border.all(color: badgeColor.withValues(alpha: 0.2)),
+            ),
+            child: Text(
+              status,
+              style: context.fonts.grey12w600.copyWith(
+                color: badgeColor,
+                fontSize: 10.sp,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  DataRow _buildPatientRow(int index) {
-    return DataRow(
-      cells: [
-        DataCell(
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16.r, 
-                backgroundColor: CustomColors.palePurple, 
-                child: Icon(Icons.person_rounded, size: 18.sp, color: CustomColors.purple),
-              ),
-              SizedBox(width: AppSpacing.sm),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center, 
-                crossAxisAlignment: CrossAxisAlignment.start, 
-                children: [
-                  Text("Bessie Cooper", style: CustomFonts.black14w600),
-                  Text("bessie.c@example.com", style: CustomFonts.grey12w400),
-                ],
-              ),
-            ],
+  Widget _actionsCell(PatientDummyModel p) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        children: [
+          IconButton(
+            tooltip: 'View Profile',
+            icon: Icon(Icons.visibility_outlined, color: CustomColors.grey, size: 20.sp),
+            onPressed: () {
+              ref.read(selectedPatientProvider.notifier).state = p;
+              context.push(PatientDetailScreen.routeName);
+            },
           ),
-        ),
-        const DataCell(Text("Oct 28, 2023")),
-        const DataCell(Text("Glow MedSpa NY")),
-        DataCell(
-          AppBadge(label: "Mobile App", variant: AppBadgeVariant.brand),
-        ),
-        DataCell(_statusBadge("Active")),
-        DataCell(
-          Row(
-            children: [
-              IconButton(icon: Icon(Icons.visibility_outlined, size: 20.sp, color: CustomColors.grey), onPressed: () {}),
-              IconButton(icon: Icon(Icons.more_horiz_rounded, size: 20.sp, color: CustomColors.grey), onPressed: () {}),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _statusBadge(String status) {
-    return AppBadge(label: status, variant: AppBadgeVariant.success);
+  Widget _buildEmptyState() {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 48),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: context.appEdgeInsets(all: 20),
+              decoration: const BoxDecoration(
+                color: CustomColors.whiteGrey,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.search_off_rounded, size: context.sp(48), color: CustomColors.grey),
+            ),
+            context.verticalSpace(24),
+            Text('No patients match your filters', style: context.fonts.black18w600),
+            context.verticalSpace(8),
+            Text(
+              'Try clearing your search keyword, resetting the filters, or onboard a new client.',
+              style: context.fonts.grey14w400,
+              textAlign: TextAlign.center,
+            ),
+            context.verticalSpace(24),
+            CustomOutlinedButton(
+              onTap: () {
+                _searchController.clear();
+                setState(() {
+                  _selectedClinicFilter = 'All Clinics';
+                  _selectedStatusFilter = 'All Statuses';
+                });
+              },
+              label: 'Clear All Filters',
+              color: Colors.white,
+              textColor: CustomColors.purple,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

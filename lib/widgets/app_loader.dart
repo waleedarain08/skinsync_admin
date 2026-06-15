@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../utils/assets.dart';
+import '../utils/theme.dart';
 
 class AppLoader extends StatelessWidget {
   final double? size;

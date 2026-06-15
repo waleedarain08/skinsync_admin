@@ -8,7 +8,7 @@ import 'base_view_model.dart';
 
 final productViewModelProvider =
     NotifierProvider<ProductViewModel, ProductState>(
-      () => ProductViewModel._(),
+      ProductViewModel._,
     );
 
 class ProductViewModel extends BaseViewModel<ProductState> {
@@ -64,9 +64,8 @@ class ProductViewModel extends BaseViewModel<ProductState> {
           () async {
             final produdct = await _productRepository.updateProduct(req: req);
             final currentList = state.products ?? [];
-            currentList.removeWhere((element) => element.id == produdct.id);
-            currentList.add(produdct);
-            state = state.copyWith(products: currentList);
+            final newList = currentList.map((e) => e.id == produdct.id ? produdct : e).toList();
+            state = state.copyWith(products: newList);
             return true;
           },
         ) ??

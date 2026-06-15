@@ -1,8 +1,10 @@
+import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
+import 'package:skinsync_admin/screens/appointment_detail_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
@@ -16,16 +18,17 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
+import 'package:skinsync_admin/screens/dispute_screen.dart';
+import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
 import 'package:skinsync_admin/screens/invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
-import 'package:skinsync_admin/screens/dispute_screen.dart';
-import 'package:skinsync_admin/screens/sign_in_screen.dart';
-import 'package:skinsync_admin/screens/treatment_management_screen.dart';
-import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
-import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
+import 'package:skinsync_admin/screens/patient_detail_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
+import 'package:skinsync_admin/screens/product_detail_screen.dart';
+import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
-import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
+import 'package:skinsync_admin/screens/treatment_management_screen.dart';
 
 class RouteGenerator {
   static final GoRouter router = GoRouter(
@@ -121,10 +124,11 @@ class RouteGenerator {
             name: CreateSubscriptionPlanScreen.routeName,
             path: CreateSubscriptionPlanScreen.routeName,
             builder: (context, state) {
-              if (state.extra is FreeSystemPlanModel) {
-                return CreateSubscriptionPlanScreen(freePlanToEdit: state.extra as FreeSystemPlanModel);
+              final extra = state.extra;
+              if (extra is FreeSystemPlanModel) {
+                return CreateSubscriptionPlanScreen(freePlanToEdit: extra);
               }
-              return CreateSubscriptionPlanScreen(planToEdit: state.extra as SubscriptionPlanModel?);
+              return CreateSubscriptionPlanScreen(planToEdit: extra as SubscriptionPlanModel?);
             },
           ),
           GoRoute(
@@ -151,6 +155,21 @@ class RouteGenerator {
             name: SettingScreen.routeName,
             path: SettingScreen.routeName,
             builder: (_, _) => const SettingScreen(),
+          ),
+          GoRoute(
+            name: ProductDetailScreen.routeName,
+            path: ProductDetailScreen.routeName,
+            builder: (_, _) => const ProductDetailScreen(),
+          ),
+          GoRoute(
+            name: AppointmentDetailScreen.routeName,
+            path: AppointmentDetailScreen.routeName,
+            builder: (_, _) => const AppointmentDetailScreen(),
+          ),
+          GoRoute(
+            name: PatientDetailScreen.routeName,
+            path: PatientDetailScreen.routeName,
+            builder: (_, _) => const PatientDetailScreen(),
           ),
         ],
       ),

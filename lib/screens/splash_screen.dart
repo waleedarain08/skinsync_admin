@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 
 import '../services/storage_service.dart';
@@ -18,26 +18,21 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool _animate = false;
-  final int _duration = 1000; // animation duration
+  final int _duration = 1000;
 
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!mounted) return;
+      setState(() => _animate = true);
       await Future.delayed(Duration(milliseconds: _duration));
-      setState(() {
-        _animate = true;
-      });
-
-      await Future.delayed(Duration(milliseconds: _duration - 800));
-
-      if (mounted) {
-        if (SecureStorageService().isLoggedIn) {
-          context.go(UserManagement.routeName);
-        } else {
-          context.goNamed(SignInScreen.routeName);
-        }
+      if (!mounted) return;
+      if (SecureStorageService().isLoggedIn) {
+        context.go(DashboardScreen.routeName);
+      } else {
+        context.goNamed(SignInScreen.routeName);
       }
     });
   }
@@ -50,21 +45,15 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: CustomColors.purpleWhiteStateBlueLightGradient,
-            ),
-          ),
-
+          Container(decoration: const BoxDecoration(gradient: CustomColors.purpleWhiteStateBlueLightGradient)),
           AnimatedOpacity(
             opacity: _animate ? 0.0 : 1.0,
-            duration: Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
+            duration: const Duration(milliseconds: 500),
             child: Center(
               child: Image.asset(
                 PngAssets.splashLogo,
-                height: 169.h,
-                width: 169.w,
+                height: 120.h,
+                width: 120.w,
               ),
             ),
           ),
@@ -72,20 +61,20 @@ class _SplashScreenState extends State<SplashScreen> {
           AnimatedPositioned(
             duration: Duration(milliseconds: _duration),
             top: _animate ? screenHeight : -screenHeight,
-            left: _animate ? screenWidth : -362.r,
+            left: _animate ? screenWidth : -200.r,
             child: CircleAvatar(
-              radius: 362.r,
-              backgroundColor: CustomColors.purple,
+              radius: 300.r,
+              backgroundColor: CustomColors.lightPurple,
             ),
           ),
 
           AnimatedPositioned(
             duration: Duration(milliseconds: _duration),
             bottom: _animate ? screenHeight : -screenHeight,
-            right: _animate ? screenWidth : -362.r,
+            right: _animate ? screenWidth : -200.r,
             child: CircleAvatar(
-              radius: 362.r,
-              backgroundColor: CustomColors.slateBlueLight,
+              radius: 300.r,
+              backgroundColor: CustomColors.lightPurple
             ),
           ),
         ],

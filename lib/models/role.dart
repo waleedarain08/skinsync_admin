@@ -1,10 +1,4 @@
 class RoleModel {
-  int? iD;
-  String? name;
-  String? description;
-  Null permissions;
-  Null users;
-
   RoleModel({
     this.iD,
     this.name,
@@ -13,13 +7,20 @@ class RoleModel {
     this.users,
   });
 
-  RoleModel.fromJson(Map<String, dynamic> json) {
-    iD = json['ID'];
-    name = json['Name'];
-    description = json['Description'];
-    permissions = json['Permissions'];
-    users = json['Users'];
+  factory RoleModel.fromJson(Map<String, dynamic> json) {
+    return RoleModel(
+      iD: json['ID'],
+      name: json['Name'],
+      description: json['Description'],
+      permissions: json['Permissions'],
+      users: json['Users'],
+    );
   }
+  int? iD;
+  String? name;
+  String? description;
+  Null permissions;
+  Null users;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};

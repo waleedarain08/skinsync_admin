@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:responsive_framework/responsive_framework.dart';
-import 'package:skinsync_admin/route_generator.dart';
-import 'package:skinsync_admin/widgets/app_loader.dart';
 
+import 'route_generator.dart';
 import 'utils/screen_size.dart';
 import 'utils/theme.dart';
+import 'widgets/app_loader.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -22,10 +20,10 @@ class AppInit extends StatelessWidget {
       ..radius = 12.0
       ..progressColor = CustomColors.white
       ..backgroundColor = CustomColors.white
-      ..indicatorColor = CustomColors.green
+      ..indicatorColor = CustomColors.white
       ..textColor = CustomColors.white
       ..maskColor = CustomColors.black.withValues(alpha: 0.4)
-      ..indicatorWidget = AppLoader(size: 50)
+      ..indicatorWidget = const AppLoader(size: 50)
       ..userInteractions = true
       ..dismissOnTap = false;
   }
@@ -33,12 +31,14 @@ class AppInit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     configLoading();
-    return ScreenUtilInit(
-      designSize: getDesignSize(context: context),
+
+    return ScreenUtilPlusInit(
+      designSize: getDesignSize(context),
       ensureScreenSize: true,
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, child) {
+      autoRebuild: false,
+      builder: (context, child) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'SkinSync Admin',
@@ -47,18 +47,7 @@ class AppInit extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           builder: (context, child) {
-            final easyLoadingBuilder = EasyLoading.init();
-            final responsiveBuilder = ResponsiveBreakpoints.builder(
-              child: child!,
-              breakpoints: [
-                const Breakpoint(start: 0, end: 480, name: MOBILE),
-                const Breakpoint(start: 481, end: 1024, name: TABLET),
-                const Breakpoint(start: 1025, end: 1920, name: DESKTOP),
-                const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-              ],
-            );
-
-            return easyLoadingBuilder(context, responsiveBuilder);
+            return EasyLoading.init()(context, child);
           },
         );
       },

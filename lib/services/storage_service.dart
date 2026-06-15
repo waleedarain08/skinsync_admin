@@ -31,7 +31,7 @@ class SecureStorageService {
   /// Call once at app start
   Future<void> init() async {
     _token = await _storage.read(key: _tokenKey.name);
-    ColoredPrint.green("Auth Token: $_token");
+    ColoredPrint.green('Auth Token: $_token');
     _authStateController.add(isLoggedIn);
   }
 
@@ -43,7 +43,7 @@ class SecureStorageService {
   Future<void> saveToken(String token) async {
     _token = token;
     await _storage.write(key: _tokenKey.name, value: token);
-    ColoredPrint.green("Token Saved");
+    ColoredPrint.green('Token Saved');
     ColoredPrint.green(token);
     _authStateController.add(true);
   }
@@ -55,7 +55,7 @@ class SecureStorageService {
   Future<void> clearToken() async {
     _token = null;
     await _storage.delete(key: _tokenKey.name);
-    ColoredPrint.red("Token Cleared");
+    ColoredPrint.red('Token Cleared');
     _authStateController.add(false);
   }
 
@@ -117,7 +117,7 @@ class SecureStorageService {
   }
 
   void dispose() {
-    ColoredPrint.red("Dispose: SecureStorageService");
+    ColoredPrint.red('Dispose: SecureStorageService');
     _authStateController.close();
   }
 }

@@ -1,6 +1,6 @@
 import 'base_response_model.dart';
 
-class RefreshTokenResponse extends BaseApiResponseModel {
+class RefreshTokenResponse extends BaseApiResponseModel<RefreshTokenData> {
   RefreshTokenResponse({
     required super.isSuccess,
     required super.message,
@@ -9,11 +9,11 @@ class RefreshTokenResponse extends BaseApiResponseModel {
 
   factory RefreshTokenResponse.fromJson(Map<String, dynamic> json) =>
       RefreshTokenResponse(
-        isSuccess: json["is_success"],
-        message: json["message"],
-        data: json["data"] == null
+        isSuccess: json['is_success'],
+        message: json['message'],
+        data: json['data'] == null
             ? null
-            : RefreshTokenData.fromJson(json["data"]),
+            : RefreshTokenData.fromJson(json['data']),
       );
 }
 
@@ -32,9 +32,9 @@ class RefreshTokenData {
 
   factory RefreshTokenData.fromJson(Map<String, dynamic> json) =>
       RefreshTokenData(
-        accessToken: json["access_token"],
-        refreshToken: json["refresh_token"],
-        accessExpiresAt: json["access_expires_at"],
-        refreshExpiresAt: json["refresh_expires_at"],
+        accessToken: json['access_token'],
+        refreshToken: json['refresh_token'],
+        accessExpiresAt: json['access_expires_at'],
+        refreshExpiresAt: json['refresh_expires_at'],
       );
 }

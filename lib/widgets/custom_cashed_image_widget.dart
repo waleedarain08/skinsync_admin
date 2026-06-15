@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../utils/color_constant.dart';
@@ -72,7 +72,7 @@ class _CustomCachedImageState extends State<CustomCachedImage> {
               children: [
                 const Icon(Icons.broken_image, color: Colors.grey, size: 40),
                 const SizedBox(height: 8),
-                TextButton(onPressed: _retry, child: const Text("Retry")),
+                TextButton(onPressed: _retry, child: const Text('Retry')),
               ],
             ),
           ),

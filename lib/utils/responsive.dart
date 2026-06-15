@@ -1,37 +1,55 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:responsive_framework/responsive_framework.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 import '../app_init.dart';
 
 abstract class Responsive {
-  static T when<T>({
+  static T when<T>(
+    BuildContext context, {
     required T defaultValue,
     ValueGetter<T>? mobile,
     ValueGetter<T>? tablet,
     ValueGetter<T>? desktop,
   }) {
-    final breakpoint = ResponsiveBreakpoints.of(
-      navigatorKey.currentContext!,
-    ).breakpoint;
-    if (breakpoint.name == MOBILE) {
+    // Accessing context.w(0) to register as a listener of ScreenUtil metrics if needed,
+    // though MediaQuery.sizeOf(context) already registers as a listener of size changes.
+    final width = MediaQuery.sizeOf(context).width;
+
+    if (width < 480) {
       return mobile?.call() ?? defaultValue;
-    } else if (breakpoint.name == TABLET) {
+    } else if (width < 1024) {
       return tablet?.call() ?? defaultValue;
-    } else if (breakpoint.name == DESKTOP || breakpoint.name == '4K') {
-      return desktop?.call() ?? defaultValue;
     } else {
-      return defaultValue;
+      return desktop?.call() ?? defaultValue;
+    }
+  }
+
+  // Legacy version using navigatorKey
+  static T when_static<T>({
+    required T defaultValue,
+    ValueGetter<T>? mobile,
+    ValueGetter<T>? tablet,
+    ValueGetter<T>? desktop,
+  }) {
+    final context = navigatorKey.currentContext!;
+    final width = MediaQuery.sizeOf(context).width;
+
+    if (width < 480) {
+      return mobile?.call() ?? defaultValue;
+    } else if (width < 1024) {
+      return tablet?.call() ?? defaultValue;
+    } else {
+      return desktop?.call() ?? defaultValue;
     }
   }
 }
 
 extension ResponsiveExtension on BuildContext {
-  bool get isMobile => ResponsiveBreakpoints.of(this).isMobile;
+  bool get isMobile => MediaQuery.sizeOf(this).width < 480;
 
-  bool get isTablet => ResponsiveBreakpoints.of(this).isTablet;
+  bool get isTablet => MediaQuery.sizeOf(this).width >= 481 && MediaQuery.sizeOf(this).width <= 1024;
 
-  bool get isDesktop => ResponsiveBreakpoints.of(this).breakpoint.name == DESKTOP || ResponsiveBreakpoints.of(this).breakpoint.name == '4K';
+  bool get isDesktop => MediaQuery.sizeOf(this).width > 1024;
 
   bool get isLandscape =>
       MediaQuery.of(this).orientation == Orientation.landscape;
@@ -63,9 +81,11 @@ class AdaptiveLayoutRowColumn extends StatelessWidget {
     if (context.isLandscape) {
       final rowChildren = <Widget>[];
       for (var i = 0; i < children.length; i++) {
-        if (i > 0) rowChildren.add(SizedBox(width: widthBetween ?? 20.w));
+        if (i > 0) rowChildren.add(context.horizontalSpace(widthBetween ?? 20));
         if (expandedWidget == true) {
           rowChildren.add(Expanded(child: children[i]));
+        } else {
+          rowChildren.add(children[i]);
         }
       }
       return Row(
@@ -76,7 +96,7 @@ class AdaptiveLayoutRowColumn extends StatelessWidget {
     }
     final columnChildren = <Widget>[];
     for (var i = 0; i < children.length; i++) {
-      if (i > 0) columnChildren.add(SizedBox(height: heightBetween ?? 20.h));
+      if (i > 0) columnChildren.add(context.verticalSpace(heightBetween ?? 20));
       columnChildren.add(children[i]);
     }
     return Column(
@@ -115,7 +135,7 @@ class AdaptiveLayoutList extends StatelessWidget {
         physics: context.isLandscape
             ? null
             : isScrollVertical
-            ? NeverScrollableScrollPhysics()
+            ? const NeverScrollableScrollPhysics()
             : null,
         scrollDirection: context.isLandscape ? Axis.horizontal : Axis.vertical,
         itemBuilder: (context, index) {
@@ -123,8 +143,8 @@ class AdaptiveLayoutList extends StatelessWidget {
         },
         separatorBuilder: (BuildContext context, int index) {
           return context.isLandscape
-              ? SizedBox(width: spaceWidth ?? 20.w)
-              : SizedBox(height: spaceHeight ?? 20.h);
+              ? context.horizontalSpace(spaceWidth ?? 20)
+              : context.verticalSpace(spaceHeight ?? 20);
         },
       ),
     );

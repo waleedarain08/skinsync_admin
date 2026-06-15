@@ -21,7 +21,7 @@ class RegisterClinicReqModel {
     this.cc,
     this.country,
     this.clinicAddress,
-    this.clinicLogo = "https://example.com/logo.png",
+    this.clinicLogo = 'https://example.com/logo.png',
     this.ownerName,
     this.ownerEmail,
     this.lat,

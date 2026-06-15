@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/assets.dart';
 import '../utils/theme.dart';
 
@@ -49,10 +48,10 @@ class EmptyWidget extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20.h),
-            Text(text, style: CustomFonts.black18w600, textAlign: TextAlign.center),
+            Text(text, style: context.fonts.black18w600, textAlign: TextAlign.center),
             if (subtitle != null) ...[
               SizedBox(height: 8.h),
-              Text(subtitle!, style: CustomFonts.grey13w500, textAlign: TextAlign.center),
+              Text(subtitle!, style: context.fonts.grey13w500, textAlign: TextAlign.center),
             ],
           ],
         ),

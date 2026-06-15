@@ -23,16 +23,18 @@ class UserModel {
     this.updatedAt,
   });
 
-  UserModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    email = json['email'];
-    name = json['name'];
-    roleId = json['role_id'];
-    role = json['role'] != null ? RoleModel.fromJson(json['role']) : null;
-    status = json['status'];
-    lastLogin = json['last_login'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'],
+      email: json['email'],
+      name: json['name'],
+      roleId: json['role_id'],
+      role: json['role'] != null ? RoleModel.fromJson(json['role']) : null,
+      status: json['status'],
+      lastLogin: json['last_login'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+    );
   }
 
   Map<String, dynamic> toJson() {

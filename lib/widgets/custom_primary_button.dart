@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../utils/theme.dart';
 import 'app_loader.dart';
@@ -50,10 +49,10 @@ class _CustomPrimaryButtonState extends State<CustomPrimaryButton> {
           color: Colors.transparent,
           child: InkWell(
             onTap: enabled ? widget.onTap : null,
-            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            borderRadius: context.borderRadius(all: 12),
             child: Ink(
               width: widget.width,
-              height: widget.height ?? AppTheme.buttonHeight,
+              height: widget.height ?? context.h(52),
               decoration: BoxDecoration(
                 color: enabled
                     ? CustomColors.purple
@@ -83,14 +82,14 @@ class _CustomPrimaryButtonState extends State<CustomPrimaryButton> {
                               Icon(
                                 widget.icon,
                                 color: CustomColors.white,
-                                size: 18.sp,
+                                size: context.sp(18),
                               ),
-                              SizedBox(width: 10.w),
+                              context.horizontalSpace(10),
                             ],
                             Flexible(
                               child: Text(
                                 widget.label,
-                                style: CustomFonts.white14w600,
+                                style: context.fonts.white14w600,
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
                               ),

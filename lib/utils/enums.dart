@@ -1,6 +1,6 @@
 enum SharedPreferencesKeys {
-  themeModeKey("theme-mode"),
-  accessTokenKey("access-token"),
+  themeModeKey('theme-mode'),
+  accessTokenKey('access-token'),
   refreshTokenKey('refresh-token'),
   accessTokenExpiryKey('access-token-expiry'),
   refreshTokenExpiryKey('refresh-token-expiry'),

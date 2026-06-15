@@ -5,14 +5,15 @@ import 'package:skinsync_admin/repositories/subscription_repository.dart';
 import 'package:skinsync_admin/services/clinic_services.dart';
 import 'package:skinsync_admin/services/product_services.dart';
 import 'package:skinsync_admin/services/subscription_services.dart';
+
 import '../repositories/auth_repository.dart';
+import '../repositories/setting_repository.dart';
 import '../repositories/treatment_repository.dart';
 import 'api_base_helper.dart';
 import 'auth_service.dart';
+import 'setting_service.dart';
 import 'storage_service.dart';
 import 'treatment_services.dart';
-import '../repositories/setting_repository.dart';
-import 'setting_service.dart';
 
 final locator = GetIt.instance;
 

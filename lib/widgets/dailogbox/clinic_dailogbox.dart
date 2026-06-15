@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/utils/validators.dart';
-import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
+import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+
 import '../build_textfield.dart';
 import '../phone_widget.dart';
 import 'standard_dialog.dart';
@@ -51,7 +51,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle("General Information"),
+              _buildSectionTitle('General Information'),
               SizedBox(height: 24.h),
               Row(
                 children: [
@@ -81,7 +81,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Phone Number", style: CustomFonts.black14w600),
+                        Text('Phone Number', style: context.fonts.black14w600),
                         SizedBox(height: 8.h),
                         PhoneWidget(controller: _clinicPhoneController),
                       ],
@@ -99,7 +99,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
                 ],
               ),
               SizedBox(height: 32.h),
-              _buildSectionTitle("Owner Details"),
+              _buildSectionTitle('Owner Details'),
               SizedBox(height: 24.h),
               Row(
                 children: [
@@ -136,7 +136,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             ),
-            child: const Text("Cancel"),
+            child: const Text('Cancel'),
           ),
         ),
         Consumer(
@@ -175,7 +175,7 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
+        Text(title, style: context.fonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );
@@ -227,7 +227,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle("General Information"),
+              _buildSectionTitle('General Information'),
               SizedBox(height: 24.h),
               Row(
                 children: [
@@ -257,7 +257,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Phone Number", style: CustomFonts.black14w600),
+                        Text('Phone Number', style: context.fonts.black14w600),
                         SizedBox(height: 8.h),
                         PhoneWidget(controller: _clinicPhoneController),
                       ],
@@ -288,7 +288,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
               padding: EdgeInsets.symmetric(horizontal: 24.w),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
             ),
-            child: const Text("Cancel"),
+            child: const Text('Cancel'),
           ),
         ),
         Consumer(
@@ -314,7 +314,7 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomFonts.black16w600.copyWith(color: CustomColors.purple)),
+        Text(title, style: context.fonts.black16w600.copyWith(color: CustomColors.purple)),
         const Divider(),
       ],
     );

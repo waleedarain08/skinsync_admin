@@ -1,12 +1,4 @@
 class Clinic {
-  int? id;
-  String? name;
-  String? email;
-  String? phone;
-  String? address;
-  String? logo;
-  String? status;
-
   Clinic({
     this.id,
     this.name,
@@ -17,13 +9,22 @@ class Clinic {
     this.status,
   });
 
-  Clinic.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    email = json['email'];
-    phone = json['phone'];
-    address = json['address'];
-    logo = json['logo'];
-    status = json['status'];
+  factory Clinic.fromJson(Map<String, dynamic> json) {
+    return Clinic(
+      id: json['id'],
+      name: json['name'],
+      email: json['email'],
+      phone: json['phone'],
+      address: json['address'],
+      logo: json['logo'],
+      status: json['status'],
+    );
   }
+  int? id;
+  String? name;
+  String? email;
+  String? phone;
+  String? address;
+  String? logo;
+  String? status;
 }

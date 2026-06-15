@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/theme.dart';
 
 class CustomDropdown<T> extends StatelessWidget {
@@ -30,18 +29,19 @@ class CustomDropdown<T> extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: CustomFonts.black14w600),
-          SizedBox(height: 8.h),
+          Text(label, style: context.fonts.black14w600),
+          context.verticalSpace(8),
           DropdownButtonFormField<T>(
             initialValue: value,
+            isExpanded: true,
             items: items,
             onChanged: onChanged,
             validator: validator,
-            style: CustomFonts.black14w400,
-            icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.lightGrey, size: 20.sp),
-            decoration: AppDecorations.input(hint: hintText),
+            style: context.fonts.black14w400,
+            icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.lightGrey, size: context.sp(20)),
+            decoration: AppDecorations.input(context, hint: hintText),
             dropdownColor: CustomColors.white,
-            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            borderRadius: context.appBorderRadius(all: 12),
           ),
         ],
       ),

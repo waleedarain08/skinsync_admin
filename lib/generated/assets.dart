@@ -134,34 +134,7 @@ class $AssetsSvgGen {
 class $AssetsFontsGen {
   const $AssetsFontsGen();
 
-  final String fonntsComDegularDemoBlack =
-      'assets/fonts/fonnts.com-DegularDemo-Black.otf';
-  final String fonntsComDegularDemoBlackItalic =
-      'assets/fonts/fonnts.com-DegularDemo-BlackItalic.otf';
-  final String fonntsComDegularDemoBold =
-      'assets/fonts/fonnts.com-DegularDemo-Bold.otf';
-  final String fonntsComDegularDemoBoldItalic =
-      'assets/fonts/fonnts.com-DegularDemo-BoldItalic.otf';
-  final String fonntsComDegularDemoItalic =
-      'assets/fonts/fonnts.com-DegularDemo-Italic.otf';
-  final String fonntsComDegularDemoLight =
-      'assets/fonts/fonnts.com-DegularDemo-Light.otf';
-  final String fonntsComDegularDemoLightItalic =
-      'assets/fonts/fonnts.com-DegularDemo-LightItalic.otf';
-  final String fonntsComDegularDemoMedium =
-      'assets/fonts/fonnts.com-DegularDemo-Medium.otf';
-  final String fonntsComDegularDemoMediumItalic =
-      'assets/fonts/fonnts.com-DegularDemo-MediumItalic.otf';
-  final String fonntsComDegularDemoRegular =
-      'assets/fonts/fonnts.com-DegularDemo-Regular.otf';
-  final String fonntsComDegularDemoSemibold =
-      'assets/fonts/fonnts.com-DegularDemo-Semibold.otf';
-  final String fonntsComDegularDemoSemiboldItalic =
-      'assets/fonts/fonnts.com-DegularDemo-SemiboldItalic.otf';
-  final String fonntsComDegularDemoThin =
-      'assets/fonts/fonnts.com-DegularDemo-Thin.otf';
-  final String fonntsComDegularDemoThinItalic =
-      'assets/fonts/fonnts.com-DegularDemo-ThinItalic.otf';
+  final String geist = 'assets/fonts/Geist-VariableFont_wght.ttf';
 }
 
 class AssetGenImage {

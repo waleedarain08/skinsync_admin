@@ -1,24 +1,27 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-
-import 'package:skinsync_admin/widgets/build_textfield.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/nested_category_selector.dart';
+
 import 'business_info_screen.dart';
 
-import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-
-class CreateStaffScreen extends StatefulWidget {
+class CreateStaffScreen extends ConsumerStatefulWidget {
   const CreateStaffScreen({super.key});
 
   @override
-  State<CreateStaffScreen> createState() => _CreateStaffScreenState();
+  ConsumerState<CreateStaffScreen> createState() => _CreateStaffScreenState();
 }
 
-class _CreateStaffScreenState extends State<CreateStaffScreen> {
+class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
   final TextEditingController _treatmentNameController =
       TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -26,28 +29,10 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _selectedImage;
 
-  // Dropdown values
-  String? _selectedCategory;
-  String? _selectedSubcategory;
+  // Selected category data
+  String? _categoryId;
+  String? _categoryPath;
 
-  // Dropdown lists
-  final List<String> _categories = [
-    'Facial Treatments',
-    'Body Treatments',
-    'Skin Care',
-    'Hair Treatments',
-    'Massage Therapy',
-    'Wellness',
-  ];
-
-  final List<String> _subcategories = [
-    'Anti-Aging',
-    'Hydration',
-    'Acne Treatment',
-    'Brightening',
-    'Relaxation',
-    'Deep Tissue',
-  ];
 
   @override
   void dispose() {
@@ -61,58 +46,58 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
       context: context,
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(context.r(16))),
       ),
       builder: (context) => SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(16.w),
+          padding: context.appEdgeInsets(all: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'Select Image',
-                style: CustomFonts.black20w600,
+                style: context.fonts.black20w600,
               ),
-              SizedBox(height: 20.h),
+              context.verticalSpace(20),
               ListTile(
                 leading: Container(
-                  padding: EdgeInsets.all(10.w),
+                  padding: context.appEdgeInsets(all: 10),
                   decoration: BoxDecoration(
                     color: Colors.blue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8.r),
+                    borderRadius: context.borderRadius(all: 8),
                   ),
                   child: Icon(
                     Icons.photo_library_outlined,
                     color: Colors.blue,
-                    size: 24.sp,
+                    size: context.sp(24),
                   ),
                 ),
                 title: Text(
                   'Choose from Gallery',
-                  style: CustomFonts.black14w600,
+                  style: context.fonts.black14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
                   _pickFromGallery();
                 },
               ),
-              SizedBox(height: 8.h),
+              context.verticalSpace(8),
               ListTile(
                 leading: Container(
-                  padding: EdgeInsets.all(10.w),
+                  padding: context.appEdgeInsets(all: 10),
                   decoration: BoxDecoration(
                     color: Colors.green.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8.r),
+                    borderRadius: context.borderRadius(all: 8),
                   ),
                   child: Icon(
                     Icons.camera_alt_outlined,
                     color: Colors.green,
-                    size: 24.sp,
+                    size: context.sp(24),
                   ),
                 ),
                 title: Text(
                   'Take a Photo',
-                  style: CustomFonts.black14w600,
+                  style: context.fonts.black14w600,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -120,23 +105,23 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                 },
               ),
               if (_selectedImage != null) ...[
-                SizedBox(height: 8.h),
+                context.verticalSpace(8),
                 ListTile(
                   leading: Container(
-                    padding: EdgeInsets.all(10.w),
+                    padding: context.appEdgeInsets(all: 10),
                     decoration: BoxDecoration(
                       color: Colors.red.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8.r),
+                      borderRadius: context.borderRadius(all: 8),
                     ),
                     child: Icon(
                       Icons.delete_outline,
                       color: Colors.red,
-                      size: 24.sp,
+                      size: context.sp(24),
                     ),
                   ),
                   title: Text(
                     'Remove Photo',
-                    style: CustomFonts.black14w600.copyWith(color: Colors.red),
+                    style: context.fonts.black14w600.copyWith(color: Colors.red),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -146,7 +131,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                   },
                 ),
               ],
-              SizedBox(height: 16.h),
+              context.verticalSpace(16),
             ],
           ),
         ),
@@ -195,15 +180,15 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
     return GradientScaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 250.w),
+          padding: context.appEdgeInsets(vertical: 20, horizontal: 250),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header with back button
-              _buildHeader(),
-              SizedBox(height: 24.h),
+              _buildHeader(context),
+              context.verticalSpace(24),
               // Main Form Container
-              _buildFormContainer(),
+              _buildFormContainer(context),
             ],
           ),
         ),
@@ -211,29 +196,29 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       children: [
         GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: Icon(Icons.arrow_back, size: 24.sp, color: Colors.black),
+          child: Icon(Icons.arrow_back, size: context.sp(24), color: Colors.black),
         ),
-        SizedBox(width: 12.w),
+        context.horizontalSpace(12),
         Text(
           'Create Staff',
-          style: CustomFonts.black18w600,
+          style: context.fonts.black18w600,
         ),
       ],
     );
   }
 
-  Widget _buildFormContainer() {
+  Widget _buildFormContainer(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(24.w),
+      padding: context.appEdgeInsets(all: 24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: context.borderRadius(all: 12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -246,41 +231,66 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Profile Picture Section
-          _buildProfilePictureSection(),
-          SizedBox(height: 24.h),
+          _buildProfilePictureSection(context),
+          context.verticalSpace(24),
           // Treatment Name
           BuildTextField(
             label: 'Treatment Name',
             controller: _treatmentNameController,
             hintText: 'e.g., Botox, Dermal Fillers',
           ),
-          SizedBox(height: 20.h),
-          // Category Dropdown
-          _buildDropdownField(
-            label: 'Category',
-            hintText: 'Select category',
-            value: _selectedCategory,
-            items: _categories,
-            onChanged: (value) {
-              setState(() {
-                _selectedCategory = value;
-              });
-            },
+          context.verticalSpace(20),
+          // Category Selection
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Category Hierarchy', style: context.fonts.black14w600),
+              context.verticalSpace(8),
+              InkWell(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => NestedCategorySelector(
+                      categories: ref.watch(treatmentDataViewModelProvider).categories,
+                      initialCategoryId: _categoryId,
+                      onSelected: (cat, path) {
+                        setState(() {
+                          _categoryId = cat.id;
+                          _categoryPath = path;
+                        });
+                      },
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: context.borderRadius(all: 12),
+                    border: Border.all(color: CustomColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _categoryPath ?? 'Select category',
+                          style: _categoryPath == null 
+                              ? context.fonts.grey14w400 
+                              : context.fonts.black14w600,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.grey),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 20.h),
-          // Subcategory Dropdown
-          _buildDropdownField(
-            label: 'Subcategory',
-            hintText: 'Select subcategory',
-            value: _selectedSubcategory,
-            items: _subcategories,
-            onChanged: (value) {
-              setState(() {
-                _selectedSubcategory = value;
-              });
-            },
-          ),
-          SizedBox(height: 20.h),
+          context.verticalSpace(20),
           // Description
           BuildTextField(
             label: 'Description',
@@ -288,15 +298,15 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             hintText: 'Describe the treatment and its benefits',
             maxLines: 5,
           ),
-          SizedBox(height: 32.h),
+          context.verticalSpace(32),
           // Buttons Row
-          _buildButtonsRow(),
+          _buildButtonsRow(context),
         ],
       ),
     );
   }
 
-  Widget _buildProfilePictureSection() {
+  Widget _buildProfilePictureSection(BuildContext context) {
     return Row(
       children: [
         // Profile Picture Circle with Dotted Border
@@ -310,10 +320,10 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
               gapLength: 4,
             ),
             child: Container(
-              width: 68.w,
-              height: 68.w,
-              padding: EdgeInsets.all(2.w),
-              child: Container(
+              width: context.w(68),
+              height: context.w(68),
+              padding: context.appEdgeInsets(all: 2),
+              child: DecoratedBox(
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
@@ -323,21 +333,21 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
                         child: kIsWeb
                             ? Image.network(
                                 _selectedImage!.path,
-                                width: 64.w,
-                                height: 64.w,
+                                width: context.w(64),
+                                height: context.w(64),
                                 fit: BoxFit.cover,
                               )
                             : Image.file(
                                 File(_selectedImage!.path),
-                                width: 64.w,
-                                height: 64.w,
+                                width: context.w(64),
+                                height: context.w(64),
                                 fit: BoxFit.cover,
                               ),
                       )
                     : Center(
                         child: Icon(
                           Icons.camera_alt_outlined,
-                          size: 24.sp,
+                          size: context.sp(24),
                           color: Colors.black87,
                         ),
                       ),
@@ -345,19 +355,19 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             ),
           ),
         ),
-        SizedBox(width: 16.w),
+        context.horizontalSpace(16),
         // Text Column
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Profile Picture',
-              style: CustomFonts.black14w600,
+              style: context.fonts.black14w600,
             ),
-            SizedBox(height: 4.h),
+            context.verticalSpace(4),
             Text(
               'Upload your profile picture',
-              style: CustomFonts.grey12w400,
+              style: context.fonts.grey12w400,
             ),
           ],
         ),
@@ -365,54 +375,7 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
     );
   }
 
-  Widget _buildDropdownField({
-    required String label,
-    required String hintText,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: CustomFonts.black14w600,
-        ),
-        SizedBox(height: 8.h),
-        DropdownButtonFormField<String>(
-          isExpanded: true,
-          hint: Text(
-            hintText,
-            style: CustomFonts.grey14w400,
-          ),
-          initialValue: value,
-          items: items
-              .map(
-                (item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: CustomFonts.black14w400,
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: Colors.grey[500],
-            size: 24.sp,
-          ),
-          dropdownColor: Colors.white,
-          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-          decoration: AppDecorations.input(hint: hintText),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildButtonsRow() {
+  Widget _buildButtonsRow(BuildContext context) {
     return Row(
       children: [
         Expanded(
@@ -429,26 +392,17 @@ class _CreateStaffScreenState extends State<CreateStaffScreen> {
             label: 'Create Staff',
           ),
         ),
-        SizedBox(width: 16.w),
+        context.horizontalSpace(16),
         // Cancel Button
         Expanded(
-          child: OutlinedButton(
-            onPressed: () {
+          child: CustomOutlinedButton(
+            onTap: () {
               // Handle cancel
               Navigator.pop(context);
             },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.black,
-              padding: EdgeInsets.symmetric(vertical: 20.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              side: BorderSide(color: Colors.grey[300]!, width: 1),
-            ),
-            child: Text(
-              'Cancel',
-              style: CustomFonts.black14w500,
-            ),
+            label: 'Cancel',
+            color: Colors.grey[300],
+            textColor: Colors.black,
           ),
         ),
       ],

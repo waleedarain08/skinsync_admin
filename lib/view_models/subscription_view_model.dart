@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/subscription_plan_model.dart';
+
 import '../models/free_system_plan_model.dart';
+import '../models/subscription_plan_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
 import '../utils/dummy_data.dart';
@@ -8,7 +9,7 @@ import 'base_state_model.dart';
 import 'base_view_model.dart';
 
 final subscriptionViewModelProvider = NotifierProvider<SubscriptionViewModel, SubscriptionState>(
-  () => SubscriptionViewModel._(),
+  SubscriptionViewModel._,
 );
 
 class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {

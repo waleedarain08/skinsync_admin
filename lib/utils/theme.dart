@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'color_constant.dart';
 import 'custom_fonts.dart';
 
+export 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 export 'color_constant.dart';
 export 'custom_fonts.dart';
 
 class AppTheme {
-  // Design Standards
+  // Design Standards (Static getters using singleton)
   static double get inputHeight => 52.h;
   static double get buttonHeight => 52.h;
   static double get borderRadius => 12.r;
@@ -50,7 +51,7 @@ class AppTheme {
       ),
 
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent, // Change to transparent to allow gradient to show
+        backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
@@ -162,11 +163,36 @@ class AppTheme {
   }
 }
 
+extension AppScreenUtilContext on BuildContext {
+  double get screenWidth => MediaQuery.of(this).size.width;
+  double get screenHeight => MediaQuery.of(this).size.height;
+
+  EdgeInsets appEdgeInsets({double? horizontal, double? vertical, double? all, double? left, double? top, double? right, double? bottom}) {
+    if (all != null) return EdgeInsets.all(r(all));
+    return EdgeInsets.only(
+      left: w(left ?? horizontal ?? 0),
+      top: h(top ?? vertical ?? 0),
+      right: w(right ?? horizontal ?? 0),
+      bottom: h(bottom ?? vertical ?? 0),
+    );
+  }
+
+  BorderRadius appBorderRadius({double? all, double? topLeft, double? topRight, double? bottomLeft, double? bottomRight}) {
+    if (all != null) return BorderRadius.circular(r(all));
+    return BorderRadius.only(
+      topLeft: Radius.circular(r(topLeft ?? 0)),
+      topRight: Radius.circular(r(topRight ?? 0)),
+      bottomLeft: Radius.circular(r(bottomLeft ?? 0)),
+      bottomRight: Radius.circular(r(bottomRight ?? 0)),
+    );
+  }
+}
+
 class AppDecorations {
-  static BoxDecoration card = BoxDecoration(
+  static BoxDecoration card(BuildContext context) => BoxDecoration(
     color: CustomColors.white,
-    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-    border: Border.all(color: CustomColors.border, width: AppTheme.borderWidth),
+    borderRadius: context.appBorderRadius(all: 12),
+    border: Border.all(color: CustomColors.border, width: 1),
   );
 
   static Widget appBarGradient = Container(
@@ -175,95 +201,101 @@ class AppDecorations {
     ),
   );
 
-  static BoxDecoration sidebarItem = BoxDecoration(
-    borderRadius: BorderRadius.circular(8.r),
+  static BoxDecoration sidebarItem(BuildContext context) => BoxDecoration(
+    borderRadius: context.appBorderRadius(all: 8),
   );
 
-  static InputDecoration input({
+  static InputDecoration input(
+    BuildContext context, {
     String? hint,
     Widget? prefixIcon,
     Widget? suffixIcon,
     Color? fillColor,
     EdgeInsets? contentPadding,
+    int maxLines = 1,
   }) =>
       InputDecoration(
         hintText: hint,
-        hintStyle: CustomFonts.grey12w400,
+        hintStyle: context.fonts.grey12w400,
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
         filled: true,
         fillColor: fillColor ?? CustomColors.white,
-        contentPadding: contentPadding ?? EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-        constraints: BoxConstraints(minHeight: AppTheme.inputHeight, maxHeight: AppTheme.inputHeight),
+        contentPadding: contentPadding ?? context.appEdgeInsets(horizontal: 16, vertical: 14),
+        constraints: BoxConstraints(
+          minHeight: context.h(52), 
+          maxHeight: maxLines > 1 ? double.infinity : context.h(52)
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-          borderSide: BorderSide(color: CustomColors.border, width: AppTheme.borderWidth),
+          borderRadius: context.appBorderRadius(all: 12),
+          borderSide: const BorderSide(color: CustomColors.border, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-          borderSide: BorderSide(color: CustomColors.border, width: AppTheme.borderWidth),
+          borderRadius: context.appBorderRadius(all: 12),
+          borderSide: const BorderSide(color: CustomColors.border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-          borderSide: BorderSide(color: CustomColors.purple, width: AppTheme.borderWidth * 1.5),
+          borderRadius: context.appBorderRadius(all: 12),
+          borderSide: const BorderSide(color: CustomColors.purple, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-          borderSide: BorderSide(color: CustomColors.red, width: AppTheme.borderWidth),
+          borderRadius: context.appBorderRadius(all: 12),
+          borderSide: const BorderSide(color: CustomColors.red, width: 1),
         ),
       );
 }
 
 class AppSpacing {
-  static double get xs => 8.w;
-  static double get sm => 12.w;
-  static double get md => 16.w;
-  static double get lg => 20.w;
-  static double get xl => 24.w;
-  static double get xxl => 32.w;
-  static double get xxxl => 40.w;
-  static double get pagePaddingH => 28.w;
-  static double get pagePaddingV => 28.h;
-  static double get topBarHeight => 72.h;
-  static double get sidebarWidth => 280.w;
-  static double get cardPadding => 24.w;
+  static double xs(BuildContext context) => context.w(8);
+  static double sm(BuildContext context) => context.w(12);
+  static double md(BuildContext context) => context.w(16);
+  static double lg(BuildContext context) => context.w(20);
+  static double xl(BuildContext context) => context.w(24);
+  static double xxl(BuildContext context) => context.w(32);
+  static double xxxl(BuildContext context) => context.w(40);
+  
+  static double pagePaddingH(BuildContext context) => context.w(28);
+  static double pagePaddingV(BuildContext context) => context.h(28);
+  static double topBarHeight(BuildContext context) => context.h(72);
+  static double cardPadding(BuildContext context) => context.w(24);
+
+  // Legacy static getters
+  static double get pagePaddingH_static => 28.w;
+  static double get pagePaddingV_static => 28.h;
 }
 
 class AppRadius {
-  static double get xs => 6.r;
-  static double get sm => 8.r;
-  static double get md => 12.r;
-  static double get lg => 16.r;
-  static double get xl => 20.r;
-  static double get xxl => 24.r;
-  static double get full => 999.r;
+  static double xs(BuildContext context) => context.r(6);
+  static double sm(BuildContext context) => context.r(8);
+  static double md(BuildContext context) => context.r(12);
+  static double lg(BuildContext context) => context.r(16);
+  static double xl(BuildContext context) => context.r(20);
+  static double xxl(BuildContext context) => context.r(24);
+  static double full(BuildContext context) => context.r(999);
 }
 
 class AppShadows {
-  static List<BoxShadow> get card => [
+  static List<BoxShadow> card(BuildContext context) => [
         BoxShadow(
           color: CustomColors.black.withValues(alpha: 0.05),
-          blurRadius: 10.r,
-          offset: Offset(0, 4.h),
+          blurRadius: context.r(10),
+          offset: Offset(0, context.h(4)),
         ),
       ];
 
-  static List<BoxShadow> get cardHover => [
+  static List<BoxShadow> cardHover(BuildContext context) => [
         BoxShadow(
           color: CustomColors.black.withValues(alpha: 0.1),
-          blurRadius: 20.r,
-          offset: Offset(0, 8.h),
+          blurRadius: context.r(20),
+          offset: Offset(0, context.h(8)),
         ),
       ];
 
-  static List<BoxShadow> get lg => [
-    BoxShadow(color: CustomColors.black.withValues(alpha: 0.1), blurRadius: 30, offset: const Offset(0, 10))
+  static List<BoxShadow> lg(BuildContext context) => [
+    BoxShadow(color: CustomColors.black.withValues(alpha: 0.1), blurRadius: context.r(30), offset: Offset(0, context.h(10)))
   ];
-  static List<BoxShadow> get md => [
-    BoxShadow(color: CustomColors.black.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, 5))
+  
+  static List<BoxShadow> xs(BuildContext context) => [
+    BoxShadow(color: CustomColors.black.withValues(alpha: 0.05), blurRadius: 10.r, offset: const Offset(0, 2))
   ];
-  static List<BoxShadow> get sm => [
-    BoxShadow(color: CustomColors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 2))
-  ];
-  static List<BoxShadow> get xs => sm;
 }

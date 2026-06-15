@@ -11,7 +11,7 @@ import 'base_state_model.dart';
 import 'base_view_model.dart';
 
 final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
-  () => AuthViewModel._(),
+  AuthViewModel._,
 );
 
 class AuthViewModel extends BaseViewModel<AuthState> {
@@ -61,7 +61,7 @@ class AuthViewModel extends BaseViewModel<AuthState> {
             email: email,
             otp: otp,
           );
-          EasyLoading.showSuccess("OTP Verified successfully");
+          EasyLoading.showSuccess('OTP Verified successfully');
           return true;
         }) ??
         false;

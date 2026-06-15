@@ -1,23 +1,22 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
-import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/responsive.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
-import 'package:skinsync_admin/widgets/phone_widget.dart';
-
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/phone_widget.dart';
 
 class ClinicDetailScreen extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-detail';
@@ -82,9 +81,9 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       clinicEmail: _clinicEmailController.text.trim(),
       clinicPhone: _clinicPhoneController.text.trim(),
       clinicAddress: _clinicAddressController.text.trim(),
-      cc: selectedCountry?.dialCode ?? "+1",
-      country: selectedCountry?.code ?? "US",
-      clinicLogo: _selectedLogo?.path ?? clinic.logo ?? "https://example.com/logo.png",
+      cc: selectedCountry?.dialCode ?? '+1',
+      country: selectedCountry?.code ?? 'US',
+      clinicLogo: _selectedLogo?.path ?? clinic.logo ?? 'https://example.com/logo.png',
       website: _websiteController.text.trim(),
       description: _descriptionController.text.trim(),
     );
@@ -92,7 +91,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final success = await ref.read(clinicViewModelProvider.notifier).updateClinic(clinic.id!, req);
     if (success && mounted) {
       setState(() => _isEditMode = false);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Clinic updated successfully")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Clinic updated successfully')));
     }
   }
 
@@ -101,7 +100,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final clinic = ref.watch(clinicViewModelProvider).selectedClinic;
 
     if (clinic == null) {
-      return GradientScaffold(body: Center(child: Text("No Clinic Data Found", style: CustomFonts.black16w400)));
+      return GradientScaffold(body: Center(child: Text('No Clinic Data Found', style: context.fonts.black16w400)));
     }
 
     final bool isMobile = context.isMobile;
@@ -109,7 +108,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     return GradientScaffold(
       appBar: AppBar(
         flexibleSpace: AppDecorations.appBarGradient,
-        title: Text("Clinic Detail", style: CustomFonts.black18w600),
+        title: Text('Clinic Detail', style: context.fonts.black18w600),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.black),
@@ -166,7 +165,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                       width: isMobile ? double.infinity : 240.w,
                       child: CustomPrimaryButton(
                         onTap: _updateClinic,
-                        label: "Save Changes",
+                        label: 'Save Changes',
                         height: 56.h,
                       ),
                     ),
@@ -207,7 +206,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                   child: (_selectedLogo == null && (clinic.logo == null || clinic.logo!.isEmpty))
                       ? Icon(Icons.business_outlined, size: 40.sp, color: CustomColors.black)
                       : _isEditMode
-                          ? Container(
+                          ? DecoratedBox(
                               decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(20.r)),
                               child: const Icon(Icons.camera_alt_outlined, color: Colors.white),
                             )
@@ -221,13 +220,13 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                   children: [
                     Row(
                       children: [
-                        Flexible(child: Text(clinic.name ?? 'N/A', style: CustomFonts.black26w700, overflow: TextOverflow.ellipsis)),
+                        Flexible(child: Text(clinic.name ?? 'N/A', style: context.fonts.black26w700, overflow: TextOverflow.ellipsis)),
                         SizedBox(width: 16.w),
                         _statusBadge(clinic.status ?? 'Active'),
                       ],
                     ),
                     SizedBox(height: 8.h),
-                    Text(clinic.address ?? 'N/A', style: CustomFonts.grey16w400),
+                    Text(clinic.address ?? 'N/A', style: context.fonts.grey16w400),
                     SizedBox(height: 16.h),
                     Wrap(
                       spacing: 12.w,
@@ -250,41 +249,41 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
   Widget _buildMainContent(ClinicModel clinic) {
     return Column(
       children: [
-        _infoSection("General Information", [
+        _infoSection('General Information', [
           BuildTextField(
-            label: "Clinic Name",
+            label: 'Clinic Name',
             controller: _clinicNameController,
-            hintText: "Enter clinic name",
+            hintText: 'Enter clinic name',
             validator: Validators.empty,
             readOnly: !_isEditMode,
           ),
           SizedBox(height: 24.h),
           BuildTextField(
-            label: "Description",
+            label: 'Description',
             controller: _descriptionController,
-            hintText: "Enter description",
+            hintText: 'Enter description',
             maxLines: 3,
             readOnly: !_isEditMode,
           ),
         ]),
         SizedBox(height: 24.h),
-        _infoSection("Contact & Location", [
+        _infoSection('Contact & Location', [
           AdaptiveLayoutRowColumn(
             heightBetween: 24.h,
             widthBetween: 16.w,
             expandedWidget: true,
             children: [
               BuildTextField(
-                label: "Email Address",
+                label: 'Email Address',
                 controller: _clinicEmailController,
-                hintText: "clinic@example.com",
+                hintText: 'clinic@example.com',
                 validator: Validators.email,
                 readOnly: !_isEditMode,
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Phone Number", style: CustomFonts.black14w600),
+                  Text('Phone Number', style: context.fonts.black14w600),
                   SizedBox(height: 10.h),
                   PhoneWidget(controller: _clinicPhoneController, readOnly: !_isEditMode),
                 ],
@@ -293,9 +292,9 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
           ),
           SizedBox(height: 24.h),
           BuildTextField(
-            label: "Full Address",
+            label: 'Full Address',
             controller: _clinicAddressController,
-            hintText: "Enter address",
+            hintText: 'Enter address',
             validator: Validators.empty,
             readOnly: !_isEditMode,
           ),
@@ -305,8 +304,8 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             widthBetween: 16.w,
             expandedWidget: true,
             children: [
-              BuildTextField(label: "Website", controller: _websiteController, hintText: "https://example.com", readOnly: !_isEditMode),
-              BuildTextField(label: "Plan", controller: TextEditingController(text: clinic.subscriptionPlan), hintText: "Plan", readOnly: true),
+              BuildTextField(label: 'Website', controller: _websiteController, hintText: 'https://example.com', readOnly: !_isEditMode),
+              BuildTextField(label: 'Plan', controller: TextEditingController(text: clinic.subscriptionPlan), hintText: 'Plan', readOnly: true),
             ],
           ),
         ]),
@@ -317,16 +316,16 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
   Widget _buildStatsSidebar(ClinicModel clinic) {
     return Column(
       children: [
-        _infoSection("Performance Overview", [
-          _statRow(Icons.people_outline, "Total Appointments", clinic.totalAppointments?.toString() ?? "0"),
-          _statRow(Icons.medical_services_outlined, "Total Treatments", clinic.totalTreatments?.toString() ?? "0"),
-          _statRow(Icons.payments_outlined, "Total Revenue", "\$${clinic.totalRevenue?.toStringAsFixed(0) ?? "0"}"),
+        _infoSection('Performance Overview', [
+          _statRow(Icons.people_outline, 'Total Appointments', clinic.totalAppointments?.toString() ?? '0'),
+          _statRow(Icons.medical_services_outlined, 'Total Treatments', clinic.totalTreatments?.toString() ?? '0'),
+          _statRow(Icons.payments_outlined, 'Total Revenue', "\$${clinic.totalRevenue?.toStringAsFixed(0) ?? "0"}"),
         ]),
         SizedBox(height: 24.h),
-        _infoSection("Subscription Info", [
-          _statRow(Icons.card_membership_outlined, "Current Plan", clinic.subscriptionPlan ?? "Standard"),
-          _statRow(Icons.access_time_rounded, "Working Hours", clinic.workingHours ?? "09:00 - 17:00"),
-          _statRow(Icons.update_rounded, "Last Updated", clinic.updatedAt ?? "N/A"),
+        _infoSection('Subscription Info', [
+          _statRow(Icons.card_membership_outlined, 'Current Plan', clinic.subscriptionPlan ?? 'Standard'),
+          _statRow(Icons.access_time_rounded, 'Working Hours', clinic.workingHours ?? '09:00 - 17:00'),
+          _statRow(Icons.update_rounded, 'Last Updated', clinic.updatedAt ?? 'N/A'),
         ]),
       ],
     );
@@ -338,7 +337,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: CustomFonts.black16w700),
+          Text(title, style: context.fonts.black16w700),
           SizedBox(height: 24.h),
           ...children,
         ],
@@ -356,10 +355,10 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             children: [
               Icon(icon, size: 18.sp, color: CustomColors.grey),
               SizedBox(width: 12.w),
-              Text(label, style: CustomFonts.grey13w500),
+              Text(label, style: context.fonts.grey13w500),
             ],
           ),
-          Flexible(child: Text(value, style: CustomFonts.grey14w600, overflow: TextOverflow.ellipsis)),
+          Flexible(child: Text(value, style: context.fonts.grey14w600, overflow: TextOverflow.ellipsis)),
         ],
       ),
     );
@@ -375,7 +374,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       ),
       child: Text(
         status.toUpperCase(),
-        style: isActive ? CustomFonts.green10w700 : CustomFonts.red10w700,
+        style: isActive ? context.fonts.green10w700 : context.fonts.red10w700,
       ),
     );
   }
@@ -389,7 +388,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         children: [
           Icon(icon, size: 14.sp, color: CustomColors.grey),
           SizedBox(width: 8.w),
-          Text(label, style: CustomFonts.grey13w500),
+          Text(label, style: context.fonts.grey13w500),
         ],
       ),
     );

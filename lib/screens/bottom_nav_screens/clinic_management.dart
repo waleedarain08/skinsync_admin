@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/clinic_model.dart';
-import 'package:skinsync_admin/models/invite_clinic_model.dart';
-import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
-import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
-import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/view_models/clinic_view_model.dart';
-import 'package:skinsync_admin/widgets/app_badge.dart';
-import 'package:skinsync_admin/widgets/app_search_field.dart';
-import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
-import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/app_loader.dart';
 
-import '../../widgets/app_loader.dart';
+import '../../models/clinic_model.dart';
+import '../../models/invite_clinic_model.dart';
+import '../../utils/theme.dart';
+import '../../view_models/clinic_view_model.dart';
+import '../../widgets/app_search_field.dart';
+import '../../widgets/borderd_container_widget.dart';
+import '../../widgets/custom_dropdown_widget.dart';
+import '../../widgets/custom_outlined_button.dart';
+import '../../widgets/custom_primary_button.dart';
 import '../../widgets/dailogbox/clinic_dailogbox.dart';
-import '../../widgets/dailogbox/standard_dialog.dart';
+import '../../widgets/gradient_scaffold.dart';
+import '../../widgets/number_paginator.dart';
+import '../add_new_clinic_screen.dart';
+import '../clinic_detail_screen.dart';
 import '../invite_clinic_detail_screen.dart';
 
 class ClinicManagement extends ConsumerStatefulWidget {
@@ -31,20 +30,20 @@ class ClinicManagement extends ConsumerStatefulWidget {
 class _ClinicManagementState extends ConsumerState<ClinicManagement>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late ScrollController _activeScrollController;
-  late ScrollController _inviteScrollController;
-  late TextEditingController _activeSearchController;
-  late TextEditingController _inviteSearchController;
+  final TextEditingController _searchController = TextEditingController();
+
+  String _selectedRegionFilter = 'All Regions';
+  String _selectedPlanFilter = 'All Plans';
+  String _selectedStatusFilter = 'All Statuses';
+
+  int _activePage = 0;
+  int _invitePage = 0;
+  static const int _itemsPerPage = 5;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _activeScrollController = ScrollController();
-    _inviteScrollController = ScrollController();
-    _activeSearchController = TextEditingController();
-    _inviteSearchController = TextEditingController();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(clinicViewModelProvider.notifier).initialize();
     });
@@ -53,36 +52,93 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   @override
   void dispose() {
     _tabController.dispose();
-    _activeScrollController.dispose();
-    _inviteScrollController.dispose();
-    _activeSearchController.dispose();
-    _inviteSearchController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(clinicViewModelProvider);
+    final clinics = state.clinics ?? [];
+    final inviteClinics = state.inviteClinics ?? [];
+
+    // Filter active clinics
+    final filteredClinics = clinics.where((c) {
+      final query = _searchController.text.toLowerCase();
+      final matchesQuery =
+          query.isEmpty ||
+          (c.name?.toLowerCase().contains(query) ?? false) ||
+          (c.email?.toLowerCase().contains(query) ?? false) ||
+          (c.address?.toLowerCase().contains(query) ?? false);
+
+      final matchesPlan =
+          _selectedPlanFilter == 'All Plans' ||
+          c.subscriptionPlan == _selectedPlanFilter;
+
+      final matchesRegion =
+          _selectedRegionFilter == 'All Regions' ||
+          (c.address?.toLowerCase().contains(
+                _selectedRegionFilter.toLowerCase(),
+              ) ??
+              false);
+
+      final matchesStatus =
+          _selectedStatusFilter == 'All Statuses' ||
+          (c.status?.toLowerCase() == _selectedStatusFilter.toLowerCase());
+
+      return matchesQuery && matchesPlan && matchesRegion && matchesStatus;
+    }).toList();
+
+    // Filter invite clinics
+    final filteredInvites = inviteClinics.where((c) {
+      final query = _searchController.text.toLowerCase();
+      final matchesQuery =
+          query.isEmpty ||
+          c.name.toLowerCase().contains(query) ||
+          c.email.toLowerCase().contains(query) ||
+          c.address.toLowerCase().contains(query);
+
+      final matchesRegion =
+          _selectedRegionFilter == 'All Regions' ||
+          c.address.toLowerCase().contains(_selectedRegionFilter.toLowerCase());
+
+      final matchesStatus =
+          _selectedStatusFilter == 'All Statuses' ||
+          (_selectedStatusFilter == 'Pending' &&
+              c.invitationStatus.toLowerCase().contains('sent'));
+
+      return matchesQuery && matchesRegion && matchesStatus;
+    }).toList();
+
     return GradientScaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.pagePaddingH,
-          vertical: AppSpacing.pagePaddingV,
-        ),
+      body: SingleChildScrollView(
+        padding: context.appEdgeInsets(horizontal: 28, vertical: 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            SizedBox(height: AppSpacing.xxl),
-            _buildStatsSummary(),
-            SizedBox(height: AppSpacing.xxl),
+            _buildHeader(context),
+            context.verticalSpace(32),
+            _buildStatsSummary(context),
+            context.verticalSpace(32),
+            _buildFilters(),
+            context.verticalSpace(32),
             _buildTabs(),
-            SizedBox(height: AppSpacing.xl),
-            Expanded(
+            context.verticalSpace(24),
+            SizedBox(
+              height: context.h(600),
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildActiveClinicsTab(),
-                  _buildPendingInvitationsTab(),
+                  _buildActiveClinicsTab(
+                    context,
+                    filteredClinics,
+                    state.loading,
+                  ),
+                  _buildPendingInvitationsTab(
+                    context,
+                    filteredInvites,
+                    state.loading,
+                  ),
                 ],
               ),
             ),
@@ -92,18 +148,18 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Clinic Partners", style: CustomFonts.black26w700),
-            SizedBox(height: 6.h),
+            Text('Clinic Partners', style: context.fonts.black26w700),
+            context.verticalSpace(6),
             Text(
-              "Manage and monitor your MedSpa network performance.",
-              style: CustomFonts.grey13w500,
+              'Manage and monitor your MedSpa network performance.',
+              style: context.fonts.grey13w500,
             ),
           ],
         ),
@@ -111,39 +167,43 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
           onTap: () => context.push(AddNewClinicScreen.routeName),
           icon: Icons.add_rounded,
           label: 'Add New Clinic',
-          width: 200.w,
+          width: context.w(200),
         ),
       ],
     );
   }
 
-  Widget _buildStatsSummary() {
+  Widget _buildStatsSummary(BuildContext context) {
     return Row(
       children: [
         _buildMiniStat(
-          "Total Clinics",
-          "48",
+          context,
+          'Total Clinics',
+          '48',
           Icons.business_rounded,
           CustomColors.purple,
         ),
-        SizedBox(width: AppSpacing.md),
+        context.horizontalSpace(16),
         _buildMiniStat(
-          "Active Partners",
-          "42",
+          context,
+          'Active Partners',
+          '42',
           Icons.bolt_rounded,
           CustomColors.green,
         ),
-        SizedBox(width: AppSpacing.md),
+        context.horizontalSpace(16),
         _buildMiniStat(
-          "Network Revenue",
-          "\$245K",
+          context,
+          'Network Revenue',
+          '\$245K',
           Icons.payments_rounded,
           CustomColors.green,
         ),
-        SizedBox(width: AppSpacing.md),
+        context.horizontalSpace(16),
         _buildMiniStat(
-          "Avg Patient Rating",
-          "4.8",
+          context,
+          'Avg Patient Rating',
+          '4.8',
           Icons.star_rounded,
           Colors.amber,
         ),
@@ -152,6 +212,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   }
 
   Widget _buildMiniStat(
+    BuildContext context,
     String title,
     String value,
     IconData icon,
@@ -159,24 +220,35 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   ) {
     return Expanded(
       child: BorderdContainerWidget(
-        padding: EdgeInsets.all(AppSpacing.lg),
+        padding: context.appEdgeInsets(all: 16),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(12.w),
+              padding: context.appEdgeInsets(all: 10),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
+                borderRadius: context.borderRadius(all: 8),
               ),
-              child: Icon(icon, color: color, size: 22.sp),
+              child: Icon(icon, color: color, size: context.sp(20)),
             ),
-            SizedBox(width: AppSpacing.md),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: CustomFonts.black18w600),
-                Text(title, style: CustomFonts.grey12w400),
-              ],
+            context.horizontalSpace(14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: context.fonts.black18w600,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  context.verticalSpace(2),
+                  Text(
+                    title,
+                    style: context.fonts.grey11w400,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -184,8 +256,104 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     );
   }
 
+  Widget _buildFilters() {
+    return BorderdContainerWidget(
+      padding: EdgeInsets.all(16.w),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: AppSearchField(
+              controller: _searchController,
+              hintText: 'Search clinics by name, email or location...',
+              onChanged: (val) {
+                setState(() {
+                  _activePage = 0;
+                  _invitePage = 0;
+                });
+              },
+              onClear: () {
+                _searchController.clear();
+                setState(() {
+                  _activePage = 0;
+                  _invitePage = 0;
+                });
+              },
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: 'Region / Network',
+              hintText: 'All Regions',
+              value: _selectedRegionFilter,
+              items: const [
+                'All Regions',
+                'East Coast',
+                'West Coast',
+                'Midwest',
+                'South',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedRegionFilter = val ?? 'All Regions';
+                  _activePage = 0;
+                  _invitePage = 0;
+                });
+              },
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: 'Subscription Plan',
+              hintText: 'All Plans',
+              value: _selectedPlanFilter,
+              items: const [
+                'All Plans',
+                'Basic',
+                'Standard',
+                'Premium',
+                'Enterprise',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedPlanFilter = val ?? 'All Plans';
+                  _activePage = 0;
+                  _invitePage = 0;
+                });
+              },
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: 'Status',
+              hintText: 'All Statuses',
+              value: _selectedStatusFilter,
+              items: const [
+                'All Statuses',
+                'Active',
+                'Inactive',
+                'Pending',
+                'Suspended',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedStatusFilter = val ?? 'All Statuses';
+                  _activePage = 0;
+                  _invitePage = 0;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTabs() {
-    return Container(
+    return DecoratedBox(
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: CustomColors.border)),
       ),
@@ -193,298 +361,416 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
         controller: _tabController,
         isScrollable: true,
         tabs: const [
-          Tab(text: "Active Clinics"),
-          Tab(text: "Pending Invitations"),
+          Tab(text: 'Active Partners'),
+          Tab(text: 'Prospect Invitations'),
         ],
       ),
     );
   }
 
-  Widget _buildActiveClinicsTab() {
-    final state = ref.watch(clinicViewModelProvider);
-    final clinics = state.clinics ?? [];
-    return Column(
-      children: [
-        _buildSearchAndFilterBar(
-          _activeSearchController,
-          "Search by name, email or location...",
-        ),
-        SizedBox(height: AppSpacing.md),
-        Expanded(
-          child: _buildUnifiedTable<ClinicModel>(
-            title: "Partner Directory",
-            items: clinics,
-            isLoading: state.loading,
-            controller: _activeScrollController,
-            columns: const [
-              DataColumn(label: Text('CLINIC')),
-              DataColumn(label: Text('CONTACT')),
-              DataColumn(label: Text('LOCATION')),
-              DataColumn(label: Text('PACKAGE')),
-              DataColumn(label: Text('STATS')),
-              DataColumn(label: Text('STATUS')),
-              DataColumn(label: Text('ACTIONS')),
-            ],
-            rowBuilder: (item) => _buildActiveClinicRow(item),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPendingInvitationsTab() {
-    final state = ref.watch(clinicViewModelProvider);
-    final inviteClinics = state.inviteClinics ?? [];
-    return Column(
-      children: [
-        _buildSearchAndFilterBar(
-          _inviteSearchController,
-          "Search prospect clinics...",
-        ),
-        SizedBox(height: AppSpacing.md),
-        Expanded(
-          child: _buildUnifiedTable<InviteClinicModel>(
-            title: "Prospect Pipeline",
-            items: inviteClinics,
-            isLoading: state.loading,
-            controller: _inviteScrollController,
-            columns: const [
-              DataColumn(label: Text('PROSPECT')),
-              DataColumn(label: Text('CONTACT')),
-              DataColumn(label: Text('LOCATION')),
-              DataColumn(label: Text('STATUS')),
-              DataColumn(label: Text('ACTIONS')),
-            ],
-            rowBuilder: (item) => _buildInviteClinicRow(item),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSearchAndFilterBar(
-    TextEditingController controller,
-    String hint,
+  Widget _buildActiveClinicsTab(
+    BuildContext context,
+    List<ClinicModel> clinics,
+    bool isLoading,
   ) {
-    return Row(
+    if (isLoading) {
+      return const Center(child: AppLoader());
+    }
+
+    if (clinics.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    final totalPages = (clinics.length / _itemsPerPage).ceil();
+    final paginatedClinics = clinics
+        .skip(_activePage * _itemsPerPage)
+        .take(_itemsPerPage)
+        .toList();
+
+    return Column(
       children: [
-        AppSearchField(
-          controller: controller,
-          hintText: hint,
-          onChanged: (val) => setState(() {}),
-        ),
-        SizedBox(width: AppSpacing.md),
-        OutlinedButton.icon(
-          onPressed: () => _showFiltersModal(),
-          icon: const Icon(Icons.filter_list_rounded, size: 20),
-          label: const Text("Filters"),
-          style: OutlinedButton.styleFrom(
-            backgroundColor: Colors.white,
-            minimumSize: Size(0, 52.h),
+        Expanded(
+          child: BorderdContainerWidget(
+            padding: EdgeInsets.zero,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: Table(
+                columnWidths: const {
+                  0: FlexColumnWidth(4), // Clinic Name / logo
+                  1: FlexColumnWidth(3), // Contact / Location
+                  2: FlexColumnWidth(2), // Subscription Plan
+                  3: FlexColumnWidth(2), // Total Appointments (or Providers)
+                  4: FlexColumnWidth(2), // Total Treatments
+                  5: FlexColumnWidth(2), // Status
+                  6: FlexColumnWidth(2), // Actions
+                },
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: [
+                  // Header Row
+                  TableRow(
+                    decoration: const BoxDecoration(
+                      color: CustomColors.whiteGrey,
+                      border: Border(
+                        bottom: BorderSide(color: CustomColors.border),
+                      ),
+                    ),
+                    children: [
+                      _tableHeaderCell('CLINIC PARTNER'),
+                      _tableHeaderCell('CONTACT & REGION'),
+                      _tableHeaderCell('PLAN'),
+                      _tableHeaderCell('APPOINTMENTS'),
+                      _tableHeaderCell('TREATMENTS'),
+                      _tableHeaderCell('STATUS'),
+                      _tableHeaderCell('ACTIONS'),
+                    ],
+                  ),
+                  // Data Rows
+                  ...paginatedClinics.map((clinic) {
+                    return TableRow(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: CustomColors.border),
+                        ),
+                      ),
+                      children: [
+                        _clinicNameCell(clinic.name, clinic.logo),
+                        _clinicContactCell(
+                          clinic.email,
+                          clinic.phone,
+                          clinic.address,
+                        ),
+                        _tableTextCell(
+                          clinic.subscriptionPlan ?? 'Standard',
+                          style: context.fonts.black14w600,
+                        ),
+                        _tableTextCell(
+                          '${clinic.totalAppointments ?? 0} Appts',
+                          style: context.fonts.grey14w400,
+                        ),
+                        _tableTextCell(
+                          '${clinic.totalTreatments ?? 0} Proc',
+                          style: context.fonts.grey14w400,
+                        ),
+                        _statusBadgeCell(clinic.status ?? 'Active'),
+                        _activeActionsCell(clinic),
+                      ],
+                    );
+                  }),
+                ],
+              ),
+            ),
           ),
         ),
+        if (totalPages > 1)
+          Padding(
+            padding: context.appEdgeInsets(vertical: 24),
+            child: Center(
+              child: NumberPaginator(
+                totalPages: totalPages,
+                currentPage: _activePage,
+                onPageChanged: (pageIndex) {
+                  setState(() {
+                    _activePage = pageIndex;
+                  });
+                },
+              ),
+            ),
+          ),
       ],
     );
   }
 
-  void _showFiltersModal() {
-    showDialog(
-      context: context,
-      builder: (context) => StandardDialog(
-        title: "Filter Clinics",
-        width: 600.w,
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDropdown<String>(
-                    label: "Region",
-                    hintText: "All Regions",
-                    items:
-                        const ["East Coast", "West Coast", "Midwest", "South"]
-                            .map(
-                              (s) => DropdownMenuItem(value: s, child: Text(s)),
-                            )
-                            .toList(),
-                    onChanged: (val) {},
+  Widget _buildPendingInvitationsTab(
+    BuildContext context,
+    List<InviteClinicModel> invites,
+    bool isLoading,
+  ) {
+    if (isLoading) {
+      return const Center(child: AppLoader());
+    }
+
+    if (invites.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    final totalPages = (invites.length / _itemsPerPage).ceil();
+    final paginatedInvites = invites
+        .skip(_invitePage * _itemsPerPage)
+        .take(_itemsPerPage)
+        .toList();
+
+    return Column(
+      children: [
+        Expanded(
+          child: BorderdContainerWidget(
+            padding: EdgeInsets.zero,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: Table(
+                columnWidths: const {
+                  0: FlexColumnWidth(4), // Clinic Name / logo
+                  1: FlexColumnWidth(4), // Contact / Location
+                  2: FlexColumnWidth(3), // Region / Address
+                  3: FlexColumnWidth(2), // Status
+                  4: FlexColumnWidth(2), // Actions
+                },
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: [
+                  // Header Row
+                  TableRow(
+                    decoration: const BoxDecoration(
+                      color: CustomColors.whiteGrey,
+                      border: Border(
+                        bottom: BorderSide(color: CustomColors.border),
+                      ),
+                    ),
+                    children: [
+                      _tableHeaderCell('PROSPECT CLINIC'),
+                      _tableHeaderCell('CONTACT DETAIL'),
+                      _tableHeaderCell('LOCATION'),
+                      _tableHeaderCell('STATUS'),
+                      _tableHeaderCell('ACTIONS'),
+                    ],
                   ),
-                ),
-                SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: CustomDropdown<String>(
-                    label: "Status",
-                    hintText: "All Status",
-                    items: const ["Active", "Inactive", "Pending"]
-                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                        .toList(),
-                    onChanged: (val) {},
-                  ),
-                ),
-              ],
+                  // Data Rows
+                  ...paginatedInvites.map((clinic) {
+                    return TableRow(
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: CustomColors.border),
+                        ),
+                      ),
+                      children: [
+                        _clinicNameCell(clinic.name, clinic.logo),
+                        _clinicContactCell(clinic.email, clinic.phone, null),
+                        _tableTextCell(
+                          clinic.address,
+                          style: context.fonts.grey14w400,
+                        ),
+                        _invitationStatusBadgeCell(clinic.invitationStatus),
+                        _inviteActionsCell(clinic),
+                      ],
+                    );
+                  }),
+                ],
+              ),
             ),
-            SizedBox(height: AppSpacing.xl),
-            CustomDropdown<String>(
-              label: "Subscription Plan",
-              hintText: "All Plans",
-              items: const [
-                "Basic",
-                "Standard",
-                "Premium",
-                "Enterprise",
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (val) {},
+          ),
+        ),
+        if (totalPages > 1)
+          Padding(
+            padding: context.appEdgeInsets(vertical: 24),
+            child: Center(
+              child: NumberPaginator(
+                totalPages: totalPages,
+                currentPage: _invitePage,
+                onPageChanged: (pageIndex) {
+                  setState(() {
+                    _invitePage = pageIndex;
+                  });
+                },
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _tableHeaderCell(String label) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Text(
+        label,
+        style: context.fonts.grey12w600.copyWith(letterSpacing: 1),
+      ),
+    );
+  }
+
+  Widget _clinicNameCell(String? name, String? logo) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 18.r,
+            backgroundColor: CustomColors.palePurple,
+            backgroundImage: (logo != null && logo.isNotEmpty)
+                ? NetworkImage(logo)
+                : null,
+            child: (logo == null || logo.isEmpty)
+                ? Text(name?[0] ?? 'C', style: context.fonts.purple12w700)
+                : null,
+          ),
+          context.horizontalSpace(12),
+          Expanded(
+            child: Text(
+              name ?? 'N/A',
+              style: context.fonts.black14w600,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _clinicContactCell(String? email, String? phone, String? address) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            email ?? 'N/A',
+            style: context.fonts.grey13w500,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (phone != null && phone.isNotEmpty) ...[
+            context.verticalSpace(2),
+            Text(phone, style: context.fonts.grey12w400),
+          ],
+          if (address != null && address.isNotEmpty) ...[
+            context.verticalSpace(2),
+            Text(
+              address,
+              style: context.fonts.grey11w400,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Reset All"),
-          ),
-          CustomPrimaryButton(
-            onTap: () => Navigator.pop(context),
-            label: "Apply Filters",
-            width: 140.w,
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildUnifiedTable<T>({
-    required String title,
-    required List<T> items,
-    required bool isLoading,
-    required ScrollController controller,
-    required List<DataColumn> columns,
-    required DataRow Function(T) rowBuilder,
-  }) {
-    return BorderdContainerWidget(
-      padding: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.xl,
-              AppSpacing.xl,
-              AppSpacing.xl,
-              AppSpacing.md,
+  Widget _tableTextCell(String text, {required TextStyle style}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Text(
+        text,
+        style: style,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  Widget _statusBadgeCell(String status) {
+    final bool isActive = status.toLowerCase() == 'active';
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 16.h),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            color: isActive
+                ? CustomColors.green.withValues(alpha: 0.1)
+                : CustomColors.red.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(
+              color: isActive
+                  ? CustomColors.green.withValues(alpha: 0.2)
+                  : CustomColors.red.withValues(alpha: 0.2),
             ),
-            child: Text(title, style: CustomFonts.black18w600),
           ),
-          Expanded(
-            child: isLoading
-                ? const Center(child: AppLoader())
-                : items.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(AppSpacing.xxl),
-                      child: Text(
-                        "No entries found",
-                        style: CustomFonts.grey13w500,
-                      ),
-                    ),
-                  )
-                : Scrollbar(
-                    controller: controller,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
-                      controller: controller,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                minWidth: constraints.maxWidth,
-                              ),
-                              child: DataTable(
-                                headingRowColor: WidgetStateProperty.all(
-                                  CustomColors.whiteGrey,
-                                ),
-                                rows: List.generate(
-                                  items.length,
-                                  (index) => rowBuilder(items[index]),
-                                ),
-                                columns: columns,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+          child: Text(
+            status,
+            style: context.fonts.grey12w600.copyWith(
+              color: isActive ? CustomColors.green : CustomColors.red,
+              fontSize: 10.sp,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _invitationStatusBadgeCell(String status) {
+    Color badgeColor = Colors.blue;
+    final String cleanStatus = status.toLowerCase();
+
+    if (cleanStatus.contains('sent') ||
+        cleanStatus.contains('invited') ||
+        cleanStatus.contains('awaiting')) {
+      badgeColor = Colors.blue;
+    } else if (cleanStatus.contains('interested') ||
+        cleanStatus.contains('pending')) {
+      badgeColor = CustomColors.green;
+    } else if (cleanStatus.contains('expired')) {
+      badgeColor = CustomColors.red;
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 16.h),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            color: badgeColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(color: badgeColor.withValues(alpha: 0.2)),
+          ),
+          child: Text(
+            status,
+            style: context.fonts.grey12w600.copyWith(
+              color: badgeColor,
+              fontSize: 10.sp,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _activeActionsCell(ClinicModel clinic) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        children: [
+          IconButton(
+            tooltip: 'View Details',
+            icon: Icon(
+              Icons.visibility_outlined,
+              size: 20.sp,
+              color: CustomColors.grey,
+            ),
+            onPressed: () {
+              ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
+              context.push(ClinicDetailScreen.routeName);
+            },
+          ),
+          IconButton(
+            tooltip: 'Edit Partner',
+            icon: Icon(
+              Icons.edit_road_rounded,
+              size: 20.sp,
+              color: CustomColors.purple,
+            ),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => EditClinicDialogBox(clinic: clinic),
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  DataRow _buildActiveClinicRow(ClinicModel clinic) {
-    return DataRow(
-      cells: [
-        DataCell(_buildNameCell(clinic.name, clinic.logo)),
-        DataCell(_buildContactCell(clinic.email, clinic.phone)),
-        DataCell(Text(clinic.address ?? 'N/A', style: CustomFonts.grey13w500)),
-        DataCell(_buildPlanBadge(clinic.subscriptionPlan ?? "Standard")),
-        DataCell(
-          _buildStatsCell(
-            clinic.totalAppointments?.toString() ?? "0",
-            Icons.people_outline_rounded,
-            clinic.rating?.toString() ?? "0",
-            Icons.star_outline_rounded,
-          ),
-        ),
-        DataCell(_statusBadge(clinic.status ?? 'Active')),
-        DataCell(
-          Row(
-            children: [
-              IconButton(
-                tooltip: 'View Details',
-                icon: Icon(
-                  Icons.visibility_outlined,
-                  size: 20.sp,
-                  color: CustomColors.grey,
-                ),
-                onPressed: () {
-                  ref
-                      .read(clinicViewModelProvider.notifier)
-                      .selectClinic(clinic);
-                  context.push(ClinicDetailScreen.routeName);
-                },
-              ),
-              IconButton(
-                tooltip: 'Edit Partner',
-                icon: Icon(
-                  Icons.edit_outlined,
-                  size: 20.sp,
-                  color: CustomColors.grey,
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => EditClinicDialogBox(clinic: clinic),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  DataRow _buildInviteClinicRow(InviteClinicModel clinic) {
-    return DataRow(
-      cells: [
-        DataCell(_buildNameCell(clinic.name, clinic.logo)),
-        DataCell(_buildContactCell(clinic.email, clinic.phone)),
-        DataCell(Text(clinic.address, style: CustomFonts.grey13w500)),
-        DataCell(_invitationStatusBadge(clinic.invitationStatus)),
-        DataCell(
+  Widget _inviteActionsCell(InviteClinicModel clinic) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        children: [
           IconButton(
             tooltip: 'View Prospect',
             icon: Icon(
@@ -499,93 +785,70 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               context.push(InviteClinicDetailScreen.routeName);
             },
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 48),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: context.appEdgeInsets(all: 20),
+              decoration: const BoxDecoration(
+                color: CustomColors.whiteGrey,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: context.sp(48),
+                color: CustomColors.grey,
+              ),
+            ),
+            context.verticalSpace(24),
+            Text(
+              'No clinics match your refinements',
+              style: context.fonts.black18w600,
+            ),
+            context.verticalSpace(8),
+            Text(
+              'Try clearing your search keyword, resetting the filters, or onboard a brand new clinic partner.',
+              style: context.fonts.grey14w400,
+              textAlign: TextAlign.center,
+            ),
+            context.verticalSpace(24),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CustomOutlinedButton(
+                  onTap: () {
+                    _searchController.clear();
+                    setState(() {
+                      _selectedRegionFilter = 'All Regions';
+                      _selectedPlanFilter = 'All Plans';
+                      _selectedStatusFilter = 'All Statuses';
+                    });
+                  },
+                  label: 'Clear All Filters',
+                  color: Colors.white,
+                  textColor: CustomColors.purple,
+                ),
+                context.horizontalSpace(16),
+                CustomPrimaryButton(
+                  onTap: () => context.push(AddNewClinicScreen.routeName),
+                  icon: Icons.add_rounded,
+                  label: 'Add Clinic',
+                  width: context.w(180),
+                ),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     );
-  }
-
-  Widget _buildNameCell(String? name, String? logo) {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 16.r,
-          backgroundColor: CustomColors.palePurple,
-          backgroundImage: (logo != null && logo.isNotEmpty)
-              ? NetworkImage(logo)
-              : null,
-          child: (logo == null || logo.isEmpty)
-              ? Text(name?[0] ?? "C", style: CustomFonts.purple12w700)
-              : null,
-        ),
-        SizedBox(width: AppSpacing.sm),
-        Text(name ?? 'N/A', style: CustomFonts.black14w600),
-      ],
-    );
-  }
-
-  Widget _buildContactCell(String? email, String? phone) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(email ?? 'N/A', style: CustomFonts.grey13w500),
-        Text(phone ?? '', style: CustomFonts.grey12w400),
-      ],
-    );
-  }
-
-  Widget _buildPlanBadge(String plan) {
-    return AppBadge(label: plan, variant: AppBadgeVariant.secondary);
-  }
-
-  Widget _buildStatsCell(
-    String val1,
-    IconData icon1,
-    String val2,
-    IconData icon2,
-  ) {
-    return Row(
-      children: [
-        _miniIconStat(icon1, val1),
-        SizedBox(width: AppSpacing.sm),
-        _miniIconStat(icon2, val2),
-      ],
-    );
-  }
-
-  Widget _miniIconStat(IconData icon, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 14.sp, color: CustomColors.lightGrey),
-        SizedBox(width: 4.w),
-        Text(value, style: CustomFonts.grey12w400),
-      ],
-    );
-  }
-
-  Widget _statusBadge(String status) {
-    final bool isActive = status.toLowerCase() == 'active';
-    return AppBadge(
-      label: status,
-      variant: isActive ? AppBadgeVariant.success : AppBadgeVariant.error,
-    );
-  }
-
-  Widget _invitationStatusBadge(String status) {
-    AppBadgeVariant variant = AppBadgeVariant.info;
-    String cleanStatus = status.toLowerCase();
-
-    if (cleanStatus.contains('sent') ||
-        cleanStatus.contains('invited') ||
-        cleanStatus.contains('awaiting')) {
-      variant = AppBadgeVariant.info;
-    } else if (cleanStatus.contains('interested') ||
-        cleanStatus.contains('pending')) {
-      variant = AppBadgeVariant.success;
-    } else if (cleanStatus.contains('expired')) {
-      variant = AppBadgeVariant.error;
-    }
-
-    return AppBadge(label: status, variant: variant);
   }
 }
