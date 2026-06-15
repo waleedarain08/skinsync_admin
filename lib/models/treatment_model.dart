@@ -71,6 +71,10 @@ class TreatmentModel {
 
   List<ProductUsageModel>? productUsages;
 
+  // Post Treatment Photos
+  bool requirePostTreatmentPhotos;
+  int requiredPostTreatmentPhotoCount;
+
   // Follow-Up Fields (Deprecated in favor of session-scoped follow-ups but kept for migration if needed)
   bool isFollowUpRequired;
 
@@ -129,6 +133,8 @@ class TreatmentModel {
     this.postTreatmentAttachments,
     this.preTreatmentConsentForm,
     this.productUsages,
+    this.requirePostTreatmentPhotos = false,
+    this.requiredPostTreatmentPhotoCount = 0,
     this.isFollowUpRequired = false,
   });
 
@@ -231,6 +237,9 @@ class TreatmentModel {
       productUsages: (json['product_usages'] as List?)
           ?.map((e) => ProductUsageModel.fromJson(e))
           .toList(),
+      requirePostTreatmentPhotos: json['require_post_treatment_photos'] ?? false,
+      requiredPostTreatmentPhotoCount:
+          json['required_post_treatment_photo_count'] ?? 0,
       isFollowUpRequired: json['is_follow_up_required'] ?? false,
     );
   }
@@ -290,6 +299,8 @@ class TreatmentModel {
     List<Attachment>? postTreatmentAttachments,
     Attachment? preTreatmentConsentForm,
     List<ProductUsageModel>? productUsages,
+    bool? requirePostTreatmentPhotos,
+    int? requiredPostTreatmentPhotoCount,
     bool? isFollowUpRequired,
   }) {
     return TreatmentModel(
@@ -366,6 +377,10 @@ class TreatmentModel {
       preTreatmentConsentForm:
           preTreatmentConsentForm ?? this.preTreatmentConsentForm,
       productUsages: productUsages ?? this.productUsages,
+      requirePostTreatmentPhotos:
+          requirePostTreatmentPhotos ?? this.requirePostTreatmentPhotos,
+      requiredPostTreatmentPhotoCount:
+          requiredPostTreatmentPhotoCount ?? this.requiredPostTreatmentPhotoCount,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
     );
   }
@@ -432,6 +447,8 @@ class TreatmentModel {
           .toList(),
       'pre_treatment_consent_form': preTreatmentConsentForm?.toJson(),
       'product_usages': productUsages?.map((e) => e.toJson()).toList(),
+      'require_post_treatment_photos': requirePostTreatmentPhotos,
+      'required_post_treatment_photo_count': requiredPostTreatmentPhotoCount,
       'is_follow_up_required': isFollowUpRequired,
     };
   }

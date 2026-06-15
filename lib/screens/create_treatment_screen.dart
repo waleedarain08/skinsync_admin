@@ -129,6 +129,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       'Basic Information',
       'Treatment Areas',
       'Inventory Products',
+      'Post Treatment Photos',
       'Pricing',
       'Scheduling',
       'Protocols',
@@ -280,6 +281,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       'Basic Information',
       'Body Areas',
       'Inventory Products',
+      'Post Treatment Photos',
       'Pricing Setup',
       'Scheduling',
       'Clinical Protocols',
@@ -298,6 +300,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       'Core identification details including status.',
       'Define mandatory sub-areas.',
       'Configure required products from inventory and area-wise consumption.',
+      'Configure how many post-treatment photos should be captured for this treatment.',
       'Finalize treatment base price and sub-area pricing adjustments.',
       'Centralize appointment duration, preparation times, and booking permissions.',
       'Standardize procedures with checklists and required text fields.',
@@ -316,6 +319,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       Icons.description_outlined,
       Icons.accessibility_new_outlined,
       Icons.inventory_2_outlined,
+      Icons.add_a_photo_outlined,
       Icons.payments_outlined,
       Icons.schedule_outlined,
       Icons.assignment_turned_in_outlined,
@@ -1823,6 +1827,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
           _summaryChip(context, 'Follow-Up Required', Icons.replay_outlined),
         if (state.useInAiSimulator)
           _summaryChip(context, 'AI Compatible', Icons.auto_awesome_outlined),
+        if (state.requirePostTreatmentPhotos)
+          _summaryChip(
+            context,
+            '${state.requiredPostTreatmentPhotoCount} Photos Required',
+            Icons.add_a_photo_outlined,
+          ),
         _summaryChip(
           context,
           state.status.toUpperCase(),
@@ -1894,18 +1904,18 @@ class CreateTreatmentScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Step ${state.currentStep + 1} of 16',
+                'Step ${state.currentStep + 1} of 17',
                 style: context.fonts.black14w700,
               ),
               Text(
-                '${((state.currentStep + 1) / 16 * 100).toInt()}%',
+                '${((state.currentStep + 1) / 17 * 100).toInt()}%',
                 style: context.fonts.purple14w700,
               ),
             ],
           ),
           context.verticalSpace(8),
           LinearProgressIndicator(
-            value: (state.currentStep + 1) / 16,
+            value: (state.currentStep + 1) / 17,
             minHeight: context.h(4),
             backgroundColor: CustomColors.whiteGrey,
             valueColor: const AlwaysStoppedAnimation<Color>(
@@ -1934,10 +1944,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 3:
         return _buildStepMaterials(context, state, viewModel, dataState, ref);
       case 4:
-        return _buildStepPricing(context, state, viewModel);
+        return _buildPostTreatmentPhotosStep(context, state, viewModel);
       case 5:
-        return _buildStepScheduling(context, state, viewModel);
+        return _buildStepPricing(context, state, viewModel);
       case 6:
+        return _buildStepScheduling(context, state, viewModel);
+      case 7:
         return _buildStepProtocolsStep(
           context,
           state,
@@ -1945,23 +1957,23 @@ class CreateTreatmentScreen extends ConsumerWidget {
           dataState,
           ref,
         );
-      case 7:
-        return _buildStepPreInstructions(context, state, viewModel);
       case 8:
-        return _buildStepPostInstructions(context, state, viewModel);
+        return _buildStepPreInstructions(context, state, viewModel);
       case 9:
-        return _buildStepNotifications(context, state, viewModel, dataState);
+        return _buildStepPostInstructions(context, state, viewModel);
       case 10:
-        return _buildStepDowntime(context, state, viewModel, dataState);
+        return _buildStepNotifications(context, state, viewModel, dataState);
       case 11:
-        return _buildStepRoles(context, state, viewModel, dataState);
+        return _buildStepDowntime(context, state, viewModel, dataState);
       case 12:
-        return _buildStepSessions(context, state, viewModel, dataState);
+        return _buildStepRoles(context, state, viewModel, dataState);
       case 13:
-        return _buildStepFollowUp(context, state, viewModel, dataState);
+        return _buildStepSessions(context, state, viewModel, dataState);
       case 14:
-        return _buildStepConsent(context, state, viewModel, ref);
+        return _buildStepFollowUp(context, state, viewModel, dataState);
       case 15:
+        return _buildStepConsent(context, state, viewModel, ref);
+      case 16:
         return _buildStepLogic(context, state, viewModel);
       default:
         return const SizedBox.shrink();
@@ -6080,7 +6092,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     TreatmentViewModel viewModel,
     TreatmentDataState dataState,
   ) {
-    final bool isLastStep = state.currentStep == 15;
+    final bool isLastStep = state.currentStep == 16;
 
     return Row(
       children: [
@@ -6106,11 +6118,14 @@ class CreateTreatmentScreen extends ConsumerWidget {
               if (state.currentStep == 3) {
                 if (!_validateProductQuantities(context, state)) return;
               }
-              if (state.currentStep == 5) {
+              if (state.currentStep == 4) {
+                if (!_validatePostPhotos(context, state)) return;
+              }
+              if (state.currentStep == 6) {
                 if (!_validateScheduling(context, viewModel)) return;
               }
 
-              if (state.currentStep < 15) {
+              if (state.currentStep < 16) {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel
@@ -6125,6 +6140,21 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  bool _validatePostPhotos(BuildContext context, TreatmentState state) {
+    if (state.requirePostTreatmentPhotos) {
+      if (state.requiredPostTreatmentPhotoCount <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please specify the required number of photos.'),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+    }
+    return true;
   }
 
   bool _validateProductQuantities(BuildContext context, TreatmentState state) {
@@ -6252,6 +6282,119 @@ class CreateTreatmentScreen extends ConsumerWidget {
       }
     }
     return true;
+  }
+
+  Widget _buildPostTreatmentPhotosStep(
+    BuildContext context,
+    TreatmentState state,
+    TreatmentViewModel viewModel,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Require Post Treatment Photos',
+                    style: context.fonts.black16w600,
+                  ),
+                  Text(
+                    state.requirePostTreatmentPhotos
+                        ? 'Provider must capture photos to complete treatment.'
+                        : 'Post treatment photos are optional for this treatment.',
+                    style: context.fonts.grey12w400,
+                  ),
+                ],
+              ),
+            ),
+            Switch.adaptive(
+              value: state.requirePostTreatmentPhotos,
+              activeColor: CustomColors.purple,
+              onChanged: (val) =>
+                  viewModel.toggleRequirePostTreatmentPhotos(val),
+            ),
+          ],
+        ),
+        if (state.requirePostTreatmentPhotos) ...[
+          context.verticalSpace(32),
+          const Divider(),
+          context.verticalSpace(32),
+          Text('Required Number of Photos', style: context.fonts.black16w600),
+          context.verticalSpace(8),
+          Text(
+            'Specify how many photos the provider is expected to upload.',
+            style: context.fonts.grey12w400,
+          ),
+          context.verticalSpace(20),
+          Row(
+            children: [
+              _counterButton(
+                icon: Icons.remove,
+                onTap: () {
+                  final current =
+                      int.tryParse(
+                        viewModel.postTreatmentPhotoCountController.text,
+                      ) ??
+                      0;
+                  if (current > 1) {
+                    final newVal = (current - 1).toString();
+                    viewModel.postTreatmentPhotoCountController.text = newVal;
+                    viewModel.updateRequiredPostTreatmentPhotoCount(newVal);
+                  }
+                },
+              ),
+              Container(
+                width: context.w(100),
+                margin: context.appEdgeInsets(horizontal: 16),
+                child: BuildTextField(
+                  label: '',
+                  controller: viewModel.postTreatmentPhotoCountController,
+                  hintText: '0',
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) =>
+                      viewModel.updateRequiredPostTreatmentPhotoCount(
+                        val ?? '0',
+                      ),
+                ),
+              ),
+              _counterButton(
+                icon: Icons.add,
+                onTap: () {
+                  final current =
+                      int.tryParse(
+                        viewModel.postTreatmentPhotoCountController.text,
+                      ) ??
+                      0;
+                  final newVal = (current + 1).toString();
+                  viewModel.postTreatmentPhotoCountController.text = newVal;
+                  viewModel.updateRequiredPostTreatmentPhotoCount(newVal);
+                },
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _counterButton({required IconData icon, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          border: Border.all(color: CustomColors.border),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, size: 20, color: CustomColors.purple),
+      ),
+    );
   }
 }
 

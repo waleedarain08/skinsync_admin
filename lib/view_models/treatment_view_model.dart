@@ -61,6 +61,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final followUpDurationValueController = TextEditingController();
   final followUpNotesController = TextEditingController();
 
+  // Step - Post Treatment Photos Controllers
+  final postTreatmentPhotoCountController = TextEditingController(text: '0');
+
   // Step 3 Controllers (Protocols)
   final protocolNameController = TextEditingController();
 
@@ -104,6 +107,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     totalSessionsController.dispose();
     followUpDurationValueController.dispose();
     followUpNotesController.dispose();
+    postTreatmentPhotoCountController.dispose();
     protocolNameController.dispose();
     categoryIdController.dispose();
     categoryNameController.dispose();
@@ -173,6 +177,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     totalSessionsController.clear();
     followUpDurationValueController.clear();
     followUpNotesController.clear();
+    postTreatmentPhotoCountController.text = '0';
     protocolNameController.clear();
     categoryIdController.clear();
     categoryNameController.clear();
@@ -212,6 +217,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       sessionSource: 'category',
       totalSessions: 1,
       productUsageEntries: [],
+      requirePostTreatmentPhotos: false,
+      requiredPostTreatmentPhotoCount: 0,
       selectedTreatment: null,
       useInAiSimulator: false,
       enableByDefault: false,
@@ -398,6 +405,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     categoryIdController.text = treatment.categoryId ?? '';
     categoryNameController.text = treatment.categoryName ?? '';
     categoryPathController.text = treatment.categoryPath ?? '';
+    postTreatmentPhotoCountController.text =
+        treatment.requiredPostTreatmentPhotoCount.toString();
     
     // Clear and re-populate areas
     for (final area in state.areas) {
@@ -447,6 +456,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       totalSessions: treatment.totalSessions,
       sessions: newSessions,
       productUsageEntries: newProductUsageEntries,
+      requirePostTreatmentPhotos: treatment.requirePostTreatmentPhotos,
+      requiredPostTreatmentPhotoCount: treatment.requiredPostTreatmentPhotoCount,
       isFollowUpRequired: treatment.isFollowUpRequired,
       useInAiSimulator: treatment.useInAiSimulator,
       enableByDefault: treatment.enableByDefault,
@@ -841,6 +852,19 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(useInAiSimulator: value ?? false);
   }
 
+  void toggleRequirePostTreatmentPhotos(bool? value) {
+    state = state.copyWith(requirePostTreatmentPhotos: value ?? false);
+    if (!(value ?? false)) {
+      postTreatmentPhotoCountController.text = '0';
+      state = state.copyWith(requiredPostTreatmentPhotoCount: 0);
+    }
+  }
+
+  void updateRequiredPostTreatmentPhotoCount(String value) {
+    final count = int.tryParse(value) ?? 0;
+    state = state.copyWith(requiredPostTreatmentPhotoCount: count);
+  }
+
   void toggleEnableByDefault(bool? value) {
     state = state.copyWith(enableByDefault: value ?? false);
   }
@@ -1199,6 +1223,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 ? Attachment(url: state.preTreatmentConsentForm!.path ?? '', type: 'pdf', name: state.preTreatmentConsentForm!.name)
                 : state.existingConsentForm)
             : null,
+        requirePostTreatmentPhotos: state.requirePostTreatmentPhotos,
+        requiredPostTreatmentPhotoCount: state.requiredPostTreatmentPhotoCount,
         isFollowUpRequired: state.isFollowUpRequired,
         productUsages: state.productUsageEntries.map((e) {
           final List<SubAreaConsumption> subAreaConsumptions = [];
@@ -1420,6 +1446,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 ? Attachment(url: state.preTreatmentConsentForm!.path ?? '', type: 'pdf', name: state.preTreatmentConsentForm!.name)
                 : state.existingConsentForm)
             : null,
+        requirePostTreatmentPhotos: state.requirePostTreatmentPhotos,
+        requiredPostTreatmentPhotoCount: state.requiredPostTreatmentPhotoCount,
         isFollowUpRequired: state.isFollowUpRequired,
         productUsages: state.productUsageEntries.map((e) {
           final List<SubAreaConsumption> subAreaConsumptions = [];
@@ -1586,6 +1614,10 @@ class TreatmentState extends BaseStateModel {
   final List<NotificationEntry> preNotificationEntries;
   final List<NotificationEntry> postNotificationEntries;
 
+  // Post Treatment Photos
+  final bool requirePostTreatmentPhotos;
+  final int requiredPostTreatmentPhotoCount;
+
   // Follow-Up fields
   final bool isFollowUpRequired;
 
@@ -1640,6 +1672,8 @@ class TreatmentState extends BaseStateModel {
     this.productUsageEntries = const [],
     this.preNotificationEntries = const [],
     this.postNotificationEntries = const [],
+    this.requirePostTreatmentPhotos = false,
+    this.requiredPostTreatmentPhotoCount = 0,
     this.isFollowUpRequired = false,
     this.useInAiSimulator = false,
     this.enableByDefault = false,
@@ -1692,6 +1726,8 @@ class TreatmentState extends BaseStateModel {
     String? sessionSource,
     int? totalSessions,
     List<ProductUsageEntry>? productUsageEntries,
+    bool? requirePostTreatmentPhotos,
+    int? requiredPostTreatmentPhotoCount,
     bool? isFollowUpRequired,
     bool? useInAiSimulator,
     bool? enableByDefault,
@@ -1742,6 +1778,10 @@ class TreatmentState extends BaseStateModel {
       sessionSource: sessionSource ?? this.sessionSource,
       totalSessions: totalSessions ?? this.totalSessions,
       productUsageEntries: productUsageEntries ?? this.productUsageEntries,
+      requirePostTreatmentPhotos:
+          requirePostTreatmentPhotos ?? this.requirePostTreatmentPhotos,
+      requiredPostTreatmentPhotoCount:
+          requiredPostTreatmentPhotoCount ?? this.requiredPostTreatmentPhotoCount,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
       useInAiSimulator: useInAiSimulator ?? this.useInAiSimulator,
       enableByDefault: enableByDefault ?? this.enableByDefault,
