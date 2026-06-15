@@ -10,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import '../models/notification_entry.dart';
 import '../models/product_model.dart';
 import '../models/treatment_data_models.dart';
-import '../utils/dummy_data.dart';
 import '../utils/theme.dart';
 import '../utils/validators.dart';
 import '../view_models/product_view_model.dart';
@@ -22,6 +21,7 @@ import '../widgets/build_textfield.dart';
 import '../widgets/custom_dropdown_widget.dart';
 import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
+import '../widgets/dailogbox/product_dailogboxs.dart';
 import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_category_selector.dart';
@@ -5290,8 +5290,6 @@ class CreateTreatmentScreen extends ConsumerWidget {
     TreatmentViewModel viewModel,
     TreatmentState state,
   ) {
-    final inventoryProducts = TreatmentData.dummyInventoryProducts;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -5304,15 +5302,31 @@ class CreateTreatmentScreen extends ConsumerWidget {
             readOnly: true,
             onTap: () => controller.openView(),
             hintText: 'Select product from inventory',
-            suffixIcon: const Icon(
-              Icons.add_circle_outline_rounded,
-              color: CustomColors.purple,
+            suffixIcon: IconButton(
+              icon: const Icon(
+                Icons.add_circle_outline_rounded,
+                color: CustomColors.purple,
+              ),
+              onPressed: () async {
+                final newProduct = await showDialog<ProductModel>(
+                  context: context,
+                  builder: (context) => const ProductDialogBox(),
+                );
+                if (newProduct != null && newProduct.id != null) {
+                  viewModel.addProductUsage(
+                    newProduct.id!,
+                    newProduct.name,
+                    newProduct.unit,
+                  );
+                  controller.text = newProduct.name;
+                }
+              },
             ),
             maxWidth: double.infinity,
           ),
           suggestionsBuilder: (context, controller) {
             final query = controller.text.toLowerCase();
-            final filtered = inventoryProducts
+            final filtered = products
                 .where((p) => p.name.toLowerCase().contains(query))
                 .toList();
 

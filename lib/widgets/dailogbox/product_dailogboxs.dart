@@ -271,11 +271,15 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                 );
                 
                 final notifier = ref.read(productViewModelProvider.notifier);
-                final Future<bool> action = isEdit ? notifier.updateProduct(product) : notifier.addProduct(product);
-                
-                action.then((success) {
-                  if (success && context.mounted) context.pop();
-                });
+                if (isEdit) {
+                  notifier.updateProduct(product).then((success) {
+                    if (success && context.mounted) context.pop();
+                  });
+                } else {
+                  notifier.addProduct(product).then((newProduct) {
+                    if (newProduct != null && context.mounted) context.pop(newProduct);
+                  });
+                }
               },
               label: state.loading ? 'Saving...' : 'Save Catalog Product',
               width: 180.w,

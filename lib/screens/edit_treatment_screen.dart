@@ -7,10 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../models/product_model.dart';
 import '../models/treatment_data_models.dart';
-import '../utils/dummy_data.dart';
 import '../utils/theme.dart';
 import '../utils/validators.dart';
+import '../view_models/product_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
 import '../widgets/app_search_field.dart';
@@ -18,6 +19,7 @@ import '../widgets/borderd_container_widget.dart';
 import '../widgets/build_textfield.dart';
 import '../widgets/custom_dropdown_widget.dart';
 import '../widgets/custom_primary_button.dart';
+import '../widgets/dailogbox/product_dailogboxs.dart';
 import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_category_selector.dart';
@@ -1537,6 +1539,7 @@ class EditTreatmentScreen extends ConsumerWidget {
     TreatmentViewModel viewModel,
     WidgetRef ref,
   ) {
+    final productState = ref.watch(productViewModelProvider);
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
@@ -1544,7 +1547,12 @@ class EditTreatmentScreen extends ConsumerWidget {
         children: [
           Text('Inventory Products', style: context.fonts.black18w600),
           context.verticalSpace(24),
-          _buildProductSelector(context, viewModel, state),
+          _buildProductSelector(
+            context,
+            viewModel,
+            state,
+            productState.products ?? [],
+          ),
           if (state.productUsageEntries.isNotEmpty) ...[
             context.verticalSpace(32),
             ListView.separated(
@@ -1572,9 +1580,8 @@ class EditTreatmentScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentViewModel viewModel,
     TreatmentState state,
+    List<ProductModel> products,
   ) {
-    final inventoryProducts = TreatmentData.dummyInventoryProducts;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1587,15 +1594,31 @@ class EditTreatmentScreen extends ConsumerWidget {
             readOnly: true,
             onTap: () => controller.openView(),
             hintText: 'Select product from inventory',
-            suffixIcon: const Icon(
-              Icons.add_circle_outline_rounded,
-              color: CustomColors.purple,
+            suffixIcon: IconButton(
+              icon: const Icon(
+                Icons.add_circle_outline_rounded,
+                color: CustomColors.purple,
+              ),
+              onPressed: () async {
+                final newProduct = await showDialog<ProductModel>(
+                  context: context,
+                  builder: (context) => const ProductDialogBox(),
+                );
+                if (newProduct != null && newProduct.id != null) {
+                  viewModel.addProductUsage(
+                    newProduct.id!,
+                    newProduct.name,
+                    newProduct.unit,
+                  );
+                  controller.text = newProduct.name;
+                }
+              },
             ),
             maxWidth: double.infinity,
           ),
           suggestionsBuilder: (context, controller) {
             final query = controller.text.toLowerCase();
-            final filtered = inventoryProducts
+            final filtered = products
                 .where((p) => p.name.toLowerCase().contains(query))
                 .toList();
 
