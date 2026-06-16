@@ -19,15 +19,14 @@ class AuthService implements AuthRepository {
   @override
   Future<LoginResponseModel> login({required LoginRequestModel req}) async {
     final jsonResponse = await _api.post(Endpoint.login, body: req.toJson());
-    final response = BaseApiResponseModel<LoginResponseModel>.fromJson(
+    final response = LoginResponseModel.fromJson(
       jsonResponse,
-      (json) => LoginResponseModel.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw BadRequestException(response.message);
     }
-    if (response.data?.accessToken == null) {
+    if (response.data == null) {
       throw UnknownException(response.message);
     }
 
@@ -44,7 +43,7 @@ class AuthService implements AuthRepository {
         response.data!.refreshExpiresAt! * 1000,
       ),
     );
-    return response.data!;
+    return response;
   }
 
   @override
@@ -55,9 +54,9 @@ class AuthService implements AuthRepository {
     );
     final response = BaseApiResponseModel<Null>.fromJson(
       jsonResponse,
-      (_) => null,
+          (_) => null,
     );
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw BadRequestException(response.message);
     }
     return response;
@@ -71,9 +70,9 @@ class AuthService implements AuthRepository {
     );
     final response = BaseApiResponseModel<String>.fromJson(
       jsonResponse,
-      (json) => json as String,
+          (json) => json as String,
     );
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -87,9 +86,9 @@ class AuthService implements AuthRepository {
     );
     final response = BaseApiResponseModel<Null>.fromJson(
       jsonResponse,
-      (_) => null,
+          (_) => null,
     );
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw BadRequestException(response.message);
     }
     return response;
@@ -105,11 +104,12 @@ class AuthService implements AuthRepository {
     );
     final response = BaseApiResponseModel<Null>.fromJson(
       jsonResponse,
-      (_) => null,
+          (_) => null,
     );
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw BadRequestException(response.message);
     }
     return response;
   }
 }
+

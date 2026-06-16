@@ -187,7 +187,7 @@ class ApiBaseHelper {
     final json = await http.post(uri, body: jsonEncode(request));
     log('RESPONSE: ${json.body}');
     final response = RefreshTokenResponse.fromJson(_processResponse(json));
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw const UnauthorizedException('Unauthorized');
     }
     final secureStorage = locator<SecureStorageService>();

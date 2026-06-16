@@ -1,9 +1,35 @@
-// ignore_for_file: unnecessary_this
+import '../user_model.dart';
+import 'base_response_model.dart';
 
-import 'package:skinsync_admin/models/user_model.dart';
+class LoginResponseModel extends BaseApiResponseModel<AuthData> {
+  const LoginResponseModel({
+    required super.status,
+    required super.message,
+    super.data,
+  });
 
-class LoginResponseModel {
-  LoginResponseModel({
+  factory LoginResponseModel.fromJson(Map<String, dynamic> json) =>
+      LoginResponseModel(
+        status: json['status'],
+        message: json['message'],
+        data: json['data'] == null ? null : AuthData.fromJson(json['data']),
+      );
+
+  Map<String, dynamic> toJson() => {
+    'status': status,
+    'message': message,
+    'data': data?.toJson(),
+  };
+}
+
+class AuthData {
+  final String? accessToken;
+  final String? refreshToken;
+  final int? accessExpiresAt;
+  final int? refreshExpiresAt;
+  final UserModel? user;
+
+  AuthData({
     this.accessToken,
     this.refreshToken,
     this.accessExpiresAt,
@@ -11,32 +37,21 @@ class LoginResponseModel {
     this.user,
   });
 
-  factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
-    return LoginResponseModel(
-      accessToken: json['access_token'],
-      refreshToken: json['refresh_token'],
-      accessExpiresAt: json['access_expires_at'],
-      refreshExpiresAt: json['refresh_expires_at'],
-      user: json['admin_user'] != null
-          ? UserModel.fromJson(json['admin_user'])
-          : null,
-    );
-  }
-  String? accessToken;
-  String? refreshToken;
-  int? accessExpiresAt;
-  int? refreshExpiresAt;
-  UserModel? user;
+  factory AuthData.fromJson(Map<String, dynamic> json) => AuthData(
+    accessToken: json['access_token'],
+    refreshToken: json['refresh_token'],
+    accessExpiresAt: json['access_expires_at'],
+    refreshExpiresAt: json['refresh_expires_at'],
+    user: json['admin_user'] == null
+        ? null
+        : UserModel.fromJson(json['admin_user']),
+  );
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['access_token'] = this.accessToken;
-    data['refresh_token'] = this.refreshToken;
-    data['access_expires_at'] = this.accessExpiresAt;
-    data['refresh_expires_at'] = this.refreshExpiresAt;
-    if (this.user != null) {
-      data['admin_user'] = this.user!.toJson();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+    'access_token': accessToken,
+    'refresh_token': refreshToken,
+    'access_expires_at': accessExpiresAt,
+    'refresh_expires_at': refreshExpiresAt,
+    'admin_user': user?.toJson(),
+  };
 }

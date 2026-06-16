@@ -19,7 +19,7 @@ class ProductServices implements ProductRepository {
       (json) => ProductModel.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -37,7 +37,7 @@ class ProductServices implements ProductRepository {
       (json) => ProductModel.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -54,7 +54,7 @@ class ProductServices implements ProductRepository {
       (_) => null,
     );
 
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw BadRequestException(response.message);
     }
     return response;
@@ -71,7 +71,7 @@ class ProductServices implements ProductRepository {
             .toList();
       },
     );
-    if (!response.isSuccess) {
+    if (!response.status) {
       throw BadRequestException(response.message);
     }
     return response.data!;
