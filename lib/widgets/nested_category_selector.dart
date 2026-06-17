@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/treatment_data_models.dart';
+import '../models/responses/category_list_response.dart';
 import '../utils/theme.dart';
-import '../view_models/treatment_data_view_model.dart';
+import '../view_models/category_view_model.dart';
 import 'dailogbox/category_creation_dialog.dart';
 
 class NestedCategorySelector extends ConsumerStatefulWidget {
@@ -13,9 +13,9 @@ class NestedCategorySelector extends ConsumerStatefulWidget {
     this.initialCategoryId,
     required this.onSelected,
   });
-  final List<CategoryItem> categories;
+  final List<CategoryModel> categories;
   final String? initialCategoryId;
-  final void Function(CategoryItem category, String path) onSelected;
+  final void Function(CategoryModel category, String path) onSelected;
 
   @override
   ConsumerState<NestedCategorySelector> createState() =>
@@ -24,29 +24,32 @@ class NestedCategorySelector extends ConsumerStatefulWidget {
 
 class _NestedCategorySelectorState
     extends ConsumerState<NestedCategorySelector> {
-  List<String> _selectedPath = [];
+  List<int> _selectedPath = [];
 
   @override
   void initState() {
     super.initState();
     if (widget.initialCategoryId != null) {
-      _selectedPath = _findPathToCategory(
-        widget.categories,
-        widget.initialCategoryId!,
-        [],
-      );
+      final id = int.tryParse(widget.initialCategoryId!);
+      if (id != null) {
+        _selectedPath = _findPathToCategory(
+          widget.categories,
+          id,
+          [],
+        );
+      }
     }
   }
 
-  List<String> _findPathToCategory(
-    List<CategoryItem> items,
-    String id,
-    List<String> currentPath,
+  List<int> _findPathToCategory(
+    List<CategoryModel> items,
+    int id,
+    List<int> currentPath,
   ) {
     for (final item in items) {
       if (item.id == id) return [...currentPath, item.id];
-      if (item.children.isNotEmpty) {
-        final path = _findPathToCategory(item.children, id, [
+      if (item.subCategories.isNotEmpty) {
+        final path = _findPathToCategory(item.subCategories, id, [
           ...currentPath,
           item.id,
         ]);
@@ -56,7 +59,7 @@ class _NestedCategorySelectorState
     return [];
   }
 
-  void _onLevelSelect(int level, CategoryItem category) {
+  void _onLevelSelect(int level, CategoryModel category) {
     setState(() {
       if (level < _selectedPath.length) {
         _selectedPath = _selectedPath.sublist(0, level);
@@ -77,7 +80,7 @@ class _NestedCategorySelectorState
 
   @override
   Widget build(BuildContext context) {
-    final dataViewModel = ref.read(treatmentDataViewModelProvider.notifier);
+    final categoryViewModel = ref.read(categoryViewModelProvider.notifier);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +95,7 @@ class _NestedCategorySelectorState
           onSelect: (item) => _onLevelSelect(0, item),
           onAddChild: (parent) =>
               _showCreationDialog(context, parent.name, (result) {
-                dataViewModel.addCategory(
+                categoryViewModel.addCategory(
                   result['name'],
                   icon: result['icon'],
                   parentId: parent.id,
@@ -107,7 +110,7 @@ class _NestedCategorySelectorState
                 );
               }),
           onAddRoot: () => _showCreationDialog(context, null, (result) {
-            dataViewModel.addCategory(
+            categoryViewModel.addCategory(
               result['name'],
               icon: result['icon'],
               consentFormName: result['consentFile']?.name,
@@ -127,7 +130,7 @@ class _NestedCategorySelectorState
           final parentId = _selectedPath[index];
           final parentNode = _findCategoryInTree(widget.categories, parentId);
 
-          if (parentNode == null || parentNode.children.isEmpty) {
+          if (parentNode == null || parentNode.subCategories.isEmpty) {
             return const SizedBox.shrink();
           }
 
@@ -136,14 +139,14 @@ class _NestedCategorySelectorState
             child: _buildCategoryLevel(
               context,
               title: 'Subcategory of ${parentNode.name}',
-              items: parentNode.children,
+              items: parentNode.subCategories,
               selectedId: _selectedPath.length > index + 1
                   ? _selectedPath[index + 1]
                   : null,
               onSelect: (item) => _onLevelSelect(index + 1, item),
               onAddChild: (parent) =>
                   _showCreationDialog(context, parent.name, (result) {
-                    dataViewModel.addCategory(
+                    categoryViewModel.addCategory(
                       result['name'],
                       icon: result['icon'],
                       parentId: parent.id,
@@ -167,10 +170,10 @@ class _NestedCategorySelectorState
   Widget _buildCategoryLevel(
     BuildContext context, {
     required String title,
-    required List<CategoryItem> items,
-    required String? selectedId,
-    required Function(CategoryItem) onSelect,
-    required Function(CategoryItem) onAddChild,
+    required List<CategoryModel> items,
+    required int? selectedId,
+    required void Function(CategoryModel) onSelect,
+    required void Function(CategoryModel) onAddChild,
     VoidCallback? onAddRoot,
   }) {
     return Column(
@@ -228,11 +231,11 @@ class _NestedCategorySelectorState
     }
   }
 
-  CategoryItem? _findCategoryInTree(List<CategoryItem> items, String id) {
+  CategoryModel? _findCategoryInTree(List<CategoryModel> items, int id) {
     for (final item in items) {
       if (item.id == id) return item;
-      if (item.children.isNotEmpty) {
-        final found = _findCategoryInTree(item.children, id);
+      if (item.subCategories.isNotEmpty) {
+        final found = _findCategoryInTree(item.subCategories, id);
         if (found != null) return found;
       }
     }
@@ -247,7 +250,7 @@ class _CategoryCard extends StatelessWidget {
     required this.onTap,
     required this.onAddChild,
   });
-  final CategoryItem category;
+  final CategoryModel category;
   final bool isSelected;
   final VoidCallback onTap;
   final VoidCallback onAddChild;

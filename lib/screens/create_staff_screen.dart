@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
+import 'package:skinsync_admin/view_models/category_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
@@ -32,6 +32,14 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
   // Selected category data
   String? _categoryId;
   String? _categoryPath;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(categoryViewModelProvider.notifier).fetchCategories();
+    });
+  }
 
 
   @override
@@ -253,11 +261,11 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     builder: (_) => NestedCategorySelector(
-                      categories: ref.watch(treatmentDataViewModelProvider).categories,
+                      categories: ref.watch(categoryViewModelProvider).categories,
                       initialCategoryId: _categoryId,
                       onSelected: (cat, path) {
                         setState(() {
-                          _categoryId = cat.id;
+                          _categoryId = cat.id.toString();
                           _categoryPath = path;
                         });
                       },

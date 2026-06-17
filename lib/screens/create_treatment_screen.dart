@@ -12,6 +12,7 @@ import '../models/product_model.dart';
 import '../models/treatment_data_models.dart';
 import '../utils/theme.dart';
 import '../utils/validators.dart';
+import '../view_models/category_view_model.dart';
 import '../view_models/product_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
@@ -26,16 +27,30 @@ import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_category_selector.dart';
 
-class CreateTreatmentScreen extends ConsumerWidget {
+class CreateTreatmentScreen extends ConsumerStatefulWidget {
   const CreateTreatmentScreen({super.key});
 
   static const String routeName = '/create-treatment';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CreateTreatmentScreen> createState() => _CreateTreatmentScreenState();
+}
+
+class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(categoryViewModelProvider.notifier).fetchCategories();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
     final dataState = ref.watch(treatmentDataViewModelProvider);
+    final categoryState = ref.watch(categoryViewModelProvider);
 
     final bool isDesktop = context.screenWidth > 1200;
     final bool isTablet =
@@ -93,6 +108,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                                 state,
                                 viewModel,
                                 dataState,
+                                categoryState,
                                 ref,
                               ),
                             ),
@@ -102,6 +118,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                               state,
                               viewModel,
                               dataState,
+                              categoryState,
                             ),
                           ],
                         ),
@@ -113,7 +130,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             ),
           ),
           if (isDesktop)
-            _buildRightSidebar(context, state, viewModel, dataState),
+            _buildRightSidebar(context, state, viewModel, dataState, categoryState),
         ],
       ),
     );
@@ -378,11 +395,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     TreatmentState state,
     TreatmentViewModel viewModel,
     TreatmentDataState dataState,
+    CategoryState categoryState,
   ) {
-    CategoryItem? selectedCategory;
+    CategoryModel? selectedCategory;
     if (viewModel.categoryIdController.text.isNotEmpty) {
       selectedCategory = viewModel.findCategoryById(
-        dataState.categories,
+        categoryState.categories,
         viewModel.categoryIdController.text,
       );
     }
@@ -422,11 +440,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
               style: context.fonts.black16w600,
             ),
             context.verticalSpace(16),
-            _buildProtocolFormPreview(context, state, viewModel, dataState),
+            _buildProtocolFormPreview(context, state, viewModel, dataState, categoryState),
             context.verticalSpace(32),
             Text('Patient Journey Preview', style: context.fonts.black16w600),
             context.verticalSpace(20),
-            _buildPatientJourneyPreview(context, state, viewModel, dataState),
+            _buildPatientJourneyPreview(context, state, viewModel, categoryState),
             context.verticalSpace(32),
             Text('Configuration Summary', style: context.fonts.black16w600),
             context.verticalSpace(16),
@@ -438,7 +456,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   }
 
   List<TreatmentProtocolNoteItem> _getCategoryDefaultNotes(
-    CategoryItem? category,
+    CategoryModel? category,
   ) {
     if (category == null) return [];
     if (category.name.toLowerCase().contains('inject') ||
@@ -473,7 +491,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     TreatmentState state,
     TreatmentViewModel viewModel,
     TreatmentDataState dataState,
-    CategoryItem? selectedCategory,
+    CategoryModel? selectedCategory,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -623,7 +641,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    CategoryItem? selectedCategory,
+    CategoryModel? selectedCategory,
   ) {
     final basicOk =
         viewModel.validateGlobalSku(
@@ -723,7 +741,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    CategoryItem? selectedCategory,
+    CategoryModel? selectedCategory,
   ) {
     return _blueprintSection(
       context,
@@ -826,7 +844,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   Widget _buildSessionsSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryItem? selectedCategory,
+    CategoryModel? selectedCategory,
   ) {
     final isCategory = state.sessionSource == 'category';
 
@@ -916,7 +934,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   Widget _buildConsentSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryItem? selectedCategory,
+    CategoryModel? selectedCategory,
   ) {
     final isCategory = state.consentType == 'category';
     String consentFileName = 'No PDF uploaded';
@@ -997,7 +1015,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   Widget _buildNotificationsSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryItem? selectedCategory,
+    CategoryModel? selectedCategory,
   ) {
     final isPreCategory = state.preNotificationSource == 'category';
     final isPostCategory = state.postNotificationSource == 'category';
@@ -1048,7 +1066,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   Widget _buildDowntimeSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryItem? selectedCategory,
+    CategoryModel? selectedCategory,
   ) {
     final level = state.downtimeLevel;
     int days = 0;
@@ -1056,17 +1074,19 @@ class CreateTreatmentScreen extends ConsumerWidget {
       final presets = selectedCategory.downtimePresets;
       if (level == 'low') {
         days = presets.low;
-      } else if (level == 'moderate')
+      } else if (level == 'moderate') {
         days = presets.moderate;
-      else if (level == 'high')
+      } else if (level == 'high') {
         days = presets.high;
+      }
     } else {
       if (level == 'low') {
         days = 2;
-      } else if (level == 'moderate')
+      } else if (level == 'moderate') {
         days = 5;
-      else if (level == 'high')
+      } else if (level == 'high') {
         days = 10;
+      }
     }
 
     return _blueprintSection(
@@ -1085,7 +1105,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   Widget _buildProviderRolesSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryItem? selectedCategory,
+    CategoryModel? selectedCategory,
   ) {
     final isCategory = state.providerRolesSource == 'category';
     final List<String> roles = isCategory
@@ -1345,12 +1365,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    TreatmentDataState dataState,
+    CategoryState categoryState,
   ) {
-    CategoryItem? selectedCategory;
+    CategoryModel? selectedCategory;
     if (viewModel.categoryIdController.text.isNotEmpty) {
       selectedCategory = viewModel.findCategoryById(
-        dataState.categories,
+        categoryState.categories,
         viewModel.categoryIdController.text,
       );
     }
@@ -1359,16 +1379,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
     if (state.sessionSource == 'custom') {
       totalFus = state.sessions.fold(0, (sum, s) => sum + s.followUps.length);
     } else if (selectedCategory != null) {
-      if (selectedCategory.defaultSessions != null &&
-          selectedCategory.defaultSessions!.isNotEmpty) {
-        totalFus = selectedCategory.defaultSessions!.fold(
+      if (selectedCategory.defaultSessions.isNotEmpty) {
+        totalFus = selectedCategory.defaultSessions.fold(
           0,
           (sum, s) => sum + s.followUps.length,
         );
-      } else {
-        totalFus =
-            (selectedCategory.totalSessions) *
-            (selectedCategory.defaultFollowUps?.length ?? 0);
       }
     }
 
@@ -1412,6 +1427,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     TreatmentState state,
     TreatmentViewModel viewModel,
     TreatmentDataState dataState,
+    CategoryState categoryState,
   ) {
     final selectedProtocols = dataState.protocols
         .where((p) => state.selectedProtocolIds.contains(p.id))
@@ -1423,10 +1439,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
         .where((p) => p.type == ProtocolType.text)
         .toList();
 
-    CategoryItem? selectedCategory;
+    CategoryModel? selectedCategory;
     if (viewModel.categoryIdController.text.isNotEmpty) {
       selectedCategory = viewModel.findCategoryById(
-        dataState.categories,
+        categoryState.categories,
         viewModel.categoryIdController.text,
       );
     }
@@ -1932,11 +1948,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     TreatmentState state,
     TreatmentViewModel viewModel,
     TreatmentDataState dataState,
+    CategoryState categoryState,
     WidgetRef ref,
   ) {
     switch (state.currentStep) {
       case 0:
-        return _buildStepCategory(context, state, viewModel, dataState);
+        return _buildStepCategory(context, state, viewModel, categoryState);
       case 1:
         return _buildStepDetails(context, state, viewModel);
       case 2:
@@ -1962,13 +1979,13 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 9:
         return _buildPostTreatmentPhotosStep(context, state, viewModel);
       case 10:
-        return _buildStepNotifications(context, state, viewModel, dataState);
+        return _buildStepNotifications(context, state, viewModel, categoryState);
       case 11:
-        return _buildStepDowntime(context, state, viewModel, dataState);
+        return _buildStepDowntime(context, state, viewModel, categoryState);
       case 12:
-        return _buildStepRoles(context, state, viewModel, dataState);
+        return _buildStepRoles(context, state, viewModel, categoryState);
       case 13:
-        return _buildStepSessions(context, state, viewModel, dataState);
+        return _buildStepSessions(context, state, viewModel, categoryState);
       case 14:
         return _buildStepFollowUp(context, state, viewModel, dataState);
       case 15:
@@ -2100,12 +2117,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    TreatmentDataState dataState,
+    CategoryState categoryState,
   ) {
-    CategoryItem? selectedCategory;
+    CategoryModel? selectedCategory;
     if (viewModel.categoryIdController.text.isNotEmpty) {
       selectedCategory = viewModel.findCategoryById(
-        dataState.categories,
+        categoryState.categories,
         viewModel.categoryIdController.text,
       );
     }
@@ -2113,9 +2130,9 @@ class CreateTreatmentScreen extends ConsumerWidget {
     return StatefulBuilder(
       builder: (context, setState) {
         Widget buildCategoryDefaultPreviews(
-          List<NotificationConfig> notifications,
-          bool isPre,
-        ) {
+          List<CategoryNotificationModel> notifications, {
+          required bool isPre,
+        }) {
           if (notifications.isEmpty) {
             return Container(
               padding: context.appEdgeInsets(all: 16),
@@ -2433,7 +2450,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                   if (state.preNotificationSource == 'category') ...[
                     buildCategoryDefaultPreviews(
                       selectedCategory?.preNotifications ?? [],
-                      true,
+                      isPre: true,
                     ),
                   ] else ...[
                     buildCustomNotificationBuilder(
@@ -2486,7 +2503,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                   if (state.postNotificationSource == 'category') ...[
                     buildCategoryDefaultPreviews(
                       selectedCategory?.postNotifications ?? [],
-                      false,
+                      isPre: false,
                     ),
                   ] else ...[
                     buildCustomNotificationBuilder(
@@ -2544,16 +2561,16 @@ class CreateTreatmentScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    TreatmentDataState dataState,
+    CategoryState categoryState,
   ) {
-    CategoryItem? selectedCategory;
+    CategoryModel? selectedCategory;
     if (viewModel.categoryIdController.text.isNotEmpty) {
       selectedCategory = viewModel.findCategoryById(
-        dataState.categories,
+        categoryState.categories,
         viewModel.categoryIdController.text,
       );
     }
-    final presets = selectedCategory?.downtimePresets ?? DowntimePresets();
+    final presets = selectedCategory?.downtimePresets ?? CategoryDowntimePresetModel();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2678,12 +2695,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    TreatmentDataState dataState,
+    CategoryState categoryState,
   ) {
-    CategoryItem? selectedCategory;
+    CategoryModel? selectedCategory;
     if (viewModel.categoryIdController.text.isNotEmpty) {
       selectedCategory = viewModel.findCategoryById(
-        dataState.categories,
+        categoryState.categories,
         viewModel.categoryIdController.text,
       );
     }
@@ -2816,12 +2833,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    TreatmentDataState dataState,
+    CategoryState categoryState,
   ) {
-    CategoryItem? selectedCategory;
+    CategoryModel? selectedCategory;
     if (viewModel.categoryIdController.text.isNotEmpty) {
       selectedCategory = viewModel.findCategoryById(
-        dataState.categories,
+        categoryState.categories,
         viewModel.categoryIdController.text,
       );
     }
@@ -3294,11 +3311,11 @@ class CreateTreatmentScreen extends ConsumerWidget {
     TreatmentViewModel viewModel,
     WidgetRef ref,
   ) {
-    final dataState = ref.watch(treatmentDataViewModelProvider);
-    CategoryItem? selectedCategory;
+    final categoryState = ref.watch(categoryViewModelProvider);
+    CategoryModel? selectedCategory;
     if (viewModel.categoryIdController.text.isNotEmpty) {
       selectedCategory = viewModel.findCategoryById(
-        dataState.categories,
+        categoryState.categories,
         viewModel.categoryIdController.text,
       );
     }
@@ -4822,7 +4839,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    TreatmentDataState dataState,
+    CategoryState categoryState,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -4835,7 +4852,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
         ),
         context.verticalSpace(32),
         NestedCategorySelector(
-          categories: dataState.categories,
+          categories: categoryState.categories,
           initialCategoryId: viewModel.categoryIdController.text,
           onSelected: (cat, path) => viewModel.onCategorySelected(cat, path),
         ),
@@ -5022,16 +5039,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
     if (index == -1) {
       final newEntry = AreaViewModelEntry();
       newEntry.areaController.text = area.name;
-      viewModel.state = viewModel.state.copyWith(
-        areas: [...cleanAreas, newEntry],
-      );
+      viewModel.updateAreas([...cleanAreas, newEntry]);
     } else {
       final updated = [...cleanAreas];
       updated[index].dispose();
       updated.removeAt(index);
-      viewModel.state = viewModel.state.copyWith(
-        areas: updated.isEmpty ? [AreaViewModelEntry()] : updated,
-      );
+      viewModel.updateAreas(updated.isEmpty ? [AreaViewModelEntry()] : updated);
     }
   }
 
@@ -5051,9 +5064,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
       final newEntry = AreaViewModelEntry();
       newEntry.areaController.text = area.name;
       newEntry.subAreas = [SubAreaConfig(name: subArea.name)];
-      viewModel.state = viewModel.state.copyWith(
-        areas: [...cleanAreas, newEntry],
-      );
+      viewModel.updateAreas([...cleanAreas, newEntry]);
     } else {
       final areaEntry = cleanAreas[index];
       final subIndex = areaEntry.subAreas.indexWhere(
@@ -5069,7 +5080,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
             .where((s) => s.name != subArea.name)
             .toList();
       }
-      viewModel.state = viewModel.state.copyWith(areas: cleanAreas);
+      viewModel.updateAreas(cleanAreas);
     }
   }
 
@@ -5095,9 +5106,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
           children: [SubAreaChildConfig(name: child.name)],
         ),
       ];
-      viewModel.state = viewModel.state.copyWith(
-        areas: [...cleanAreas, newEntry],
-      );
+      viewModel.updateAreas([...cleanAreas, newEntry]);
     } else {
       final areaEntry = cleanAreas[index];
       final subIndex = areaEntry.subAreas.indexWhere(
@@ -5127,7 +5136,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
               .toList();
         }
       }
-      viewModel.state = viewModel.state.copyWith(areas: cleanAreas);
+      viewModel.updateAreas(cleanAreas);
     }
   }
 
@@ -5151,12 +5160,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
         NestedAreaSelector(
           areas: dataState.areas,
           selectedAreas: state.areas,
-          onAreaToggle: (area) => _handleAreaToggle(area, state, viewModel),
-          onSubAreaToggle: (area, subArea) =>
+          onAreaToggle: (AreaItem area) => _handleAreaToggle(area, state, viewModel),
+          onSubAreaToggle: (AreaItem area, SubAreaItem subArea) =>
               _handleSubAreaToggle(area, subArea, state, viewModel),
-          onSubAreaChildToggle: (area, subArea, child) =>
+          onSubAreaChildToggle: (AreaItem area, SubAreaItem subArea, SubAreaChildItem child) =>
               _handleSubAreaChildToggle(area, subArea, child, state, viewModel),
-          onAddArea: (name, sku, icon) {
+          onAddArea: (String name, String sku, String? icon) {
             ref
                 .read(treatmentDataViewModelProvider.notifier)
                 .addArea(name, sku: sku, icon: icon);
@@ -5845,7 +5854,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     required String hint,
     required TextEditingController controller,
     required List<String> suggestions,
-    required Function(String) onSelected,
+    required void Function(String) onSelected,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -5986,7 +5995,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
   Widget _buildImageUploadTile(
     BuildContext context,
     String label,
-    dynamic file,
+    XFile? file,
     VoidCallback onTap,
   ) {
     return Column(
@@ -6091,6 +6100,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
     TreatmentState state,
     TreatmentViewModel viewModel,
     TreatmentDataState dataState,
+    CategoryState categoryState,
   ) {
     final bool isLastStep = state.currentStep == 16;
 
@@ -6129,7 +6139,7 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel
-                    .submitTreatment(context, categories: dataState.categories)
+                    .submitTreatment(context, categories: categoryState.categories)
                     .then((_) {
                       if (context.mounted) context.pop();
                     });
@@ -6401,16 +6411,16 @@ class CreateTreatmentScreen extends ConsumerWidget {
 class NestedAreaSelector extends ConsumerStatefulWidget {
   final List<AreaItem> areas;
   final List<AreaViewModelEntry> selectedAreas;
-  final Function(AreaItem area) onAreaToggle;
-  final Function(AreaItem area, SubAreaItem subArea) onSubAreaToggle;
-  final Function(AreaItem area, SubAreaItem subArea, SubAreaChildItem child)
+  final void Function(AreaItem area) onAreaToggle;
+  final void Function(AreaItem area, SubAreaItem subArea) onSubAreaToggle;
+  final void Function(AreaItem area, SubAreaItem subArea, SubAreaChildItem child)
   onSubAreaChildToggle;
 
   // Creation callbacks
-  final Function(String name, String sku, String? icon) onAddArea;
-  final Function(String parentArea, String name, String sku, String? icon)
+  final void Function(String name, String sku, String? icon) onAddArea;
+  final void Function(String parentArea, String name, String sku, String? icon)
   onAddSubArea;
-  final Function(
+  final void Function(
     String parentArea,
     String parentSubArea,
     String name,
@@ -6450,7 +6460,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
   void _showAddNodeDialog({
     required BuildContext context,
     required String title,
-    required Function(String name, String sku, String? iconPath) onAdd,
+    required void Function(String name, String sku, String? iconPath) onAdd,
   }) {
     final nameController = TextEditingController();
     final skuController = TextEditingController();
@@ -7200,7 +7210,7 @@ class _SelectedSummaryCard extends StatelessWidget {
 class ProtocolNotesCard extends StatefulWidget {
   final ProtocolItem protocol;
   final List<TreatmentProtocolNoteItem> initialNotes;
-  final Function(List<TreatmentProtocolNoteItem>) onNotesChanged;
+  final void Function(List<TreatmentProtocolNoteItem>) onNotesChanged;
 
   const ProtocolNotesCard({
     super.key,

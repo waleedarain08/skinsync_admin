@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../models/common_models.dart';
 import '../../models/notification_entry.dart';
-import '../../models/treatment_data_models.dart';
+import '../../models/responses/category_list_response.dart';
 import '../../utils/theme.dart';
 import '../build_textfield.dart';
 import '../custom_dropdown_widget.dart';
@@ -20,7 +20,6 @@ class CategoryCreationDialog extends StatefulWidget {
     this.initialName,
     this.initialIcon,
     this.initialConsentName,
-    this.initialFollowUps,
     this.initialSessions,
     this.initialTotalSessions,
     this.initialPreNotifications,
@@ -32,12 +31,11 @@ class CategoryCreationDialog extends StatefulWidget {
   final String? initialName;
   final String? initialIcon;
   final String? initialConsentName;
-  final List<FollowUpConfig>? initialFollowUps;
-  final List<SessionConfig>? initialSessions;
+  final List<CategorySessionModel>? initialSessions;
   final int? initialTotalSessions;
-  final List<NotificationConfig>? initialPreNotifications;
-  final List<NotificationConfig>? initialPostNotifications;
-  final DowntimePresets? initialDowntimePresets;
+  final List<CategoryNotificationModel>? initialPreNotifications;
+  final List<CategoryNotificationModel>? initialPostNotifications;
+  final CategoryDowntimePresetModel? initialDowntimePresets;
   final List<String>? initialDefaultRoles;
 
   @override
@@ -53,7 +51,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   XFile? _selectedIconFile;
   PlatformFile? _consentFile;
   String? _existingConsentName;
-  List<SessionConfig> _sessions = [];
+  List<CategorySessionModel> _sessions = [];
 
   List<NotificationEntry> _preNotificationEntries = [];
   List<NotificationEntry> _postNotificationEntries = [];
@@ -86,7 +84,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     if (widget.initialSessions != null && widget.initialSessions!.isNotEmpty) {
       _sessions = List.from(
         widget.initialSessions!.map(
-          (s) => SessionConfig(
+          (s) => CategorySessionModel(
             sessionNumber: s.sessionNumber,
             followUps: List.from(s.followUps),
           ),
@@ -94,11 +92,9 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
       );
     } else {
       _sessions = List.generate(initialTotalSessions, (index) {
-        return SessionConfig(
+        return CategorySessionModel(
           sessionNumber: index + 1,
-          followUps: index == 0 && widget.initialFollowUps != null
-              ? List.from(widget.initialFollowUps!)
-              : [],
+          followUps: [],
         );
       });
     }
@@ -192,7 +188,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     setState(() {
       if (count > _sessions.length) {
         for (int i = _sessions.length; i < count; i++) {
-          _sessions.add(SessionConfig(sessionNumber: i + 1, followUps: []));
+          _sessions.add(CategorySessionModel(sessionNumber: i + 1, followUps: []));
         }
       } else if (count < _sessions.length) {
         _sessions = _sessions.sublist(0, count);
@@ -206,15 +202,15 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     if (count < 0) return;
     setState(() {
       final session = _sessions[sIdx];
-      final currentFus = List<FollowUpConfig>.from(session.followUps);
+      final currentFus = List<CategoryFollowUpModel>.from(session.followUps);
       if (count > currentFus.length) {
         for (int i = currentFus.length; i < count; i++) {
-          currentFus.add(FollowUpConfig(type: 'virtual'));
+          currentFus.add(CategoryFollowUpModel(type: 'virtual'));
         }
       } else if (count < currentFus.length) {
         currentFus.removeRange(count, currentFus.length);
       }
-      _sessions[sIdx] = SessionConfig(
+      _sessions[sIdx] = CategorySessionModel(
         sessionNumber: session.sessionNumber,
         followUps: currentFus,
       );
@@ -512,7 +508,9 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   onChanged: (val) {
                     if (val != null) {
                       setState(() {
-                        config.type = val;
+                        final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
+                        newFus[fuIdx] = newFus[fuIdx].copyWith(type: val);
+                        _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
                       });
                     }
                   },
@@ -535,8 +533,14 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                               context,
                               hint: '30',
                             ),
-                            onChanged: (v) =>
-                                config.durationValue = int.tryParse(v),
+                            onChanged: (v) {
+                              final value = int.tryParse(v);
+                              setState(() {
+                                final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
+                                newFus[fuIdx] = newFus[fuIdx].copyWith(durationValue: value);
+                                _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                              });
+                            },
                           ),
                         ),
                         context.horizontalSpace(4),
@@ -558,7 +562,9 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                               onChanged: (v) {
                                 if (v != null) {
                                   setState(() {
-                                    config.durationUnit = v;
+                                    final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
+                                    newFus[fuIdx] = newFus[fuIdx].copyWith(durationUnit: v);
+                                    _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
                                   });
                                 }
                               },
@@ -582,7 +588,14 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   controller: intervalController,
                   keyboardType: TextInputType.number,
                   decoration: AppDecorations.input(context, hint: '1'),
-                  onChanged: (v) => config.intervalValue = int.tryParse(v),
+                  onChanged: (v) {
+                    final value = int.tryParse(v);
+                    setState(() {
+                      final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
+                      newFus[fuIdx] = newFus[fuIdx].copyWith(intervalValue: value);
+                      _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                    });
+                  },
                 ),
               ),
               context.horizontalSpace(12),
@@ -598,7 +611,9 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                     onChanged: (v) {
                       if (v != null) {
                         setState(() {
-                          config.intervalUnit = v;
+                          final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
+                          newFus[fuIdx] = newFus[fuIdx].copyWith(intervalUnit: v);
+                          _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
                         });
                       }
                     },
@@ -912,16 +927,13 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   'icon': _selectedIcon,
                   'consentFile': _consentFile,
                   'sessions': _sessions,
-                  'followUps': _sessions.isNotEmpty
-                      ? _sessions.first.followUps
-                      : <FollowUpConfig>[],
                   'preNotifications': _preNotificationEntries
                       .map((e) => e.toConfig())
                       .toList(),
                   'postNotifications': _postNotificationEntries
                       .map((e) => e.toConfig())
                       .toList(),
-                  'downtimePresets': DowntimePresets(
+                  'downtimePresets': CategoryDowntimePresetModel(
                     none: 0,
                     low: int.tryParse(_downtimeLowController.text) ?? 2,
                     moderate:

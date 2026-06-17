@@ -1,7 +1,9 @@
 import 'package:get_it/get_it.dart';
+import 'package:skinsync_admin/repositories/category_repository.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/repositories/product_repository.dart';
 import 'package:skinsync_admin/repositories/subscription_repository.dart';
+import 'package:skinsync_admin/services/category_services.dart';
 import 'package:skinsync_admin/services/clinic_services.dart';
 import 'package:skinsync_admin/services/product_services.dart';
 import 'package:skinsync_admin/services/subscription_services.dart';
@@ -24,6 +26,9 @@ Future<void> initializeServices() async {
   final apiBaseHelper = ApiBaseHelper();
   locator.registerLazySingleton<AuthRepository>(
     () => AuthService(api: apiBaseHelper),
+  );
+  locator.registerLazySingleton<CategoryRepository>(
+    () => CategoryServices(api: apiBaseHelper),
   );
   locator.registerLazySingleton<ClinicRepository>(
     () => ClinicService(api: apiBaseHelper),

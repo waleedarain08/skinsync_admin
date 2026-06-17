@@ -474,7 +474,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     );
   }
 
-  void setPreNotificationSource(String source, {CategoryItem? category}) {
+  void setPreNotificationSource(String source, {CategoryModel? category}) {
     state = state.copyWith(preNotificationSource: source);
     if (source == 'category' && category != null) {
       state = state.copyWith(
@@ -489,7 +489,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }
   }
 
-  void setPostNotificationSource(String source, {CategoryItem? category}) {
+  void setPostNotificationSource(String source, {CategoryModel? category}) {
     state = state.copyWith(postNotificationSource: source);
     if (source == 'category' && category != null) {
       state = state.copyWith(
@@ -506,15 +506,15 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   void setDowntimeLevel(String level) => state = state.copyWith(downtimeLevel: level);
   void setProviderRolesSource(String source) => state = state.copyWith(providerRolesSource: source);
   
-  void setSessionSource(String source, {CategoryItem? category}) {
+  void setSessionSource(String source, {CategoryModel? category}) {
     state = state.copyWith(sessionSource: source);
     if (source == 'category' && category != null) {
       for (final entry in state.sessions) {
         entry.dispose();
       }
       final List<SessionViewModelEntry> newSessions = [];
-      if (category.defaultSessions != null && category.defaultSessions!.isNotEmpty) {
-        for (final s in category.defaultSessions!) {
+      if (category.defaultSessions.isNotEmpty) {
+        for (final s in category.defaultSessions) {
           newSessions.add(SessionViewModelEntry(
             sessionNumber: s.sessionNumber,
             totalFollowUpsController: TextEditingController(text: s.followUps.length.toString()),
@@ -534,16 +534,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         for (int i = 0; i < sessionCount; i++) {
           newSessions.add(SessionViewModelEntry(
             sessionNumber: i + 1,
-            totalFollowUpsController: TextEditingController(text: (category.defaultFollowUps?.length ?? 0).toString()),
-            followUps: (category.defaultFollowUps ?? []).map((fu) => FollowUpEntry(
-              type: fu.type,
-              durationUnit: fu.durationUnit,
-              durationValueController: TextEditingController(text: fu.durationValue?.toString() ?? ''),
-              notesController: TextEditingController(text: fu.notes ?? ''),
-              intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
-              intervalUnit: fu.intervalUnit ?? 'days',
-              isImageRequired: fu.isImageRequired,
-            )).toList(),
+            totalFollowUpsController: TextEditingController(text: '0'),
+            followUps: [],
           ));
         }
       }
@@ -559,7 +551,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   void toggleOnlineBookable(bool? val) => state = state.copyWith(onlineBookable: val ?? false);
   void toggleManualApprovalRequired(bool? val) => state = state.copyWith(manualApprovalRequired: val ?? false);
 
-  void setTotalSessions(String val, {List<CategoryItem> categories = const []}) {
+  void setTotalSessions(String val) {
     final count = int.tryParse(val) ?? 1;
     if (count < 1) return;
     
@@ -643,8 +635,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }
   }
 
-  void onCategorySelected(CategoryItem category, String path) {
-    categoryIdController.text = category.id;
+  void onCategorySelected(CategoryModel category, String path) {
+    categoryIdController.text = category.id.toString();
     categoryNameController.text = category.name;
     categoryPathController.text = path;
     
@@ -653,8 +645,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         entry.dispose();
       }
       final List<SessionViewModelEntry> newSessions = [];
-      if (category.defaultSessions != null && category.defaultSessions!.isNotEmpty) {
-        for (final s in category.defaultSessions!) {
+      if (category.defaultSessions.isNotEmpty) {
+        for (final s in category.defaultSessions) {
           newSessions.add(SessionViewModelEntry(
             sessionNumber: s.sessionNumber,
             totalFollowUpsController: TextEditingController(text: s.followUps.length.toString()),
@@ -674,16 +666,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         for (int i = 0; i < sessionCount; i++) {
           newSessions.add(SessionViewModelEntry(
             sessionNumber: i + 1,
-            totalFollowUpsController: TextEditingController(text: (category.defaultFollowUps?.length ?? 0).toString()),
-            followUps: (category.defaultFollowUps ?? []).map((fu) => FollowUpEntry(
-              type: fu.type,
-              durationUnit: fu.durationUnit,
-              durationValueController: TextEditingController(text: fu.durationValue?.toString() ?? ''),
-              notesController: TextEditingController(text: fu.notes ?? ''),
-              intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
-              intervalUnit: fu.intervalUnit ?? 'days',
-              isImageRequired: fu.isImageRequired,
-            )).toList(),
+            totalFollowUpsController: TextEditingController(text: '0'),
+            followUps: [],
           ));
         }
       }
@@ -721,8 +705,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }
   }
 
-  void selectCategoryAtLevel(int level, CategoryItem category, List<CategoryItem> allCategories) {
-    List<String> currentPath = List.from(state.selectedCategoryPath);
+  void selectCategoryAtLevel(int level, CategoryModel category, List<CategoryModel> allCategories) {
+    List<int> currentPath = List.from(state.selectedCategoryPath);
     
     if (level < currentPath.length) {
       currentPath = currentPath.sublist(0, level);
@@ -738,7 +722,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       }
     }
 
-    categoryIdController.text = category.id;
+    categoryIdController.text = category.id.toString();
     categoryNameController.text = category.name;
     categoryPathController.text = fullPath;
 
@@ -746,22 +730,24 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     onCategorySelected(category, fullPath);
   }
 
-  CategoryItem? findCategoryById(List<CategoryItem> items, String id) {
+  CategoryModel? findCategoryById(List<CategoryModel> items, String id) {
+    final intId = int.tryParse(id);
+    if (intId == null) return null;
     for (final item in items) {
-      if (item.id == id) return item;
-      if (item.children.isNotEmpty) {
-        final found = findCategoryById(item.children, id);
+      if (item.id == intId) return item;
+      if (item.subCategories.isNotEmpty) {
+        final found = findCategoryById(item.subCategories, id);
         if (found != null) return found;
       }
     }
     return null;
   }
 
-  CategoryItem? _findCategoryById(List<CategoryItem> items, String id) {
+  CategoryModel? _findCategoryById(List<CategoryModel> items, int id) {
     for (final item in items) {
       if (item.id == id) return item;
-      if (item.children.isNotEmpty) {
-        final found = _findCategoryById(item.children, id);
+      if (item.subCategories.isNotEmpty) {
+        final found = _findCategoryById(item.subCategories, id);
         if (found != null) return found;
       }
     }
@@ -1077,7 +1063,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }).toList();
   }
 
-  Future<void> submitTreatment(BuildContext context, {List<CategoryItem> categories = const []}) async {
+  Future<void> submitTreatment(BuildContext context, {List<CategoryModel> categories = const [], bool isEdit = false}) async {
+    if (isEdit) {
+      return updateTreatment(context, categories: categories);
+    }
     return await runSafely<void>(showLoading: true, () async {
       final skuError = validateGlobalSku(globalSkuController.text.trim());
       if (skuError != null) {
@@ -1093,7 +1082,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (state.preNotificationSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null) {
-          effectivePreNotifications = selectedCategory.preNotifications;
+          effectivePreNotifications = selectedCategory.preNotifications.map((n) => NotificationConfig(
+            title: n.title,
+            message: n.message,
+            timing: n.timing,
+            timingUnit: n.timingUnit,
+            type: n.type,
+          )).toList();
         }
       } else {
         effectivePreNotifications = state.preNotificationEntries.map((e) => e.toConfig()).toList();
@@ -1103,7 +1098,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (state.postNotificationSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null) {
-          effectivePostNotifications = selectedCategory.postNotifications;
+          effectivePostNotifications = selectedCategory.postNotifications.map((n) => NotificationConfig(
+            title: n.title,
+            message: n.message,
+            timing: n.timing,
+            timingUnit: n.timingUnit,
+            type: n.type,
+          )).toList();
         }
       } else {
         effectivePostNotifications = state.postNotificationEntries.map((e) => e.toConfig()).toList();
@@ -1111,8 +1112,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       
       if (state.sessionSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
-        if (selectedCategory != null && selectedCategory.defaultSessions != null && selectedCategory.defaultSessions!.isNotEmpty) {
-          effectiveSessions = selectedCategory.defaultSessions!.map((s) => SessionConfig(
+        if (selectedCategory != null && selectedCategory.defaultSessions.isNotEmpty) {
+          effectiveSessions = selectedCategory.defaultSessions.map((s) => SessionConfig(
             sessionNumber: s.sessionNumber,
             followUps: s.followUps.map((f) => FollowUpConfig(
               type: f.type,
@@ -1129,15 +1130,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           for (int i = 0; i < sessionCount; i++) {
             effectiveSessions.add(SessionConfig(
               sessionNumber: i + 1,
-              followUps: (selectedCategory?.defaultFollowUps ?? []).map((f) => FollowUpConfig(
-                type: f.type,
-                durationValue: f.durationValue,
-                durationUnit: f.durationUnit,
-                notes: f.notes,
-                intervalValue: f.intervalValue,
-                intervalUnit: f.intervalUnit,
-                isImageRequired: f.isImageRequired,
-              )).toList(),
+              followUps: [],
             ));
           }
         }
@@ -1300,7 +1293,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     return 'other';
   }
 
-  Future<void> updateTreatment(BuildContext context, {List<CategoryItem> categories = const []}) async {
+  Future<void> updateTreatment(BuildContext context, {List<CategoryModel> categories = const []}) async {
     return await runSafely<void>(showLoading: true, () async {
       final skuError = validateGlobalSku(globalSkuController.text.trim(), currentTreatmentId: state.selectedTreatment?.id);
       if (skuError != null) {
@@ -1316,7 +1309,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (state.preNotificationSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null) {
-          effectivePreNotifications = selectedCategory.preNotifications;
+          effectivePreNotifications = selectedCategory.preNotifications.map((n) => NotificationConfig(
+            title: n.title,
+            message: n.message,
+            timing: n.timing,
+            timingUnit: n.timingUnit,
+            type: n.type,
+          )).toList();
         }
       } else {
         effectivePreNotifications = state.preNotificationEntries.map((e) => e.toConfig()).toList();
@@ -1326,7 +1325,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (state.postNotificationSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null) {
-          effectivePostNotifications = selectedCategory.postNotifications;
+          effectivePostNotifications = selectedCategory.postNotifications.map((n) => NotificationConfig(
+            title: n.title,
+            message: n.message,
+            timing: n.timing,
+            timingUnit: n.timingUnit,
+            type: n.type,
+          )).toList();
         }
       } else {
         effectivePostNotifications = state.postNotificationEntries.map((e) => e.toConfig()).toList();
@@ -1334,8 +1339,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       
       if (state.sessionSource == 'category') {
         final selectedCategory = findCategoryById(categories, categoryIdController.text);
-        if (selectedCategory != null && selectedCategory.defaultSessions != null && selectedCategory.defaultSessions!.isNotEmpty) {
-          effectiveSessions = selectedCategory.defaultSessions!.map((s) => SessionConfig(
+        if (selectedCategory != null && selectedCategory.defaultSessions.isNotEmpty) {
+          effectiveSessions = selectedCategory.defaultSessions.map((s) => SessionConfig(
             sessionNumber: s.sessionNumber,
             followUps: s.followUps.map((f) => FollowUpConfig(
               type: f.type,
@@ -1352,15 +1357,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           for (int i = 0; i < sessionCount; i++) {
             effectiveSessions.add(SessionConfig(
               sessionNumber: i + 1,
-              followUps: (selectedCategory?.defaultFollowUps ?? []).map((f) => FollowUpConfig(
-                type: f.type,
-                durationValue: f.durationValue,
-                durationUnit: f.durationUnit,
-                notes: f.notes,
-                intervalValue: f.intervalValue,
-                intervalUnit: f.intervalUnit,
-                isImageRequired: f.isImageRequired,
-              )).toList(),
+              followUps: [],
             ));
           }
         }
@@ -1554,6 +1551,26 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     } while (state.treatments.any((t) => t.globalSku == generated && t.id != currentId));
     globalSkuController.text = generated;
   }
+
+  void updateTreatmentState({
+    List<AreaViewModelEntry>? areas,
+    bool? requirePostTreatmentPhotos,
+    int? requiredPostTreatmentPhotoCount,
+    String? status,
+    String? gender,
+    // Add other fields as needed
+  }) {
+    state = state.copyWith(
+      areas: areas,
+      requirePostTreatmentPhotos: requirePostTreatmentPhotos,
+      requiredPostTreatmentPhotoCount: requiredPostTreatmentPhotoCount,
+      status: status,
+    );
+  }
+
+  void updateAreas(List<AreaViewModelEntry> areas) {
+    state = state.copyWith(areas: areas);
+  }
 }
 
 class SessionViewModelEntry {
@@ -1584,11 +1601,12 @@ class TreatmentState extends BaseStateModel {
   final XFile? treatmentImage;
   final XFile? treatmentIcon;
   final List<AreaViewModelEntry> areas;
-  final List<String> selectedCategoryPath;
+  final List<int> selectedCategoryPath;
   final List<String> selectedProtocolIds;
   final List<TreatmentProtocolNote> selectedProtocolNotes;
   final List<TreatmentProtocolNoteItem> standaloneNotes;
   final String status; // draft | active | deactive
+  final String gender; // both | male | female
   
   final int? preNotificationOffset;
   final int? postNotificationOffset;
@@ -1652,6 +1670,7 @@ class TreatmentState extends BaseStateModel {
     this.selectedProtocolNotes = const [],
     this.standaloneNotes = const [],
     this.status = 'active',
+    this.gender = 'both',
     this.preNotificationOffset,
     this.postNotificationOffset,
     this.preTreatmentAttachments = const [],
@@ -1701,11 +1720,12 @@ class TreatmentState extends BaseStateModel {
     XFile? treatmentImage,
     XFile? treatmentIcon,
     List<AreaViewModelEntry>? areas,
-    List<String>? selectedCategoryPath,
+    List<int>? selectedCategoryPath,
     List<String>? selectedProtocolIds,
     List<TreatmentProtocolNote>? selectedProtocolNotes,
     List<TreatmentProtocolNoteItem>? standaloneNotes,
     String? status,
+    String? gender,
     int? preNotificationOffset,
     int? postNotificationOffset,
     List<NotificationEntry>? preNotificationEntries,
@@ -1758,6 +1778,7 @@ class TreatmentState extends BaseStateModel {
       selectedProtocolNotes: selectedProtocolNotes ?? this.selectedProtocolNotes,
       standaloneNotes: standaloneNotes ?? this.standaloneNotes,
       status: status ?? this.status,
+      gender: gender ?? this.gender,
       preNotificationOffset: preNotificationOffset ?? this.preNotificationOffset,
       postNotificationOffset: postNotificationOffset ?? this.postNotificationOffset,
       preNotificationEntries: preNotificationEntries ?? this.preNotificationEntries,

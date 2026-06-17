@@ -6,7 +6,7 @@ import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 
 import '../../widgets/custom_dropdown_widget.dart';
 import '../utils/theme.dart';
-import '../view_models/treatment_data_view_model.dart';
+import 'package:skinsync_admin/view_models/category_view_model.dart';
 import '../view_models/treatment_view_model.dart';
 import '../widgets/app_search_field.dart';
 import '../widgets/borderd_container_widget.dart';
@@ -38,6 +38,7 @@ class _TreatmentManagementScreenState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(treatmentViewModelProvider.notifier).initialize();
+      ref.read(categoryViewModelProvider.notifier).fetchCategories();
     });
   }
 
@@ -45,15 +46,13 @@ class _TreatmentManagementScreenState
   Widget build(BuildContext context) {
     final state = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
-    final dataState = ref.watch(treatmentDataViewModelProvider);
+    final categoryState = ref.watch(categoryViewModelProvider);
 
     // Parent categories (top-level)
-    final parentCategories = dataState.categories
-        .where((c) => c.parentId == null)
-        .toList();
+    final parentCategories = categoryState.categories;
 
     // Find currently selected parent category if any
-    CategoryItem? selectedParent;
+    CategoryModel? selectedParent;
     if (_selectedCategoryFilter != 'All Categories') {
       selectedParent = parentCategories
           .where((c) => c.name == _selectedCategoryFilter)
@@ -61,7 +60,7 @@ class _TreatmentManagementScreenState
     }
 
     // Subcategories of selected parent
-    final subCategories = selectedParent?.children ?? [];
+    final subCategories = selectedParent?.subCategories ?? [];
 
     // Filter treatments dynamically based on inline filters
     final filteredTreatments = state.treatments.where((t) {
@@ -263,8 +262,8 @@ class _TreatmentManagementScreenState
 
   Widget _buildFilters(
     TreatmentViewModel viewModel,
-    List<CategoryItem> parentCategories,
-    List<CategoryItem> subCategories,
+    List<CategoryModel> parentCategories,
+    List<CategoryModel> subCategories,
   ) {
     return BorderdContainerWidget(
       padding: EdgeInsets.all(16.w),
