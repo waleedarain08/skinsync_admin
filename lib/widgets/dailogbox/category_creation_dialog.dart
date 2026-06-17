@@ -3,23 +3,26 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../models/notification_entry.dart';
 import '../../models/responses/category_list_response.dart';
 import '../../utils/theme.dart';
+import '../../view_models/category_view_model.dart';
 import '../build_textfield.dart';
 import '../custom_dropdown_widget.dart';
 import 'standard_dialog.dart';
 
-class CategoryCreationDialog extends StatefulWidget {
+class CategoryCreationDialog extends ConsumerStatefulWidget {
   const CategoryCreationDialog({
     super.key,
     this.parentName,
     this.initialName,
     this.initialIcon,
     this.initialConsentName,
+    this.initialConsentUrl,
     this.initialSessions,
     this.initialTotalSessions,
     this.initialPreNotifications,
@@ -31,6 +34,7 @@ class CategoryCreationDialog extends StatefulWidget {
   final String? initialName;
   final String? initialIcon;
   final String? initialConsentName;
+  final String? initialConsentUrl;
   final List<CategorySessionModel>? initialSessions;
   final int? initialTotalSessions;
   final List<CategoryNotificationModel>? initialPreNotifications;
@@ -39,18 +43,19 @@ class CategoryCreationDialog extends StatefulWidget {
   final List<String>? initialDefaultRoles;
 
   @override
-  State<CategoryCreationDialog> createState() => _CategoryCreationDialogState();
+  ConsumerState<CategoryCreationDialog> createState() =>
+      _CategoryCreationDialogState();
 }
 
-class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
+class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _totalSessionsController;
   final List<TextEditingController> _sessionFollowUpsCountControllers = [];
   late String _selectedIcon;
   final ImagePicker _imagePicker = ImagePicker();
-  XFile? _selectedIconFile;
-  PlatformFile? _consentFile;
-  String? _existingConsentName;
+  XFile? _localIconPreview;
+  String? _consentFormUrl;
+  String? _consentFormName;
   List<CategorySessionModel> _sessions = [];
 
   List<NotificationEntry> _preNotificationEntries = [];
@@ -79,7 +84,8 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
       text: initialTotalSessions.toString(),
     );
     _selectedIcon = widget.initialIcon ?? 'category';
-    _existingConsentName = widget.initialConsentName;
+    _consentFormUrl = widget.initialConsentUrl;
+    _consentFormName = widget.initialConsentName;
 
     if (widget.initialSessions != null && widget.initialSessions!.isNotEmpty) {
       _sessions = List.from(
@@ -222,10 +228,15 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
       type: FileType.custom,
       allowedExtensions: ['pdf'],
     );
-    if (result != null && result.files.isNotEmpty) {
+    if (result == null || result.files.isEmpty) return;
+
+    final file = result.files.first;
+    final viewModel = ref.read(categoryViewModelProvider.notifier);
+    final url = await viewModel.uploadConsentFile(file);
+    if (url != null && mounted) {
       setState(() {
-        _consentFile = result.files.first;
-        _existingConsentName = null;
+        _consentFormUrl = url;
+        _consentFormName = file.name;
       });
     }
   }
@@ -234,12 +245,65 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     final XFile? image = await _imagePicker.pickImage(
       source: ImageSource.gallery,
     );
-    if (image != null) {
-      setState(() {
-        _selectedIconFile = image;
-        _selectedIcon = image.path;
-      });
+    if (image == null) return;
+
+    setState(() => _localIconPreview = image);
+
+    final viewModel = ref.read(categoryViewModelProvider.notifier);
+    final url = await viewModel.uploadCategoryIcon(image);
+    if (!mounted) return;
+
+    if (url != null) {
+      setState(() => _selectedIcon = url);
+    } else {
+      setState(() => _localIconPreview = null);
     }
+  }
+
+  bool get _hasIconUrl =>
+      _selectedIcon.startsWith('http') || _selectedIcon.startsWith('https');
+
+  Widget _buildIconPlaceholder() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.add_a_photo_outlined,
+          size: 32.sp,
+          color: CustomColors.purple,
+        ),
+        context.verticalSpace(8),
+        Text(
+          'Tap to upload',
+          style: context.fonts.purple12w700,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIconPreview() {
+    if (_localIconPreview != null) {
+      return Image(
+        image: kIsWeb
+            ? NetworkImage(_localIconPreview!.path)
+            : FileImage(File(_localIconPreview!.path)) as ImageProvider,
+        width: 120.w,
+        height: 120.w,
+        fit: BoxFit.cover,
+      );
+    }
+
+    if (_hasIconUrl) {
+      return Image.network(
+        _selectedIcon,
+        width: 120.w,
+        height: 120.w,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => _buildIconPlaceholder(),
+      );
+    }
+
+    return _buildIconPlaceholder();
   }
 
   Widget _buildNotificationsBuilder(bool isPre) {
@@ -659,45 +723,11 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                 color: CustomColors.whiteGrey,
                 borderRadius: context.appBorderRadius(all: 12),
                 border: Border.all(color: CustomColors.border),
-                image: _selectedIconFile != null
-                    ? DecorationImage(
-                        image: kIsWeb
-                            ? NetworkImage(_selectedIconFile!.path)
-                            : FileImage(File(_selectedIconFile!.path))
-                                as ImageProvider,
-                        fit: BoxFit.cover,
-                      )
-                    : (_selectedIcon.isNotEmpty &&
-                            (_selectedIcon.startsWith('http') ||
-                                _selectedIcon.contains('/')))
-                        ? DecorationImage(
-                            image: _selectedIcon.startsWith('http')
-                                ? NetworkImage(_selectedIcon)
-                                : FileImage(File(_selectedIcon))
-                                    as ImageProvider,
-                            fit: BoxFit.cover,
-                          )
-                        : null,
               ),
-              child: (_selectedIconFile == null &&
-                      !_selectedIcon.startsWith('http') &&
-                      !_selectedIcon.contains('/'))
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_a_photo_outlined,
-                          size: 32.sp,
-                          color: CustomColors.purple,
-                        ),
-                        context.verticalSpace(8),
-                        Text(
-                          'Tap to upload',
-                          style: context.fonts.purple12w700,
-                        ),
-                      ],
-                    )
-                  : null,
+              child: ClipRRect(
+                borderRadius: context.appBorderRadius(all: 12),
+                child: _buildIconPreview(),
+              ),
             ),
           ),
           context.verticalSpace(32),
@@ -887,22 +917,26 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   context.horizontalSpace(16),
                   Expanded(
                     child: Text(
-                      _consentFile?.name ??
-                          _existingConsentName ??
-                          'Upload Default PDF',
-                      style:
-                          (_consentFile != null || _existingConsentName != null)
+                      _consentFormName ?? 'Upload Default PDF',
+                      style: _consentFormUrl != null
                           ? context.fonts.black14w600
                           : context.fonts.grey14w400,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Icon(
-                    Icons.cloud_upload_outlined,
-                    color: CustomColors.grey,
-                    size: 20,
-                  ),
+                  if (_consentFormUrl != null)
+                    const Icon(
+                      Icons.check_circle_outline,
+                      color: CustomColors.green,
+                      size: 20,
+                    )
+                  else
+                    const Icon(
+                      Icons.cloud_upload_outlined,
+                      color: CustomColors.grey,
+                      size: 20,
+                    ),
                 ],
               ),
             ),
@@ -925,7 +959,8 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   'totalSessions':
                       int.tryParse(_totalSessionsController.text) ?? 1,
                   'icon': _selectedIcon,
-                  'consentFile': _consentFile,
+                  'consentFormUrl': _consentFormUrl,
+                  'consentFormName': _consentFormName,
                   'sessions': _sessions,
                   'preNotifications': _preNotificationEntries
                       .map((e) => e.toConfig())

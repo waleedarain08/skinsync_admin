@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +27,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     String? initialName,
     String? initialIcon,
     String? initialConsentName,
+    String? initialConsentUrl,
     List<CategorySessionModel>? initialSessions,
     int? initialTotalSessions,
     List<CategoryNotificationModel>? initialPreNotifications,
@@ -37,7 +37,8 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     required void Function(
       String name,
       String icon,
-      PlatformFile? consentFile,
+      String? consentFormUrl,
+      String? consentFormName,
       List<CategorySessionModel>? sessions,
       List<CategoryNotificationModel>? preNotif,
       List<CategoryNotificationModel>? postNotif,
@@ -54,6 +55,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
             initialName: initialName,
             initialIcon: initialIcon,
             initialConsentName: initialConsentName,
+            initialConsentUrl: initialConsentUrl,
             initialSessions: initialSessions,
             initialTotalSessions: initialTotalSessions,
             initialPreNotifications: initialPreNotifications,
@@ -67,7 +69,8 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
       onConfirm(
         result['name'],
         result['icon'],
-        result['consentFile'],
+        result['consentFormUrl'],
+        result['consentFormName'],
         result['sessions'],
         result['preNotifications'],
         result['postNotifications'],
@@ -616,7 +619,8 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                   (
                     String name,
                     String icon,
-                    PlatformFile? consentFile,
+                    String? consentFormUrl,
+                    String? consentFormName,
                     List<CategorySessionModel>? sessions,
                     List<CategoryNotificationModel>? preNotif,
                     List<CategoryNotificationModel>? postNotif,
@@ -625,8 +629,8 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                   ) => viewModel.addCategory(
                     name,
                     icon: icon,
-                    consentFormName: consentFile?.name,
-                    consentFormUrl: consentFile?.path,
+                    consentFormName: consentFormName,
+                    consentFormUrl: consentFormUrl,
                     defaultSessions: sessions,
                     preNotifications: preNotif,
                     postNotifications: postNotif,
@@ -1062,7 +1066,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
                         (
                           String name,
                           String icon,
-                          PlatformFile? consentFile,
+                          String? consentFormUrl,
+                          String? consentFormName,
                           List<CategorySessionModel>? sessions,
                           List<CategoryNotificationModel>? preNotif,
                           List<CategoryNotificationModel>? postNotif,
@@ -1072,8 +1077,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
                           name,
                           icon: icon,
                           parentId: category.id,
-                          consentFormName: consentFile?.name,
-                          consentFormUrl: consentFile?.path,
+                          consentFormName: consentFormName,
+                          consentFormUrl: consentFormUrl,
                           defaultSessions: sessions,
                           preNotifications: preNotif,
                           postNotifications: postNotif,
@@ -1091,6 +1096,7 @@ class _RecursiveCategoryTile extends StatelessWidget {
                     initialName: category.name,
                     initialIcon: category.icon,
                     initialConsentName: category.consentFormName,
+                    initialConsentUrl: category.consentFormUrl,
                     initialSessions: category.defaultSessions,
                     initialTotalSessions: category.totalSessions,
                     initialPreNotifications: category.preNotifications,
@@ -1101,7 +1107,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
                         (
                           String name,
                           String icon,
-                          PlatformFile? consentFile,
+                          String? consentFormUrl,
+                          String? consentFormName,
                           List<CategorySessionModel>? sessions,
                           List<CategoryNotificationModel>? preNotif,
                           List<CategoryNotificationModel>? postNotif,
@@ -1112,9 +1119,9 @@ class _RecursiveCategoryTile extends StatelessWidget {
                           name,
                           icon: icon,
                           consentFormName:
-                              consentFile?.name ?? category.consentFormName,
+                              consentFormName ?? category.consentFormName,
                           consentFormUrl:
-                              consentFile?.path ?? category.consentFormUrl,
+                              consentFormUrl ?? category.consentFormUrl,
                           defaultSessions: sessions ?? category.defaultSessions,
                           totalSessions: sessions?.length,
                           preNotifications:

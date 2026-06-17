@@ -65,6 +65,7 @@ dependencies:
   country_code_picker: ^3.4.1
   cached_network_image: ^3.4.1
   sidebarx: ^0.17.2
+  firebase_storage: ^13.4.3
 
 dev_dependencies:
   flutter_test:
