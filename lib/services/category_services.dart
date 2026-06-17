@@ -30,7 +30,7 @@ class CategoryServices implements CategoryRepository {
   }
 
   @override
-  Future<CategoryModel> getCategoryDetail(int categoryId) async {
+  Future<CategoryDetailDto> getCategoryDetail(int categoryId) async {
     final jsonResponse = await _api.get(
       Endpoint.categoryDetail,
       pathParams: {'id': categoryId.toString()},
@@ -46,6 +46,6 @@ class CategoryServices implements CategoryRepository {
     if (response.data == null) {
       throw const BadRequestException('Category detail not found');
     }
-    return response.data!.toCategoryModel();
+    return response.data!;
   }
 }

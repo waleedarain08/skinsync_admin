@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/responses/category_list_response.dart';
+import '../models/responses/category_detail_response.dart';
 import '../repositories/category_repository.dart';
 import '../services/locator.dart';
 import 'base_state_model.dart';
@@ -14,7 +15,7 @@ final categoryViewModelProvider =
 class CategoryState extends BaseStateModel {
   final List<CategoryModel> categories;
   final List<CategoryModel> flattenedCategories;
-  final CategoryModel? selectedCategoryDetail;
+  final CategoryDetailDto? selectedCategoryDetail;
 
   CategoryState({
     super.loading,
@@ -27,7 +28,7 @@ class CategoryState extends BaseStateModel {
     bool? loading,
     List<CategoryModel>? categories,
     List<CategoryModel>? flattenedCategories,
-    CategoryModel? selectedCategoryDetail,
+    CategoryDetailDto? selectedCategoryDetail,
   }) {
     return CategoryState(
       loading: loading ?? this.loading,
@@ -63,8 +64,8 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     );
   }
 
-  Future<CategoryModel?> getCategoryDetail(int categoryId) async {
-    CategoryModel? detailed;
+  Future<CategoryDetailDto?> getCategoryDetail(int categoryId) async {
+    CategoryDetailDto? detailed;
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
@@ -136,11 +137,11 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     int? parentId,
     String? consentFormUrl,
     String? consentFormName,
-    List<CategorySessionModel>? defaultSessions,
+    List<dynamic>? defaultSessions,
     int? totalSessions,
-    List<CategoryNotificationModel>? preNotifications,
-    List<CategoryNotificationModel>? postNotifications,
-    CategoryDowntimePresetModel? downtimePresets,
+    List<dynamic>? preNotifications,
+    List<dynamic>? postNotifications,
+    dynamic downtimePresets,
     List<String>? defaultRoles,
   }) {
     if (name.isEmpty) return;
@@ -149,14 +150,6 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
       name: name,
       icon: icon ?? '',
       parentId: parentId,
-      consentFormUrl: consentFormUrl,
-      consentFormName: consentFormName,
-      defaultSessions: defaultSessions ?? [],
-      totalSessions: totalSessions ?? 1,
-      preNotifications: preNotifications ?? const [],
-      postNotifications: postNotifications ?? const [],
-      downtimePresets: downtimePresets ?? CategoryDowntimePresetModel(),
-      defaultRoles: defaultRoles ?? [],
       subCategories: [],
     );
 
@@ -173,9 +166,22 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
   List<CategoryModel> _addChildToTree(List<CategoryModel> items, int parentId, CategoryModel newChild) {
     return items.map((item) {
       if (item.id == parentId) {
-        return item.copyWith(subCategories: [...item.subCategories, newChild]);
+        // Return a fresh new CategoryModel with updated subcategories since copyWith isn't available
+        return CategoryModel(
+          id: item.id,
+          name: item.name,
+          icon: item.icon,
+          parentId: item.parentId,
+          subCategories: [...item.subCategories, newChild],
+        );
       } else if (item.subCategories.isNotEmpty) {
-        return item.copyWith(subCategories: _addChildToTree(item.subCategories, parentId, newChild));
+        return CategoryModel(
+          id: item.id,
+          name: item.name,
+          icon: item.icon,
+          parentId: item.parentId,
+          subCategories: _addChildToTree(item.subCategories, parentId, newChild),
+        );
       }
       return item;
     }).toList();
@@ -187,11 +193,11 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     String? icon,
     String? consentFormUrl,
     String? consentFormName,
-    List<CategorySessionModel>? defaultSessions,
+    List<dynamic>? defaultSessions,
     int? totalSessions,
-    List<CategoryNotificationModel>? preNotifications,
-    List<CategoryNotificationModel>? postNotifications,
-    CategoryDowntimePresetModel? downtimePresets,
+    List<dynamic>? preNotifications,
+    List<dynamic>? postNotifications,
+    dynamic downtimePresets,
     List<String>? defaultRoles,
   }) {
     state = state.copyWith(
@@ -200,14 +206,6 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
         id,
         newName,
         icon,
-        consentFormUrl,
-        consentFormName,
-        defaultSessions,
-        totalSessions,
-        preNotifications,
-        postNotifications,
-        downtimePresets,
-        defaultRoles,
       ),
     );
     state = state.copyWith(flattenedCategories: _flattenCategories(state.categories));
@@ -218,45 +216,23 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     int id,
     String newName,
     String? icon,
-    String? consentFormUrl,
-    String? consentFormName,
-    List<CategorySessionModel>? defaultSessions,
-    int? totalSessions,
-    List<CategoryNotificationModel>? preNotifications,
-    List<CategoryNotificationModel>? postNotifications,
-    CategoryDowntimePresetModel? downtimePresets,
-    List<String>? defaultRoles,
   ) {
     return items.map((item) {
       if (item.id == id) {
-        return item.copyWith(
+        return CategoryModel(
+          id: item.id,
           name: newName,
           icon: icon ?? item.icon,
-          consentFormUrl: consentFormUrl,
-          consentFormName: consentFormName,
-          defaultSessions: defaultSessions ?? item.defaultSessions,
-          totalSessions: totalSessions ?? item.totalSessions,
-          preNotifications: preNotifications ?? item.preNotifications,
-          postNotifications: postNotifications ?? item.postNotifications,
-          downtimePresets: downtimePresets ?? item.downtimePresets,
-          defaultRoles: defaultRoles ?? item.defaultRoles,
+          parentId: item.parentId,
+          subCategories: item.subCategories,
         );
       } else if (item.subCategories.isNotEmpty) {
-        return item.copyWith(
-          subCategories: _updateInTree(
-            item.subCategories,
-            id,
-            newName,
-            icon,
-            consentFormUrl,
-            consentFormName,
-            defaultSessions,
-            totalSessions,
-            preNotifications,
-            postNotifications,
-            downtimePresets,
-            defaultRoles,
-          ),
+        return CategoryModel(
+          id: item.id,
+          name: item.name,
+          icon: item.icon,
+          parentId: item.parentId,
+          subCategories: _updateInTree(item.subCategories, id, newName, icon),
         );
       }
       return item;
@@ -274,7 +250,13 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     final filtered = items.where((item) => item.id != id).toList();
     return filtered.map((item) {
       if (item.subCategories.isNotEmpty) {
-        return item.copyWith(subCategories: _removeFromTree(item.subCategories, id));
+        return CategoryModel(
+          id: item.id,
+          name: item.name,
+          icon: item.icon,
+          parentId: item.parentId,
+          subCategories: _removeFromTree(item.subCategories, id),
+        );
       }
       return item;
     }).toList();

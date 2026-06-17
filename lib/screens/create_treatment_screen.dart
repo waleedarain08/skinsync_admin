@@ -10,6 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import '../models/notification_entry.dart';
 import '../models/product_model.dart';
 import '../models/treatment_data_models.dart';
+import '../models/responses/category_detail_response.dart';
+import '../models/notification_model.dart';
 import '../utils/theme.dart';
 import '../utils/validators.dart';
 import '../view_models/category_view_model.dart';
@@ -397,13 +399,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentDataState dataState,
     CategoryState categoryState,
   ) {
-    CategoryModel? selectedCategory;
-    if (viewModel.categoryIdController.text.isNotEmpty) {
-      selectedCategory = viewModel.findCategoryById(
-        categoryState.categories,
-        viewModel.categoryIdController.text,
-      );
-    }
+    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
 
     return Container(
       width: context.w(350),
@@ -456,7 +452,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 
   List<TreatmentProtocolNoteItem> _getCategoryDefaultNotes(
-    CategoryModel? category,
+    CategoryDetailDto? category,
   ) {
     if (category == null) return [];
     if (category.name.toLowerCase().contains('inject') ||
@@ -491,7 +487,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentState state,
     TreatmentViewModel viewModel,
     TreatmentDataState dataState,
-    CategoryModel? selectedCategory,
+    CategoryDetailDto? selectedCategory,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -641,7 +637,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    CategoryModel? selectedCategory,
+    CategoryDetailDto? selectedCategory,
   ) {
     final basicOk =
         viewModel.validateGlobalSku(
@@ -741,7 +737,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     BuildContext context,
     TreatmentState state,
     TreatmentViewModel viewModel,
-    CategoryModel? selectedCategory,
+    CategoryDetailDto? selectedCategory,
   ) {
     return _blueprintSection(
       context,
@@ -844,7 +840,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   Widget _buildSessionsSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryModel? selectedCategory,
+    CategoryDetailDto? selectedCategory,
   ) {
     final isCategory = state.sessionSource == 'category';
 
@@ -934,7 +930,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   Widget _buildConsentSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryModel? selectedCategory,
+    CategoryDetailDto? selectedCategory,
   ) {
     final isCategory = state.consentType == 'category';
     String consentFileName = 'No PDF uploaded';
@@ -1015,7 +1011,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   Widget _buildNotificationsSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryModel? selectedCategory,
+    CategoryDetailDto? selectedCategory,
   ) {
     final isPreCategory = state.preNotificationSource == 'category';
     final isPostCategory = state.postNotificationSource == 'category';
@@ -1066,7 +1062,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   Widget _buildDowntimeSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryModel? selectedCategory,
+    CategoryDetailDto? selectedCategory,
   ) {
     final level = state.downtimeLevel;
     int days = 0;
@@ -1105,11 +1101,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   Widget _buildProviderRolesSummary(
     BuildContext context,
     TreatmentState state,
-    CategoryModel? selectedCategory,
+    CategoryDetailDto? selectedCategory,
   ) {
     final isCategory = state.providerRolesSource == 'category';
     final List<String> roles = isCategory
-        ? (selectedCategory?.defaultRoles ?? [])
+        ? (selectedCategory?.defaultRoles.map((r) => r.name[0] + r.name.substring(1).toLowerCase()).toList() ?? [])
         : state.selectedRoles;
 
     return _blueprintSection(
@@ -1367,13 +1363,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentViewModel viewModel,
     CategoryState categoryState,
   ) {
-    CategoryModel? selectedCategory;
-    if (viewModel.categoryIdController.text.isNotEmpty) {
-      selectedCategory = viewModel.findCategoryById(
-        categoryState.categories,
-        viewModel.categoryIdController.text,
-      );
-    }
+    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
 
     int totalFus = 0;
     if (state.sessionSource == 'custom') {
@@ -1439,13 +1429,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         .where((p) => p.type == ProtocolType.text)
         .toList();
 
-    CategoryModel? selectedCategory;
-    if (viewModel.categoryIdController.text.isNotEmpty) {
-      selectedCategory = viewModel.findCategoryById(
-        categoryState.categories,
-        viewModel.categoryIdController.text,
-      );
-    }
+    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
 
     List<TreatmentProtocolNoteItem> notesToShow = [];
     if (state.standaloneNotes.isNotEmpty) {
@@ -2119,18 +2103,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentViewModel viewModel,
     CategoryState categoryState,
   ) {
-    CategoryModel? selectedCategory;
-    if (viewModel.categoryIdController.text.isNotEmpty) {
-      selectedCategory = viewModel.findCategoryById(
-        categoryState.categories,
-        viewModel.categoryIdController.text,
-      );
-    }
+    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
 
     return StatefulBuilder(
       builder: (context, setState) {
         Widget buildCategoryDefaultPreviews(
-          List<CategoryNotificationModel> notifications, {
+          List<NotificationModel> notifications, {
           required bool isPre,
         }) {
           if (notifications.isEmpty) {
@@ -2155,16 +2133,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             separatorBuilder: (_, _) => context.verticalSpace(12),
             itemBuilder: (context, idx) {
               final config = notifications[idx];
-              final typeText = config.type != null
-                  ? ' [${config.type![0].toUpperCase()}${config.type!.substring(1)}]'
-                  : '';
+              final typeStr = typeValues.reverse[config.type] ?? 'reminder';
+              final typeText = ' [${typeStr[0].toUpperCase()}${typeStr.substring(1)}]';
+              final timingUnitStr = unitValues.reverse[config.timingUnit] ?? 'hours';
               return _buildNotificationPreview(
                 context,
                 title:
-                    "${config.title ?? 'Notification'} $typeText (Read-only)",
-                message: config.message ?? '',
+                    "${config.title} $typeText (Read-only)",
+                message: config.message,
                 timing:
-                    "${config.timing ?? 0} ${config.timingUnit ?? 'hours'} ${isPre ? 'Before' : 'After'}",
+                    "${config.timing} $timingUnitStr ${isPre ? 'Before' : 'After'}",
               );
             },
           );
@@ -2563,14 +2541,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentViewModel viewModel,
     CategoryState categoryState,
   ) {
-    CategoryModel? selectedCategory;
-    if (viewModel.categoryIdController.text.isNotEmpty) {
-      selectedCategory = viewModel.findCategoryById(
-        categoryState.categories,
-        viewModel.categoryIdController.text,
-      );
-    }
-    final presets = selectedCategory?.downtimePresets ?? CategoryDowntimePresetModel();
+    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
+    final presets = selectedCategory?.downtimePresets;
+    final lowDays = presets?.low ?? 2;
+    final moderateDays = presets?.moderate ?? 5;
+    final highDays = presets?.high ?? 10;
+    final noneDays = presets?.none ?? 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2586,7 +2562,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         _downtimeOption(
           context,
           'None',
-          '${presets.none} Days',
+          '${noneDays} Days',
           'No booking restrictions.',
           state.downtimeLevel == 'None',
           () => viewModel.setDowntimeLevel('None'),
@@ -2595,7 +2571,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         _downtimeOption(
           context,
           'Low',
-          '${presets.low} Days',
+          '${lowDays} Days',
           'Short recovery window.',
           state.downtimeLevel == 'Low',
           () => viewModel.setDowntimeLevel('Low'),
@@ -2604,7 +2580,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         _downtimeOption(
           context,
           'Moderate',
-          '${presets.moderate} Days',
+          '${moderateDays} Days',
           'Standard clinical recovery.',
           state.downtimeLevel == 'Moderate',
           () => viewModel.setDowntimeLevel('Moderate'),
@@ -2613,7 +2589,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         _downtimeOption(
           context,
           'High',
-          '${presets.high} Days',
+          '${highDays} Days',
           'Extended recovery required.',
           state.downtimeLevel == 'High',
           () => viewModel.setDowntimeLevel('High'),
@@ -2697,13 +2673,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentViewModel viewModel,
     CategoryState categoryState,
   ) {
-    CategoryModel? selectedCategory;
-    if (viewModel.categoryIdController.text.isNotEmpty) {
-      selectedCategory = viewModel.findCategoryById(
-        categoryState.categories,
-        viewModel.categoryIdController.text,
-      );
-    }
+    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
     final List<String> availableRoles = [
       'Injector',
       'Aesthetician',
@@ -2711,7 +2681,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       'Nurse',
       'Specialist',
     ];
-    final List<String> categoryRoles = selectedCategory?.defaultRoles ?? [];
+    final List<String> categoryRoles = selectedCategory?.defaultRoles.map((r) => defaultRoleValues.reverse[r] ?? '').toList() ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2835,13 +2805,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentViewModel viewModel,
     CategoryState categoryState,
   ) {
-    CategoryModel? selectedCategory;
-    if (viewModel.categoryIdController.text.isNotEmpty) {
-      selectedCategory = viewModel.findCategoryById(
-        categoryState.categories,
-        viewModel.categoryIdController.text,
-      );
-    }
+    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
     final int categorySessions = selectedCategory?.totalSessions ?? 1;
 
     return Column(
@@ -3311,14 +3275,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentViewModel viewModel,
     WidgetRef ref,
   ) {
-    final categoryState = ref.watch(categoryViewModelProvider);
-    CategoryModel? selectedCategory;
-    if (viewModel.categoryIdController.text.isNotEmpty) {
-      selectedCategory = viewModel.findCategoryById(
-        categoryState.categories,
-        viewModel.categoryIdController.text,
-      );
-    }
+    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

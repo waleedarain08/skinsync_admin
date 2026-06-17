@@ -7,7 +7,9 @@ import 'package:image_picker/image_picker.dart';
 
 import '../models/notification_entry.dart';
 import '../models/treatment_data_models.dart';
+import '../models/responses/category_detail_response.dart';
 import '../repositories/treatment_repository.dart';
+import '../repositories/category_repository.dart';
 import '../services/locator.dart';
 import '../utils/dummy_data.dart';
 import 'base_state_model.dart';
@@ -22,6 +24,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   // ignore: unused_field
   final TreatmentRepository _treatmentRepository = locator<TreatmentRepository>();
+  final CategoryRepository _categoryRepository = locator<CategoryRepository>();
 
   // Step 1 Controllers
   final globalSkuController = TextEditingController();
@@ -474,31 +477,33 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     );
   }
 
-  void setPreNotificationSource(String source, {CategoryModel? category}) {
+  void setPreNotificationSource(String source, {CategoryDetailDto? category}) {
     state = state.copyWith(preNotificationSource: source);
-    if (source == 'category' && category != null) {
+    final detail = category ?? state.selectedCategoryDetail;
+    if (source == 'category' && detail != null) {
       state = state.copyWith(
-        preNotificationEntries: (category.preNotifications).map((config) => NotificationEntry(
+        preNotificationEntries: detail.preNotifications.map((config) => NotificationEntry(
           titleController: TextEditingController(text: config.title),
           messageController: TextEditingController(text: config.message),
-          timingValueController: TextEditingController(text: config.timing?.toString()),
-          timingUnit: config.timingUnit ?? 'hours',
-          type: config.type ?? 'reminder',
+          timingValueController: TextEditingController(text: config.timing.toString()),
+          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+          type: typeValues.reverse[config.type] ?? 'reminder',
         )).toList(),
       );
     }
   }
 
-  void setPostNotificationSource(String source, {CategoryModel? category}) {
+  void setPostNotificationSource(String source, {CategoryDetailDto? category}) {
     state = state.copyWith(postNotificationSource: source);
-    if (source == 'category' && category != null) {
+    final detail = category ?? state.selectedCategoryDetail;
+    if (source == 'category' && detail != null) {
       state = state.copyWith(
-        postNotificationEntries: (category.postNotifications).map((config) => NotificationEntry(
+        postNotificationEntries: detail.postNotifications.map((config) => NotificationEntry(
           titleController: TextEditingController(text: config.title),
           messageController: TextEditingController(text: config.message),
-          timingValueController: TextEditingController(text: config.timing?.toString()),
-          timingUnit: config.timingUnit ?? 'hours',
-          type: config.type ?? 'care',
+          timingValueController: TextEditingController(text: config.timing.toString()),
+          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+          type: typeValues.reverse[config.type] ?? 'care',
         )).toList(),
       );
     }
@@ -506,31 +511,32 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   void setDowntimeLevel(String level) => state = state.copyWith(downtimeLevel: level);
   void setProviderRolesSource(String source) => state = state.copyWith(providerRolesSource: source);
   
-  void setSessionSource(String source, {CategoryModel? category}) {
+  void setSessionSource(String source, {CategoryDetailDto? category}) {
     state = state.copyWith(sessionSource: source);
-    if (source == 'category' && category != null) {
+    final detail = category ?? state.selectedCategoryDetail;
+    if (source == 'category' && detail != null) {
       for (final entry in state.sessions) {
         entry.dispose();
       }
       final List<SessionViewModelEntry> newSessions = [];
-      if (category.defaultSessions.isNotEmpty) {
-        for (final s in category.defaultSessions) {
+      if (detail.defaultSessions.isNotEmpty) {
+        for (final s in detail.defaultSessions) {
           newSessions.add(SessionViewModelEntry(
             sessionNumber: s.sessionNumber,
             totalFollowUpsController: TextEditingController(text: s.followUps.length.toString()),
             followUps: s.followUps.map((fu) => FollowUpEntry(
               type: fu.type,
-              durationUnit: fu.durationUnit,
-              durationValueController: TextEditingController(text: fu.durationValue?.toString() ?? ''),
-              notesController: TextEditingController(text: fu.notes ?? ''),
-              intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
-              intervalUnit: fu.intervalUnit ?? 'days',
+              durationUnit: unitValues.reverse[fu.durationUnit] ?? 'minutes',
+              durationValueController: TextEditingController(text: fu.durationValue.toString()),
+              notesController: TextEditingController(text: fu.notes),
+              intervalValueController: TextEditingController(text: fu.intervalValue.toString()),
+              intervalUnit: fu.intervalUnit,
               isImageRequired: fu.isImageRequired,
             )).toList(),
           ));
         }
       } else {
-        final int sessionCount = category.totalSessions;
+        final int sessionCount = detail.totalSessions;
         for (int i = 0; i < sessionCount; i++) {
           newSessions.add(SessionViewModelEntry(
             sessionNumber: i + 1,
@@ -635,34 +641,43 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }
   }
 
-  void onCategorySelected(CategoryModel category, String path) {
+  Future<void> onCategorySelected(CategoryModel category, String path) async {
     categoryIdController.text = category.id.toString();
     categoryNameController.text = category.name;
     categoryPathController.text = path;
     
+    CategoryDetailDto? detail;
+    try {
+      detail = await _categoryRepository.getCategoryDetail(category.id);
+      state = state.copyWith(selectedCategoryDetail: detail);
+    } catch (_) {
+      // ignore
+    }
+
+    final effectiveDetail = detail;
     if (state.sessionSource == 'category') {
       for (final entry in state.sessions) {
         entry.dispose();
       }
       final List<SessionViewModelEntry> newSessions = [];
-      if (category.defaultSessions.isNotEmpty) {
-        for (final s in category.defaultSessions) {
+      if (effectiveDetail != null && effectiveDetail.defaultSessions.isNotEmpty) {
+        for (final s in effectiveDetail.defaultSessions) {
           newSessions.add(SessionViewModelEntry(
             sessionNumber: s.sessionNumber,
             totalFollowUpsController: TextEditingController(text: s.followUps.length.toString()),
             followUps: s.followUps.map((fu) => FollowUpEntry(
               type: fu.type,
-              durationUnit: fu.durationUnit,
-              durationValueController: TextEditingController(text: fu.durationValue?.toString() ?? ''),
-              notesController: TextEditingController(text: fu.notes ?? ''),
-              intervalValueController: TextEditingController(text: fu.intervalValue?.toString() ?? ''),
-              intervalUnit: fu.intervalUnit ?? 'days',
+              durationUnit: unitValues.reverse[fu.durationUnit] ?? 'minutes',
+              durationValueController: TextEditingController(text: fu.durationValue.toString()),
+              notesController: TextEditingController(text: fu.notes),
+              intervalValueController: TextEditingController(text: fu.intervalValue.toString()),
+              intervalUnit: fu.intervalUnit,
               isImageRequired: fu.isImageRequired,
             )).toList(),
           ));
         }
       } else {
-        final int sessionCount = category.totalSessions;
+        final int sessionCount = effectiveDetail?.totalSessions ?? 1;
         for (int i = 0; i < sessionCount; i++) {
           newSessions.add(SessionViewModelEntry(
             sessionNumber: i + 1,
@@ -675,31 +690,29 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         totalSessions: newSessions.length,
         sessions: newSessions,
       );
-    } else {
-      state = state.copyWith();
     }
 
     // Sync Notifications
-    if (state.preNotificationSource == 'category') {
+    if (state.preNotificationSource == 'category' && effectiveDetail != null) {
       state = state.copyWith(
-        preNotificationEntries: (category.preNotifications).map((config) => NotificationEntry(
+        preNotificationEntries: (effectiveDetail.preNotifications).map((config) => NotificationEntry(
           titleController: TextEditingController(text: config.title),
           messageController: TextEditingController(text: config.message),
-          timingValueController: TextEditingController(text: config.timing?.toString()),
-          timingUnit: config.timingUnit ?? 'hours',
-          type: config.type ?? 'reminder',
+          timingValueController: TextEditingController(text: config.timing.toString()),
+          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+          type: typeValues.reverse[config.type] ?? 'reminder',
         )).toList(),
       );
     }
     
-    if (state.postNotificationSource == 'category') {
+    if (state.postNotificationSource == 'category' && effectiveDetail != null) {
       state = state.copyWith(
-        postNotificationEntries: (category.postNotifications).map((config) => NotificationEntry(
+        postNotificationEntries: (effectiveDetail.postNotifications).map((config) => NotificationEntry(
           titleController: TextEditingController(text: config.title),
           messageController: TextEditingController(text: config.message),
-          timingValueController: TextEditingController(text: config.timing?.toString()),
-          timingUnit: config.timingUnit ?? 'hours',
-          type: config.type ?? 'care',
+          timingValueController: TextEditingController(text: config.timing.toString()),
+          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+          type: typeValues.reverse[config.type] ?? 'care',
         )).toList(),
       );
     }
@@ -1076,18 +1089,27 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         return;
       }
 
+      CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
+      if (selectedCategory == null && categoryIdController.text.isNotEmpty) {
+        final categoryId = int.tryParse(categoryIdController.text);
+        if (categoryId != null) {
+          try {
+            selectedCategory = await _categoryRepository.getCategoryDetail(categoryId);
+          } catch (_) {}
+        }
+      }
+
       List<SessionConfig> effectiveSessions = [];
       
       List<NotificationConfig> effectivePreNotifications = [];
       if (state.preNotificationSource == 'category') {
-        final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null) {
           effectivePreNotifications = selectedCategory.preNotifications.map((n) => NotificationConfig(
             title: n.title,
             message: n.message,
             timing: n.timing,
-            timingUnit: n.timingUnit,
-            type: n.type,
+            timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
+            type: typeValues.reverse[n.type] ?? 'reminder',
           )).toList();
         }
       } else {
@@ -1096,14 +1118,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
       List<NotificationConfig> effectivePostNotifications = [];
       if (state.postNotificationSource == 'category') {
-        final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null) {
           effectivePostNotifications = selectedCategory.postNotifications.map((n) => NotificationConfig(
             title: n.title,
             message: n.message,
             timing: n.timing,
-            timingUnit: n.timingUnit,
-            type: n.type,
+            timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
+            type: typeValues.reverse[n.type] ?? 'care',
           )).toList();
         }
       } else {
@@ -1111,14 +1132,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       }
       
       if (state.sessionSource == 'category') {
-        final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null && selectedCategory.defaultSessions.isNotEmpty) {
           effectiveSessions = selectedCategory.defaultSessions.map((s) => SessionConfig(
             sessionNumber: s.sessionNumber,
             followUps: s.followUps.map((f) => FollowUpConfig(
               type: f.type,
               durationValue: f.durationValue,
-              durationUnit: f.durationUnit,
+              durationUnit: unitValues.reverse[f.durationUnit] ?? 'minutes',
               notes: f.notes,
               intervalValue: f.intervalValue,
               intervalUnit: f.intervalUnit,
@@ -1303,18 +1323,27 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         return;
       }
 
+      CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
+      if (selectedCategory == null && categoryIdController.text.isNotEmpty) {
+        final categoryId = int.tryParse(categoryIdController.text);
+        if (categoryId != null) {
+          try {
+            selectedCategory = await _categoryRepository.getCategoryDetail(categoryId);
+          } catch (_) {}
+        }
+      }
+
       List<SessionConfig> effectiveSessions = [];
 
       List<NotificationConfig> effectivePreNotifications = [];
       if (state.preNotificationSource == 'category') {
-        final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null) {
           effectivePreNotifications = selectedCategory.preNotifications.map((n) => NotificationConfig(
             title: n.title,
             message: n.message,
             timing: n.timing,
-            timingUnit: n.timingUnit,
-            type: n.type,
+            timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
+            type: typeValues.reverse[n.type] ?? 'reminder',
           )).toList();
         }
       } else {
@@ -1323,14 +1352,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
       List<NotificationConfig> effectivePostNotifications = [];
       if (state.postNotificationSource == 'category') {
-        final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null) {
           effectivePostNotifications = selectedCategory.postNotifications.map((n) => NotificationConfig(
             title: n.title,
             message: n.message,
             timing: n.timing,
-            timingUnit: n.timingUnit,
-            type: n.type,
+            timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
+            type: typeValues.reverse[n.type] ?? 'care',
           )).toList();
         }
       } else {
@@ -1338,14 +1366,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       }
       
       if (state.sessionSource == 'category') {
-        final selectedCategory = findCategoryById(categories, categoryIdController.text);
         if (selectedCategory != null && selectedCategory.defaultSessions.isNotEmpty) {
           effectiveSessions = selectedCategory.defaultSessions.map((s) => SessionConfig(
             sessionNumber: s.sessionNumber,
             followUps: s.followUps.map((f) => FollowUpConfig(
               type: f.type,
               durationValue: f.durationValue,
-              durationUnit: f.durationUnit,
+              durationUnit: unitValues.reverse[f.durationUnit] ?? 'minutes',
               notes: f.notes,
               intervalValue: f.intervalValue,
               intervalUnit: f.intervalUnit,
@@ -1597,6 +1624,7 @@ class TreatmentState extends BaseStateModel {
   final List<TreatmentModel> filteredTreatments;
   final TreatmentModel? selectedTreatment;
   final int? selectedTreatmentId;
+  final CategoryDetailDto? selectedCategoryDetail;
   final int currentStep;
   final XFile? treatmentImage;
   final XFile? treatmentIcon;
@@ -1662,6 +1690,7 @@ class TreatmentState extends BaseStateModel {
     this.filteredTreatments = const [],
     this.selectedTreatment,
     this.selectedTreatmentId,
+    this.selectedCategoryDetail,
     this.currentStep = 0,
     this.treatmentImage,
     this.treatmentIcon,
@@ -1759,8 +1788,10 @@ class TreatmentState extends BaseStateModel {
     bool? manualApprovalRequired,
     int? minimumBookingNotice,
     int? maximumDaysInAdvance,
+    CategoryDetailDto? selectedCategoryDetail,
   }) {
     return TreatmentState(
+      selectedCategoryDetail: selectedCategoryDetail ?? this.selectedCategoryDetail,
       loading: loading ?? this.loading,
       currentPage: currentPage ?? this.currentPage,
       totalPages: totalPages ?? this.totalPages,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
+import 'package:skinsync_admin/models/responses/category_custom_models.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
@@ -1100,46 +1101,23 @@ class _RecursiveCategoryTile extends StatelessWidget {
             IconButton(
               tooltip: 'Edit Category',
               icon: const Icon(Icons.edit_outlined, size: 20),
-              onPressed:
-                  () => ManageTreatmentDataScreen._showCategoryCreationDialog(
-                    context: context,
+              onPressed: () async {
+                final result = await showDialog<Map<String, dynamic>>(
+                  context: context,
+                  builder: (context) => CategoryCreationDialog(
+                    categoryId: category.id,
                     initialName: category.name,
                     initialIcon: category.icon,
-                    initialConsentName: category.consentFormName,
-                    initialSessions: category.defaultSessions,
-                    initialTotalSessions: category.totalSessions,
-                    initialPreNotifications: category.preNotifications,
-                    initialPostNotifications: category.postNotifications,
-                    initialDowntimePresets: category.downtimePresets,
-                    initialDefaultRoles: category.defaultRoles,
-                    onConfirm:
-                        (
-                          String name,
-                          String icon,
-                          PlatformFile? consentFile,
-                          List<CategorySessionModel>? sessions,
-                          List<CategoryNotificationModel>? preNotif,
-                          List<CategoryNotificationModel>? postNotif,
-                          CategoryDowntimePresetModel? downtime,
-                          List<String>? roles,
-                        ) => viewModel.editCategory(
-                          category.id,
-                          name,
-                          icon: icon,
-                          consentFormName:
-                              consentFile?.name ?? category.consentFormName,
-                          consentFormUrl:
-                              consentFile?.path ?? category.consentFormUrl,
-                          defaultSessions: sessions ?? category.defaultSessions,
-                          totalSessions: sessions?.length,
-                          preNotifications:
-                              preNotif ?? category.preNotifications,
-                          postNotifications:
-                              postNotif ?? category.postNotifications,
-                          downtimePresets: downtime ?? category.downtimePresets,
-                          defaultRoles: roles ?? category.defaultRoles,
-                        ),
                   ),
+                );
+                if (result != null) {
+                  viewModel.editCategory(
+                    category.id,
+                    result['name'],
+                    icon: result['icon'],
+                  );
+                }
+              },
             ),
             IconButton(
               tooltip: 'Delete Category',

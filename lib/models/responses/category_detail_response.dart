@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:skinsync_admin/models/sessions_model.dart';
+
+import '../common_models.dart';
 import 'base_response_model.dart';
-import 'category_list_response.dart';
+import '../notification_model.dart';
 
 class CategoryDetailResponse extends BaseApiResponseModel<CategoryDetailDto> {
   const CategoryDetailResponse({
@@ -30,276 +35,121 @@ class CategoryDetailDto {
   final String icon;
   final int? parentId;
   final int totalSessions;
-  final String? consentFormUrl;
-  final String? consentFormName;
-  final List<CategorySessionDto> defaultSessions;
-  final List<CategoryNotificationDto> preNotifications;
-  final List<CategoryNotificationDto> postNotifications;
-  final CategoryDowntimePresetDto downtimePresets;
-  final List<String> defaultRoles;
+  final String consentFormUrl;
+  final String consentFormName;
+  final List<SessionsModel> defaultSessions;
+  final List<NotificationModel> preNotifications;
+  final List<NotificationModel> postNotifications;
+  final DowntimePresets downtimePresets;
+  final List<DefaultRole> defaultRoles;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final List<CategoryDetailDto> subCategories;
 
   CategoryDetailDto({
     required this.id,
     required this.name,
     required this.icon,
-    this.parentId,
-    this.totalSessions = 1,
-    this.consentFormUrl,
-    this.consentFormName,
-    this.defaultSessions = const [],
-    this.preNotifications = const [],
-    this.postNotifications = const [],
+    required this.parentId,
+    required this.totalSessions,
+    required this.consentFormUrl,
+    required this.consentFormName,
+    required this.defaultSessions,
+    required this.preNotifications,
+    required this.postNotifications,
     required this.downtimePresets,
-    this.defaultRoles = const [],
-    this.subCategories = const [],
+    required this.defaultRoles,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.subCategories,
   });
 
-  factory CategoryDetailDto.fromJson(Map<String, dynamic> json) {
-    return CategoryDetailDto(
-      id: json['id'] as int,
-      name: json['name'] ?? '',
-      icon: json['icon'] ?? '',
-      parentId: json['parent_id'] as int?,
-      totalSessions: json['total_sessions'] ?? 1,
-      consentFormUrl: json['consent_form_url'],
-      consentFormName: json['consent_form_name'],
-      defaultSessions: (json['default_sessions'] as List?)
-              ?.map((e) => CategorySessionDto.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      preNotifications: (json['pre_notifications'] as List?)
-              ?.map((e) => CategoryNotificationDto.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      postNotifications: (json['post_notifications'] as List?)
-              ?.map((e) => CategoryNotificationDto.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      downtimePresets: json['downtime_presets'] != null
-          ? CategoryDowntimePresetDto.fromJson(json['downtime_presets'] as Map<String, dynamic>)
-          : CategoryDowntimePresetDto(),
-      defaultRoles: (json['default_roles'] as List?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
-      subCategories: (json['sub_categories'] as List?)
-              ?.map((e) => CategoryDetailDto.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-    );
-  }
+  factory CategoryDetailDto.fromRawJson(String str) => CategoryDetailDto.fromJson(json.decode(str));
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'icon': icon,
-      'parent_id': parentId,
-      'total_sessions': totalSessions,
-      'consent_form_url': consentFormUrl,
-      'consent_form_name': consentFormName,
-      'default_sessions': defaultSessions.map((e) => e.toJson()).toList(),
-      'pre_notifications': preNotifications.map((e) => e.toJson()).toList(),
-      'post_notifications': postNotifications.map((e) => e.toJson()).toList(),
-      'downtime_presets': downtimePresets.toJson(),
-      'default_roles': defaultRoles,
-      'sub_categories': subCategories.map((e) => e.toJson()).toList(),
-    };
-  }
+  String toRawJson() => json.encode(toJson());
 
-  CategoryModel toCategoryModel() {
-    return CategoryModel(
-      id: id,
-      name: name,
-      icon: icon,
-      parentId: parentId,
-      totalSessions: totalSessions,
-      consentFormUrl: consentFormUrl,
-      consentFormName: consentFormName,
-      defaultSessions: defaultSessions.map((s) => s.toCategorySessionModel()).toList(),
-      preNotifications: preNotifications.map((n) => n.toCategoryNotificationModel()).toList(),
-      postNotifications: postNotifications.map((n) => n.toCategoryNotificationModel()).toList(),
-      downtimePresets: downtimePresets.toCategoryDowntimePresetModel(),
-      defaultRoles: defaultRoles,
-      subCategories: subCategories.map((s) => s.toCategoryModel()).toList(),
-    );
+  factory CategoryDetailDto.fromJson(Map<String, dynamic> json) => CategoryDetailDto(
+    id: json["id"],
+    name: json["name"],
+    icon: json["icon"],
+    parentId: json["parent_id"],
+    totalSessions: json["total_sessions"],
+    consentFormUrl: json["consent_form_url"],
+    consentFormName: json["consent_form_name"],
+    defaultSessions: List<SessionsModel>.from(json["default_sessions"].map((x) => SessionsModel.fromJson(x))),
+    preNotifications: List<NotificationModel>.from(json["pre_notifications"].map((x) => NotificationModel.fromJson(x))),
+    postNotifications: List<NotificationModel>.from(json["post_notifications"].map((x) => NotificationModel.fromJson(x))),
+    downtimePresets: DowntimePresets.fromJson(json["downtime_presets"]),
+    defaultRoles: List<DefaultRole>.from(json["default_roles"].map((x) => defaultRoleValues.map[x]!)),
+    createdAt: DateTime.parse(json["created_at"]),
+    updatedAt: DateTime.parse(json["updated_at"]),
+    subCategories: List<CategoryDetailDto>.from(json["sub_categories"].map((x) => CategoryDetailDto.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "icon": icon,
+    "parent_id": parentId,
+    "total_sessions": totalSessions,
+    "consent_form_url": consentFormUrl,
+    "consent_form_name": consentFormName,
+    "default_sessions": List<dynamic>.from(defaultSessions.map((x) => x.toJson())),
+    "pre_notifications": List<dynamic>.from(preNotifications.map((x) => x.toJson())),
+    "post_notifications": List<dynamic>.from(postNotifications.map((x) => x.toJson())),
+    "downtime_presets": downtimePresets.toJson(),
+    "default_roles": List<dynamic>.from(defaultRoles.map((x) => defaultRoleValues.reverse[x])),
+    "created_at": createdAt.toIso8601String(),
+    "updated_at": updatedAt.toIso8601String(),
+    "sub_categories": List<dynamic>.from(subCategories.map((x) => x.toJson())),
+  };
+}
+
+enum DefaultRole {
+  AESTHETICIAN,
+  INJECTOR,
+  MD
+}
+
+final defaultRoleValues = EnumValues({
+  "Aesthetician": DefaultRole.AESTHETICIAN,
+  "Injector": DefaultRole.INJECTOR,
+  "MD": DefaultRole.MD
+});
+
+
+
+enum Unit {
+  HOURS,
+  MINUTES
+}
+
+final unitValues = EnumValues({
+  "hours": Unit.HOURS,
+  "minutes": Unit.MINUTES
+});
+
+
+
+enum Type {
+  CARE,
+  INSTRUCTION
+}
+
+final typeValues = EnumValues({
+  "care": Type.CARE,
+  "instruction": Type.INSTRUCTION
+});
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    reverseMap = map.map((k, v) => MapEntry(v, k));
+    return reverseMap;
   }
 }
 
-class CategorySessionDto {
-  final int sessionNumber;
-  final List<CategoryFollowUpDto> followUps;
-
-  CategorySessionDto({
-    required this.sessionNumber,
-    this.followUps = const [],
-  });
-
-  factory CategorySessionDto.fromJson(Map<String, dynamic> json) {
-    return CategorySessionDto(
-      sessionNumber: json['session_number'] ?? 1,
-      followUps: (json['follow_ups'] as List?)
-              ?.map((e) => CategoryFollowUpDto.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'session_number': sessionNumber,
-      'follow_ups': followUps.map((e) => e.toJson()).toList(),
-    };
-  }
-
-  CategorySessionModel toCategorySessionModel() {
-    return CategorySessionModel(
-      sessionNumber: sessionNumber,
-      followUps: followUps.map((f) => f.toCategoryFollowUpModel()).toList(),
-    );
-  }
-}
-
-class CategoryFollowUpDto {
-  final String type;
-  final int? durationValue;
-  final String durationUnit;
-  final int? intervalValue;
-  final String? intervalUnit;
-  final bool isImageRequired;
-  final String? notes;
-
-  CategoryFollowUpDto({
-    required this.type,
-    this.durationValue,
-    this.durationUnit = 'minutes',
-    this.intervalValue,
-    this.intervalUnit = 'days',
-    this.isImageRequired = false,
-    this.notes,
-  });
-
-  factory CategoryFollowUpDto.fromJson(Map<String, dynamic> json) {
-    return CategoryFollowUpDto(
-      type: json['type'] ?? 'virtual',
-      durationValue: json['duration_value'] as int?,
-      durationUnit: json['duration_unit'] ?? 'minutes',
-      intervalValue: json['interval_value'] as int?,
-      intervalUnit: json['interval_unit'],
-      isImageRequired: json['is_image_required'] ?? false,
-      notes: json['notes'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-      'duration_value': durationValue,
-      'duration_unit': durationUnit,
-      'interval_value': intervalValue,
-      'interval_unit': intervalUnit,
-      'is_image_required': isImageRequired,
-      'notes': notes,
-    };
-  }
-
-  CategoryFollowUpModel toCategoryFollowUpModel() {
-    return CategoryFollowUpModel(
-      type: type,
-      durationValue: durationValue,
-      durationUnit: durationUnit,
-      intervalValue: intervalValue,
-      intervalUnit: intervalUnit,
-      isImageRequired: isImageRequired,
-      notes: notes,
-    );
-  }
-}
-
-class CategoryNotificationDto {
-  final String? title;
-  final String? message;
-  final int? timing;
-  final String? timingUnit;
-  final String? type;
-
-  CategoryNotificationDto({
-    this.title,
-    this.message,
-    this.timing,
-    this.timingUnit,
-    this.type,
-  });
-
-  factory CategoryNotificationDto.fromJson(Map<String, dynamic> json) {
-    return CategoryNotificationDto(
-      title: json['title'],
-      message: json['message'],
-      timing: json['timing'] as int?,
-      timingUnit: json['timing_unit'],
-      type: json['type'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'message': message,
-      'timing': timing,
-      'timing_unit': timingUnit,
-      'type': type,
-    };
-  }
-
-  CategoryNotificationModel toCategoryNotificationModel() {
-    return CategoryNotificationModel(
-      title: title,
-      message: message,
-      timing: timing,
-      timingUnit: timingUnit,
-      type: type,
-    );
-  }
-}
-
-class CategoryDowntimePresetDto {
-  final int high;
-  final int moderate;
-  final int low;
-  final int none;
-
-  CategoryDowntimePresetDto({
-    this.high = 10,
-    this.moderate = 5,
-    this.low = 2,
-    this.none = 0,
-  });
-
-  factory CategoryDowntimePresetDto.fromJson(Map<String, dynamic> json) {
-    return CategoryDowntimePresetDto(
-      high: json['high'] ?? 10,
-      moderate: json['moderate'] ?? 5,
-      low: json['low'] ?? 2,
-      none: json['none'] ?? 0,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'high': high,
-      'moderate': moderate,
-      'low': low,
-      'none': none,
-    };
-  }
-
-  CategoryDowntimePresetModel toCategoryDowntimePresetModel() {
-    return CategoryDowntimePresetModel(
-      high: high,
-      moderate: moderate,
-      low: low,
-      none: none,
-    );
-  }
-}

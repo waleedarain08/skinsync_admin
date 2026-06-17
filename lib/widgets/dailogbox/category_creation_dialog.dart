@@ -8,7 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/notification_entry.dart';
-import '../../models/responses/category_list_response.dart';
+import '../../models/responses/category_custom_models.dart';
+import '../../models/responses/category_detail_response.dart';
 import '../../utils/theme.dart';
 import '../../view_models/category_view_model.dart';
 import '../build_textfield.dart';
@@ -188,7 +189,7 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
     });
   }
 
-  void _populateFromCategory(CategoryModel cat) {
+  void _populateFromCategory(CategoryDetailDto cat) {
     _nameController.text = cat.name;
     _totalSessionsController.text = cat.totalSessions.toString();
     _selectedIcon = cat.icon;
@@ -199,7 +200,19 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
       cat.defaultSessions.map(
         (s) => CategorySessionModel(
           sessionNumber: s.sessionNumber,
-          followUps: List.from(s.followUps),
+          followUps: List.from(
+            s.followUps.map(
+              (f) => CategoryFollowUpModel(
+                type: f.type,
+                durationValue: f.durationValue,
+                durationUnit: unitValues.reverse[f.durationUnit] ?? 'minutes',
+                intervalValue: f.intervalValue,
+                intervalUnit: f.intervalUnit,
+                isImageRequired: f.isImageRequired,
+                notes: f.notes,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -211,10 +224,10 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
           titleController: TextEditingController(text: config.title),
           messageController: TextEditingController(text: config.message),
           timingValueController: TextEditingController(
-            text: config.timing?.toString(),
+            text: config.timing.toString(),
           ),
-          timingUnit: config.timingUnit ?? 'hours',
-          type: config.type ?? 'reminder',
+          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+          type: typeValues.reverse[config.type] ?? 'reminder',
         ),
       ),
     );
@@ -225,10 +238,10 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
           titleController: TextEditingController(text: config.title),
           messageController: TextEditingController(text: config.message),
           timingValueController: TextEditingController(
-            text: config.timing?.toString(),
+            text: config.timing.toString(),
           ),
-          timingUnit: config.timingUnit ?? 'hours',
-          type: config.type ?? 'care',
+          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+          type: typeValues.reverse[config.type] ?? 'care',
         ),
       ),
     );
@@ -237,7 +250,9 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
     _downtimeModerateController.text = cat.downtimePresets.moderate.toString();
     _downtimeHighController.text = cat.downtimePresets.high.toString();
 
-    _selectedRoles = List.from(cat.defaultRoles);
+    _selectedRoles = List.from(
+      cat.defaultRoles.map((r) => defaultRoleValues.reverse[r] ?? ''),
+    );
   }
 
   void _syncFollowUpsCountControllers() {
