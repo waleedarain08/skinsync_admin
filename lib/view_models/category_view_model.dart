@@ -1,9 +1,14 @@
+import 'dart:developer';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/responses/category_list_response.dart';
 import '../models/responses/category_detail_response.dart';
 import '../repositories/category_repository.dart';
 import '../services/locator.dart';
+import '../services/media_service.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 
@@ -49,6 +54,27 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
   }
 
   final CategoryRepository _categoryRepository = locator<CategoryRepository>();
+  final MediaService _mediaService = MediaService();
+
+  Future<String?> uploadCategoryIcon(XFile image) async {
+    final url = await runSafely<String?>(
+      () => _mediaService.uploadImage('category/icon', image),
+    );
+    if (url != null) {
+      log('Category icon uploaded: $url');
+    }
+    return url;
+  }
+
+  Future<String?> uploadConsentFile(PlatformFile file) async {
+    final url = await runSafely<String?>(
+      () => _mediaService.uploadFile('category/pdf', file),
+    );
+    if (url != null) {
+      log('Category consent PDF uploaded: $url');
+    }
+    return url;
+  }
 
   Future<void> fetchCategories() async {
     await runSafely(
