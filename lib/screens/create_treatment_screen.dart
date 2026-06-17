@@ -129,12 +129,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
       'Basic Information',
       'Treatment Areas',
       'Inventory Products',
-      'Post Treatment Photos',
       'Scheduling',
       'Pricing',
       'Protocols',
       'Pre-Treatment Instructions',
       'Post-Treatment Instructions',
+      'Post Treatment Photos',
       'Phase Notifications',
       'Downtime Level',
       'Allowed Provider Roles',
@@ -281,12 +281,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
       'Basic Information',
       'Body Areas',
       'Inventory Products',
-      'Post Treatment Photos',
       'Scheduling',
       'Pricing Setup',
       'Clinical Protocols',
       'Pre-Treatment Instructions',
       'Post-Treatment Instructions',
+      'Post Treatment Photos',
       'Phase Notifications',
       'Downtime Level',
       'Allowed Provider Roles',
@@ -300,12 +300,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
       'Core identification details including status.',
       'Define mandatory sub-areas.',
       'Configure required products from inventory and area-wise consumption.',
-      'Configure how many post-treatment photos should be captured for this treatment.',
       'Centralize appointment duration, preparation times, and booking permissions.',
       'Finalize treatment base price and sub-area pricing adjustments.',
       'Standardize procedures with checklists and required text fields.',
       'Detailed instructions and supporting media for patients before the procedure.',
       'Aftercare guidelines and recovery media for patients after the procedure.',
+      'Configure how many post-treatment photos should be captured for this treatment.',
       'Automated reminders and follow-up engagement messages.',
       'Configure booking restriction window after treatment.',
       'Define which provider roles are authorized to perform this treatment.',
@@ -319,12 +319,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
       Icons.description_outlined,
       Icons.accessibility_new_outlined,
       Icons.inventory_2_outlined,
-      Icons.add_a_photo_outlined,
       Icons.schedule_outlined,
       Icons.payments_outlined,
       Icons.assignment_turned_in_outlined,
       Icons.login_rounded,
       Icons.logout_rounded,
+      Icons.add_a_photo_outlined,
       Icons.notifications_active_outlined,
       Icons.hourglass_bottom_rounded,
       Icons.badge_outlined,
@@ -1944,12 +1944,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
       case 3:
         return _buildStepMaterials(context, state, viewModel, dataState, ref);
       case 4:
-        return _buildPostTreatmentPhotosStep(context, state, viewModel);
-      case 5:
         return _buildStepScheduling(context, state, viewModel);
-      case 6:
+      case 5:
         return _buildStepPricing(context, state, viewModel);
-      case 7:
+      case 6:
         return _buildStepProtocolsStep(
           context,
           state,
@@ -1957,10 +1955,12 @@ class CreateTreatmentScreen extends ConsumerWidget {
           dataState,
           ref,
         );
-      case 8:
+      case 7:
         return _buildStepPreInstructions(context, state, viewModel);
-      case 9:
+      case 8:
         return _buildStepPostInstructions(context, state, viewModel);
+      case 9:
+        return _buildPostTreatmentPhotosStep(context, state, viewModel);
       case 10:
         return _buildStepNotifications(context, state, viewModel, dataState);
       case 11:
@@ -6119,10 +6119,10 @@ class CreateTreatmentScreen extends ConsumerWidget {
                 if (!_validateProductQuantities(context, state)) return;
               }
               if (state.currentStep == 4) {
-                if (!_validatePostPhotos(context, state)) return;
-              }
-              if (state.currentStep == 5) {
                 if (!_validateScheduling(context, viewModel)) return;
+              }
+              if (state.currentStep == 9) {
+                if (!_validatePostPhotos(context, state)) return;
               }
 
               if (state.currentStep < 16) {

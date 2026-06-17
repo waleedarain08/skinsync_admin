@@ -104,6 +104,8 @@ class EditTreatmentScreen extends ConsumerWidget {
                 context.verticalSpace(32),
                 _buildPostTreatmentSection(context, state, viewModel),
                 context.verticalSpace(32),
+                _buildPostTreatmentPhotosSection(context, state, viewModel),
+                context.verticalSpace(32),
                 _buildNotificationsSection(
                   context,
                   state,
@@ -120,8 +122,6 @@ class EditTreatmentScreen extends ConsumerWidget {
                 _buildFollowUpEditSection(context, state, viewModel, ref),
                 context.verticalSpace(32),
                 _buildConsentSection(context, state, viewModel, ref),
-                context.verticalSpace(32),
-                _buildPostTreatmentPhotosSection(context, state, viewModel),
                 context.verticalSpace(32),
                 _buildProtocolsSection(
                   context,
