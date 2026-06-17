@@ -1,5 +1,6 @@
 import '../models/responses/base_response_model.dart';
 import '../models/responses/category_list_response.dart';
+import '../models/responses/category_detail_response.dart';
 import '../repositories/category_repository.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
@@ -26,5 +27,25 @@ class CategoryServices implements CategoryRepository {
       throw BadRequestException(response.message);
     }
     return response.data ?? [];
+  }
+
+  @override
+  Future<CategoryModel> getCategoryDetail(int categoryId) async {
+    final jsonResponse = await _api.get(
+      Endpoint.categoryDetail,
+      pathParams: {'id': categoryId.toString()},
+    );
+    final response = BaseApiResponseModel<CategoryDetailDto>.fromJson(
+      jsonResponse,
+      (json) => CategoryDetailDto.fromJson(json as Map<String, dynamic>),
+    );
+
+    if (!response.status) {
+      throw BadRequestException(response.message);
+    }
+    if (response.data == null) {
+      throw const BadRequestException('Category detail not found');
+    }
+    return response.data!.toCategoryModel();
   }
 }

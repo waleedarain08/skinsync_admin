@@ -37,7 +37,7 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(categoryViewModelProvider.notifier).fetchCategories();
+      // ref.read(categoryViewModelProvider.notifier).fetchCategories();
     });
   }
 

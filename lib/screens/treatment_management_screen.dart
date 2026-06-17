@@ -38,7 +38,7 @@ class _TreatmentManagementScreenState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(treatmentViewModelProvider.notifier).initialize();
-      ref.read(categoryViewModelProvider.notifier).fetchCategories();
+      // ref.read(categoryViewModelProvider.notifier).fetchCategories();
     });
   }
 

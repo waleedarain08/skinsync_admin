@@ -14,22 +14,26 @@ final categoryViewModelProvider =
 class CategoryState extends BaseStateModel {
   final List<CategoryModel> categories;
   final List<CategoryModel> flattenedCategories;
+  final CategoryModel? selectedCategoryDetail;
 
   CategoryState({
     super.loading,
     this.categories = const [],
     this.flattenedCategories = const [],
+    this.selectedCategoryDetail,
   });
 
   CategoryState copyWith({
     bool? loading,
     List<CategoryModel>? categories,
     List<CategoryModel>? flattenedCategories,
+    CategoryModel? selectedCategoryDetail,
   }) {
     return CategoryState(
       loading: loading ?? this.loading,
       categories: categories ?? this.categories,
       flattenedCategories: flattenedCategories ?? this.flattenedCategories,
+      selectedCategoryDetail: selectedCategoryDetail ?? this.selectedCategoryDetail,
     );
   }
 }
@@ -45,9 +49,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
 
   final CategoryRepository _categoryRepository = locator<CategoryRepository>();
 
-  Future<void> fetchCategories({bool forceRefresh = false}) async {
-    if (!forceRefresh && state.categories.isNotEmpty) return;
-
+  Future<void> fetchCategories() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
@@ -59,6 +61,18 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
         );
       },
     );
+  }
+
+  Future<CategoryModel?> getCategoryDetail(int categoryId) async {
+    CategoryModel? detailed;
+    await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        detailed = await _categoryRepository.getCategoryDetail(categoryId);
+        state = state.copyWith(selectedCategoryDetail: detailed);
+      },
+    );
+    return detailed;
   }
 
   List<CategoryModel> _flattenCategories(List<CategoryModel> categories) {

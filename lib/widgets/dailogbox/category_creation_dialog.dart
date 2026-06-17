@@ -1,48 +1,58 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/notification_entry.dart';
 import '../../models/responses/category_list_response.dart';
 import '../../utils/theme.dart';
+import '../../view_models/category_view_model.dart';
 import '../build_textfield.dart';
 import '../custom_dropdown_widget.dart';
+import '../custom_primary_button.dart';
 import 'standard_dialog.dart';
 
-class CategoryCreationDialog extends StatefulWidget {
+class CategoryCreationDialog extends ConsumerStatefulWidget {
   const CategoryCreationDialog({
     super.key,
     this.parentName,
     this.initialName,
     this.initialIcon,
     this.initialConsentName,
+    this.initialConsentFormUrl,
     this.initialSessions,
     this.initialTotalSessions,
     this.initialPreNotifications,
     this.initialPostNotifications,
     this.initialDowntimePresets,
     this.initialDefaultRoles,
+    this.categoryId,
+    this.isViewMode = false,
   });
+
   final String? parentName;
   final String? initialName;
   final String? initialIcon;
   final String? initialConsentName;
+  final String? initialConsentFormUrl;
   final List<CategorySessionModel>? initialSessions;
   final int? initialTotalSessions;
   final List<CategoryNotificationModel>? initialPreNotifications;
   final List<CategoryNotificationModel>? initialPostNotifications;
   final CategoryDowntimePresetModel? initialDowntimePresets;
   final List<String>? initialDefaultRoles;
+  final int? categoryId;
+  final bool isViewMode;
 
   @override
-  State<CategoryCreationDialog> createState() => _CategoryCreationDialogState();
+  ConsumerState<CategoryCreationDialog> createState() => _CategoryCreationDialogState();
 }
 
-class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
+class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _totalSessionsController;
   final List<TextEditingController> _sessionFollowUpsCountControllers = [];
@@ -51,7 +61,9 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   XFile? _selectedIconFile;
   PlatformFile? _consentFile;
   String? _existingConsentName;
+  String? _consentFormUrl;
   List<CategorySessionModel> _sessions = [];
+  bool _isLoadingDetail = false;
 
   List<NotificationEntry> _preNotificationEntries = [];
   List<NotificationEntry> _postNotificationEntries = [];
@@ -80,6 +92,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     );
     _selectedIcon = widget.initialIcon ?? 'category';
     _existingConsentName = widget.initialConsentName;
+    _consentFormUrl = widget.initialConsentFormUrl;
 
     if (widget.initialSessions != null && widget.initialSessions!.isNotEmpty) {
       _sessions = List.from(
@@ -145,6 +158,86 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     _selectedRoles = widget.initialDefaultRoles != null
         ? List.from(widget.initialDefaultRoles!)
         : [];
+
+    if (widget.categoryId != null) {
+      _isLoadingDetail = true;
+      _fetchCategoryDetail();
+    }
+  }
+
+  void _fetchCategoryDetail() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final detail = await ref.read(categoryViewModelProvider.notifier).getCategoryDetail(widget.categoryId!);
+        if (detail != null && mounted) {
+          _populateFromCategory(detail);
+        }
+      } catch (_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to load category details.')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoadingDetail = false;
+          });
+        }
+      }
+    });
+  }
+
+  void _populateFromCategory(CategoryModel cat) {
+    _nameController.text = cat.name;
+    _totalSessionsController.text = cat.totalSessions.toString();
+    _selectedIcon = cat.icon;
+    _existingConsentName = cat.consentFormName;
+    _consentFormUrl = cat.consentFormUrl;
+
+    _sessions = List.from(
+      cat.defaultSessions.map(
+        (s) => CategorySessionModel(
+          sessionNumber: s.sessionNumber,
+          followUps: List.from(s.followUps),
+        ),
+      ),
+    );
+    _syncFollowUpsCountControllers();
+
+    _preNotificationEntries = List.from(
+      cat.preNotifications.map(
+        (config) => NotificationEntry(
+          titleController: TextEditingController(text: config.title),
+          messageController: TextEditingController(text: config.message),
+          timingValueController: TextEditingController(
+            text: config.timing?.toString(),
+          ),
+          timingUnit: config.timingUnit ?? 'hours',
+          type: config.type ?? 'reminder',
+        ),
+      ),
+    );
+
+    _postNotificationEntries = List.from(
+      cat.postNotifications.map(
+        (config) => NotificationEntry(
+          titleController: TextEditingController(text: config.title),
+          messageController: TextEditingController(text: config.message),
+          timingValueController: TextEditingController(
+            text: config.timing?.toString(),
+          ),
+          timingUnit: config.timingUnit ?? 'hours',
+          type: config.type ?? 'care',
+        ),
+      ),
+    );
+
+    _downtimeLowController.text = cat.downtimePresets.low.toString();
+    _downtimeModerateController.text = cat.downtimePresets.moderate.toString();
+    _downtimeHighController.text = cat.downtimePresets.high.toString();
+
+    _selectedRoles = List.from(cat.defaultRoles);
   }
 
   void _syncFollowUpsCountControllers() {
@@ -183,6 +276,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   }
 
   void _updateSessionsCount(String val) {
+    if (widget.isViewMode) return;
     final count = int.tryParse(val) ?? 1;
     if (count < 1) return;
     setState(() {
@@ -198,6 +292,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   }
 
   void _updateSessionFollowUpCount(int sIdx, String val) {
+    if (widget.isViewMode) return;
     final count = int.tryParse(val) ?? 0;
     if (count < 0) return;
     setState(() {
@@ -218,6 +313,10 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
   }
 
   Future<void> _pickConsent() async {
+    if (widget.isViewMode) {
+      _viewConsentPdf();
+      return;
+    }
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
@@ -230,7 +329,50 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
     }
   }
 
+  void _viewConsentPdf() async {
+    final pdfUrl = _consentFormUrl ?? widget.initialConsentFormUrl;
+    if (pdfUrl == null || pdfUrl.isEmpty) {
+      _showPdfError();
+    } else {
+      try {
+        final uri = Uri.parse(pdfUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        } else {
+          _showPdfError();
+        }
+      } catch (_) {
+        _showPdfError();
+      }
+    }
+  }
+
+  void _showPdfError() {
+    showDialog(
+      context: context,
+      builder: (context) => StandardDialog(
+        title: "Consent Form Preview",
+        width: context.w(400),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.picture_as_pdf_outlined, color: CustomColors.red, size: 48),
+            context.verticalSpace(12),
+            Text("PDF Not Available", style: context.fonts.black14w600),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Close"),
+          )
+        ],
+      ),
+    );
+  }
+
   Future<void> _pickIcon() async {
+    if (widget.isViewMode) return;
     final XFile? image = await _imagePicker.pickImage(
       source: ImageSource.gallery,
     );
@@ -240,6 +382,48 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
         _selectedIcon = image.path;
       });
     }
+  }
+
+  Widget _buildIconPreview() {
+    if (_selectedIconFile != null) {
+      return Image.file(
+        File(_selectedIconFile!.path),
+        fit: BoxFit.cover,
+      );
+    }
+    if (_selectedIcon.isNotEmpty &&
+        (_selectedIcon.startsWith('http') || _selectedIcon.contains('/'))) {
+      return Image.network(
+        _selectedIcon,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return const Center(
+            child: Icon(
+              Icons.broken_image,
+              color: CustomColors.lightGrey,
+              size: 32,
+            ),
+          );
+        },
+      );
+    }
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.add_a_photo_outlined,
+            size: 32.sp,
+            color: CustomColors.purple,
+          ),
+          context.verticalSpace(8),
+          Text(
+            widget.isViewMode ? 'No icon uploaded' : 'Tap to upload',
+            style: context.fonts.purple12w700,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildNotificationsBuilder(bool isPre) {
@@ -259,26 +443,27 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(titleLabel, style: context.fonts.black16w600),
-            TextButton.icon(
-              onPressed: () {
-                setState(() {
-                  entries.add(
-                    NotificationEntry(
-                      titleController: TextEditingController(),
-                      messageController: TextEditingController(),
-                      timingValueController: TextEditingController(),
-                      timingUnit: 'hours',
-                      type: defaultType,
-                    ),
-                  );
-                });
-              },
-              icon: const Icon(
-                Icons.add_circle_outline,
-                color: CustomColors.purple,
+            if (!widget.isViewMode)
+              TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    entries.add(
+                      NotificationEntry(
+                        titleController: TextEditingController(),
+                        messageController: TextEditingController(),
+                        timingValueController: TextEditingController(),
+                        timingUnit: 'hours',
+                        type: defaultType,
+                      ),
+                    );
+                  });
+                },
+                icon: const Icon(
+                  Icons.add_circle_outline,
+                  color: CustomColors.purple,
+                ),
+                label: const Text('Add Notification'),
               ),
-              label: const Text('Add Notification'),
-            ),
           ],
         ),
         context.verticalSpace(12),
@@ -321,18 +506,19 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                           'Notification #${idx + 1}',
                           style: context.fonts.purple14w700,
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: CustomColors.red,
+                        if (!widget.isViewMode)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: CustomColors.red,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                final removed = entries.removeAt(idx);
+                                removed.dispose();
+                              });
+                            },
                           ),
-                          onPressed: () {
-                            setState(() {
-                              final removed = entries.removeAt(idx);
-                              removed.dispose();
-                            });
-                          },
-                        ),
                       ],
                     ),
                     context.verticalSpace(12),
@@ -340,6 +526,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                       label: 'Title',
                       controller: entry.titleController,
                       hintText: 'e.g. Stop blood thinners',
+                      readOnly: widget.isViewMode,
                     ),
                     context.verticalSpace(12),
                     BuildTextField(
@@ -347,6 +534,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                       controller: entry.messageController,
                       hintText: 'Enter notification message...',
                       maxLines: 2,
+                      readOnly: widget.isViewMode,
                     ),
                     context.verticalSpace(12),
                     Row(
@@ -358,6 +546,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                             controller: entry.timingValueController,
                             hintText: 'e.g. 24',
                             keyboardType: TextInputType.number,
+                            readOnly: widget.isViewMode,
                           ),
                         ),
                         context.horizontalSpace(12),
@@ -401,13 +590,15 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                                         child: Text('Days'),
                                       ),
                                     ],
-                                    onChanged: (v) {
-                                      if (v != null) {
-                                        setState(() {
-                                          entry.timingUnit = v;
-                                        });
-                                      }
-                                    },
+                                    onChanged: widget.isViewMode
+                                        ? null
+                                        : (v) {
+                                            if (v != null) {
+                                              setState(() {
+                                                entry.timingUnit = v;
+                                              });
+                                            }
+                                          },
                                   ),
                                 ),
                               ),
@@ -449,13 +640,15 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                                     ),
                                   )
                                   .toList(),
-                              onChanged: (v) {
-                                if (v != null) {
-                                  setState(() {
-                                    entry.type = v;
-                                  });
-                                }
-                              },
+                              onChanged: widget.isViewMode
+                                  ? null
+                                  : (v) {
+                                      if (v != null) {
+                                        setState(() {
+                                          entry.type = v;
+                                        });
+                                      }
+                                    },
                             ),
                           ),
                         ),
@@ -505,15 +698,17 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                       child: Text('In-Person'),
                     ),
                   ],
-                  onChanged: (val) {
-                    if (val != null) {
-                      setState(() {
-                        final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
-                        newFus[fuIdx] = newFus[fuIdx].copyWith(type: val);
-                        _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
-                      });
-                    }
-                  },
+                  onChanged: widget.isViewMode
+                      ? null
+                      : (val) {
+                          if (val != null) {
+                            setState(() {
+                              final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
+                              newFus[fuIdx] = newFus[fuIdx].copyWith(type: val);
+                              _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                            });
+                          }
+                        },
                 ),
               ),
               context.horizontalSpace(12),
@@ -529,6 +724,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                           child: TextFormField(
                             controller: durationController,
                             keyboardType: TextInputType.number,
+                            readOnly: widget.isViewMode,
                             decoration: AppDecorations.input(
                               context,
                               hint: '30',
@@ -559,15 +755,17 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                                   child: Text('h'),
                                 ),
                               ],
-                              onChanged: (v) {
-                                if (v != null) {
-                                  setState(() {
-                                    final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
-                                    newFus[fuIdx] = newFus[fuIdx].copyWith(durationUnit: v);
-                                    _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
-                                  });
-                                }
-                              },
+                              onChanged: widget.isViewMode
+                                  ? null
+                                  : (v) {
+                                      if (v != null) {
+                                        setState(() {
+                                          final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
+                                          newFus[fuIdx] = newFus[fuIdx].copyWith(durationUnit: v);
+                                          _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                                        });
+                                      }
+                                    },
                             ),
                           ),
                         ),
@@ -587,6 +785,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                 child: TextFormField(
                   controller: intervalController,
                   keyboardType: TextInputType.number,
+                  readOnly: widget.isViewMode,
                   decoration: AppDecorations.input(context, hint: '1'),
                   onChanged: (v) {
                     final value = int.tryParse(v);
@@ -608,15 +807,17 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                       DropdownMenuItem(value: 'days', child: Text('Days')),
                       DropdownMenuItem(value: 'weeks', child: Text('Weeks')),
                     ],
-                    onChanged: (v) {
-                      if (v != null) {
-                        setState(() {
-                          final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
-                          newFus[fuIdx] = newFus[fuIdx].copyWith(intervalUnit: v);
-                          _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
-                        });
-                      }
-                    },
+                    onChanged: widget.isViewMode
+                        ? null
+                        : (v) {
+                            if (v != null) {
+                              setState(() {
+                                final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
+                                newFus[fuIdx] = newFus[fuIdx].copyWith(intervalUnit: v);
+                                _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                              });
+                            }
+                          },
                   ),
                 ),
               ),
@@ -630,12 +831,33 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.categoryId != null && _isLoadingDetail) {
+      return StandardDialog(
+        title: 'Category Details',
+        width: context.w(700),
+        content: SizedBox(
+          height: context.h(300),
+          child: const Center(
+            child: CircularProgressIndicator(color: CustomColors.purple),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      );
+    }
+
     return StandardDialog(
-      title: widget.initialName != null
-          ? 'Edit Category'
-          : (widget.parentName == null
-                ? 'Create New Category'
-                : 'Add Subcategory to ${widget.parentName}'),
+      title: widget.isViewMode
+          ? 'Category Configuration'
+          : (widget.initialName != null
+              ? 'Edit Category'
+              : (widget.parentName == null
+                    ? 'Create New Category'
+                    : 'Add Subcategory to ${widget.parentName}')),
       width: context.w(700),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -646,6 +868,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
             label: 'Category Name',
             controller: _nameController,
             hintText: 'e.g. Skin Rejuvenation',
+            readOnly: widget.isViewMode,
           ),
           context.verticalSpace(24),
           Text('Select Category Icon', style: context.fonts.black14w600),
@@ -659,45 +882,11 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                 color: CustomColors.whiteGrey,
                 borderRadius: context.appBorderRadius(all: 12),
                 border: Border.all(color: CustomColors.border),
-                image: _selectedIconFile != null
-                    ? DecorationImage(
-                        image: kIsWeb
-                            ? NetworkImage(_selectedIconFile!.path)
-                            : FileImage(File(_selectedIconFile!.path))
-                                as ImageProvider,
-                        fit: BoxFit.cover,
-                      )
-                    : (_selectedIcon.isNotEmpty &&
-                            (_selectedIcon.startsWith('http') ||
-                                _selectedIcon.contains('/')))
-                        ? DecorationImage(
-                            image: _selectedIcon.startsWith('http')
-                                ? NetworkImage(_selectedIcon)
-                                : FileImage(File(_selectedIcon))
-                                    as ImageProvider,
-                            fit: BoxFit.cover,
-                          )
-                        : null,
               ),
-              child: (_selectedIconFile == null &&
-                      !_selectedIcon.startsWith('http') &&
-                      !_selectedIcon.contains('/'))
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_a_photo_outlined,
-                          size: 32.sp,
-                          color: CustomColors.purple,
-                        ),
-                        context.verticalSpace(8),
-                        Text(
-                          'Tap to upload',
-                          style: context.fonts.purple12w700,
-                        ),
-                      ],
-                    )
-                  : null,
+              child: ClipRRect(
+                borderRadius: context.appBorderRadius(all: 12),
+                child: _buildIconPreview(),
+              ),
             ),
           ),
           context.verticalSpace(32),
@@ -715,6 +904,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
             controller: _totalSessionsController,
             hintText: '1',
             keyboardType: TextInputType.number,
+            readOnly: widget.isViewMode,
             onChanged: (val) => _updateSessionsCount(val ?? ''),
           ),
           if (_sessions.isNotEmpty) ...[
@@ -753,6 +943,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                             controller: _sessionFollowUpsCountControllers[sIdx],
                             hintText: '0',
                             keyboardType: TextInputType.number,
+                            readOnly: widget.isViewMode,
                             onChanged: (val) =>
                                 _updateSessionFollowUpCount(sIdx, val ?? ''),
                           ),
@@ -802,6 +993,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   controller: _downtimeLowController,
                   hintText: '2',
                   keyboardType: TextInputType.number,
+                  readOnly: widget.isViewMode,
                 ),
               ),
               context.horizontalSpace(12),
@@ -811,6 +1003,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   controller: _downtimeModerateController,
                   hintText: '5',
                   keyboardType: TextInputType.number,
+                  readOnly: widget.isViewMode,
                 ),
               ),
               context.horizontalSpace(12),
@@ -820,6 +1013,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                   controller: _downtimeHighController,
                   hintText: '10',
                   keyboardType: TextInputType.number,
+                  readOnly: widget.isViewMode,
                 ),
               ),
             ],
@@ -840,15 +1034,17 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
               return FilterChip(
                 label: Text(role),
                 selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      _selectedRoles.add(role);
-                    } else {
-                      _selectedRoles.remove(role);
-                    }
-                  });
-                },
+                onSelected: widget.isViewMode
+                    ? null
+                    : (selected) {
+                        setState(() {
+                          if (selected) {
+                            _selectedRoles.add(role);
+                          } else {
+                            _selectedRoles.remove(role);
+                          }
+                        });
+                      },
                 selectedColor: CustomColors.purple.withValues(alpha: 0.2),
                 checkmarkColor: CustomColors.purple,
                 labelStyle: isSelected
@@ -889,7 +1085,7 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                     child: Text(
                       _consentFile?.name ??
                           _existingConsentName ??
-                          'Upload Default PDF',
+                          (widget.isViewMode ? 'PDF Not Available' : 'Upload Default PDF'),
                       style:
                           (_consentFile != null || _existingConsentName != null)
                           ? context.fonts.black14w600
@@ -898,8 +1094,8 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Icon(
-                    Icons.cloud_upload_outlined,
+                  Icon(
+                    widget.isViewMode ? Icons.open_in_new_rounded : Icons.cloud_upload_outlined,
                     color: CustomColors.grey,
                     size: 20,
                   ),
@@ -910,44 +1106,52 @@ class _CategoryCreationDialogState extends State<CategoryCreationDialog> {
           context.verticalSpace(32),
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        SizedBox(
-          width: context.w(120),
-          child: ElevatedButton(
-            onPressed: () {
-              if (_nameController.text.isNotEmpty) {
-                Navigator.pop(context, {
-                  'name': _nameController.text,
-                  'totalSessions':
-                      int.tryParse(_totalSessionsController.text) ?? 1,
-                  'icon': _selectedIcon,
-                  'consentFile': _consentFile,
-                  'sessions': _sessions,
-                  'preNotifications': _preNotificationEntries
-                      .map((e) => e.toConfig())
-                      .toList(),
-                  'postNotifications': _postNotificationEntries
-                      .map((e) => e.toConfig())
-                      .toList(),
-                  'downtimePresets': CategoryDowntimePresetModel(
-                    none: 0,
-                    low: int.tryParse(_downtimeLowController.text) ?? 2,
-                    moderate:
-                        int.tryParse(_downtimeModerateController.text) ?? 5,
-                    high: int.tryParse(_downtimeHighController.text) ?? 10,
-                  ),
-                  'defaultRoles': _selectedRoles,
-                });
-              }
-            },
-            child: Text(widget.initialName != null ? 'Update' : 'Create'),
-          ),
-        ),
-      ],
+      actions: widget.isViewMode
+          ? [
+              CustomPrimaryButton(
+                onTap: () => Navigator.pop(context),
+                label: 'Close',
+                width: context.w(120),
+              ),
+            ]
+          : [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              SizedBox(
+                width: context.w(120),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_nameController.text.isNotEmpty) {
+                      Navigator.pop(context, {
+                        'name': _nameController.text,
+                        'totalSessions':
+                            int.tryParse(_totalSessionsController.text) ?? 1,
+                        'icon': _selectedIcon,
+                        'consentFile': _consentFile,
+                        'sessions': _sessions,
+                        'preNotifications': _preNotificationEntries
+                            .map((e) => e.toConfig())
+                            .toList(),
+                        'postNotifications': _postNotificationEntries
+                            .map((e) => e.toConfig())
+                            .toList(),
+                        'downtimePresets': CategoryDowntimePresetModel(
+                          none: 0,
+                          low: int.tryParse(_downtimeLowController.text) ?? 2,
+                          moderate:
+                              int.tryParse(_downtimeModerateController.text) ?? 5,
+                          high: int.tryParse(_downtimeHighController.text) ?? 10,
+                        ),
+                        'defaultRoles': _selectedRoles,
+                      });
+                    }
+                  },
+                  child: Text(widget.initialName != null ? 'Update' : 'Create'),
+                ),
+              ),
+            ],
     );
   }
 }
