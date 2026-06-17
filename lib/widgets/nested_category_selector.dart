@@ -291,23 +291,55 @@ class _CategoryCard extends StatelessWidget {
                   size: context.sp(22),
                   color: isSelected ? Colors.white : CustomColors.purple,
                 ),
-                InkWell(
-                  onTap: onAddChild,
-                  borderRadius: BorderRadius.circular(100),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Colors.white.withValues(alpha: 0.2)
-                          : CustomColors.softGrey,
-                      shape: BoxShape.circle,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => CategoryCreationDialog(
+                            categoryId: category.id,
+                            isViewMode: true,
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(100),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Colors.white.withValues(alpha: 0.2)
+                              : CustomColors.softGrey,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.visibility_outlined,
+                          size: 14,
+                          color: isSelected ? Colors.white : CustomColors.grey,
+                        ),
+                      ),
                     ),
-                    child: Icon(
-                      Icons.add,
-                      size: 14,
-                      color: isSelected ? Colors.white : CustomColors.grey,
+                    context.horizontalSpace(6),
+                    InkWell(
+                      onTap: onAddChild,
+                      borderRadius: BorderRadius.circular(100),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Colors.white.withValues(alpha: 0.2)
+                              : CustomColors.softGrey,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          size: 14,
+                          color: isSelected ? Colors.white : CustomColors.grey,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),

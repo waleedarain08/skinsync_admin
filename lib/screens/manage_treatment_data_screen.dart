@@ -587,9 +587,7 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
             ],
           ),
         ),
-        body: categoryState.loading 
-            ? const Center(child: CircularProgressIndicator()) 
-            : TabBarView(
+        body: TabBarView(
                 children: [
                   _buildCategoriesTab(context, categoryState, categoryViewModel),
                   _buildAreasTab(context, dataState, dataViewModel),
@@ -877,7 +875,7 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
         shape: const RoundedRectangleBorder(side: BorderSide.none),
         leading: Container(
           width: context.w(40),
-          height: context.w(40),
+          height: context.w(100),
           decoration: BoxDecoration(
             color: CustomColors.whiteGrey,
             borderRadius: context.borderRadius(all: 8),
@@ -1051,6 +1049,23 @@ class _RecursiveCategoryTile extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            IconButton(
+              tooltip: 'View Category Details',
+              icon: const Icon(
+                Icons.visibility_outlined,
+                size: 20,
+                color: CustomColors.purple,
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => CategoryCreationDialog(
+                    categoryId: category.id,
+                    isViewMode: true,
+                  ),
+                );
+              },
+            ),
             IconButton(
               tooltip: 'Add Child Category',
               icon: const Icon(
