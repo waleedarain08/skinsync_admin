@@ -18,13 +18,13 @@ import '../view_models/category_view_model.dart';
 import '../view_models/product_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
+import 'create_product_screen.dart';
 import '../widgets/app_search_field.dart';
 import '../widgets/borderd_container_widget.dart';
 import '../widgets/build_textfield.dart';
 import '../widgets/custom_dropdown_widget.dart';
 import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
-import '../widgets/dailogbox/product_dailogboxs.dart';
 import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_category_selector.dart';
@@ -5286,9 +5286,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 color: CustomColors.purple,
               ),
               onPressed: () async {
-                final newProduct = await showDialog<ProductModel>(
-                  context: context,
-                  builder: (context) => const ProductDialogBox(),
+                final newProduct = await context.push<ProductModel>(
+                  CreateProductScreen.routeName,
+                  extra: null,
                 );
                 if (newProduct != null && newProduct.id != null) {
                   viewModel.addProductUsage(

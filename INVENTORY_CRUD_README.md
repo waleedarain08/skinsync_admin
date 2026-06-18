@@ -30,6 +30,11 @@ To facilitate instant offline responsiveness and mock testing before backend rea
 | `image` | `String` | URL to product image |
 | `description` | `String` | Product specifications |
 | `enforce_lot_tracking`| `bool` | Flag requiring lot/expiration logging at clinic levels |
+| `clinic_cost` | `double?` | Price paid by the clinic per bulk purchase Unit Type |
+| `retail_price_per_unit` | `double?` | Retail price charged to patients per billable unit (e.g. per ml) |
+| `supplier` | `String?` | Vendor or supplier of this product batch |
+| `lot_number` | `String?` | Manufacturing lot/batch code |
+| `expiration_date` | `String?` | Expiration date of this product batch (ISO 8601) |
 
 ### 📦 Dynamic Packaging & Billing Fields (Section 2 & 3)
 To handle multi-tiered packaging (e.g., 1 Carton ➔ 8 Boxes ➔ 5 Syringes ➔ 4 ml), the following fields are actively managed and calculated:
@@ -96,7 +101,12 @@ Clicking `+` next to Category queries the active category provider and displays 
           "billable_unit": "ml",
           "billable_quantity_per_item": 4.0,
           "total_billable_quantity": 160.0,
-          "enforce_lot_tracking": true
+          "enforce_lot_tracking": true,
+          "clinic_cost": 800.0,
+          "retail_price_per_unit": 15.0,
+          "supplier": "McKesson",
+          "lot_number": "L98765",
+          "expiration_date": "2026-12-31T00:00:00.000Z"
         }
       ]
     }
@@ -123,7 +133,12 @@ Clicking `+` next to Category queries the active category provider and displays 
       "billable_unit": "units",
       "billable_quantity_per_item": 300.0,
       "total_billable_quantity": 6000.0,
-      "enforce_lot_tracking": true
+      "enforce_lot_tracking": true,
+      "clinic_cost": 650.0,
+      "retail_price_per_unit": 10.0,
+      "supplier": "Allergan Logistics",
+      "lot_number": "D45678",
+      "expiration_date": "2027-06-30T00:00:00.000Z"
     }
     ```
 *   **Mock Response (200 OK):**
@@ -149,7 +164,12 @@ Clicking `+` next to Category queries the active category provider and displays 
         "billable_unit": "units",
         "billable_quantity_per_item": 300.0,
         "total_billable_quantity": 6000.0,
-        "enforce_lot_tracking": true
+        "enforce_lot_tracking": true,
+        "clinic_cost": 650.0,
+        "retail_price_per_unit": 10.0,
+        "supplier": "Allergan Logistics",
+        "lot_number": "D45678",
+        "expiration_date": "2027-06-30T00:00:00.000Z"
       }
     }
     ```

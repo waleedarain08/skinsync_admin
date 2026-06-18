@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/widgets/custom_cashed_image_widget.dart';
-import 'package:skinsync_admin/widgets/dailogbox/product_dailogboxs.dart';
+import 'package:skinsync_admin/screens/create_product_screen.dart';
 import '../utils/color_constant.dart';
 import '../utils/custom_fonts.dart';
 import '../view_models/product_view_model.dart';
@@ -17,10 +18,7 @@ class ProductTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        showDialog(
-          context: context,
-          builder: (context) => ProductDialogBox(product: product),
-        );
+        context.push(CreateProductScreen.routeName, extra: product);
       },
       onDoubleTap: () {
         ref.read(productViewModelProvider.notifier).deleteProduct(product.id!);

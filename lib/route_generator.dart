@@ -3,6 +3,7 @@ import 'package:skinsync_admin/app_init.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
+import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/screens/appointment_detail_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
@@ -27,6 +28,7 @@ import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/product_detail_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
+import 'package:skinsync_admin/screens/create_product_screen.dart';
 import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/screens/treatment_management_screen.dart';
 
@@ -160,6 +162,11 @@ class RouteGenerator {
             name: ProductDetailScreen.routeName,
             path: ProductDetailScreen.routeName,
             builder: (_, _) => const ProductDetailScreen(),
+          ),
+          GoRoute(
+            name: CreateProductScreen.routeName,
+            path: CreateProductScreen.routeName,
+            builder: (context, state) => CreateProductScreen(productToEdit: state.extra as ProductModel?),
           ),
           GoRoute(
             name: AppointmentDetailScreen.routeName,

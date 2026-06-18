@@ -9,9 +9,9 @@ import '../../widgets/app_search_field.dart';
 import '../../widgets/borderd_container_widget.dart';
 import '../../widgets/custom_dropdown_widget.dart';
 import '../../widgets/custom_primary_button.dart';
-import '../../widgets/dailogbox/product_dailogboxs.dart';
 import '../../widgets/gradient_scaffold.dart';
 import '../../widgets/number_paginator.dart';
+import '../create_product_screen.dart';
 import '../product_detail_screen.dart';
 
 class ProductManagement extends ConsumerStatefulWidget {
@@ -129,10 +129,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
         ),
         CustomPrimaryButton(
           onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) => const ProductDialogBox(product: null),
-            );
+            context.push(CreateProductScreen.routeName, extra: null);
           },
           icon: Icons.add_circle_outline,
           label: 'Create Catalog Product',
@@ -539,10 +536,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               size: 20.sp,
             ),
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => ProductDialogBox(product: product),
-              );
+              context.push(CreateProductScreen.routeName, extra: product);
             },
           ),
           IconButton(
