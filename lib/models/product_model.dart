@@ -33,6 +33,7 @@ class ProductModel {
   final String? supplier;
   final String? lotNumber;
   final DateTime? expirationDate;
+  final List<int>? selectedCategoryIds;
 
   ProductModel({
     this.id,
@@ -63,6 +64,7 @@ class ProductModel {
     this.supplier,
     this.lotNumber,
     this.expirationDate,
+    this.selectedCategoryIds,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -97,6 +99,9 @@ class ProductModel {
       expirationDate: json['expiration_date'] != null
           ? DateTime.parse(json['expiration_date'])
           : null,
+      selectedCategoryIds: json['selected_category_ids'] != null
+          ? List<int>.from(json['selected_category_ids'])
+          : null,
     );
   }
 
@@ -130,6 +135,7 @@ class ProductModel {
       'supplier': supplier,
       'lot_number': lotNumber,
       'expiration_date': expirationDate?.toIso8601String(),
+      'selected_category_ids': selectedCategoryIds,
     };
   }
 }
