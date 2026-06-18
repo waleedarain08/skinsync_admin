@@ -27,13 +27,29 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
   late final TextEditingController _barcodeController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _unitsPerPackageController;
+  
+  // New Controllers from Master Checklist
+  late final TextEditingController _boxQuantityController;
+  late final TextEditingController _itemQuantityPerBoxController;
+  late final TextEditingController _billableQuantityPerItemController;
+  late final TextEditingController _totalBillableQuantityController;
+  late final TextEditingController _clinicCostController;
+  late final TextEditingController _retailPricePerUnitController;
+  late final TextEditingController _supplierController;
+  late final TextEditingController _lotNumberController;
+  late final TextEditingController _expirationDateController;
 
   String? _selectedBrand;
   String? _selectedManufacturer;
   String? _selectedPurpose;
   String? _selectedUnit;
   String? _selectedPackageType;
+  String? _selectedCategory;
+  String? _selectedSubcategory;
+  String? _selectedBillableUnit;
   bool _enforceLotTracking = true;
+  bool _activeStatus = true;
+  DateTime? _expirationDate;
 
   @override
   void initState() {
@@ -46,12 +62,34 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
       text: widget.product?.unitsPerPackage?.toString() ?? '1',
     );
 
+    _boxQuantityController = TextEditingController(text: widget.product?.boxQuantity?.toString() ?? '0');
+    _itemQuantityPerBoxController = TextEditingController(text: widget.product?.itemQuantityPerBox?.toString() ?? '0');
+    _billableQuantityPerItemController = TextEditingController(text: widget.product?.billableQuantityPerItem?.toString() ?? '0');
+    _totalBillableQuantityController = TextEditingController(text: widget.product?.totalBillableQuantity?.toString() ?? '0');
+    _clinicCostController = TextEditingController(text: widget.product?.clinicCost?.toString() ?? '0');
+    _retailPricePerUnitController = TextEditingController(text: widget.product?.retailPricePerUnit?.toString() ?? '0');
+    _supplierController = TextEditingController(text: widget.product?.supplier);
+    _lotNumberController = TextEditingController(text: widget.product?.lotNumber);
+    
+    if (widget.product?.expirationDate != null) {
+      _expirationDate = widget.product!.expirationDate;
+      _expirationDateController = TextEditingController(
+        text: '${_expirationDate!.year}-${_expirationDate!.month}-${_expirationDate!.day}',
+      );
+    } else {
+      _expirationDateController = TextEditingController();
+    }
+
     _selectedBrand = widget.product?.brand;
     _selectedManufacturer = widget.product?.manufacturer;
     _selectedPurpose = widget.product?.productPurpose;
     _selectedUnit = widget.product?.unit;
     _selectedPackageType = widget.product?.packageType;
+    _selectedCategory = widget.product?.category;
+    _selectedSubcategory = widget.product?.subcategory;
+    _selectedBillableUnit = widget.product?.billableUnit;
     _enforceLotTracking = widget.product?.enforceLotTracking ?? true;
+    _activeStatus = widget.product?.status?.toLowerCase() != 'inactive';
   }
 
   @override
@@ -61,6 +99,15 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
     _barcodeController.dispose();
     _descriptionController.dispose();
     _unitsPerPackageController.dispose();
+    _boxQuantityController.dispose();
+    _itemQuantityPerBoxController.dispose();
+    _billableQuantityPerItemController.dispose();
+    _totalBillableQuantityController.dispose();
+    _clinicCostController.dispose();
+    _retailPricePerUnitController.dispose();
+    _supplierController.dispose();
+    _lotNumberController.dispose();
+    _expirationDateController.dispose();
     super.dispose();
   }
 
@@ -80,8 +127,8 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
               _buildImagePicker(),
               SizedBox(height: 24.h),
               
-              // SECTION 1: BASIC METADATA
-              Text('SECTION 1: BASIC METADATA', style: context.fonts.purple12w700),
+              // SECTION 1: BASIC INFORMATION
+              Text('SECTION 1: BASIC INFORMATION', style: context.fonts.purple12w700),
               SizedBox(height: 16.h),
               Row(
                 children: [
@@ -126,20 +173,20 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                   Expanded(
                     child: Consumer(
                       builder: (context, ref, _) {
-                        final manufacturers = ref.watch(masterDataViewModelProvider).manufacturers;
+                        final categories = ref.watch(masterDataViewModelProvider).categories;
                         return _buildSelectOrCreateDropdown(
-                          label: 'Manufacturer',
-                          hint: 'Select Manufacturer',
-                          value: _selectedManufacturer,
-                          items: manufacturers,
-                          onChanged: (val) => setState(() => _selectedManufacturer = val),
+                          label: 'Category',
+                          hint: 'Select Category',
+                          value: _selectedCategory,
+                          items: categories,
+                          onChanged: (val) => setState(() => _selectedCategory = val),
                           onCreate: () => _showCreateMasterItemDialog(
                             context,
                             ref,
-                            'Manufacturer',
+                            'Category',
                             (name) {
-                              ref.read(masterDataViewModelProvider.notifier).addManufacturer(name);
-                              setState(() => _selectedManufacturer = name);
+                              ref.read(masterDataViewModelProvider.notifier).addCategory(name);
+                              setState(() => _selectedCategory = name);
                             },
                           ),
                         );
@@ -147,6 +194,34 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                     ),
                   ),
                   SizedBox(width: 16.w),
+                  Expanded(
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        final subcategories = ref.watch(masterDataViewModelProvider).subcategories;
+                        return _buildSelectOrCreateDropdown(
+                          label: 'Subcategory',
+                          hint: 'Select Subcategory',
+                          value: _selectedSubcategory,
+                          items: subcategories,
+                          onChanged: (val) => setState(() => _selectedSubcategory = val),
+                          onCreate: () => _showCreateMasterItemDialog(
+                            context,
+                            ref,
+                            'Subcategory',
+                            (name) {
+                              ref.read(masterDataViewModelProvider.notifier).addSubcategory(name);
+                              setState(() => _selectedSubcategory = name);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              Row(
+                children: [
                   Expanded(
                     child: BuildTextField(
                       label: 'Global SKU (Unique key)',
@@ -155,67 +230,38 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                       validator: Validators.empty,
                     ),
                   ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: BuildTextField(
+                      label: 'Barcode / UPC (Optional)',
+                      controller: _barcodeController,
+                      hintText: 'e.g. 0123456789',
+                    ),
+                  ),
                 ],
-              ),
-              SizedBox(height: 16.h),
-              BuildTextField(
-                label: 'Barcode / UPC (Optional)',
-                controller: _barcodeController,
-                hintText: 'e.g. 0123456789',
               ),
               
               SizedBox(height: 32.h),
-              
-              // SECTION 2: PLATFORM USAGE & CLASSIFICATION
-              Text('SECTION 2: PLATFORM USAGE & CLASSIFICATION', style: context.fonts.purple12w700),
+
+              // SECTION 2: PACKAGING
+              Text('SECTION 2: PACKAGING', style: context.fonts.purple12w700),
               SizedBox(height: 16.h),
               Row(
                 children: [
                   Expanded(
                     child: Consumer(
                       builder: (context, ref, _) {
-                        final usageTypes = ref.watch(masterDataViewModelProvider).usageTypes;
-                        return _buildSelectOrCreateDropdown(
-                          label: 'Product Purpose / Usage Type',
-                          hint: 'Select Purpose',
-                          value: _selectedPurpose,
-                          items: usageTypes,
-                          onChanged: (val) {
-                            setState(() {
-                              _selectedPurpose = val;
-                              if (val?.toLowerCase() == 'variable') {
-                                _enforceLotTracking = true;
-                              }
-                            });
-                          },
-                          onCreate: () => _showCreateMasterItemDialog(
-                            context,
-                            ref,
-                            'Usage Type',
-                            (name) {
-                              ref.read(masterDataViewModelProvider.notifier).addUsageType(name);
-                              setState(() => _selectedPurpose = name);
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: Consumer(
-                      builder: (context, ref, _) {
                         final units = ref.watch(masterDataViewModelProvider).units;
                         return _buildSelectOrCreateDropdown(
-                          label: 'Base Measurement Unit',
-                          hint: 'Select Unit',
+                          label: 'Unit Type',
+                          hint: 'Select Unit Type',
                           value: _selectedUnit,
                           items: units,
                           onChanged: (val) => setState(() => _selectedUnit = val),
                           onCreate: () => _showCreateMasterItemDialog(
                             context,
                             ref,
-                            'Unit',
+                            'Unit Type',
                             (name) {
                               ref.read(masterDataViewModelProvider.notifier).addUnit(name);
                               setState(() => _selectedUnit = name);
@@ -225,16 +271,29 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                       },
                     ),
                   ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: BuildTextField(
+                      label: 'Box Quantity',
+                      controller: _boxQuantityController,
+                      hintText: 'e.g. 10',
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
                 ],
               ),
-              
-              SizedBox(height: 32.h),
-
-              // SECTION 3: PACKAGING DETAILS
-              Text('SECTION 3: PACKAGING DETAILS', style: context.fonts.purple12w700),
               SizedBox(height: 16.h),
               Row(
                 children: [
+                  Expanded(
+                    child: BuildTextField(
+                      label: 'Item Quantity Per Box',
+                      controller: _itemQuantityPerBoxController,
+                      hintText: 'e.g. 1',
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
                   Expanded(
                     child: Consumer(
                       builder: (context, ref, _) {
@@ -258,18 +317,168 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                       },
                     ),
                   ),
+                ],
+              ),
+
+              SizedBox(height: 32.h),
+
+              // SECTION 3: BILLING / CONSUMPTION
+              Text('SECTION 3: BILLING / CONSUMPTION', style: context.fonts.purple12w700),
+              SizedBox(height: 16.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        final units = ref.watch(masterDataViewModelProvider).units;
+                        return _buildSelectOrCreateDropdown(
+                          label: 'Billable Unit',
+                          hint: 'Select Billable Unit',
+                          value: _selectedBillableUnit,
+                          items: units,
+                          onChanged: (val) => setState(() => _selectedBillableUnit = val),
+                          onCreate: () => _showCreateMasterItemDialog(
+                            context,
+                            ref,
+                            'Billable Unit',
+                            (name) {
+                              ref.read(masterDataViewModelProvider.notifier).addUnit(name);
+                              setState(() => _selectedBillableUnit = name);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   SizedBox(width: 16.w),
                   Expanded(
                     child: BuildTextField(
-                      label: 'Units Per Package',
-                      controller: _unitsPerPackageController,
-                      hintText: 'e.g. 22',
-                      keyboardType: TextInputType.number,
-                      validator: (val) {
-                        if (val == null || val.isEmpty) return 'Required';
-                        final numVal = int.tryParse(val);
-                        if (numVal == null || numVal <= 0) return 'Must be > 0';
-                        return null;
+                      label: 'Billable Quantity Per Item',
+                      controller: _billableQuantityPerItemController,
+                      hintText: 'e.g. 1.0',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              BuildTextField(
+                label: 'Total Billable Quantity',
+                controller: _totalBillableQuantityController,
+                hintText: 'e.g. 100.0',
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
+
+              SizedBox(height: 32.h),
+
+              // SECTION 4: PRICING
+              Text('SECTION 4: PRICING', style: context.fonts.purple12w700),
+              SizedBox(height: 16.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: BuildTextField(
+                      label: 'Clinic Cost (\$)',
+                      controller: _clinicCostController,
+                      hintText: '0.00',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: Validators.empty,
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: BuildTextField(
+                      label: 'Retail Price Per Unit (\$)',
+                      controller: _retailPricePerUnitController,
+                      hintText: '0.00',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: Validators.empty,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 32.h),
+
+              // SECTION 5: SUPPLIER & INVENTORY
+              Text('SECTION 5: SUPPLIER & INVENTORY', style: context.fonts.purple12w700),
+              SizedBox(height: 16.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: BuildTextField(
+                      label: 'Supplier',
+                      controller: _supplierController,
+                      hintText: 'Enter supplier name...',
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: BuildTextField(
+                      label: 'Lot Number',
+                      controller: _lotNumberController,
+                      hintText: 'e.g. LOT123456',
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: _expirationDate ?? DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (date != null) {
+                          setState(() {
+                            _expirationDate = date;
+                            _expirationDateController.text = '${date.year}-${date.month}-${date.day}';
+                          });
+                        }
+                      },
+                      child: AbsorbPointer(
+                        child: BuildTextField(
+                          label: 'Expiration Date',
+                          controller: _expirationDateController,
+                          hintText: 'YYYY-MM-DD',
+                          suffixIcon: const Icon(Icons.calendar_today_rounded, size: 18),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        final usageTypes = ref.watch(masterDataViewModelProvider).usageTypes;
+                        return _buildSelectOrCreateDropdown(
+                          label: 'Usage Type',
+                          hint: 'Select Usage Type',
+                          value: _selectedPurpose,
+                          items: usageTypes,
+                          onChanged: (val) {
+                            setState(() {
+                              _selectedPurpose = val;
+                              if (val?.toLowerCase() == 'variable') {
+                                _enforceLotTracking = true;
+                              }
+                            });
+                          },
+                          onCreate: () => _showCreateMasterItemDialog(
+                            context,
+                            ref,
+                            'Usage Type',
+                            (name) {
+                              ref.read(masterDataViewModelProvider.notifier).addUsageType(name);
+                              setState(() => _selectedPurpose = name);
+                            },
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -278,46 +487,21 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
 
               SizedBox(height: 32.h),
               
-              // SECTION 4: GLOBAL COMPLIANCE
-              Text('SECTION 4: GLOBAL COMPLIANCE', style: context.fonts.purple12w700),
+              // SECTION 6: GLOBAL COMPLIANCE & STATUS
+              Text('SECTION 6: GLOBAL COMPLIANCE & STATUS', style: context.fonts.purple12w700),
               SizedBox(height: 16.h),
-              Container(
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: CustomColors.whiteGrey,
-                  borderRadius: BorderRadius.circular(10.r),
-                  border: Border.all(color: CustomColors.border),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Enforce Lot & Expiration Tracking at Clinic Level',
-                            style: context.fonts.black14w600,
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            'Forces child clinics to log lot and expiration details upon receiving stock.',
-                            style: context.fonts.grey12w400,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Switch.adaptive(
-                      value: _enforceLotTracking,
-                      activeColor: CustomColors.purple,
-                      onChanged: (val) {
-                        setState(() {
-                          _enforceLotTracking = val;
-                        });
-                      },
-                    ),
-                  ],
-                ),
+              _buildSwitchRow(
+                title: 'Enforce Lot & Expiration Tracking at Clinic Level',
+                subtitle: 'Forces child clinics to log lot and expiration details upon receiving stock.',
+                value: _enforceLotTracking,
+                onChanged: (val) => setState(() => _enforceLotTracking = val),
+              ),
+              SizedBox(height: 16.h),
+              _buildSwitchRow(
+                title: 'Active Status',
+                subtitle: 'Enable or disable this product in the global catalog.',
+                value: _activeStatus,
+                onChanged: (val) => setState(() => _activeStatus = val),
               ),
               
               SizedBox(height: 16.h),
@@ -346,9 +530,10 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                   unit: _selectedUnit ?? 'units',
                   description: _descriptionController.text,
                   sku: _skuController.text,
-                  category: _selectedPurpose ?? 'variable',
+                  category: _selectedCategory,
+                  subcategory: _selectedSubcategory,
                   quantity: 0,
-                  status: 'Active',
+                  status: _activeStatus ? 'Active' : 'Inactive',
                   brand: _selectedBrand,
                   manufacturer: _selectedManufacturer,
                   globalSku: _skuController.text,
@@ -357,6 +542,16 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
                   enforceLotTracking: _enforceLotTracking,
                   packageType: _selectedPackageType,
                   unitsPerPackage: int.tryParse(_unitsPerPackageController.text),
+                  boxQuantity: int.tryParse(_boxQuantityController.text),
+                  itemQuantityPerBox: int.tryParse(_itemQuantityPerBoxController.text),
+                  billableUnit: _selectedBillableUnit,
+                  billableQuantityPerItem: double.tryParse(_billableQuantityPerItemController.text),
+                  totalBillableQuantity: double.tryParse(_totalBillableQuantityController.text),
+                  clinicCost: double.tryParse(_clinicCostController.text),
+                  retailPricePerUnit: double.tryParse(_retailPricePerUnitController.text),
+                  supplier: _supplierController.text,
+                  lotNumber: _lotNumberController.text,
+                  expirationDate: _expirationDate,
                 );
                 
                 final notifier = ref.read(productViewModelProvider.notifier);
@@ -376,6 +571,42 @@ class _ProductDialogBoxState extends State<ProductDialogBox> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildSwitchRow({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: CustomColors.border),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: context.fonts.black14w600),
+                SizedBox(height: 4.h),
+                Text(subtitle, style: context.fonts.grey12w400),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            value: value,
+            activeColor: CustomColors.purple,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
     );
   }
 

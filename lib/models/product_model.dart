@@ -21,6 +21,19 @@ class ProductModel {
   final String? packageType;
   final int? unitsPerPackage;
 
+  // Audit and extended fields from Master Checklist
+  final String? subcategory;
+  final int? boxQuantity;
+  final int? itemQuantityPerBox;
+  final String? billableUnit;
+  final double? billableQuantityPerItem;
+  final double? totalBillableQuantity;
+  final double? clinicCost;
+  final double? retailPricePerUnit;
+  final String? supplier;
+  final String? lotNumber;
+  final DateTime? expirationDate;
+
   ProductModel({
     this.id,
     required this.image,
@@ -39,6 +52,17 @@ class ProductModel {
     this.enforceLotTracking,
     this.packageType,
     this.unitsPerPackage,
+    this.subcategory,
+    this.boxQuantity,
+    this.itemQuantityPerBox,
+    this.billableUnit,
+    this.billableQuantityPerItem,
+    this.totalBillableQuantity,
+    this.clinicCost,
+    this.retailPricePerUnit,
+    this.supplier,
+    this.lotNumber,
+    this.expirationDate,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -60,6 +84,19 @@ class ProductModel {
       enforceLotTracking: json['enforce_lot_tracking'],
       packageType: json['package_type'],
       unitsPerPackage: json['units_per_package'] as int?,
+      subcategory: json['subcategory'],
+      boxQuantity: json['box_quantity'] as int?,
+      itemQuantityPerBox: json['item_quantity_per_box'] as int?,
+      billableUnit: json['billable_unit'],
+      billableQuantityPerItem: (json['billable_quantity_per_item'] as num?)?.toDouble(),
+      totalBillableQuantity: (json['total_billable_quantity'] as num?)?.toDouble(),
+      clinicCost: (json['clinic_cost'] as num?)?.toDouble(),
+      retailPricePerUnit: (json['retail_price_per_unit'] as num?)?.toDouble(),
+      supplier: json['supplier'],
+      lotNumber: json['lot_number'],
+      expirationDate: json['expiration_date'] != null
+          ? DateTime.parse(json['expiration_date'])
+          : null,
     );
   }
 
@@ -82,6 +119,17 @@ class ProductModel {
       'enforce_lot_tracking': enforceLotTracking,
       'package_type': packageType,
       'units_per_package': unitsPerPackage,
+      'subcategory': subcategory,
+      'box_quantity': boxQuantity,
+      'item_quantity_per_box': itemQuantityPerBox,
+      'billable_unit': billableUnit,
+      'billable_quantity_per_item': billableQuantityPerItem,
+      'total_billable_quantity': totalBillableQuantity,
+      'clinic_cost': clinicCost,
+      'retail_price_per_unit': retailPricePerUnit,
+      'supplier': supplier,
+      'lot_number': lotNumber,
+      'expiration_date': expirationDate?.toIso8601String(),
     };
   }
 }

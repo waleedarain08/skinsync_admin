@@ -10,6 +10,8 @@ class MasterDataState {
   final List<String> usageTypes;
   final List<String> units;
   final List<String> packageTypes;
+  final List<String> categories;
+  final List<String> subcategories;
 
   MasterDataState({
     this.brands = const [],
@@ -17,6 +19,8 @@ class MasterDataState {
     this.usageTypes = const [],
     this.units = const [],
     this.packageTypes = const [],
+    this.categories = const [],
+    this.subcategories = const [],
   });
 
   MasterDataState copyWith({
@@ -25,6 +29,8 @@ class MasterDataState {
     List<String>? usageTypes,
     List<String>? units,
     List<String>? packageTypes,
+    List<String>? categories,
+    List<String>? subcategories,
   }) {
     return MasterDataState(
       brands: brands ?? this.brands,
@@ -32,6 +38,8 @@ class MasterDataState {
       usageTypes: usageTypes ?? this.usageTypes,
       units: units ?? this.units,
       packageTypes: packageTypes ?? this.packageTypes,
+      categories: categories ?? this.categories,
+      subcategories: subcategories ?? this.subcategories,
     );
   }
 }
@@ -45,6 +53,8 @@ class MasterDataViewModel extends Notifier<MasterDataState> {
       usageTypes: ['Treatment', 'Retail Sale', 'Consumable', 'Injection', 'Cleaning', 'Procedure', 'Medication', 'Laboratory', 'Variable', 'Required', 'Setup/Supply', 'Device'],
       units: ['Piece', 'ML', 'MG', 'Gram', 'KG', 'Liter', 'Tablet', 'Capsule', 'Unit', 'Syringe', 'Vial', 'Box'],
       packageTypes: ['Box', 'Pack', 'Bottle', 'Carton', 'Tube', 'Bag', 'Piece', 'Tray', 'Custom'],
+      categories: ['Injectables', 'Skincare', 'Equipment', 'Consumables', 'Medications'],
+      subcategories: ['Neurotoxins', 'Fillers', 'Cleansers', 'Moisturizers', 'Lasers', 'Syringes', 'Needles', 'Gauze'],
     );
   }
 
@@ -75,6 +85,18 @@ class MasterDataViewModel extends Notifier<MasterDataState> {
   void addPackageType(String name) {
     if (name.isNotEmpty && !state.packageTypes.contains(name)) {
       state = state.copyWith(packageTypes: [...state.packageTypes, name]);
+    }
+  }
+
+  void addCategory(String name) {
+    if (name.isNotEmpty && !state.categories.contains(name)) {
+      state = state.copyWith(categories: [...state.categories, name]);
+    }
+  }
+
+  void addSubcategory(String name) {
+    if (name.isNotEmpty && !state.subcategories.contains(name)) {
+      state = state.copyWith(subcategories: [...state.subcategories, name]);
     }
   }
 }
