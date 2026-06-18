@@ -1,107 +1,185 @@
-# Inventory (Product Catalog) CRUD API Documentation
+# Inventory (Product Catalog) CRUD & In-Memory Mode Documentation
 
-This document outlines the requests and responses for the Global Product Catalog (Inventory) management system.
+This document outlines the current data models, UI logic, and in-memory simulated flow for the Global Product Catalog (Inventory) management system inside Skinsync Admin.
 
-## Data Models
+---
+
+## 🛠️ Unified Architecture & Mode
+
+To facilitate instant offline responsiveness and mock testing before backend readiness, the **Product Module** has been updated to run entirely on **In-Memory Dummy Data**. 
+
+*   **Bypassed Endpoints:** Bypasses listing, creation, updates, and deletion endpoints.
+*   **Active Category API:** The `GET /api/admin/categories` endpoint remains **fully active** and integrated with the hierarchical dialog picker.
+*   **State Persistence:** In-memory lists mutate instantly during runtime, allowing seamless Create, Read, Update, and Delete actions with real-time UI refreshes.
+
+---
+
+## 📋 Data Models
 
 ### Product Structure
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| `id` | `int` | Internal database identifier |
-| `name` | `String` | Human-readable product name |
+| `id` | `int` | Internal identifier (auto-incremented in-memory) |
+| `name` | `String` | Product name |
 | `brand` | `String?` | Manufacturer or brand name (e.g. Allergan, Galderma) |
 | `global_sku` | `String?` | Unique global catalog identifier |
-| `sku` | `String?` | Clinic-specific SKU (if applicable) |
-| `category` | `String?` | Product category (e.g. Neurotoxin, Dermal Filler, Consumable) |
-| `product_purpose` | `String?` | Clinical use case |
-| `unit` | `String` | Base unit of measure (e.g. Units, ml, Vial, Syringe) |
-| `unit_type` | `String?` | Measurement classification |
-| `quantity` | `int?` | Available stock level |
+| `sku` | `String?` | Clinic-specific SKU |
+| `category` | `String?` | String representing full selected hierarchy path (e.g., `Full Body Laser > Arm Laser`) |
+| `selected_category_ids` | `List<int>?` | Full chain of category IDs representing hierarchy, allowing precise backend taxonomy mapping |
 | `status` | `String` | `Active` or `Inactive` |
 | `image` | `String` | URL to product image |
-| `description` | `String` | Detailed product specifications |
-| `enforce_lot_tracking`| `bool` | Flag to require lot number and expiration entry during use |
+| `description` | `String` | Product specifications |
+| `enforce_lot_tracking`| `bool` | Flag requiring lot/expiration logging at clinic levels |
+
+### 📦 Dynamic Packaging & Billing Fields (Section 2 & 3)
+To handle multi-tiered packaging (e.g., 1 Carton ➔ 8 Boxes ➔ 5 Syringes ➔ 4 ml), the following fields are actively managed and calculated:
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `unit_type` | `String?` | Bulk purchase unit (e.g. `Carton`, `Case`, `Box`) |
+| `box_quantity` | `int?` | Inner boxes inside one Unit Type |
+| `item_quantity_per_box`| `int?`| Quantity of physical items (e.g., syringes) per inner box |
+| `package_type` | `String?` | The base physical item (e.g., `Syringe`, `Vial`, `Piece`) |
+| `billable_unit` | `String?` | Measurement for consumption/billing (e.g., `ml`, `mg`, `units`) |
+| `billable_quantity_per_item` | `double?` | Volume/potency contained in a single physical syringe/vial (e.g., 4.0 ml) |
+| `total_billable_quantity` | `double?` | **[Read-Only]** Automatically calculated total capacity of the bulk unit (`box_quantity` × `item_quantity_per_box` × `billable_quantity_per_item`) |
 
 ---
 
-## Endpoints
+## 🎨 Interactive UI & Business Rules
 
-### 1. List All Products
-Retrieves the complete global product catalog.
+### 1. Dynamic Formula Footer
+At the bottom of Section 2, the dialog dynamically displays a visual packaging equation in real-time as users enter counts:
+`Total [Package Type]s in 1 [Unit Type] = [Box Quantity] boxes × [Item Quantity] [Package Type]s = [Total] [Package Type]s.`
 
-*   **URL:** `/admin/products`
-*   **Method:** `GET`
-*   **Success Response (200):**
+### 2. Auto-Calculated Capacity
+Total Billable Quantity is locked (`readOnly: true`) and auto-calculated in real-time as users type. For example:
+- `Box Quantity` = 8
+- `Item Quantity` = 5
+- `Billable Qty per Item` = 4.0 ml
+- **Result:** `Total Billable Quantity` automatically pre-fills with **`160.0`**.
+
+### 3. Left-to-Right Hierarchical Category Selector
+Clicking `+` next to Category queries the active category provider and displays a left-to-right columns selector supporting **unlimited recursive nesting levels**. 
+*   **Breadcrumb Generation:** Automatically merges selected level names into a clean path (`Parent > Subcategory > Child`).
+*   **Lineage Storage:** Populates `selectedCategoryIds` with the full selection lineage (e.g., `[1, 2, 3]`).
+*   **Clear Option:** The `Clear Category` button clears selection and paths, indicating that a product is non-category-specific.
+
+---
+
+## 🧪 Simulation Endpoints (In-Memory View Model)
+
+### 1. List Products
+*   **Simulated URL:** `GET /api/admin/products`
+*   **Action:** Fetches directly from the mutable copy of `dummyProducts`.
+*   **Mock Response (200 OK):**
     ```json
     {
-      "success": true,
+      "status": true,
+      "message": "Products fetched successfully",
       "data": [
         {
-          "id": 1,
-          "name": "Botox Cosmetic",
+          "id": 101,
+          "image": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop",
+          "name": "Botox Cosmetic 100 Unit Vial",
           "brand": "Allergan",
-          "global_sku": "ALGN-BTX-100",
-          "category": "Neurotoxin",
-          "unit": "Units",
-          "quantity": 5000,
+          "global_sku": "ALL-BTX-100U-V",
+          "sku": "ALL-BTX-100U-V",
+          "category": "Injectables > Neurotoxins",
+          "selected_category_ids": [1, 12],
           "status": "Active",
+          "description": "Preservative-free sterile, vacuum-dried powder for reconstitution. Contains 100 units.",
+          "unit_type": "Carton",
+          "box_quantity": 8,
+          "item_quantity_per_box": 5,
+          "package_type": "Syringe",
+          "billable_unit": "ml",
+          "billable_quantity_per_item": 4.0,
+          "total_billable_quantity": 160.0,
           "enforce_lot_tracking": true
         }
       ]
     }
     ```
 
-### 2. Create Product
-Adds a new product to the global inventory.
-
-*   **URL:** `/admin/products`
-*   **Method:** `POST`
-*   **Request Body:**
+### 2. Add Product
+*   **Simulated URL:** `POST /api/admin/products`
+*   **Action:** Generates a unique `id`, appends the new `ProductModel` to the local memory list, and refreshes the catalog instantly.
+*   **Simulated Request Body:**
     ```json
     {
-      "name": "Juvederm Ultra XC",
-      "brand": "Allergan",
-      "global_sku": "ALGN-JUV-U",
-      "description": "Cross-linked hyaluronic acid dermal filler.",
-      "unit": "ml",
-      "category": "Dermal Filler",
-      "image": "https://storage.skinsyncai.com/products/juvederm.png",
+      "name": "Dysport 300 Unit Vial",
+      "image": "",
+      "brand": "Galderma",
+      "sku": "GAL-DSP-300U",
+      "category": "Injectables > Neurotoxins",
+      "selected_category_ids": [1, 12],
       "status": "Active",
+      "description": "AbobotulinumtoxinA powder for injection.",
+      "unit_type": "Carton",
+      "box_quantity": 4,
+      "item_quantity_per_box": 5,
+      "package_type": "Vial",
+      "billable_unit": "units",
+      "billable_quantity_per_item": 300.0,
+      "total_billable_quantity": 6000.0,
       "enforce_lot_tracking": true
+    }
+    ```
+*   **Mock Response (200 OK):**
+    ```json
+    {
+      "status": true,
+      "message": "Product created successfully",
+      "data": {
+        "id": 106,
+        "image": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop",
+        "name": "Dysport 300 Unit Vial",
+        "brand": "Galderma",
+        "global_sku": "GAL-DSP-300U",
+        "sku": "GAL-DSP-300U",
+        "category": "Injectables > Neurotoxins",
+        "selected_category_ids": [1, 12],
+        "status": "Active",
+        "description": "AbobotulinumtoxinA powder for injection.",
+        "unit_type": "Carton",
+        "box_quantity": 4,
+        "item_quantity_per_box": 5,
+        "package_type": "Vial",
+        "billable_unit": "units",
+        "billable_quantity_per_item": 300.0,
+        "total_billable_quantity": 6000.0,
+        "enforce_lot_tracking": true
+      }
     }
     ```
 
 ### 3. Update Product
-Modifies details of an existing catalog item.
-
-*   **URL:** `/admin/products/{id}`
-*   **Method:** `PATCH`
-*   **Request Body:**
+*   **Simulated URL:** `PATCH /api/admin/products/{id}`
+*   **Action:** Locates the modified item in memory, updates its fields, and posts an instant UI refresh.
+*   **Simulated Request Body:**
     ```json
     {
-      "name": "Updated Product Name",
-      "quantity": 150,
+      "id": 101,
+      "name": "Updated Botox Cosmetic 100 Unit Vial",
       "status": "Inactive"
+    }
+    ```
+*   **Mock Response (200 OK):**
+    ```json
+    {
+      "status": true,
+      "message": "Product updated successfully"
     }
     ```
 
 ### 4. Delete Product
-Archives or removes a product from the global catalog.
-
-*   **URL:** `/admin/products/{id}`
-*   **Method:** `DELETE`
-
----
-
-## Technical Specifications
-
-### Clinical Units
-Common unit values used in the system:
-*   `Units` (for Neurotoxins)
-*   `ml` (for Fillers/Topicals)
-*   `Vial` (for Lyophilized products)
-*   `Syringe` (for Pre-filled items)
-*   `Box` (for Consumables)
-
-### Lot Tracking Rules
-If `enforce_lot_tracking` is `true`, the clinical app will force practitioners to scan or enter a lot number and expiration date before the product can be deducted from inventory during a treatment session.
+*   **Simulated URL:** `DELETE /api/admin/products/{id}`
+*   **Action:** Removes the selected ID from the in-memory array and updates state.
+*   **Mock Response (200 OK):**
+    ```json
+    {
+      "status": true,
+      "message": "Product deleted successfully"
+    }
+    ```

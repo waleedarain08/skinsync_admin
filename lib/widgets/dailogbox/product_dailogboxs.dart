@@ -36,11 +36,6 @@ class _ProductDialogBoxState extends ConsumerState<ProductDialogBox> {
   late final TextEditingController _itemQuantityPerBoxController;
   late final TextEditingController _billableQuantityPerItemController;
   late final TextEditingController _totalBillableQuantityController;
-  late final TextEditingController _clinicCostController;
-  late final TextEditingController _retailPricePerUnitController;
-  late final TextEditingController _supplierController;
-  late final TextEditingController _lotNumberController;
-  late final TextEditingController _expirationDateController;
 
   String? _selectedBrand;
   String? _selectedManufacturer;
@@ -52,8 +47,15 @@ class _ProductDialogBoxState extends ConsumerState<ProductDialogBox> {
   String? _selectedBillableUnit;
   bool _enforceLotTracking = true;
   bool _activeStatus = true;
-  DateTime? _expirationDate;
   List<int> _selectedCategoryIds = [];
+
+  void _updateTotalBillableQuantity() {
+    final int boxQty = int.tryParse(_boxQuantityController.text) ?? 0;
+    final int itemQty = int.tryParse(_itemQuantityPerBoxController.text) ?? 0;
+    final double billableQty = double.tryParse(_billableQuantityPerItemController.text) ?? 0.0;
+    final double total = boxQty * itemQty * billableQty;
+    _totalBillableQuantityController.text = total.toStringAsFixed(1);
+  }
 
   @override
   void initState() {
@@ -70,19 +72,6 @@ class _ProductDialogBoxState extends ConsumerState<ProductDialogBox> {
     _itemQuantityPerBoxController = TextEditingController(text: widget.product?.itemQuantityPerBox?.toString() ?? '0');
     _billableQuantityPerItemController = TextEditingController(text: widget.product?.billableQuantityPerItem?.toString() ?? '0');
     _totalBillableQuantityController = TextEditingController(text: widget.product?.totalBillableQuantity?.toString() ?? '0');
-    _clinicCostController = TextEditingController(text: widget.product?.clinicCost?.toString() ?? '0');
-    _retailPricePerUnitController = TextEditingController(text: widget.product?.retailPricePerUnit?.toString() ?? '0');
-    _supplierController = TextEditingController(text: widget.product?.supplier);
-    _lotNumberController = TextEditingController(text: widget.product?.lotNumber);
-    
-    if (widget.product?.expirationDate != null) {
-      _expirationDate = widget.product!.expirationDate;
-      _expirationDateController = TextEditingController(
-        text: '${_expirationDate!.year}-${_expirationDate!.month}-${_expirationDate!.day}',
-      );
-    } else {
-      _expirationDateController = TextEditingController();
-    }
 
     _selectedBrand = widget.product?.brand;
     _selectedManufacturer = widget.product?.manufacturer;
@@ -108,11 +97,6 @@ class _ProductDialogBoxState extends ConsumerState<ProductDialogBox> {
     _itemQuantityPerBoxController.dispose();
     _billableQuantityPerItemController.dispose();
     _totalBillableQuantityController.dispose();
-    _clinicCostController.dispose();
-    _retailPricePerUnitController.dispose();
-    _supplierController.dispose();
-    _lotNumberController.dispose();
-    _expirationDateController.dispose();
     super.dispose();
   }
 
@@ -238,218 +222,9 @@ class _ProductDialogBoxState extends ConsumerState<ProductDialogBox> {
                   ),
                 ],
               ),
-              
-              SizedBox(height: 32.h),
-
-              // SECTION 2: PACKAGING
-              Text('SECTION 2: PACKAGING', style: context.fonts.purple12w700),
               SizedBox(height: 16.h),
               Row(
                 children: [
-                  Expanded(
-                    child: Consumer(
-                      builder: (context, ref, _) {
-                        final units = ref.watch(masterDataViewModelProvider).units;
-                        return _buildSelectOrCreateDropdown(
-                          label: 'Unit Type',
-                          hint: 'Select Unit Type',
-                          value: _selectedUnit,
-                          items: units,
-                          onChanged: (val) => setState(() => _selectedUnit = val),
-                          onCreate: () => _showCreateMasterItemDialog(
-                            context,
-                            ref,
-                            'Unit Type',
-                            (name) {
-                              ref.read(masterDataViewModelProvider.notifier).addUnit(name);
-                              setState(() => _selectedUnit = name);
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: BuildTextField(
-                      label: 'Box Quantity',
-                      controller: _boxQuantityController,
-                      hintText: 'e.g. 10',
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: BuildTextField(
-                      label: 'Item Quantity Per Box',
-                      controller: _itemQuantityPerBoxController,
-                      hintText: 'e.g. 1',
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: Consumer(
-                      builder: (context, ref, _) {
-                        final packageTypes = ref.watch(masterDataViewModelProvider).packageTypes;
-                        return _buildSelectOrCreateDropdown(
-                          label: 'Package Type',
-                          hint: 'Select Package Type',
-                          value: _selectedPackageType,
-                          items: packageTypes,
-                          onChanged: (val) => setState(() => _selectedPackageType = val),
-                          onCreate: () => _showCreateMasterItemDialog(
-                            context,
-                            ref,
-                            'Package Type',
-                            (name) {
-                              ref.read(masterDataViewModelProvider.notifier).addPackageType(name);
-                              setState(() => _selectedPackageType = name);
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 32.h),
-
-              // SECTION 3: BILLING / CONSUMPTION
-              Text('SECTION 3: BILLING / CONSUMPTION', style: context.fonts.purple12w700),
-              SizedBox(height: 16.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: Consumer(
-                      builder: (context, ref, _) {
-                        final units = ref.watch(masterDataViewModelProvider).units;
-                        return _buildSelectOrCreateDropdown(
-                          label: 'Billable Unit',
-                          hint: 'Select Billable Unit',
-                          value: _selectedBillableUnit,
-                          items: units,
-                          onChanged: (val) => setState(() => _selectedBillableUnit = val),
-                          onCreate: () => _showCreateMasterItemDialog(
-                            context,
-                            ref,
-                            'Billable Unit',
-                            (name) {
-                              ref.read(masterDataViewModelProvider.notifier).addUnit(name);
-                              setState(() => _selectedBillableUnit = name);
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: BuildTextField(
-                      label: 'Billable Quantity Per Item',
-                      controller: _billableQuantityPerItemController,
-                      hintText: 'e.g. 1.0',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.h),
-              BuildTextField(
-                label: 'Total Billable Quantity',
-                controller: _totalBillableQuantityController,
-                hintText: 'e.g. 100.0',
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              ),
-
-              SizedBox(height: 32.h),
-
-              // SECTION 4: PRICING
-              Text('SECTION 4: PRICING', style: context.fonts.purple12w700),
-              SizedBox(height: 16.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: BuildTextField(
-                      label: 'Clinic Cost (\$)',
-                      controller: _clinicCostController,
-                      hintText: '0.00',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      validator: Validators.empty,
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: BuildTextField(
-                      label: 'Retail Price Per Unit (\$)',
-                      controller: _retailPricePerUnitController,
-                      hintText: '0.00',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      validator: Validators.empty,
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 32.h),
-
-              // SECTION 5: SUPPLIER & INVENTORY
-              Text('SECTION 5: SUPPLIER & INVENTORY', style: context.fonts.purple12w700),
-              SizedBox(height: 16.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: BuildTextField(
-                      label: 'Supplier',
-                      controller: _supplierController,
-                      hintText: 'Enter supplier name...',
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: BuildTextField(
-                      label: 'Lot Number',
-                      controller: _lotNumberController,
-                      hintText: 'e.g. LOT123456',
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: _expirationDate ?? DateTime.now(),
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (date != null) {
-                          setState(() {
-                            _expirationDate = date;
-                            _expirationDateController.text = '${date.year}-${date.month}-${date.day}';
-                          });
-                        }
-                      },
-                      child: AbsorbPointer(
-                        child: BuildTextField(
-                          label: 'Expiration Date',
-                          controller: _expirationDateController,
-                          hintText: 'YYYY-MM-DD',
-                          suffixIcon: const Icon(Icons.calendar_today_rounded, size: 18),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
                   Expanded(
                     child: Consumer(
                       builder: (context, ref, _) {
@@ -482,6 +257,254 @@ class _ProductDialogBoxState extends ConsumerState<ProductDialogBox> {
                   ),
                 ],
               ),
+              
+              SizedBox(height: 32.h),
+
+              // SECTION 2: PACKAGING
+              Text('SECTION 2: PACKAGING', style: context.fonts.purple12w700),
+              SizedBox(height: 16.h),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final packageTypes = ref.watch(masterDataViewModelProvider).packageTypes;
+                            return _buildSelectOrCreateDropdown(
+                              label: 'Unit Type',
+                              hint: 'Select Unit Type',
+                              value: _selectedUnit,
+                              items: packageTypes,
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedUnit = val;
+                                  _updateTotalBillableQuantity();
+                                });
+                              },
+                              onCreate: () => _showCreateMasterItemDialog(
+                                context,
+                                ref,
+                                'Unit Type',
+                                (name) {
+                                  ref.read(masterDataViewModelProvider.notifier).addPackageType(name);
+                                  setState(() {
+                                    _selectedUnit = name;
+                                    _updateTotalBillableQuantity();
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 6.h),
+                        Text('The bulk unit purchased from suppliers, e.g. Carton, Case.', style: context.fonts.grey12w400),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BuildTextField(
+                          label: 'Box Quantity',
+                          controller: _boxQuantityController,
+                          hintText: 'e.g. 10',
+                          keyboardType: TextInputType.number,
+                          onChanged: (_) {
+                            setState(() {
+                              _updateTotalBillableQuantity();
+                            });
+                          },
+                        ),
+                        SizedBox(height: 6.h),
+                        Text('Number of inner boxes inside one Unit Type bulk unit.', style: context.fonts.grey12w400),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BuildTextField(
+                          label: 'Item Quantity Per Box',
+                          controller: _itemQuantityPerBoxController,
+                          hintText: 'e.g. 1',
+                          keyboardType: TextInputType.number,
+                          onChanged: (_) {
+                            setState(() {
+                              _updateTotalBillableQuantity();
+                            });
+                          },
+                        ),
+                        SizedBox(height: 6.h),
+                        Text('Count of physical consumable items (like syringes) per inner box.', style: context.fonts.grey12w400),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final units = ref.watch(masterDataViewModelProvider).units;
+                            return _buildSelectOrCreateDropdown(
+                              label: 'Package Type',
+                              hint: 'Select Package Type',
+                              value: _selectedPackageType,
+                              items: units,
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedPackageType = val;
+                                  _updateTotalBillableQuantity();
+                                });
+                              },
+                              onCreate: () => _showCreateMasterItemDialog(
+                                context,
+                                ref,
+                                'Package Type',
+                                (name) {
+                                  ref.read(masterDataViewModelProvider.notifier).addUnit(name);
+                                  setState(() {
+                                    _selectedPackageType = name;
+                                    _updateTotalBillableQuantity();
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 6.h),
+                        Text('The base physical consumable item type, e.g. Syringe, Vial.', style: context.fonts.grey12w400),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              // DYNAMIC PACKAGING CALCULATION FOOTER
+              Builder(
+                builder: (context) {
+                  final int boxQty = int.tryParse(_boxQuantityController.text) ?? 0;
+                  final int itemQty = int.tryParse(_itemQuantityPerBoxController.text) ?? 0;
+                  final int totalItems = boxQty * itemQty;
+                  final String unitName = _selectedUnit ?? 'Carton';
+                  final String packName = _selectedPackageType ?? 'Syringe';
+                  
+                  return Container(
+                    margin: EdgeInsets.only(top: 16.h),
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: CustomColors.purple.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: CustomColors.purple.withValues(alpha: 0.1)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.calculate_outlined, color: CustomColors.purple, size: 20),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Text(
+                            "Total ${packName}s in 1 $unitName = $boxQty boxes × $itemQty ${packName}s = $totalItems ${packName}s.",
+                            style: context.fonts.purple14w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              ),
+
+              SizedBox(height: 32.h),
+
+              // SECTION 3: BILLING / CONSUMPTION
+              Text('SECTION 3: BILLING / CONSUMPTION', style: context.fonts.purple12w700),
+              SizedBox(height: 16.h),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final units = ref.watch(masterDataViewModelProvider).units;
+                            return _buildSelectOrCreateDropdown(
+                              label: 'Billable Unit',
+                              hint: 'Select Billable Unit',
+                              value: _selectedBillableUnit,
+                              items: units,
+                              onChanged: (val) => setState(() => _selectedBillableUnit = val),
+                              onCreate: () => _showCreateMasterItemDialog(
+                                context,
+                                ref,
+                                'Billable Unit',
+                                (name) {
+                                  ref.read(masterDataViewModelProvider.notifier).addUnit(name);
+                                  setState(() => _selectedBillableUnit = name);
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 6.h),
+                        Text('Unit of measurement for treatment and billing, e.g. ml, units.', style: context.fonts.grey12w400),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BuildTextField(
+                          label: 'Billable Quantity Per Item',
+                          controller: _billableQuantityPerItemController,
+                          hintText: 'e.g. 1.0',
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          onChanged: (_) {
+                            setState(() {
+                              _updateTotalBillableQuantity();
+                            });
+                          },
+                        ),
+                        SizedBox(height: 6.h),
+                        Text('Volume or potency contained in a single syringe/vial, e.g. 4.0 ml.', style: context.fonts.grey12w400),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BuildTextField(
+                    label: 'Total Billable Quantity',
+                    controller: _totalBillableQuantityController,
+                    hintText: 'Calculated automatically...',
+                    readOnly: true,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  ),
+                  SizedBox(height: 6.h),
+                  Text('Calculated total volume/potency of the entire bulk unit (Unit Type) in billable units.', style: context.fonts.grey12w400),
+                ],
+              ),
+
+              SizedBox(height: 32.h),
 
               SizedBox(height: 32.h),
               
@@ -545,11 +568,6 @@ class _ProductDialogBoxState extends ConsumerState<ProductDialogBox> {
                   billableUnit: _selectedBillableUnit,
                   billableQuantityPerItem: double.tryParse(_billableQuantityPerItemController.text),
                   totalBillableQuantity: double.tryParse(_totalBillableQuantityController.text),
-                  clinicCost: double.tryParse(_clinicCostController.text),
-                  retailPricePerUnit: double.tryParse(_retailPricePerUnitController.text),
-                  supplier: _supplierController.text,
-                  lotNumber: _lotNumberController.text,
-                  expirationDate: _expirationDate,
                   selectedCategoryIds: _selectedCategoryIds,
                 );
                 
