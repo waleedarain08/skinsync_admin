@@ -23,6 +23,7 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
     this.parentName,
     this.initialName,
     this.initialIcon,
+    this.initialImage,
     this.initialConsentName,
     this.initialConsentFormUrl,
     this.initialSessions,
@@ -38,6 +39,7 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
   final String? parentName;
   final String? initialName;
   final String? initialIcon;
+  final String? initialImage;
   final String? initialConsentName;
   final String? initialConsentFormUrl;
   final List<CategorySessionModel>? initialSessions;
@@ -58,8 +60,10 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
   late final TextEditingController _totalSessionsController;
   final List<TextEditingController> _sessionFollowUpsCountControllers = [];
   late String _selectedIcon;
+  late String _selectedImage;
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _selectedIconFile;
+  XFile? _selectedImageFile;
   PlatformFile? _consentFile;
   String? _existingConsentName;
   String? _consentFormUrl;
@@ -92,6 +96,7 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
       text: initialTotalSessions.toString(),
     );
     _selectedIcon = widget.initialIcon ?? 'category';
+    _selectedImage = widget.initialImage ?? '';
     _existingConsentName = widget.initialConsentName;
     _consentFormUrl = widget.initialConsentFormUrl;
 
@@ -193,6 +198,7 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
     _nameController.text = cat.name;
     _totalSessionsController.text = cat.totalSessions.toString();
     _selectedIcon = cat.icon;
+    _selectedImage = cat.image;
     _existingConsentName = cat.consentFormName;
     _consentFormUrl = cat.consentFormUrl;
 
@@ -399,6 +405,19 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
     }
   }
 
+  Future<void> _pickImage() async {
+    if (widget.isViewMode) return;
+    final XFile? image = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+    );
+    if (image != null) {
+      setState(() {
+        _selectedImageFile = image;
+        _selectedImage = image.path;
+      });
+    }
+  }
+
   Widget _buildIconPreview() {
     if (_selectedIconFile != null) {
       return Image.file(
@@ -434,6 +453,48 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
           context.verticalSpace(8),
           Text(
             widget.isViewMode ? 'No icon uploaded' : 'Tap to upload',
+            style: context.fonts.purple12w700,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImagePreview() {
+    if (_selectedImageFile != null) {
+      return Image.file(
+        File(_selectedImageFile!.path),
+        fit: BoxFit.cover,
+      );
+    }
+    if (_selectedImage.isNotEmpty &&
+        (_selectedImage.startsWith('http') || _selectedImage.contains('/'))) {
+      return Image.network(
+        _selectedImage,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return const Center(
+            child: Icon(
+              Icons.broken_image,
+              color: CustomColors.lightGrey,
+              size: 32,
+            ),
+          );
+        },
+      );
+    }
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.add_a_photo_outlined,
+            size: 32.sp,
+            color: CustomColors.purple,
+          ),
+          context.verticalSpace(8),
+          Text(
+            widget.isViewMode ? 'No image uploaded' : 'Tap to upload',
             style: context.fonts.purple12w700,
           ),
         ],
@@ -886,23 +947,60 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
             readOnly: widget.isViewMode,
           ),
           context.verticalSpace(24),
-          Text('Select Category Icon', style: context.fonts.black14w600),
-          context.verticalSpace(12),
-          GestureDetector(
-            onTap: _pickIcon,
-            child: Container(
-              width: 120.w,
-              height: 120.w,
-              decoration: BoxDecoration(
-                color: CustomColors.whiteGrey,
-                borderRadius: context.appBorderRadius(all: 12),
-                border: Border.all(color: CustomColors.border),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Select Category Icon', style: context.fonts.black14w600),
+                    context.verticalSpace(12),
+                    GestureDetector(
+                      onTap: _pickIcon,
+                      child: Container(
+                        width: double.infinity,
+                        height: 120.w,
+                        decoration: BoxDecoration(
+                          color: CustomColors.whiteGrey,
+                          borderRadius: context.appBorderRadius(all: 12),
+                          border: Border.all(color: CustomColors.border),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: context.appBorderRadius(all: 12),
+                          child: _buildIconPreview(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: ClipRRect(
-                borderRadius: context.appBorderRadius(all: 12),
-                child: _buildIconPreview(),
+              context.horizontalSpace(16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Select Category Image', style: context.fonts.black14w600),
+                    context.verticalSpace(12),
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: double.infinity,
+                        height: 120.w,
+                        decoration: BoxDecoration(
+                          color: CustomColors.whiteGrey,
+                          borderRadius: context.appBorderRadius(all: 12),
+                          border: Border.all(color: CustomColors.border),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: context.appBorderRadius(all: 12),
+                          child: _buildImagePreview(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
           context.verticalSpace(32),
           const Divider(),
@@ -1144,6 +1242,7 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                         'totalSessions':
                             int.tryParse(_totalSessionsController.text) ?? 1,
                         'icon': _selectedIcon,
+                        'image': _selectedImage,
                         'consentFile': _consentFile,
                         'sessions': _sessions,
                         'preNotifications': _preNotificationEntries

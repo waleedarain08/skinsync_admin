@@ -76,6 +76,16 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     return url;
   }
 
+  Future<String?> uploadCategoryImage(XFile image) async {
+    final url = await runSafely<String?>(
+      () => _mediaService.uploadImage('category/image', image),
+    );
+    if (url != null) {
+      log('Category image uploaded: $url');
+    }
+    return url;
+  }
+
   Future<void> fetchCategories() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
@@ -160,6 +170,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
   void addCategory(
     String name, {
     String? icon,
+    String? image,
     int? parentId,
     String? consentFormUrl,
     String? consentFormName,
@@ -175,6 +186,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
       id: DateTime.now().millisecondsSinceEpoch,
       name: name,
       icon: icon ?? '',
+      image: image ?? '',
       parentId: parentId,
       subCategories: [],
     );
@@ -192,20 +204,11 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
   List<CategoryModel> _addChildToTree(List<CategoryModel> items, int parentId, CategoryModel newChild) {
     return items.map((item) {
       if (item.id == parentId) {
-        // Return a fresh new CategoryModel with updated subcategories since copyWith isn't available
-        return CategoryModel(
-          id: item.id,
-          name: item.name,
-          icon: item.icon,
-          parentId: item.parentId,
+        return item.copyWith(
           subCategories: [...item.subCategories, newChild],
         );
       } else if (item.subCategories.isNotEmpty) {
-        return CategoryModel(
-          id: item.id,
-          name: item.name,
-          icon: item.icon,
-          parentId: item.parentId,
+        return item.copyWith(
           subCategories: _addChildToTree(item.subCategories, parentId, newChild),
         );
       }
@@ -217,6 +220,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     int id,
     String newName, {
     String? icon,
+    String? image,
     String? consentFormUrl,
     String? consentFormName,
     List<dynamic>? defaultSessions,
@@ -232,6 +236,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
         id,
         newName,
         icon,
+        image,
       ),
     );
     state = state.copyWith(flattenedCategories: _flattenCategories(state.categories));
@@ -242,23 +247,18 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     int id,
     String newName,
     String? icon,
+    String? image,
   ) {
     return items.map((item) {
       if (item.id == id) {
-        return CategoryModel(
-          id: item.id,
+        return item.copyWith(
           name: newName,
           icon: icon ?? item.icon,
-          parentId: item.parentId,
-          subCategories: item.subCategories,
+          image: image ?? item.image,
         );
       } else if (item.subCategories.isNotEmpty) {
-        return CategoryModel(
-          id: item.id,
-          name: item.name,
-          icon: item.icon,
-          parentId: item.parentId,
-          subCategories: _updateInTree(item.subCategories, id, newName, icon),
+        return item.copyWith(
+          subCategories: _updateInTree(item.subCategories, id, newName, icon, image),
         );
       }
       return item;
@@ -276,11 +276,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     final filtered = items.where((item) => item.id != id).toList();
     return filtered.map((item) {
       if (item.subCategories.isNotEmpty) {
-        return CategoryModel(
-          id: item.id,
-          name: item.name,
-          icon: item.icon,
-          parentId: item.parentId,
+        return item.copyWith(
           subCategories: _removeFromTree(item.subCategories, id),
         );
       }

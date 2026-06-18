@@ -28,6 +28,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     String? parentName,
     String? initialName,
     String? initialIcon,
+    String? initialImage,
     String? initialConsentName,
     List<CategorySessionModel>? initialSessions,
     int? initialTotalSessions,
@@ -38,6 +39,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     required void Function(
       String name,
       String icon,
+      String image,
       PlatformFile? consentFile,
       List<CategorySessionModel>? sessions,
       List<CategoryNotificationModel>? preNotif,
@@ -54,6 +56,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
             parentName: parentName,
             initialName: initialName,
             initialIcon: initialIcon,
+            initialImage: initialImage,
             initialConsentName: initialConsentName,
             initialSessions: initialSessions,
             initialTotalSessions: initialTotalSessions,
@@ -68,6 +71,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
       onConfirm(
         result['name'],
         result['icon'],
+        result['image'],
         result['consentFile'],
         result['sessions'],
         result['preNotifications'],
@@ -615,6 +619,7 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                   (
                     String name,
                     String icon,
+                    String image,
                     PlatformFile? consentFile,
                     List<CategorySessionModel>? sessions,
                     List<CategoryNotificationModel>? preNotif,
@@ -624,6 +629,7 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                   ) => viewModel.addCategory(
                     name,
                     icon: icon,
+                    image: image,
                     consentFormName: consentFile?.name,
                     consentFormUrl: consentFile?.path,
                     defaultSessions: sessions,
@@ -1078,6 +1084,7 @@ class _RecursiveCategoryTile extends StatelessWidget {
                         (
                           String name,
                           String icon,
+                          String image,
                           PlatformFile? consentFile,
                           List<CategorySessionModel>? sessions,
                           List<CategoryNotificationModel>? preNotif,
@@ -1087,6 +1094,7 @@ class _RecursiveCategoryTile extends StatelessWidget {
                         ) => viewModel.addCategory(
                           name,
                           icon: icon,
+                          image: image,
                           parentId: category.id,
                           consentFormName: consentFile?.name,
                           consentFormUrl: consentFile?.path,
@@ -1101,23 +1109,42 @@ class _RecursiveCategoryTile extends StatelessWidget {
             IconButton(
               tooltip: 'Edit Category',
               icon: const Icon(Icons.edit_outlined, size: 20),
-              onPressed: () async {
-                final result = await showDialog<Map<String, dynamic>>(
-                  context: context,
-                  builder: (context) => CategoryCreationDialog(
-                    categoryId: category.id,
+              onPressed:
+                  () => ManageTreatmentDataScreen._showCategoryCreationDialog(
+                    context: context,
                     initialName: category.name,
                     initialIcon: category.icon,
+                    initialImage: category.image,
+                    onConfirm:
+                        (
+                          String name,
+                          String icon,
+                          String image,
+                          PlatformFile? consentFile,
+                          List<CategorySessionModel>? sessions,
+                          List<CategoryNotificationModel>? preNotif,
+                          List<CategoryNotificationModel>? postNotif,
+                          CategoryDowntimePresetModel? downtime,
+                          List<String>? roles,
+                        ) => viewModel.editCategory(
+                          category.id,
+                          name,
+                          icon: icon,
+                          image: image,
+                          consentFormName:
+                              consentFile?.name,
+                          consentFormUrl:
+                              consentFile?.path,
+                          defaultSessions: sessions,
+                          totalSessions: sessions?.length,
+                          preNotifications:
+                              preNotif,
+                          postNotifications:
+                              postNotif,
+                          downtimePresets: downtime,
+                          defaultRoles: roles,
+                        ),
                   ),
-                );
-                if (result != null) {
-                  viewModel.editCategory(
-                    category.id,
-                    result['name'],
-                    icon: result['icon'],
-                  );
-                }
-              },
             ),
             IconButton(
               tooltip: 'Delete Category',

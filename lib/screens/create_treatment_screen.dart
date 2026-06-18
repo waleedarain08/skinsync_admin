@@ -6075,7 +6075,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         Expanded(
           flex: 2,
           child: CustomPrimaryButton(
-            onTap: () {
+            onTap: () async {
+              if (state.currentStep == 0) {
+                if (!await _validateAndFetchCategory(context, state, viewModel, categoryState)) return;
+              }
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
               }
@@ -6107,6 +6110,92 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         ),
       ],
     );
+  }
+
+  Future<bool> _validateAndFetchCategory(
+    BuildContext context,
+    TreatmentState state,
+    TreatmentViewModel viewModel,
+    CategoryState categoryState,
+  ) async {
+    final categoryIdStr = viewModel.categoryIdController.text;
+    if (categoryIdStr.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a category.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
+    final categoryId = int.tryParse(categoryIdStr);
+    if (categoryId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a category.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
+    CategoryModel? findCategory(List<CategoryModel> list, int id) {
+      for (final cat in list) {
+        if (cat.id == id) return cat;
+        final nested = findCategory(cat.subCategories, id);
+        if (nested != null) return nested;
+      }
+      return null;
+    }
+
+    final selectedNode = findCategory(categoryState.categories, categoryId);
+    if (selectedNode == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a category.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
+    if (selectedNode.subCategories.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a subcategory.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
+    try {
+      final success = await viewModel.fetchAndPopulateCategoryDefaults(categoryId);
+      if (!success) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Unable to load category configuration. Please try again.'),
+              backgroundColor: CustomColors.red,
+            ),
+          );
+        }
+        return false;
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to load category configuration. Please try again.'),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+      }
+      return false;
+    }
+
+    return true;
   }
 
   bool _validatePostPhotos(BuildContext context, TreatmentState state) {

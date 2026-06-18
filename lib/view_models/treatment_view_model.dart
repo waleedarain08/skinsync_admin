@@ -646,75 +646,97 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     categoryNameController.text = category.name;
     categoryPathController.text = path;
     
-    CategoryDetailDto? detail;
-    try {
-      detail = await _categoryRepository.getCategoryDetail(category.id);
-      state = state.copyWith(selectedCategoryDetail: detail);
-    } catch (_) {
-      // ignore
-    }
+    // Clear previously loaded detail and reset defaults if category changes
+    state = state.copyWith(selectedCategoryDetail: null);
+  }
 
-    final effectiveDetail = detail;
-    if (state.sessionSource == 'category') {
-      for (final entry in state.sessions) {
-        entry.dispose();
-      }
-      final List<SessionViewModelEntry> newSessions = [];
-      if (effectiveDetail != null && effectiveDetail.defaultSessions.isNotEmpty) {
-        for (final s in effectiveDetail.defaultSessions) {
-          newSessions.add(SessionViewModelEntry(
-            sessionNumber: s.sessionNumber,
-            totalFollowUpsController: TextEditingController(text: s.followUps.length.toString()),
-            followUps: s.followUps.map((fu) => FollowUpEntry(
-              type: fu.type,
-              durationUnit: unitValues.reverse[fu.durationUnit] ?? 'minutes',
-              durationValueController: TextEditingController(text: fu.durationValue.toString()),
-              notesController: TextEditingController(text: fu.notes),
-              intervalValueController: TextEditingController(text: fu.intervalValue.toString()),
-              intervalUnit: fu.intervalUnit,
-              isImageRequired: fu.isImageRequired,
-            )).toList(),
-          ));
-        }
-      } else {
-        final int sessionCount = effectiveDetail?.totalSessions ?? 1;
-        for (int i = 0; i < sessionCount; i++) {
-          newSessions.add(SessionViewModelEntry(
-            sessionNumber: i + 1,
-            totalFollowUpsController: TextEditingController(text: '0'),
-            followUps: [],
-          ));
-        }
-      }
-      state = state.copyWith(
-        totalSessions: newSessions.length,
-        sessions: newSessions,
-      );
-    }
+  Future<bool> fetchAndPopulateCategoryDefaults(int categoryId) async {
+    return await runSafely<bool>(
+      showLoading: true,
+      () async {
+        final detail = await _categoryRepository.getCategoryDetail(categoryId);
+        state = state.copyWith(selectedCategoryDetail: detail);
 
-    // Sync Notifications
-    if (state.preNotificationSource == 'category' && effectiveDetail != null) {
-      state = state.copyWith(
-        preNotificationEntries: (effectiveDetail.preNotifications).map((config) => NotificationEntry(
-          titleController: TextEditingController(text: config.title),
-          messageController: TextEditingController(text: config.message),
-          timingValueController: TextEditingController(text: config.timing.toString()),
-          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
-          type: typeValues.reverse[config.type] ?? 'reminder',
-        )).toList(),
-      );
+        // Auto-populate defaults if sources are set to 'category'
+        
+        // 1. Sessions & Follow Ups
+        if (state.sessionSource == 'category') {
+          _syncSessionsWithCategory(detail);
+        }
+
+        // 2. Notifications
+        if (state.preNotificationSource == 'category') {
+          _syncNotificationsWithCategory(detail, isPre: true);
+        }
+        if (state.postNotificationSource == 'category') {
+          _syncNotificationsWithCategory(detail, isPre: false);
+        }
+
+        // 3. Provider Roles
+        if (state.providerRolesSource == 'category') {
+          final roles = detail.defaultRoles.map((r) => defaultRoleValues.reverse[r] ?? '').toList();
+          state = state.copyWith(selectedRoles: roles);
+        }
+
+        // 4. Downtime - The UI logic uses selectedCategoryDetail.downtimePresets
+        // No explicit state update needed here as it's reactive in the UI
+
+        return true;
+      },
+    ) ?? false;
+  }
+
+  void _syncSessionsWithCategory(CategoryDetailDto detail) {
+    for (final entry in state.sessions) {
+      entry.dispose();
     }
-    
-    if (state.postNotificationSource == 'category' && effectiveDetail != null) {
-      state = state.copyWith(
-        postNotificationEntries: (effectiveDetail.postNotifications).map((config) => NotificationEntry(
-          titleController: TextEditingController(text: config.title),
-          messageController: TextEditingController(text: config.message),
-          timingValueController: TextEditingController(text: config.timing.toString()),
-          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
-          type: typeValues.reverse[config.type] ?? 'care',
-        )).toList(),
-      );
+    final List<SessionViewModelEntry> newSessions = [];
+    if (detail.defaultSessions.isNotEmpty) {
+      for (final s in detail.defaultSessions) {
+        newSessions.add(SessionViewModelEntry(
+          sessionNumber: s.sessionNumber,
+          totalFollowUpsController: TextEditingController(text: s.followUps.length.toString()),
+          followUps: s.followUps.map((fu) => FollowUpEntry(
+            type: fu.type,
+            durationUnit: unitValues.reverse[fu.durationUnit] ?? 'minutes',
+            durationValueController: TextEditingController(text: fu.durationValue.toString()),
+            notesController: TextEditingController(text: fu.notes),
+            intervalValueController: TextEditingController(text: fu.intervalValue.toString()),
+            intervalUnit: fu.intervalUnit,
+            isImageRequired: fu.isImageRequired,
+          )).toList(),
+        ));
+      }
+    } else {
+      final int sessionCount = detail.totalSessions;
+      for (int i = 0; i < sessionCount; i++) {
+        newSessions.add(SessionViewModelEntry(
+          sessionNumber: i + 1,
+          totalFollowUpsController: TextEditingController(text: '0'),
+          followUps: [],
+        ));
+      }
+    }
+    state = state.copyWith(
+      totalSessions: newSessions.length,
+      sessions: newSessions,
+    );
+  }
+
+  void _syncNotificationsWithCategory(CategoryDetailDto detail, {required bool isPre}) {
+    final notifications = isPre ? detail.preNotifications : detail.postNotifications;
+    final entries = notifications.map((config) => NotificationEntry(
+      titleController: TextEditingController(text: config.title),
+      messageController: TextEditingController(text: config.message),
+      timingValueController: TextEditingController(text: config.timing.toString()),
+      timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+      type: typeValues.reverse[config.type] ?? (isPre ? 'reminder' : 'care'),
+    )).toList();
+
+    if (isPre) {
+      state = state.copyWith(preNotificationEntries: entries);
+    } else {
+      state = state.copyWith(postNotificationEntries: entries);
     }
   }
 

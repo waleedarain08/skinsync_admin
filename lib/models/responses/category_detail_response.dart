@@ -33,6 +33,7 @@ class CategoryDetailDto {
   final int id;
   final String name;
   final String icon;
+  final String image;
   final int? parentId;
   final int totalSessions;
   final String consentFormUrl;
@@ -50,6 +51,7 @@ class CategoryDetailDto {
     required this.id,
     required this.name,
     required this.icon,
+    required this.image,
     required this.parentId,
     required this.totalSessions,
     required this.consentFormUrl,
@@ -72,6 +74,7 @@ class CategoryDetailDto {
     id: json["id"],
     name: json["name"],
     icon: json["icon"],
+    image: json["image"] ?? "",
     parentId: json["parent_id"],
     totalSessions: json["total_sessions"],
     consentFormUrl: json["consent_form_url"],
@@ -90,6 +93,7 @@ class CategoryDetailDto {
     "id": id,
     "name": name,
     "icon": icon,
+    "image": image,
     "parent_id": parentId,
     "total_sessions": totalSessions,
     "consent_form_url": consentFormUrl,
