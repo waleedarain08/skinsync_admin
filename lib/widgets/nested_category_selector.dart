@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/models/requests/create_category_request.dart';
 
+import '../models/responses/category_detail_response.dart';
 import '../models/responses/category_list_response.dart';
 import '../utils/theme.dart';
 import '../view_models/category_view_model.dart';
@@ -92,23 +94,26 @@ class _NestedCategorySelectorState
           title: 'Main Category',
           items: widget.categories,
           selectedId: _selectedPath.isNotEmpty ? _selectedPath[0] : null,
-          onSelect: (item) => _onLevelSelect(0, item),
-          onAddChild: (parent) =>
-              _showCreationDialog(context, parent.name, (result) {
-                categoryViewModel.addCategory(
-                  result['name'],
-                  icon: result['icon'],
-                  parentId: parent.id,
-                  consentFormName: result['consentFormName'],
-                  consentFormUrl: result['consentFormUrl'],
-                  defaultSessions: result['sessions'],
-                  totalSessions: result['totalSessions'],
-                  preNotifications: result['preNotifications'],
-                  postNotifications: result['postNotifications'],
-                  downtimePresets: result['downtimePresets'],
-                  defaultRoles: result['defaultRoles'],
-                );
-              }),
+              onSelect: (item) => _onLevelSelect(0, item),
+              onAddChild: (parent) => _showAddChildDialog(
+            context,
+            parent,
+            (result) {
+              categoryViewModel.addCategory(
+                result['name'],
+                icon: result['icon'],
+                parentId: parent.id,
+                consentFormName: result['consentFormName'],
+                consentFormUrl: result['consentFormUrl'],
+                defaultSessions: result['sessions'],
+                totalSessions: result['totalSessions'],
+                preNotifications: result['preNotifications'],
+                postNotifications: result['postNotifications'],
+                downtimePresets: result['downtimePresets'],
+                defaultRoles: result['defaultRoles'],
+              );
+            },
+          ),
           onAddRoot: () => _showCreationDialog(context, null, (result) {
             categoryViewModel.addCategory(
               result['name'],
@@ -144,22 +149,25 @@ class _NestedCategorySelectorState
                   ? _selectedPath[index + 1]
                   : null,
               onSelect: (item) => _onLevelSelect(index + 1, item),
-              onAddChild: (parent) =>
-                  _showCreationDialog(context, parent.name, (result) {
-                    categoryViewModel.addCategory(
-                      result['name'],
-                      icon: result['icon'],
-                      parentId: parent.id,
-                      consentFormName: result['consentFormName'],
-                      consentFormUrl: result['consentFormUrl'],
-                      defaultSessions: result['sessions'],
-                      totalSessions: result['totalSessions'],
-                      preNotifications: result['preNotifications'],
-                      postNotifications: result['postNotifications'],
-                      downtimePresets: result['downtimePresets'],
-                      defaultRoles: result['defaultRoles'],
-                    );
-                  }),
+              onAddChild: (parent) => _showAddChildDialog(
+                context,
+                parent,
+                (result) {
+                  categoryViewModel.addCategory(
+                    result['name'],
+                    icon: result['icon'],
+                    parentId: parent.id,
+                    consentFormName: result['consentFormName'],
+                    consentFormUrl: result['consentFormUrl'],
+                    defaultSessions: result['sessions'],
+                    totalSessions: result['totalSessions'],
+                    preNotifications: result['preNotifications'],
+                    postNotifications: result['postNotifications'],
+                    downtimePresets: result['downtimePresets'],
+                    defaultRoles: result['defaultRoles'],
+                  );
+                },
+              ),
             ),
           );
         }),
@@ -229,6 +237,107 @@ class _NestedCategorySelectorState
     if (result != null) {
       onSave(result);
     }
+  }
+
+  Future<void> _showAddChildDialog(
+    BuildContext context,
+    CategoryModel parent,
+    void Function(Map<String, dynamic>) onSave,
+  ) async {
+    final categoryViewModel = ref.read(categoryViewModelProvider.notifier);
+    final detail = await categoryViewModel.getCategoryDetail(parent.id);
+
+    if (!context.mounted) return;
+
+    if (detail == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load category details.')),
+      );
+      return;
+    }
+
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _buildCategoryDialogFromDetail(
+        detail,
+        parentName: parent.name,
+      ),
+    );
+
+    if (result != null) {
+      onSave(result);
+    }
+  }
+
+  CategoryCreationDialog _buildCategoryDialogFromDetail(
+    CategoryDetailDto detail, {
+    String? parentName,
+    bool isViewMode = false,
+  }) {
+    return CategoryCreationDialog(
+      parentName: parentName,
+      isViewMode: isViewMode,
+      initialName: isViewMode ? detail.name : null,
+      initialIcon: detail.icon,
+      initialImage: detail.image,
+      initialConsentName: detail.consentFormName,
+      initialConsentFormUrl: detail.consentFormUrl,
+      initialSessions: detail.defaultSessions
+          .map(
+            (session) => CategorySessionModel(
+              sessionNumber: session.sessionNumber,
+              followUps: session.followUps
+                  .map(
+                    (followUp) => CategoryFollowUpModel(
+                      type: followUp.type,
+                      durationValue: followUp.durationValue,
+                      durationUnit:
+                          unitValues.reverse[followUp.durationUnit] ??
+                              'minutes',
+                      intervalValue: followUp.intervalValue,
+                      intervalUnit: followUp.intervalUnit,
+                      isImageRequired: followUp.isImageRequired,
+                      notes: followUp.notes,
+                    ),
+                  )
+                  .toList(),
+            ),
+          )
+          .toList(),
+      initialTotalSessions: detail.totalSessions,
+      initialPreNotifications: detail.preNotifications
+          .map(
+            (notification) => CategoryNotificationModel(
+              title: notification.title,
+              message: notification.message,
+              timing: notification.timing,
+              timingUnit: unitValues.reverse[notification.timingUnit],
+              type: typeValues.reverse[notification.type],
+            ),
+          )
+          .toList(),
+      initialPostNotifications: detail.postNotifications
+          .map(
+            (notification) => CategoryNotificationModel(
+              title: notification.title,
+              message: notification.message,
+              timing: notification.timing,
+              timingUnit: unitValues.reverse[notification.timingUnit],
+              type: typeValues.reverse[notification.type],
+            ),
+          )
+          .toList(),
+      initialDowntimePresets: CategoryDowntimePresetModel(
+        none: detail.downtimePresets.none,
+        low: detail.downtimePresets.low,
+        moderate: detail.downtimePresets.moderate,
+        high: detail.downtimePresets.high,
+      ),
+      initialDefaultRoles: detail.defaultRoles
+          .map((role) => defaultRoleValues.reverse[role] ?? '')
+          .where((role) => role.isNotEmpty)
+          .toList(),
+    );
   }
 
   CategoryModel? _findCategoryInTree(List<CategoryModel> items, int id) {

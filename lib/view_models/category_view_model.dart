@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/requests/create_category_request.dart';
 import '../models/responses/category_list_response.dart';
 import '../models/responses/category_detail_response.dart';
 import '../repositories/category_repository.dart';
@@ -13,9 +14,7 @@ import 'base_state_model.dart';
 import 'base_view_model.dart';
 
 final categoryViewModelProvider =
-    NotifierProvider<CategoryViewModel, CategoryState>(
-  CategoryViewModel.new,
-);
+    NotifierProvider<CategoryViewModel, CategoryState>(CategoryViewModel.new);
 
 class CategoryState extends BaseStateModel {
   final List<CategoryModel> categories;
@@ -39,7 +38,8 @@ class CategoryState extends BaseStateModel {
       loading: loading ?? this.loading,
       categories: categories ?? this.categories,
       flattenedCategories: flattenedCategories ?? this.flattenedCategories,
-      selectedCategoryDetail: selectedCategoryDetail ?? this.selectedCategoryDetail,
+      selectedCategoryDetail:
+          selectedCategoryDetail ?? this.selectedCategoryDetail,
     );
   }
 }
@@ -56,9 +56,15 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
   final CategoryRepository _categoryRepository = locator<CategoryRepository>();
   final MediaService _mediaService = MediaService();
 
-  Future<String?> uploadCategoryIcon(XFile image) async {
+  Future<String?> uploadCategoryIcon(
+    XFile image, {
+    bool showLoading = true,
+    bool showError = true,
+  }) async {
     final url = await runSafely<String?>(
       () => _mediaService.uploadImage('category/icon', image),
+      showLoading: showLoading,
+      showError: showError,
     );
     if (url != null) {
       log('Category icon uploaded: $url');
@@ -66,9 +72,15 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     return url;
   }
 
-  Future<String?> uploadConsentFile(PlatformFile file) async {
+  Future<String?> uploadConsentFile(
+    PlatformFile file, {
+    bool showLoading = true,
+    bool showError = true,
+  }) async {
     final url = await runSafely<String?>(
       () => _mediaService.uploadFile('category/pdf', file),
+      showLoading: showLoading,
+      showError: showError,
     );
     if (url != null) {
       log('Category consent PDF uploaded: $url');
@@ -76,9 +88,15 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     return url;
   }
 
-  Future<String?> uploadCategoryImage(XFile image) async {
+  Future<String?> uploadCategoryImage(
+    XFile image, {
+    bool showLoading = true,
+    bool showError = true,
+  }) async {
     final url = await runSafely<String?>(
       () => _mediaService.uploadImage('category/image', image),
+      showLoading: showLoading,
+      showError: showError,
     );
     if (url != null) {
       log('Category image uploaded: $url');
@@ -96,6 +114,19 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
           categories: categories,
           flattenedCategories: flattened,
         );
+      },
+    );
+  }
+
+  Future<bool?> creatCategory({required CreateCategoryResquest request}) async {
+    return await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        final response = await _categoryRepository.createCategory(request);
+        if (response.status) {
+          await fetchCategories();
+        }
+        return true;
       },
     );
   }
@@ -146,10 +177,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
         : getSubCategories(parentId);
 
     return list
-        .map((cat) => DropdownMenuItem(
-              value: cat.id,
-              child: Text(cat.name),
-            ))
+        .map((cat) => DropdownMenuItem(value: cat.id, child: Text(cat.name)))
         .toList();
   }
 
@@ -198,18 +226,26 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
         categories: _addChildToTree(state.categories, parentId, newCategory),
       );
     }
-    state = state.copyWith(flattenedCategories: _flattenCategories(state.categories));
+    state = state.copyWith(
+      flattenedCategories: _flattenCategories(state.categories),
+    );
   }
 
-  List<CategoryModel> _addChildToTree(List<CategoryModel> items, int parentId, CategoryModel newChild) {
+  List<CategoryModel> _addChildToTree(
+    List<CategoryModel> items,
+    int parentId,
+    CategoryModel newChild,
+  ) {
     return items.map((item) {
       if (item.id == parentId) {
-        return item.copyWith(
-          subCategories: [...item.subCategories, newChild],
-        );
+        return item.copyWith(subCategories: [...item.subCategories, newChild]);
       } else if (item.subCategories.isNotEmpty) {
         return item.copyWith(
-          subCategories: _addChildToTree(item.subCategories, parentId, newChild),
+          subCategories: _addChildToTree(
+            item.subCategories,
+            parentId,
+            newChild,
+          ),
         );
       }
       return item;
@@ -231,15 +267,11 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     List<String>? defaultRoles,
   }) {
     state = state.copyWith(
-      categories: _updateInTree(
-        state.categories,
-        id,
-        newName,
-        icon,
-        image,
-      ),
+      categories: _updateInTree(state.categories, id, newName, icon, image),
     );
-    state = state.copyWith(flattenedCategories: _flattenCategories(state.categories));
+    state = state.copyWith(
+      flattenedCategories: _flattenCategories(state.categories),
+    );
   }
 
   List<CategoryModel> _updateInTree(
@@ -258,7 +290,13 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
         );
       } else if (item.subCategories.isNotEmpty) {
         return item.copyWith(
-          subCategories: _updateInTree(item.subCategories, id, newName, icon, image),
+          subCategories: _updateInTree(
+            item.subCategories,
+            id,
+            newName,
+            icon,
+            image,
+          ),
         );
       }
       return item;
@@ -266,10 +304,10 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
   }
 
   void deleteCategory(int id) {
+    state = state.copyWith(categories: _removeFromTree(state.categories, id));
     state = state.copyWith(
-      categories: _removeFromTree(state.categories, id),
+      flattenedCategories: _flattenCategories(state.categories),
     );
-    state = state.copyWith(flattenedCategories: _flattenCategories(state.categories));
   }
 
   List<CategoryModel> _removeFromTree(List<CategoryModel> items, int id) {

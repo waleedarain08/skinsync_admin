@@ -1,14 +1,16 @@
-import 'dart:io';
+import 'dart:developer';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/requests/create_category_request.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/notification_entry.dart';
-import '../../models/responses/category_custom_models.dart';
 import '../../models/responses/category_detail_response.dart';
 import '../../utils/theme.dart';
 import '../../view_models/category_view_model.dart';
@@ -52,23 +54,23 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
   final bool isViewMode;
 
   @override
-  ConsumerState<CategoryCreationDialog> createState() => _CategoryCreationDialogState();
+  ConsumerState<CategoryCreationDialog> createState() =>
+      _CategoryCreationDialogState();
 }
 
-class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog> {
+class _CategoryCreationDialogState
+    extends ConsumerState<CategoryCreationDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _totalSessionsController;
   final List<TextEditingController> _sessionFollowUpsCountControllers = [];
   late String _selectedIcon;
   late String _selectedImage;
   final ImagePicker _imagePicker = ImagePicker();
-  XFile? _selectedIconFile;
-  XFile? _selectedImageFile;
-  PlatformFile? _consentFile;
   String? _existingConsentName;
   String? _consentFormUrl;
   List<CategorySessionModel> _sessions = [];
   bool _isLoadingDetail = false;
+  bool _isSubmitting = false;
 
   List<NotificationEntry> _preNotificationEntries = [];
   List<NotificationEntry> _postNotificationEntries = [];
@@ -111,10 +113,7 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
       );
     } else {
       _sessions = List.generate(initialTotalSessions, (index) {
-        return CategorySessionModel(
-          sessionNumber: index + 1,
-          followUps: [],
-        );
+        return CategorySessionModel(sessionNumber: index + 1, followUps: []);
       });
     }
     _syncFollowUpsCountControllers();
@@ -174,7 +173,9 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
   void _fetchCategoryDetail() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        final detail = await ref.read(categoryViewModelProvider.notifier).getCategoryDetail(widget.categoryId!);
+        final detail = await ref
+            .read(categoryViewModelProvider.notifier)
+            .getCategoryDetail(widget.categoryId!);
         if (detail != null && mounted) {
           _populateFromCategory(detail);
         }
@@ -303,7 +304,9 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
     setState(() {
       if (count > _sessions.length) {
         for (int i = _sessions.length; i < count; i++) {
-          _sessions.add(CategorySessionModel(sessionNumber: i + 1, followUps: []));
+          _sessions.add(
+            CategorySessionModel(sessionNumber: i + 1, followUps: []),
+          );
         }
       } else if (count < _sessions.length) {
         _sessions = _sessions.sublist(0, count);
@@ -341,13 +344,25 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
+      withData: kIsWeb,
     );
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        _consentFile = result.files.first;
-        _existingConsentName = null;
-      });
-    }
+    if (result == null || result.files.isEmpty || !mounted) return;
+
+    final file = result.files.first;
+    final url = await _uploadWithLoading(
+      loadingMessage: 'Uploading consent form...',
+      errorMessage: 'Failed to upload consent form',
+      logLabel: 'Category consent form',
+      upload: () => ref
+          .read(categoryViewModelProvider.notifier)
+          .uploadConsentFile(file, showLoading: false, showError: false),
+    );
+    if (url == null || !mounted) return;
+
+    setState(() {
+      _consentFormUrl = url;
+      _existingConsentName = file.name;
+    });
   }
 
   void _viewConsentPdf() async {
@@ -377,7 +392,11 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.picture_as_pdf_outlined, color: CustomColors.red, size: 48),
+            const Icon(
+              Icons.picture_as_pdf_outlined,
+              color: CustomColors.red,
+              size: 48,
+            ),
             context.verticalSpace(12),
             Text("PDF Not Available", style: context.fonts.black14w600),
           ],
@@ -386,10 +405,107 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text("Close"),
-          )
+          ),
         ],
       ),
     );
+  }
+
+  Future<String?> _uploadWithLoading({
+    required String loadingMessage,
+    required String errorMessage,
+    required String logLabel,
+    required Future<String?> Function() upload,
+  }) async {
+    EasyLoading.show(status: loadingMessage);
+    final url = await upload();
+    if (url == null || url.isEmpty) {
+      EasyLoading.showError(errorMessage);
+      return null;
+    }
+    EasyLoading.dismiss();
+    log('$logLabel uploaded URL: $url');
+    return url;
+  }
+
+  Future<void> _submitCategory() async {
+    if (_nameController.text.isEmpty || _isSubmitting) {
+      EasyLoading.showError('Please Enter The Name');
+      return;
+    }
+    final selectedCategoryName = ref
+        .read(categoryViewModelProvider)
+        .selectedCategoryDetail
+        ?.name;
+    if (selectedCategoryName == _nameController.text) {
+      EasyLoading.showError('Parent Name Can\'t Be sub Category Name ');
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      if (!mounted) return;
+      final request = CreateCategoryResquest(
+        name: _nameController.text,
+        icon: _selectedIcon,
+        imageUrl: _selectedImage,
+        parentId: widget.categoryId,
+        totalSessions: int.tryParse(_totalSessionsController.text) ?? 1,
+        consentFormUrl: _consentFormUrl,
+        consentFormName: _existingConsentName,
+        defaultSessions: _sessions,
+        preNotifications: _preNotificationEntries
+            .map((e) => e.toConfig())
+            .toList(),
+        postNotifications: _postNotificationEntries
+            .map((e) => e.toConfig())
+            .toList(),
+        downtimePresets: CategoryDowntimePresetModel(
+          none: 0,
+          low: int.tryParse(_downtimeLowController.text) ?? 2,
+          moderate: int.tryParse(_downtimeModerateController.text) ?? 5,
+          high: int.tryParse(_downtimeHighController.text) ?? 10,
+        ),
+        defaultRoles: _selectedRoles,
+      );
+
+      ref
+          .read(categoryViewModelProvider.notifier)
+          .creatCategory(request: request)
+          .then((value) {
+            if (value == true) {
+              Navigator.pop(context);
+            }
+          });
+
+      // Navigator.pop(context, {
+      //   'name': _nameController.text,
+      //   'totalSessions': int.tryParse(_totalSessionsController.text) ?? 1,
+      //   'icon': _selectedIcon,
+      //   'image': _selectedImage,
+      //   'consentFormUrl': _consentFormUrl,
+      //   'consentFormName': _existingConsentName,
+      //   'sessions': _sessions,
+      //   'preNotifications': _preNotificationEntries
+      //       .map((e) => e.toConfig())
+      //       .toList(),
+      //   'postNotifications': _postNotificationEntries
+      //       .map((e) => e.toConfig())
+      //       .toList(),
+      //   'downtimePresets': CategoryDowntimePresetModel(
+      //     none: 0,
+      //     low: int.tryParse(_downtimeLowController.text) ?? 2,
+      //     moderate: int.tryParse(_downtimeModerateController.text) ?? 5,
+      //     high: int.tryParse(_downtimeHighController.text) ?? 10,
+      //   ),
+      //   'defaultRoles': _selectedRoles,
+      // });
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   Future<void> _pickIcon() async {
@@ -397,12 +513,21 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
     final XFile? image = await _imagePicker.pickImage(
       source: ImageSource.gallery,
     );
-    if (image != null) {
-      setState(() {
-        _selectedIconFile = image;
-        _selectedIcon = image.path;
-      });
-    }
+    if (image == null || !mounted) return;
+
+    final url = await _uploadWithLoading(
+      loadingMessage: 'Uploading icon...',
+      errorMessage: 'Failed to upload icon',
+      logLabel: 'Category icon',
+      upload: () => ref
+          .read(categoryViewModelProvider.notifier)
+          .uploadCategoryIcon(image, showLoading: false, showError: false),
+    );
+    if (url == null || !mounted) return;
+
+    setState(() {
+      _selectedIcon = url;
+    });
   }
 
   Future<void> _pickImage() async {
@@ -410,26 +535,39 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
     final XFile? image = await _imagePicker.pickImage(
       source: ImageSource.gallery,
     );
-    if (image != null) {
-      setState(() {
-        _selectedImageFile = image;
-        _selectedImage = image.path;
-      });
-    }
+    if (image == null || !mounted) return;
+
+    final url = await _uploadWithLoading(
+      loadingMessage: 'Uploading image...',
+      errorMessage: 'Failed to upload image',
+      logLabel: 'Category image',
+      upload: () => ref
+          .read(categoryViewModelProvider.notifier)
+          .uploadCategoryImage(image, showLoading: false, showError: false),
+    );
+    if (url == null || !mounted) return;
+
+    setState(() {
+      _selectedImage = url;
+    });
   }
 
   Widget _buildIconPreview() {
-    if (_selectedIconFile != null) {
-      return Image.file(
-        File(_selectedIconFile!.path),
-        fit: BoxFit.cover,
-      );
-    }
-    if (_selectedIcon.isNotEmpty &&
-        (_selectedIcon.startsWith('http') || _selectedIcon.contains('/'))) {
+    if (_selectedIcon.isNotEmpty && _selectedIcon.startsWith('http')) {
       return Image.network(
         _selectedIcon,
         fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          );
+        },
         errorBuilder: (context, error, stackTrace) {
           return const Center(
             child: Icon(
@@ -441,6 +579,7 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
         },
       );
     }
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -461,14 +600,7 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
   }
 
   Widget _buildImagePreview() {
-    if (_selectedImageFile != null) {
-      return Image.file(
-        File(_selectedImageFile!.path),
-        fit: BoxFit.cover,
-      );
-    }
-    if (_selectedImage.isNotEmpty &&
-        (_selectedImage.startsWith('http') || _selectedImage.contains('/'))) {
+    if (_selectedImage.isNotEmpty && _selectedImage.startsWith('http')) {
       return Image.network(
         _selectedImage,
         fit: BoxFit.cover,
@@ -779,9 +911,13 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                       : (val) {
                           if (val != null) {
                             setState(() {
-                              final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
+                              final newFus = List<CategoryFollowUpModel>.from(
+                                _sessions[sIdx].followUps,
+                              );
                               newFus[fuIdx] = newFus[fuIdx].copyWith(type: val);
-                              _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                              _sessions[sIdx] = _sessions[sIdx].copyWith(
+                                followUps: newFus,
+                              );
                             });
                           }
                         },
@@ -808,9 +944,15 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                             onChanged: (v) {
                               final value = int.tryParse(v);
                               setState(() {
-                                final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
-                                newFus[fuIdx] = newFus[fuIdx].copyWith(durationValue: value);
-                                _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                                final newFus = List<CategoryFollowUpModel>.from(
+                                  _sessions[sIdx].followUps,
+                                );
+                                newFus[fuIdx] = newFus[fuIdx].copyWith(
+                                  durationValue: value,
+                                );
+                                _sessions[sIdx] = _sessions[sIdx].copyWith(
+                                  followUps: newFus,
+                                );
                               });
                             },
                           ),
@@ -836,9 +978,14 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                                   : (v) {
                                       if (v != null) {
                                         setState(() {
-                                          final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
-                                          newFus[fuIdx] = newFus[fuIdx].copyWith(durationUnit: v);
-                                          _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                                          final newFus =
+                                              List<CategoryFollowUpModel>.from(
+                                                _sessions[sIdx].followUps,
+                                              );
+                                          newFus[fuIdx] = newFus[fuIdx]
+                                              .copyWith(durationUnit: v);
+                                          _sessions[sIdx] = _sessions[sIdx]
+                                              .copyWith(followUps: newFus);
                                         });
                                       }
                                     },
@@ -866,9 +1013,15 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                   onChanged: (v) {
                     final value = int.tryParse(v);
                     setState(() {
-                      final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
-                      newFus[fuIdx] = newFus[fuIdx].copyWith(intervalValue: value);
-                      _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                      final newFus = List<CategoryFollowUpModel>.from(
+                        _sessions[sIdx].followUps,
+                      );
+                      newFus[fuIdx] = newFus[fuIdx].copyWith(
+                        intervalValue: value,
+                      );
+                      _sessions[sIdx] = _sessions[sIdx].copyWith(
+                        followUps: newFus,
+                      );
                     });
                   },
                 ),
@@ -888,9 +1041,15 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                         : (v) {
                             if (v != null) {
                               setState(() {
-                                final newFus = List<CategoryFollowUpModel>.from(_sessions[sIdx].followUps);
-                                newFus[fuIdx] = newFus[fuIdx].copyWith(intervalUnit: v);
-                                _sessions[sIdx] = _sessions[sIdx].copyWith(followUps: newFus);
+                                final newFus = List<CategoryFollowUpModel>.from(
+                                  _sessions[sIdx].followUps,
+                                );
+                                newFus[fuIdx] = newFus[fuIdx].copyWith(
+                                  intervalUnit: v,
+                                );
+                                _sessions[sIdx] = _sessions[sIdx].copyWith(
+                                  followUps: newFus,
+                                );
                               });
                             }
                           },
@@ -930,10 +1089,10 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
       title: widget.isViewMode
           ? 'Category Configuration'
           : (widget.initialName != null
-              ? 'Edit Category'
-              : (widget.parentName == null
-                    ? 'Create New Category'
-                    : 'Add Subcategory to ${widget.parentName}')),
+                ? 'Edit Category'
+                : (widget.parentName == null
+                      ? 'Create New Category'
+                      : 'Add Subcategory to ${widget.parentName}')),
       width: context.w(700),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -953,7 +1112,10 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Select Category Icon', style: context.fonts.black14w600),
+                    Text(
+                      'Select Category Icon',
+                      style: context.fonts.black14w600,
+                    ),
                     context.verticalSpace(12),
                     GestureDetector(
                       onTap: _pickIcon,
@@ -979,7 +1141,10 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Select Category Image', style: context.fonts.black14w600),
+                    Text(
+                      'Select Category Image',
+                      style: context.fonts.black14w600,
+                    ),
                     context.verticalSpace(12),
                     GestureDetector(
                       onTap: _pickImage,
@@ -1196,11 +1361,11 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                   context.horizontalSpace(16),
                   Expanded(
                     child: Text(
-                      _consentFile?.name ??
-                          _existingConsentName ??
-                          (widget.isViewMode ? 'PDF Not Available' : 'Upload Default PDF'),
-                      style:
-                          (_consentFile != null || _existingConsentName != null)
+                      _existingConsentName ??
+                          (widget.isViewMode
+                              ? 'PDF Not Available'
+                              : 'Upload Default PDF'),
+                      style: _existingConsentName != null
                           ? context.fonts.black14w600
                           : context.fonts.grey14w400,
                       maxLines: 1,
@@ -1208,7 +1373,9 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
                     ),
                   ),
                   Icon(
-                    widget.isViewMode ? Icons.open_in_new_rounded : Icons.cloud_upload_outlined,
+                    widget.isViewMode
+                        ? Icons.open_in_new_rounded
+                        : Icons.cloud_upload_outlined,
                     color: CustomColors.grey,
                     size: 20,
                   ),
@@ -1229,40 +1396,23 @@ class _CategoryCreationDialogState extends ConsumerState<CategoryCreationDialog>
             ]
           : [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: _isSubmitting ? null : () => Navigator.pop(context),
                 child: const Text('Cancel'),
               ),
               SizedBox(
                 width: context.w(120),
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (_nameController.text.isNotEmpty) {
-                      Navigator.pop(context, {
-                        'name': _nameController.text,
-                        'totalSessions':
-                            int.tryParse(_totalSessionsController.text) ?? 1,
-                        'icon': _selectedIcon,
-                        'image': _selectedImage,
-                        'consentFile': _consentFile,
-                        'sessions': _sessions,
-                        'preNotifications': _preNotificationEntries
-                            .map((e) => e.toConfig())
-                            .toList(),
-                        'postNotifications': _postNotificationEntries
-                            .map((e) => e.toConfig())
-                            .toList(),
-                        'downtimePresets': CategoryDowntimePresetModel(
-                          none: 0,
-                          low: int.tryParse(_downtimeLowController.text) ?? 2,
-                          moderate:
-                              int.tryParse(_downtimeModerateController.text) ?? 5,
-                          high: int.tryParse(_downtimeHighController.text) ?? 10,
-                        ),
-                        'defaultRoles': _selectedRoles,
-                      });
-                    }
-                  },
-                  child: Text(widget.initialName != null ? 'Update' : 'Create'),
+                  onPressed: _isSubmitting ? null : _submitCategory,
+                  child: _isSubmitting
+                      ? SizedBox(
+                          width: context.w(20),
+                          height: context.h(20),
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(widget.initialName != null ? 'Update' : 'Create'),
                 ),
               ),
             ],

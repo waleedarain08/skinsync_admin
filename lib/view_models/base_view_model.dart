@@ -19,6 +19,7 @@ abstract class BaseViewModel<S> extends Notifier<S> {
   Future<T?> runSafely<T>(
     AsyncValueGetter<T> action, {
     bool showLoading = true,
+    bool showError = true,
     void Function(bool)? onLoadingChange,
   }) async {
     try {
@@ -31,7 +32,9 @@ abstract class BaseViewModel<S> extends Notifier<S> {
       return await action.call();
     } catch (e, s) {
       log('BASE: $e', stackTrace: s);
-      onError(e.toString().replaceAll('Exception:', ''));
+      if (showError) {
+        onError(e.toString().replaceAll('Exception:', ''));
+      }
       return null;
     } finally {
       onLoadingChange?.call(false);

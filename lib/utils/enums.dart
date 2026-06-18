@@ -34,7 +34,8 @@ enum Endpoint {
   updateClinicAppVersion('admin/app-version/clinicapp'),
   subscriptionPlans('admin/subscription-plans'),
   categories('admin/categories'),
-  categoryDetail('admin/categories/{id}');
+  categoryDetail('admin/categories/{id}'),
+  createCategory('admin/categories');
 
   final String path;
   const Endpoint(this.path);
