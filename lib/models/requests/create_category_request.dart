@@ -1,3 +1,60 @@
+import 'package:skinsync_admin/models/common_models.dart';
+
+class CreateCategoryResquest {
+  final String? name;
+  final String? icon;
+  final int? parentId;
+  final String? imageUrl;
+  final int? totalSessions;
+  final String? consentFormUrl;
+  final String? consentFormName;
+  final List<CategorySessionModel>? defaultSessions;
+  final List<NotificationConfig>? preNotifications;
+  final List<NotificationConfig>? postNotifications;
+  final CategoryDowntimePresetModel? downtimePresets;
+  final List<String>? defaultRoles;
+
+  CreateCategoryResquest({
+    this.name,
+    this.icon,
+    this.parentId,
+    this.totalSessions,
+    this.consentFormUrl,
+    this.consentFormName,
+    this.defaultSessions,
+    this.imageUrl,
+    this.preNotifications,
+    this.postNotifications,
+    this.downtimePresets,
+    this.defaultRoles,
+  });
+
+  Map<String, dynamic> toJson() => {
+
+    "name": name,
+    "icon": icon,
+    "parent_id": parentId,
+   // "imageUrl" : imageUrl,
+    "total_sessions": totalSessions,
+    "consent_form_url": consentFormUrl,
+    "consent_form_name": consentFormName,
+    "default_sessions": defaultSessions == null
+        ? []
+        : List<dynamic>.from(defaultSessions!.map((x) => x.toJson())),
+    "pre_notifications": preNotifications == null
+        ? []
+        : List<dynamic>.from(preNotifications!.map((x) => x.toJson())),
+    "post_notifications": postNotifications == null
+        ? []
+        : List<dynamic>.from(postNotifications!.map((x) => x.toJson())),
+    "downtime_presets": downtimePresets?.toJson(),
+    
+    "default_roles": defaultRoles == null
+        ? []
+        : List<dynamic>.from(defaultRoles!.map((x) => x)),
+  };
+}
+
 class CategorySessionModel {
   final int sessionNumber;
   final List<CategoryFollowUpModel> followUps;
@@ -10,9 +67,12 @@ class CategorySessionModel {
   factory CategorySessionModel.fromJson(Map<String, dynamic> json) {
     return CategorySessionModel(
       sessionNumber: json['session_number'] ?? 1,
-      followUps: (json['follow_ups'] as List?)
-              ?.map((e) =>
-                  CategoryFollowUpModel.fromJson(e as Map<String, dynamic>))
+      followUps:
+          (json['follow_ups'] as List?)
+              ?.map(
+                (e) =>
+                    CategoryFollowUpModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           [],
     );
@@ -175,12 +235,7 @@ class CategoryDowntimePresetModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'high': high,
-      'moderate': moderate,
-      'low': low,
-      'none': none,
-    };
+    return {'high': high, 'moderate': moderate, 'low': low, 'none': none};
   }
 
   CategoryDowntimePresetModel copyWith({

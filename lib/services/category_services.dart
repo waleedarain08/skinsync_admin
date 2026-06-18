@@ -1,3 +1,5 @@
+import 'package:skinsync_admin/models/requests/create_category_request.dart';
+
 import '../models/responses/base_response_model.dart';
 import '../models/responses/category_list_response.dart';
 import '../models/responses/category_detail_response.dart';
@@ -47,5 +49,22 @@ class CategoryServices implements CategoryRepository {
       throw const BadRequestException('Category detail not found');
     }
     return response.data!;
+  }
+
+  @override
+  Future<BaseApiResponseModel> createCategory(
+    CreateCategoryResquest request,
+  ) async {
+    final jsonResponse = await _api.post(
+      Endpoint.createCategory,
+      body: request,
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse, (_) => null);
+
+    if (!response.status) {
+      throw BadRequestException(response.message);
+    }
+
+    return response;
   }
 }

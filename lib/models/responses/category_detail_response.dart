@@ -112,13 +112,15 @@ class CategoryDetailDto {
 enum DefaultRole {
   AESTHETICIAN,
   INJECTOR,
-  MD
+  MD,
+  SPECIALIST
 }
 
 final defaultRoleValues = EnumValues({
   "Aesthetician": DefaultRole.AESTHETICIAN,
   "Injector": DefaultRole.INJECTOR,
-  "MD": DefaultRole.MD
+  "MD": DefaultRole.MD,
+  "Specialist": DefaultRole.SPECIALIST
 });
 
 
