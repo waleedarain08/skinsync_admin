@@ -13,7 +13,7 @@ class ProductResponse extends BaseApiResponseModel<ProductModel> {
       ProductResponse(
         isSuccess:
             (json['is_success'] as bool?) ??
-            (json['status'] as bool?) ??
+           
             false,
         message: json['message'] ?? '',
         data: json['data'] == null

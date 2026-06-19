@@ -15,7 +15,7 @@ class CategoryDetailResponse extends BaseApiResponseModel<CategoryDetailDto> {
 
   factory CategoryDetailResponse.fromJson(Map<String, dynamic> json) =>
       CategoryDetailResponse(
-        isSuccess: (json['is_success'] as bool?) ?? (json['status'] as bool?) ?? false,
+        isSuccess: json['is_success'] ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
@@ -23,50 +23,51 @@ class CategoryDetailResponse extends BaseApiResponseModel<CategoryDetailDto> {
       );
 
   Map<String, dynamic> toJson() => {
-        'status': isSuccess,
+        'is_success': isSuccess,
         'message': message,
         'data': data?.toJson(),
       };
 }
 
 class CategoryDetailDto {
-  final int id;
-  final String name;
-  final String icon;
-  final String image;
+  final int? id;
+  final String? name;
+  final String? icon;
+  final String? image;
   final int? parentId;
-  final int totalSessions;
-  final String consentFormUrl;
-  final String consentFormName;
-  final List<SessionsModel> defaultSessions;
-  final List<NotificationModel> preNotifications;
-  final List<NotificationModel> postNotifications;
-  final DowntimePresets downtimePresets;
-  final List<DefaultRole> defaultRoles;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final List<CategoryDetailDto> subCategories;
+  final int? totalSessions;
+  final String? consentFormUrl;
+  final String? consentFormName;
+  final List<SessionsModel>? defaultSessions;
+  final List<NotificationModel>? preNotifications;
+  final List<NotificationModel>? postNotifications;
+  final DowntimePresets? downtimePresets;
+  final List<DefaultRole>? defaultRoles;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final List<CategoryDetailDto>? subCategories;
 
   CategoryDetailDto({
-    required this.id,
-    required this.name,
-    required this.icon,
-    required this.image,
-    required this.parentId,
-    required this.totalSessions,
-    required this.consentFormUrl,
-    required this.consentFormName,
-    required this.defaultSessions,
-    required this.preNotifications,
-    required this.postNotifications,
-    required this.downtimePresets,
-    required this.defaultRoles,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.subCategories,
+    this.id,
+    this.name,
+    this.icon,
+    this.image,
+    this.parentId,
+    this.totalSessions,
+    this.consentFormUrl,
+    this.consentFormName,
+    this.defaultSessions,
+    this.preNotifications,
+    this.postNotifications,
+    this.downtimePresets,
+    this.defaultRoles,
+    this.createdAt,
+    this.updatedAt,
+    this.subCategories,
   });
 
-  factory CategoryDetailDto.fromRawJson(String str) => CategoryDetailDto.fromJson(json.decode(str));
+  factory CategoryDetailDto.fromRawJson(String str) =>
+      CategoryDetailDto.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
@@ -74,19 +75,36 @@ class CategoryDetailDto {
     id: json["id"],
     name: json["name"],
     icon: json["icon"],
-    image: json["image"] ?? "",
+    image: json["image"],
     parentId: json["parent_id"],
     totalSessions: json["total_sessions"],
     consentFormUrl: json["consent_form_url"],
     consentFormName: json["consent_form_name"],
-    defaultSessions: List<SessionsModel>.from(json["default_sessions"].map((x) => SessionsModel.fromJson(x))),
-    preNotifications: List<NotificationModel>.from(json["pre_notifications"].map((x) => NotificationModel.fromJson(x))),
-    postNotifications: List<NotificationModel>.from(json["post_notifications"].map((x) => NotificationModel.fromJson(x))),
-    downtimePresets: DowntimePresets.fromJson(json["downtime_presets"]),
-    defaultRoles: List<DefaultRole>.from(json["default_roles"].map((x) => defaultRoleValues.map[x]!)),
-    createdAt: DateTime.parse(json["created_at"]),
-    updatedAt: DateTime.parse(json["updated_at"]),
-    subCategories: List<CategoryDetailDto>.from(json["sub_categories"].map((x) => CategoryDetailDto.fromJson(x))),
+    defaultSessions: json["default_sessions"] == null
+        ? null
+        : List<SessionsModel>.from(
+            json["default_sessions"].map((x) => SessionsModel.fromJson(x))),
+    preNotifications: json["pre_notifications"] == null
+        ? null
+        : List<NotificationModel>.from(
+            json["pre_notifications"].map((x) => NotificationModel.fromJson(x))),
+    postNotifications: json["post_notifications"] == null
+        ? null
+        : List<NotificationModel>.from(
+            json["post_notifications"].map((x) => NotificationModel.fromJson(x))),
+    downtimePresets: json["downtime_presets"] == null
+        ? null
+        : DowntimePresets.fromJson(json["downtime_presets"]),
+    defaultRoles: json["default_roles"] == null
+        ? null
+        : List<DefaultRole>.from(
+            json["default_roles"].map((x) => defaultRoleValues.map[x]!)),
+    createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
+    updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
+    subCategories: json["sub_categories"] == null
+        ? null
+        : List<CategoryDetailDto>.from(
+            json["sub_categories"].map((x) => CategoryDetailDto.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -98,14 +116,24 @@ class CategoryDetailDto {
     "total_sessions": totalSessions,
     "consent_form_url": consentFormUrl,
     "consent_form_name": consentFormName,
-    "default_sessions": List<dynamic>.from(defaultSessions.map((x) => x.toJson())),
-    "pre_notifications": List<dynamic>.from(preNotifications.map((x) => x.toJson())),
-    "post_notifications": List<dynamic>.from(postNotifications.map((x) => x.toJson())),
-    "downtime_presets": downtimePresets.toJson(),
-    "default_roles": List<dynamic>.from(defaultRoles.map((x) => defaultRoleValues.reverse[x])),
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
-    "sub_categories": List<dynamic>.from(subCategories.map((x) => x.toJson())),
+    "default_sessions": defaultSessions == null
+        ? null
+        : List<dynamic>.from(defaultSessions!.map((x) => x.toJson())),
+    "pre_notifications": preNotifications == null
+        ? null
+        : List<dynamic>.from(preNotifications!.map((x) => x.toJson())),
+    "post_notifications": postNotifications == null
+        ? null
+        : List<dynamic>.from(postNotifications!.map((x) => x.toJson())),
+    "downtime_presets": downtimePresets?.toJson(),
+    "default_roles": defaultRoles == null
+        ? null
+        : List<dynamic>.from(defaultRoles!.map((x) => defaultRoleValues.reverse[x])),
+    "created_at": createdAt?.toIso8601String(),
+    "updated_at": updatedAt?.toIso8601String(),
+    "sub_categories": subCategories == null
+        ? null
+        : List<dynamic>.from(subCategories!.map((x) => x.toJson())),
   };
 }
 
@@ -158,4 +186,3 @@ class EnumValues<T> {
     return reverseMap;
   }
 }
-

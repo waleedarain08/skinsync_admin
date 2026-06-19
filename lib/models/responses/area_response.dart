@@ -11,17 +11,13 @@ class AreaResponse extends BaseApiResponseModel<AreaModel> {
 
   factory AreaResponse.fromJson(Map<String, dynamic> json) =>
       AreaResponse(
-        isSuccess: (json['is_success'] as bool?) ?? (json['status'] as bool?) ?? false,
+        isSuccess: (json['is_success'] as bool?) ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
             : AreaModel.fromJson(json['data'] as Map<String, dynamic>),
       );
 
-  Map<String, dynamic> toJson() => {
-    'status': isSuccess,
-    'message': message,
-    'data': data?.toJson(),
-  };
+ 
 }
 

@@ -8,7 +8,7 @@ class ProductDetailResponse extends BaseApiResponseModel<ProductDetailModel> {
   });
 
   factory ProductDetailResponse.fromJson(Map<String, dynamic> json) {
-    final bool success = (json['is_success'] as bool?) ?? (json['status'] as bool?) ?? false;
+    final bool success = (json['is_success'] as bool?)  ?? false;
     return ProductDetailResponse(
       isSuccess: success,
       message: json['message'] ?? '',
@@ -18,11 +18,7 @@ class ProductDetailResponse extends BaseApiResponseModel<ProductDetailModel> {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'status': isSuccess,
-        'message': message,
-        'data': data?.toJson(),
-      };
+
 }
 
 class ProductDetailModel {

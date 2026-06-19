@@ -9,7 +9,7 @@ class RefreshTokenResponse extends BaseApiResponseModel<RefreshTokenData> {
 
   factory RefreshTokenResponse.fromJson(Map<String, dynamic> json) =>
       RefreshTokenResponse(
-        isSuccess: (json['is_success'] as bool?) ?? (json['status'] as bool?) ?? false,
+        isSuccess: (json['is_success'] as bool?) ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null

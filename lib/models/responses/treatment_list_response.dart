@@ -10,7 +10,7 @@ class TreatmentListResponse extends BaseApiResponseModel<List<TreatmentModel>> {
 
   factory TreatmentListResponse.fromJson(Map<String, dynamic> json) =>
       TreatmentListResponse(
-        isSuccess: (json['is_success'] as bool?) ?? (json['status'] as bool?) ?? false,
+        isSuccess: (json['is_success'] as bool?)  ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
@@ -19,9 +19,5 @@ class TreatmentListResponse extends BaseApiResponseModel<List<TreatmentModel>> {
                 .toList(),
       );
 
-  Map<String, dynamic> toJson() => {
-        'status': isSuccess,
-        'message': message,
-        'data': data?.map((e) => e.toRequest()).toList(),
-      };
+
 }
