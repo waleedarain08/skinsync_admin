@@ -1,11 +1,11 @@
-import 'package:skinsync_admin/models/role.dart';
+// import 'package:skinsync_admin/models/role.dart';
 
 class UserModel {
   int? id;
   String? email;
   String? name;
   int? roleId;
-  RoleModel? role;
+  // RoleModel? role;
   String? status;
   String? lastLogin;
   String? createdAt;
@@ -16,7 +16,7 @@ class UserModel {
     this.email,
     this.name,
     this.roleId,
-    this.role,
+    // this.role,
     this.status,
     this.lastLogin,
     this.createdAt,
@@ -29,7 +29,7 @@ class UserModel {
       email: json['email'],
       name: json['name'],
       roleId: json['role_id'],
-      role: json['role'] != null ? RoleModel.fromJson(json['role']) : null,
+      // role: json['role'] != null ? RoleModel.fromJson(json['role']) : null,
       status: json['status'],
       lastLogin: json['last_login'],
       createdAt: json['created_at'],
@@ -43,9 +43,9 @@ class UserModel {
     data['email'] = email;
     data['name'] = name;
     data['role_id'] = roleId;
-    if (role != null) {
-      data['role'] = role!.toJson();
-    }
+    // if (role != null) {
+    //   data['role'] = role!.toJson();
+    // }
     data['status'] = status;
     data['last_login'] = lastLogin;
     data['created_at'] = createdAt;

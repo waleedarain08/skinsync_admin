@@ -10,7 +10,7 @@ class TreatmentCrudResponse extends BaseApiResponseModel<TreatmentModel> {
 
   factory TreatmentCrudResponse.fromJson(Map<String, dynamic> json) =>
       TreatmentCrudResponse(
-        isSuccess: json['status'] ?? false,
+        isSuccess: (json['is_success'] as bool?) ?? (json['status'] as bool?) ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null

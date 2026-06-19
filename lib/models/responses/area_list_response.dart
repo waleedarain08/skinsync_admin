@@ -9,7 +9,7 @@ class AreaListResponse extends BaseApiResponseModel<List<AreaModel>> {
 
   factory AreaListResponse.fromJson(Map<String, dynamic> json) =>
       AreaListResponse(
-        isSuccess: json['status'] ?? false,
+        isSuccess: (json['is_success'] as bool?) ?? (json['status'] as bool?) ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
