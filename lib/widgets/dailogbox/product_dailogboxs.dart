@@ -569,6 +569,7 @@ class _ProductDialogBoxState extends ConsumerState<ProductDialogBox> {
                   billableQuantityPerItem: double.tryParse(_billableQuantityPerItemController.text),
                   totalBillableQuantity: double.tryParse(_totalBillableQuantityController.text),
                   selectedCategoryIds: _selectedCategoryIds,
+                  barcode: _barcodeController.text,
                 );
                 
                 final notifier = ref.read(productViewModelProvider.notifier);

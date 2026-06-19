@@ -34,6 +34,7 @@ class ProductModel {
   final String? lotNumber;
   final DateTime? expirationDate;
   final List<int>? selectedCategoryIds;
+  final String? barcode;
 
   ProductModel({
     this.id,
@@ -65,6 +66,7 @@ class ProductModel {
     this.lotNumber,
     this.expirationDate,
     this.selectedCategoryIds,
+    this.barcode,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -102,6 +104,7 @@ class ProductModel {
       selectedCategoryIds: json['selected_category_ids'] != null
           ? List<int>.from(json['selected_category_ids'])
           : null,
+      barcode: json['barcode'],
     );
   }
 
@@ -136,6 +139,7 @@ class ProductModel {
       'lot_number': lotNumber,
       'expiration_date': expirationDate?.toIso8601String(),
       'selected_category_ids': selectedCategoryIds,
+      'barcode': barcode,
     };
   }
 }

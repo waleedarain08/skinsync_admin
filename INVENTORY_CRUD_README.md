@@ -24,6 +24,8 @@ To facilitate instant offline responsiveness and mock testing before backend rea
 | `brand` | `String?` | Manufacturer or brand name (e.g. Allergan, Galderma) |
 | `global_sku` | `String?` | Unique global catalog identifier |
 | `sku` | `String?` | Clinic-specific SKU |
+| `barcode` | `String?` | Barcode or UPC code of the product |
+| `product_purpose`| `String?`| The usage type/clinical purpose of the product |
 | `category` | `String?` | String representing full selected hierarchy path (e.g., `Full Body Laser > Arm Laser`) |
 | `selected_category_ids` | `List<int>?` | Full chain of category IDs representing hierarchy, allowing precise backend taxonomy mapping |
 | `status` | `String` | `Active` or `Inactive` |
@@ -90,6 +92,8 @@ Clicking `+` next to Category queries the active category provider and displays 
           "brand": "Allergan",
           "global_sku": "ALL-BTX-100U-V",
           "sku": "ALL-BTX-100U-V",
+          "barcode": "1234567890",
+          "product_purpose": "Variable",
           "category": "Injectables > Neurotoxins",
           "selected_category_ids": [1, 12],
           "status": "Active",
@@ -122,6 +126,8 @@ Clicking `+` next to Category queries the active category provider and displays 
       "image": "",
       "brand": "Galderma",
       "sku": "GAL-DSP-300U",
+      "barcode": "9876543210",
+      "product_purpose": "Variable",
       "category": "Injectables > Neurotoxins",
       "selected_category_ids": [1, 12],
       "status": "Active",
@@ -153,6 +159,8 @@ Clicking `+` next to Category queries the active category provider and displays 
         "brand": "Galderma",
         "global_sku": "GAL-DSP-300U",
         "sku": "GAL-DSP-300U",
+        "barcode": "9876543210",
+        "product_purpose": "Variable",
         "category": "Injectables > Neurotoxins",
         "selected_category_ids": [1, 12],
         "status": "Active",

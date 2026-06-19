@@ -344,6 +344,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               lotNumber: _lotNumberController.text,
                               expirationDate: _expirationDate,
                               selectedCategoryIds: _selectedCategoryIds,
+                              barcode: _barcodeController.text,
                             );
                             
                             final notifier = ref.read(productViewModelProvider.notifier);
