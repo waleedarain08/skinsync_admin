@@ -1,5 +1,6 @@
 import 'package:skinsync_admin/models/requests/area_request.dart';
 
+import '../models/requests/create_sub_area_request.dart';
 import '../models/responses/area_list_response.dart';
 import '../models/responses/base_response_model.dart';
 import '../repositories/area_repository.dart';
@@ -49,5 +50,23 @@ class AreaServices implements AreaRepository {
       throw BadRequestException(response.message);
     }
     return response.data!;
+  }
+
+
+  @override
+  Future<BaseApiResponseModel> createSubArea(CreateSubAreaRequest request) async {
+    final jsonResponse = await _api.post(
+      Endpoint.subAreas,
+      body: request.toJson(),
+    );
+    final response = BaseApiResponseModel<Null>.fromJson(
+      jsonResponse,
+          (_) => null,
+    );
+
+    if (!response.status) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 }

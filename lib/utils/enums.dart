@@ -36,7 +36,9 @@ enum Endpoint {
   categories('admin/categories'),
   categoryDetail('admin/categories/{id}'),
   createCategory('admin/categories'),
-  areas('admin/areas');
+  areas('admin/areas'),
+  subAreas('admin/areas/sub');
+
 
   final String path;
   const Endpoint(this.path);

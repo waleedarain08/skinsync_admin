@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/requests/area_request.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/exception.dart';
-
+import '../models/requests/create_sub_area_request.dart';
 import '../models/responses/area_list_response.dart';
 import '../repositories/area_repository.dart';
 import '../services/locator.dart';
@@ -78,11 +78,32 @@ class AreaViewModel extends BaseViewModel<AreaState> {
         throw const UnknownException('Failed to upload image');
       }
       return await _areaRepository.createArea(
-        AreaRequest(name: name, globalSku: globalSku, icon: icon),
+        AreaRequest(name: name, globalSku: globalSku, icon: imageUrl),
       );
     });
   }
 
+
+  Future<bool?> createSubArea({
+    required String name,
+    required String globalSku,
+    required String icon,
+    required int parentId,
+  }) async {
+    return await runSafely<bool>(() async {
+      final String? imageUrl = await MediaService().uploadImage(
+        'areas/icons/',
+        XFile(icon),
+      );
+      if (imageUrl == null) {
+        throw const UnknownException('Failed to upload image');
+      }
+       await _areaRepository.createSubArea(
+        CreateSubAreaRequest(parentId: parentId, name: name, globalSku: globalSku, icon: imageUrl),
+      );
+      return true;
+    });
+  }
   Future<void> refreshAreas() async {
     await fetchAreas();
   }

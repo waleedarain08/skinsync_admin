@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
-
 import '../models/notification_entry.dart';
 import '../models/notification_model.dart';
 import '../models/product_model.dart';
@@ -6398,7 +6396,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 ),
                 context.horizontalSpace(12),
                 CustomPrimaryButton(
-                  onTap: () {
+                  onTap: () async {
                     final name = nameController.text.trim();
                     final sku = skuController.text.trim().toUpperCase();
 
@@ -6608,14 +6606,14 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 _showAddNodeDialog(
                   context: context,
                   title: 'Create New Sub-Area in ${area.name}',
-                  onAdd: (name, sku, icon) => widget.onAddSubArea(
-                    // TODO: Add actual parent area id.
-                    parentAreaId: 0,
-                    parentAreaName: area.name,
-                    name: name,
-                    sku: sku,
-                    icon: icon,
-                  ),
+                  onAdd: (name, sku, icon) =>widget.onAddSubArea(
+                      // TODO: Add actual parent area id.
+                      parentAreaId: area.id,
+                      parentAreaName: area.name,
+                      name: name,
+                      sku: sku,
+                      icon: icon,
+                    ),
                 );
               },
             );
