@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/product_model.dart';
+import '../models/responses/product_detail_response.dart';
 import '../repositories/product_repository.dart';
 import '../services/locator.dart';
 import 'base_state_model.dart';
@@ -15,6 +16,7 @@ class ProductState extends BaseStateModel {
   final String? errorMessage;
   final int pageSize;
   final String searchKeyword;
+  final ProductDetailModel? selectedProduct;
 
   ProductState({
     super.loading,
@@ -24,6 +26,7 @@ class ProductState extends BaseStateModel {
     this.errorMessage,
     this.pageSize = 20,
     this.searchKeyword = '',
+    this.selectedProduct,
   });
 
   ProductState copyWith({
@@ -34,6 +37,7 @@ class ProductState extends BaseStateModel {
     int? pageSize,
     int? totalPages,
     String? searchKeyword,
+    ProductDetailModel? selectedProduct,
   }) {
     return ProductState(
       loading: loading ?? this.loading,
@@ -43,6 +47,7 @@ class ProductState extends BaseStateModel {
       errorMessage: errorMessage ?? this.errorMessage,
       pageSize: pageSize ?? this.pageSize,
       searchKeyword: searchKeyword ?? this.searchKeyword,
+      selectedProduct: selectedProduct ?? this.selectedProduct,
     );
   }
 }
@@ -60,6 +65,7 @@ class ProductViewModel extends BaseViewModel<ProductState> {
   int get pageSize => state.pageSize;
   int get totalPages => state.totalPages;
   String get searchKeyword => state.searchKeyword;
+  ProductDetailModel? get selectedProduct => state.selectedProduct;
 
   @override
   void init() {
@@ -86,6 +92,24 @@ class ProductViewModel extends BaseViewModel<ProductState> {
             pageSize: response.limit ?? limit,
             totalPages: response.totalPages ?? 1,
             searchKeyword: search,
+            errorMessage: null,
+          );
+        } catch (e) {
+          state = state.copyWith(errorMessage: e.toString());
+          rethrow;
+        }
+      },
+    );
+  }
+
+  Future<void> fetchProductDetail(int productId) async {
+    await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        try {
+          final response = await _productRepository.getProductDetail(id: productId);
+          state = state.copyWith(
+            selectedProduct: response.data,
             errorMessage: null,
           );
         } catch (e) {
