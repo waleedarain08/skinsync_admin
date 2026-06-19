@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../utils/theme.dart';
 import '../utils/validators.dart';
+import '../view_models/area_view_model.dart';
 import '../view_models/category_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
@@ -27,8 +28,11 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(categoryViewModelProvider.notifier).fetchCategories();
+      await ref.read(areaViewModelProvider.notifier).fetchAreas();
+      final fetchedAreas = ref.read(areaViewModelProvider).areas;
+      ref.read(treatmentDataViewModelProvider.notifier).setAreasFromBackend(fetchedAreas);
     });
   }
 

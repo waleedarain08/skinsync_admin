@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/requests/create_category_request.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/view_models/area_view_model.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -552,8 +553,11 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(categoryViewModelProvider.notifier).fetchCategories();
+      await ref.read(areaViewModelProvider.notifier).fetchAreas();
+      final fetchedAreas = ref.read(areaViewModelProvider).areas;
+      ref.read(treatmentDataViewModelProvider.notifier).setAreasFromBackend(fetchedAreas);
     });
   }
 

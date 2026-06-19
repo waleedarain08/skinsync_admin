@@ -1,0 +1,117 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/responses/area_list_response.dart';
+import '../repositories/area_repository.dart';
+import '../services/locator.dart';
+import 'base_state_model.dart';
+import 'base_view_model.dart';
+
+final areaViewModelProvider =
+    NotifierProvider<AreaViewModel, AreaState>(AreaViewModel.new);
+
+class AreaState extends BaseStateModel {
+  final List<AreaModel> areas;
+  final List<AreaModel> flattenedAreas;
+  final String? errorMessage;
+
+  AreaState({
+    super.loading,
+    this.areas = const [],
+    this.flattenedAreas = const [],
+    this.errorMessage,
+  });
+
+  AreaState copyWith({
+    bool? loading,
+    List<AreaModel>? areas,
+    List<AreaModel>? flattenedAreas,
+    String? errorMessage,
+  }) {
+    return AreaState(
+      loading: loading ?? this.loading,
+      areas: areas ?? this.areas,
+      flattenedAreas: flattenedAreas ?? this.flattenedAreas,
+      errorMessage: errorMessage ?? this.errorMessage,
+    );
+  }
+}
+
+class AreaViewModel extends BaseViewModel<AreaState> {
+  AreaViewModel() : super(AreaState());
+
+  final AreaRepository _areaRepository = locator<AreaRepository>();
+
+  Future<void> fetchAreas() async {
+    state = state.copyWith(errorMessage: null);
+    await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        try {
+          final fetched = await _areaRepository.getAreas();
+          final flattened = _flattenAreas(fetched);
+          state = state.copyWith(
+            areas: fetched,
+            flattenedAreas: flattened,
+          );
+        } catch (e) {
+          state = state.copyWith(errorMessage: e.toString());
+          rethrow;
+        }
+      },
+    );
+  }
+
+  Future<void> refreshAreas() async {
+    await fetchAreas();
+  }
+
+  List<AreaModel> _flattenAreas(List<AreaModel> list) {
+    final List<AreaModel> result = [];
+    for (final area in list) {
+      result.add(area);
+      if (area.subAreas.isNotEmpty) {
+        result.addAll(_flattenAreas(area.subAreas));
+      }
+    }
+    return result;
+  }
+
+  // --- Helper Methods ---
+
+  List<AreaModel> getAllAreas() => state.flattenedAreas;
+
+  AreaModel? findAreaById(int id) {
+    try {
+      return state.flattenedAreas.firstWhere((a) => a.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  List<AreaModel> getSubAreas(int parentId) {
+    final parent = findAreaById(parentId);
+    return parent?.subAreas ?? [];
+  }
+
+  List<DropdownMenuItem<int>> getAreaDropdownItems({int? parentId}) {
+    final list = parentId == null
+        ? state.areas
+        : getSubAreas(parentId);
+
+    return list
+        .map((area) => DropdownMenuItem(value: area.id, child: Text(area.name)))
+        .toList();
+  }
+
+  // Recursive search for an area by ID in the tree
+  AreaModel? findInTree(List<AreaModel> items, int id) {
+    for (final item in items) {
+      if (item.id == id) return item;
+      if (item.subAreas.isNotEmpty) {
+        final found = findInTree(item.subAreas, id);
+        if (found != null) return found;
+      }
+    }
+    return null;
+  }
+}

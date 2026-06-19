@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/treatment_data_models.dart';
+import '../models/responses/area_list_response.dart';
 
 final treatmentDataViewModelProvider = NotifierProvider<TreatmentDataViewModel, TreatmentDataState>(
   TreatmentDataViewModel.new,
@@ -327,5 +328,31 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
         return a;
       }).toList(),
     );
+  }
+
+  void setAreasFromBackend(List<AreaModel> apiAreas) {
+    final List<AreaItem> mapped = apiAreas.map((level1) {
+      return AreaItem(
+        name: level1.name,
+        globalSku: level1.globalSku,
+        icon: level1.icon,
+        subAreas: level1.subAreas.map((level2) {
+          return SubAreaItem(
+            name: level2.name,
+            globalSku: level2.globalSku,
+            icon: level2.icon,
+            children: level2.subAreas.map((level3) {
+              return SubAreaChildItem(
+                name: level3.name,
+                globalSku: level3.globalSku,
+                icon: level3.icon,
+              );
+            }).toList(),
+          );
+        }).toList(),
+      );
+    }).toList();
+    
+    state = state.copyWith(areas: mapped);
   }
 }
