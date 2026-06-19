@@ -28,14 +28,11 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   String _selectedPurposeFilter = 'All Purposes';
   String _selectedTrackingFilter = 'All Statuses';
 
-  int _currentPage = 0;
-  static const int _itemsPerPage = 5;
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(productViewModelProvider.notifier).fetchProducts();
+      ref.read(productViewModelProvider.notifier).fetchProducts(page: 1, limit: 20);
     });
   }
 
@@ -73,11 +70,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
       return matchesQuery && matchesPurpose && matchesTracking;
     }).toList();
 
-    final totalPages = (filteredProducts.length / _itemsPerPage).ceil();
-    final paginatedProducts = filteredProducts
-        .skip(_currentPage * _itemsPerPage)
-        .take(_itemsPerPage)
-        .toList();
+    final paginatedProducts = filteredProducts;
 
     return GradientScaffold(
       body: SingleChildScrollView(
@@ -92,17 +85,19 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             _buildFilters(),
             SizedBox(height: 24.h),
             _buildCatalogTable(paginatedProducts),
-            if (totalPages > 1)
+            if (state.totalPages >= 1)
               Padding(
                 padding: context.appEdgeInsets(vertical: 24),
                 child: Center(
                   child: NumberPaginator(
-                    totalPages: totalPages,
-                    currentPage: _currentPage,
+                    totalPages: state.totalPages,
+                    currentPage: state.currentPage - 1,
                     onPageChanged: (pageIndex) {
-                      setState(() {
-                        _currentPage = pageIndex;
-                      });
+                      ref.read(productViewModelProvider.notifier).fetchProducts(
+                            search: state.searchKeyword,
+                            page: pageIndex + 1,
+                            limit: state.pageSize,
+                          );
                     },
                   ),
                 ),
@@ -230,6 +225,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   }
 
   Widget _buildFilters() {
+    final state = ref.watch(productViewModelProvider);
     return BorderdContainerWidget(
       padding: EdgeInsets.all(16.w),
       child: Row(
@@ -241,9 +237,11 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               hintText:
                   'Search master catalog by product name, SKU or brand manufacturer...',
               onChanged: (val) {
-                setState(() {
-                  _currentPage = 0;
-                });
+                ref.read(productViewModelProvider.notifier).fetchProducts(
+                      search: val,
+                      page: 1,
+                      limit: state.pageSize,
+                    );
               },
             ),
           ),
@@ -264,7 +262,6 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedPurposeFilter = val ?? 'All Purposes';
-                  _currentPage = 0;
                 });
               },
             ),
@@ -283,7 +280,6 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               onChanged: (val) {
                 setState(() {
                   _selectedTrackingFilter = val ?? 'All Statuses';
-                  _currentPage = 0;
                 });
               },
             ),

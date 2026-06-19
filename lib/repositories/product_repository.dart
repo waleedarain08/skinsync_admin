@@ -1,9 +1,12 @@
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
+import 'package:skinsync_admin/models/responses/product_list_response.dart';
+import 'package:skinsync_admin/models/responses/product_detail_response.dart';
 
 abstract class ProductRepository {
   Future<ProductModel> addProduct({required ProductModel req});
   Future<ProductModel> updateProduct({required ProductModel req});
   Future<BaseApiResponseModel> deleteProduct({required int id});
-  Future<List<ProductModel>> getProducts();
+  Future<ProductListResponse> getProducts({String search = '', int page = 1, int limit = 10});
+  Future<ProductDetailResponse> getProductDetail({required int id});
 }

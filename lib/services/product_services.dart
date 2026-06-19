@@ -62,12 +62,19 @@ class ProductServices implements ProductRepository {
   }
 
   @override
-  Future<List<ProductModel>> getProducts() async {
-    final jsonResponse = await _api.get(Endpoint.products);
+  Future<ProductListResponse> getProducts({String search = '', int page = 1, int limit = 10}) async {
+    final jsonResponse = await _api.get(
+      Endpoint.products,
+      queryParams: {
+        'search': search,
+        'page': page.toString(),
+        'limit': limit.toString(),
+      },
+    );
     final response = ProductListResponse.fromJson(jsonResponse);
-    if (!(response.isSuccess)) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
-    return response.data ?? [];
+    return response;
   }
 }

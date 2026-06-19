@@ -13,22 +13,36 @@ final productViewModelProvider =
 class ProductState extends BaseStateModel {
   final List<ProductModel> products;
   final String? errorMessage;
+  final int pageSize;
+  final String searchKeyword;
 
   ProductState({
     super.loading,
+    super.currentPage = 1,
+    super.totalPages = 1,
     this.products = const [],
     this.errorMessage,
+    this.pageSize = 20,
+    this.searchKeyword = '',
   });
 
   ProductState copyWith({
     bool? loading,
     List<ProductModel>? products,
     String? errorMessage,
+    int? currentPage,
+    int? pageSize,
+    int? totalPages,
+    String? searchKeyword,
   }) {
     return ProductState(
       loading: loading ?? this.loading,
+      currentPage: currentPage ?? this.currentPage,
+      totalPages: totalPages ?? this.totalPages,
       products: products ?? this.products,
       errorMessage: errorMessage ?? this.errorMessage,
+      pageSize: pageSize ?? this.pageSize,
+      searchKeyword: searchKeyword ?? this.searchKeyword,
     );
   }
 }
@@ -42,6 +56,10 @@ class ProductViewModel extends BaseViewModel<ProductState> {
   List<ProductModel> get products => state.products;
   bool get isLoading => state.loading;
   String? get errorMessage => state.errorMessage;
+  int get currentPage => state.currentPage;
+  int get pageSize => state.pageSize;
+  int get totalPages => state.totalPages;
+  String get searchKeyword => state.searchKeyword;
 
   @override
   void init() {
@@ -49,17 +67,25 @@ class ProductViewModel extends BaseViewModel<ProductState> {
   }
 
   Future<void> initialize() async {
-    await fetchProducts();
+    await fetchProducts(page: 1, limit: 20);
   }
 
-  Future<void> fetchProducts() async {
+  Future<void> fetchProducts({
+    String search = '',
+    int page = 1,
+    int limit = 20,
+  }) async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
         try {
-          final fetchedProducts = await _productRepository.getProducts();
+          final response = await _productRepository.getProducts(search: search, page: page, limit: limit);
           state = state.copyWith(
-            products: fetchedProducts,
+            products: response.data ?? [],
+            currentPage: response.page ?? page,
+            pageSize: response.limit ?? limit,
+            totalPages: response.totalPages ?? 1,
+            searchKeyword: search,
             errorMessage: null,
           );
         } catch (e) {
@@ -70,8 +96,30 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     );
   }
 
+  Future<void> searchProducts(String keyword) async {
+    await fetchProducts(search: keyword, page: 1, limit: state.pageSize);
+  }
+
+  Future<void> nextPage() async {
+    if (state.currentPage < state.totalPages) {
+      await fetchProducts(search: state.searchKeyword, page: state.currentPage + 1, limit: state.pageSize);
+    }
+  }
+
+  Future<void> previousPage() async {
+    if (state.currentPage > 1) {
+      await fetchProducts(search: state.searchKeyword, page: state.currentPage - 1, limit: state.pageSize);
+    }
+  }
+
+  Future<void> goToPage(int page) async {
+    if (page >= 1 && page <= state.totalPages) {
+      await fetchProducts(search: state.searchKeyword, page: page, limit: state.pageSize);
+    }
+  }
+
   Future<void> refreshProducts() async {
-    await fetchProducts();
+    await fetchProducts(search: state.searchKeyword, page: state.currentPage, limit: state.pageSize);
   }
 
   List<ProductModel> getAllProducts() {
@@ -101,7 +149,7 @@ class ProductViewModel extends BaseViewModel<ProductState> {
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
         final productWithId = await _productRepository.addProduct(req: req);
-        await fetchProducts();
+        await refreshProducts();
         EasyLoading.showSuccess('Product created successfully');
         return productWithId;
       },
@@ -113,7 +161,7 @@ class ProductViewModel extends BaseViewModel<ProductState> {
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
         await _productRepository.updateProduct(req: req);
-        await fetchProducts();
+        await refreshProducts();
         EasyLoading.showSuccess('Product updated successfully');
         return true;
       },
@@ -125,7 +173,7 @@ class ProductViewModel extends BaseViewModel<ProductState> {
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
         await _productRepository.deleteProduct(id: id);
-        await fetchProducts();
+        await refreshProducts();
         EasyLoading.showSuccess('Product deleted successfully');
         return true;
       },

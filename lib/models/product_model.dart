@@ -85,7 +85,7 @@ class ProductModel {
       brand: json['brand'],
       manufacturer: json['manufacturer'],
       globalSku: json['global_sku'],
-      productPurpose: json['product_purpose'],
+      productPurpose: json['product_purpose'] ?? json['usage_type'],
       unitType: json['unit_type'],
       enforceLotTracking: json['enforce_lot_tracking'],
       usageType: json['usage_type'] ?? json['product_purpose'],
