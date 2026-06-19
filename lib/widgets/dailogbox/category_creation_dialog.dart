@@ -195,19 +195,19 @@ class _CategoryCreationDialogState
   }
 
   void _populateFromCategory(CategoryDetailDto cat) {
-    _nameController.text = cat.name;
+    _nameController.text = cat.name ?? '' ;
     _totalSessionsController.text = cat.totalSessions.toString();
-    _selectedIcon = cat.icon;
-    _selectedImage = cat.image;
+    _selectedIcon = cat.icon ?? '';
+    _selectedImage = cat.image ?? '';
     _existingConsentName = cat.consentFormName;
     _consentFormUrl = cat.consentFormUrl;
 
     _sessions = List.from(
-      cat.defaultSessions.map(
+      cat.defaultSessions?.map(
         (s) => CategorySessionModel(
           sessionNumber: s.sessionNumber,
           followUps: List.from(
-            s.followUps.map(
+            s.followUps?.map(
               (f) => CategoryFollowUpModel(
                 type: f.type,
                 durationValue: f.durationValue,
@@ -217,15 +217,15 @@ class _CategoryCreationDialogState
                 isImageRequired: f.isImageRequired,
                 notes: f.notes,
               ),
-            ),
+            ) ?? [],
           ),
         ),
-      ),
+      ) ?? [],
     );
     _syncFollowUpsCountControllers();
 
     _preNotificationEntries = List.from(
-      cat.preNotifications.map(
+      cat.preNotifications?.map(
         (config) => NotificationEntry(
           titleController: TextEditingController(text: config.title),
           messageController: TextEditingController(text: config.message),
@@ -235,11 +235,11 @@ class _CategoryCreationDialogState
           timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
           type: typeValues.reverse[config.type] ?? 'reminder',
         ),
-      ),
+      ) ?? [],
     );
 
     _postNotificationEntries = List.from(
-      cat.postNotifications.map(
+      cat.postNotifications?.map(
         (config) => NotificationEntry(
           titleController: TextEditingController(text: config.title),
           messageController: TextEditingController(text: config.message),
@@ -249,15 +249,15 @@ class _CategoryCreationDialogState
           timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
           type: typeValues.reverse[config.type] ?? 'care',
         ),
-      ),
+      ) ?? [],
     );
 
-    _downtimeLowController.text = cat.downtimePresets.low.toString();
-    _downtimeModerateController.text = cat.downtimePresets.moderate.toString();
-    _downtimeHighController.text = cat.downtimePresets.high.toString();
+    _downtimeLowController.text = cat.downtimePresets?.low.toString() ?? "";
+    _downtimeModerateController.text = cat.downtimePresets?.moderate.toString() ?? "";
+    _downtimeHighController.text = cat.downtimePresets?.high.toString() ?? "";
 
     _selectedRoles = List.from(
-      cat.defaultRoles.map((r) => defaultRoleValues.reverse[r] ?? ''),
+      cat.defaultRoles?.map((r) => defaultRoleValues.reverse[r] ?? '') ?? [],
     );
   }
 

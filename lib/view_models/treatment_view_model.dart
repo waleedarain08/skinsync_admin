@@ -566,7 +566,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     if (source == 'category' && detail != null) {
       state = state.copyWith(
         preNotificationEntries: detail.preNotifications
-            .map(
+            ?.map(
               (config) => NotificationEntry(
                 titleController: TextEditingController(text: config.title),
                 messageController: TextEditingController(text: config.message),
@@ -576,8 +576,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
                 type: typeValues.reverse[config.type] ?? 'reminder',
               ),
-            )
-            .toList(),
+            ) 
+            .toList() ?? [],
       );
     }
   }
@@ -588,7 +588,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     if (source == 'category' && detail != null) {
       state = state.copyWith(
         postNotificationEntries: detail.postNotifications
-            .map(
+            ?.map(
               (config) => NotificationEntry(
                 titleController: TextEditingController(text: config.title),
                 messageController: TextEditingController(text: config.message),
@@ -599,7 +599,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 type: typeValues.reverse[config.type] ?? 'care',
               ),
             )
-            .toList(),
+            .toList() ?? [],
       );
     }
   }
@@ -610,61 +610,61 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       state = state.copyWith(providerRolesSource: source);
 
   void setSessionSource(String source, {CategoryDetailDto? category}) {
-    state = state.copyWith(sessionSource: source);
-    final detail = category ?? state.selectedCategoryDetail;
-    if (source == 'category' && detail != null) {
-      for (final entry in state.sessions) {
-        entry.dispose();
-      }
-      final List<SessionViewModelEntry> newSessions = [];
-      if (detail.defaultSessions.isNotEmpty) {
-        for (final s in detail.defaultSessions) {
-          newSessions.add(
-            SessionViewModelEntry(
-              sessionNumber: s.sessionNumber,
-              totalFollowUpsController: TextEditingController(
-                text: s.followUps.length.toString(),
-              ),
-              followUps: s.followUps
-                  .map(
-                    (fu) => FollowUpEntry(
-                      type: fu.type,
-                      durationUnit:
-                          unitValues.reverse[fu.durationUnit] ?? 'minutes',
-                      durationValueController: TextEditingController(
-                        text: fu.durationValue.toString(),
-                      ),
-                      notesController: TextEditingController(text: fu.notes),
-                      intervalValueController: TextEditingController(
-                        text: fu.intervalValue.toString(),
-                      ),
-                      intervalUnit: fu.intervalUnit,
-                      isImageRequired: fu.isImageRequired,
-                    ),
-                  )
-                  .toList(),
-            ),
-          );
-        }
-      } else {
-        final int sessionCount = detail.totalSessions;
-        for (int i = 0; i < sessionCount; i++) {
-          newSessions.add(
-            SessionViewModelEntry(
-              sessionNumber: i + 1,
-              totalFollowUpsController: TextEditingController(text: '0'),
-              followUps: [],
-            ),
-          );
-        }
-      }
-      state = state.copyWith(
-        totalSessions: newSessions.length,
-        sessions: newSessions,
-      );
+  state = state.copyWith(sessionSource: source);
+  final detail = category ?? state.selectedCategoryDetail;
+  if (source == 'category' && detail != null) {
+    for (final entry in state.sessions) {
+      entry.dispose();
     }
+    final List<SessionViewModelEntry> newSessions = [];
+    final defaultSessions = detail.defaultSessions;
+    if (defaultSessions != null && defaultSessions.isNotEmpty) {
+      for (final s in defaultSessions) {
+        newSessions.add(
+          SessionViewModelEntry(
+            sessionNumber: s.sessionNumber,
+            totalFollowUpsController: TextEditingController(
+              text: s.followUps.length.toString(),
+            ),
+            followUps: s.followUps
+                .map(
+                  (fu) => FollowUpEntry(
+                    type: fu.type,
+                    durationUnit:
+                        unitValues.reverse[fu.durationUnit] ?? 'minutes',
+                    durationValueController: TextEditingController(
+                      text: fu.durationValue.toString(),
+                    ),
+                    notesController: TextEditingController(text: fu.notes),
+                    intervalValueController: TextEditingController(
+                      text: fu.intervalValue.toString(),
+                    ),
+                    intervalUnit: fu.intervalUnit,
+                    isImageRequired: fu.isImageRequired,
+                  ),
+                )
+                .toList(),
+          ),
+        );
+      }
+    } else {
+      final int sessionCount = detail.totalSessions ?? 0;
+      for (int i = 0; i < sessionCount; i++) {
+        newSessions.add(
+          SessionViewModelEntry(
+            sessionNumber: i + 1,
+            totalFollowUpsController: TextEditingController(text: '0'),
+            followUps: [],
+          ),
+        );
+      }
+    }
+    state = state.copyWith(
+      totalSessions: newSessions.length,
+      sessions: newSessions,
+    );
   }
-
+}
   void toggleAllowClinicOverride(bool? val) =>
       state = state.copyWith(allowClinicOverride: val ?? false);
   void toggleAllowProviderOverride(bool? val) =>
@@ -795,8 +795,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           // 3. Provider Roles
           if (state.providerRolesSource == 'category') {
             final roles = detail.defaultRoles
-                .map((r) => defaultRoleValues.reverse[r] ?? '')
-                .toList();
+                ?.map((r) => defaultRoleValues.reverse[r] ?? '')
+                .toList() ??
+                [];
             state = state.copyWith(selectedRoles: roles);
           }
 
@@ -813,8 +814,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       entry.dispose();
     }
     final List<SessionViewModelEntry> newSessions = [];
-    if (detail.defaultSessions.isNotEmpty) {
-      for (final s in detail.defaultSessions) {
+    if (detail.defaultSessions?.isNotEmpty == true) {
+      for (final s in detail.defaultSessions!) {
         newSessions.add(
           SessionViewModelEntry(
             sessionNumber: s.sessionNumber,
@@ -843,7 +844,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         );
       }
     } else {
-      final int sessionCount = detail.totalSessions;
+      final int sessionCount = detail.totalSessions ?? 0;
       for (int i = 0; i < sessionCount; i++) {
         newSessions.add(
           SessionViewModelEntry(
@@ -868,7 +869,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         ? detail.preNotifications
         : detail.postNotifications;
     final entries = notifications
-        .map(
+        ?.map(
           (config) => NotificationEntry(
             titleController: TextEditingController(text: config.title),
             messageController: TextEditingController(text: config.message),
@@ -881,7 +882,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 (isPre ? 'reminder' : 'care'),
           ),
         )
-        .toList();
+        .toList()?? [];
 
     if (isPre) {
       state = state.copyWith(preNotificationEntries: entries);
@@ -1348,7 +1349,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (state.preNotificationSource == 'category') {
         if (selectedCategory != null) {
           effectivePreNotifications = selectedCategory.preNotifications
-              .map(
+              ?.map(
                 (n) => NotificationConfig(
                   title: n.title,
                   message: n.message,
@@ -1357,7 +1358,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                   type: typeValues.reverse[n.type] ?? 'reminder',
                 ),
               )
-              .toList();
+              .toList() ?? [];
         }
       } else {
         effectivePreNotifications = state.preNotificationEntries
@@ -1369,7 +1370,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (state.postNotificationSource == 'category') {
         if (selectedCategory != null) {
           effectivePostNotifications = selectedCategory.postNotifications
-              .map(
+              ?.map(
                 (n) => NotificationConfig(
                   title: n.title,
                   message: n.message,
@@ -1378,7 +1379,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                   type: typeValues.reverse[n.type] ?? 'care',
                 ),
               )
-              .toList();
+              .toList() ?? [];
         }
       } else {
         effectivePostNotifications = state.postNotificationEntries
@@ -1387,9 +1388,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       }
 
       if (state.sessionSource == 'category') {
+         final defaultSessions = selectedCategory?.defaultSessions;
         if (selectedCategory != null &&
-            selectedCategory.defaultSessions.isNotEmpty) {
-          effectiveSessions = selectedCategory.defaultSessions
+      defaultSessions != null &&
+      defaultSessions.isNotEmpty) {
+          effectiveSessions = defaultSessions
               .map(
                 (s) => SessionConfig(
                   sessionNumber: s.sessionNumber,
@@ -1662,7 +1665,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (state.preNotificationSource == 'category') {
         if (selectedCategory != null) {
           effectivePreNotifications = selectedCategory.preNotifications
-              .map(
+              ?.map(
                 (n) => NotificationConfig(
                   title: n.title,
                   message: n.message,
@@ -1671,7 +1674,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                   type: typeValues.reverse[n.type] ?? 'reminder',
                 ),
               )
-              .toList();
+              .toList() ?? [];
         }
       } else {
         effectivePreNotifications = state.preNotificationEntries
@@ -1683,7 +1686,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (state.postNotificationSource == 'category') {
         if (selectedCategory != null) {
           effectivePostNotifications = selectedCategory.postNotifications
-              .map(
+              ?.map(
                 (n) => NotificationConfig(
                   title: n.title,
                   message: n.message,
@@ -1692,7 +1695,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                   type: typeValues.reverse[n.type] ?? 'care',
                 ),
               )
-              .toList();
+              .toList() ?? [];
         }
       } else {
         effectivePostNotifications = state.postNotificationEntries
@@ -1702,9 +1705,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
       if (state.sessionSource == 'category') {
         if (selectedCategory != null &&
-            selectedCategory.defaultSessions.isNotEmpty) {
-          effectiveSessions = selectedCategory.defaultSessions
-              .map(
+            selectedCategory.defaultSessions != null &&
+            selectedCategory.defaultSessions!.isNotEmpty) {
+          effectiveSessions = selectedCategory.defaultSessions!
+              ?.map(
                 (s) => SessionConfig(
                   sessionNumber: s.sessionNumber,
                   followUps: s.followUps
@@ -1720,10 +1724,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                           isImageRequired: f.isImageRequired,
                         ),
                       )
-                      .toList(),
+                      .toList() ,
                 ),
               )
-              .toList();
+              .toList() ?? [];
         } else {
           final int sessionCount = selectedCategory?.totalSessions ?? 1;
           for (int i = 0; i < sessionCount; i++) {
