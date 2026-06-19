@@ -6,20 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/responses/area_list_response.dart';
 
 import '../models/notification_entry.dart';
-import '../models/product_model.dart';
-import '../models/treatment_data_models.dart';
-import '../models/responses/category_detail_response.dart';
 import '../models/notification_model.dart';
+import '../models/product_model.dart';
+import '../models/responses/category_detail_response.dart';
+import '../models/treatment_data_models.dart';
+import '../utils/list_utils.dart';
 import '../utils/theme.dart';
 import '../utils/validators.dart';
+import '../view_models/area_view_model.dart';
 import '../view_models/category_view_model.dart';
 import '../view_models/product_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
-import '../view_models/area_view_model.dart';
 import '../view_models/treatment_view_model.dart';
-import 'create_product_screen.dart';
 import '../widgets/app_search_field.dart';
 import '../widgets/borderd_container_widget.dart';
 import '../widgets/build_textfield.dart';
@@ -29,6 +30,7 @@ import '../widgets/custom_primary_button.dart';
 import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_category_selector.dart';
+import 'create_product_screen.dart';
 
 class CreateTreatmentScreen extends ConsumerStatefulWidget {
   const CreateTreatmentScreen({super.key});
@@ -36,7 +38,8 @@ class CreateTreatmentScreen extends ConsumerStatefulWidget {
   static const String routeName = '/create-treatment';
 
   @override
-  ConsumerState<CreateTreatmentScreen> createState() => _CreateTreatmentScreenState();
+  ConsumerState<CreateTreatmentScreen> createState() =>
+      _CreateTreatmentScreenState();
 }
 
 class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
@@ -47,7 +50,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       ref.read(categoryViewModelProvider.notifier).fetchCategories();
       await ref.read(areaViewModelProvider.notifier).fetchAreas();
       final fetchedAreas = ref.read(areaViewModelProvider).areas;
-      ref.read(treatmentDataViewModelProvider.notifier).setAreasFromBackend(fetchedAreas);
+      ref
+          .read(treatmentDataViewModelProvider.notifier)
+          .setAreasFromBackend(fetchedAreas);
     });
   }
 
@@ -136,7 +141,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             ),
           ),
           if (isDesktop)
-            _buildRightSidebar(context, state, viewModel, dataState, categoryState),
+            _buildRightSidebar(
+              context,
+              state,
+              viewModel,
+              dataState,
+              categoryState,
+            ),
         ],
       ),
     );
@@ -440,11 +451,22 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               style: context.fonts.black16w600,
             ),
             context.verticalSpace(16),
-            _buildProtocolFormPreview(context, state, viewModel, dataState, categoryState),
+            _buildProtocolFormPreview(
+              context,
+              state,
+              viewModel,
+              dataState,
+              categoryState,
+            ),
             context.verticalSpace(32),
             Text('Patient Journey Preview', style: context.fonts.black16w600),
             context.verticalSpace(20),
-            _buildPatientJourneyPreview(context, state, viewModel, categoryState),
+            _buildPatientJourneyPreview(
+              context,
+              state,
+              viewModel,
+              categoryState,
+            ),
             context.verticalSpace(32),
             Text('Configuration Summary', style: context.fonts.black16w600),
             context.verticalSpace(16),
@@ -811,28 +833,23 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               spacing: 12,
               runSpacing: 12,
               children: activeAreas.map((areaEntry) {
-                // Find corresponding AreaItem in dataState.areas
-                final areaItem = dataState.areas.firstWhere(
+                // Find corresponding AreaModel in dataState.areas
+                final areaItem = dataState.areas.firstWhereOrNull(
                   (a) => a.name == areaEntry.areaController.text,
-                  orElse: () => AreaItem(
-                    name: areaEntry.areaController.text,
-                    globalSku: 'N/A',
-                  ),
                 );
 
                 final List<String> subNames = areaEntry.subAreas.map((s) {
                   // Find corresponding subarea SKU
-                  final subItem = areaItem.subAreas.firstWhere(
+                  final subItem = areaItem?.subAreas.firstWhereOrNull(
                     (sa) => sa.name == s.name,
-                    orElse: () => SubAreaItem(name: s.name, globalSku: 'N/A'),
                   );
-                  return '${s.name} (${subItem.globalSku})';
+                  return '${s.name} (${subItem?.globalSku ?? 'N/A'})';
                 }).toList();
 
                 return _SelectedSummaryCard(
-                  title: areaItem.name,
-                  sku: areaItem.globalSku,
-                  icon: areaItem.icon,
+                  title: areaItem?.name ?? 'N/A',
+                  sku: areaItem?.globalSku ?? 'N/A',
+                  icon: areaItem?.icon,
                   subLabel: 'Selected Sub-Areas:',
                   items: subNames,
                 );
@@ -1109,7 +1126,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   ) {
     final isCategory = state.providerRolesSource == 'category';
     final List<String> roles = isCategory
-        ? (selectedCategory?.defaultRoles.map((r) => r.name[0] + r.name.substring(1).toLowerCase()).toList() ?? [])
+        ? (selectedCategory?.defaultRoles
+                  .map((r) => r.name[0] + r.name.substring(1).toLowerCase())
+                  .toList() ??
+              [])
         : state.selectedRoles;
 
     return _blueprintSection(
@@ -1523,20 +1543,18 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                                       'Notes:',
                                       style: context.fonts.black12w600,
                                     ),
-                                    ...pNote.notes
-                                        .map(
-                                          (note) => Padding(
-                                            padding: const EdgeInsets.only(
-                                              left: 8.0,
-                                              top: 4.0,
-                                            ),
-                                            child: Text(
-                                              "• ${note.title != null && note.title!.isNotEmpty ? '${note.title}: ' : ''}${note.description}",
-                                              style: context.fonts.grey11w400,
-                                            ),
-                                          ),
-                                        )
-                                        ,
+                                    ...pNote.notes.map(
+                                      (note) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 8.0,
+                                          top: 4.0,
+                                        ),
+                                        child: Text(
+                                          "• ${note.title != null && note.title!.isNotEmpty ? '${note.title}: ' : ''}${note.description}",
+                                          style: context.fonts.grey11w400,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 );
                               }
@@ -1588,20 +1606,18 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                             children: [
                               context.verticalSpace(8),
                               Text('Notes:', style: context.fonts.black12w600),
-                              ...pNote.notes
-                                  .map(
-                                    (note) => Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 8.0,
-                                        top: 4.0,
-                                      ),
-                                      child: Text(
-                                        "• ${note.title != null && note.title!.isNotEmpty ? '${note.title}: ' : ''}${note.description}",
-                                        style: context.fonts.grey11w400,
-                                      ),
-                                    ),
-                                  )
-                                  ,
+                              ...pNote.notes.map(
+                                (note) => Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 8.0,
+                                    top: 4.0,
+                                  ),
+                                  child: Text(
+                                    "• ${note.title != null && note.title!.isNotEmpty ? '${note.title}: ' : ''}${note.description}",
+                                    style: context.fonts.grey11w400,
+                                  ),
+                                ),
+                              ),
                             ],
                           );
                         }
@@ -1967,7 +1983,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       case 9:
         return _buildPostTreatmentPhotosStep(context, state, viewModel);
       case 10:
-        return _buildStepNotifications(context, state, viewModel, categoryState);
+        return _buildStepNotifications(
+          context,
+          state,
+          viewModel,
+          categoryState,
+        );
       case 11:
         return _buildStepDowntime(context, state, viewModel, categoryState);
       case 12:
@@ -2138,12 +2159,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             itemBuilder: (context, idx) {
               final config = notifications[idx];
               final typeStr = typeValues.reverse[config.type] ?? 'reminder';
-              final typeText = ' [${typeStr[0].toUpperCase()}${typeStr.substring(1)}]';
-              final timingUnitStr = unitValues.reverse[config.timingUnit] ?? 'hours';
+              final typeText =
+                  ' [${typeStr[0].toUpperCase()}${typeStr.substring(1)}]';
+              final timingUnitStr =
+                  unitValues.reverse[config.timingUnit] ?? 'hours';
               return _buildNotificationPreview(
                 context,
-                title:
-                    "${config.title} $typeText (Read-only)",
+                title: "${config.title} $typeText (Read-only)",
                 message: config.message,
                 timing:
                     "${config.timing} $timingUnitStr ${isPre ? 'Before' : 'After'}",
@@ -2685,7 +2707,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       'Nurse',
       'Specialist',
     ];
-    final List<String> categoryRoles = selectedCategory?.defaultRoles.map((r) => defaultRoleValues.reverse[r] ?? '').toList() ?? [];
+    final List<String> categoryRoles =
+        selectedCategory?.defaultRoles
+            .map((r) => defaultRoleValues.reverse[r] ?? '')
+            .toList() ??
+        [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -4987,7 +5013,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 
   void _handleAreaToggle(
-    AreaItem area,
+    AreaModel area,
     TreatmentState state,
     TreatmentViewModel viewModel,
   ) {
@@ -5010,8 +5036,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 
   void _handleSubAreaToggle(
-    AreaItem area,
-    SubAreaItem subArea,
+    AreaModel area,
+    AreaModel subArea,
     TreatmentState state,
     TreatmentViewModel viewModel,
   ) {
@@ -5046,9 +5072,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 
   void _handleSubAreaChildToggle(
-    AreaItem area,
-    SubAreaItem subArea,
-    SubAreaChildItem child,
+    AreaModel area,
+    AreaModel subArea,
+    AreaModel child,
     TreatmentState state,
     TreatmentViewModel viewModel,
   ) {
@@ -5121,21 +5147,27 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         NestedAreaSelector(
           areas: dataState.areas,
           selectedAreas: state.areas,
-          onAreaToggle: (AreaItem area) => _handleAreaToggle(area, state, viewModel),
-          onSubAreaToggle: (AreaItem area, SubAreaItem subArea) =>
+          onAreaToggle: (AreaModel area) =>
+              _handleAreaToggle(area, state, viewModel),
+          onSubAreaToggle: (AreaModel area, AreaModel subArea) =>
               _handleSubAreaToggle(area, subArea, state, viewModel),
-          onSubAreaChildToggle: (AreaItem area, SubAreaItem subArea, SubAreaChildItem child) =>
-              _handleSubAreaChildToggle(area, subArea, child, state, viewModel),
-          onAddArea: (String name, String sku, String? icon) {
-            ref
+          onSubAreaChildToggle:
+              (AreaModel area, AreaModel subArea, AreaModel child) =>
+                  _handleSubAreaChildToggle(
+                    area,
+                    subArea,
+                    child,
+                    state,
+                    viewModel,
+                  ),
+          onAddArea: (String name, String sku, String icon) async {
+            await ref
                 .read(treatmentDataViewModelProvider.notifier)
                 .addArea(name, sku: sku, icon: icon);
           },
-          onAddSubArea: (parentArea, name, sku, icon) {
-            ref
-                .read(treatmentDataViewModelProvider.notifier)
-                .addSubArea(parentArea, name, sku: sku, icon: icon);
-          },
+          onAddSubArea: ref
+              .read(treatmentDataViewModelProvider.notifier)
+              .addSubArea,
           onAddSubAreaChild: (parentArea, parentSubArea, name, sku, icon) {
             ref
                 .read(treatmentDataViewModelProvider.notifier)
@@ -5710,249 +5742,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     );
   }
 
-  Widget _buildAreaRow(
-    BuildContext context,
-    int index,
-    AreaViewModelEntry entry,
-    TreatmentViewModel viewModel,
-    TreatmentDataState dataState,
-  ) {
-    return Container(
-      padding: context.appEdgeInsets(all: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: context.appBorderRadius(all: 16),
-        border: Border.all(color: CustomColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _buildSearchField(
-                  context,
-                  label: 'Area Name',
-                  hint: 'e.g. Upper Face',
-                  controller: entry.areaController,
-                  suggestions: dataState.areas.map((a) => a.name).toList(),
-                  onSelected: (val) => viewModel.onAreaSelected(index, val),
-                ),
-              ),
-              if (index > 0)
-                Padding(
-                  padding: context.appEdgeInsets(top: 32, left: 16),
-                  child: IconButton(
-                    onPressed: () => viewModel.removeArea(index),
-                    icon: const Icon(
-                      Icons.delete_outline,
-                      color: CustomColors.red,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          context.verticalSpace(24),
-          _buildSubAreaSection(context, index, entry, viewModel, dataState),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSubAreaSection(
-    BuildContext context,
-    int areaIndex,
-    AreaViewModelEntry entry,
-    TreatmentViewModel viewModel,
-    TreatmentDataState dataState,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSearchField(
-          context,
-          label: 'Sub Areas (Mandatory)',
-          hint: 'Select or type to add sub areas',
-          controller: entry.subAreaController,
-          suggestions: dataState.areas.isEmpty
-              ? []
-              : dataState.areas
-                    .firstWhere(
-                      (a) => a.name == entry.areaController.text,
-                      orElse: () => dataState.areas.first,
-                    )
-                    .subAreas
-                    .map((s) => s.name)
-                    .toList(),
-          onSelected: (val) => viewModel.addSubArea(areaIndex, val),
-        ),
-        if (entry.subAreas.isNotEmpty) ...[
-          context.verticalSpace(16),
-          Wrap(
-            spacing: context.w(12),
-            runSpacing: context.h(12),
-            children: entry.subAreas.map((sub) {
-              return Chip(
-                avatar: const Icon(Icons.subdirectory_arrow_right, size: 14),
-                label: Text(sub.name, style: context.fonts.grey13w500),
-                onDeleted: () => viewModel.removeSubArea(areaIndex, sub.name),
-                backgroundColor: CustomColors.green.withValues(alpha: 0.1),
-                side: BorderSide(
-                  color: CustomColors.green.withValues(alpha: 0.2),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildSearchField(
-    BuildContext context, {
-    required String label,
-    required String hint,
-    required TextEditingController controller,
-    required List<String> suggestions,
-    required void Function(String) onSelected,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: context.fonts.black14w600),
-        context.verticalSpace(10),
-        SearchAnchor(
-          viewHintText: hint,
-          viewConstraints: BoxConstraints(maxHeight: context.h(350)),
-          viewShape: RoundedRectangleBorder(
-            borderRadius: context.appBorderRadius(all: 16),
-          ),
-          viewSurfaceTintColor: Colors.white,
-          viewBackgroundColor: Colors.white,
-          viewElevation: 12,
-          builder: (context, searchController) {
-            if (searchController.text.isEmpty && controller.text.isNotEmpty) {
-              searchController.text = controller.text;
-            }
-
-            return AppSearchField(
-              controller: controller,
-              readOnly: true,
-              onTap: () {
-                searchController.text = controller.text;
-                searchController.openView();
-              },
-              hintText: hint,
-              suffixIcon: const Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: CustomColors.grey,
-              ),
-              maxWidth: double.infinity,
-            );
-          },
-          suggestionsBuilder: (context, searchController) {
-            final query = searchController.text.toLowerCase();
-            // final filteredList = suggestions.where((s) => s.toLowerCase().contains(query)).toList();
-
-            return [
-              if (searchController.text.isNotEmpty &&
-                  !suggestions.contains(searchController.text))
-                Padding(
-                  padding: context.appEdgeInsets(
-                    left: 16,
-                    top: 12,
-                    right: 16,
-                    bottom: 8,
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      controller.text = searchController.text;
-                      onSelected(searchController.text);
-                      searchController.closeView(searchController.text);
-                    },
-                    borderRadius: context.appBorderRadius(all: 10),
-                    child: Container(
-                      padding: context.appEdgeInsets(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: CustomColors.purple.withValues(alpha: 0.05),
-                        borderRadius: context.appBorderRadius(all: 10),
-                        border: Border.all(
-                          color: CustomColors.purple.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.add_circle_outline_rounded,
-                            color: CustomColors.black,
-                            size: 20,
-                          ),
-                          context.horizontalSpace(12),
-                          Expanded(
-                            child: Text(
-                              'Create new: "${searchController.text}"',
-                              style: context.fonts.black14w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ...suggestions.map((item) {
-                final bool isMatch = item.toLowerCase().contains(query);
-                if (!isMatch && query.isNotEmpty) {
-                  return const SizedBox.shrink();
-                }
-
-                return Column(
-                  children: [
-                    ListTile(
-                      contentPadding: context.appEdgeInsets(
-                        horizontal: 24,
-                        vertical: 4,
-                      ),
-                      leading: Container(
-                        width: context.w(32),
-                        height: context.w(32),
-                        decoration: BoxDecoration(
-                          color: CustomColors.whiteGrey,
-                          borderRadius: context.appBorderRadius(all: 6),
-                        ),
-                        child: const Icon(
-                          Icons.circle_outlined,
-                          size: 14,
-                          color: CustomColors.grey,
-                        ),
-                      ),
-                      title: Text(item, style: context.fonts.grey14w400),
-                      hoverColor: CustomColors.green.withValues(alpha: 0.05),
-                      onTap: () {
-                        controller.text = item;
-                        onSelected(item);
-                        searchController.closeView(item);
-                      },
-                    ),
-                    const Divider(
-                      height: 1,
-                      indent: 24,
-                      endIndent: 24,
-                      color: CustomColors.border,
-                    ),
-                  ],
-                );
-              }),
-            ];
-          },
-        ),
-      ],
-    );
-  }
-
   Widget _buildImageUploadTile(
     BuildContext context,
     String label,
@@ -6081,7 +5870,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           child: CustomPrimaryButton(
             onTap: () async {
               if (state.currentStep == 0) {
-                if (!await _validateAndFetchCategory(context, state, viewModel, categoryState)) return;
+                if (!await _validateAndFetchCategory(
+                  context,
+                  state,
+                  viewModel,
+                  categoryState,
+                ))
+                  return;
               }
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
@@ -6103,7 +5898,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 viewModel.setStep(state.currentStep + 1);
               } else {
                 viewModel
-                    .submitTreatment(context, categories: categoryState.categories)
+                    .submitTreatment(
+                      context,
+                      categories: categoryState.categories,
+                    )
                     .then((_) {
                       if (context.mounted) context.pop();
                     });
@@ -6175,12 +5973,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     }
 
     try {
-      final success = await viewModel.fetchAndPopulateCategoryDefaults(categoryId);
+      final success = await viewModel.fetchAndPopulateCategoryDefaults(
+        categoryId,
+      );
       if (!success) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Unable to load category configuration. Please try again.'),
+              content: Text(
+                'Unable to load category configuration. Please try again.',
+              ),
               backgroundColor: CustomColors.red,
             ),
           );
@@ -6191,7 +5993,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Unable to load category configuration. Please try again.'),
+            content: Text(
+              'Unable to load category configuration. Please try again.',
+            ),
             backgroundColor: CustomColors.red,
           ),
         );
@@ -6416,10 +6220,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   controller: viewModel.postTreatmentPhotoCountController,
                   hintText: '0',
                   keyboardType: TextInputType.number,
-                  onChanged: (val) =>
-                      viewModel.updateRequiredPostTreatmentPhotoCount(
-                        val ?? '0',
-                      ),
+                  onChanged: (val) => viewModel
+                      .updateRequiredPostTreatmentPhotoCount(val ?? '0'),
                 ),
               ),
               _counterButton(
@@ -6458,18 +6260,26 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 }
 
+typedef SubAreaSetter =
+    void Function({
+      required int parentAreaId,
+      required String parentAreaName,
+      required String name,
+      String? sku,
+      String? icon,
+    });
+
 class NestedAreaSelector extends ConsumerStatefulWidget {
-  final List<AreaItem> areas;
+  final List<AreaModel> areas;
   final List<AreaViewModelEntry> selectedAreas;
-  final void Function(AreaItem area) onAreaToggle;
-  final void Function(AreaItem area, SubAreaItem subArea) onSubAreaToggle;
-  final void Function(AreaItem area, SubAreaItem subArea, SubAreaChildItem child)
+  final void Function(AreaModel area) onAreaToggle;
+  final void Function(AreaModel area, AreaModel subArea) onSubAreaToggle;
+  final void Function(AreaModel area, AreaModel subArea, AreaModel child)
   onSubAreaChildToggle;
 
   // Creation callbacks
-  final void Function(String name, String sku, String? icon) onAddArea;
-  final void Function(String parentArea, String name, String sku, String? icon)
-  onAddSubArea;
+  final void Function(String name, String sku, String icon) onAddArea;
+  final SubAreaSetter onAddSubArea;
   final void Function(
     String parentArea,
     String parentSubArea,
@@ -6510,7 +6320,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
   void _showAddNodeDialog({
     required BuildContext context,
     required String title,
-    required void Function(String name, String sku, String? iconPath) onAdd,
+    required void Function(String name, String sku, String iconPath) onAdd,
   }) {
     final nameController = TextEditingController();
     final skuController = TextEditingController();
@@ -6555,15 +6365,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                           border: Border.all(color: CustomColors.border),
                         ),
                         child: pickedIconPath != null
-                            ? (pickedIconPath!.startsWith('http')
-                                  ? Image.network(
-                                      pickedIconPath!,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Image.file(
-                                      File(pickedIconPath!),
-                                      fit: BoxFit.cover,
-                                    ))
+                            ? Image.network(pickedIconPath!, fit: BoxFit.cover)
                             : const Icon(
                                 Icons.image_outlined,
                                 color: CustomColors.grey,
@@ -6638,7 +6440,16 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                       return;
                     }
 
-                    onAdd(name, sku, pickedIconPath);
+                    if (pickedIconPath == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Area icon must be selected!'),
+                          backgroundColor: CustomColors.red,
+                        ),
+                      );
+                      return;
+                    }
+                    onAdd(name, sku, pickedIconPath!);
                     Navigator.pop(context);
                   },
                   label: 'Add',
@@ -6676,7 +6487,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
             (sa) => sa.name == s.name,
           );
 
-          final selectedChildren = s.children.where((c) {
+          final selectedChildren = s.subAreas.where((c) {
             return subAreaConfig.children.any((sac) => sac.name == c.name);
           }).toList();
 
@@ -6737,11 +6548,8 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
           : null;
     }
 
-    final focusedSubArea = focusedArea.subAreas.firstWhere(
+    final focusedSubArea = focusedArea.subAreas.firstWhereOrNull(
       (s) => s.name == _focusedSubAreaName,
-      orElse: () => focusedArea.subAreas.isNotEmpty
-          ? focusedArea.subAreas.first
-          : SubAreaItem(name: '', globalSku: ''),
     );
 
     return Column(
@@ -6799,8 +6607,14 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 _showAddNodeDialog(
                   context: context,
                   title: 'Create New Sub-Area in ${area.name}',
-                  onAdd: (name, sku, icon) =>
-                      widget.onAddSubArea(area.name, name, sku, icon),
+                  onAdd: (name, sku, icon) => widget.onAddSubArea(
+                    // TODO: Add actual parent area id.
+                    parentAreaId: 0,
+                    parentAreaName: area.name,
+                    name: name,
+                    sku: sku,
+                    icon: icon,
+                  ),
                 );
               },
             );
@@ -6824,8 +6638,14 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                   _showAddNodeDialog(
                     context: context,
                     title: 'Create New Sub-Area in ${focusedArea.name}',
-                    onAdd: (name, sku, icon) =>
-                        widget.onAddSubArea(focusedArea.name, name, sku, icon),
+                    onAdd: (name, sku, icon) => widget.onAddSubArea(
+                      // TODO: Send actual parent area id here;
+                      parentAreaId: 0,
+                      parentAreaName: focusedArea.name,
+                      name: name,
+                      sku: sku,
+                      icon: icon,
+                    ),
                   );
                 },
                 icon: const Icon(
@@ -6879,8 +6699,9 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
         ],
 
         // Level 2: Sub-Area Children
-        if (focusedSubArea.name.isNotEmpty &&
-            focusedSubArea.children.isNotEmpty) ...[
+        if (focusedSubArea != null &&
+            focusedSubArea.name.isNotEmpty &&
+            focusedSubArea.subAreas.isNotEmpty) ...[
           context.verticalSpace(32),
           const Divider(),
           context.verticalSpace(24),
@@ -6920,7 +6741,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
           Wrap(
             spacing: 16,
             runSpacing: 16,
-            children: focusedSubArea.children.map((child) {
+            children: focusedSubArea.subAreas.map((child) {
               final subAreaConfig = areaEntry.subAreas.firstWhere(
                 (s) => s.name == focusedSubArea.name,
                 orElse: () => SubAreaConfig(name: focusedSubArea.name),
@@ -7093,29 +6914,30 @@ class _AreaCard extends StatelessWidget {
 
   Widget _buildIcon(BuildContext context) {
     if (icon != null && icon!.isNotEmpty) {
-      if (icon!.startsWith('http')) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: Image.network(
-            icon!,
-            width: 22,
-            height: 22,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => _fallbackIcon(context),
-          ),
-        );
-      } else if (icon!.contains('/') || icon!.contains('\\')) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: Image.file(
-            File(icon!),
-            width: 22,
-            height: 22,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => _fallbackIcon(context),
-          ),
-        );
-      }
+      debugPrint('ICON: $icon');
+      // if (icon!.startsWith('http')) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.network(
+          icon!,
+          width: 22,
+          height: 22,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => _fallbackIcon(context),
+        ),
+      );
+      // } else if (icon!.contains('/') || icon!.contains('\\')) {
+      //   return ClipRRect(
+      //     borderRadius: BorderRadius.circular(4),
+      //     child: Image.file(
+      //       File(icon!),
+      //       width: 22,
+      //       height: 22,
+      //       fit: BoxFit.cover,
+      //       errorBuilder: (_, _, _) => _fallbackIcon(context),
+      //     ),
+      //   );
+      // }
     }
     return _fallbackIcon(context);
   }

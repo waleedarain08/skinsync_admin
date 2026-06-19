@@ -1,13 +1,19 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/models/requests/area_request.dart';
+import 'package:skinsync_admin/services/media_service.dart';
+import 'package:skinsync_admin/utils/exception.dart';
+
 import '../models/responses/area_list_response.dart';
 import '../repositories/area_repository.dart';
 import '../services/locator.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 
-final areaViewModelProvider =
-    NotifierProvider<AreaViewModel, AreaState>(AreaViewModel.new);
+final areaViewModelProvider = NotifierProvider<AreaViewModel, AreaState>(
+  AreaViewModel.new,
+);
 
 class AreaState extends BaseStateModel {
   final List<AreaModel> areas;
@@ -49,16 +55,32 @@ class AreaViewModel extends BaseViewModel<AreaState> {
         try {
           final fetched = await _areaRepository.getAreas();
           final flattened = _flattenAreas(fetched);
-          state = state.copyWith(
-            areas: fetched,
-            flattenedAreas: flattened,
-          );
+          state = state.copyWith(areas: fetched, flattenedAreas: flattened);
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;
         }
       },
     );
+  }
+
+  Future<AreaModel?> createArea({
+    required String name,
+    required String globalSku,
+    required String icon,
+  }) async {
+    return await runSafely<AreaModel?>(() async {
+      final String? imageUrl = await MediaService().uploadImage(
+        'areas/icons/',
+        XFile(icon),
+      );
+      if (imageUrl == null) {
+        throw const UnknownException('Failed to upload image');
+      }
+      return await _areaRepository.createArea(
+        AreaRequest(name: name, globalSku: globalSku, icon: icon),
+      );
+    });
   }
 
   Future<void> refreshAreas() async {
@@ -94,9 +116,7 @@ class AreaViewModel extends BaseViewModel<AreaState> {
   }
 
   List<DropdownMenuItem<int>> getAreaDropdownItems({int? parentId}) {
-    final list = parentId == null
-        ? state.areas
-        : getSubAreas(parentId);
+    final list = parentId == null ? state.areas : getSubAreas(parentId);
 
     return list
         .map((area) => DropdownMenuItem(value: area.id, child: Text(area.name)))

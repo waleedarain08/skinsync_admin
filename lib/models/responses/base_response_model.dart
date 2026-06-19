@@ -3,12 +3,16 @@ class BaseApiResponseModel<T> {
   final String message;
   final T? data;
 
-  const BaseApiResponseModel({required this.status, required this.message, this.data});
+  const BaseApiResponseModel({
+    required this.status,
+    required this.message,
+    this.data,
+  });
 
   factory BaseApiResponseModel.fromJson(
-      Map<String, dynamic> json,
-      T Function(Object? json) fromJsonT,
-      ) {
+    Map<String, dynamic> json,
+    T? Function(Object? json) fromJsonT,
+  ) {
     return BaseApiResponseModel<T>(
       status: json['status'] ?? false,
       message: json['message'] ?? '',
@@ -25,4 +29,3 @@ class BaseApiResponseModel<T> {
     return BaseApiResponseModel<T>(status: true, message: message, data: data);
   }
 }
-

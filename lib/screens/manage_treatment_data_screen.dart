@@ -52,20 +52,19 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
   }) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder:
-          (context) => CategoryCreationDialog(
-            parentName: parentName,
-            initialName: initialName,
-            initialIcon: initialIcon,
-            initialImage: initialImage,
-            initialConsentName: initialConsentName,
-            initialSessions: initialSessions,
-            initialTotalSessions: initialTotalSessions,
-            initialPreNotifications: initialPreNotifications,
-            initialPostNotifications: initialPostNotifications,
-            initialDowntimePresets: initialDowntimePresets,
-            initialDefaultRoles: initialDefaultRoles,
-          ),
+      builder: (context) => CategoryCreationDialog(
+        parentName: parentName,
+        initialName: initialName,
+        initialIcon: initialIcon,
+        initialImage: initialImage,
+        initialConsentName: initialConsentName,
+        initialSessions: initialSessions,
+        initialTotalSessions: initialTotalSessions,
+        initialPreNotifications: initialPreNotifications,
+        initialPostNotifications: initialPostNotifications,
+        initialDowntimePresets: initialDowntimePresets,
+        initialDefaultRoles: initialDefaultRoles,
+      ),
     );
 
     if (result != null) {
@@ -90,57 +89,54 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     String? initialName,
     String? initialIcon,
     bool showIconField = true,
-    required void Function(String, String?) onConfirm,
+    required void Function(String, String) onConfirm,
   }) {
     final nameController = TextEditingController(text: initialName);
     final iconController = TextEditingController(text: initialIcon);
 
     showDialog(
       context: context,
-      builder:
-          (context) => StandardDialog(
-            title: title,
-            width: context.w(450),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                BuildTextField(
-                  label: 'Name',
-                  controller: nameController,
-                  hintText: 'Enter name...',
-                ),
-                if (showIconField) ...[
-                  context.verticalSpace(20),
-                  BuildTextField(
-                    label: 'Icon URL (Optional)',
-                    controller: iconController,
-                    hintText: 'https://...',
-                  ),
-                ],
-              ],
+      builder: (context) => StandardDialog(
+        title: title,
+        width: context.w(450),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            BuildTextField(
+              label: 'Name',
+              controller: nameController,
+              hintText: 'Enter name...',
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              CustomPrimaryButton(
-                onTap: () {
-                  if (nameController.text.trim().isNotEmpty) {
-                    onConfirm(
-                      nameController.text.trim(),
-                      iconController.text.trim().isEmpty
-                          ? null
-                          : iconController.text.trim(),
-                    );
-                    Navigator.pop(context);
-                  }
-                },
-                label: 'Confirm',
-                width: context.w(120),
+            if (showIconField) ...[
+              context.verticalSpace(20),
+              BuildTextField(
+                label: 'Icon URL (Optional)',
+                controller: iconController,
+                hintText: 'https://...',
               ),
             ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
+          CustomPrimaryButton(
+            onTap: () {
+              if (nameController.text.trim().isNotEmpty) {
+                onConfirm(
+                  nameController.text.trim(),
+                  iconController.text.trim(),
+                );
+                Navigator.pop(context);
+              }
+            },
+            label: 'Confirm',
+            width: context.w(120),
+          ),
+        ],
+      ),
     );
   }
 
@@ -154,32 +150,31 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
 
     showDialog(
       context: context,
-      builder:
-          (context) => StandardDialog(
-            title: title,
-            width: context.w(450),
-            content: BuildTextField(
-              label: 'Protocol Title',
-              controller: controller,
-              hintText: 'Enter protocol title...',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              CustomPrimaryButton(
-                onTap: () {
-                  if (controller.text.trim().isNotEmpty) {
-                    onConfirm(controller.text.trim());
-                    Navigator.pop(context);
-                  }
-                },
-                label: 'Confirm',
-                width: context.w(120),
-              ),
-            ],
+      builder: (context) => StandardDialog(
+        title: title,
+        width: context.w(450),
+        content: BuildTextField(
+          label: 'Protocol Title',
+          controller: controller,
+          hintText: 'Enter protocol title...',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
+          CustomPrimaryButton(
+            onTap: () {
+              if (controller.text.trim().isNotEmpty) {
+                onConfirm(controller.text.trim());
+                Navigator.pop(context);
+              }
+            },
+            label: 'Confirm',
+            width: context.w(120),
+          ),
+        ],
+      ),
     );
   }
 
@@ -189,15 +184,14 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     required void Function(ProtocolItem) onSave,
   }) {
     final titleController = TextEditingController(text: protocol.title);
-    final List<Map<String, dynamic>> descGroups =
-        protocol.descriptions
-            .map(
-              (d) => {
-                'title': TextEditingController(text: d.title),
-                'text': TextEditingController(text: d.text),
-              },
-            )
-            .toList();
+    final List<Map<String, dynamic>> descGroups = protocol.descriptions
+        .map(
+          (d) => {
+            'title': TextEditingController(text: d.title),
+            'text': TextEditingController(text: d.text),
+          },
+        )
+        .toList();
 
     showDialog(
       context: context,
@@ -236,7 +230,10 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
                                 });
                               });
                             },
-                            icon: const Icon(Icons.add_circle_outline, size: 18),
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              size: 18,
+                            ),
                             label: const Text('Add Description'),
                           ),
                         ],
@@ -287,19 +284,17 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
                                           ),
                                           padding: EdgeInsets.zero,
                                           constraints: const BoxConstraints(),
-                                          onPressed:
-                                              idx > 0
-                                                  ? () {
-                                                    setDialogState(() {
-                                                      final temp =
-                                                          descGroups[idx];
-                                                      descGroups[idx] =
-                                                          descGroups[idx - 1];
-                                                      descGroups[idx - 1] =
-                                                          temp;
-                                                    });
-                                                  }
-                                                  : null,
+                                          onPressed: idx > 0
+                                              ? () {
+                                                  setDialogState(() {
+                                                    final temp =
+                                                        descGroups[idx];
+                                                    descGroups[idx] =
+                                                        descGroups[idx - 1];
+                                                    descGroups[idx - 1] = temp;
+                                                  });
+                                                }
+                                              : null,
                                         ),
                                         context.horizontalSpace(8),
                                         IconButton(
@@ -309,19 +304,17 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
                                           ),
                                           padding: EdgeInsets.zero,
                                           constraints: const BoxConstraints(),
-                                          onPressed:
-                                              idx < descGroups.length - 1
-                                                  ? () {
-                                                    setDialogState(() {
-                                                      final temp =
-                                                          descGroups[idx];
-                                                      descGroups[idx] =
-                                                          descGroups[idx + 1];
-                                                      descGroups[idx + 1] =
-                                                          temp;
-                                                    });
-                                                  }
-                                                  : null,
+                                          onPressed: idx < descGroups.length - 1
+                                              ? () {
+                                                  setDialogState(() {
+                                                    final temp =
+                                                        descGroups[idx];
+                                                    descGroups[idx] =
+                                                        descGroups[idx + 1];
+                                                    descGroups[idx + 1] = temp;
+                                                  });
+                                                }
+                                              : null,
                                         ),
                                         context.horizontalSpace(8),
                                         IconButton(
@@ -410,108 +403,101 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
   }) {
     showDialog(
       context: context,
-      builder:
-          (context) => StandardDialog(
-            title: 'Protocol Details',
-            width: context.w(500),
-            content: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(protocol.title, style: context.fonts.black18w600),
-                context.verticalSpace(8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: CustomColors.purple.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    protocol.type == ProtocolType.checkbox
-                        ? 'CHECKBOX PROTOCOL'
-                        : 'TEXT PROTOCOL',
-                    style: context.fonts.purple12w700,
+      builder: (context) => StandardDialog(
+        title: 'Protocol Details',
+        width: context.w(500),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(protocol.title, style: context.fonts.black18w600),
+            context.verticalSpace(8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: CustomColors.purple.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                protocol.type == ProtocolType.checkbox
+                    ? 'CHECKBOX PROTOCOL'
+                    : 'TEXT PROTOCOL',
+                style: context.fonts.purple12w700,
+              ),
+            ),
+            context.verticalSpace(20),
+            const Divider(),
+            context.verticalSpace(16),
+            if (protocol.descriptions.isEmpty)
+              Text(
+                'No clinical descriptions configured for this protocol.',
+                style: context.fonts.grey14w400,
+              )
+            else
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: context.h(400)),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: protocol.descriptions.map((desc) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(
+                                    color: CustomColors.purple,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    '${desc.order}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                context.horizontalSpace(12),
+                                if (desc.title != null &&
+                                    desc.title!.isNotEmpty)
+                                  Expanded(
+                                    child: Text(
+                                      desc.title!,
+                                      style: context.fonts.black14w700,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            context.verticalSpace(8),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 34.0),
+                              child: Text(
+                                desc.text,
+                                style: context.fonts.grey14w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
-                context.verticalSpace(20),
-                const Divider(),
-                context.verticalSpace(16),
-                if (protocol.descriptions.isEmpty)
-                  Text(
-                    'No clinical descriptions configured for this protocol.',
-                    style: context.fonts.grey14w400,
-                  )
-                else
-                  ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: context.h(400)),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children:
-                            protocol.descriptions.map((desc) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 20.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(6),
-                                          decoration: const BoxDecoration(
-                                            color: CustomColors.purple,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Text(
-                                            '${desc.order}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        context.horizontalSpace(12),
-                                        if (desc.title != null &&
-                                            desc.title!.isNotEmpty)
-                                          Expanded(
-                                            child: Text(
-                                              desc.title!,
-                                              style: context.fonts.black14w700,
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                    context.verticalSpace(8),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 34.0,
-                                      ),
-                                      child: Text(
-                                        desc.text,
-                                        style: context.fonts.grey14w400,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            actions: [
-              CustomPrimaryButton(
-                onTap: () => Navigator.pop(context),
-                label: 'Close',
-                width: context.w(120),
               ),
-            ],
+          ],
+        ),
+        actions: [
+          CustomPrimaryButton(
+            onTap: () => Navigator.pop(context),
+            label: 'Close',
+            width: context.w(120),
           ),
+        ],
+      ),
     );
   }
 
@@ -522,34 +508,34 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
   ) {
     showDialog(
       context: context,
-      builder:
-          (context) => StandardDialog(
-            title: 'Confirm Delete',
-            width: context.w(400),
-            content: Text(
-              "Are you sure you want to delete '$name'? This action is irreversible. All child sub-items will also be removed.",
-              style: context.fonts.black14w400,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              CustomPrimaryButton(
-                onTap: () {
-                  onConfirm();
-                  Navigator.pop(context);
-                },
-                label: 'Delete',
-                width: context.w(120),
-              ),
-            ],
+      builder: (context) => StandardDialog(
+        title: 'Confirm Delete',
+        width: context.w(400),
+        content: Text(
+          "Are you sure you want to delete '$name'? This action is irreversible. All child sub-items will also be removed.",
+          style: context.fonts.black14w400,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
+          CustomPrimaryButton(
+            onTap: () {
+              onConfirm();
+              Navigator.pop(context);
+            },
+            label: 'Delete',
+            width: context.w(120),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataScreen> {
+class _ManageTreatmentDataScreenState
+    extends ConsumerState<ManageTreatmentDataScreen> {
   @override
   void initState() {
     super.initState();
@@ -557,7 +543,9 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
       ref.read(categoryViewModelProvider.notifier).fetchCategories();
       await ref.read(areaViewModelProvider.notifier).fetchAreas();
       final fetchedAreas = ref.read(areaViewModelProvider).areas;
-      ref.read(treatmentDataViewModelProvider.notifier).setAreasFromBackend(fetchedAreas);
+      ref
+          .read(treatmentDataViewModelProvider.notifier)
+          .setAreasFromBackend(fetchedAreas);
     });
   }
 
@@ -595,12 +583,12 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
           ),
         ),
         body: TabBarView(
-                children: [
-                  _buildCategoriesTab(context, categoryState, categoryViewModel),
-                  _buildAreasTab(context, dataState, dataViewModel),
-                  _buildProtocolsTab(context, dataState, dataViewModel),
-                ],
-              ),
+          children: [
+            _buildCategoriesTab(context, categoryState, categoryViewModel),
+            _buildAreasTab(context, dataState, dataViewModel),
+            _buildProtocolsTab(context, dataState, dataViewModel),
+          ],
+        ),
       ),
     );
   }
@@ -681,7 +669,8 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
             onAdd: () => ManageTreatmentDataScreen._showItemDialog(
               context: context,
               title: 'Add New Area',
-              onConfirm: (String name, String? icon) => viewModel.addArea(name, icon: icon),
+              onConfirm: (String name, String icon) =>
+                  viewModel.addArea(name, icon: icon),
             ),
           ),
           context.verticalSpace(24),
@@ -697,21 +686,24 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                 name: area.name,
                 icon: area.icon,
                 childrenCount: area.subAreas.length,
-                children:
-                    area.subAreas
-                        .map((s) => _ChildItemData(name: s.name, icon: s.icon))
-                        .toList(),
-                onEdit:
-                    (name, icon) =>
-                        viewModel.editArea(area.name, name, icon: icon),
+                children: area.subAreas
+                    .map((s) => _ChildItemData(name: s.name, icon: s.icon))
+                    .toList(),
+                onEdit: (name, icon) =>
+                    viewModel.editArea(area.name, name, icon: icon),
                 onDelete: () => viewModel.deleteArea(area.name),
-                onAddChild:
-                    (name, icon) =>
-                        viewModel.addSubArea(area.name, name, icon: icon),
-                onEditChild:
-                    (old, name, icon) =>
-                        viewModel.editSubArea(area.name, old, name, icon: icon),
-                onDeleteChild: (name) => viewModel.deleteSubArea(area.name, name),
+                onAddChild: (name, icon) =>
+                    // TODO: Add area id instead of 0
+                    viewModel.addSubArea(
+                      parentAreaId: 0,
+                      parentAreaName: area.name,
+                      name: name,
+                      icon: icon,
+                    ),
+                onEditChild: (old, name, icon) =>
+                    viewModel.editSubArea(area.name, old, name, icon: icon),
+                onDeleteChild: (name) =>
+                    viewModel.deleteSubArea(area.name, name),
               );
             },
           ),
@@ -735,7 +727,10 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
               labelColor: CustomColors.purple,
               unselectedLabelColor: CustomColors.grey,
               indicatorColor: CustomColors.purple,
-              tabs: [Tab(text: 'Checkboxes'), Tab(text: 'Text Fields')],
+              tabs: [
+                Tab(text: 'Checkboxes'),
+                Tab(text: 'Text Fields'),
+              ],
             ),
           ),
           Expanded(
@@ -747,7 +742,12 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                   viewModel,
                   ProtocolType.checkbox,
                 ),
-                _buildProtocolList(context, state, viewModel, ProtocolType.text),
+                _buildProtocolList(
+                  context,
+                  state,
+                  viewModel,
+                  ProtocolType.text,
+                ),
               ],
             ),
           ),
@@ -762,12 +762,12 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
     TreatmentDataViewModel viewModel,
     ProtocolType type,
   ) {
-    final filteredProtocols =
-        state.protocols.where((p) => p.type == type).toList();
-    final title =
-        type == ProtocolType.checkbox
-            ? 'Checkbox Protocols'
-            : 'Text Field Protocols';
+    final filteredProtocols = state.protocols
+        .where((p) => p.type == type)
+        .toList();
+    final title = type == ProtocolType.checkbox
+        ? 'Checkbox Protocols'
+        : 'Text Field Protocols';
 
     return SingleChildScrollView(
       padding: context.appEdgeInsets(all: 24),
@@ -812,18 +812,21 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                     ),
                     IconButton(
                       icon: const Icon(Icons.info_outline_rounded, size: 20),
-                      onPressed: () => ManageTreatmentDataScreen._showProtocolDetailDialog(
-                        context: context,
-                        protocol: protocol,
-                      ),
+                      onPressed: () =>
+                          ManageTreatmentDataScreen._showProtocolDetailDialog(
+                            context: context,
+                            protocol: protocol,
+                          ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit_outlined, size: 20),
-                      onPressed: () => ManageTreatmentDataScreen._showEnhancedProtocolDialog(
-                        context: context,
-                        protocol: protocol,
-                        onSave: (updated) => viewModel.saveProtocol(updated),
-                      ),
+                      onPressed: () =>
+                          ManageTreatmentDataScreen._showEnhancedProtocolDialog(
+                            context: context,
+                            protocol: protocol,
+                            onSave: (updated) =>
+                                viewModel.saveProtocol(updated),
+                          ),
                     ),
                     IconButton(
                       icon: const Icon(
@@ -831,11 +834,12 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                         size: 20,
                         color: CustomColors.red,
                       ),
-                      onPressed: () => ManageTreatmentDataScreen._showDeleteConfirm(
-                        context,
-                        protocol.title,
-                        () => viewModel.deleteProtocol(protocol.id),
-                      ),
+                      onPressed: () =>
+                          ManageTreatmentDataScreen._showDeleteConfirm(
+                            context,
+                            protocol.title,
+                            () => viewModel.deleteProtocol(protocol.id),
+                          ),
                     ),
                   ],
                 ),
@@ -889,18 +893,13 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
             color: CustomColors.whiteGrey,
             borderRadius: context.borderRadius(all: 8),
           ),
-          child:
-              icon != null
-                  ? Image.network(
-                    icon,
-                    errorBuilder:
-                        (context, error, stackTrace) =>
-                            const Icon(Icons.category_outlined),
-                  )
-                  : const Icon(
-                    Icons.category_outlined,
-                    color: CustomColors.purple,
-                  ),
+          child: icon != null
+              ? Image.network(
+                  icon,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.category_outlined),
+                )
+              : const Icon(Icons.category_outlined, color: CustomColors.purple),
         ),
         title: Text(name, style: context.fonts.black16w600),
         subtitle: Text(
@@ -926,7 +925,11 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                 size: 20,
                 color: CustomColors.red,
               ),
-              onPressed: () => ManageTreatmentDataScreen._showDeleteConfirm(context, name, onDelete),
+              onPressed: () => ManageTreatmentDataScreen._showDeleteConfirm(
+                context,
+                name,
+                onDelete,
+              ),
             ),
             const Icon(Icons.expand_more),
           ],
@@ -946,21 +949,20 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                         color: CustomColors.whiteGrey,
                         borderRadius: context.borderRadius(all: 6),
                       ),
-                      child:
-                          child.icon != null
-                              ? Image.network(
-                                child.icon!,
-                                errorBuilder:
-                                    (context, error, stackTrace) => const Icon(
-                                      Icons.subdirectory_arrow_right,
-                                      size: 16,
-                                    ),
-                              )
-                              : const Icon(
-                                Icons.subdirectory_arrow_right,
-                                size: 16,
-                                color: CustomColors.grey,
-                              ),
+                      child: child.icon != null
+                          ? Image.network(
+                              child.icon!,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                    Icons.subdirectory_arrow_right,
+                                    size: 16,
+                                  ),
+                            )
+                          : const Icon(
+                              Icons.subdirectory_arrow_right,
+                              size: 16,
+                              color: CustomColors.grey,
+                            ),
                     ),
                     title: Text(child.name, style: context.fonts.black14w400),
                     trailing: Row(
@@ -968,15 +970,15 @@ class _ManageTreatmentDataScreenState extends ConsumerState<ManageTreatmentDataS
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit_outlined, size: 18),
-                          onPressed: () => ManageTreatmentDataScreen._showItemDialog(
-                            context: context,
-                            title: 'Edit Sub-item',
-                            initialName: child.name,
-                            initialIcon: child.icon,
-                            onConfirm:
-                                (newName, newIcon) =>
+                          onPressed: () =>
+                              ManageTreatmentDataScreen._showItemDialog(
+                                context: context,
+                                title: 'Edit Sub-item',
+                                initialName: child.name,
+                                initialIcon: child.icon,
+                                onConfirm: (newName, newIcon) =>
                                     onEditChild(child.name, newName, newIcon),
-                          ),
+                              ),
                         ),
                         IconButton(
                           icon: const Icon(
@@ -1037,18 +1039,13 @@ class _RecursiveCategoryTile extends StatelessWidget {
             color: CustomColors.whiteGrey,
             borderRadius: context.borderRadius(all: 8),
           ),
-          child:
-              category.icon.isNotEmpty
-                  ? Image.network(
-                    category.icon,
-                    errorBuilder:
-                        (context, error, stackTrace) =>
-                            const Icon(Icons.category_outlined),
-                  )
-                  : const Icon(
-                    Icons.category_outlined,
-                    color: CustomColors.purple,
-                  ),
+          child: category.icon.isNotEmpty
+              ? Image.network(
+                  category.icon,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.category_outlined),
+                )
+              : const Icon(Icons.category_outlined, color: CustomColors.purple),
         ),
         title: Text(category.name, style: context.fonts.black16w600),
         subtitle: Text(
@@ -1082,8 +1079,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
                 size: 20,
                 color: CustomColors.green,
               ),
-              onPressed:
-                  () => ManageTreatmentDataScreen._showCategoryCreationDialog(
+              onPressed: () =>
+                  ManageTreatmentDataScreen._showCategoryCreationDialog(
                     context: context,
                     parentName: category.name,
                     onConfirm:
@@ -1116,8 +1113,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
             IconButton(
               tooltip: 'Edit Category',
               icon: const Icon(Icons.edit_outlined, size: 20),
-              onPressed:
-                  () => ManageTreatmentDataScreen._showCategoryCreationDialog(
+              onPressed: () =>
+                  ManageTreatmentDataScreen._showCategoryCreationDialog(
                     context: context,
                     initialName: category.name,
                     initialIcon: category.icon,
@@ -1143,10 +1140,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
                           consentFormUrl: consentFormUrl,
                           defaultSessions: sessions,
                           totalSessions: sessions?.length,
-                          preNotifications:
-                              preNotif,
-                          postNotifications:
-                              postNotif,
+                          preNotifications: preNotif,
+                          postNotifications: postNotif,
                           downtimePresets: downtime,
                           defaultRoles: roles,
                         ),
@@ -1159,27 +1154,25 @@ class _RecursiveCategoryTile extends StatelessWidget {
                 size: 20,
                 color: CustomColors.red,
               ),
-              onPressed:
-                  () => ManageTreatmentDataScreen._showDeleteConfirm(
-                    context,
-                    category.name,
-                    () => viewModel.deleteCategory(category.id),
-                  ),
+              onPressed: () => ManageTreatmentDataScreen._showDeleteConfirm(
+                context,
+                category.name,
+                () => viewModel.deleteCategory(category.id),
+              ),
             ),
             if (category.subCategories.isNotEmpty)
               const Icon(Icons.expand_more),
           ],
         ),
-        children:
-            category.subCategories
-                .map(
-                  (child) => _RecursiveCategoryTile(
-                    category: child,
-                    viewModel: viewModel,
-                    level: level + 1,
-                  ),
-                )
-                .toList(),
+        children: category.subCategories
+            .map(
+              (child) => _RecursiveCategoryTile(
+                category: child,
+                viewModel: viewModel,
+                level: level + 1,
+              ),
+            )
+            .toList(),
       ),
     );
   }

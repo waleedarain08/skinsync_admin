@@ -14,15 +14,15 @@ class AreaListResponse extends BaseApiResponseModel<List<AreaModel>> {
         data: json['data'] == null
             ? null
             : (json['data'] as List)
-                .map((e) => AreaModel.fromJson(e as Map<String, dynamic>))
-                .toList(),
+                  .map((e) => AreaModel.fromJson(e as Map<String, dynamic>))
+                  .toList(),
       );
 
   Map<String, dynamic> toJson() => {
-        'status': status,
-        'message': message,
-        'data': data?.map((e) => e.toJson()).toList(),
-      };
+    'status': status,
+    'message': message,
+    'data': data?.map((e) => e.toJson()).toList(),
+  };
 }
 
 class AreaModel {
@@ -52,9 +52,10 @@ class AreaModel {
       icon: json['icon'] ?? '',
       image: json['image'] ?? '',
       subAreasCount: json['sub_areas_count'] as int? ?? 0,
-      subAreas: (json['sub_areas'] as List?)
-          ?.map((e) => AreaModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
+      subAreas:
+          (json['sub_areas'] as List?)
+              ?.map((e) => AreaModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
           [],
     );
   }

@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/create_category_request.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -341,7 +340,7 @@ class _CategoryCreationDialogState
       _viewConsentPdf();
       return;
     }
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
       withData: kIsWeb,
