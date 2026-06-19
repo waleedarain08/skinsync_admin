@@ -23,7 +23,7 @@ class AuthService implements AuthRepository {
       jsonResponse,
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     if (response.data == null) {
@@ -54,9 +54,9 @@ class AuthService implements AuthRepository {
     );
     final response = BaseApiResponseModel<Null>.fromJson(
       jsonResponse,
-          (_) => null,
+         
     );
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response;
@@ -70,9 +70,9 @@ class AuthService implements AuthRepository {
     );
     final response = BaseApiResponseModel<String>.fromJson(
       jsonResponse,
-          (json) => json as String,
+         
     );
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -86,9 +86,9 @@ class AuthService implements AuthRepository {
     );
     final response = BaseApiResponseModel<Null>.fromJson(
       jsonResponse,
-          (_) => null,
+        
     );
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response;
@@ -104,9 +104,9 @@ class AuthService implements AuthRepository {
     );
     final response = BaseApiResponseModel<Null>.fromJson(
       jsonResponse,
-          (_) => null,
+      
     );
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response;

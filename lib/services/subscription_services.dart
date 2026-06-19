@@ -1,4 +1,3 @@
-import '../models/responses/base_response_model.dart';
 import '../models/subscription_plan_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../utils/enums.dart';
@@ -13,15 +12,11 @@ class SubscriptionServices implements SubscriptionRepository {
   @override
   Future<List<SubscriptionPlanModel>> getSubscriptionPlans() async {
     final jsonResponse = await _api.get(Endpoint.subscriptionPlans);
-    final response = BaseApiResponseModel<List<SubscriptionPlanModel>>.fromJson(
+    final response = SubscriptionPlanListResponse.fromJson(
       jsonResponse,
-      (json) {
-        return (json as List)
-            .map((plan) => SubscriptionPlanModel.fromJson(plan))
-            .toList();
-      },
+      
     );
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -33,12 +28,11 @@ class SubscriptionServices implements SubscriptionRepository {
       Endpoint.subscriptionPlans,
       body: plan.toJson(),
     );
-    final response = BaseApiResponseModel<SubscriptionPlanModel>.fromJson(
+    final response =SubscriptionPlanResponse.fromJson(
       jsonResponse,
-      (json) => SubscriptionPlanModel.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;

@@ -480,8 +480,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     CategoryDetailDto? category,
   ) {
     if (category == null) return [];
-    if (category.name.toLowerCase().contains('inject') ||
-        category.name.toLowerCase().contains('fill')) {
+    if ((category.name?.toLowerCase().contains('inject') ?? false) ||
+        (category.name?.toLowerCase().contains('fill') ?? false)) {
       return [
         TreatmentProtocolNoteItem(
           title: 'Category Pre Care Instructions',
@@ -1038,8 +1038,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
 
     String preSummary = 'Not configured';
     if (isPreCategory) {
-      preSummary = (selectedCategory?.preNotifications.isNotEmpty ?? false)
-          ? '${selectedCategory!.preNotifications.length} Category Defaults'
+      preSummary = (selectedCategory?.preNotifications?.isNotEmpty ?? false)
+          ? '${selectedCategory?.preNotifications?.length} Category Defaults'
           : 'Category Default';
     } else {
       preSummary =
@@ -1048,8 +1048,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
 
     String postSummary = 'Not configured';
     if (isPostCategory) {
-      postSummary = (selectedCategory?.postNotifications.isNotEmpty ?? false)
-          ? '${selectedCategory!.postNotifications.length} Category Defaults'
+      postSummary = (selectedCategory?.postNotifications?.isNotEmpty ?? false)
+          ? '${selectedCategory?.postNotifications?.length } Category Defaults'
           : 'Category Default';
     } else {
       postSummary =
@@ -1089,11 +1089,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     if (selectedCategory != null) {
       final presets = selectedCategory.downtimePresets;
       if (level == 'low') {
-        days = presets.low;
+        days = presets?.low ?? 0;
       } else if (level == 'moderate') {
-        days = presets.moderate;
+        days = presets?.moderate ?? 0;
       } else if (level == 'high') {
-        days = presets.high;
+        days = presets?.high ?? 0;
       }
     } else {
       if (level == 'low') {
@@ -1126,7 +1126,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     final isCategory = state.providerRolesSource == 'category';
     final List<String> roles = isCategory
         ? (selectedCategory?.defaultRoles
-                  .map((r) => r.name[0] + r.name.substring(1).toLowerCase())
+                  ?.map((r) => r.name[0] + r.name.substring(1).toLowerCase())
                   .toList() ??
               [])
         : state.selectedRoles;
@@ -1392,8 +1392,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     if (state.sessionSource == 'custom') {
       totalFus = state.sessions.fold(0, (sum, s) => sum + s.followUps.length);
     } else if (selectedCategory != null) {
-      if (selectedCategory.defaultSessions.isNotEmpty) {
-        totalFus = selectedCategory.defaultSessions.fold(
+      if (selectedCategory.defaultSessions?.isNotEmpty ?? false) {
+        totalFus = selectedCategory.defaultSessions!.fold(
           0,
           (sum, s) => sum + s.followUps.length,
         );
@@ -2708,7 +2708,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     ];
     final List<String> categoryRoles =
         selectedCategory?.defaultRoles
-            .map((r) => defaultRoleValues.reverse[r] ?? '')
+            ?.map((r) => defaultRoleValues.reverse[r] ?? '')
             .toList() ??
         [];
 

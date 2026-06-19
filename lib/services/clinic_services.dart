@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
+import 'package:skinsync_admin/models/responses/clinic_list_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 
 import '../models/clinic_model.dart';
@@ -24,10 +25,10 @@ class ClinicService implements ClinicRepository {
     );
     final response = BaseApiResponseModel<ClinicModel>.fromJson(
       jsonResponse,
-      (json) => ClinicModel.fromJson(json as Map<String, dynamic>),
+     
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -43,31 +44,25 @@ class ClinicService implements ClinicRepository {
       pathParams: {'id': id.toString()},
       body: req.toJson(),
     );
-    final response = BaseApiResponseModel<ClinicModel>.fromJson(
+    final response = ClinicResponse.fromJson(
       jsonResponse,
-      (json) => ClinicModel.fromJson(json as Map<String, dynamic>),
+     
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
   }
 
-  @override
-  Future<List<ClinicModel>> getClinics() async {
-    final jsonResponse = await _api.get(Endpoint.getClinics);
-    final response = BaseApiResponseModel<List<ClinicModel>>.fromJson(
-      jsonResponse,
-      (json) {
-        return (json as List)
-            .map((treatment) => ClinicModel.fromJson(treatment))
-            .toList();
-      },
-    );
-    if (!response.status) {
-      throw BadRequestException(response.message);
-    }
-    return response.data!;
+ @override
+Future<List<ClinicModel>> getClinics() async {
+  final jsonResponse = await _api.get(Endpoint.getClinics);
+  final response = ClinicListResponse.fromJson(jsonResponse);
+
+  if (!response.isSuccess) {
+    throw BadRequestException(response.message);
   }
+  return response.data ?? [];
+}
 }

@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/product_model.dart';
+import 'package:skinsync_admin/models/responses/product_detail_response.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-
-class SelectedProductNotifier extends Notifier<ProductModel?> {
-  @override
-  ProductModel? build() => null;
-  void set(ProductModel? p) => state = p;
-}
-
-final selectedProductProvider = NotifierProvider<SelectedProductNotifier, ProductModel?>(
-  SelectedProductNotifier.new,
-);
+import 'package:skinsync_admin/widgets/custom_cashed_image_widget.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   static const String routeName = '/product-detail';
   const ProductDetailScreen({super.key});
 
+  String _formatValue(dynamic val) {
+    if (val == null) return '—';
+    if (val is String && val.trim().isEmpty) return '—';
+    if (val is num && val == 0) return '—';
+    return val.toString();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final product = ref.watch(selectedProductProvider);
+    final productState = ref.watch(productViewModelProvider);
+    final product = productState.selectedProduct;
     final treatments = ref.watch(treatmentViewModelProvider).treatments;
 
     if (product == null) {
@@ -69,6 +69,10 @@ class ProductDetailScreen extends ConsumerWidget {
                         children: [
                           _buildProductInfoSection(context, product),
                           context.verticalSpace(24),
+                          _buildPackagingSection(context, product),
+                          context.verticalSpace(24),
+                          _buildBillingAndPricingSection(context, product),
+                          context.verticalSpace(24),
                           _buildUsedInTreatmentsSection(context, ref, usedInTreatments),
                         ],
                       ),
@@ -78,9 +82,9 @@ class ProductDetailScreen extends ConsumerWidget {
                       flex: 2,
                       child: Column(
                         children: [
-                          _buildInventoryStatsSection(context, product),
+                          _buildSupplierSection(context, product),
                           context.verticalSpace(24),
-                          _buildComplianceSection(context, product),
+                          _buildComplianceAndTrackingSection(context, product),
                         ],
                       ),
                     ),
@@ -94,25 +98,26 @@ class ProductDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeaderSection(BuildContext context, ProductModel product) {
+  Widget _buildHeaderSection(BuildContext context, ProductDetailModel product) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 32),
       child: Row(
         children: [
-          Container(
-            width: context.w(120),
-            height: context.w(120),
-            decoration: BoxDecoration(
-              color: CustomColors.whiteGrey,
-              borderRadius: context.appBorderRadius(all: 20),
-              image: product.image.isNotEmpty
-                  ? DecorationImage(image: NetworkImage(product.image), fit: BoxFit.cover)
-                  : null,
-              border: Border.all(color: CustomColors.border),
+          ClipRRect(
+            borderRadius: context.appBorderRadius(all: 20),
+            child: SizedBox(
+              width: context.w(120),
+              height: context.w(120),
+              child: product.image.isEmpty
+                  ? Container(
+                      color: CustomColors.whiteGrey,
+                      child: Icon(Icons.inventory_2_outlined, size: context.sp(48), color: CustomColors.grey),
+                    )
+                  : CustomCachedImage(
+                      imageUrl: product.image,
+                      fit: BoxFit.cover,
+                    ),
             ),
-            child: product.image.isEmpty
-                ? Icon(Icons.inventory_2_outlined, size: context.sp(48), color: CustomColors.grey)
-                : null,
           ),
           context.horizontalSpace(32),
           Expanded(
@@ -123,7 +128,7 @@ class ProductDetailScreen extends ConsumerWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        product.name,
+                        _formatValue(product.name),
                         style: context.fonts.black26w700,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -134,7 +139,7 @@ class ProductDetailScreen extends ConsumerWidget {
                 ),
                 context.verticalSpace(8),
                 Text(
-                  '${product.brand ?? 'Global'} • ${product.manufacturer ?? 'Manufacturer'}',
+                  _formatValue(product.brand),
                   style: context.fonts.purple14w600,
                 ),
                 context.verticalSpace(16),
@@ -142,9 +147,10 @@ class ProductDetailScreen extends ConsumerWidget {
                   spacing: 12.w,
                   runSpacing: 12.h,
                   children: [
-                    _infoChip(context, Icons.tag_rounded, "SKU: ${product.globalSku ?? product.sku ?? 'N/A'}"),
-                    _infoChip(context, Icons.category_outlined, product.category ?? 'Clinical'),
-                    _infoChip(context, Icons.settings_input_component_outlined, product.productPurpose ?? 'Usage'),
+                    _infoChip(context, Icons.tag_rounded, "SKU: ${_formatValue(product.globalSku)}"),
+                    _infoChip(context, Icons.barcode_reader, "Barcode: ${_formatValue(product.barcode)}"),
+                    _infoChip(context, Icons.category_outlined, _formatValue(product.category)),
+                    _infoChip(context, Icons.settings_input_component_outlined, _formatValue(product.usageType)),
                   ],
                 ),
               ],
@@ -155,27 +161,26 @@ class ProductDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProductInfoSection(BuildContext context, ProductModel product) {
+  Widget _buildProductInfoSection(BuildContext context, ProductDetailModel product) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Product & Packaging Details', style: context.fonts.black18w600),
+          Text('Basic Information', style: context.fonts.black18w600),
           context.verticalSpace(24),
-          _labelValueRow(context, 'Product Name', product.name),
-          _labelValueRow(context, 'Brand', product.brand ?? 'N/A'),
-          _labelValueRow(context, 'Manufacturer', product.manufacturer ?? 'N/A'),
-          _labelValueRow(context, 'Category', product.category ?? 'General Catalog'),
-          _labelValueRow(context, 'Global SKU', product.globalSku ?? product.sku ?? 'N/A'),
-          _labelValueRow(context, 'Base Unit', product.unitType ?? product.unit),
-          _labelValueRow(context, 'Package Type', product.packageType ?? 'Individual'),
-          _labelValueRow(context, 'Units Per Package', '${product.unitsPerPackage ?? 1} Units'),
+          _labelValueRow(context, 'Product Name', _formatValue(product.name)),
+          _labelValueRow(context, 'Brand', _formatValue(product.brand)),
+          _labelValueRow(context, 'Global SKU', _formatValue(product.globalSku)),
+          _labelValueRow(context, 'Barcode', _formatValue(product.barcode)),
+          _labelValueRow(context, 'Category', _formatValue(product.category)),
+          _labelValueRow(context, 'Selected Category IDs', _formatValue(product.selectedCategoryIds?.join(', '))),
+          _labelValueRow(context, 'Status', _formatValue(product.status)),
           const Divider(height: 32),
           Text('Description', style: context.fonts.black14w700),
           context.verticalSpace(12),
           Text(
-            product.description.isNotEmpty ? product.description : 'No description provided for this catalog product.',
+            product.description.isNotEmpty ? product.description : 'No description provided.',
             style: context.fonts.grey14w400h16,
           ),
         ],
@@ -183,37 +188,80 @@ class ProductDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInventoryStatsSection(BuildContext context, ProductModel product) {
+  Widget _buildPackagingSection(BuildContext context, ProductDetailModel product) {
     return BorderdContainerWidget(
-      padding: context.appEdgeInsets(all: 24),
+      padding: context.appEdgeInsets(all: 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Inventory Overview', style: context.fonts.black16w700),
+          Text('Packaging Information', style: context.fonts.black18w600),
           context.verticalSpace(24),
-          _statRow(context, Icons.warehouse_outlined, 'Current Stock', '${product.quantity ?? 0} ${product.unit}'),
-          _statRow(context, Icons.storefront_outlined, 'Clinics Using', '34 Clinics'),
-          _statRow(context, Icons.analytics_outlined, 'Monthly Usage', '45.2 Avg'),
-          _statRow(context, Icons.history_rounded, 'Last Stock Update', '2 days ago'),
+          _labelValueRow(context, 'Unit Type', _formatValue(product.unitType)),
+          _labelValueRow(context, 'Package Type', _formatValue(product.packageType)),
+          _labelValueRow(context, 'Box Quantity', _formatValue(product.boxQuantity)),
+          _labelValueRow(context, 'Item Quantity Per Box', _formatValue(product.itemQuantityPerBox)),
         ],
       ),
     );
   }
 
-  Widget _buildComplianceSection(BuildContext context, ProductModel product) {
+  Widget _buildBillingAndPricingSection(BuildContext context, ProductDetailModel product) {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Billing & Pricing Information', style: context.fonts.black18w600),
+          context.verticalSpace(24),
+          _labelValueRow(context, 'Billable Unit', _formatValue(product.billableUnit)),
+          _labelValueRow(context, 'Billable Quantity Per Item', _formatValue(product.billableQuantityPerItem)),
+          _labelValueRow(context, 'Total Billable Quantity', _formatValue(product.totalBillableQuantity)),
+          const Divider(height: 32),
+          _labelValueRow(context, 'Clinic Cost', product.clinicCost != null ? '\$${product.clinicCost}' : '—'),
+          _labelValueRow(context, 'Retail Price Per Unit', product.retailPricePerUnit != null ? '\$${product.retailPricePerUnit}' : '—'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSupplierSection(BuildContext context, ProductDetailModel product) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Compliance & Rules', style: context.fonts.black16w700),
+          Text('Supplier Information', style: context.fonts.black16w700),
+          context.verticalSpace(24),
+          _statRow(context, Icons.store_outlined, 'Supplier', _formatValue(product.supplier)),
+          _statRow(context, Icons.pin_outlined, 'Lot Number', _formatValue(product.lotNumber)),
+          _statRow(
+            context,
+            Icons.date_range_outlined,
+            'Expiration Date',
+            product.expirationDate != null
+                ? product.expirationDate!.toIso8601String().split('T').first
+                : '—',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComplianceAndTrackingSection(BuildContext context, ProductDetailModel product) {
+    final enforce = product.enforceLotTracking ?? false;
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Compliance & Tracking', style: context.fonts.black16w700),
           context.verticalSpace(24),
           _statRow(
             context,
             Icons.security_rounded,
             'Lot Tracking',
-            (product.enforceLotTracking ?? false) ? 'Enforced' : 'Optional',
-            color: (product.enforceLotTracking ?? false) ? CustomColors.purple : null,
+            enforce ? 'Yes' : 'No',
+            color: enforce ? CustomColors.green : null,
           ),
           _statRow(context, Icons.verified_user_outlined, 'Verification', 'FDA Validated'),
           _statRow(context, Icons.timer_outlined, 'Shelf Life', '24 Months'),
@@ -222,7 +270,11 @@ class ProductDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildUsedInTreatmentsSection(BuildContext context, WidgetRef ref, List<TreatmentModel> treatments) {
+  Widget _buildUsedInTreatmentsSection(
+    BuildContext context,
+    WidgetRef ref,
+    List<TreatmentModel> treatments,
+  ) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 28),
       child: Column(
@@ -252,15 +304,11 @@ class ProductDetailScreen extends ConsumerWidget {
               ),
             )
           else
-            GridView.builder(
+            ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: treatments.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                mainAxisExtent: context.h(60),
-                mainAxisSpacing: 12,
-              ),
+              separatorBuilder: (_, __) => context.verticalSpace(12),
               itemBuilder: (context, index) {
                 final treatment = treatments[index];
                 return InkWell(
@@ -270,7 +318,7 @@ class ProductDetailScreen extends ConsumerWidget {
                   },
                   borderRadius: context.appBorderRadius(all: 12),
                   child: Container(
-                    padding: context.appEdgeInsets(horizontal: 20),
+                    padding: context.appEdgeInsets(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
                       color: CustomColors.whiteGrey,
                       borderRadius: context.appBorderRadius(all: 12),

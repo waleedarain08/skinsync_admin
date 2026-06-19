@@ -83,7 +83,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       clinicAddress: _clinicAddressController.text.trim(),
       cc: selectedCountry?.dialCode ?? '+1',
       country: selectedCountry?.code ?? 'US',
-      clinicLogo: _selectedLogo?.path ?? clinic.logo ?? 'https://example.com/logo.png',
+      clinicLogo: _selectedLogo?.path ?? clinic?.logo ?? 'h??ttps://example.com/logo.png',
       website: _websiteController.text.trim(),
       description: _descriptionController.text.trim(),
     );
@@ -120,11 +120,11 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             onPressed: () {
               setState(() {
                 if (_isEditMode) {
-                  _clinicNameController.text = clinic.name ?? '';
-                  _clinicEmailController.text = clinic.email ?? '';
-                  _clinicPhoneController.text = clinic.phone ?? '';
-                  _clinicAddressController.text = clinic.address ?? '';
-                  _descriptionController.text = clinic.description ?? '';
+                  _clinicNameController.text = clinic?.name ?? '';
+                  _clinicEmailController.text = clinic?.email ?? '';
+                  _clinicPhoneController.text = clinic?.phone ?? '';
+                  _clinicAddressController.text = clinic?.address ?? '';
+                  _descriptionController.text = clinic?.description ?? '';
                   _selectedLogo = null;
                 }
                 _isEditMode = !_isEditMode;
@@ -220,20 +220,20 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                   children: [
                     Row(
                       children: [
-                        Flexible(child: Text(clinic.name ?? 'N/A', style: context.fonts.black26w700, overflow: TextOverflow.ellipsis)),
+                        Flexible(child: Text(clinic?.name ?? 'N/A', style: context.fonts.black26w700, overflow: TextOverflow.ellipsis)),
                         SizedBox(width: 16.w),
-                        _statusBadge(clinic.status ?? 'Active'),
+                        _statusBadge(clinic?.status ?? 'Active'),
                       ],
                     ),
                     SizedBox(height: 8.h),
-                    Text(clinic.address ?? 'N/A', style: context.fonts.grey16w400),
+                    Text(clinic?.address ?? 'N/A', style: context.fonts.grey16w400),
                     SizedBox(height: 16.h),
                     Wrap(
                       spacing: 12.w,
                       runSpacing: 12.h,
                       children: [
-                        _infoChip(Icons.calendar_today_outlined, "Joined: ${clinic.createdAt ?? 'N/A'}"),
-                        _infoChip(Icons.star_outline_rounded, "Rating: ${clinic.rating ?? '0.0'}"),
+                        _infoChip(Icons.calendar_today_outlined, "Joined: ${clinic?.createdAt ?? 'N/A'}"),
+                        _infoChip(Icons.star_outline_rounded, "Rating: ${clinic?.rating ?? '0.0'}"),
                       ],
                     ),
                   ],
@@ -305,7 +305,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             expandedWidget: true,
             children: [
               BuildTextField(label: 'Website', controller: _websiteController, hintText: 'https://example.com', readOnly: !_isEditMode),
-              BuildTextField(label: 'Plan', controller: TextEditingController(text: clinic.subscriptionPlan), hintText: 'Plan', readOnly: true),
+              BuildTextField(label: 'Plan', controller: TextEditingController(text: clinic?.subscriptionPlan), hintText: 'Plan', readOnly: true),
             ],
           ),
         ]),
@@ -323,9 +323,9 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         ]),
         SizedBox(height: 24.h),
         _infoSection('Subscription Info', [
-          _statRow(Icons.card_membership_outlined, 'Current Plan', clinic.subscriptionPlan ?? 'Standard'),
-          _statRow(Icons.access_time_rounded, 'Working Hours', clinic.workingHours ?? '09:00 - 17:00'),
-          _statRow(Icons.update_rounded, 'Last Updated', clinic.updatedAt ?? 'N/A'),
+          _statRow(Icons.card_membership_outlined, 'Current Plan', clinic?.subscriptionPlan ?? 'Standard'),
+          _statRow(Icons.access_time_rounded, 'Working Hours', clinic?.workingHours ?? '09:00 - 17:00'),
+          _statRow(Icons.update_rounded, 'Last Updated', clinic?.updatedAt.toString() ?? 'N/A'),
         ]),
       ],
     );

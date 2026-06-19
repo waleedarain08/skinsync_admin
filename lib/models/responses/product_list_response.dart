@@ -2,21 +2,27 @@ import '../product_model.dart';
 import 'base_response_model.dart';
 
 class ProductListResponse extends BaseApiResponseModel<List<ProductModel>> {
-  final bool? isSuccess;
+  final int? page;
+  final int? limit;
+  final int? totalPages;
 
   const ProductListResponse({
-    required super.status,
+    required super.isSuccess,
     required super.message,
     super.data,
-    this.isSuccess,
+    this.page,
+    this.limit,
+    this.totalPages,
   });
 
   factory ProductListResponse.fromJson(Map<String, dynamic> json) {
-    final bool success = (json['is_success'] as bool?) ?? (json['status'] as bool?) ?? false;
+    final bool success = (json['is_success'] as bool?) ?? false;
     return ProductListResponse(
-      status: success,
       isSuccess: success,
       message: json['message'] ?? '',
+      page: json['page'] as int?,
+      limit: json['limit'] as int?,
+      totalPages: json['total_pages'] as int? ?? json['totalPages'] as int?,
       data: json['data'] == null
           ? null
           : (json['data'] as List)
@@ -25,10 +31,5 @@ class ProductListResponse extends BaseApiResponseModel<List<ProductModel>> {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'status': status,
-        'is_success': isSuccess,
-        'message': message,
-        'data': data?.map((e) => e.toJson()).toList(),
-      };
+ 
 }

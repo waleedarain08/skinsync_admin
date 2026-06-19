@@ -283,30 +283,31 @@ class _NestedCategorySelectorState
       initialConsentName: detail.consentFormName,
       initialConsentFormUrl: detail.consentFormUrl,
       initialSessions: detail.defaultSessions
-          .map(
+          ?.map(
             (session) => CategorySessionModel(
               sessionNumber: session.sessionNumber,
               followUps: session.followUps
-                  .map(
-                    (followUp) => CategoryFollowUpModel(
-                      type: followUp.type,
-                      durationValue: followUp.durationValue,
-                      durationUnit:
-                          unitValues.reverse[followUp.durationUnit] ??
-                              'minutes',
-                      intervalValue: followUp.intervalValue,
-                      intervalUnit: followUp.intervalUnit,
-                      isImageRequired: followUp.isImageRequired,
-                      notes: followUp.notes,
-                    ),
-                  )
-                  .toList(),
+    .map(
+      (followUp) => CategoryFollowUpModel(
+        type: followUp.type ?? '',
+        durationValue: followUp.durationValue ?? 0,
+        durationUnit:
+            unitValues.reverse[followUp.durationUnit] ??
+            'minutes',
+        intervalValue: followUp.intervalValue ?? 0,
+        intervalUnit: followUp.intervalUnit ?? '',
+        isImageRequired:
+            followUp.isImageRequired ?? false,
+        notes: followUp.notes ?? '',
+      ),
+    )
+    .toList(),
             ),
           )
-          .toList(),
+          .toList() ?? [],
       initialTotalSessions: detail.totalSessions,
       initialPreNotifications: detail.preNotifications
-          .map(
+          ?.map(
             (notification) => CategoryNotificationModel(
               title: notification.title,
               message: notification.message,
@@ -315,9 +316,9 @@ class _NestedCategorySelectorState
               type: typeValues.reverse[notification.type],
             ),
           )
-          .toList(),
+          .toList() ?? [],
       initialPostNotifications: detail.postNotifications
-          .map(
+          ?.map(
             (notification) => CategoryNotificationModel(
               title: notification.title,
               message: notification.message,
@@ -326,17 +327,17 @@ class _NestedCategorySelectorState
               type: typeValues.reverse[notification.type],
             ),
           )
-          .toList(),
+          .toList() ?? [],
       initialDowntimePresets: CategoryDowntimePresetModel(
-        none: detail.downtimePresets.none,
-        low: detail.downtimePresets.low,
-        moderate: detail.downtimePresets.moderate,
-        high: detail.downtimePresets.high,
+        none: detail.downtimePresets?.none ?? 0,
+        low: detail.downtimePresets?.low ?? 0,
+        moderate: detail.downtimePresets?.moderate ?? 0,
+        high: detail.downtimePresets?.high ?? 0,
       ),
       initialDefaultRoles: detail.defaultRoles
-          .map((role) => defaultRoleValues.reverse[role] ?? '')
+          ?.map((role) => defaultRoleValues.reverse[role] ?? '')
           .where((role) => role.isNotEmpty)
-          .toList(),
+          .toList() ?? [],
     );
   }
 
