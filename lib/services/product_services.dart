@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:skinsync_admin/models/product_model.dart';
 import '../models/responses/base_response_model.dart';
 import '../models/responses/product_list_response.dart';
+import '../models/responses/product_detail_response.dart';
 import '../repositories/product_repository.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
@@ -62,12 +63,32 @@ class ProductServices implements ProductRepository {
   }
 
   @override
-  Future<List<ProductModel>> getProducts() async {
-    final jsonResponse = await _api.get(Endpoint.products);
+  Future<ProductListResponse> getProducts({String search = '', int page = 1, int limit = 10}) async {
+    final jsonResponse = await _api.get(
+      Endpoint.products,
+      queryParams: {
+        'search': search,
+        'page': page.toString(),
+        'limit': limit.toString(),
+      },
+    );
     final response = ProductListResponse.fromJson(jsonResponse);
-    if (!(response.isSuccess)) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
-    return response.data ?? [];
+    return response;
+  }
+
+  @override
+  Future<ProductDetailResponse> getProductDetail({required int id}) async {
+    final jsonResponse = await _api.get(
+      Endpoint.updateProduct,
+      pathParams: {'id': id.toString()},
+    );
+    final response = ProductDetailResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 }
