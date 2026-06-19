@@ -48,6 +48,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(categoryViewModelProvider.notifier).fetchCategories();
+      ref.read(productViewModelProvider.notifier).fetchProducts();
       await ref.read(areaViewModelProvider.notifier).fetchAreas();
       final fetchedAreas = ref.read(areaViewModelProvider).areas;
       ref
@@ -5272,7 +5273,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         context.verticalSpace(32),
         _buildProductSelector(
           context,
-          productState.products ?? [],
+          productState.products,
           viewModel,
           state,
         ),

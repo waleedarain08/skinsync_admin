@@ -21,6 +21,8 @@ final treatmentViewModelProvider =
 class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   TreatmentViewModel._() : super(TreatmentState());
 
+  static final List<TreatmentModel> _localTreatments = List.from(TreatmentData.dummyTreatments);
+
   // ignore: unused_field
   final TreatmentRepository _treatmentRepository =
       locator<TreatmentRepository>();
@@ -146,14 +148,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   Future<bool> getTreatments({int page = 1}) async {
     return await runSafely<bool?>(showLoading: false, () async {
           state = state.copyWith(loading: true, currentPage: page);
-          // Using dummy data for now
           await Future.delayed(const Duration(milliseconds: 500));
           state = state.copyWith(
-            treatments: TreatmentData.dummyTreatments,
-            filteredTreatments: TreatmentData.dummyTreatments,
+            treatments: List.from(_localTreatments),
+            filteredTreatments: _getFilteredList(_localTreatments),
             loading: false,
-            totalPages: 5,
-            totalResults: 50,
+            totalPages: 1,
+            totalResults: _localTreatments.length,
           );
           return true;
         }) ??
@@ -1260,26 +1261,23 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   }
 
   void toggleTreatmentStatus(int treatmentId) {
-    final updatedList = state.treatments.map((t) {
-      if (t.id == treatmentId) {
-        return t.copyWith(status: t.status == 'active' ? 'deactive' : 'active');
-      }
-      return t;
-    }).toList();
+    final index = _localTreatments.indexWhere((t) => t.id == treatmentId);
+    if (index != -1) {
+      final t = _localTreatments[index];
+      _localTreatments[index] = t.copyWith(status: t.status == 'active' ? 'deactive' : 'active');
+    }
 
     state = state.copyWith(
-      treatments: updatedList,
-      filteredTreatments: _getFilteredList(updatedList),
+      treatments: List.from(_localTreatments),
+      filteredTreatments: _getFilteredList(_localTreatments),
     );
   }
 
   void deleteTreatment(int treatmentId) {
-    final updatedList = state.treatments
-        .where((t) => t.id != treatmentId)
-        .toList();
+    _localTreatments.removeWhere((t) => t.id == treatmentId);
     state = state.copyWith(
-      treatments: updatedList,
-      filteredTreatments: _getFilteredList(updatedList),
+      treatments: List.from(_localTreatments),
+      filteredTreatments: _getFilteredList(_localTreatments),
     );
   }
 
@@ -1608,8 +1606,15 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       // Perform API call using treatment.toRequest()
       // await _treatmentRepository.createTreatment(treatment.toRequest());
 
+      final newId = _localTreatments.isEmpty
+          ? 1
+          : (_localTreatments.map((t) => t.id ?? 0).reduce((a, b) => a > b ? a : b) + 1);
+      final treatmentWithId = treatment.copyWith(id: newId);
+      _localTreatments.add(treatmentWithId);
+
       await Future.delayed(const Duration(seconds: 1));
       resetForm();
+      await getTreatments();
     });
   }
 
@@ -1912,16 +1917,14 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             .toList(),
       );
 
-      final updatedTreatments = state.treatments.map((t) {
-        if (t.id == state.selectedTreatment!.id) {
-          return treatment;
-        }
-        return t;
-      }).toList();
+      final idx = _localTreatments.indexWhere((t) => t.id == state.selectedTreatment!.id);
+      if (idx != -1) {
+        _localTreatments[idx] = treatment;
+      }
 
       state = state.copyWith(
-        treatments: updatedTreatments,
-        filteredTreatments: _getFilteredList(updatedTreatments),
+        treatments: List.from(_localTreatments),
+        filteredTreatments: _getFilteredList(_localTreatments),
       );
 
       await Future.delayed(const Duration(seconds: 1));
