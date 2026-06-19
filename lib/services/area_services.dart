@@ -24,7 +24,7 @@ class AreaServices implements AreaRepository {
       },
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data ?? [];
@@ -45,7 +45,7 @@ class AreaServices implements AreaRepository {
       return AreaModel.fromJson(json as Map<String, dynamic>);
     });
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;

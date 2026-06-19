@@ -20,7 +20,7 @@ class ProductServices implements ProductRepository {
       (json) => ProductModel.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -38,7 +38,7 @@ class ProductServices implements ProductRepository {
       (json) => ProductModel.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -55,7 +55,7 @@ class ProductServices implements ProductRepository {
       (_) => null,
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response;
@@ -65,7 +65,7 @@ class ProductServices implements ProductRepository {
   Future<List<ProductModel>> getProducts() async {
     final jsonResponse = await _api.get(Endpoint.products);
     final response = ProductListResponse.fromJson(jsonResponse);
-    if (!(response.isSuccess ?? false)) {
+    if (!(response.isSuccess)) {
       throw BadRequestException(response.message);
     }
     return response.data ?? [];

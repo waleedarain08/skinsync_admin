@@ -1,10 +1,10 @@
 class BaseApiResponseModel<T> {
-  final bool status;
+  final bool isSuccess;
   final String message;
   final T? data;
 
   const BaseApiResponseModel({
-    required this.status,
+    required this.isSuccess,
     required this.message,
     this.data,
   });
@@ -14,7 +14,7 @@ class BaseApiResponseModel<T> {
     T? Function(Object? json) fromJsonT,
   ) {
     return BaseApiResponseModel<T>(
-      status: json['status'] ?? false,
+      isSuccess: json['is_success'] ?? false,
       message: json['message'] ?? '',
       data: json['data'] != null ? fromJsonT(json['data']) : null,
     );
@@ -26,6 +26,6 @@ class BaseApiResponseModel<T> {
     String message = '',
     int statusCode = 400,
   }) {
-    return BaseApiResponseModel<T>(status: true, message: message, data: data);
+    return BaseApiResponseModel<T>(isSuccess: true, message: message, data: data);
   }
 }

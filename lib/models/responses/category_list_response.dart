@@ -2,14 +2,14 @@ import 'base_response_model.dart';
 
 class CategoryListResponse extends BaseApiResponseModel<List<CategoryModel>> {
   const CategoryListResponse({
-    required super.status,
+    required super.isSuccess,
     required super.message,
     super.data,
   });
 
   factory CategoryListResponse.fromJson(Map<String, dynamic> json) =>
       CategoryListResponse(
-        status: json['status'] ?? false,
+        isSuccess: json['status'] ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
@@ -19,7 +19,7 @@ class CategoryListResponse extends BaseApiResponseModel<List<CategoryModel>> {
       );
 
   Map<String, dynamic> toJson() => {
-        'status': status,
+        'status': isSuccess,
         'message': message,
         'data': data?.map((e) => e.toJson()).toList(),
       };

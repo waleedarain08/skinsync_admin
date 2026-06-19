@@ -2,14 +2,14 @@ import 'base_response_model.dart';
 
 class AreaListResponse extends BaseApiResponseModel<List<AreaModel>> {
   const AreaListResponse({
-    required super.status,
+    required super.isSuccess,
     required super.message,
     super.data,
   });
 
   factory AreaListResponse.fromJson(Map<String, dynamic> json) =>
       AreaListResponse(
-        status: json['status'] ?? false,
+        isSuccess: json['status'] ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
@@ -19,7 +19,7 @@ class AreaListResponse extends BaseApiResponseModel<List<AreaModel>> {
       );
 
   Map<String, dynamic> toJson() => {
-    'status': status,
+    'status': isSuccess,
     'message': message,
     'data': data?.map((e) => e.toJson()).toList(),
   };

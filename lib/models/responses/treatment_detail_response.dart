@@ -3,14 +3,14 @@ import 'base_response_model.dart';
 
 class TreatmentDetailResponse extends BaseApiResponseModel<TreatmentModel> {
   const TreatmentDetailResponse({
-    required super.status,
+    required super.isSuccess,
     required super.message,
     super.data,
   });
 
   factory TreatmentDetailResponse.fromJson(Map<String, dynamic> json) =>
       TreatmentDetailResponse(
-        status: json['status'] ?? false,
+        isSuccess: json['status'] ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
@@ -18,7 +18,7 @@ class TreatmentDetailResponse extends BaseApiResponseModel<TreatmentModel> {
       );
 
   Map<String, dynamic> toJson() => {
-        'status': status,
+        'status': isSuccess,
         'message': message,
         'data': data?.toRequest(),
       };

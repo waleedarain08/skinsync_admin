@@ -28,7 +28,7 @@ class SettingViewModel extends BaseViewModel<SettingState> {
             final response = await _settingRepository.updateCustomerAppVersion(
               req: req,
             );
-            if (response.status) {
+            if (response.isSuccess) {
               EasyLoading.showSuccess(
                 response.message.isNotEmpty ? response.message : 'Success',
               );
@@ -60,7 +60,7 @@ class SettingViewModel extends BaseViewModel<SettingState> {
             final response = await _settingRepository.updateClinicAppVersion(
               req: req,
             );
-            if (response.status) {
+            if (response.isSuccess) {
               EasyLoading.showSuccess(
                 response.message.isNotEmpty ? response.message : 'Success',
               );

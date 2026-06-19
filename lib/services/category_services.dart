@@ -25,7 +25,7 @@ class CategoryServices implements CategoryRepository {
       },
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data ?? [];
@@ -42,7 +42,7 @@ class CategoryServices implements CategoryRepository {
       (json) => CategoryDetailDto.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     if (response.data == null) {
@@ -61,7 +61,7 @@ class CategoryServices implements CategoryRepository {
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse, (_) => null);
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
 

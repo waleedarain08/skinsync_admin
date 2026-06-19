@@ -21,7 +21,7 @@ class SubscriptionServices implements SubscriptionRepository {
             .toList();
       },
     );
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -38,7 +38,7 @@ class SubscriptionServices implements SubscriptionRepository {
       (json) => SubscriptionPlanModel.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;

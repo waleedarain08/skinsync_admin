@@ -8,14 +8,14 @@ import '../notification_model.dart';
 
 class CategoryDetailResponse extends BaseApiResponseModel<CategoryDetailDto> {
   const CategoryDetailResponse({
-    required super.status,
+    required super.isSuccess,
     required super.message,
     super.data,
   });
 
   factory CategoryDetailResponse.fromJson(Map<String, dynamic> json) =>
       CategoryDetailResponse(
-        status: json['status'] ?? false,
+        isSuccess: json['status'] ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
@@ -23,7 +23,7 @@ class CategoryDetailResponse extends BaseApiResponseModel<CategoryDetailDto> {
       );
 
   Map<String, dynamic> toJson() => {
-        'status': status,
+        'status': isSuccess,
         'message': message,
         'data': data?.toJson(),
       };

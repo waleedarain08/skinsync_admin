@@ -27,7 +27,7 @@ class ClinicService implements ClinicRepository {
       (json) => ClinicModel.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -48,7 +48,7 @@ class ClinicService implements ClinicRepository {
       (json) => ClinicModel.fromJson(json as Map<String, dynamic>),
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
@@ -65,7 +65,7 @@ class ClinicService implements ClinicRepository {
             .toList();
       },
     );
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;

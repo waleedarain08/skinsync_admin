@@ -3,20 +3,20 @@ import 'base_response_model.dart';
 
 class LoginResponseModel extends BaseApiResponseModel<AuthData> {
   const LoginResponseModel({
-    required super.status,
+    required super.isSuccess,
     required super.message,
     super.data,
   });
 
   factory LoginResponseModel.fromJson(Map<String, dynamic> json) =>
       LoginResponseModel(
-        status: json['status'],
+        isSuccess: json['status'],
         message: json['message'],
         data: json['data'] == null ? null : AuthData.fromJson(json['data']),
       );
 
   Map<String, dynamic> toJson() => {
-    'status': status,
+    'status': isSuccess,
     'message': message,
     'data': data?.toJson(),
   };
