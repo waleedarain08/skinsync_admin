@@ -15,9 +15,9 @@ class ProductServices implements ProductRepository {
   @override
   Future<ProductModel> addProduct({required ProductModel req}) async {
     final jsonResponse = await _api.post(Endpoint.products, body: req.toJson());
-    final response = BaseApiResponseModel<ProductModel>.fromJson(
-      jsonResponse,
-      (json) => ProductModel.fromJson(json as Map<String, dynamic>),
+    final response = ProductResponse.fromJson(
+      jsonResponse
+    
     );
 
     if (!response.isSuccess) {
@@ -33,9 +33,9 @@ class ProductServices implements ProductRepository {
       body: req.toJson(),
       pathParams: {'id': req.id.toString()},
     );
-    final response = BaseApiResponseModel<ProductModel>.fromJson(
+    final response = ProductResponse.fromJson(
       jsonResponse,
-      (json) => ProductModel.fromJson(json as Map<String, dynamic>),
+    
     );
 
     if (!response.isSuccess) {
@@ -52,7 +52,7 @@ class ProductServices implements ProductRepository {
     );
     final response = BaseApiResponseModel<Null>.fromJson(
       jsonResponse,
-      (_) => null,
+    
     );
 
     if (!response.isSuccess) {

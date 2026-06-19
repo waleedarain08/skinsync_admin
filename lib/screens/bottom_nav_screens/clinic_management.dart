@@ -440,18 +440,18 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                           clinic.address,
                         ),
                         _tableTextCell(
-                          clinic.subscriptionPlan ?? 'Standard',
+                          clinic?.subscriptionPlan ?? 'Standard',
                           style: context.fonts.black14w600,
                         ),
                         _tableTextCell(
-                          '${clinic.totalAppointments ?? 0} Appts',
+                          '${clinic?.totalAppointments ?? 0} Appts',
                           style: context.fonts.grey14w400,
                         ),
                         _tableTextCell(
-                          '${clinic.totalTreatments ?? 0} Proc',
+                          '${clinic?.totalTreatments ?? 0} Proc',
                           style: context.fonts.grey14w400,
                         ),
-                        _statusBadgeCell(clinic.status ?? 'Active'),
+                        _statusBadgeCell(clinic?.status ?? 'Active'),
                         _activeActionsCell(clinic),
                       ],
                     );
