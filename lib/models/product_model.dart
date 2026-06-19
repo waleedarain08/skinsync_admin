@@ -16,6 +16,7 @@ class ProductModel {
   final String? productPurpose;
   final String? unitType;
   final bool? enforceLotTracking;
+  final String? usageType;
 
   // New packaging fields
   final String? packageType;
@@ -52,6 +53,7 @@ class ProductModel {
     this.productPurpose,
     this.unitType,
     this.enforceLotTracking,
+    this.usageType,
     this.packageType,
     this.unitsPerPackage,
     this.subcategory,
@@ -86,6 +88,7 @@ class ProductModel {
       productPurpose: json['product_purpose'],
       unitType: json['unit_type'],
       enforceLotTracking: json['enforce_lot_tracking'],
+      usageType: json['usage_type'] ?? json['product_purpose'],
       packageType: json['package_type'],
       unitsPerPackage: json['units_per_package'] as int?,
       subcategory: json['subcategory'],
@@ -125,6 +128,7 @@ class ProductModel {
       'product_purpose': productPurpose,
       'unit_type': unitType,
       'enforce_lot_tracking': enforceLotTracking,
+      'usage_type': usageType ?? productPurpose,
       'package_type': packageType,
       'units_per_package': unitsPerPackage,
       'subcategory': subcategory,

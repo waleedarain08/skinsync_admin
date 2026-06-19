@@ -13,6 +13,7 @@ import '../../widgets/gradient_scaffold.dart';
 import '../../widgets/number_paginator.dart';
 import '../create_product_screen.dart';
 import '../product_detail_screen.dart';
+import '../../widgets/custom_cashed_image_widget.dart';
 
 class ProductManagement extends ConsumerStatefulWidget {
   const ProductManagement({super.key});
@@ -34,7 +35,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(productViewModelProvider.notifier).getProducts();
+      ref.read(productViewModelProvider.notifier).fetchProducts();
     });
   }
 
@@ -47,7 +48,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(productViewModelProvider);
-    final catalogProducts = state.products ?? [];
+    final catalogProducts = state.products;
 
     // Filter products dynamically
     final filteredProducts = catalogProducts.where((p) {
@@ -141,7 +142,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   Widget _buildCatalogOverview() {
     final state = ref.watch(productViewModelProvider);
-    final catalogProducts = state.products ?? [];
+    final catalogProducts = state.products;
 
     final totalSkus = catalogProducts.length;
     final totalBrands = catalogProducts.map((p) => p.brand).toSet().length;
@@ -397,16 +398,20 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
         children: [
-          Container(
-            width: 48.w,
-            height: 48.w,
-            decoration: BoxDecoration(
-              color: CustomColors.whiteGrey,
-              borderRadius: BorderRadius.circular(8.r),
-              image: DecorationImage(
-                image: NetworkImage(product.image),
-                fit: BoxFit.cover,
-              ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: SizedBox(
+              width: 48.w,
+              height: 48.w,
+              child: product.image.isEmpty
+                  ? const DecoratedBox(
+                      decoration: BoxDecoration(color: CustomColors.whiteGrey),
+                      child: Icon(Icons.broken_image, color: CustomColors.grey),
+                    )
+                  : CustomCachedImage(
+                      imageUrl: product.image,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
           SizedBox(width: 16.w),
