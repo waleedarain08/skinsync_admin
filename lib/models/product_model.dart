@@ -1,6 +1,4 @@
-
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
-
 
 class ProductResponse extends BaseApiResponseModel<ProductModel> {
   const ProductResponse({
@@ -11,24 +9,20 @@ class ProductResponse extends BaseApiResponseModel<ProductModel> {
 
   factory ProductResponse.fromJson(Map<String, dynamic> json) =>
       ProductResponse(
-        isSuccess:
-            (json['is_success'] as bool?) ??
-           
-            false,
+        isSuccess: (json['is_success'] as bool?) ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
-            : ProductModel.fromJson(
-                json['data'] as Map<String, dynamic>,
-              ),
+            : ProductModel.fromJson(json['data'] as Map<String, dynamic>),
       );
 
   Map<String, dynamic> toJson() => {
-        'is_success': isSuccess,
-        'message': message,
-        'data': data?.toJson(),
-      };
+    'is_success': isSuccess,
+    'message': message,
+    'data': data?.toJson(),
+  };
 }
+
 class ProductModel {
   final int? id;
   final String image;
@@ -126,8 +120,10 @@ class ProductModel {
       boxQuantity: json['box_quantity'] as int?,
       itemQuantityPerBox: json['item_quantity_per_box'] as int?,
       billableUnit: json['billable_unit'],
-      billableQuantityPerItem: (json['billable_quantity_per_item'] as num?)?.toDouble(),
-      totalBillableQuantity: (json['total_billable_quantity'] as num?)?.toDouble(),
+      billableQuantityPerItem: (json['billable_quantity_per_item'] as num?)
+          ?.toDouble(),
+      totalBillableQuantity: (json['total_billable_quantity'] as num?)
+          ?.toDouble(),
       clinicCost: (json['clinic_cost'] as num?)?.toDouble(),
       retailPricePerUnit: (json['retail_price_per_unit'] as num?)?.toDouble(),
       supplier: json['supplier'],
@@ -138,7 +134,7 @@ class ProductModel {
       selectedCategoryIds: json['selected_category_ids'] != null
           ? List<int>.from(json['selected_category_ids'])
           : null,
-      barcode: json['barcode'],
+      //  barcode: json['barcode'],
     );
   }
 
@@ -148,21 +144,21 @@ class ProductModel {
       'image': image,
       'name': name,
       'description': description,
-      'unit': unit,
-      'sku': sku,
+      // 'unit': unit,
+      // 'sku': sku,
       'category': category,
-      'quantity': quantity,
+      // 'quantity': quantity,
       'status': status,
       'brand': brand,
-      'manufacturer': manufacturer,
+      // 'manufacturer': manufacturer,
       'global_sku': globalSku,
-      'product_purpose': productPurpose,
+      // 'product_purpose': productPurpose,
       'unit_type': unitType,
       'enforce_lot_tracking': enforceLotTracking,
       'usage_type': usageType ?? productPurpose,
       'package_type': packageType,
-      'units_per_package': unitsPerPackage,
-      'subcategory': subcategory,
+      // 'units_per_package': unitsPerPackage,
+      // 'subcategory': subcategory,
       'box_quantity': boxQuantity,
       'item_quantity_per_box': itemQuantityPerBox,
       'billable_unit': billableUnit,

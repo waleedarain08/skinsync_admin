@@ -19,7 +19,8 @@ class CreateProductScreen extends ConsumerStatefulWidget {
   static const String routeName = '/create-product';
 
   @override
-  ConsumerState<CreateProductScreen> createState() => _CreateProductScreenState();
+  ConsumerState<CreateProductScreen> createState() =>
+      _CreateProductScreenState();
 }
 
 class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
@@ -30,7 +31,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
   late final TextEditingController _barcodeController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _unitsPerPackageController;
-  
+
   late final TextEditingController _boxQuantityController;
   late final TextEditingController _itemQuantityPerBoxController;
   late final TextEditingController _billableQuantityPerItemController;
@@ -57,7 +58,8 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
   void _updateTotalBillableQuantity() {
     final int boxQty = int.tryParse(_boxQuantityController.text) ?? 0;
     final int itemQty = int.tryParse(_itemQuantityPerBoxController.text) ?? 0;
-    final double billableQty = double.tryParse(_billableQuantityPerItemController.text) ?? 0.0;
+    final double billableQty =
+        double.tryParse(_billableQuantityPerItemController.text) ?? 0.0;
     final double total = boxQty * itemQty * billableQty;
     _totalBillableQuantityController.text = total.toStringAsFixed(1);
   }
@@ -66,26 +68,47 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.productToEdit?.name);
-    _skuController = TextEditingController(text: widget.productToEdit?.sku ?? widget.productToEdit?.globalSku);
+    _skuController = TextEditingController(
+      text: widget.productToEdit?.sku ?? widget.productToEdit?.globalSku,
+    );
     _barcodeController = TextEditingController();
-    _descriptionController = TextEditingController(text: widget.productToEdit?.description);
+    _descriptionController = TextEditingController(
+      text: widget.productToEdit?.description,
+    );
     _unitsPerPackageController = TextEditingController(
       text: widget.productToEdit?.unitsPerPackage?.toString() ?? '1',
     );
 
-    _boxQuantityController = TextEditingController(text: widget.productToEdit?.boxQuantity?.toString() ?? '0');
-    _itemQuantityPerBoxController = TextEditingController(text: widget.productToEdit?.itemQuantityPerBox?.toString() ?? '0');
-    _billableQuantityPerItemController = TextEditingController(text: widget.productToEdit?.billableQuantityPerItem?.toString() ?? '0');
-    _totalBillableQuantityController = TextEditingController(text: widget.productToEdit?.totalBillableQuantity?.toString() ?? '0');
-    _clinicCostController = TextEditingController(text: widget.productToEdit?.clinicCost?.toString() ?? '0');
-    _retailPricePerUnitController = TextEditingController(text: widget.productToEdit?.retailPricePerUnit?.toString() ?? '0');
-    _supplierController = TextEditingController(text: widget.productToEdit?.supplier);
-    _lotNumberController = TextEditingController(text: widget.productToEdit?.lotNumber);
-    
+    _boxQuantityController = TextEditingController(
+      text: widget.productToEdit?.boxQuantity?.toString() ?? '0',
+    );
+    _itemQuantityPerBoxController = TextEditingController(
+      text: widget.productToEdit?.itemQuantityPerBox?.toString() ?? '0',
+    );
+    _billableQuantityPerItemController = TextEditingController(
+      text: widget.productToEdit?.billableQuantityPerItem?.toString() ?? '0',
+    );
+    _totalBillableQuantityController = TextEditingController(
+      text: widget.productToEdit?.totalBillableQuantity?.toString() ?? '0',
+    );
+    _clinicCostController = TextEditingController(
+      text: widget.productToEdit?.clinicCost?.toString() ?? '0',
+    );
+    _retailPricePerUnitController = TextEditingController(
+      text: widget.productToEdit?.retailPricePerUnit?.toString() ?? '0',
+    );
+    _supplierController = TextEditingController(
+      text: widget.productToEdit?.supplier,
+    );
+    _lotNumberController = TextEditingController(
+      text: widget.productToEdit?.lotNumber,
+    );
+
     if (widget.productToEdit?.expirationDate != null) {
       _expirationDate = widget.productToEdit!.expirationDate;
       _expirationDateController = TextEditingController(
-        text: '${_expirationDate!.year}-${_expirationDate!.month}-${_expirationDate!.day}',
+        text:
+            '${_expirationDate!.year}-${_expirationDate!.month}-${_expirationDate!.day}',
       );
     } else {
       _expirationDateController = TextEditingController();
@@ -163,20 +186,58 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
   }
 
   Widget _buildImagePicker() {
+    final state = ref.watch(productViewModelProvider);
+
+    final image = state.imageUrl ?? widget.productToEdit?.image;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Product Image', style: context.fonts.black14w600),
+
         SizedBox(height: 12.h),
-        Container(
-          width: 140.w,
-          height: 140.w,
-          decoration: BoxDecoration(
-            color: CustomColors.whiteGrey,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: CustomColors.grey.withValues(alpha: 0.1)),
+
+        InkWell(
+          onTap: () {
+            ref.read(productViewModelProvider.notifier).pickAndUploadImage();
+          },
+
+          child: Container(
+            width: 140.w,
+            height: 140.w,
+
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(),
+            ),
+
+            child: state.uploadingImage
+                ? const Center(child: CircularProgressIndicator())
+                : image != null && image.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+
+                    child: Image.network(
+                      image,
+                      fit: BoxFit.cover,
+
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) {
+                          return child;
+                        }
+
+                        return const Center(child: CircularProgressIndicator());
+                      },
+
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Icon(Icons.broken_image_outlined, size: 40),
+                        );
+                      },
+                    ),
+                  )
+                : const Center(child: Icon(Icons.add_a_photo)),
           ),
-          child: const Center(child: Icon(Icons.add_a_photo_outlined, color: CustomColors.grey)),
         ),
       ],
     );
@@ -199,7 +260,11 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
             Text(label, style: context.fonts.black14w600),
             IconButton(
               onPressed: onCreate,
-              icon: const Icon(Icons.add_circle_outline_rounded, color: CustomColors.purple, size: 20),
+              icon: const Icon(
+                Icons.add_circle_outline_rounded,
+                color: CustomColors.purple,
+                size: 20,
+              ),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
@@ -209,10 +274,16 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
         DropdownButtonFormField<String>(
           value: value,
           isExpanded: true,
-          items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+          items: items
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
           onChanged: onChanged,
           style: context.fonts.black14w400,
-          icon: Icon(Icons.keyboard_arrow_down_rounded, color: CustomColors.lightGrey, size: context.sp(20)),
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: CustomColors.lightGrey,
+            size: context.sp(20),
+          ),
           decoration: AppDecorations.input(context, hint: hint),
           dropdownColor: CustomColors.white,
           borderRadius: context.appBorderRadius(all: 12),
@@ -295,11 +366,16 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                       children: [
                         IconButton(
                           onPressed: () => context.pop(),
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 20,
+                          ),
                         ),
                         SizedBox(width: 8.w),
                         Text(
-                          isEdit ? 'Edit Catalog Product' : 'Create New Catalog Product',
+                          isEdit
+                              ? 'Edit Catalog Product'
+                              : 'Create New Catalog Product',
                           style: context.fonts.black32w700,
                         ),
                       ],
@@ -313,11 +389,16 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                         SizedBox(width: 16.w),
                         CustomPrimaryButton(
                           onTap: () {
-                            if (!_formKey.currentState!.validate() || state.loading) return;
+                            if (!_formKey.currentState!.validate() ||
+                                state.loading)
+                              return;
                             final product = ProductModel(
                               id: widget.productToEdit?.id,
                               name: _nameController.text,
-                              image: widget.productToEdit?.image ?? 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop',
+                              image:
+                                  state.imageUrl ??
+                                  widget.productToEdit?.image ??
+                                  '',
                               unit: _selectedUnit ?? 'units',
                               description: _descriptionController.text,
                               sku: _skuController.text,
@@ -332,33 +413,53 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               unitType: _selectedUnit,
                               enforceLotTracking: _enforceLotTracking,
                               packageType: _selectedPackageType,
-                              unitsPerPackage: int.tryParse(_unitsPerPackageController.text),
-                              boxQuantity: int.tryParse(_boxQuantityController.text),
-                              itemQuantityPerBox: int.tryParse(_itemQuantityPerBoxController.text),
+                              unitsPerPackage: int.tryParse(
+                                _unitsPerPackageController.text,
+                              ),
+                              boxQuantity: int.tryParse(
+                                _boxQuantityController.text,
+                              ),
+                              itemQuantityPerBox: int.tryParse(
+                                _itemQuantityPerBoxController.text,
+                              ),
                               billableUnit: _selectedBillableUnit,
-                              billableQuantityPerItem: double.tryParse(_billableQuantityPerItemController.text),
-                              totalBillableQuantity: double.tryParse(_totalBillableQuantityController.text),
-                              clinicCost: double.tryParse(_clinicCostController.text),
-                              retailPricePerUnit: double.tryParse(_retailPricePerUnitController.text),
+                              billableQuantityPerItem: double.tryParse(
+                                _billableQuantityPerItemController.text,
+                              ),
+                              totalBillableQuantity: double.tryParse(
+                                _totalBillableQuantityController.text,
+                              ),
+                              clinicCost: double.tryParse(
+                                _clinicCostController.text,
+                              ),
+                              retailPricePerUnit: double.tryParse(
+                                _retailPricePerUnitController.text,
+                              ),
                               supplier: _supplierController.text,
                               lotNumber: _lotNumberController.text,
-                              expirationDate: _expirationDate,
+                              expirationDate: _expirationDate?.toUtc() ,
                               selectedCategoryIds: _selectedCategoryIds,
                               barcode: _barcodeController.text,
                             );
-                            
-                            final notifier = ref.read(productViewModelProvider.notifier);
+
+                            final notifier = ref.read(
+                              productViewModelProvider.notifier,
+                            );
                             if (isEdit) {
                               notifier.updateProduct(product).then((success) {
-                                if (success && context.mounted) context.pop(true);
+                                if (success && context.mounted)
+                                  context.pop(true);
                               });
                             } else {
                               notifier.addProduct(product).then((newProduct) {
-                                if (newProduct != null && context.mounted) context.pop(newProduct);
+                                if (newProduct != null && context.mounted)
+                                  context.pop(newProduct);
                               });
                             }
                           },
-                          label: state.loading ? 'Saving...' : 'Save Catalog Product',
+                          label: state.loading
+                              ? 'Saving...'
+                              : 'Save Catalog Product',
                           width: 180.w,
                         ),
                       ],
@@ -381,9 +482,12 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                     children: [
                       _buildImagePicker(),
                       SizedBox(height: 24.h),
-                      
+
                       // SECTION 1: BASIC INFORMATION
-                      Text('SECTION 1: BASIC INFORMATION', style: context.fonts.purple12w700),
+                      Text(
+                        'SECTION 1: BASIC INFORMATION',
+                        style: context.fonts.purple12w700,
+                      ),
                       SizedBox(height: 16.h),
                       Row(
                         children: [
@@ -400,19 +504,27 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                           Expanded(
                             child: Consumer(
                               builder: (context, ref, _) {
-                                final brands = ref.watch(masterDataViewModelProvider).brands;
+                                final brands = ref
+                                    .watch(masterDataViewModelProvider)
+                                    .brands;
                                 return _buildSelectOrCreateDropdown(
                                   label: 'Brand',
                                   hint: 'Select Brand',
                                   value: _selectedBrand,
                                   items: brands,
-                                  onChanged: (val) => setState(() => _selectedBrand = val),
+                                  onChanged: (val) =>
+                                      setState(() => _selectedBrand = val),
                                   onCreate: () => _showCreateMasterItemDialog(
                                     context,
                                     ref,
                                     'Brand',
                                     (name) {
-                                      ref.read(masterDataViewModelProvider.notifier).addBrand(name);
+                                      ref
+                                          .read(
+                                            masterDataViewModelProvider
+                                                .notifier,
+                                          )
+                                          .addBrand(name);
                                       setState(() => _selectedBrand = name);
                                     },
                                   ),
@@ -430,12 +542,21 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Category', style: context.fonts.black14w600),
+                                    Text(
+                                      'Category',
+                                      style: context.fonts.black14w600,
+                                    ),
                                     IconButton(
-                                      onPressed: () => _showCategorySelectionDialog(context),
-                                      icon: const Icon(Icons.add_circle_outline_rounded, color: CustomColors.purple, size: 20),
+                                      onPressed: () =>
+                                          _showCategorySelectionDialog(context),
+                                      icon: const Icon(
+                                        Icons.add_circle_outline_rounded,
+                                        color: CustomColors.purple,
+                                        size: 20,
+                                      ),
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
                                     ),
@@ -443,22 +564,30 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                 ),
                                 SizedBox(height: 8.h),
                                 GestureDetector(
-                                  onTap: () => _showCategorySelectionDialog(context),
+                                  onTap: () =>
+                                      _showCategorySelectionDialog(context),
                                   child: AbsorbPointer(
                                     child: TextFormField(
-                                      controller: TextEditingController(text: _selectedCategory),
-                                      style: context.fonts.black14w400,
-                                      decoration: AppDecorations.input(
-                                        context,
-                                        hint: 'Select Category Hierarchy',
-                                      ).copyWith(
-                                        suffixIcon: Icon(
-                                          Icons.keyboard_arrow_right_rounded,
-                                          color: CustomColors.lightGrey,
-                                          size: context.sp(20),
-                                        ),
+                                      controller: TextEditingController(
+                                        text: _selectedCategory,
                                       ),
-                                      validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                                      style: context.fonts.black14w400,
+                                      decoration:
+                                          AppDecorations.input(
+                                            context,
+                                            hint: 'Select Category Hierarchy',
+                                          ).copyWith(
+                                            suffixIcon: Icon(
+                                              Icons
+                                                  .keyboard_arrow_right_rounded,
+                                              color: CustomColors.lightGrey,
+                                              size: context.sp(20),
+                                            ),
+                                          ),
+                                      validator: (val) =>
+                                          val == null || val.isEmpty
+                                          ? 'Required'
+                                          : null,
                                     ),
                                   ),
                                 ),
@@ -494,7 +623,9 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                           Expanded(
                             child: Consumer(
                               builder: (context, ref, _) {
-                                final usageTypes = ref.watch(masterDataViewModelProvider).usageTypes;
+                                final usageTypes = ref
+                                    .watch(masterDataViewModelProvider)
+                                    .usageTypes;
                                 return _buildSelectOrCreateDropdown(
                                   label: 'Usage Type',
                                   hint: 'Select Usage Type',
@@ -513,7 +644,12 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                     ref,
                                     'Usage Type',
                                     (name) {
-                                      ref.read(masterDataViewModelProvider.notifier).addUsageType(name);
+                                      ref
+                                          .read(
+                                            masterDataViewModelProvider
+                                                .notifier,
+                                          )
+                                          .addUsageType(name);
                                       setState(() => _selectedPurpose = name);
                                     },
                                   ),
@@ -523,11 +659,14 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                           ),
                         ],
                       ),
-                      
+
                       SizedBox(height: 32.h),
 
                       // SECTION 2: PACKAGING
-                      Text('SECTION 2: PACKAGING', style: context.fonts.purple12w700),
+                      Text(
+                        'SECTION 2: PACKAGING',
+                        style: context.fonts.purple12w700,
+                      ),
                       SizedBox(height: 16.h),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -538,7 +677,9 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               children: [
                                 Consumer(
                                   builder: (context, ref, _) {
-                                    final packageTypes = ref.watch(masterDataViewModelProvider).packageTypes;
+                                    final packageTypes = ref
+                                        .watch(masterDataViewModelProvider)
+                                        .packageTypes;
                                     return _buildSelectOrCreateDropdown(
                                       label: 'Unit Type',
                                       hint: 'Select Unit Type',
@@ -550,23 +691,32 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                           _updateTotalBillableQuantity();
                                         });
                                       },
-                                      onCreate: () => _showCreateMasterItemDialog(
-                                        context,
-                                        ref,
-                                        'Unit Type',
-                                        (name) {
-                                          ref.read(masterDataViewModelProvider.notifier).addPackageType(name);
-                                          setState(() {
-                                            _selectedUnit = name;
-                                            _updateTotalBillableQuantity();
-                                          });
-                                        },
-                                      ),
+                                      onCreate: () =>
+                                          _showCreateMasterItemDialog(
+                                            context,
+                                            ref,
+                                            'Unit Type',
+                                            (name) {
+                                              ref
+                                                  .read(
+                                                    masterDataViewModelProvider
+                                                        .notifier,
+                                                  )
+                                                  .addPackageType(name);
+                                              setState(() {
+                                                _selectedUnit = name;
+                                                _updateTotalBillableQuantity();
+                                              });
+                                            },
+                                          ),
                                     );
                                   },
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('The bulk unit purchased from suppliers, e.g. Carton, Case.', style: context.fonts.grey12w400),
+                                Text(
+                                  'The bulk unit purchased from suppliers, e.g. Carton, Case.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -587,7 +737,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   },
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('Number of inner boxes inside one Unit Type bulk unit.', style: context.fonts.grey12w400),
+                                Text(
+                                  'Number of inner boxes inside one Unit Type bulk unit.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -613,7 +766,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   },
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('Count of physical consumable items (like syringes) per inner box.', style: context.fonts.grey12w400),
+                                Text(
+                                  'Count of physical consumable items (like syringes) per inner box.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -624,7 +780,9 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               children: [
                                 Consumer(
                                   builder: (context, ref, _) {
-                                    final units = ref.watch(masterDataViewModelProvider).units;
+                                    final units = ref
+                                        .watch(masterDataViewModelProvider)
+                                        .units;
                                     return _buildSelectOrCreateDropdown(
                                       label: 'Package Type',
                                       hint: 'Select Package Type',
@@ -636,23 +794,32 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                           _updateTotalBillableQuantity();
                                         });
                                       },
-                                      onCreate: () => _showCreateMasterItemDialog(
-                                        context,
-                                        ref,
-                                        'Package Type',
-                                        (name) {
-                                          ref.read(masterDataViewModelProvider.notifier).addUnit(name);
-                                          setState(() {
-                                            _selectedPackageType = name;
-                                            _updateTotalBillableQuantity();
-                                          });
-                                        },
-                                      ),
+                                      onCreate: () =>
+                                          _showCreateMasterItemDialog(
+                                            context,
+                                            ref,
+                                            'Package Type',
+                                            (name) {
+                                              ref
+                                                  .read(
+                                                    masterDataViewModelProvider
+                                                        .notifier,
+                                                  )
+                                                  .addUnit(name);
+                                              setState(() {
+                                                _selectedPackageType = name;
+                                                _updateTotalBillableQuantity();
+                                              });
+                                            },
+                                          ),
                                     );
                                   },
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('The base physical consumable item type, e.g. Syringe, Vial.', style: context.fonts.grey12w400),
+                                Text(
+                                  'The base physical consumable item type, e.g. Syringe, Vial.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -662,24 +829,43 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                       // DYNAMIC PACKAGING CALCULATION FOOTER
                       Builder(
                         builder: (context) {
-                          final int boxQty = int.tryParse(_boxQuantityController.text) ?? 0;
-                          final int itemQty = int.tryParse(_itemQuantityPerBoxController.text) ?? 0;
+                          final int boxQty =
+                              int.tryParse(_boxQuantityController.text) ?? 0;
+                          final int itemQty =
+                              int.tryParse(
+                                _itemQuantityPerBoxController.text,
+                              ) ??
+                              0;
                           final int totalItems = boxQty * itemQty;
                           final String unitName = _selectedUnit ?? 'Carton';
-                          final String packName = _selectedPackageType ?? 'Syringe';
-                          
+                          final String packName =
+                              _selectedPackageType ?? 'Syringe';
+
                           return Container(
                             margin: EdgeInsets.only(top: 16.h),
-                            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 12.h,
+                            ),
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: CustomColors.purple.withValues(alpha: 0.05),
+                              color: CustomColors.purple.withValues(
+                                alpha: 0.05,
+                              ),
                               borderRadius: BorderRadius.circular(8.r),
-                              border: Border.all(color: CustomColors.purple.withValues(alpha: 0.1)),
+                              border: Border.all(
+                                color: CustomColors.purple.withValues(
+                                  alpha: 0.1,
+                                ),
+                              ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.calculate_outlined, color: CustomColors.purple, size: 20),
+                                const Icon(
+                                  Icons.calculate_outlined,
+                                  color: CustomColors.purple,
+                                  size: 20,
+                                ),
                                 SizedBox(width: 12.w),
                                 Expanded(
                                   child: Text(
@@ -690,13 +876,16 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               ],
                             ),
                           );
-                        }
+                        },
                       ),
 
                       SizedBox(height: 32.h),
 
                       // SECTION 3: BILLING / CONSUMPTION
-                      Text('SECTION 3: BILLING / CONSUMPTION', style: context.fonts.purple12w700),
+                      Text(
+                        'SECTION 3: BILLING / CONSUMPTION',
+                        style: context.fonts.purple12w700,
+                      ),
                       SizedBox(height: 16.h),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -707,27 +896,43 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               children: [
                                 Consumer(
                                   builder: (context, ref, _) {
-                                    final units = ref.watch(masterDataViewModelProvider).units;
+                                    final units = ref
+                                        .watch(masterDataViewModelProvider)
+                                        .units;
                                     return _buildSelectOrCreateDropdown(
                                       label: 'Billable Unit',
                                       hint: 'Select Billable Unit',
                                       value: _selectedBillableUnit,
                                       items: units,
-                                      onChanged: (val) => setState(() => _selectedBillableUnit = val),
-                                      onCreate: () => _showCreateMasterItemDialog(
-                                        context,
-                                        ref,
-                                        'Billable Unit',
-                                        (name) {
-                                          ref.read(masterDataViewModelProvider.notifier).addUnit(name);
-                                          setState(() => _selectedBillableUnit = name);
-                                        },
+                                      onChanged: (val) => setState(
+                                        () => _selectedBillableUnit = val,
                                       ),
+                                      onCreate: () =>
+                                          _showCreateMasterItemDialog(
+                                            context,
+                                            ref,
+                                            'Billable Unit',
+                                            (name) {
+                                              ref
+                                                  .read(
+                                                    masterDataViewModelProvider
+                                                        .notifier,
+                                                  )
+                                                  .addUnit(name);
+                                              setState(
+                                                () => _selectedBillableUnit =
+                                                    name,
+                                              );
+                                            },
+                                          ),
                                     );
                                   },
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('Unit of measurement for treatment and billing, e.g. ml, units.', style: context.fonts.grey12w400),
+                                Text(
+                                  'Unit of measurement for treatment and billing, e.g. ml, units.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -738,9 +943,13 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               children: [
                                 BuildTextField(
                                   label: 'Billable Quantity Per Item',
-                                  controller: _billableQuantityPerItemController,
+                                  controller:
+                                      _billableQuantityPerItemController,
                                   hintText: 'e.g. 1.0',
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
                                   onChanged: (_) {
                                     setState(() {
                                       _updateTotalBillableQuantity();
@@ -748,7 +957,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   },
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('Volume or potency contained in a single syringe/vial, e.g. 4.0 ml.', style: context.fonts.grey12w400),
+                                Text(
+                                  'Volume or potency contained in a single syringe/vial, e.g. 4.0 ml.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -763,17 +975,25 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             controller: _totalBillableQuantityController,
                             hintText: 'Calculated automatically...',
                             readOnly: true,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                           ),
                           SizedBox(height: 6.h),
-                          Text('Calculated total volume/potency of the entire bulk unit (Unit Type) in billable units.', style: context.fonts.grey12w400),
+                          Text(
+                            'Calculated total volume/potency of the entire bulk unit (Unit Type) in billable units.',
+                            style: context.fonts.grey12w400,
+                          ),
                         ],
                       ),
 
                       SizedBox(height: 32.h),
 
                       // SECTION 4: PRICING
-                      Text('SECTION 4: PRICING', style: context.fonts.purple12w700),
+                      Text(
+                        'SECTION 4: PRICING',
+                        style: context.fonts.purple12w700,
+                      ),
                       SizedBox(height: 16.h),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -786,11 +1006,17 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   label: 'Clinic Cost (\$)',
                                   controller: _clinicCostController,
                                   hintText: '0.00',
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
                                   validator: Validators.empty,
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('The cost price paid by the clinic per bulk Unit Type, e.g. \$800.', style: context.fonts.grey12w400),
+                                Text(
+                                  'The cost price paid by the clinic per bulk Unit Type, e.g. \$800.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -803,11 +1029,17 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   label: 'Retail Price Per Unit (\$)',
                                   controller: _retailPricePerUnitController,
                                   hintText: '0.00',
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
                                   validator: Validators.empty,
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('The default retail price charged to patients per billable unit, e.g. \$15.', style: context.fonts.grey12w400),
+                                Text(
+                                  'The default retail price charged to patients per billable unit, e.g. \$15.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -817,7 +1049,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                       SizedBox(height: 32.h),
 
                       // SECTION 5: SUPPLIER & INVENTORY
-                      Text('SECTION 5: SUPPLIER & INVENTORY', style: context.fonts.purple12w700),
+                      Text(
+                        'SECTION 5: SUPPLIER & INVENTORY',
+                        style: context.fonts.purple12w700,
+                      ),
                       SizedBox(height: 16.h),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -832,7 +1067,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   hintText: 'Enter supplier name...',
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('The vendor or supplier of this product, e.g. McKesson.', style: context.fonts.grey12w400),
+                                Text(
+                                  'The vendor or supplier of this product, e.g. McKesson.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -847,7 +1085,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   hintText: 'e.g. LOT123456',
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('The manufacturing batch/lot code of the product, e.g. L98765.', style: context.fonts.grey12w400),
+                                Text(
+                                  'The manufacturing batch/lot code of the product, e.g. L98765.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -865,14 +1106,16 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   onTap: () async {
                                     final date = await showDatePicker(
                                       context: context,
-                                      initialDate: _expirationDate ?? DateTime.now(),
+                                      initialDate:
+                                          _expirationDate ?? DateTime.now(),
                                       firstDate: DateTime(2000),
                                       lastDate: DateTime(2100),
                                     );
                                     if (date != null) {
                                       setState(() {
                                         _expirationDate = date;
-                                        _expirationDateController.text = '${date.year}-${date.month}-${date.day}';
+                                        _expirationDateController.text =
+                                            '${date.year}-${date.month}-${date.day}';
                                       });
                                     }
                                   },
@@ -881,12 +1124,18 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                       label: 'Expiration Date',
                                       controller: _expirationDateController,
                                       hintText: 'YYYY-MM-DD',
-                                      suffixIcon: const Icon(Icons.calendar_today_rounded, size: 18),
+                                      suffixIcon: const Icon(
+                                        Icons.calendar_today_rounded,
+                                        size: 18,
+                                      ),
                                     ),
                                   ),
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('The official expiration date of the batch, e.g. 2026-12-31.', style: context.fonts.grey12w400),
+                                Text(
+                                  'The official expiration date of the batch, e.g. 2026-12-31.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -895,30 +1144,38 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                       ),
 
                       SizedBox(height: 32.h),
-                      
+
                       // SECTION 6: GLOBAL COMPLIANCE & STATUS
-                      Text('SECTION 6: GLOBAL COMPLIANCE & STATUS', style: context.fonts.purple12w700),
+                      Text(
+                        'SECTION 6: GLOBAL COMPLIANCE & STATUS',
+                        style: context.fonts.purple12w700,
+                      ),
                       SizedBox(height: 16.h),
                       _buildSwitchRow(
-                        title: 'Enforce Lot & Expiration Tracking at Clinic Level',
-                        subtitle: 'Forces child clinics to log lot and expiration details upon receiving stock.',
+                        title:
+                            'Enforce Lot & Expiration Tracking at Clinic Level',
+                        subtitle:
+                            'Forces child clinics to log lot and expiration details upon receiving stock.',
                         value: _enforceLotTracking,
-                        onChanged: (val) => setState(() => _enforceLotTracking = val),
+                        onChanged: (val) =>
+                            setState(() => _enforceLotTracking = val),
                       ),
                       SizedBox(height: 16.h),
                       _buildSwitchRow(
                         title: 'Active Status',
-                        subtitle: 'Enable or disable this product in the global catalog.',
+                        subtitle:
+                            'Enable or disable this product in the global catalog.',
                         value: _activeStatus,
                         onChanged: (val) => setState(() => _activeStatus = val),
                       ),
-                      
+
                       SizedBox(height: 16.h),
                       BuildTextField(
                         maxLines: 3,
                         label: 'Description / Usage Instructions',
                         controller: _descriptionController,
-                        hintText: 'Global product details and reconstitution instructions...',
+                        hintText:
+                            'Global product details and reconstitution instructions...',
                       ),
                     ],
                   ),
