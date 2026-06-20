@@ -594,6 +594,30 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               ],
                             ),
                           ),
+                          SizedBox(width: 16.w),
+                          Expanded(
+                            child: Consumer(
+                              builder: (context, ref, _) {
+                                final manufacturers = ref.watch(masterDataViewModelProvider).manufacturers;
+                                return _buildSelectOrCreateDropdown(
+                                  label: 'Manufacturer',
+                                  hint: 'Select Manufacturer',
+                                  value: _selectedManufacturer,
+                                  items: manufacturers,
+                                  onChanged: (val) => setState(() => _selectedManufacturer = val),
+                                  onCreate: () => _showCreateMasterItemDialog(
+                                    context,
+                                    ref,
+                                    'Manufacturer',
+                                    (name) {
+                                      ref.read(masterDataViewModelProvider.notifier).addManufacturer(name);
+                                      setState(() => _selectedManufacturer = name);
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                         ],
                       ),
                       SizedBox(height: 16.h),
@@ -681,34 +705,28 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                         .watch(masterDataViewModelProvider)
                                         .packageTypes;
                                     return _buildSelectOrCreateDropdown(
-                                      label: 'Unit Type',
-                                      hint: 'Select Unit Type',
-                                      value: _selectedUnit,
+                                      label: 'Package Type',
+                                      hint: 'Select Package Type',
+                                      value: _selectedPackageType,
                                       items: packageTypes,
                                       onChanged: (val) {
                                         setState(() {
-                                          _selectedUnit = val;
+                                          _selectedPackageType = val;
                                           _updateTotalBillableQuantity();
                                         });
                                       },
-                                      onCreate: () =>
-                                          _showCreateMasterItemDialog(
-                                            context,
-                                            ref,
-                                            'Unit Type',
-                                            (name) {
-                                              ref
-                                                  .read(
-                                                    masterDataViewModelProvider
-                                                        .notifier,
-                                                  )
-                                                  .addPackageType(name);
-                                              setState(() {
-                                                _selectedUnit = name;
-                                                _updateTotalBillableQuantity();
-                                              });
-                                            },
-                                          ),
+                                      onCreate: () => _showCreateMasterItemDialog(
+                                        context,
+                                        ref,
+                                        'Package Type',
+                                        (name) {
+                                          ref.read(masterDataViewModelProvider.notifier).addPackageType(name);
+                                          setState(() {
+                                            _selectedPackageType = name;
+                                            _updateTotalBillableQuantity();
+                                          });
+                                        },
+                                      ),
                                     );
                                   },
                                 ),
@@ -737,10 +755,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   },
                                 ),
                                 SizedBox(height: 6.h),
-                                Text(
-                                  'Number of inner boxes inside one Unit Type bulk unit.',
-                                  style: context.fonts.grey12w400,
-                                ),
+                                Text('Number of inner boxes inside one Package Type bulk unit.', style: context.fonts.grey12w400),
                               ],
                             ),
                           ),
@@ -784,34 +799,28 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                         .watch(masterDataViewModelProvider)
                                         .units;
                                     return _buildSelectOrCreateDropdown(
-                                      label: 'Package Type',
-                                      hint: 'Select Package Type',
-                                      value: _selectedPackageType,
+                                      label: 'Unit Type',
+                                      hint: 'Select Unit Type',
+                                      value: _selectedUnit,
                                       items: units,
                                       onChanged: (val) {
                                         setState(() {
-                                          _selectedPackageType = val;
+                                          _selectedUnit = val;
                                           _updateTotalBillableQuantity();
                                         });
                                       },
-                                      onCreate: () =>
-                                          _showCreateMasterItemDialog(
-                                            context,
-                                            ref,
-                                            'Package Type',
-                                            (name) {
-                                              ref
-                                                  .read(
-                                                    masterDataViewModelProvider
-                                                        .notifier,
-                                                  )
-                                                  .addUnit(name);
-                                              setState(() {
-                                                _selectedPackageType = name;
-                                                _updateTotalBillableQuantity();
-                                              });
-                                            },
-                                          ),
+                                      onCreate: () => _showCreateMasterItemDialog(
+                                        context,
+                                        ref,
+                                        'Unit Type',
+                                        (name) {
+                                          ref.read(masterDataViewModelProvider.notifier).addUnit(name);
+                                          setState(() {
+                                            _selectedUnit = name;
+                                            _updateTotalBillableQuantity();
+                                          });
+                                        },
+                                      ),
                                     );
                                   },
                                 ),
@@ -837,10 +846,9 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               ) ??
                               0;
                           final int totalItems = boxQty * itemQty;
-                          final String unitName = _selectedUnit ?? 'Carton';
-                          final String packName =
-                              _selectedPackageType ?? 'Syringe';
-
+                          final String unitName = _selectedPackageType ?? 'Carton';
+                          final String packName = _selectedUnit ?? 'Syringe';
+                          
                           return Container(
                             margin: EdgeInsets.only(top: 16.h),
                             padding: EdgeInsets.symmetric(
