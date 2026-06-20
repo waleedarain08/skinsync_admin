@@ -15,7 +15,7 @@ class CategoryDetailResponse extends BaseApiResponseModel<CategoryDetailDto> {
 
   factory CategoryDetailResponse.fromJson(Map<String, dynamic> json) =>
       CategoryDetailResponse(
-        isSuccess: json['status'] ?? false,
+        isSuccess: json['is_success'] ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
@@ -23,7 +23,7 @@ class CategoryDetailResponse extends BaseApiResponseModel<CategoryDetailDto> {
       );
 
   Map<String, dynamic> toJson() => {
-        'status': isSuccess,
+        'is_success': isSuccess,
         'message': message,
         'data': data?.toJson(),
       };

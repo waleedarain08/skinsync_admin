@@ -294,7 +294,7 @@ class TreatmentData {
       subscriptionPlan: 'Premium',
       totalAppointments: 450,
       rating: 4.8,
-      createdAt: '2023-01-15',
+      createdAt:DateTime.parse('2023-01-15'),
     ),
     ClinicModel(
       id: 2,
@@ -307,7 +307,7 @@ class TreatmentData {
       subscriptionPlan: 'Basic',
       totalAppointments: 120,
       rating: 4.5,
-      createdAt: '2023-03-10',
+      createdAt: DateTime.parse('2023-01-15'),
     ),
   ];
 
@@ -322,7 +322,7 @@ class TreatmentData {
       invitationStatus: 'Invitation Sent',
       interestedPatientsCount: 12,
       pendingAppointmentsCount: 5,
-      invitedDate: '2023-10-01',
+      invitedDate: '2023-01-15T10:30:00',
     ),
     InviteClinicModel(
       id: 2,

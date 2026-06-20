@@ -21,7 +21,9 @@ final treatmentViewModelProvider =
 class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   TreatmentViewModel._() : super(TreatmentState());
 
-  static final List<TreatmentModel> _localTreatments = List.from(TreatmentData.dummyTreatments);
+  static final List<TreatmentModel> _localTreatments = List.from(
+    TreatmentData.dummyTreatments,
+  );
 
   // ignore: unused_field
   final TreatmentRepository _treatmentRepository =
@@ -565,19 +567,24 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     final detail = category ?? state.selectedCategoryDetail;
     if (source == 'category' && detail != null) {
       state = state.copyWith(
-        preNotificationEntries: detail.preNotifications
-            ?.map(
-              (config) => NotificationEntry(
-                titleController: TextEditingController(text: config.title),
-                messageController: TextEditingController(text: config.message),
-                timingValueController: TextEditingController(
-                  text: config.timing.toString(),
-                ),
-                timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
-                type: typeValues.reverse[config.type] ?? 'reminder',
-              ),
-            ) 
-            .toList() ?? [],
+        preNotificationEntries:
+            detail.preNotifications
+                ?.map(
+                  (config) => NotificationEntry(
+                    titleController: TextEditingController(text: config.title),
+                    messageController: TextEditingController(
+                      text: config.message,
+                    ),
+                    timingValueController: TextEditingController(
+                      text: config.timing.toString(),
+                    ),
+                    timingUnit:
+                        unitValues.reverse[config.timingUnit] ?? 'hours',
+                    type: typeValues.reverse[config.type] ?? 'reminder',
+                  ),
+                )
+                .toList() ??
+            [],
       );
     }
   }
@@ -587,19 +594,24 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     final detail = category ?? state.selectedCategoryDetail;
     if (source == 'category' && detail != null) {
       state = state.copyWith(
-        postNotificationEntries: detail.postNotifications
-            ?.map(
-              (config) => NotificationEntry(
-                titleController: TextEditingController(text: config.title),
-                messageController: TextEditingController(text: config.message),
-                timingValueController: TextEditingController(
-                  text: config.timing.toString(),
-                ),
-                timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
-                type: typeValues.reverse[config.type] ?? 'care',
-              ),
-            )
-            .toList() ?? [],
+        postNotificationEntries:
+            detail.postNotifications
+                ?.map(
+                  (config) => NotificationEntry(
+                    titleController: TextEditingController(text: config.title),
+                    messageController: TextEditingController(
+                      text: config.message,
+                    ),
+                    timingValueController: TextEditingController(
+                      text: config.timing.toString(),
+                    ),
+                    timingUnit:
+                        unitValues.reverse[config.timingUnit] ?? 'hours',
+                    type: typeValues.reverse[config.type] ?? 'care',
+                  ),
+                )
+                .toList() ??
+            [],
       );
     }
   }
@@ -610,61 +622,64 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       state = state.copyWith(providerRolesSource: source);
 
   void setSessionSource(String source, {CategoryDetailDto? category}) {
-  state = state.copyWith(sessionSource: source);
-  final detail = category ?? state.selectedCategoryDetail;
-  if (source == 'category' && detail != null) {
-    for (final entry in state.sessions) {
-      entry.dispose();
-    }
-    final List<SessionViewModelEntry> newSessions = [];
-    final defaultSessions = detail.defaultSessions;
-    if (defaultSessions != null && defaultSessions.isNotEmpty) {
-      for (final s in defaultSessions) {
-        newSessions.add(
-          SessionViewModelEntry(
-            sessionNumber: s.sessionNumber,
-            totalFollowUpsController: TextEditingController(
-              text: s.followUps.length.toString(),
+    state = state.copyWith(sessionSource: source);
+    final detail = category ?? state.selectedCategoryDetail;
+    if (source == 'category' && detail != null) {
+      for (final entry in state.sessions) {
+        entry.dispose();
+      }
+      final List<SessionViewModelEntry> newSessions = [];
+      final defaultSessions = detail.defaultSessions;
+      if (defaultSessions != null && defaultSessions.isNotEmpty) {
+        for (final s in defaultSessions) {
+          newSessions.add(
+            SessionViewModelEntry(
+              sessionNumber: s.sessionNumber,
+              totalFollowUpsController: TextEditingController(
+                text: s.followUps.length.toString(),
+              ),
+              followUps: s.followUps
+                  .map(
+                    (fu) => FollowUpEntry(
+                      type: fu.type ?? '',
+                      durationUnit:
+                          unitValues.reverse[fu.durationUnit] ?? 'minutes',
+                      durationValueController: TextEditingController(
+                        text: (fu.durationValue ?? 0).toString(),
+                      ),
+                      notesController: TextEditingController(
+                        text: fu.notes ?? '',
+                      ),
+                      intervalValueController: TextEditingController(
+                        text: (fu.intervalValue ?? 0).toString(),
+                      ),
+                      intervalUnit: fu.intervalUnit ?? '',
+                      isImageRequired: fu.isImageRequired ?? false,
+                    ),
+                  )
+                  .toList(),
             ),
-            followUps: s.followUps
-                .map(
-                  (fu) => FollowUpEntry(
-                    type: fu.type,
-                    durationUnit:
-                        unitValues.reverse[fu.durationUnit] ?? 'minutes',
-                    durationValueController: TextEditingController(
-                      text: fu.durationValue.toString(),
-                    ),
-                    notesController: TextEditingController(text: fu.notes),
-                    intervalValueController: TextEditingController(
-                      text: fu.intervalValue.toString(),
-                    ),
-                    intervalUnit: fu.intervalUnit,
-                    isImageRequired: fu.isImageRequired,
-                  ),
-                )
-                .toList(),
-          ),
-        );
+          );
+        }
+      } else {
+        final int sessionCount = detail.totalSessions ?? 0;
+        for (int i = 0; i < sessionCount; i++) {
+          newSessions.add(
+            SessionViewModelEntry(
+              sessionNumber: i + 1,
+              totalFollowUpsController: TextEditingController(text: '0'),
+              followUps: [],
+            ),
+          );
+        }
       }
-    } else {
-      final int sessionCount = detail.totalSessions ?? 0;
-      for (int i = 0; i < sessionCount; i++) {
-        newSessions.add(
-          SessionViewModelEntry(
-            sessionNumber: i + 1,
-            totalFollowUpsController: TextEditingController(text: '0'),
-            followUps: [],
-          ),
-        );
-      }
+      state = state.copyWith(
+        totalSessions: newSessions.length,
+        sessions: newSessions,
+      );
     }
-    state = state.copyWith(
-      totalSessions: newSessions.length,
-      sessions: newSessions,
-    );
   }
-}
+
   void toggleAllowClinicOverride(bool? val) =>
       state = state.copyWith(allowClinicOverride: val ?? false);
   void toggleAllowProviderOverride(bool? val) =>
@@ -794,9 +809,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
           // 3. Provider Roles
           if (state.providerRolesSource == 'category') {
-            final roles = detail.defaultRoles
-                ?.map((r) => defaultRoleValues.reverse[r] ?? '')
-                .toList() ??
+            final roles =
+                detail.defaultRoles
+                    ?.map((r) => defaultRoleValues.reverse[r] ?? '')
+                    .toList() ??
                 [];
             state = state.copyWith(selectedRoles: roles);
           }
@@ -825,18 +841,20 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             followUps: s.followUps
                 .map(
                   (fu) => FollowUpEntry(
-                    type: fu.type,
+                    type: fu.type ?? '',
                     durationUnit:
                         unitValues.reverse[fu.durationUnit] ?? 'minutes',
                     durationValueController: TextEditingController(
-                      text: fu.durationValue.toString(),
+                      text: (fu.durationValue ?? 0).toString(),
                     ),
-                    notesController: TextEditingController(text: fu.notes),
+                    notesController: TextEditingController(
+                      text: fu.notes ?? '',
+                    ),
                     intervalValueController: TextEditingController(
-                      text: fu.intervalValue.toString(),
+                      text: (fu.intervalValue ?? 0).toString(),
                     ),
-                    intervalUnit: fu.intervalUnit,
-                    isImageRequired: fu.isImageRequired,
+                    intervalUnit: fu.intervalUnit ?? '',
+                    isImageRequired: fu.isImageRequired ?? false,
                   ),
                 )
                 .toList(),
@@ -868,21 +886,23 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     final notifications = isPre
         ? detail.preNotifications
         : detail.postNotifications;
-    final entries = notifications
-        ?.map(
-          (config) => NotificationEntry(
-            titleController: TextEditingController(text: config.title),
-            messageController: TextEditingController(text: config.message),
-            timingValueController: TextEditingController(
-              text: config.timing.toString(),
-            ),
-            timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
-            type:
-                typeValues.reverse[config.type] ??
-                (isPre ? 'reminder' : 'care'),
-          ),
-        )
-        .toList()?? [];
+    final entries =
+        notifications
+            ?.map(
+              (config) => NotificationEntry(
+                titleController: TextEditingController(text: config.title),
+                messageController: TextEditingController(text: config.message),
+                timingValueController: TextEditingController(
+                  text: config.timing.toString(),
+                ),
+                timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+                type:
+                    typeValues.reverse[config.type] ??
+                    (isPre ? 'reminder' : 'care'),
+              ),
+            )
+            .toList() ??
+        [];
 
     if (isPre) {
       state = state.copyWith(preNotificationEntries: entries);
@@ -1265,7 +1285,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     final index = _localTreatments.indexWhere((t) => t.id == treatmentId);
     if (index != -1) {
       final t = _localTreatments[index];
-      _localTreatments[index] = t.copyWith(status: t.status == 'active' ? 'deactive' : 'active');
+      _localTreatments[index] = t.copyWith(
+        status: t.status == 'active' ? 'deactive' : 'active',
+      );
     }
 
     state = state.copyWith(
@@ -1348,17 +1370,19 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       List<NotificationConfig> effectivePreNotifications = [];
       if (state.preNotificationSource == 'category') {
         if (selectedCategory != null) {
-          effectivePreNotifications = selectedCategory.preNotifications
-              ?.map(
-                (n) => NotificationConfig(
-                  title: n.title,
-                  message: n.message,
-                  timing: n.timing,
-                  timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
-                  type: typeValues.reverse[n.type] ?? 'reminder',
-                ),
-              )
-              .toList() ?? [];
+          effectivePreNotifications =
+              selectedCategory.preNotifications
+                  ?.map(
+                    (n) => NotificationConfig(
+                      title: n.title,
+                      message: n.message,
+                      timing: n.timing,
+                      timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
+                      type: typeValues.reverse[n.type] ?? 'reminder',
+                    ),
+                  )
+                  .toList() ??
+              [];
         }
       } else {
         effectivePreNotifications = state.preNotificationEntries
@@ -1369,17 +1393,19 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       List<NotificationConfig> effectivePostNotifications = [];
       if (state.postNotificationSource == 'category') {
         if (selectedCategory != null) {
-          effectivePostNotifications = selectedCategory.postNotifications
-              ?.map(
-                (n) => NotificationConfig(
-                  title: n.title,
-                  message: n.message,
-                  timing: n.timing,
-                  timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
-                  type: typeValues.reverse[n.type] ?? 'care',
-                ),
-              )
-              .toList() ?? [];
+          effectivePostNotifications =
+              selectedCategory.postNotifications
+                  ?.map(
+                    (n) => NotificationConfig(
+                      title: n.title,
+                      message: n.message,
+                      timing: n.timing,
+                      timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
+                      type: typeValues.reverse[n.type] ?? 'care',
+                    ),
+                  )
+                  .toList() ??
+              [];
         }
       } else {
         effectivePostNotifications = state.postNotificationEntries
@@ -1388,10 +1414,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       }
 
       if (state.sessionSource == 'category') {
-         final defaultSessions = selectedCategory?.defaultSessions;
+        final defaultSessions = selectedCategory?.defaultSessions;
         if (selectedCategory != null &&
-      defaultSessions != null &&
-      defaultSessions.isNotEmpty) {
+            defaultSessions != null &&
+            defaultSessions.isNotEmpty) {
           effectiveSessions = defaultSessions
               .map(
                 (s) => SessionConfig(
@@ -1399,14 +1425,14 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                   followUps: s.followUps
                       .map(
                         (f) => FollowUpConfig(
-                          type: f.type,
-                          durationValue: f.durationValue,
+                          type: f.type ?? '',
+                          durationValue: f.durationValue ?? 0,
                           durationUnit:
                               unitValues.reverse[f.durationUnit] ?? 'minutes',
-                          notes: f.notes,
-                          intervalValue: f.intervalValue,
-                          intervalUnit: f.intervalUnit,
-                          isImageRequired: f.isImageRequired,
+                          notes: f.notes ?? '',
+                          intervalValue: f.intervalValue ?? 0,
+                          intervalUnit: f.intervalUnit ?? '',
+                          isImageRequired: f.isImageRequired ?? false,
                         ),
                       )
                       .toList(),
@@ -1611,7 +1637,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
       final newId = _localTreatments.isEmpty
           ? 1
-          : (_localTreatments.map((t) => t.id ?? 0).reduce((a, b) => a > b ? a : b) + 1);
+          : (_localTreatments
+                    .map((t) => t.id ?? 0)
+                    .reduce((a, b) => a > b ? a : b) +
+                1);
       final treatmentWithId = treatment.copyWith(id: newId);
       _localTreatments.add(treatmentWithId);
 
@@ -1664,17 +1693,19 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       List<NotificationConfig> effectivePreNotifications = [];
       if (state.preNotificationSource == 'category') {
         if (selectedCategory != null) {
-          effectivePreNotifications = selectedCategory.preNotifications
-              ?.map(
-                (n) => NotificationConfig(
-                  title: n.title,
-                  message: n.message,
-                  timing: n.timing,
-                  timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
-                  type: typeValues.reverse[n.type] ?? 'reminder',
-                ),
-              )
-              .toList() ?? [];
+          effectivePreNotifications =
+              selectedCategory.preNotifications
+                  ?.map(
+                    (n) => NotificationConfig(
+                      title: n.title,
+                      message: n.message,
+                      timing: n.timing,
+                      timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
+                      type: typeValues.reverse[n.type] ?? 'reminder',
+                    ),
+                  )
+                  .toList() ??
+              [];
         }
       } else {
         effectivePreNotifications = state.preNotificationEntries
@@ -1685,17 +1716,19 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       List<NotificationConfig> effectivePostNotifications = [];
       if (state.postNotificationSource == 'category') {
         if (selectedCategory != null) {
-          effectivePostNotifications = selectedCategory.postNotifications
-              ?.map(
-                (n) => NotificationConfig(
-                  title: n.title,
-                  message: n.message,
-                  timing: n.timing,
-                  timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
-                  type: typeValues.reverse[n.type] ?? 'care',
-                ),
-              )
-              .toList() ?? [];
+          effectivePostNotifications =
+              selectedCategory.postNotifications
+                  ?.map(
+                    (n) => NotificationConfig(
+                      title: n.title,
+                      message: n.message,
+                      timing: n.timing,
+                      timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
+                      type: typeValues.reverse[n.type] ?? 'care',
+                    ),
+                  )
+                  .toList() ??
+              [];
         }
       } else {
         effectivePostNotifications = state.postNotificationEntries
@@ -1707,27 +1740,29 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         if (selectedCategory != null &&
             selectedCategory.defaultSessions != null &&
             selectedCategory.defaultSessions!.isNotEmpty) {
-          effectiveSessions = selectedCategory.defaultSessions!
-              ?.map(
-                (s) => SessionConfig(
-                  sessionNumber: s.sessionNumber,
-                  followUps: s.followUps
-                      .map(
-                        (f) => FollowUpConfig(
-                          type: f.type,
-                          durationValue: f.durationValue,
-                          durationUnit:
-                              unitValues.reverse[f.durationUnit] ?? 'minutes',
-                          notes: f.notes,
-                          intervalValue: f.intervalValue,
-                          intervalUnit: f.intervalUnit,
-                          isImageRequired: f.isImageRequired,
-                        ),
-                      )
-                      .toList() ,
-                ),
-              )
-              .toList() ?? [];
+          effectiveSessions =
+              selectedCategory.defaultSessions!
+                  ?.map(
+                    (s) => SessionConfig(
+                      sessionNumber: s.sessionNumber,
+                      followUps: s.followUps
+                          .map(
+                            (f) => FollowUpConfig(
+                              type: f.type ?? '',
+                              durationValue: f.durationValue ?? 0,
+                              durationUnit:
+                                  unitValues.reverse[f.durationUnit] ??
+                                  'minutes',
+                              notes: f.notes ?? '',
+                              intervalValue: f.intervalValue ?? 0,
+                              intervalUnit: f.intervalUnit ?? '',
+                              isImageRequired: f.isImageRequired ?? false,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  )
+                  .toList() ?? [];
         } else {
           final int sessionCount = selectedCategory?.totalSessions ?? 1;
           for (int i = 0; i < sessionCount; i++) {
@@ -1921,7 +1956,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             .toList(),
       );
 
-      final idx = _localTreatments.indexWhere((t) => t.id == state.selectedTreatment!.id);
+      final idx = _localTreatments.indexWhere(
+        (t) => t.id == state.selectedTreatment!.id,
+      );
       if (idx != -1) {
         _localTreatments[idx] = treatment;
       }

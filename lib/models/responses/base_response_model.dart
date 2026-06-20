@@ -11,12 +11,12 @@ class BaseApiResponseModel<T> {
 
   factory BaseApiResponseModel.fromJson(
     Map<String, dynamic> json,
-    T? Function(Object? json) fromJsonT,
+  
   ) {
     return BaseApiResponseModel<T>(
       isSuccess: json['is_success'] ?? false,
       message: json['message'] ?? '',
-      data: json['data'] != null ? fromJsonT(json['data']) : null,
+      data: json['data'] != null ? (json['data']) : null,
     );
   }
 

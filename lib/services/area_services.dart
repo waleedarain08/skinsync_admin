@@ -1,7 +1,8 @@
 import 'package:skinsync_admin/models/requests/area_request.dart';
+import 'package:skinsync_admin/models/responses/area_response.dart';
 
+import '../models/requests/create_sub_area_request.dart';
 import '../models/responses/area_list_response.dart';
-import '../models/responses/base_response_model.dart';
 import '../repositories/area_repository.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
@@ -15,13 +16,9 @@ class AreaServices implements AreaRepository {
   @override
   Future<List<AreaModel>> getAreas() async {
     final jsonResponse = await _api.get(Endpoint.areas);
-    final response = BaseApiResponseModel<List<AreaModel>>.fromJson(
+    final response = AreaListResponse.fromJson(
       jsonResponse,
-      (json) {
-        return (json as List)
-            .map((item) => AreaModel.fromJson(item as Map<String, dynamic>))
-            .toList();
-      },
+  
     );
 
     if (!response.isSuccess) {
@@ -36,18 +33,31 @@ class AreaServices implements AreaRepository {
       Endpoint.areas,
       body: request.toJson(),
     );
-    final response = BaseApiResponseModel<AreaModel>.fromJson(jsonResponse, (
-      json,
-    ) {
-      if (json == null) {
-        return null;
-      }
-      return AreaModel.fromJson(json as Map<String, dynamic>);
-    });
+    final response = AreaResponse.fromJson(jsonResponse,
+   
+  );
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
+  }
+
+
+  @override
+  Future<BaseApiResponseModel> createSubArea(CreateSubAreaRequest request) async {
+    final jsonResponse = await _api.post(
+      Endpoint.subAreas,
+      body: request.toJson(),
+    );
+    final response = BaseApiResponseModel<Null>.fromJson(
+      jsonResponse,
+          (_) => null,
+    );
+
+    if (!response.status) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 }

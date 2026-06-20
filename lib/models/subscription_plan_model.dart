@@ -1,3 +1,61 @@
+
+import 'package:skinsync_admin/models/responses/base_response_model.dart';
+
+class SubscriptionPlanResponse
+    extends BaseApiResponseModel<SubscriptionPlanModel> {
+  const SubscriptionPlanResponse({
+    required super.isSuccess,
+    required super.message,
+    super.data,
+  });
+
+  factory SubscriptionPlanResponse.fromJson(
+    Map<String, dynamic> json,
+  ) =>
+      SubscriptionPlanResponse(
+        isSuccess:
+            (json['is_success'] as bool?) ??
+            
+            false,
+        message: json['message'] ?? '',
+        data: json['data'] == null
+            ? null
+            : SubscriptionPlanModel.fromJson(
+                json['data'] as Map<String, dynamic>,
+              ),
+      );
+
+  
+}
+
+class SubscriptionPlanListResponse
+    extends BaseApiResponseModel<List<SubscriptionPlanModel>> {
+  const SubscriptionPlanListResponse({
+    required super.isSuccess,
+    required super.message,
+    super.data,
+  });
+
+  factory SubscriptionPlanListResponse.fromJson(
+    Map<String, dynamic> json,
+  ) =>
+      SubscriptionPlanListResponse(
+        isSuccess:
+            (json['is_success'] as bool?) ??
+            (json['status'] as bool?) ??
+            false,
+        message: json['message'] ?? '',
+        data: json['data'] == null
+            ? []
+            : List<SubscriptionPlanModel>.from(
+                (json['data'] as List).map(
+                  (e) => SubscriptionPlanModel.fromJson(e),
+                ),
+              ),
+      );
+
+ 
+}
 class SubscriptionPlanModel {
   int? id;
   String? name;

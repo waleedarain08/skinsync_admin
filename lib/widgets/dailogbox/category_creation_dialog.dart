@@ -202,27 +202,29 @@ class _CategoryCreationDialogState
     _existingConsentName = cat.consentFormName;
     _consentFormUrl = cat.consentFormUrl;
 
-    _sessions = List.from(
-      cat.defaultSessions?.map(
+  _sessions = List.from(
+  cat.defaultSessions?.map(
         (s) => CategorySessionModel(
           sessionNumber: s.sessionNumber,
           followUps: List.from(
             s.followUps?.map(
-              (f) => CategoryFollowUpModel(
-                type: f.type,
-                durationValue: f.durationValue,
-                durationUnit: unitValues.reverse[f.durationUnit] ?? 'minutes',
-                intervalValue: f.intervalValue,
-                intervalUnit: f.intervalUnit,
-                isImageRequired: f.isImageRequired,
-                notes: f.notes,
-              ),
-            ) ?? [],
+                  (f) => CategoryFollowUpModel(
+                    type: f.type ?? '',
+                    durationValue: f.durationValue ?? 0,
+                    durationUnit:
+                        unitValues.reverse[f.durationUnit] ?? 'minutes',
+                    intervalValue: f.intervalValue ?? 0,
+                    intervalUnit: f.intervalUnit ?? '',
+                    isImageRequired: f.isImageRequired ?? false,
+                    notes: f.notes ?? '',
+                  ),
+                ) ??
+                [],
           ),
         ),
-      ) ?? [],
-    );
-    _syncFollowUpsCountControllers();
+      ) ??
+      [],
+); _syncFollowUpsCountControllers();
 
     _preNotificationEntries = List.from(
       cat.preNotifications?.map(

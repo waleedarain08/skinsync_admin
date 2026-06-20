@@ -9,7 +9,7 @@ class CategoryListResponse extends BaseApiResponseModel<List<CategoryModel>> {
 
   factory CategoryListResponse.fromJson(Map<String, dynamic> json) =>
       CategoryListResponse(
-        isSuccess: json['status'] ?? false,
+        isSuccess: (json['is_success'] as bool?) ?? false,
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
@@ -18,11 +18,7 @@ class CategoryListResponse extends BaseApiResponseModel<List<CategoryModel>> {
                 .toList(),
       );
 
-  Map<String, dynamic> toJson() => {
-        'status': isSuccess,
-        'message': message,
-        'data': data?.map((e) => e.toJson()).toList(),
-      };
+ 
 }
 
 class CategoryModel {

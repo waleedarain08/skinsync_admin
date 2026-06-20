@@ -550,7 +550,7 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
             children: _selectedClinics.map((email) {
               final clinic = clinics.firstWhere((c) => c.email == email, orElse: () => clinics.first);
               return Chip(
-                label: Text(clinic.name ?? email, style: context.fonts.black13w500),
+                label: Text(clinic?.name ?? email, style: context.fonts.black13w500),
                 backgroundColor: CustomColors.green.withValues(alpha: 0.1),
                 deleteIcon: const Icon(Icons.close, size: 14),
                 onDeleted: () => setState(() => _selectedClinics.remove(email)),
@@ -577,8 +577,8 @@ class _CreateSubscriptionPlanScreenState extends ConsumerState<CreateSubscriptio
                       final clinic = filteredClinics[index];
                       final isSelected = _selectedClinics.contains(clinic.email);
                       return CheckboxListTile(
-                        title: Text(clinic.name ?? 'N/A', style: context.fonts.grey14w600),
-                        subtitle: Text(clinic.email ?? 'N/A', style: context.fonts.grey13w500),
+                        title: Text(clinic?.name ?? 'N/A', style: context.fonts.grey14w600),
+                        subtitle: Text(clinic?.email ?? 'N/A', style: context.fonts.grey13w500),
                         value: isSelected,
                         onChanged: (val) {
                           setState(() {

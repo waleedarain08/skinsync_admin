@@ -287,20 +287,21 @@ class _NestedCategorySelectorState
             (session) => CategorySessionModel(
               sessionNumber: session.sessionNumber,
               followUps: session.followUps
-                  .map(
-                    (followUp) => CategoryFollowUpModel(
-                      type: followUp.type,
-                      durationValue: followUp.durationValue,
-                      durationUnit:
-                          unitValues.reverse[followUp.durationUnit] ??
-                              'minutes',
-                      intervalValue: followUp.intervalValue,
-                      intervalUnit: followUp.intervalUnit,
-                      isImageRequired: followUp.isImageRequired,
-                      notes: followUp.notes,
-                    ),
-                  )
-                  .toList() ,
+    .map(
+      (followUp) => CategoryFollowUpModel(
+        type: followUp.type ?? '',
+        durationValue: followUp.durationValue ?? 0,
+        durationUnit:
+            unitValues.reverse[followUp.durationUnit] ??
+            'minutes',
+        intervalValue: followUp.intervalValue ?? 0,
+        intervalUnit: followUp.intervalUnit ?? '',
+        isImageRequired:
+            followUp.isImageRequired ?? false,
+        notes: followUp.notes ?? '',
+      ),
+    )
+    .toList(),
             ),
           )
           .toList() ?? [],

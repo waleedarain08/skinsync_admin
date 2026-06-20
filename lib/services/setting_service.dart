@@ -19,7 +19,7 @@ class SettingService implements SettingRepository {
     );
     final response = BaseApiResponseModel<dynamic>.fromJson(
       jsonResponse,
-      (json) => json,
+    
     );
 
     return response;
@@ -35,7 +35,7 @@ class SettingService implements SettingRepository {
     );
     final response = BaseApiResponseModel<dynamic>.fromJson(
       jsonResponse,
-      (json) => json,
+     
     );
 
     return response;
