@@ -1,5 +1,6 @@
 import 'package:skinsync_admin/models/requests/area_request.dart';
 import 'package:skinsync_admin/models/responses/area_response.dart';
+import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
 import '../models/requests/create_sub_area_request.dart';
 import '../models/responses/area_list_response.dart';
@@ -52,10 +53,10 @@ class AreaServices implements AreaRepository {
     );
     final response = BaseApiResponseModel<Null>.fromJson(
       jsonResponse,
-          (_) => null,
+        
     );
 
-    if (!response.status) {
+    if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response;
