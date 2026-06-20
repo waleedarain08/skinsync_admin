@@ -87,6 +87,10 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     await fetchProducts(page: 1, limit: 20);
   }
 
+void setImageNull() {
+    state = state.copyWith(imageUrl: null);
+  }
+
   Future<void> fetchProducts({
     String search = '',
     int page = 1,

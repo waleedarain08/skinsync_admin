@@ -67,6 +67,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(productViewModelProvider.notifier).setImageNull();
+    });
+
     _nameController = TextEditingController(text: widget.productToEdit?.name);
     _skuController = TextEditingController(
       text: widget.productToEdit?.sku ?? widget.productToEdit?.globalSku,
@@ -437,7 +441,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               ),
                               supplier: _supplierController.text,
                               lotNumber: _lotNumberController.text,
-                              expirationDate: _expirationDate?.toUtc() ,
+                              expirationDate: _expirationDate?.toUtc(),
                               selectedCategoryIds: _selectedCategoryIds,
                               barcode: _barcodeController.text,
                             );
@@ -598,20 +602,31 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                           Expanded(
                             child: Consumer(
                               builder: (context, ref, _) {
-                                final manufacturers = ref.watch(masterDataViewModelProvider).manufacturers;
+                                final manufacturers = ref
+                                    .watch(masterDataViewModelProvider)
+                                    .manufacturers;
                                 return _buildSelectOrCreateDropdown(
                                   label: 'Manufacturer',
                                   hint: 'Select Manufacturer',
                                   value: _selectedManufacturer,
                                   items: manufacturers,
-                                  onChanged: (val) => setState(() => _selectedManufacturer = val),
+                                  onChanged: (val) => setState(
+                                    () => _selectedManufacturer = val,
+                                  ),
                                   onCreate: () => _showCreateMasterItemDialog(
                                     context,
                                     ref,
                                     'Manufacturer',
                                     (name) {
-                                      ref.read(masterDataViewModelProvider.notifier).addManufacturer(name);
-                                      setState(() => _selectedManufacturer = name);
+                                      ref
+                                          .read(
+                                            masterDataViewModelProvider
+                                                .notifier,
+                                          )
+                                          .addManufacturer(name);
+                                      setState(
+                                        () => _selectedManufacturer = name,
+                                      );
                                     },
                                   ),
                                 );
@@ -715,18 +730,24 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                           _updateTotalBillableQuantity();
                                         });
                                       },
-                                      onCreate: () => _showCreateMasterItemDialog(
-                                        context,
-                                        ref,
-                                        'Package Type',
-                                        (name) {
-                                          ref.read(masterDataViewModelProvider.notifier).addPackageType(name);
-                                          setState(() {
-                                            _selectedPackageType = name;
-                                            _updateTotalBillableQuantity();
-                                          });
-                                        },
-                                      ),
+                                      onCreate: () =>
+                                          _showCreateMasterItemDialog(
+                                            context,
+                                            ref,
+                                            'Package Type',
+                                            (name) {
+                                              ref
+                                                  .read(
+                                                    masterDataViewModelProvider
+                                                        .notifier,
+                                                  )
+                                                  .addPackageType(name);
+                                              setState(() {
+                                                _selectedPackageType = name;
+                                                _updateTotalBillableQuantity();
+                                              });
+                                            },
+                                          ),
                                     );
                                   },
                                 ),
@@ -755,7 +776,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   },
                                 ),
                                 SizedBox(height: 6.h),
-                                Text('Number of inner boxes inside one Package Type bulk unit.', style: context.fonts.grey12w400),
+                                Text(
+                                  'Number of inner boxes inside one Package Type bulk unit.',
+                                  style: context.fonts.grey12w400,
+                                ),
                               ],
                             ),
                           ),
@@ -809,18 +833,24 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                           _updateTotalBillableQuantity();
                                         });
                                       },
-                                      onCreate: () => _showCreateMasterItemDialog(
-                                        context,
-                                        ref,
-                                        'Unit Type',
-                                        (name) {
-                                          ref.read(masterDataViewModelProvider.notifier).addUnit(name);
-                                          setState(() {
-                                            _selectedUnit = name;
-                                            _updateTotalBillableQuantity();
-                                          });
-                                        },
-                                      ),
+                                      onCreate: () =>
+                                          _showCreateMasterItemDialog(
+                                            context,
+                                            ref,
+                                            'Unit Type',
+                                            (name) {
+                                              ref
+                                                  .read(
+                                                    masterDataViewModelProvider
+                                                        .notifier,
+                                                  )
+                                                  .addUnit(name);
+                                              setState(() {
+                                                _selectedUnit = name;
+                                                _updateTotalBillableQuantity();
+                                              });
+                                            },
+                                          ),
                                     );
                                   },
                                 ),
@@ -846,9 +876,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               ) ??
                               0;
                           final int totalItems = boxQty * itemQty;
-                          final String unitName = _selectedPackageType ?? 'Carton';
+                          final String unitName =
+                              _selectedPackageType ?? 'Carton';
                           final String packName = _selectedUnit ?? 'Syringe';
-                          
+
                           return Container(
                             margin: EdgeInsets.only(top: 16.h),
                             padding: EdgeInsets.symmetric(
