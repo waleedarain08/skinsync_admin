@@ -4429,27 +4429,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           hintText: 'Detailed medical and process information...',
           maxLines: 5,
         ),
-        context.verticalSpace(24),
-        CustomDropdown<String>(
-          label: 'Treatment Status',
-          hintText: 'Select status',
-          value: state.status,
-          items: [
-            DropdownMenuItem(
-              value: 'active',
-              child: Text('Active', style: context.fonts.black14w400),
-            ),
-            DropdownMenuItem(
-              value: 'deactive',
-              child: Text('Deactive', style: context.fonts.black14w400),
-            ),
-            DropdownMenuItem(
-              value: 'draft',
-              child: Text('Draft', style: context.fonts.black14w400),
-            ),
-          ],
-          onChanged: (val) => viewModel.setStatus(val ?? 'active'),
-        ),
       ],
     );
   }
