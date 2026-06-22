@@ -300,8 +300,8 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
       parentId:parentAreaId,
     );
 
-    if (value!) {
-      ref
+    if (value == true) {
+    await  ref
           .read(areaViewModelProvider.notifier)
           .refreshAreas();
     }
