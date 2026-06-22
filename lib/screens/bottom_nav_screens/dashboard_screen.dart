@@ -42,22 +42,28 @@ class DashboardScreen extends StatelessWidget {
             context.verticalSpace(32),
             _buildQuickStats(context),
             context.verticalSpace(32),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(flex: 2, child: _buildRevenueChart(context)),
-                context.horizontalSpace(24),
-                Expanded(flex: 1, child: _buildTopClinics(context)),
-              ],
+            SizedBox(
+              height: context.h(400),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 2, child: _buildRevenueChart(context)),
+                  context.horizontalSpace(24),
+                  Expanded(flex: 1, child: _buildTopClinics(context)),
+                ],
+              ),
             ),
             context.verticalSpace(32),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: _buildRecentAppointments(context)),
-                context.horizontalSpace(24),
-                Expanded(child: _buildTreatmentAnalytics(context)),
-              ],
+            SizedBox(
+              height: context.h(400),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: _buildRecentAppointments(context)),
+                  context.horizontalSpace(24),
+                  Expanded(child: _buildTreatmentAnalytics(context)),
+                ],
+              ),
             ),
           ],
         ),
@@ -190,8 +196,8 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
           context.verticalSpace(24),
-          SizedBox(
-            height: context.h(280),
+          Expanded(
+            // height: context.h(280),
             child: LineChart(
               LineChartData(
                 gridData: FlGridData(
@@ -240,13 +246,20 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildTopClinics(BuildContext context) {
     return BorderdContainerWidget(
       enableHover: true,
+
       padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Top Clinics', style: context.fonts.black18w600),
           context.verticalSpace(24),
-          ...List.generate(5, (index) => _buildClinicItem(context, index)),
+          Expanded(
+            child: ListView.builder(
+              itemCount: 5,
+              itemBuilder: (context, index) => _buildClinicItem(context, index),
+            ),
+          ),
+          // ...List.generate(5, (index) => _buildClinicItem(context, index)),
         ],
       ),
     );
@@ -265,7 +278,7 @@ class DashboardScreen extends StatelessWidget {
               borderRadius: context.appBorderRadius(all: 8),
             ),
             alignment: Alignment.center,
-            child: Text('${index + 1}', style: context.fonts.white12w700),
+            child: Text('${index + 1}', style: context.fonts.purple14w600),
           ),
           context.horizontalSpace(12),
           Expanded(
@@ -301,7 +314,13 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
           context.verticalSpace(16),
-          ...List.generate(4, (index) => _activityItem(context)),
+          Expanded(
+            child: ListView.builder(
+              itemCount: 6,
+              itemBuilder: (context, index) => _activityItem(context),
+            ),
+          ),
+          // ...List.generate(4, (index) => _activityItem(context)),
         ],
       ),
     );
@@ -364,8 +383,8 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Text('Treatments Distribution', style: context.fonts.black18w600),
           context.verticalSpace(24),
-          SizedBox(
-            height: context.h(200),
+          Expanded(
+            // height: context.h(200),
             child: PieChart(
               PieChartData(
                 sections: [
