@@ -1,36 +1,36 @@
 import 'base_response_model.dart';
 
-class BrandListResponse extends BaseApiResponseModel<List<BrandModel>> {
-  const BrandListResponse({
+class PackageTypeListResponse extends BaseApiResponseModel<List<PackageTypeModel>> {
+  const PackageTypeListResponse({
     required super.isSuccess,
     required super.message,
     super.data,
   });
 
-  factory BrandListResponse.fromJson(Map<String, dynamic> json) {
-    return BrandListResponse(
+  factory PackageTypeListResponse.fromJson(Map<String, dynamic> json) {
+    return PackageTypeListResponse(
       isSuccess: json['status'] as bool? ?? false,
       message: json['message'] ?? '',
       data: json['data'] == null
           ? null
           : (json['data'] as List)
-          .map((e) => BrandModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => PackageTypeModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 }
 
-class BrandModel {
+class PackageTypeModel {
   final int id;
   final String name;
 
-  const BrandModel({
+  const PackageTypeModel({
     required this.id,
     required this.name,
   });
 
-  factory BrandModel.fromJson(Map<String, dynamic> json) {
-    return BrandModel(
+  factory PackageTypeModel.fromJson(Map<String, dynamic> json) {
+    return PackageTypeModel(
       id: json['id'] as int? ?? 0,
       name: json['name'] ?? '',
     );

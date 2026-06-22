@@ -50,7 +50,7 @@ class MasterDataViewModel extends Notifier<MasterDataState> {
     return MasterDataState(
       brands: ['Allergan', 'Bella Medical', 'McKesson', 'Regimen MD', 'Candela', 'Galderma', 'Merz', 'Nestle', 'Loreal', 'Unilever', 'Johnson & Johnson'],
       manufacturers: ['Allergan PLC', 'Nestle Pakistan', 'Loreal Paris Factory', 'ABC Medical Industries', 'XYZ Pharmaceuticals'],
-      usageTypes: ['Treatment', 'Retail Sale', 'Consumable', 'Injection', 'Cleaning', 'Procedure', 'Medication', 'Laboratory', 'Variable', 'Required', 'Setup/Supply', 'Device'],
+      usageTypes: ['Treatment', 'Retailer', 'Both'],
       units: ['Gram', 'ML', 'MG', 'Piece', 'KG', 'Liter', 'Tablet', 'Capsule', 'Unit', 'Syringe', 'Vial'],
       packageTypes: ['Box', 'Pack', 'Bottle', 'Carton', 'Tube', 'Bag', 'Case', 'Tray', 'Custom'],
       categories: ['Injectables', 'Skincare', 'Equipment', 'Consumables', 'Medications'],

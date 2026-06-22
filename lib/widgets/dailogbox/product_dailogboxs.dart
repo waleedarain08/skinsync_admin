@@ -8,7 +8,6 @@ import 'package:skinsync_admin/view_models/master_data_view_model.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import '../custom_outlined_button.dart';
-
 import '../../models/responses/category_list_response.dart';
 import '../../view_models/category_view_model.dart';
 import '../build_textfield.dart';
@@ -255,6 +254,28 @@ class _ProductDialogBoxState extends ConsumerState<ProductDialogBox> {
                       },
                     ),
                   ),
+                  // Expanded(
+                  //   child: SelectOrCreateDropdown<UsageType>(
+                  //     label: 'Usage Type',
+                  //     hint: 'Select Usage Type',
+                  //     value: _selectedPurpose,
+                  //     items: UsageType.values,
+                  //     itemLabel: (usageType) => usageType.name,
+                  //     onChanged: (val) =>
+                  //         setState(() => _selectedPurpose = val),
+                  //     onOpen: () => ref
+                  //         .read(productViewModelProvider.notifier)
+                  //         .fetchBrand(),
+                  //     onCreate: () {},
+                  //     // onCreate: () => _showCreateMasterItemDialog(
+                  //     //   context,
+                  //     //   ref,
+                  //     //   'Usage Type',
+                  //     //       (name) =>
+                  //     //       setState(() => _selectedPurpose = name),
+                  //     // ),
+                  //   ),
+                  // ),
                 ],
               ),
               

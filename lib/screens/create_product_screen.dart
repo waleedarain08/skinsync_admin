@@ -11,6 +11,7 @@ import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import '../widgets/build_textfield.dart';
 import '../widgets/dailogbox/product_dailogboxs.dart';
+import '../widgets/select_or_create_dropdown_widget.dart';
 
 class CreateProductScreen extends ConsumerStatefulWidget {
   const CreateProductScreen({super.key, this.productToEdit});
@@ -69,6 +70,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(productViewModelProvider.notifier).setImageNull();
+      // ref.read(productViewModelProvider.notifier).fetchBrand();
     });
 
     _nameController = TextEditingController(text: widget.productToEdit?.name);
@@ -168,20 +170,24 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
             hintText: 'Enter name...',
           ),
           actions: [
+            SizedBox(
+              width: double.infinity,
+              child: CustomPrimaryButton(
+                onTap: () {
+                  final name = controller.text.trim();
+                  if (name.isNotEmpty) {
+                    onAdd(name);
+                    Navigator.pop(context);
+                  }
+                },
+                label: 'Add',
+                width: 100.w,
+              ),
+            ),
+            SizedBox(height: 10.h),
             CustomOutlinedButton(
               onTap: () => Navigator.pop(context),
               label: 'Cancel',
-            ),
-            CustomPrimaryButton(
-              onTap: () {
-                final name = controller.text.trim();
-                if (name.isNotEmpty) {
-                  onAdd(name);
-                  Navigator.pop(context);
-                }
-              },
-              label: 'Add',
-              width: 100.w,
             ),
           ],
         );
@@ -505,32 +511,72 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             ),
                           ),
                           SizedBox(width: 16.w),
+                          // Expanded(
+                          //   child: Consumer(
+                          //     builder: (context, ref, _) {
+                          //       final brands = ref
+                          //           .watch(productViewModelProvider)
+                          //           .brands
+                          //           ?.map((e) => e.name)
+                          //           .toList() ??
+                          //           [];
+                          //       return _buildSelectOrCreateDropdown(
+                          //         label: 'Brand',
+                          //         hint: 'Select Brand',
+                          //         value: _selectedBrand,
+                          //         items: brands,
+                          //         onChanged: (val) =>
+                          //             setState(() => _selectedBrand = val),
+                          //         onCreate: () => _showCreateMasterItemDialog(
+                          //           context,
+                          //           ref,
+                          //           'Brand',
+                          //           (name) {
+                          //             ref.read(productViewModelProvider.notifier).fetchBrand();
+                          //             // ref
+                          //             //     .read(
+                          //             //       masterDataViewModelProvider
+                          //             //           .notifier,
+                          //             //     )
+                          //             //     .addBrand(name).then((_){
+                          //             //
+                          //             //     });
+                          //             setState(() => _selectedBrand = name);
+                          //           },
+                          //         ),
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
                           Expanded(
                             child: Consumer(
                               builder: (context, ref, _) {
-                                final brands = ref
-                                    .watch(masterDataViewModelProvider)
-                                    .brands;
-                                return _buildSelectOrCreateDropdown(
+                                final brands =
+                                    ref
+                                        .watch(productViewModelProvider)
+                                        .brands ??
+                                    [];
+
+                                return SelectOrCreateDropdown<String>(
                                   label: 'Brand',
                                   hint: 'Select Brand',
                                   value: _selectedBrand,
-                                  items: brands,
+                                  items: brands
+                                      .map((e) => e.name)
+                                      .toList(), // ← convert to List<String>
+                                  itemLabel: (brand) =>
+                                      brand, // ← String displays itself
                                   onChanged: (val) =>
                                       setState(() => _selectedBrand = val),
+                                  onOpen: () => ref
+                                      .read(productViewModelProvider.notifier)
+                                      .fetchBrand(),
                                   onCreate: () => _showCreateMasterItemDialog(
                                     context,
                                     ref,
                                     'Brand',
-                                    (name) {
-                                      ref
-                                          .read(
-                                            masterDataViewModelProvider
-                                                .notifier,
-                                          )
-                                          .addBrand(name);
-                                      setState(() => _selectedBrand = name);
-                                    },
+                                    (name) =>
+                                        setState(() => _selectedBrand = name),
                                   ),
                                 );
                               },
@@ -599,35 +645,72 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             ),
                           ),
                           SizedBox(width: 16.w),
+
+                          // Expanded(
+                          //   child: Consumer(
+                          //     builder: (context, ref, _) {
+                          //       final manufacturers = ref
+                          //           .watch(masterDataViewModelProvider)
+                          //           .manufacturers;
+                          //       return _buildSelectOrCreateDropdown(
+                          //         label: 'Manufacturer',
+                          //         hint: 'Select Manufacturer',
+                          //         value: _selectedManufacturer,
+                          //         items: manufacturers,
+                          //         onChanged: (val) => setState(
+                          //           () => _selectedManufacturer = val,
+                          //         ),
+                          //         onCreate: () => _showCreateMasterItemDialog(
+                          //           context,
+                          //           ref,
+                          //           'Manufacturer',
+                          //           (name) {
+                          //             ref
+                          //                 .read(
+                          //                   masterDataViewModelProvider
+                          //                       .notifier,
+                          //                 )
+                          //                 .addManufacturer(name);
+                          //             setState(
+                          //               () => _selectedManufacturer = name,
+                          //             );
+                          //           },
+                          //         ),
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
                           Expanded(
                             child: Consumer(
                               builder: (context, ref, _) {
-                                final manufacturers = ref
-                                    .watch(masterDataViewModelProvider)
-                                    .manufacturers;
-                                return _buildSelectOrCreateDropdown(
+                                final manufacturers =
+                                    ref
+                                        .watch(productViewModelProvider)
+                                        .manufacturers ??
+                                    [];
+
+                                return SelectOrCreateDropdown<String>(
                                   label: 'Manufacturer',
                                   hint: 'Select Manufacturer',
                                   value: _selectedManufacturer,
-                                  items: manufacturers,
+                                  items: manufacturers
+                                      .map((e) => e.name)
+                                      .toList(), // ← convert to List<String>
+                                  itemLabel: (manufacturer) =>
+                                      manufacturer, // ← String displays itself
                                   onChanged: (val) => setState(
                                     () => _selectedManufacturer = val,
                                   ),
+                                  onOpen: () => ref
+                                      .read(productViewModelProvider.notifier)
+                                      .fetchManufacturer(),
                                   onCreate: () => _showCreateMasterItemDialog(
                                     context,
                                     ref,
                                     'Manufacturer',
-                                    (name) {
-                                      ref
-                                          .read(
-                                            masterDataViewModelProvider
-                                                .notifier,
-                                          )
-                                          .addManufacturer(name);
-                                      setState(
-                                        () => _selectedManufacturer = name,
-                                      );
-                                    },
+                                    (name) => setState(
+                                      () => _selectedManufacturer = name,
+                                    ),
                                   ),
                                 );
                               },
@@ -659,43 +742,99 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                       SizedBox(height: 16.h),
                       Row(
                         children: [
+                          // Expanded(
+                          //   child: Consumer(
+                          //     builder: (context, ref, _) {
+                          //       final usageTypes = ref
+                          //           .watch(masterDataViewModelProvider)
+                          //           .usageTypes;
+                          //       return _buildSelectOrCreateDropdown(
+                          //         label: 'Usage Type',
+                          //         hint: 'Select Usage Type',
+                          //         value: _selectedPurpose,
+                          //         items: usageTypes,
+                          //         onChanged: (val) {
+                          //           setState(() {
+                          //             _selectedPurpose = val;
+                          //             if (val?.toLowerCase() == 'variable') {
+                          //               _enforceLotTracking = true;
+                          //             }
+                          //           });
+                          //         },
+                          //         onCreate: () => _showCreateMasterItemDialog(
+                          //           context,
+                          //           ref,
+                          //           'Usage Type',
+                          //           (name) {
+                          //             ref
+                          //                 .read(
+                          //                   masterDataViewModelProvider
+                          //                       .notifier,
+                          //                 )
+                          //                 .addUsageType(name);
+                          //             setState(() => _selectedPurpose = name);
+                          //           },
+                          //         ),
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
                           Expanded(
                             child: Consumer(
                               builder: (context, ref, _) {
-                                final usageTypes = ref
-                                    .watch(masterDataViewModelProvider)
-                                    .usageTypes;
-                                return _buildSelectOrCreateDropdown(
+                                final usageType =
+                                    ref
+                                        .watch(productViewModelProvider)
+                                        .usageType ??
+                                        [];
+
+                                return SelectOrCreateDropdown<String>(
                                   label: 'Usage Type',
                                   hint: 'Select Usage Type',
                                   value: _selectedPurpose,
-                                  items: usageTypes,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      _selectedPurpose = val;
-                                      if (val?.toLowerCase() == 'variable') {
-                                        _enforceLotTracking = true;
-                                      }
-                                    });
-                                  },
+                                  items: usageType
+                                      .map((e) => e.name)
+                                      .toList(), // ← convert to List<String>
+                                  itemLabel: (usageType) =>
+                                  usageType, // ← String displays itself
+                                  onChanged: (val) =>
+                                      setState(() => _selectedPurpose = val),
+                                  onOpen: () => ref
+                                      .read(productViewModelProvider.notifier)
+                                      .fetchUsageType(),
                                   onCreate: () => _showCreateMasterItemDialog(
                                     context,
                                     ref,
-                                    'Usage Type',
-                                    (name) {
-                                      ref
-                                          .read(
-                                            masterDataViewModelProvider
-                                                .notifier,
-                                          )
-                                          .addUsageType(name);
-                                      setState(() => _selectedPurpose = name);
-                                    },
+                                    'UsageType',
+                                        (name) =>
+                                        setState(() => _selectedPurpose = name),
                                   ),
                                 );
                               },
                             ),
                           ),
+                          // Expanded(
+                          //   child: SelectOrCreateDropdown<UsageType>(
+                          //     label: 'Usage Type',
+                          //     hint: 'Select Usage Type',
+                          //     value: _selectedPurpose,
+                          //     items: UsageType.values,
+                          //     itemLabel: (usageType) => usageType.name,
+                          //     onChanged: (val) =>
+                          //         setState(() => _selectedPurpose = val),
+                          //     onOpen: () => ref
+                          //         .read(productViewModelProvider.notifier)
+                          //         .fetchBrand(),
+                          //     onCreate: () {},
+                          //     // onCreate: () => _showCreateMasterItemDialog(
+                          //     //   context,
+                          //     //   ref,
+                          //     //   'Usage Type',
+                          //     //       (name) =>
+                          //     //       setState(() => _selectedPurpose = name),
+                          //     // ),
+                          //   ),
+                          // ),
                         ],
                       ),
 
@@ -710,43 +849,92 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Expanded(
+                          //   child: Column(
+                          //     crossAxisAlignment: CrossAxisAlignment.start,
+                          //     children: [
+                          //       Consumer(
+                          //         builder: (context, ref, _) {
+                          //           final packageTypes = ref
+                          //               .watch(masterDataViewModelProvider)
+                          //               .packageTypes;
+                          //           return _buildSelectOrCreateDropdown(
+                          //             label: 'Package Type',
+                          //             hint: 'Select Package Type',
+                          //             value: _selectedPackageType,
+                          //             items: packageTypes,
+                          //             onChanged: (val) {
+                          //               setState(() {
+                          //                 _selectedPackageType = val;
+                          //                 _updateTotalBillableQuantity();
+                          //               });
+                          //             },
+                          //             onCreate: () =>
+                          //                 _showCreateMasterItemDialog(
+                          //                   context,
+                          //                   ref,
+                          //                   'Package Type',
+                          //                   (name) {
+                          //                     ref
+                          //                         .read(
+                          //                           masterDataViewModelProvider
+                          //                               .notifier,
+                          //                         )
+                          //                         .addPackageType(name);
+                          //                     setState(() {
+                          //                       _selectedPackageType = name;
+                          //                       _updateTotalBillableQuantity();
+                          //                     });
+                          //                   },
+                          //                 ),
+                          //           );
+                          //         },
+                          //       ),
+                          //       SizedBox(height: 6.h),
+                          //       Text(
+                          //         'The bulk unit purchased from suppliers, e.g. Carton, Case.',
+                          //         style: context.fonts.grey12w400,
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: .start,
                               children: [
                                 Consumer(
                                   builder: (context, ref, _) {
-                                    final packageTypes = ref
-                                        .watch(masterDataViewModelProvider)
-                                        .packageTypes;
-                                    return _buildSelectOrCreateDropdown(
+                                    final packageTypes =
+                                        ref
+                                            .watch(productViewModelProvider)
+                                            .packageTypes ??
+                                        [];
+
+                                    return SelectOrCreateDropdown<String>(
                                       label: 'Package Type',
                                       hint: 'Select Package Type',
                                       value: _selectedPackageType,
-                                      items: packageTypes,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          _selectedPackageType = val;
-                                          _updateTotalBillableQuantity();
-                                        });
-                                      },
+                                      items: packageTypes
+                                          .map((e) => e.name)
+                                          .toList(), // ← convert to List<String>
+                                      itemLabel: (brand) =>
+                                          brand, // ← String displays itself
+                                      onChanged: (val) => setState(
+                                        () => _selectedPackageType = val,
+                                      ),
+                                      onOpen: () => ref
+                                          .read(
+                                            productViewModelProvider.notifier,
+                                          )
+                                          .fetchPackageTypes(),
                                       onCreate: () =>
                                           _showCreateMasterItemDialog(
                                             context,
                                             ref,
                                             'Package Type',
-                                            (name) {
-                                              ref
-                                                  .read(
-                                                    masterDataViewModelProvider
-                                                        .notifier,
-                                                  )
-                                                  .addPackageType(name);
-                                              setState(() {
-                                                _selectedPackageType = name;
-                                                _updateTotalBillableQuantity();
-                                              });
-                                            },
+                                            (name) => setState(
+                                              () => _selectedPackageType = name,
+                                            ),
                                           ),
                                     );
                                   },
@@ -815,41 +1003,40 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                           SizedBox(width: 16.w),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: .start,
                               children: [
                                 Consumer(
                                   builder: (context, ref, _) {
-                                    final units = ref
-                                        .watch(masterDataViewModelProvider)
-                                        .units;
-                                    return _buildSelectOrCreateDropdown(
+                                    final unitTypes =
+                                        ref
+                                            .watch(productViewModelProvider)
+                                            .unitTypes ??
+                                        [];
+
+                                    return SelectOrCreateDropdown<String>(
                                       label: 'Unit Type',
                                       hint: 'Select Unit Type',
                                       value: _selectedUnit,
-                                      items: units,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          _selectedUnit = val;
-                                          _updateTotalBillableQuantity();
-                                        });
-                                      },
+                                      items: unitTypes
+                                          .map((e) => e.name)
+                                          .toList(), // ← convert to List<String>
+                                      itemLabel: (unit) =>
+                                          unit, // ← String displays itself
+                                      onChanged: (val) =>
+                                          setState(() => _selectedUnit = val),
+                                      onOpen: () => ref
+                                          .read(
+                                            productViewModelProvider.notifier,
+                                          )
+                                          .fetchUnitTypes(),
                                       onCreate: () =>
                                           _showCreateMasterItemDialog(
                                             context,
                                             ref,
                                             'Unit Type',
-                                            (name) {
-                                              ref
-                                                  .read(
-                                                    masterDataViewModelProvider
-                                                        .notifier,
-                                                  )
-                                                  .addUnit(name);
-                                              setState(() {
-                                                _selectedUnit = name;
-                                                _updateTotalBillableQuantity();
-                                              });
-                                            },
+                                            (name) => setState(
+                                              () => _selectedUnit = name,
+                                            ),
                                           ),
                                     );
                                   },
@@ -862,6 +1049,55 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               ],
                             ),
                           ),
+                          // Expanded(
+                          //   child: Column(
+                          //     crossAxisAlignment: CrossAxisAlignment.start,
+                          //     children: [
+                          //       Consumer(
+                          //         builder: (context, ref, _) {
+                          //           final units = ref
+                          //               .watch(masterDataViewModelProvider)
+                          //               .units;
+                          //           return _buildSelectOrCreateDropdown(
+                          //             label: 'Unit Type',
+                          //             hint: 'Select Unit Type',
+                          //             value: _selectedUnit,
+                          //             items: units,
+                          //             onChanged: (val) {
+                          //               setState(() {
+                          //                 _selectedUnit = val;
+                          //                 _updateTotalBillableQuantity();
+                          //               });
+                          //             },
+                          //             onCreate: () =>
+                          //                 _showCreateMasterItemDialog(
+                          //                   context,
+                          //                   ref,
+                          //                   'Unit Type',
+                          //                   (name) {
+                          //                     ref
+                          //                         .read(
+                          //                           masterDataViewModelProvider
+                          //                               .notifier,
+                          //                         )
+                          //                         .addUnit(name);
+                          //                     setState(() {
+                          //                       _selectedUnit = name;
+                          //                       _updateTotalBillableQuantity();
+                          //                     });
+                          //                   },
+                          //                 ),
+                          //           );
+                          //         },
+                          //       ),
+                          //       SizedBox(height: 6.h),
+                          //       Text(
+                          //         'The base physical consumable item type, e.g. Syringe, Vial.',
+                          //         style: context.fonts.grey12w400,
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
 

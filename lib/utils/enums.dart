@@ -1,3 +1,4 @@
+
 enum SharedPreferencesKeys {
   themeModeKey('theme-mode'),
   accessTokenKey('access-token'),
@@ -37,7 +38,13 @@ enum Endpoint {
   categoryDetail('admin/categories/{id}'),
   createCategory('admin/categories'),
   areas('admin/areas'),
-  subAreas('admin/areas/sub');
+  subAreas('admin/areas/sub'),
+  getBrands('admin/brands'),
+  unitTypesList('admin/unit-types'),
+  packageTypeList('admin/package-types'),
+  usageType('admin/usage-types'),
+
+  manufacturersList('admin/manufacturers');
 
 
   final String path;
@@ -62,3 +69,16 @@ enum BaseUrls {
 
   const BaseUrls(this.url);
 }
+
+// enum UsageType {
+//   treatment,
+//   retailer,
+//   both;
+// }
+
+// void test() {
+//   const type = UsageType.treatment;
+//   log('API: ${type.name}');
+//   log('DISPLAY: ${type.name.capitalize}');
+// }
+
