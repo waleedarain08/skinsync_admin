@@ -107,29 +107,32 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
     // Dynamic real-time filter logic
     final filteredPatients = _patients.where((p) {
       final query = _searchController.text.toLowerCase();
-      final matchesQuery = query.isEmpty ||
+      final matchesQuery =
+          query.isEmpty ||
           p.name.toLowerCase().contains(query) ||
           p.email.toLowerCase().contains(query) ||
           p.phone.contains(query);
 
-      final matchesClinic = _selectedClinicFilter == 'All Clinics' ||
+      final matchesClinic =
+          _selectedClinicFilter == 'All Clinics' ||
           p.clinic == _selectedClinicFilter;
 
-      final matchesStatus = _selectedStatusFilter == 'All Statuses' ||
+      final matchesStatus =
+          _selectedStatusFilter == 'All Statuses' ||
           p.status == _selectedStatusFilter;
 
       return matchesQuery && matchesClinic && matchesStatus;
     }).toList();
 
     final totalPages = (filteredPatients.length / _itemsPerPage).ceil();
-    final paginatedPatients = filteredPatients.skip(_currentPage * _itemsPerPage).take(_itemsPerPage).toList();
+    final paginatedPatients = filteredPatients
+        .skip(_currentPage * _itemsPerPage)
+        .take(_itemsPerPage)
+        .toList();
 
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: context.appEdgeInsets(
-          horizontal: 28,
-          vertical: 28,
-        ),
+        padding: context.appEdgeInsets(horizontal: 28, vertical: 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -189,18 +192,48 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
   Widget _buildQuickMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard(context, 'Total Patients', '12,840', Icons.people_rounded, CustomColors.purple),
+        _buildMetricCard(
+          context,
+          'Total Patients',
+          '12,840',
+          Icons.people_rounded,
+          CustomColors.purple,
+        ),
         context.horizontalSpace(16),
-        _buildMetricCard(context, 'Verified Profiles', '8,200', Icons.verified_user_rounded, CustomColors.green),
+        _buildMetricCard(
+          context,
+          'Verified Profiles',
+          '8,200',
+          Icons.verified_user_rounded,
+          CustomColors.green,
+        ),
         context.horizontalSpace(16),
-        _buildMetricCard(context, 'App Users', '9,450', Icons.smartphone_rounded, CustomColors.green),
+        _buildMetricCard(
+          context,
+          'App Users',
+          '9,450',
+          Icons.smartphone_rounded,
+          CustomColors.green,
+        ),
         context.horizontalSpace(16),
-        _buildMetricCard(context, 'Active Network', '3,390', Icons.hub_rounded, CustomColors.purple),
+        _buildMetricCard(
+          context,
+          'Active Network',
+          '3,390',
+          Icons.hub_rounded,
+          CustomColors.purple,
+        ),
       ],
     );
   }
 
-  Widget _buildMetricCard(BuildContext context, String title, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Expanded(
       child: BorderdContainerWidget(
         padding: context.appEdgeInsets(all: 16),
@@ -219,9 +252,17 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(value, style: context.fonts.black18w600, overflow: TextOverflow.ellipsis),
+                  Text(
+                    value,
+                    style: context.fonts.black18w600,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   context.verticalSpace(2),
-                  Text(title, style: context.fonts.grey11w400, overflow: TextOverflow.ellipsis),
+                  Text(
+                    title,
+                    style: context.fonts.grey11w400,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
@@ -235,6 +276,7 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
     return BorderdContainerWidget(
       padding: EdgeInsets.all(16.w),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             flex: 3,
@@ -260,9 +302,12 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
               label: 'Assigned Clinic',
               hintText: 'All Clinics',
               value: _selectedClinicFilter,
-              items: const ['All Clinics', 'Glow MedSpa NY', 'Skinsync LA', 'Aesthetic Chicago']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
+              items: const [
+                'All Clinics',
+                'Glow MedSpa NY',
+                'Skinsync LA',
+                'Aesthetic Chicago',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (val) {
                 setState(() {
                   _selectedClinicFilter = val ?? 'All Clinics';
@@ -277,9 +322,13 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
               label: 'Status',
               hintText: 'All Statuses',
               value: _selectedStatusFilter,
-              items: const ['All Statuses', 'Active', 'Inactive', 'New', 'Archived']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
+              items: const [
+                'All Statuses',
+                'Active',
+                'Inactive',
+                'New',
+                'Archived',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (val) {
                 setState(() {
                   _selectedStatusFilter = val ?? 'All Statuses';
@@ -334,14 +383,22 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
             ...list.map((p) {
               return TableRow(
                 decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: CustomColors.border)),
+                  border: Border(
+                    bottom: BorderSide(color: CustomColors.border),
+                  ),
                 ),
                 children: [
                   _patientNameCell(p.name, p.email),
                   _tableTextCell(p.phone, style: context.fonts.grey14w400),
                   _tableTextCell(p.clinic, style: context.fonts.grey14w400),
-                  _tableTextCell(p.lastAppointment, style: context.fonts.black14w600),
-                  _tableTextCell('${p.totalTreatments} Proc', style: context.fonts.grey14w400),
+                  _tableTextCell(
+                    p.lastAppointment,
+                    style: context.fonts.black14w600,
+                  ),
+                  _tableTextCell(
+                    '${p.totalTreatments} Proc',
+                    style: context.fonts.grey14w400,
+                  ),
                   _statusBadgeCell(p.status),
                   _actionsCell(p),
                 ],
@@ -455,7 +512,11 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
         children: [
           IconButton(
             tooltip: 'View Profile',
-            icon: Icon(Icons.visibility_outlined, color: CustomColors.grey, size: 20.sp),
+            icon: Icon(
+              Icons.visibility_outlined,
+              color: CustomColors.grey,
+              size: 20.sp,
+            ),
             onPressed: () {
               ref.read(selectedPatientProvider.notifier).state = p;
               context.push(PatientDetailScreen.routeName);
@@ -479,10 +540,17 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
                 color: CustomColors.whiteGrey,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.search_off_rounded, size: context.sp(48), color: CustomColors.grey),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: context.sp(48),
+                color: CustomColors.grey,
+              ),
             ),
             context.verticalSpace(24),
-            Text('No patients match your filters', style: context.fonts.black18w600),
+            Text(
+              'No patients match your filters',
+              style: context.fonts.black18w600,
+            ),
             context.verticalSpace(8),
             Text(
               'Try clearing your search keyword, resetting the filters, or onboard a new client.',

@@ -32,7 +32,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(productViewModelProvider.notifier).fetchProducts(page: 1, limit: 20);
+      ref
+          .read(productViewModelProvider.notifier)
+          .fetchProducts(page: 1, limit: 20);
     });
   }
 
@@ -93,7 +95,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                     totalPages: state.totalPages,
                     currentPage: state.currentPage - 1,
                     onPageChanged: (pageIndex) {
-                      ref.read(productViewModelProvider.notifier).fetchProducts(
+                      ref
+                          .read(productViewModelProvider.notifier)
+                          .fetchProducts(
                             search: state.searchKeyword,
                             page: pageIndex + 1,
                             limit: state.pageSize,
@@ -229,6 +233,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     return BorderdContainerWidget(
       padding: EdgeInsets.all(16.w),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             flex: 3,
@@ -237,11 +242,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               hintText:
                   'Search master catalog by product name, SKU or brand manufacturer...',
               onChanged: (val) {
-                ref.read(productViewModelProvider.notifier).fetchProducts(
-                      search: val,
-                      page: 1,
-                      limit: state.pageSize,
-                    );
+                ref
+                    .read(productViewModelProvider.notifier)
+                    .fetchProducts(search: val, page: 1, limit: state.pageSize);
               },
             ),
           ),

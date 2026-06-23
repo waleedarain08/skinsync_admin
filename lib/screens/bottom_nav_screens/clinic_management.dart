@@ -260,6 +260,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     return BorderdContainerWidget(
       padding: EdgeInsets.all(16.w),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             flex: 3,

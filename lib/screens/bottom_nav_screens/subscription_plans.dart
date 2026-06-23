@@ -130,7 +130,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     return BorderdContainerWidget(
       enableHover: true,
       padding: context.appEdgeInsets(all: 24),
-      backgroundColor: CustomColors.purple.withValues(alpha: 0.02),
+      // backgroundColor: CustomColors.purple.withValues(alpha: 0.02),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -386,7 +386,10 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     );
   }
 
-  Future<void> _confirmDelete(BuildContext context, SubscriptionPlanModel plan) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    SubscriptionPlanModel plan,
+  ) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => StandardDialog(

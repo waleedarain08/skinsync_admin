@@ -38,7 +38,8 @@ class AppointmentManagement extends ConsumerStatefulWidget {
   const AppointmentManagement({super.key});
 
   @override
-  ConsumerState<AppointmentManagement> createState() => _AppointmentManagementState();
+  ConsumerState<AppointmentManagement> createState() =>
+      _AppointmentManagementState();
 }
 
 class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
@@ -116,34 +117,42 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
     // Dynamically filter list
     final filteredAppointments = _appointments.where((a) {
       final query = _searchController.text.toLowerCase();
-      final matchesQuery = query.isEmpty ||
+      final matchesQuery =
+          query.isEmpty ||
           a.patientName.toLowerCase().contains(query) ||
           a.treatment.toLowerCase().contains(query);
 
-      final matchesClinic = _selectedClinicFilter == 'All Clinics' ||
+      final matchesClinic =
+          _selectedClinicFilter == 'All Clinics' ||
           a.clinic == _selectedClinicFilter;
 
-      final matchesProvider = _selectedProviderFilter == 'All Providers' ||
+      final matchesProvider =
+          _selectedProviderFilter == 'All Providers' ||
           a.provider == _selectedProviderFilter;
 
-      final matchesType = _selectedTypeFilter == 'All Types' ||
-          a.type == _selectedTypeFilter;
+      final matchesType =
+          _selectedTypeFilter == 'All Types' || a.type == _selectedTypeFilter;
 
-      final matchesStatus = _selectedStatusFilter == 'All Statuses' ||
+      final matchesStatus =
+          _selectedStatusFilter == 'All Statuses' ||
           a.status == _selectedStatusFilter;
 
-      return matchesQuery && matchesClinic && matchesProvider && matchesType && matchesStatus;
+      return matchesQuery &&
+          matchesClinic &&
+          matchesProvider &&
+          matchesType &&
+          matchesStatus;
     }).toList();
 
     final totalPages = (filteredAppointments.length / _itemsPerPage).ceil();
-    final paginatedAppointments = filteredAppointments.skip(_currentPage * _itemsPerPage).take(_itemsPerPage).toList();
+    final paginatedAppointments = filteredAppointments
+        .skip(_currentPage * _itemsPerPage)
+        .take(_itemsPerPage)
+        .toList();
 
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: context.appEdgeInsets(
-          horizontal: 28,
-          vertical: 28,
-        ),
+        padding: context.appEdgeInsets(horizontal: 28, vertical: 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -202,18 +211,48 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
   Widget _buildAppointmentMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard(context, 'Upcoming', '1,240', Icons.event_available_rounded, CustomColors.green),
+        _buildMetricCard(
+          context,
+          'Upcoming',
+          '1,240',
+          Icons.event_available_rounded,
+          CustomColors.green,
+        ),
         context.horizontalSpace(16),
-        _buildMetricCard(context, 'Completed', '8,450', Icons.check_circle_outline_rounded, CustomColors.green),
+        _buildMetricCard(
+          context,
+          'Completed',
+          '8,450',
+          Icons.check_circle_outline_rounded,
+          CustomColors.green,
+        ),
         context.horizontalSpace(16),
-        _buildMetricCard(context, 'Cancelled', '120', Icons.cancel_outlined, CustomColors.red),
+        _buildMetricCard(
+          context,
+          'Cancelled',
+          '120',
+          Icons.cancel_outlined,
+          CustomColors.red,
+        ),
         context.horizontalSpace(16),
-        _buildMetricCard(context, 'No Shows', '45', Icons.person_off_outlined, CustomColors.amber),
+        _buildMetricCard(
+          context,
+          'No Shows',
+          '45',
+          Icons.person_off_outlined,
+          CustomColors.amber,
+        ),
       ],
     );
   }
 
-  Widget _buildMetricCard(BuildContext context, String title, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Expanded(
       child: BorderdContainerWidget(
         padding: context.appEdgeInsets(all: 16),
@@ -232,9 +271,17 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(value, style: context.fonts.black18w600, overflow: TextOverflow.ellipsis),
+                  Text(
+                    value,
+                    style: context.fonts.black18w600,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   context.verticalSpace(2),
-                  Text(title, style: context.fonts.grey11w400, overflow: TextOverflow.ellipsis),
+                  Text(
+                    title,
+                    style: context.fonts.grey11w400,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
@@ -248,6 +295,7 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
     return BorderdContainerWidget(
       padding: EdgeInsets.all(16.w),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             flex: 3,
@@ -273,9 +321,12 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               label: 'Clinic',
               hintText: 'All Clinics',
               value: _selectedClinicFilter,
-              items: const ['All Clinics', 'Glow MedSpa NY', 'Skinsync LA', 'Aesthetic Chicago']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
+              items: const [
+                'All Clinics',
+                'Glow MedSpa NY',
+                'Skinsync LA',
+                'Aesthetic Chicago',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (val) {
                 setState(() {
                   _selectedClinicFilter = val ?? 'All Clinics';
@@ -290,9 +341,12 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               label: 'Provider',
               hintText: 'All Providers',
               value: _selectedProviderFilter,
-              items: const ['All Providers', 'Dr. Sarah Jenkins', 'Dr. Albert Flores', 'Nurse Jane Cooper']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
+              items: const [
+                'All Providers',
+                'Dr. Sarah Jenkins',
+                'Dr. Albert Flores',
+                'Nurse Jane Cooper',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (val) {
                 setState(() {
                   _selectedProviderFilter = val ?? 'All Providers';
@@ -307,9 +361,12 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               label: 'Type',
               hintText: 'All Types',
               value: _selectedTypeFilter,
-              items: const ['All Types', 'In-Person', 'Virtual', 'Follow-Up']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
+              items: const [
+                'All Types',
+                'In-Person',
+                'Virtual',
+                'Follow-Up',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (val) {
                 setState(() {
                   _selectedTypeFilter = val ?? 'All Types';
@@ -324,9 +381,14 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               label: 'Status',
               hintText: 'All Statuses',
               value: _selectedStatusFilter,
-              items: const ['All Statuses', 'Confirmed', 'Scheduled', 'Completed', 'Cancelled', 'No Show']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
+              items: const [
+                'All Statuses',
+                'Confirmed',
+                'Scheduled',
+                'Completed',
+                'Cancelled',
+                'No Show',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (val) {
                 setState(() {
                   _selectedStatusFilter = val ?? 'All Statuses';
@@ -383,7 +445,9 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
             ...list.map((a) {
               return TableRow(
                 decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: CustomColors.border)),
+                  border: Border(
+                    bottom: BorderSide(color: CustomColors.border),
+                  ),
                 ),
                 children: [
                   _patientCell(a.patientName, a.patientEmail),
@@ -506,7 +570,11 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
         children: [
           IconButton(
             tooltip: 'View Details',
-            icon: Icon(Icons.visibility_outlined, color: CustomColors.grey, size: 20.sp),
+            icon: Icon(
+              Icons.visibility_outlined,
+              color: CustomColors.grey,
+              size: 20.sp,
+            ),
             onPressed: () {
               ref.read(selectedAppointmentProvider.notifier).state = a;
               context.push(AppointmentDetailScreen.routeName);
@@ -514,7 +582,11 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
           ),
           IconButton(
             tooltip: 'Reschedule',
-            icon: Icon(Icons.edit_calendar_rounded, color: CustomColors.purple, size: 20.sp),
+            icon: Icon(
+              Icons.edit_calendar_rounded,
+              color: CustomColors.purple,
+              size: 20.sp,
+            ),
             onPressed: () {},
           ),
         ],
@@ -535,10 +607,17 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
                 color: CustomColors.whiteGrey,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.search_off_rounded, size: context.sp(48), color: CustomColors.grey),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: context.sp(48),
+                color: CustomColors.grey,
+              ),
             ),
             context.verticalSpace(24),
-            Text('No appointments match your filters', style: context.fonts.black18w600),
+            Text(
+              'No appointments match your filters',
+              style: context.fonts.black18w600,
+            ),
             context.verticalSpace(8),
             Text(
               'Try clearing your search keyword, resetting the filters, or schedule a new appointment partner.',
