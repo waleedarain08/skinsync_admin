@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
+import 'package:skinsync_admin/widgets/protocol_preview_widget.dart';
 import '../models/notification_entry.dart';
 import '../models/notification_model.dart';
 import '../models/product_model.dart';
@@ -29,6 +30,7 @@ import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_category_selector.dart';
 import 'create_product_screen.dart';
+import 'product_detail_screen.dart';
 
 class CreateTreatmentScreen extends ConsumerStatefulWidget {
   const CreateTreatmentScreen({super.key});
@@ -1049,7 +1051,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     String postSummary = 'Not configured';
     if (isPostCategory) {
       postSummary = (selectedCategory?.postNotifications?.isNotEmpty ?? false)
-          ? '${selectedCategory?.postNotifications?.length } Category Defaults'
+          ? '${selectedCategory?.postNotifications?.length} Category Defaults'
           : 'Category Default';
     } else {
       postSummary =
@@ -5378,15 +5380,50 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(entry.productName, style: context.fonts.black14w700),
-                  Text(
-                    'Unit of Measure: ${entry.unit}',
-                    style: context.fonts.grey12w400,
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            entry.productName,
+                            style: context.fonts.black14w700,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        context.horizontalSpace(8),
+                        IconButton(
+                          tooltip: 'View Product Details',
+                          icon: const Icon(
+                            Icons.visibility_outlined,
+                            color: CustomColors.purple,
+                            size: 18,
+                          ),
+                          onPressed: () async {
+                            try {
+                              await ref
+                                  .read(productViewModelProvider.notifier)
+                                  .fetchProductDetail(entry.productId);
+                              if (context.mounted) {
+                                context.push(ProductDetailScreen.routeName);
+                              }
+                            } catch (e) {
+                              // Handled gracefully inside view model
+                            }
+                          },
+                          constraints: const BoxConstraints(),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'Unit of Measure: ${entry.unit}',
+                      style: context.fonts.grey12w400,
+                    ),
+                  ],
+                ),
               ),
               IconButton(
                 onPressed: () => viewModel.removeProductUsage(entry.productId),
@@ -5399,62 +5436,23 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             ],
           ),
           context.verticalSpace(20),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: CustomDropdown<String>(
-                  label: 'Usage Type',
-                  hintText: 'Select',
-                  value: entry.usageType,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Required',
-                      child: Text('Required'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Optional',
-                      child: Text('Optional'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Variable',
-                      child: Text('Variable'),
-                    ),
-                    DropdownMenuItem(value: 'Setup', child: Text('Setup')),
-                    DropdownMenuItem(
-                      value: 'Post_Care',
-                      child: Text('Post Care'),
-                    ),
-                    DropdownMenuItem(value: 'Device', child: Text('Device')),
-                  ],
-                  onChanged: (val) =>
-                      viewModel.updateProductUsageEntry(index, usageType: val),
-                ),
+          CustomDropdown<String>(
+            label: 'Deduction Timing',
+            hintText: 'Select',
+            value: entry.deductionTiming,
+            items: const [
+              DropdownMenuItem(
+                value: 'On_Completion',
+                child: Text('On Completion'),
               ),
-              context.horizontalSpace(16),
-              Expanded(
-                child: CustomDropdown<String>(
-                  label: 'Deduction Timing',
-                  hintText: 'Select',
-                  value: entry.deductionTiming,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'On_Completion',
-                      child: Text('On Completion'),
-                    ),
-                    DropdownMenuItem(value: 'Manual', child: Text('Manual')),
-                    DropdownMenuItem(
-                      value: 'Post_Confirmation',
-                      child: Text('Post Confirmation'),
-                    ),
-                  ],
-                  onChanged: (val) => viewModel.updateProductUsageEntry(
-                    index,
-                    deductionTiming: val,
-                  ),
-                ),
+              DropdownMenuItem(value: 'Manual', child: Text('Manual')),
+              DropdownMenuItem(
+                value: 'Post_Confirmation',
+                child: Text('Post Confirmation'),
               ),
             ],
+            onChanged: (val) =>
+                viewModel.updateProductUsageEntry(index, deductionTiming: val),
           ),
           context.verticalSpace(20),
           Row(
@@ -5873,6 +5871,15 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
 
               if (state.currentStep < 16) {
                 if (state.currentStep == 1) {
+                  final success = await viewModel.createBasicInfo(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                }
+              // TODO : remove this condition after complettion of api
+                else {
                  final success = await viewModel.createBasicInfo(stepNumber: state.currentStep + 1);
                  if(success ?? false){
                    viewModel.setStep(state.currentStep + 1);
@@ -5895,6 +5902,21 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 }
                 else{
                   viewModel.setStep(state.currentStep + 1);
+                }
+                if (state.currentStep == 6)  {
+                  final bytes = await ProtocolFormPreview.getPdfBytes(
+                    state: state,
+                    dataState: dataState,
+                    categoryState: categoryState,
+                  );
+
+                  final success = await viewModel.callProtocol(
+                    bytes: bytes,
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
                 }
               } else {
                 viewModel
@@ -6611,14 +6633,14 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 _showAddNodeDialog(
                   context: context,
                   title: 'Create New Sub-Area in ${area.name}',
-                  onAdd: (name, sku, icon) =>widget.onAddSubArea(
-                      // TODO: Add actual parent area id.
-                      parentAreaId: area.id,
-                      parentAreaName: area.name,
-                      name: name,
-                      sku: sku,
-                      icon: icon,
-                    ),
+                  onAdd: (name, sku, icon) => widget.onAddSubArea(
+                    // TODO: Add actual parent area id.
+                    parentAreaId: area.id,
+                    parentAreaName: area.name,
+                    name: name,
+                    sku: sku,
+                    icon: icon,
+                  ),
                 );
               },
             );

@@ -39,6 +39,7 @@ enum Endpoint {
   createCategory('admin/categories'),
   areas('admin/areas'),
   subAreas('admin/areas/sub'),
+    protocol('admin/treatments/step'),
 
   basicInfo('admin/treatments/create'),
   getBrands('admin/brands'),

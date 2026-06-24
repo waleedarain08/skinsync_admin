@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/requests/protocol_request.dart';
+
 import '../models/notification_entry.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
@@ -167,6 +170,40 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           return true;
         }) ??
         false;
+  }
+
+  Future<bool?> callProtocol({
+    required int stepNumber,
+    required Uint8List bytes,
+  }) async {
+    final mediaService = MediaService();
+    const String pdfName = 'clinicForm.pdf';
+
+    return await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        final uploadedFile = await mediaService.uploadFile(
+          'treatment/pdf',
+
+          PlatformFile(name: pdfName, size: bytes.length, bytes: bytes),
+        );
+        if (uploadedFile != null) {
+          final response = await _treatmentRepository.protocol(
+            request: ProtocolRequest(
+              stepNumber: stepNumber,
+              clinicalProtocolPdf: ClinicalProtocolPdf(
+                name: pdfName,
+                url: uploadedFile,
+              ),
+            ),
+            draftID: state.draftTreatmentID ?? 0,
+          );
+
+          return response.isSuccess;
+        }
+        throw const UnknownException('Failed to upload');
+      },
+    );
   }
 
   void resetForm() {
@@ -809,7 +846,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(selectedRoles: current);
   }
 
-
   Future<bool?> createBasicInfo({
     required int stepNumber,
   }) async {
@@ -826,13 +862,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       }
       final String? iconUrl = await MediaService().uploadImage(
         'treatment/icon/',
-          state.treatmentIcon!,
+        state.treatmentIcon!,
       );
       if (iconUrl == null) {
         throw const UnknownException('Failed to upload Icon');
       }
 
-     final response =    await _treatmentRepository.createBasicInfo(
+      final response = await _treatmentRepository.createBasicInfo(
         BasicInfoRequest(
           stepNumber: stepNumber,
           selectedCategoryIds: state.selectedCategoryPath,
@@ -1899,7 +1935,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                           .toList(),
                     ),
                   )
-                  .toList() ?? [];
+                  .toList() ??
+              [];
         } else {
           final int sessionCount = selectedCategory?.totalSessions ?? 1;
           for (int i = 0; i < sessionCount; i++) {
