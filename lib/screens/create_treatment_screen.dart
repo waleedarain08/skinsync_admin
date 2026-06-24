@@ -5399,62 +5399,25 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             ],
           ),
           context.verticalSpace(20),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: CustomDropdown<String>(
-                  label: 'Usage Type',
-                  hintText: 'Select',
-                  value: entry.usageType,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Required',
-                      child: Text('Required'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Optional',
-                      child: Text('Optional'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Variable',
-                      child: Text('Variable'),
-                    ),
-                    DropdownMenuItem(value: 'Setup', child: Text('Setup')),
-                    DropdownMenuItem(
-                      value: 'Post_Care',
-                      child: Text('Post Care'),
-                    ),
-                    DropdownMenuItem(value: 'Device', child: Text('Device')),
-                  ],
-                  onChanged: (val) =>
-                      viewModel.updateProductUsageEntry(index, usageType: val),
-                ),
+          CustomDropdown<String>(
+            label: 'Deduction Timing',
+            hintText: 'Select',
+            value: entry.deductionTiming,
+            items: const [
+              DropdownMenuItem(
+                value: 'On_Completion',
+                child: Text('On Completion'),
               ),
-              context.horizontalSpace(16),
-              Expanded(
-                child: CustomDropdown<String>(
-                  label: 'Deduction Timing',
-                  hintText: 'Select',
-                  value: entry.deductionTiming,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'On_Completion',
-                      child: Text('On Completion'),
-                    ),
-                    DropdownMenuItem(value: 'Manual', child: Text('Manual')),
-                    DropdownMenuItem(
-                      value: 'Post_Confirmation',
-                      child: Text('Post Confirmation'),
-                    ),
-                  ],
-                  onChanged: (val) => viewModel.updateProductUsageEntry(
-                    index,
-                    deductionTiming: val,
-                  ),
-                ),
+              DropdownMenuItem(value: 'Manual', child: Text('Manual')),
+              DropdownMenuItem(
+                value: 'Post_Confirmation',
+                child: Text('Post Confirmation'),
               ),
             ],
+            onChanged: (val) => viewModel.updateProductUsageEntry(
+              index,
+              deductionTiming: val,
+            ),
           ),
           context.verticalSpace(20),
           Row(
