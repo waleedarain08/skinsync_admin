@@ -6,14 +6,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../models/notification_entry.dart';
+import '../models/requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
+import '../services/media_service.dart';
 import '../utils/dummy_data.dart';
+import '../utils/exception.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
+import 'category_view_model.dart';
 
 final treatmentViewModelProvider =
     NotifierProvider<TreatmentViewModel, TreatmentState>(TreatmentViewModel._);
@@ -758,6 +762,52 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(selectedRoles: current);
   }
 
+
+  Future<bool?> createBasicInfo({
+    required int stepNumber,
+    // required String globalSku,
+    // required String patientDisplayName,
+    // required String shortDescription,
+    // required String description,
+  }) async {
+    return await runSafely<bool>(() async {
+      if (state.treatmentIcon == null || state.treatmentImage == null) {
+        throw const UnknownException('Please Select Image & Icon');
+      }
+      final String? imageUrl = await MediaService().uploadImage(
+        'treatment/image/',
+        state.treatmentImage!,
+      );
+      if (imageUrl == null) {
+        throw const UnknownException('Failed to upload image');
+      }
+      final String? iconUrl = await MediaService().uploadImage(
+        'treatment/icon/',
+          state.treatmentIcon!,
+      );
+      if (iconUrl == null) {
+        throw const UnknownException('Failed to upload Icon');
+      }
+
+     final response =    await _treatmentRepository.createBasicInfo(
+        BasicInfoRequest(
+          stepNumber: stepNumber,
+          selectedCategoryIds: state.selectedCategoryPath,
+          patientDisplayName: displayNameController.text,
+          image: imageUrl,
+          shortDescription: shortDescriptionController.text,
+          description: fullDescriptionController.text,
+          globalSku: globalSkuController.text,
+          icon: iconUrl,
+        ),
+      );
+      if(response.isSuccess){
+        state = state.copyWith(draftTreatmentID: response.data?.id);
+      }
+      return true;
+    });
+  }
+
   void setRoles(List<String> roles) =>
       state = state.copyWith(selectedRoles: roles);
 
@@ -776,13 +826,38 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }
   }
 
+  List<int> _findPathToCategory(
+    List<CategoryModel> items,
+    int id,
+    List<int> currentPath,
+  ) {
+    for (final item in items) {
+      if (item.id == id) return [...currentPath, item.id];
+      if (item.subCategories.isNotEmpty) {
+        final path = _findPathToCategory(item.subCategories, id, [
+          ...currentPath,
+          item.id,
+        ]);
+        if (path.isNotEmpty) return path;
+      }
+    }
+    return [];
+  }
+
   Future<void> onCategorySelected(CategoryModel category, String path) async {
     categoryIdController.text = category.id.toString();
     categoryNameController.text = category.name;
     categoryPathController.text = path;
 
+    // Build the ID path to category recursively
+    final allCategories = ref.read(categoryViewModelProvider).categories;
+    final pathIds = _findPathToCategory(allCategories, category.id, []);
+
     // Clear previously loaded detail and reset defaults if category changes
-    state = state.copyWith(selectedCategoryDetail: null);
+    state = state.copyWith(
+      selectedCategoryDetail: null,
+      selectedCategoryPath: pathIds,
+    );
   }
 
   Future<bool> fetchAndPopulateCategoryDefaults(int categoryId) async {
@@ -2064,6 +2139,8 @@ class TreatmentState extends BaseStateModel {
   final List<TreatmentModel> filteredTreatments;
   final TreatmentModel? selectedTreatment;
   final int? selectedTreatmentId;
+
+  final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
   final int currentStep;
   final XFile? treatmentImage;
@@ -2140,6 +2217,7 @@ class TreatmentState extends BaseStateModel {
     this.standaloneNotes = const [],
     this.status = 'active',
     this.gender = 'both',
+    this.draftTreatmentID,
     this.preNotificationOffset,
     this.postNotificationOffset,
     this.preTreatmentAttachments = const [],
@@ -2188,6 +2266,7 @@ class TreatmentState extends BaseStateModel {
     int? currentStep,
     XFile? treatmentImage,
     XFile? treatmentIcon,
+    int? draftTreatmentID,
     List<AreaViewModelEntry>? areas,
     List<int>? selectedCategoryPath,
     List<String>? selectedProtocolIds,
@@ -2234,6 +2313,7 @@ class TreatmentState extends BaseStateModel {
       selectedCategoryDetail:
           selectedCategoryDetail ?? this.selectedCategoryDetail,
       loading: loading ?? this.loading,
+      draftTreatmentID: draftTreatmentID ?? this.draftTreatmentID,
       currentPage: currentPage ?? this.currentPage,
       totalPages: totalPages ?? this.totalPages,
       totalResults: totalResults ?? this.totalResults,

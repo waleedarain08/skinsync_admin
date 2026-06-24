@@ -5831,7 +5831,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     CategoryState categoryState,
   ) {
     final bool isLastStep = state.currentStep == 16;
-
     return Row(
       children: [
         if (state.currentStep > 0) ...[
@@ -5853,8 +5852,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   state,
                   viewModel,
                   categoryState,
-                ))
+                )) {
                   return;
+                }
               }
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
@@ -5873,7 +5873,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               }
 
               if (state.currentStep < 16) {
-                viewModel.setStep(state.currentStep + 1);
+                if (state.currentStep == 1) {
+                 final success = await viewModel.createBasicInfo(stepNumber: state.currentStep + 1);
+                 if(success ?? false){
+                   viewModel.setStep(state.currentStep + 1);
+                 }
+                }
+                else{
+                  viewModel.setStep(state.currentStep + 1);
+
+                }
               } else {
                 viewModel
                     .submitTreatment(
@@ -6082,6 +6091,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       );
       return false;
     }
+
     return true;
   }
 
