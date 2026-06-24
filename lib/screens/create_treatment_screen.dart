@@ -5250,12 +5250,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           style: context.fonts.grey14w400,
         ),
         context.verticalSpace(32),
-        _buildProductSelector(
-          context,
-          productState.products,
-          viewModel,
-          state,
-        ),
+        _buildProductSelector(context, productState.products, viewModel, state),
         if (state.productUsageEntries.isNotEmpty) ...[
           context.verticalSpace(32),
           ListView.separated(
@@ -5878,32 +5873,36 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 }
-              // TODO : remove this condition after complettion of api
+                // TODO : remove this condition after complettion of api
                 else {
-                 final success = await viewModel.createBasicInfo(stepNumber: state.currentStep + 1);
-                 if(success ?? false){
-                   viewModel.setStep(state.currentStep + 1);
-                 }
-                }
-                if (state.currentStep == 2) {
-                  final success = await viewModel.createTreatmentArea(stepNumber: state.currentStep + 1);
-                  if(success ?? false){
+                  final success = await viewModel.createBasicInfo(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 }
-                else{
+                if (state.currentStep == 2) {
+                  final success = await viewModel.createTreatmentArea(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else {
                   viewModel.setStep(state.currentStep + 1);
                 }
                 if (state.currentStep == 4) {
-                  final success = await viewModel.createSchedule(stepNumber: state.currentStep + 1);
-                  if(success ?? false){
+                  final success = await viewModel.createSchedule(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                else{
+                } else {
                   viewModel.setStep(state.currentStep + 1);
                 }
-                if (state.currentStep == 6)  {
+                if (state.currentStep == 6) {
                   final bytes = await ProtocolFormPreview.getPdfBytes(
                     state: state,
                     dataState: dataState,

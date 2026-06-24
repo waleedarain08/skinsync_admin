@@ -752,13 +752,14 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(totalSessions: count, sessions: updated);
   }
 
-  Future<bool?> createTreatmentArea({
-    required int stepNumber,
-  }) async {
+  Future<bool?> createTreatmentArea({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       await _treatmentRepository.createTreatmentArea(
-        TreatmentAreaRequest(stepNumber: stepNumber, selectedAreaIds: state.selectedTreatmentAreaIds),
-        state.draftTreatmentID!
+        TreatmentAreaRequest(
+          stepNumber: stepNumber,
+          selectedAreaIds: state.selectedTreatmentAreaIds,
+        ),
+        state.draftTreatmentID!,
       );
       log('Treatment Area Created : ${state.draftTreatmentID}');
 
@@ -766,30 +767,32 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     });
   }
 
-  Future<bool?> createSchedule({
-    required int stepNumber,
-  }) async {
+  Future<bool?> createSchedule({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       await _treatmentRepository.createSchedule(
         TreatmentScheduleRequest(
           stepNumber: stepNumber,
           baseDuration: int.parse(treatmentDurationController.text),
           productDurations: state.productUsageEntries
-              .map((e) => ProductDuration(
-            productId: e.productId,
-            perUnitDuration: double.tryParse(e.perUnitDurationController.text),
-          ))
+              .map(
+                (e) => ProductDuration(
+                  productId: e.productId,
+                  perUnitDuration: double.tryParse(
+                    e.perUnitDurationController.text,
+                  ),
+                ),
+              )
               .toList(),
           prepTime: state.prepTime,
-          cleanupTime:state.cleanupTime ,
-          allowClinicOverride : state.allowClinicOverride,
+          cleanupTime: state.cleanupTime,
+          allowClinicOverride: state.allowClinicOverride,
           allowProviderOverride: state.allowProviderOverride,
           onlineBookable: state.onlineBookable,
-          manualApprovalRequired : state.manualApprovalRequired,
+          manualApprovalRequired: state.manualApprovalRequired,
           minimumBookingNotice: state.minimumBookingNotice,
-          maximumDaysInAdvance:state.maximumDaysInAdvance,
+          maximumDaysInAdvance: state.maximumDaysInAdvance,
         ),
-        state.draftTreatmentID!
+        state.draftTreatmentID!,
       );
       log('Treatment Area Created : ${state.draftTreatmentID}');
 
@@ -846,9 +849,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(selectedRoles: current);
   }
 
-  Future<bool?> createBasicInfo({
-    required int stepNumber,
-  }) async {
+  Future<bool?> createBasicInfo({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       if (state.treatmentIcon == null || state.treatmentImage == null) {
         throw const UnknownException('Please Select Image & Icon');
@@ -880,7 +881,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           icon: iconUrl,
         ),
       );
-      if(response.isSuccess){
+      if (response.isSuccess) {
         log('Basic Info Created : ${response.data?.id}');
         state = state.copyWith(draftTreatmentID: response.data?.id);
       }
@@ -1473,10 +1474,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       ids.add(id);
     }
 
-    state = state.copyWith(
-      selectedTreatmentAreaIds: ids,
-    );
+    state = state.copyWith(selectedTreatmentAreaIds: ids);
   }
+
   List<TreatmentModel> _getFilteredList(List<TreatmentModel> source) {
     final query = searchController.text.toLowerCase();
     final categoryPath = filterCategoryController.text.toLowerCase();
@@ -2239,7 +2239,6 @@ class TreatmentState extends BaseStateModel {
   final TreatmentModel? selectedTreatment;
   final int? selectedTreatmentId;
 
-
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
   final int currentStep;
@@ -2485,7 +2484,7 @@ class TreatmentState extends BaseStateModel {
       minimumBookingNotice: minimumBookingNotice ?? this.minimumBookingNotice,
       maximumDaysInAdvance: maximumDaysInAdvance ?? this.maximumDaysInAdvance,
       selectedTreatmentAreaIds:
-      selectedTreatmentAreaIds ?? this.selectedTreatmentAreaIds,
+          selectedTreatmentAreaIds ?? this.selectedTreatmentAreaIds,
     );
   }
 }

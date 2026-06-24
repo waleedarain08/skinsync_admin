@@ -18,12 +18,17 @@ abstract class TreatmentRepository {
   // Future<bool> deleteTreatment(int treatmentId);
 
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request);
-    Future<BaseApiResponseModel> protocol({required ProtocolRequest request,required int draftID});
+  Future<BaseApiResponseModel> protocol({
+    required ProtocolRequest request,
+    required int draftID,
+  });
 
-
-
-  Future<BaseApiResponseModel> createTreatmentArea(TreatmentAreaRequest request, int id);
-  Future<BaseApiResponseModel> createSchedule(TreatmentScheduleRequest request, int id);
-
-
+  Future<BaseApiResponseModel> createTreatmentArea(
+    TreatmentAreaRequest request,
+    int id,
+  );
+  Future<BaseApiResponseModel> createSchedule(
+    TreatmentScheduleRequest request,
+    int id,
+  );
 }

@@ -1,7 +1,6 @@
 import 'package:skinsync_admin/models/requests/protocol_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
-
 import '../models/requests/treatment_area_request.dart';
 import '../models/requests/treatment_schedule_request.dart';
 import '../models/responses/base_response_model.dart';
@@ -18,17 +17,13 @@ class TreatmentServices implements TreatmentRepository {
 
   TreatmentServices({required ApiBaseHelper api}) : _api = api;
 
-
   @override
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request) async {
     final jsonResponse = await _api.post(
       Endpoint.basicInfo,
       body: request.toJson(),
     );
-    final response = BasicInfoResponse.fromJson(
-      jsonResponse,
-
-    );
+    final response = BasicInfoResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -36,35 +31,37 @@ class TreatmentServices implements TreatmentRepository {
     return response;
   }
 
-
   @override
-  Future<BaseApiResponseModel> createTreatmentArea(TreatmentAreaRequest request, int id) async {
+  Future<BaseApiResponseModel> createTreatmentArea(
+    TreatmentAreaRequest request,
+    int id,
+  ) async {
     final jsonResponse = await _api.patch(
       Endpoint.treatmentArea,
       body: request.toJson(),
       queryParams: {'treatment_id': id.toString()},
     );
 
-    final response = BaseApiResponseModel.fromJson(
-      jsonResponse,
-    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response;
   }
+
   @override
-  Future<BaseApiResponseModel> createSchedule(TreatmentScheduleRequest request, int id) async {
+  Future<BaseApiResponseModel> createSchedule(
+    TreatmentScheduleRequest request,
+    int id,
+  ) async {
     final jsonResponse = await _api.patch(
       Endpoint.treatmentArea,
       body: request.toJson(),
       queryParams: {'treatment_id': id.toString()},
     );
 
-    final response = BaseApiResponseModel.fromJson(
-      jsonResponse,
-    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -72,13 +69,16 @@ class TreatmentServices implements TreatmentRepository {
     return response;
   }
 
-   @override
-  Future<BaseApiResponseModel> protocol({required ProtocolRequest request , required int draftID })async {
+  @override
+  Future<BaseApiResponseModel> protocol({
+    required ProtocolRequest request,
+    required int draftID,
+  }) async {
     final jsonResponse = await _api.patch(
       Endpoint.protocol,
 
       body: request,
-      queryParams: {'treatment_id' : draftID.toString()}
+      queryParams: {'treatment_id': draftID.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
