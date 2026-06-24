@@ -29,6 +29,7 @@ import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_category_selector.dart';
 import 'create_product_screen.dart';
+import 'product_detail_screen.dart';
 
 class CreateTreatmentScreen extends ConsumerStatefulWidget {
   const CreateTreatmentScreen({super.key});
@@ -5378,15 +5379,50 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(entry.productName, style: context.fonts.black14w700),
-                  Text(
-                    'Unit of Measure: ${entry.unit}',
-                    style: context.fonts.grey12w400,
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            entry.productName,
+                            style: context.fonts.black14w700,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        context.horizontalSpace(8),
+                        IconButton(
+                          tooltip: 'View Product Details',
+                          icon: const Icon(
+                            Icons.visibility_outlined,
+                            color: CustomColors.purple,
+                            size: 18,
+                          ),
+                          onPressed: () async {
+                            try {
+                              await ref
+                                  .read(productViewModelProvider.notifier)
+                                  .fetchProductDetail(entry.productId);
+                              if (context.mounted) {
+                                context.push(ProductDetailScreen.routeName);
+                              }
+                            } catch (e) {
+                              // Handled gracefully inside view model
+                            }
+                          },
+                          constraints: const BoxConstraints(),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'Unit of Measure: ${entry.unit}',
+                      style: context.fonts.grey12w400,
+                    ),
+                  ],
+                ),
               ),
               IconButton(
                 onPressed: () => viewModel.removeProductUsage(entry.productId),
