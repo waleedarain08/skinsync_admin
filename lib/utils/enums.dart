@@ -45,6 +45,7 @@ enum Endpoint {
   unitTypesList('admin/unit-types'),
   packageTypeList('admin/package-types'),
   usageType('admin/usage-types'),
+  treatmentArea('admin/treatments/step'),
 
   manufacturersList('admin/manufacturers');
 

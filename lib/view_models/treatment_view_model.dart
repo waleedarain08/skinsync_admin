@@ -1,10 +1,12 @@
+import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
 import '../models/notification_entry.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
@@ -713,6 +715,51 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(totalSessions: count, sessions: updated);
   }
 
+  Future<bool?> createTreatmentArea({
+    required int stepNumber,
+  }) async {
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.createTreatmentArea(
+        TreatmentAreaRequest(stepNumber: stepNumber, selectedAreaIds: state.selectedTreatmentAreaIds),
+        state.draftTreatmentID!
+      );
+      log('Treatment Area Created : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
+  Future<bool?> createSchedule({
+    required int stepNumber,
+  }) async {
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.createSchedule(
+        TreatmentScheduleRequest(
+          stepNumber: stepNumber,
+          baseDuration: int.parse(treatmentDurationController.text),
+          productDurations: state.productUsageEntries
+              .map((e) => ProductDuration(
+            productId: e.productId,
+            perUnitDuration: double.tryParse(e.perUnitDurationController.text),
+          ))
+              .toList(),
+          prepTime: state.prepTime,
+          cleanupTime:state.cleanupTime ,
+          allowClinicOverride : state.allowClinicOverride,
+          allowProviderOverride: state.allowProviderOverride,
+          onlineBookable: state.onlineBookable,
+          manualApprovalRequired : state.manualApprovalRequired,
+          minimumBookingNotice: state.minimumBookingNotice,
+          maximumDaysInAdvance:state.maximumDaysInAdvance,
+        ),
+        state.draftTreatmentID!
+      );
+      log('Treatment Area Created : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
   void updateSessionFollowUpCount(int sessionIndex, String val) {
     final count = int.tryParse(val) ?? 0;
     final session = state.sessions[sessionIndex];
@@ -765,10 +812,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   Future<bool?> createBasicInfo({
     required int stepNumber,
-    // required String globalSku,
-    // required String patientDisplayName,
-    // required String shortDescription,
-    // required String description,
   }) async {
     return await runSafely<bool>(() async {
       if (state.treatmentIcon == null || state.treatmentImage == null) {
@@ -802,6 +845,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         ),
       );
       if(response.isSuccess){
+        log('Basic Info Created : ${response.data?.id}');
         state = state.copyWith(draftTreatmentID: response.data?.id);
       }
       return true;
@@ -1378,7 +1422,25 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       filteredTreatments: _getFilteredList(_localTreatments),
     );
   }
+  // void setSelectedTreatmentAreaIds(int ids) {
+  //   state = state.copyWith(
+  //     selectedTreatmentAreaIds: ids,
+  //   );
+  // }
 
+  void setSelectedTreatmentAreaIds(int id) {
+    log('Selected Treatment Area ID: $id');
+    final ids = [...state.selectedTreatmentAreaIds];
+    if (ids.contains(id)) {
+      ids.remove(id);
+    } else {
+      ids.add(id);
+    }
+
+    state = state.copyWith(
+      selectedTreatmentAreaIds: ids,
+    );
+  }
   List<TreatmentModel> _getFilteredList(List<TreatmentModel> source) {
     final query = searchController.text.toLowerCase();
     final categoryPath = filterCategoryController.text.toLowerCase();
@@ -2140,6 +2202,7 @@ class TreatmentState extends BaseStateModel {
   final TreatmentModel? selectedTreatment;
   final int? selectedTreatmentId;
 
+
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
   final int currentStep;
@@ -2197,6 +2260,7 @@ class TreatmentState extends BaseStateModel {
   final bool manualApprovalRequired;
   final int minimumBookingNotice;
   final int maximumDaysInAdvance;
+  final List<int> selectedTreatmentAreaIds;
 
   TreatmentState({
     super.loading,
@@ -2252,6 +2316,7 @@ class TreatmentState extends BaseStateModel {
     this.minimumBookingNotice = 24,
     this.maximumDaysInAdvance = 90,
     List<AreaViewModelEntry>? areas,
+    this.selectedTreatmentAreaIds = const [],
   }) : areas = areas ?? [AreaViewModelEntry()];
 
   TreatmentState copyWith({
@@ -2308,6 +2373,7 @@ class TreatmentState extends BaseStateModel {
     int? minimumBookingNotice,
     int? maximumDaysInAdvance,
     CategoryDetailDto? selectedCategoryDetail,
+    List<int>? selectedTreatmentAreaIds,
   }) {
     return TreatmentState(
       selectedCategoryDetail:
@@ -2381,6 +2447,8 @@ class TreatmentState extends BaseStateModel {
           manualApprovalRequired ?? this.manualApprovalRequired,
       minimumBookingNotice: minimumBookingNotice ?? this.minimumBookingNotice,
       maximumDaysInAdvance: maximumDaysInAdvance ?? this.maximumDaysInAdvance,
+      selectedTreatmentAreaIds:
+      selectedTreatmentAreaIds ?? this.selectedTreatmentAreaIds,
     );
   }
 }

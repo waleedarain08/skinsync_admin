@@ -5852,9 +5852,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   state,
                   viewModel,
                   categoryState,
-                )) {
+                ))
                   return;
-                }
               }
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
@@ -5879,9 +5878,23 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                    viewModel.setStep(state.currentStep + 1);
                  }
                 }
+                if (state.currentStep == 2) {
+                  final success = await viewModel.createTreatmentArea(stepNumber: state.currentStep + 1);
+                  if(success ?? false){
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                }
                 else{
                   viewModel.setStep(state.currentStep + 1);
-
+                }
+                if (state.currentStep == 4) {
+                  final success = await viewModel.createSchedule(stepNumber: state.currentStep + 1);
+                  if(success ?? false){
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                }
+                else{
+                  viewModel.setStep(state.currentStep + 1);
                 }
               } else {
                 viewModel
@@ -6091,7 +6104,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       );
       return false;
     }
-
     return true;
   }
 
@@ -6590,6 +6602,10 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                       : null;
                 });
                 widget.onAreaToggle(area);
+
+                ref
+                    .read(treatmentViewModelProvider.notifier)
+                    .setSelectedTreatmentAreaIds(area.id);
               },
               onAddChild: () {
                 _showAddNodeDialog(
@@ -6667,6 +6683,10 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                     _focusedSubAreaName = subArea.name;
                   });
                   widget.onSubAreaToggle(focusedArea, subArea);
+
+                  ref
+                      .read(treatmentViewModelProvider.notifier)
+                      .setSelectedTreatmentAreaIds(subArea.id);
                 },
                 onAddChild: () {
                   _showAddNodeDialog(
@@ -6749,6 +6769,10 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                     focusedSubArea,
                     child,
                   );
+
+                  ref
+                      .read(treatmentViewModelProvider.notifier)
+                      .setSelectedTreatmentAreaIds(child.id);
                 },
                 onAddChild: () {
                   ScaffoldMessenger.of(context).showSnackBar(

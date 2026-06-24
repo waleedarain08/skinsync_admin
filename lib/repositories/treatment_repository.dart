@@ -1,3 +1,8 @@
+import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
+
+import '../models/requests/treatment_schedule_request.dart';
+import '../models/responses/base_response_model.dart';
+
 import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 
 import '../models/requests/basic_info_request.dart';
@@ -11,5 +16,10 @@ abstract class TreatmentRepository {
   // Future<bool> deleteTreatment(int treatmentId);
 
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request);
+
+
+  Future<BaseApiResponseModel> createTreatmentArea(TreatmentAreaRequest request, int id);
+  Future<BaseApiResponseModel> createSchedule(TreatmentScheduleRequest request, int id);
+
 
 }

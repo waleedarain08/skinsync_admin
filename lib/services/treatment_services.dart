@@ -1,3 +1,7 @@
+
+import '../models/requests/treatment_area_request.dart';
+import '../models/requests/treatment_schedule_request.dart';
+import '../models/responses/base_response_model.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/basic_info_response.dart';
 import '../repositories/treatment_repository.dart';
@@ -21,6 +25,42 @@ class TreatmentServices implements TreatmentRepository {
     final response = BasicInfoResponse.fromJson(
       jsonResponse,
 
+    );
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+
+  @override
+  Future<BaseApiResponseModel> createTreatmentArea(TreatmentAreaRequest request, int id) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+      body: request.toJson(),
+      queryParams: {'treatment_id': id.toString()},
+    );
+
+    final response = BaseApiResponseModel.fromJson(
+      jsonResponse,
+    );
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+  @override
+  Future<BaseApiResponseModel> createSchedule(TreatmentScheduleRequest request, int id) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+      body: request.toJson(),
+      queryParams: {'treatment_id': id.toString()},
+    );
+
+    final response = BaseApiResponseModel.fromJson(
+      jsonResponse,
     );
 
     if (!response.isSuccess) {

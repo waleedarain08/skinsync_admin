@@ -103,17 +103,19 @@ class ApiBaseHelper {
     });
   }
 
-  Future<dynamic> patch(
-    Endpoint endpoint, {
-    Object? body,
-    Map<String, String>? pathParams,
-  }) {
-    final urlPath = pathParams != null
-        ? endpoint.withParams(pathParams)
-        : endpoint.path;
-
-    final uri = Uri.parse('${baseUrl.url}$urlPath');
+  Future<dynamic> patch(Endpoint endpoint, {Object? body, Map<String, String>? pathParams,
+    Map<String, String>? queryParams,}
+      ) {
     return _safeRequest(() async {
+      final urlPath = pathParams != null
+          ? endpoint.withParams(pathParams)
+          : endpoint.path;
+
+      final uri = Uri.parse(
+        '${baseUrl.url}$urlPath',
+      ).replace(queryParameters: queryParams);
+      log('URL: ${baseUrl.url}${endpoint.path}');
+      log('REQUEST: $body');
       final response = await _client.patch(
         uri,
         headers: await _headers(),
