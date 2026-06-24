@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
+import 'package:skinsync_admin/widgets/protocol_preview_widget.dart';
 import '../models/notification_entry.dart';
 import '../models/notification_model.dart';
 import '../models/product_model.dart';
@@ -1050,7 +1051,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     String postSummary = 'Not configured';
     if (isPostCategory) {
       postSummary = (selectedCategory?.postNotifications?.isNotEmpty ?? false)
-          ? '${selectedCategory?.postNotifications?.length } Category Defaults'
+          ? '${selectedCategory?.postNotifications?.length} Category Defaults'
           : 'Category Default';
     } else {
       postSummary =
@@ -5249,12 +5250,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           style: context.fonts.grey14w400,
         ),
         context.verticalSpace(32),
-        _buildProductSelector(
-          context,
-          productState.products,
-          viewModel,
-          state,
-        ),
+        _buildProductSelector(context, productState.products, viewModel, state),
         if (state.productUsageEntries.isNotEmpty) ...[
           context.verticalSpace(32),
           ListView.separated(
@@ -5450,10 +5446,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 child: Text('Post Confirmation'),
               ),
             ],
-            onChanged: (val) => viewModel.updateProductUsageEntry(
-              index,
-              deductionTiming: val,
-            ),
+            onChanged: (val) =>
+                viewModel.updateProductUsageEntry(index, deductionTiming: val),
           ),
           context.verticalSpace(20),
           Row(
@@ -5873,14 +5867,31 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
 
               if (state.currentStep < 16) {
                 if (state.currentStep == 1) {
-                 final success = await viewModel.createBasicInfo(stepNumber: state.currentStep + 1);
-                 if(success ?? false){
-                   viewModel.setStep(state.currentStep + 1);
-                 }
-                }
-                else{
+                  final success = await viewModel.createBasicInfo(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } 
+              // TODO : remove this condition after complettion of api
+                else {
                   viewModel.setStep(state.currentStep + 1);
+                }
+                if (state.currentStep == 6)  {
+                  final bytes = await ProtocolFormPreview.getPdfBytes(
+                    state: state,
+                    dataState: dataState,
+                    categoryState: categoryState,
+                  );
 
+                  final success = await viewModel.callProtocol(
+                    bytes: bytes,
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
                 }
               } else {
                 viewModel
@@ -6594,14 +6605,14 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 _showAddNodeDialog(
                   context: context,
                   title: 'Create New Sub-Area in ${area.name}',
-                  onAdd: (name, sku, icon) =>widget.onAddSubArea(
-                      // TODO: Add actual parent area id.
-                      parentAreaId: area.id,
-                      parentAreaName: area.name,
-                      name: name,
-                      sku: sku,
-                      icon: icon,
-                    ),
+                  onAdd: (name, sku, icon) => widget.onAddSubArea(
+                    // TODO: Add actual parent area id.
+                    parentAreaId: area.id,
+                    parentAreaName: area.name,
+                    name: name,
+                    sku: sku,
+                    icon: icon,
+                  ),
                 );
               },
             );

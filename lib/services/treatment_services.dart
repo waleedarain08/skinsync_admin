@@ -1,3 +1,6 @@
+import 'package:skinsync_admin/models/requests/protocol_request.dart';
+import 'package:skinsync_admin/models/responses/base_response_model.dart';
+
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/basic_info_response.dart';
 import '../repositories/treatment_repository.dart';
@@ -26,6 +29,23 @@ class TreatmentServices implements TreatmentRepository {
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
+    return response;
+  }
+
+   @override
+  Future<BaseApiResponseModel> protocol({required ProtocolRequest request , required int draftID })async {
+    final jsonResponse = await _api.patch(
+      Endpoint.protocol,
+      
+      body: request,
+      queryParams: {'treatment_id' : draftID.toString()}
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+
     return response;
   }
 
