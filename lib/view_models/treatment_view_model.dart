@@ -6,19 +6,26 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/business_logic_request.dart';
+import 'package:skinsync_admin/models/requests/constent_form_selection_request.dart';
+import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/follow_up_request.dart';
+import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
 import 'package:skinsync_admin/models/requests/protocol_request.dart';
+import 'package:skinsync_admin/models/requests/sessions_setup_request.dart';
 import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 
 import '../models/notification_entry.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
-import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
@@ -235,6 +242,40 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         throw const UnknownException('Failed to upload');
       },
     );
+  }
+
+  Future<bool?> callConsentFormSelection({required int stepNumber}) async {
+    final request = ConsentFormSelectionRequest(
+      stepNumber: stepNumber,
+      preTreatmentConsentForm: state.preTreatmentConsentForm != null
+          ? PreTreatmentConsentForm(
+              name: state.preTreatmentConsentForm!.name,
+              url: state.consentFormUrl,
+            )
+          : null,
+    );
+
+    log('''
+=========== CONSENT FORM SELECTION REQUEST ===========
+Draft ID             : ${state.draftTreatmentID}
+Step No              : $stepNumber
+Consent Type         : ${state.consentType}
+Consent Form         : ${state.preTreatmentConsentForm?.name}
+Body                 : ${request.toJson()}
+======================================================
+''');
+
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.consentFormSelection(
+        // ← correct endpoint
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
+
+      log('Step Consent Form Selection Saved : ${state.draftTreatmentID}');
+
+      return true;
+    });
   }
 
   void resetForm() {
@@ -843,6 +884,75 @@ Body       : ${request.toJson()}
     });
   }
 
+  Future<bool?> callDownTimeLevels({required int stepNumber}) async {
+    // Resolve the actual days from the selected level + category presets
+    final presets = state.selectedCategoryDetail?.downtimePresets;
+    final level = state.downtimeLevel;
+
+    final int? downtimeDays = switch (level) {
+      'None' => presets?.none ?? 0,
+      'Low' => presets?.low ?? 2,
+      'Moderate' => presets?.moderate ?? 5,
+      'High' => presets?.high ?? 10,
+      _ => null,
+    };
+
+    final request = DownTimeLevelRequest(
+      stepNumber: stepNumber,
+      downtimeLevel: level,
+      downtimeDays: downtimeDays,
+    );
+
+    log('''
+=========== DOWNTIME LEVEL REQUEST ===========
+Draft ID      : ${state.draftTreatmentID}
+Step No       : $stepNumber
+Downtime Level: $level
+Downtime Days : $downtimeDays
+Body          : ${request.toJson()}
+=============================================
+''');
+
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.downTimeLevels(
+        // ← correct endpoint
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
+
+      log('Step Downtime Saved : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
+  Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
+    final request = AllowedProviderRolesRequest(
+      stepNumber: stepNumber,
+      allowedRoles: state.selectedRoles, // ← matches state field from UI
+    );
+
+    log('''
+=========== ALLOWED PROVIDER ROLES REQUEST ===========
+Draft ID             : ${state.draftTreatmentID}
+Step No              : $stepNumber
+Allowed Roles        : ${state.selectedRoles.join(', ')}
+Body                 : ${request.toJson()}
+======================================================
+''');
+
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.allowedProviderRoles(
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
+
+      log('Step Allowed Provider Roles Saved : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
   Future<bool?> callPreTreatmentInstructions({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       final attachments = state.existingPreAttachments
@@ -925,6 +1035,105 @@ Body       : ${request.toJson()}
         draftTreatmentId: treatmentId,
         requirePostPhotos: state.requirePostTreatmentPhotos,
         count: state.requiredPostTreatmentPhotoCount,
+      );
+      return true;
+    });
+  }
+
+  Future<bool?> callPhaseNotifications() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.phaseNotifications(
+        draftTreatmentId: treatmentId,
+        request: PhaseNotificationsRequest(
+          preNotifications: state.preNotificationEntries.map((entry) {
+            return NotificationRequest(
+              message: entry.messageController.text,
+              timing: int.tryParse(entry.timingValueController.text),
+              timingUnit: entry.timingUnit,
+              title: entry.titleController.text,
+              type: entry.type,
+            );
+          }).toList(),
+          postNotifications: state.postNotificationEntries.map((entry) {
+            return NotificationRequest(
+              message: entry.messageController.text,
+              timing: int.tryParse(entry.timingValueController.text),
+              timingUnit: entry.timingUnit,
+              title: entry.titleController.text,
+              type: entry.type,
+            );
+          }).toList(),
+        ),
+      );
+      return true;
+    });
+  }
+
+  Future<bool?> callSessionsSetup() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.sessionsSetup(
+        draftTreatmentId: treatmentId,
+        request: SessionsSetupRequest(totalSessions: state.totalSessions),
+      );
+      return true;
+    });
+  }
+
+  Future<bool?> callFollowUpConfig() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.followUpConfig(
+        draftTreatmentId: treatmentId,
+        request: FollowUpRequest(
+          sessions: state.sessions.map((session) {
+            return Session(
+              sessionNumber: session.sessionNumber,
+              followUps: session.followUps.map((followUp) {
+                return FollowUp(
+                  type: followUp.type,
+                  durationValue: num.parse(
+                    followUp.durationValueController.text,
+                  ),
+                  durationUnit: followUp.durationUnit,
+                  intervalValue: num.parse(
+                    followUp.intervalValueController.text,
+                  ),
+                  intervalUnit: followUp.intervalUnit,
+                  isImageRequired: followUp.isImageRequired,
+                  notes: followUp.notesController.text,
+                );
+              }).toList(),
+            );
+          }).toList(),
+        ),
+      );
+      return true;
+    });
+  }
+
+  Future<bool?> callBusinessLogic() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.businessLogic(
+        draftTreatmentId: treatmentId,
+        request: BusinessLogicRequest(
+          enableByDefault: state.enableByDefault,
+          useInAiSimulator: state.useInAiSimulator,
+        ),
       );
       return true;
     });
@@ -1134,10 +1343,7 @@ Body       : ${request.toJson()}
         );
       }
     } catch (e) {
-      state = state.copyWith(
-        isLoadingProducts: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingProducts: false, error: e.toString());
     }
   }
 
@@ -1602,10 +1808,23 @@ Body       : ${request.toJson()}
     final FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
+      withData: true,
     );
 
     if (result != null && result.files.isNotEmpty) {
-      state = state.copyWith(preTreatmentConsentForm: result.files.first);
+      final file = result.files.first;
+
+      final String? url = await MediaService().uploadMedia(
+        path: 'treatment',
+        file: file,
+      );
+
+      if (url != null) {
+        state = state.copyWith(
+          preTreatmentConsentForm: file, // store PlatformFile
+          consentFormUrl: url, // store uploaded URL separately
+        );
+      }
     }
   }
 
@@ -2580,6 +2799,7 @@ class TreatmentState extends BaseStateModel {
   final int minimumBookingNotice;
   final int maximumDaysInAdvance;
   final List<int> selectedTreatmentAreaIds;
+  final String? consentFormUrl;
 
   TreatmentState({
     super.loading,
@@ -2639,6 +2859,7 @@ class TreatmentState extends BaseStateModel {
     this.isLoadingProducts = false,
     this.products = const [],
     this.error,
+    this.consentFormUrl,
   }) : areas = areas ?? [AreaViewModelEntry()];
 
   TreatmentState copyWith({
@@ -2699,6 +2920,7 @@ class TreatmentState extends BaseStateModel {
     bool? isLoadingProducts,
     List<TreatmentProductData>? products,
     String? error,
+    String? consentFormUrl,
   }) {
     return TreatmentState(
       selectedCategoryDetail:
@@ -2777,6 +2999,7 @@ class TreatmentState extends BaseStateModel {
       isLoadingProducts: isLoadingProducts ?? this.isLoadingProducts,
       products: products ?? this.products,
       error: error ?? this.error,
+      consentFormUrl: consentFormUrl ?? this.consentFormUrl,
     );
   }
 }

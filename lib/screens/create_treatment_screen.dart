@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -5423,7 +5424,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   ),
                   context.verticalSpace(12),
                   TextButton(
-                    onPressed: () => viewModel.fetchProductsByTreatmentCategory(),
+                    onPressed: () =>
+                        viewModel.fetchProductsByTreatmentCategory(),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -5496,10 +5498,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             return filtered
                 .map(
                   (p) => ListTile(
-                    title: Text(
-                      p.name,
-                      style: context.fonts.black14w600,
-                    ),
+                    title: Text(p.name, style: context.fonts.black14w600),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -5553,7 +5552,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       return '${unit}s';
     }
 
-    final TreatmentProductData? productData = state.products.any((p) => p.id == entry.productId)
+    final TreatmentProductData? productData =
+        state.products.any((p) => p.id == entry.productId)
         ? state.products.firstWhere((p) => p.id == entry.productId)
         : null;
 
@@ -5676,11 +5676,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                         ),
                         context.horizontalSpace(12),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: badgeColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: badgeColor.withOpacity(0.2)),
+                            border: Border.all(
+                              color: badgeColor.withOpacity(0.2),
+                            ),
                           ),
                           child: Text(
                             statusLabel,
@@ -6117,14 +6122,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           flex: 2,
           child: CustomPrimaryButton(
             onTap: () async {
+              log('CURRENT STEP: ${state.currentStep}');
               if (state.currentStep == 0) {
                 if (!await _validateAndFetchCategory(
                   context,
                   state,
                   viewModel,
                   categoryState,
-                ))
+                )) {
                   return;
+                }
               }
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
@@ -6141,51 +6148,56 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               if (state.currentStep == 9) {
                 if (!_validatePostPhotos(context, state)) return;
               }
+              if (state.currentStep == 10) {
+                if (!_validatePhaseNotifications(context, state)) {
+                  return;
+                }
+              }
+              if (state.currentStep == 14) {
+                if (!_validateFollowUps(context, state)) {
+                  return;
+                }
+              }
 
               if (state.currentStep < 16) {
-                if (state.currentStep == 1) {
+                if (state.currentStep == 0) {
+                  viewModel.setStep(state.currentStep + 1);
+                } else if (state.currentStep == 1) {
                   final success = await viewModel.createBasicInfo(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-
-                if (state.currentStep == 2) {
+                } else if (state.currentStep == 2) {
                   final success = await viewModel.createTreatmentArea(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 3) {
+                } else if (state.currentStep == 3) {
                   final success = await viewModel.callProductUsage(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 4) {
+                } else if (state.currentStep == 4) {
                   final success = await viewModel.createSchedule(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 5) {
+                } else if (state.currentStep == 5) {
                   final success = await viewModel.callStepPricing(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-
-                if (state.currentStep == 6) {
+                } else if (state.currentStep == 6) {
                   final bytes = await ProtocolFormPreview.getPdfBytes(
                     state: state,
                     dataState: dataState,
@@ -6199,16 +6211,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 7) {
+                } else if (state.currentStep == 7) {
                   final success = await viewModel.callPreTreatmentInstructions(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 8) {
+                } else if (state.currentStep == 8) {
                   final success = await viewModel.callPostTreatmentInstructions(
                     stepNumber: state.currentStep + 1,
                   );
@@ -6220,11 +6230,52 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(10);
                   }
+                } else if (state.currentStep == 10) {
+                  final success = await viewModel.callPhaseNotifications();
+                  if (success ?? false) {
+                    viewModel.setStep(11);
+                  }
+                } else if (state.currentStep == 11) {
+                  final success = await viewModel.callDownTimeLevels(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(12);
+                  }
+                } else if (state.currentStep == 12) {
+                  final success = await viewModel.callAllowedProviderRoles(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 13) {
+                  final success = await viewModel.callSessionsSetup();
+                  if (success ?? false) {
+                    viewModel.setStep(14);
+                  }
+                } else if (state.currentStep == 14) {
+                  final success = await viewModel.callFollowUpConfig();
+                  if (success ?? false) {
+                    viewModel.setStep(15);
+                  }
+                } else if (state.currentStep == 15) {
+                  final success = await viewModel.callConsentFormSelection(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(16);
+                  }
+                } else if (state.currentStep == 16) {
+                  final success = await viewModel.callBusinessLogic();
+                  if (success ?? false) {
+                    viewModel.setStep(17);
+                  }
                 }
-                // TODO : this is only for now to go on forward step have to remove once stepper API are completed
-                else {
-                  viewModel.setStep(state.currentStep + 1);
-                }
+                // // TODO : this is only for now to go on forward step have to remove once stepper API are completed
+                // else {
+                //   viewModel.setStep(state.currentStep + 1);
+                // }
               } else {
                 viewModel
                     .submitTreatment(
@@ -6475,6 +6526,85 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           ),
         );
         return false;
+      }
+    }
+    return true;
+  }
+
+  bool _validatePhaseNotifications(BuildContext context, TreatmentState state) {
+    log(
+      'NOTIFICATION: ${state.preNotificationEntries.length} ${state.postNotificationEntries.length}',
+    );
+    if (state.preNotificationEntries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Should have at least one notification in Pre-Notifications',
+          ),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    } else if (state.postNotificationEntries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Should have at least one notification in Post-Notifications',
+          ),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+    for (final entry in [
+      ...state.postNotificationEntries,
+      ...state.preNotificationEntries,
+    ]) {
+      if (entry.type.isEmpty ||
+          entry.titleController.text.isEmpty ||
+          entry.timingUnit.isEmpty ||
+          entry.timingValueController.text.isEmpty ||
+          entry.messageController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Make sure each notification in both categories are valid!',
+            ),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool _validateFollowUps(BuildContext context, TreatmentState state) {
+    for (final session in state.sessions) {
+      if (session.totalFollowUpsController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Total Follow Up number is required!'),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+      for (final followUp in session.followUps) {
+        if (followUp.notesController.text.isEmpty ||
+            followUp.intervalUnit.isEmpty ||
+            followUp.intervalValueController.text.isEmpty ||
+            followUp.durationValueController.text.isEmpty ||
+            followUp.type.isEmpty ||
+            followUp.durationUnit.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ensure that each follow up is valid!'),
+              backgroundColor: CustomColors.red,
+            ),
+          );
+          return false;
+        }
       }
     }
     return true;
