@@ -10,6 +10,7 @@ import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import '../widgets/build_textfield.dart';
+import '../widgets/app_network_image.dart';
 import '../widgets/dailogbox/product_dailogboxs.dart';
 import '../widgets/select_or_create_dropdown_widget.dart';
 
@@ -224,27 +225,14 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
             child: state.uploadingImage
                 ? const Center(child: CircularProgressIndicator())
                 : image != null && image.isNotEmpty
-                ? ClipRRect(
+                ? AppNetworkImage(
+                    imageUrl: image,
+                    width: 140.w,
+                    height: 140.w,
+                    fit: BoxFit.cover,
                     borderRadius: BorderRadius.circular(12),
-
-                    child: Image.network(
-                      image,
-                      fit: BoxFit.cover,
-
-                      loadingBuilder: (context, child, progress) {
-                        if (progress == null) {
-                          return child;
-                        }
-
-                        return const Center(child: CircularProgressIndicator());
-                      },
-
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child: Icon(Icons.broken_image_outlined, size: 40),
-                        );
-                      },
-                    ),
+                    errorIcon: Icons.broken_image_outlined,
+                    errorIconSize: 40,
                   )
                 : const Center(child: Icon(Icons.add_a_photo)),
           ),

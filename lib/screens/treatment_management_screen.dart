@@ -6,6 +6,7 @@ import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 
 import '../../widgets/custom_dropdown_widget.dart';
+import '../../widgets/app_network_image.dart';
 import '../utils/theme.dart';
 import '../view_models/treatment_view_model.dart';
 import '../widgets/app_search_field.dart';
@@ -435,15 +436,12 @@ class _TreatmentManagementScreenState
               border: Border.all(color: CustomColors.border),
             ),
             child: (displayImage != null && displayImage.isNotEmpty)
-                ? ClipRRect(
+                ? AppNetworkImage(
+                    imageUrl: displayImage,
+                    width: 48.w,
+                    height: 48.w,
+                    fit: BoxFit.cover,
                     borderRadius: BorderRadius.circular(8.r),
-                    child: Image.network(
-                      displayImage,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Center(
-                        child: Icon(Icons.broken_image_outlined, color: CustomColors.grey),
-                      ),
-                    ),
                   )
                 : const Center(
                     child: Icon(Icons.image_outlined, color: CustomColors.grey),
