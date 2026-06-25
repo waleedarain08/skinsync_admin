@@ -1,3 +1,4 @@
+import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
@@ -63,6 +64,10 @@ abstract class TreatmentRepository {
 
    Future<BaseApiResponseModel> downTimeLevels({
     required DownTimeLevelRequest request,
+    required int draftTreatmentID,
+  });
+  Future<BaseApiResponseModel> allowedProviderRoles({
+    required AllowedProviderRolesRequest request,
     required int draftTreatmentID,
   });
 
