@@ -159,18 +159,40 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     await getTreatments();
   }
 
-  Future<bool> getTreatments({int page = 1}) async {
+  Future<bool> getTreatments({int page = 1, String search = '', int limit = 10}) async {
     return await runSafely<bool?>(showLoading: false, () async {
           state = state.copyWith(loading: true, currentPage: page);
-          await Future.delayed(const Duration(milliseconds: 500));
-          state = state.copyWith(
-            treatments: List.from(_localTreatments),
-            filteredTreatments: _getFilteredList(_localTreatments),
-            loading: false,
-            totalPages: 1,
-            totalResults: _localTreatments.length,
-          );
-          return true;
+          try {
+            final response = await _treatmentRepository.getTreatments(
+              page: page,
+              limit: limit,
+              search: search,
+            );
+            final list = (response.data ?? []).map((dto) {
+              return TreatmentModel(
+                id: dto.id,
+                name: dto.name,
+                shortDescription: dto.shortDescription,
+                globalSku: dto.globalSku,
+                icon: dto.icon,
+                image: dto.image,
+                status: dto.status ?? 'active',
+              );
+            }).toList();
+
+            state = state.copyWith(
+              treatments: list,
+              filteredTreatments: list,
+              loading: false,
+              currentPage: response.page ?? page,
+              totalPages: response.totalPages ?? 1,
+              totalResults: list.length,
+            );
+            return true;
+          } catch (e) {
+            state = state.copyWith(loading: false);
+            rethrow;
+          }
         }) ??
         false;
   }

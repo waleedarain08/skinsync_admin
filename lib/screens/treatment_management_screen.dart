@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
+import 'package:skinsync_admin/view_models/category_view_model.dart';
 
 import '../../widgets/custom_dropdown_widget.dart';
 import '../utils/theme.dart';
-import 'package:skinsync_admin/view_models/category_view_model.dart';
 import '../view_models/treatment_view_model.dart';
 import '../widgets/app_search_field.dart';
 import '../widgets/borderd_container_widget.dart';
@@ -68,10 +68,12 @@ class _TreatmentManagementScreenState
       final matchesQuery =
           query.isEmpty ||
           (t.name?.toLowerCase().contains(query) ?? false) ||
-          (t.description?.toLowerCase().contains(query) ?? false);
+          (t.description?.toLowerCase().contains(query) ?? false) ||
+          (t.shortDescription?.toLowerCase().contains(query) ?? false);
 
       final matchesCategory =
           _selectedCategoryFilter == 'All Categories' ||
+          t.categoryPath == null ||
           (t.categoryPath?.toLowerCase().contains(
                 _selectedCategoryFilter.toLowerCase(),
               ) ??
@@ -81,6 +83,7 @@ class _TreatmentManagementScreenState
 
       final matchesSubcategory =
           _selectedSubcategoryFilter == 'All Subcategories' ||
+          t.categoryPath == null ||
           (t.categoryPath?.toLowerCase().contains(
                 _selectedSubcategoryFilter.toLowerCase(),
               ) ??
@@ -88,9 +91,9 @@ class _TreatmentManagementScreenState
 
       final matchesStatus =
           _selectedStatusFilter == 'All Statuses' ||
-          (_selectedStatusFilter == 'Active' && t.status == 'active') ||
-          (_selectedStatusFilter == 'Inactive' && t.status == 'deactive') ||
-          (_selectedStatusFilter == 'Draft' && t.status == 'draft');
+          (_selectedStatusFilter == 'Active' && t.status.toLowerCase() == 'active') ||
+          (_selectedStatusFilter == 'Inactive' && (t.status.toLowerCase() == 'deactive' || t.status.toLowerCase() == 'inactive')) ||
+          (_selectedStatusFilter == 'Draft' && t.status.toLowerCase() == 'draft');
 
       return matchesQuery &&
           matchesCategory &&
@@ -274,10 +277,12 @@ class _TreatmentManagementScreenState
             child: AppSearchField(
               controller: viewModel.searchController,
               hintText: 'Search treatments by keyword or name...',
-              onChanged: (val) => setState(() {}),
+              onChanged: (val) {
+                viewModel.getTreatments(page: 1, search: val);
+              },
               onClear: () {
                 viewModel.searchController.clear();
-                setState(() {});
+                viewModel.getTreatments(page: 1, search: '');
               },
             ),
           ),
@@ -356,11 +361,9 @@ class _TreatmentManagementScreenState
         child: Table(
           columnWidths: const {
             0: FlexColumnWidth(4), // Treatment Name / Category
-            1: FlexColumnWidth(2), // Base Price
-            2: FlexColumnWidth(2), // Sessions
-            3: FlexColumnWidth(2), // Default Status
-            4: FlexColumnWidth(2), // Status
-            5: FlexColumnWidth(2), // Actions
+            1: FlexColumnWidth(2), // Global SKU
+            2: FlexColumnWidth(2), // Status
+            3: FlexColumnWidth(2), // Actions
           },
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
@@ -372,9 +375,7 @@ class _TreatmentManagementScreenState
               ),
               children: [
                 _tableHeaderCell('TREATMENT NAME'),
-                _tableHeaderCell('BASE PRICE'),
-                _tableHeaderCell('SESSIONS'),
-                _tableHeaderCell('AUTO-ASSIGN'),
+                _tableHeaderCell('GLOBAL SKU'),
                 _tableHeaderCell('STATUS'),
                 _tableHeaderCell('ACTIONS'),
               ],
@@ -390,14 +391,9 @@ class _TreatmentManagementScreenState
                 children: [
                   _treatmentNameCell(t),
                   _tableTextCell(
-                    '\$${t.basePrice ?? 0}',
+                    t.globalSku ?? '—',
                     style: context.fonts.black14w600,
                   ),
-                  _tableTextCell(
-                    '${t.totalSessions} Sessions',
-                    style: context.fonts.grey14w400,
-                  ),
-                  _autoAssignCell(t.enableByDefault),
                   _statusBadgeCell(t.status),
                   _actionsCell(t, viewModel),
                 ],
@@ -420,6 +416,12 @@ class _TreatmentManagementScreenState
   }
 
   Widget _treatmentNameCell(TreatmentModel treatment) {
+    final displayImage = (treatment.image != null && treatment.image!.isNotEmpty)
+        ? treatment.image
+        : (treatment.icon != null && treatment.icon!.isNotEmpty)
+            ? treatment.icon
+            : null;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
@@ -430,18 +432,22 @@ class _TreatmentManagementScreenState
             decoration: BoxDecoration(
               color: CustomColors.whiteGrey,
               borderRadius: BorderRadius.circular(8.r),
-              image: (treatment.image != null && treatment.image!.isNotEmpty)
-                  ? DecorationImage(
-                      image: NetworkImage(treatment.image!),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
+              border: Border.all(color: CustomColors.border),
             ),
-            child: (treatment.image == null || treatment.image!.isEmpty)
-                ? const Center(
-                    child: Icon(Icons.image_outlined, color: CustomColors.grey),
+            child: (displayImage != null && displayImage.isNotEmpty)
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: Image.network(
+                      displayImage,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Center(
+                        child: Icon(Icons.broken_image_outlined, color: CustomColors.grey),
+                      ),
+                    ),
                   )
-                : null,
+                : const Center(
+                    child: Icon(Icons.image_outlined, color: CustomColors.grey),
+                  ),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -454,9 +460,9 @@ class _TreatmentManagementScreenState
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 2.h),
+                SizedBox(height: 4.h),
                 Text(
-                  treatment.categoryPath ?? treatment.categoryName ?? 'General',
+                  treatment.shortDescription ?? 'General',
                   style: context.fonts.purple12w700,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -481,29 +487,7 @@ class _TreatmentManagementScreenState
     );
   }
 
-  Widget _autoAssignCell(bool enable) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: Row(
-        children: [
-          Icon(
-            enable ? Icons.auto_awesome_outlined : Icons.lock_outline,
-            size: 16.sp,
-            color: enable ? Colors.amber.shade800 : CustomColors.grey,
-          ),
-          SizedBox(width: 8.w),
-          Text(
-            enable ? 'Default' : 'Manual',
-            style: enable
-                ? context.fonts.grey12w600.copyWith(
-                    color: Colors.amber.shade800,
-                  )
-                : context.fonts.grey12w600,
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _statusBadgeCell(String status) {
     final String cleanStatus = status.toLowerCase();

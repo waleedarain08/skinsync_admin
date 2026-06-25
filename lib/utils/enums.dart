@@ -46,6 +46,7 @@ enum Endpoint {
   packageTypeList('admin/package-types'),
   usageType('admin/usage-types'),
   treatmentArea('admin/treatments/step'),
+  adminTreatments('admin-treatments'),
   manufacturersList('admin/manufacturers');
 
 

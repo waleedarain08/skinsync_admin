@@ -3,23 +3,22 @@ import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
 import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 
 import '../models/requests/treatment_schedule_request.dart';
 import '../models/responses/base_response_model.dart';
 
 import 'package:skinsync_admin/models/requests/protocol_request.dart';
-import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 
 import '../models/requests/basic_info_request.dart';
 
 abstract class TreatmentRepository {
-  // Future<List<TreatmentModel>> getClinicTreatments();
-  // Future<List<TreatmentModel>> getAdminTreatments();
-  // Future<List<SideAreaModel>> getTreatmentsSideArea(int treatmentId);
-  // Future<TreatmentModel> addTreatment(AddTreatmentReqModel req);
-  // Future<TreatmentModel> editTreatment(AddTreatmentReqModel req);
-  // Future<bool> deleteTreatment(int treatmentId);
+  Future<TreatmentListResponse> getTreatments({
+    int page = 1,
+    int limit = 10,
+    String search = '',
+  });
 
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request);
   Future<BaseApiResponseModel> protocol({

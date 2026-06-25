@@ -10,6 +10,7 @@ import '../models/requests/treatment_schedule_request.dart';
 import '../models/responses/base_response_model.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/basic_info_response.dart';
+import '../models/responses/treatment_list_response.dart';
 import '../repositories/treatment_repository.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
@@ -20,6 +21,27 @@ class TreatmentServices implements TreatmentRepository {
   final ApiBaseHelper _api;
 
   TreatmentServices({required ApiBaseHelper api}) : _api = api;
+
+  @override
+  Future<TreatmentListResponse> getTreatments({
+    int page = 1,
+    int limit = 10,
+    String search = '',
+  }) async {
+    final jsonResponse = await _api.get(
+      Endpoint.adminTreatments,
+      queryParams: {
+        'page': page.toString(),
+        'limit': limit.toString(),
+        'search': search,
+      },
+    );
+    final response = TreatmentListResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
 
   @override
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request) async {
