@@ -1,5 +1,6 @@
 import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
@@ -220,7 +221,7 @@ class TreatmentServices implements TreatmentRepository {
     return response;
   }
   
-@override
+  @override
   Future<BaseApiResponseModel> downTimeLevels({
     required DownTimeLevelRequest request,
     required int draftTreatmentID,
@@ -273,6 +274,24 @@ class TreatmentServices implements TreatmentRepository {
       queryParams: {'category_ids': idsParam},
     );
     final response = TreatmentProductsResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<BaseApiResponseModel> phaseNotifications({
+    required int draftTreatmentId,
+    required PhaseNotificationsRequest request,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+      body: request,
+      queryParams: {'treatment_id': draftTreatmentId.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }

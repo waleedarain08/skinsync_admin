@@ -1,5 +1,5 @@
 import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
-import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
@@ -10,6 +10,7 @@ import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 
 import '../models/requests/basic_info_request.dart';
+import '../models/requests/down_time_level_request.dart';
 import '../models/requests/treatment_schedule_request.dart';
 import '../models/responses/base_response_model.dart';
 import '../models/responses/treatment_products_response.dart';
@@ -62,7 +63,12 @@ abstract class TreatmentRepository {
     required int count,
   });
 
-   Future<BaseApiResponseModel> downTimeLevels({
+  Future<BaseApiResponseModel> phaseNotifications({
+    required int draftTreatmentId,
+    required PhaseNotificationsRequest request,
+  });
+
+  Future<BaseApiResponseModel> downTimeLevels({
     required DownTimeLevelRequest request,
     required int draftTreatmentID,
   });
@@ -70,5 +76,4 @@ abstract class TreatmentRepository {
     required AllowedProviderRolesRequest request,
     required int draftTreatmentID,
   });
-
 }

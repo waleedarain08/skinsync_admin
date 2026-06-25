@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -6145,6 +6146,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               if (state.currentStep == 9) {
                 if (!_validatePostPhotos(context, state)) return;
               }
+              if (state.currentStep == 10) {
+                if (!_validatePhaseNotifications(context, state)) {
+                  return;
+                }
+              }
 
               if (state.currentStep < 16) {
                 if (state.currentStep == 1) {
@@ -6224,12 +6230,17 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(10);
                   }
+                } else if (state.currentStep == 10) {
+                  final success = await viewModel.callPhaseNotifications();
+                  if (success ?? false) {
+                    viewModel.setStep(11);
+                  }
                 } else if (state.currentStep == 11) {
                   final success = await viewModel.callDownTimeLevels(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
-                    viewModel.setStep(10);
+                    viewModel.setStep(12);
                   }
                  
                 } else if (state.currentStep == 12) {
@@ -6490,6 +6501,54 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           SnackBar(
             content: Text(
               "Please select at least one sub-area for '${area.areaController.text}'",
+            ),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool _validatePhaseNotifications(BuildContext context, TreatmentState state) {
+    log(
+      'NOTIFICATION: ${state.preNotificationEntries.length} ${state.postNotificationEntries.length}',
+    );
+    if (state.preNotificationEntries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Should have at least one notification in Pre-Notifications',
+          ),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    } else if (state.postNotificationEntries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Should have at least one notification in Post-Notifications',
+          ),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+    for (final entry in [
+      ...state.postNotificationEntries,
+      ...state.preNotificationEntries,
+    ]) {
+      if (entry.type.isEmpty ||
+          entry.titleController.text.isEmpty ||
+          entry.timingUnit.isEmpty ||
+          entry.timingValueController.text.isEmpty ||
+          entry.messageController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Make sure each notification in both categories are valid!',
             ),
             backgroundColor: CustomColors.red,
           ),

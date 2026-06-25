@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
@@ -15,12 +16,12 @@ import 'package:skinsync_admin/models/requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 
 import '../models/notification_entry.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
-import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
@@ -845,26 +846,26 @@ Body       : ${request.toJson()}
     });
   }
 
-Future<bool?> callDownTimeLevels({required int stepNumber}) async {
-  // Resolve the actual days from the selected level + category presets
-  final presets = state.selectedCategoryDetail?.downtimePresets;
-  final level = state.downtimeLevel;
+  Future<bool?> callDownTimeLevels({required int stepNumber}) async {
+    // Resolve the actual days from the selected level + category presets
+    final presets = state.selectedCategoryDetail?.downtimePresets;
+    final level = state.downtimeLevel;
 
-  final int? downtimeDays = switch (level) {
-    'None'     => presets?.none     ?? 0,
-    'Low'      => presets?.low      ?? 2,
-    'Moderate' => presets?.moderate ?? 5,
-    'High'     => presets?.high     ?? 10,
-    _          => null,
-  };
+    final int? downtimeDays = switch (level) {
+      'None' => presets?.none ?? 0,
+      'Low' => presets?.low ?? 2,
+      'Moderate' => presets?.moderate ?? 5,
+      'High' => presets?.high ?? 10,
+      _ => null,
+    };
 
-  final request = DownTimeLevelRequest(
-    stepNumber: stepNumber,
-    downtimeLevel: level,
-    downtimeDays: downtimeDays,
-  );
+    final request = DownTimeLevelRequest(
+      stepNumber: stepNumber,
+      downtimeLevel: level,
+      downtimeDays: downtimeDays,
+    );
 
-  log('''
+    log('''
 =========== DOWNTIME LEVEL REQUEST ===========
 Draft ID      : ${state.draftTreatmentID}
 Step No       : $stepNumber
@@ -874,17 +875,18 @@ Body          : ${request.toJson()}
 =============================================
 ''');
 
-  return await runSafely<bool>(() async {
-    await _treatmentRepository.downTimeLevels(   // ← correct endpoint
-      request: request,
-      draftTreatmentID: state.draftTreatmentID!,
-    );
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.downTimeLevels(
+        // ← correct endpoint
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
 
-    log('Step Downtime Saved : ${state.draftTreatmentID}');
+      log('Step Downtime Saved : ${state.draftTreatmentID}');
 
-    return true;
-  });
-}
+      return true;
+    });
+  }
 
 Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
   final request = AllowedProviderRolesRequest(
@@ -994,6 +996,39 @@ Body       : ${request.toJson()}
         draftTreatmentId: treatmentId,
         requirePostPhotos: state.requirePostTreatmentPhotos,
         count: state.requiredPostTreatmentPhotoCount,
+      );
+      return true;
+    });
+  }
+
+  Future<bool?> callPhaseNotifications() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.phaseNotifications(
+        draftTreatmentId: treatmentId,
+        request: PhaseNotificationsRequest(
+          preNotifications: state.preNotificationEntries.map((entry) {
+            return NotificationRequest(
+              message: entry.messageController.text,
+              timing: int.tryParse(entry.timingValueController.text),
+              timingUnit: entry.timingUnit,
+              title: entry.titleController.text,
+              type: entry.type,
+            );
+          }).toList(),
+          postNotifications: state.postNotificationEntries.map((entry) {
+            return NotificationRequest(
+              message: entry.messageController.text,
+              timing: int.tryParse(entry.timingValueController.text),
+              timingUnit: entry.timingUnit,
+              title: entry.titleController.text,
+              type: entry.type,
+            );
+          }).toList(),
+        ),
       );
       return true;
     });
@@ -1203,10 +1238,7 @@ Body       : ${request.toJson()}
         );
       }
     } catch (e) {
-      state = state.copyWith(
-        isLoadingProducts: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingProducts: false, error: e.toString());
     }
   }
 
