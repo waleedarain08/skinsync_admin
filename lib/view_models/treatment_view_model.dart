@@ -18,6 +18,7 @@ import '../models/notification_entry.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
+import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
@@ -1100,6 +1101,44 @@ Body       : ${request.toJson()}
 
   void setStep(int step) {
     state = state.copyWith(currentStep: step);
+    if (step == 3) {
+      fetchProductsByTreatmentCategory();
+    }
+  }
+
+  Future<void> fetchProductsByTreatmentCategory() async {
+    if (state.selectedCategoryPath.isEmpty) {
+      state = state.copyWith(
+        products: [],
+        isLoadingProducts: false,
+        error: null,
+      );
+      return;
+    }
+
+    state = state.copyWith(isLoadingProducts: true, error: null);
+
+    try {
+      final response = await _treatmentRepository.getProductsByTreatment(
+        state.selectedCategoryPath,
+      );
+      if (response.isSuccess) {
+        state = state.copyWith(
+          products: response.data ?? [],
+          isLoadingProducts: false,
+        );
+      } else {
+        state = state.copyWith(
+          isLoadingProducts: false,
+          error: response.message,
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoadingProducts: false,
+        error: e.toString(),
+      );
+    }
   }
 
   Future<void> pickImage(bool isIcon) async {
@@ -1145,6 +1184,9 @@ Body       : ${request.toJson()}
       selectedCategoryDetail: null,
       selectedCategoryPath: pathIds,
     );
+
+    // Refresh products if category selection changes
+    fetchProductsByTreatmentCategory();
   }
 
   Future<bool> fetchAndPopulateCategoryDefaults(int categoryId) async {
@@ -2513,6 +2555,10 @@ class TreatmentState extends BaseStateModel {
   final List<NotificationEntry> preNotificationEntries;
   final List<NotificationEntry> postNotificationEntries;
 
+  final bool isLoadingProducts;
+  final List<TreatmentProductData> products;
+  final String? error;
+
   // Post Treatment Photos
   final bool requirePostTreatmentPhotos;
   final int requiredPostTreatmentPhotoCount;
@@ -2590,6 +2636,9 @@ class TreatmentState extends BaseStateModel {
     this.maximumDaysInAdvance = 90,
     List<AreaViewModelEntry>? areas,
     this.selectedTreatmentAreaIds = const [],
+    this.isLoadingProducts = false,
+    this.products = const [],
+    this.error,
   }) : areas = areas ?? [AreaViewModelEntry()];
 
   TreatmentState copyWith({
@@ -2647,6 +2696,9 @@ class TreatmentState extends BaseStateModel {
     int? maximumDaysInAdvance,
     CategoryDetailDto? selectedCategoryDetail,
     List<int>? selectedTreatmentAreaIds,
+    bool? isLoadingProducts,
+    List<TreatmentProductData>? products,
+    String? error,
   }) {
     return TreatmentState(
       selectedCategoryDetail:
@@ -2722,6 +2774,9 @@ class TreatmentState extends BaseStateModel {
       maximumDaysInAdvance: maximumDaysInAdvance ?? this.maximumDaysInAdvance,
       selectedTreatmentAreaIds:
           selectedTreatmentAreaIds ?? this.selectedTreatmentAreaIds,
+      isLoadingProducts: isLoadingProducts ?? this.isLoadingProducts,
+      products: products ?? this.products,
+      error: error ?? this.error,
     );
   }
 }

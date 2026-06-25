@@ -11,6 +11,7 @@ import '../models/requests/treatment_area_request.dart';
 import '../models/requests/treatment_schedule_request.dart';
 import '../models/responses/basic_info_response.dart';
 import '../models/responses/treatment_list_response.dart';
+import '../models/responses/treatment_products_response.dart';
 import '../repositories/treatment_repository.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
@@ -214,7 +215,22 @@ class TreatmentServices implements TreatmentRepository {
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
+    return response;
+  }
 
+  @override
+  Future<TreatmentProductsResponse> getProductsByTreatment(
+    List<int> categoryIds,
+  ) async {
+    final String idsParam = categoryIds.join(',');
+    final jsonResponse = await _api.get(
+      Endpoint.productsByTreatmentId,
+      queryParams: {'category_ids': idsParam},
+    );
+    final response = TreatmentProductsResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
     return response;
   }
 }

@@ -11,8 +11,8 @@ import 'package:skinsync_admin/widgets/protocol_preview_widget.dart';
 
 import '../models/notification_entry.dart';
 import '../models/notification_model.dart';
-import '../models/product_model.dart';
 import '../models/responses/category_detail_response.dart';
+import '../models/responses/treatment_products_response.dart';
 import '../models/treatment_data_models.dart';
 import '../utils/list_utils.dart';
 import '../utils/theme.dart';
@@ -5394,8 +5394,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentDataState dataState,
     WidgetRef ref,
   ) {
-    final productState = ref.watch(productViewModelProvider);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -5406,7 +5404,43 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           style: context.fonts.grey14w400,
         ),
         context.verticalSpace(32),
-        _buildProductSelector(context, productState.products, viewModel, state),
+        if (state.isLoadingProducts) ...[
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.0),
+              child: CircularProgressIndicator(color: CustomColors.purple),
+            ),
+          ),
+        ] else if (state.error != null) ...[
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                children: [
+                  Text(
+                    'Error loading products: ${state.error}',
+                    style: context.fonts.grey14w400,
+                  ),
+                  context.verticalSpace(12),
+                  TextButton(
+                    onPressed: () => viewModel.fetchProductsByTreatmentCategory(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ] else if (state.products.isEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Text(
+              'No inventory products available for selected category hierarchy.',
+              style: context.fonts.grey14w400,
+            ),
+          ),
+        ] else ...[
+          _buildProductSelector(context, state.products, viewModel, state),
+        ],
         if (state.productUsageEntries.isNotEmpty) ...[
           context.verticalSpace(32),
           ListView.separated(
@@ -5431,7 +5465,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
 
   Widget _buildProductSelector(
     BuildContext context,
-    List<ProductModel> products,
+    List<TreatmentProductData> products,
     TreatmentViewModel viewModel,
     TreatmentState state,
   ) {
@@ -5462,10 +5496,27 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             return filtered
                 .map(
                   (p) => ListTile(
-                    title: Text(p.name),
-                    subtitle: Text('${p.category} • Unit: ${p.unit}'),
+                    title: Text(
+                      p.name,
+                      style: context.fonts.black14w600,
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        context.verticalSpace(4),
+                        Text(
+                          '${p.brand ?? "—"} • ${p.globalSku ?? "—"}',
+                          style: context.fonts.grey12w400,
+                        ),
+                        context.verticalSpace(2),
+                        Text(
+                          'Usage: ${p.usageType ?? "—"}',
+                          style: context.fonts.grey11w400,
+                        ),
+                      ],
+                    ),
                     onTap: () {
-                      viewModel.addProductUsage(p.id!, p.name, p.unit);
+                      viewModel.addProductUsage(p.id, p.name, 'Unit');
                       controller.closeView(p.name);
                     },
                   ),
@@ -5502,6 +5553,25 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       return '${unit}s';
     }
 
+    final TreatmentProductData? productData = state.products.any((p) => p.id == entry.productId)
+        ? state.products.firstWhere((p) => p.id == entry.productId)
+        : null;
+
+    final String cleanStatus = (productData?.status ?? 'active').toLowerCase();
+    Color badgeColor = CustomColors.green;
+    String statusLabel = 'Active';
+
+    if (cleanStatus == 'draft') {
+      badgeColor = CustomColors.amber;
+      statusLabel = 'Draft';
+    } else if (cleanStatus == 'deactive' || cleanStatus == 'inactive') {
+      badgeColor = CustomColors.grey;
+      statusLabel = 'Inactive';
+    }
+
+    final imageUrl = productData?.image;
+    final hasValidImage = imageUrl != null && imageUrl.isNotEmpty;
+
     return Container(
       padding: context.appEdgeInsets(all: 20),
       decoration: BoxDecoration(
@@ -5513,8 +5583,42 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Product Image
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: CustomColors.whiteGrey,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: hasValidImage
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              color: CustomColors.grey,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      )
+                    : const Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          color: CustomColors.grey,
+                          size: 24,
+                        ),
+                      ),
+              ),
+              context.horizontalSpace(16),
+              // Product Details
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -5553,9 +5657,40 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                         ),
                       ],
                     ),
+                    context.verticalSpace(4),
                     Text(
-                      'Unit of Measure: ${entry.unit}',
+                      'Brand: ${productData?.brand ?? "—"} • Manufacturer: ${productData?.manufacturer ?? "—"}',
                       style: context.fonts.grey12w400,
+                    ),
+                    context.verticalSpace(4),
+                    Text(
+                      'SKU: ${productData?.globalSku ?? "—"}',
+                      style: context.fonts.grey12w400,
+                    ),
+                    context.verticalSpace(4),
+                    Row(
+                      children: [
+                        Text(
+                          'Usage Type: ${productData?.usageType ?? "—"}',
+                          style: context.fonts.grey12w400,
+                        ),
+                        context.horizontalSpace(12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: badgeColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: badgeColor.withOpacity(0.2)),
+                          ),
+                          child: Text(
+                            statusLabel,
+                            style: context.fonts.grey10w700ls1.copyWith(
+                              color: badgeColor,
+                              fontSize: 9,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
