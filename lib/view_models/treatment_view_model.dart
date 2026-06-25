@@ -13,6 +13,7 @@ import 'package:skinsync_admin/models/requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
+
 import '../models/notification_entry.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
@@ -159,7 +160,11 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     await getTreatments();
   }
 
-  Future<bool> getTreatments({int page = 1, String search = '', int limit = 10}) async {
+  Future<bool> getTreatments({
+    int page = 1,
+    String search = '',
+    int limit = 10,
+  }) async {
     return await runSafely<bool?>(showLoading: false, () async {
           state = state.copyWith(loading: true, currentPage: page);
           try {
@@ -909,6 +914,21 @@ Body       : ${request.toJson()}
     });
   }
 
+  Future<bool?> callPostTreatmentPhotos() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.postTreatmentPhotos(
+        draftTreatmentId: treatmentId,
+        requirePostPhotos: state.requirePostTreatmentPhotos,
+        count: state.requiredPostTreatmentPhotoCount,
+      );
+      return true;
+    });
+  }
+
   Future<bool?> callProductUsage({required int stepNumber}) async {
     final request = ProductUsagesRequest(
       stepNumber: stepNumber,
@@ -1471,81 +1491,71 @@ Body       : ${request.toJson()}
     state = state.copyWith(postNotificationOffset: offset);
   }
 
-Future<void> pickAttachments(bool isPreTreatment) async {
-  final FilePickerResult? result =
-      await FilePicker.pickFiles(
-    allowMultiple: true,
-    withData: true,
-    type: FileType.custom,
-    allowedExtensions: [
-      'pdf',
-      'jpg',
-      'jpeg',
-      'png',
-      'webp',
-      'mp4',
-      'mov',
-      'avi',
-      'mkv',
-      'webm',
-    ],
-  );
+  Future<void> pickAttachments(bool isPreTreatment) async {
+    final FilePickerResult? result = await FilePicker.pickFiles(
+      allowMultiple: true,
+      withData: true,
+      type: FileType.custom,
+      allowedExtensions: [
+        'pdf',
+        'jpg',
+        'jpeg',
+        'png',
+        'webp',
+        'mp4',
+        'mov',
+        'avi',
+        'mkv',
+        'webm',
+      ],
+    );
 
-  if (result == null) return;
+    if (result == null) return;
 
-  await runSafely(() async {
-    final uploaded = <Attachment>[];
+    await runSafely(() async {
+      final uploaded = <Attachment>[];
 
-    for (final file in result.files) {
-      log('Uploading: ${file.name}');
+      for (final file in result.files) {
+        log('Uploading: ${file.name}');
 
-      final url = await MediaService().uploadMedia(
-        path: 'treatments',
-        file: file,
-      );
-
-      if (url == null) {
-        throw UnknownException(
-          'Failed to upload ${file.name}',
+        final url = await MediaService().uploadMedia(
+          path: 'treatments',
+          file: file,
         );
+
+        if (url == null) {
+          throw UnknownException('Failed to upload ${file.name}');
+        }
+
+        uploaded.add(
+          Attachment(url: url, type: _getFileType(file), name: file.name),
+        );
+
+        log('Uploaded: $url');
       }
 
-      uploaded.add(
-        Attachment(
-          url: url,
-          type: _getFileType(file),
-          name: file.name,
-        ),
-      );
+      if (isPreTreatment) {
+        state = state.copyWith(
+          existingPreAttachments: [
+            ...state.existingPreAttachments,
+            ...uploaded,
+          ],
+        );
 
-      log('Uploaded: $url');
-    }
+        log('PRE TOTAL: ${state.existingPreAttachments.length}');
+      } else {
+        state = state.copyWith(
+          existingPostAttachments: [
+            ...state.existingPostAttachments,
+            ...uploaded,
+          ],
+        );
 
-    if (isPreTreatment) {
-      state = state.copyWith(
-        existingPreAttachments: [
-          ...state.existingPreAttachments,
-          ...uploaded,
-        ],
-      );
+        log('POST TOTAL: ${state.existingPostAttachments.length}');
+      }
+    });
+  }
 
-      log(
-        'PRE TOTAL: ${state.existingPreAttachments.length}',
-      );
-    } else {
-      state = state.copyWith(
-        existingPostAttachments: [
-          ...state.existingPostAttachments,
-          ...uploaded,
-        ],
-      );
-
-      log(
-        'POST TOTAL: ${state.existingPostAttachments.length}',
-      );
-    }
-  });
-}
   Future<void> pickConsentForm() async {
     final FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.custom,

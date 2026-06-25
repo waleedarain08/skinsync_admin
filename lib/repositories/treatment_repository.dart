@@ -1,17 +1,15 @@
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
+import 'package:skinsync_admin/models/requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 
+import '../models/requests/basic_info_request.dart';
 import '../models/requests/treatment_schedule_request.dart';
 import '../models/responses/base_response_model.dart';
-
-import 'package:skinsync_admin/models/requests/protocol_request.dart';
-import 'package:skinsync_admin/models/responses/basic_info_response.dart';
-
-import '../models/requests/basic_info_request.dart';
 
 abstract class TreatmentRepository {
   Future<TreatmentListResponse> getTreatments({
@@ -37,18 +35,24 @@ abstract class TreatmentRepository {
 
   Future<BaseApiResponseModel> productUsage({
     required ProductUsagesRequest request,
-     required int draftTreatmentID,
+    required int draftTreatmentID,
   });
   Future<BaseApiResponseModel> stepPricing({
     required StepPricingRequest request,
-     required int draftTreatmentID,
+    required int draftTreatmentID,
   });
-   Future<BaseApiResponseModel> preTreatmentInstructions({
+  Future<BaseApiResponseModel> preTreatmentInstructions({
     required PreTreatmentInstructionsRequest request,
-     required int draftTreatmentID,
+    required int draftTreatmentID,
   });
-    Future<BaseApiResponseModel> postTreatmentInstructions({
+  Future<BaseApiResponseModel> postTreatmentInstructions({
     required PostTreatmentInstructionsRequest request,
-     required int draftTreatmentID,
+    required int draftTreatmentID,
+  });
+
+  Future<BaseApiResponseModel> postTreatmentPhotos({
+    required int draftTreatmentId,
+    required bool requirePostPhotos,
+    required int count,
   });
 }

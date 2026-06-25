@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
 import 'package:skinsync_admin/widgets/protocol_preview_widget.dart';
+
 import '../models/notification_entry.dart';
 import '../models/notification_model.dart';
 import '../models/product_model.dart';
@@ -29,7 +31,6 @@ import '../widgets/custom_primary_button.dart';
 import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_category_selector.dart';
-import 'create_product_screen.dart';
 import 'product_detail_screen.dart';
 
 class CreateTreatmentScreen extends ConsumerStatefulWidget {
@@ -2093,37 +2094,32 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 
   Widget _buildStepPostInstructions(
-  BuildContext context,
-  TreatmentState state,
-  TreatmentViewModel viewModel,
-) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      BuildTextField(
-        label: 'Post-Treatment Instructions',
-        controller:
-            viewModel.postTreatmentInstructionsController,
-        hintText:
-            'Aftercare and recovery guidelines...',
-        maxLines: 8,
-      ),
-
-      context.verticalSpace(32),
-
-      _buildUploadedAttachmentsField(
-        context,
-        state.existingPostAttachments,
-        () => viewModel.pickAttachments(false),
-        (idx) =>
-            viewModel.removeExistingAttachment(
-          false,
-          idx,
+    BuildContext context,
+    TreatmentState state,
+    TreatmentViewModel viewModel,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        BuildTextField(
+          label: 'Post-Treatment Instructions',
+          controller: viewModel.postTreatmentInstructionsController,
+          hintText: 'Aftercare and recovery guidelines...',
+          maxLines: 8,
         ),
-      ),
-    ],
-  );
-}
+
+        context.verticalSpace(32),
+
+        _buildUploadedAttachmentsField(
+          context,
+          state.existingPostAttachments,
+          () => viewModel.pickAttachments(false),
+          (idx) => viewModel.removeExistingAttachment(false, idx),
+        ),
+      ],
+    );
+  }
+
   Widget _buildStepNotifications(
     BuildContext context,
     TreatmentState state,
@@ -6020,7 +6016,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 }
-               
+
                 if (state.currentStep == 2) {
                   final success = await viewModel.createTreatmentArea(
                     stepNumber: state.currentStep + 1,
@@ -6044,7 +6040,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                } 
+                }
                 if (state.currentStep == 5) {
                   final success = await viewModel.callStepPricing(
                     stepNumber: state.currentStep + 1,
@@ -6052,7 +6048,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                } 
+                }
 
                 if (state.currentStep == 6) {
                   final bytes = await ProtocolFormPreview.getPdfBytes(
@@ -6077,12 +6073,17 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 }
-                 if (state.currentStep == 8) {
+                if (state.currentStep == 8) {
                   final success = await viewModel.callPostTreatmentInstructions(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 9) {
+                  final success = await viewModel.callPostTreatmentPhotos();
+                  if (success ?? false) {
+                    viewModel.setStep(10);
                   }
                 }
                 // TODO : this is only for now to go on forward step have to remove once stepper API are completed

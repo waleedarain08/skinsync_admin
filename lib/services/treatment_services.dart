@@ -1,3 +1,4 @@
+import 'package:skinsync_admin/models/requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
@@ -5,10 +6,9 @@ import 'package:skinsync_admin/models/requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
+import '../models/requests/basic_info_request.dart';
 import '../models/requests/treatment_area_request.dart';
 import '../models/requests/treatment_schedule_request.dart';
-import '../models/responses/base_response_model.dart';
-import '../models/requests/basic_info_request.dart';
 import '../models/responses/basic_info_response.dart';
 import '../models/responses/treatment_list_response.dart';
 import '../repositories/treatment_repository.dart';
@@ -115,7 +115,7 @@ class TreatmentServices implements TreatmentRepository {
     return response;
   }
 
- @override
+  @override
   Future<BaseApiResponseModel> productUsage({
     required ProductUsagesRequest request,
     required int draftTreatmentID,
@@ -135,7 +135,7 @@ class TreatmentServices implements TreatmentRepository {
     return response;
   }
 
-@override
+  @override
   Future<BaseApiResponseModel> stepPricing({
     required StepPricingRequest request,
     required int draftTreatmentID,
@@ -154,7 +154,7 @@ class TreatmentServices implements TreatmentRepository {
 
     return response;
   }
-  
+
   @override
   Future<BaseApiResponseModel> preTreatmentInstructions({
     required PreTreatmentInstructionsRequest request,
@@ -174,8 +174,8 @@ class TreatmentServices implements TreatmentRepository {
 
     return response;
   }
-  
-@override
+
+  @override
   Future<BaseApiResponseModel> postTreatmentInstructions({
     required PostTreatmentInstructionsRequest request,
     required int draftTreatmentID,
@@ -194,78 +194,27 @@ class TreatmentServices implements TreatmentRepository {
 
     return response;
   }
-  
 
+  @override
+  Future<BaseApiResponseModel> postTreatmentPhotos({
+    required int draftTreatmentId,
+    required bool requirePostPhotos,
+    required int count,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+      body: PostPhotosRequest(
+        requirePostTreatmentPhotos: requirePostPhotos,
+        requiredPostTreatmentPhotoCount: count,
+      ),
+      queryParams: {'treatment_id': draftTreatmentId.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
 
-  // @override
-  // Future<List<TreatmentModel>> getAdminTreatments() async {
-  //   final jsonResponse = await _api.get(Endpoint.getAdminTreatments);
-  //   final response = BaseApiResponseModel<List<TreatmentModel>>.fromJson(
-  //     jsonResponse,
-  //     (treatmentList) {
-  //       treatmentList as List;
-  //       return treatmentList
-  //           .map(
-  //             (json) => TreatmentModel.fromJson(json as Map<String, dynamic>),
-  //           )
-  //           .toList();
-  //     },
-  //   );
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
 
-  //   if (!response.isSuccess) {
-  //     throw BadRequestException(response.message);
-  //   }
-  //   return response.data ?? [];
-  // }
-
-  // @override
-  // Future<TreatmentModel> addTreatment(AddTreatmentReqModel req) async {
-  //   final jsonResponse = await _api.post(
-  //     Endpoint.addClinicTreatment,
-  //     body: req.toJson(),
-  //   );
-  //   final response = BaseApiResponseModel<TreatmentModel>.fromJson(
-  //     jsonResponse,
-  //     (treatment) => TreatmentModel.fromJson(treatment as Map<String, dynamic>),
-  //   );
-
-  //   if (!response.isSuccess) {
-  //     throw BadRequestException(response.message);
-  //   }
-  //   return response.data!;
-  // }
-
-  // @override
-  // Future<TreatmentModel> editTreatment(AddTreatmentReqModel req) async {
-  //   final jsonResponse = await _api.patch(
-  //     Endpoint.addClinicTreatment,
-  //     body: req.toJson(),
-  //   );
-  //   final response = BaseApiResponseModel<TreatmentModel>.fromJson(
-  //     jsonResponse,
-  //     (treatment) => TreatmentModel.fromJson(treatment as Map<String, dynamic>),
-  //   );
-
-  //   if (!response.isSuccess) {
-  //     throw BadRequestException(response.message);
-  //   }
-  //   return response.data!;
-  // }
-
-  // @override
-  // Future<bool> deleteTreatment(int treatmentId) async {
-  //   final jsonResponse = await _api.delete(
-  //     Endpoint.deleteTreatment,
-  //     pathParams: {"treatment_id": treatmentId.toString()},
-  //   );
-  //   final response = BaseApiResponseModel<TreatmentModel>.fromJson(
-  //     jsonResponse,
-  //     (treatment) => TreatmentModel.fromJson(treatment as Map<String, dynamic>),
-  //   );
-
-  //   if (!response.isSuccess) {
-  //     throw BadRequestException(response.message);
-  //   }
-  //   return response.isSuccess;
-  // }
+    return response;
+  }
 }
