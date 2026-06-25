@@ -141,14 +141,16 @@ enum DefaultRole {
   AESTHETICIAN,
   INJECTOR,
   MD,
-  SPECIALIST
+  SPECIALIST,
+  NURSE
 }
 
 final defaultRoleValues = EnumValues({
   "Aesthetician": DefaultRole.AESTHETICIAN,
   "Injector": DefaultRole.INJECTOR,
   "MD": DefaultRole.MD,
-  "Specialist": DefaultRole.SPECIALIST
+  "Specialist": DefaultRole.SPECIALIST,
+  "Nurse": DefaultRole.NURSE
 });
 
 

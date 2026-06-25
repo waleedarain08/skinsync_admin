@@ -450,7 +450,7 @@ class _CategoryCreationDialogState
       final request = CreateCategoryResquest(
         name: _nameController.text,
         icon: _selectedIcon,
-        imageUrl: _selectedImage,
+        image: _selectedImage,
         parentId: widget.categoryId,
         totalSessions: int.tryParse(_totalSessionsController.text) ?? 1,
         consentFormUrl: _consentFormUrl,
@@ -473,7 +473,7 @@ class _CategoryCreationDialogState
 
       ref
           .read(categoryViewModelProvider.notifier)
-          .creatCategory(request: request)
+          .createCategory(request: request)
           .then((value) {
             if (value == true) {
               Navigator.pop(context);

@@ -546,8 +546,23 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               color: CustomColors.purple,
               size: 20.sp,
             ),
-            onPressed: () {
-              context.push(CreateProductScreen.routeName, extra: product);
+            onPressed: () async {
+              if (product.id != null) {
+                try {
+                  await ref
+                      .read(productViewModelProvider.notifier)
+                      .fetchProductDetail(product.id!);
+                  final detailedProduct = ref.read(productViewModelProvider).selectedProduct;
+                  if (context.mounted && detailedProduct != null) {
+                    context.push(
+                      CreateProductScreen.routeName,
+                      extra: detailedProduct.toProductModel(),
+                    );
+                  }
+                } catch (e) {
+                  // Error handled gracefully by runSafely wrapper
+                }
+              }
             },
           ),
           IconButton(

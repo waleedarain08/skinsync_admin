@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -7,11 +8,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
+import 'package:skinsync_admin/widgets/protocol_preview_widget.dart';
 
 import '../models/notification_entry.dart';
 import '../models/notification_model.dart';
-import '../models/product_model.dart';
 import '../models/responses/category_detail_response.dart';
+import '../models/responses/treatment_products_response.dart';
 import '../models/treatment_data_models.dart';
 import '../utils/list_utils.dart';
 import '../utils/theme.dart';
@@ -30,7 +32,7 @@ import '../widgets/custom_primary_button.dart';
 import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_category_selector.dart';
-import 'create_product_screen.dart';
+import 'product_detail_screen.dart';
 
 class CreateTreatmentScreen extends ConsumerStatefulWidget {
   const CreateTreatmentScreen({super.key});
@@ -1000,16 +1002,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         viewModel.preTreatmentInstructionsController.text.isNotEmpty;
     final instructionsText = hasInstructions ? 'Configured' : 'None';
 
-    final allPre = [
-      ...state.existingPreAttachments,
-      ...state.preTreatmentAttachments.map(
-        (f) => Attachment(
-          url: f.path ?? '',
-          type: _getPlatformFileTypeSummary(f),
-          name: f.name,
-        ),
-      ),
-    ];
+    final allPre = [...state.existingPreAttachments];
 
     final pdfs = allPre.where((a) => a.type == 'pdf').length;
     final images = allPre.where((a) => a.type == 'image').length;
@@ -1051,7 +1044,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     String postSummary = 'Not configured';
     if (isPostCategory) {
       postSummary = (selectedCategory?.postNotifications?.isNotEmpty ?? false)
-          ? '${selectedCategory?.postNotifications?.length } Category Defaults'
+          ? '${selectedCategory?.postNotifications?.length} Category Defaults'
           : 'Category Default';
     } else {
       postSummary =
@@ -1201,7 +1194,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                               ),
                               ...allSubAreas.map((subArea) {
                                 final controllers = entry
-                                    .getControllersForSubArea(subArea.name);
+                                    .getControllersForSubArea(
+                                      subArea.name,
+                                      subAreaId: subArea.id,
+                                    );
                                 final minText = controllers.minController.text;
                                 final maxText = controllers.maxController.text;
                                 return Padding(
@@ -2088,11 +2084,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           maxLines: 8,
         ),
         context.verticalSpace(32),
-        _buildAttachmentsField(
+        _buildUploadedAttachmentsField(
           context,
-          state.preTreatmentAttachments,
+          state.existingPreAttachments,
           () => viewModel.pickAttachments(true),
-          (idx) => viewModel.removeAttachment(true, idx),
+          (idx) => viewModel.removeExistingAttachment(true, idx),
         ),
       ],
     );
@@ -2112,12 +2108,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           hintText: 'Aftercare and recovery guidelines...',
           maxLines: 8,
         ),
+
         context.verticalSpace(32),
-        _buildAttachmentsField(
+
+        _buildUploadedAttachmentsField(
           context,
-          state.postTreatmentAttachments,
+          state.existingPostAttachments,
           () => viewModel.pickAttachments(false),
-          (idx) => viewModel.removeAttachment(false, idx),
+          (idx) => viewModel.removeExistingAttachment(false, idx),
         ),
       ],
     );
@@ -4202,6 +4200,157 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     );
   }
 
+  Widget _buildUploadedAttachmentsField(
+    BuildContext context,
+    List<Attachment> files,
+    VoidCallback onPick,
+    void Function(int) onRemove,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Supporting Media (Optional)',
+              style: context.fonts.black14w600,
+            ),
+            TextButton.icon(
+              onPressed: onPick,
+              icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
+              label: const Text('Add Files'),
+              style: TextButton.styleFrom(foregroundColor: CustomColors.purple),
+            ),
+          ],
+        ),
+        context.verticalSpace(12),
+        if (files.isEmpty)
+          InkWell(
+            onTap: onPick,
+            child: Container(
+              width: double.infinity,
+              padding: context.appEdgeInsets(vertical: 20),
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(
+                  color: CustomColors.border,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.cloud_upload_outlined,
+                    color: CustomColors.grey,
+                    size: 24,
+                  ),
+                  context.verticalSpace(8),
+                  Text(
+                    'Upload PDFs, Images, or Videos',
+                    style: context.fonts.grey13w500,
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          Wrap(
+            spacing: context.w(12),
+            runSpacing: context.h(12),
+            children: List.generate(files.length, (index) {
+              final file = files[index];
+              return Container(
+                width: context.w(160),
+                padding: context.appEdgeInsets(all: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: context.appBorderRadius(all: 10),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: Column(
+                  children: [
+                    Stack(
+                      children: [
+                        Container(
+                          height: context.h(80),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: CustomColors.whiteGrey,
+                            borderRadius: context.appBorderRadius(all: 6),
+                          ),
+                          child: _buildUploadedAttachmentPreview(context, file),
+                        ),
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: InkWell(
+                            onTap: () => onRemove(index),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close_rounded,
+                                size: 14,
+                                color: CustomColors.red,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(8),
+                    Text(
+                      file.name,
+                      style: context.fonts.grey10w400,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildUploadedAttachmentPreview(
+    BuildContext context,
+    Attachment file,
+  ) {
+    if (file.type == 'image') {
+      return ClipRRect(
+        borderRadius: context.appBorderRadius(all: 6),
+        child: Image.network(file.url, fit: BoxFit.cover),
+      );
+    }
+    if (file.type == 'pdf') {
+      return const Icon(
+        Icons.picture_as_pdf_rounded,
+        color: CustomColors.red,
+        size: 32,
+      );
+    }
+    if (file.type == 'video') {
+      return const Icon(
+        Icons.video_collection_rounded,
+        color: CustomColors.purple,
+        size: 32,
+      );
+    }
+    return const Icon(
+      Icons.insert_drive_file_outlined,
+      color: CustomColors.grey,
+      size: 32,
+    );
+  }
+
   Widget _buildAttachmentsField(
     BuildContext context,
     List<PlatformFile> files,
@@ -4431,27 +4580,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           hintText: 'Detailed medical and process information...',
           maxLines: 5,
         ),
-        context.verticalSpace(24),
-        CustomDropdown<String>(
-          label: 'Treatment Status',
-          hintText: 'Select status',
-          value: state.status,
-          items: [
-            DropdownMenuItem(
-              value: 'active',
-              child: Text('Active', style: context.fonts.black14w400),
-            ),
-            DropdownMenuItem(
-              value: 'deactive',
-              child: Text('Deactive', style: context.fonts.black14w400),
-            ),
-            DropdownMenuItem(
-              value: 'draft',
-              child: Text('Draft', style: context.fonts.black14w400),
-            ),
-          ],
-          onChanged: (val) => viewModel.setStatus(val ?? 'active'),
-        ),
       ],
     );
   }
@@ -4463,7 +4591,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     if (allSubAreas.isNotEmpty) {
       double sum = 0.0;
       for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(subArea.name);
+        final controllers = entry.getControllersForSubArea(
+          subArea.name,
+          subAreaId: subArea.id,
+        );
         sum += double.tryParse(controllers.minController.text) ?? 0.0;
       }
       return sum;
@@ -4479,7 +4610,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     if (allSubAreas.isNotEmpty) {
       double sum = 0.0;
       for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(subArea.name);
+        final controllers = entry.getControllersForSubArea(
+          subArea.name,
+          subAreaId: subArea.id,
+        );
         sum += double.tryParse(controllers.maxController.text) ?? 0.0;
       }
       return sum;
@@ -5051,7 +5185,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     if (index == -1) {
       final newEntry = AreaViewModelEntry();
       newEntry.areaController.text = area.name;
-      newEntry.subAreas = [SubAreaConfig(name: subArea.name)];
+      newEntry.subAreas = [SubAreaConfig(name: subArea.name, id: subArea.id)];
       viewModel.updateAreas([...cleanAreas, newEntry]);
     } else {
       final areaEntry = cleanAreas[index];
@@ -5061,7 +5195,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       if (subIndex == -1) {
         areaEntry.subAreas = [
           ...areaEntry.subAreas,
-          SubAreaConfig(name: subArea.name),
+          SubAreaConfig(name: subArea.name, id: subArea.id),
         ];
       } else {
         areaEntry.subAreas = areaEntry.subAreas
@@ -5091,6 +5225,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       newEntry.subAreas = [
         SubAreaConfig(
           name: subArea.name,
+          id: subArea.id,
           children: [SubAreaChildConfig(name: child.name)],
         ),
       ];
@@ -5105,6 +5240,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           ...areaEntry.subAreas,
           SubAreaConfig(
             name: subArea.name,
+            id: subArea.id,
             children: [SubAreaChildConfig(name: child.name)],
           ),
         ];
@@ -5259,8 +5395,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentDataState dataState,
     WidgetRef ref,
   ) {
-    final productState = ref.watch(productViewModelProvider);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -5271,12 +5405,44 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           style: context.fonts.grey14w400,
         ),
         context.verticalSpace(32),
-        _buildProductSelector(
-          context,
-          productState.products,
-          viewModel,
-          state,
-        ),
+        if (state.isLoadingProducts) ...[
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.0),
+              child: CircularProgressIndicator(color: CustomColors.purple),
+            ),
+          ),
+        ] else if (state.error != null) ...[
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                children: [
+                  Text(
+                    'Error loading products: ${state.error}',
+                    style: context.fonts.grey14w400,
+                  ),
+                  context.verticalSpace(12),
+                  TextButton(
+                    onPressed: () =>
+                        viewModel.fetchProductsByTreatmentCategory(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ] else if (state.products.isEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Text(
+              'No inventory products available for selected category hierarchy.',
+              style: context.fonts.grey14w400,
+            ),
+          ),
+        ] else ...[
+          _buildProductSelector(context, state.products, viewModel, state),
+        ],
         if (state.productUsageEntries.isNotEmpty) ...[
           context.verticalSpace(32),
           ListView.separated(
@@ -5301,7 +5467,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
 
   Widget _buildProductSelector(
     BuildContext context,
-    List<ProductModel> products,
+    List<TreatmentProductData> products,
     TreatmentViewModel viewModel,
     TreatmentState state,
   ) {
@@ -5317,25 +5483,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             readOnly: true,
             onTap: () => controller.openView(),
             hintText: 'Select product from inventory',
-            suffixIcon: IconButton(
-              icon: const Icon(
-                Icons.add_circle_outline_rounded,
-                color: CustomColors.purple,
-              ),
-              onPressed: () async {
-                final newProduct = await context.push<ProductModel>(
-                  CreateProductScreen.routeName,
-                  extra: null,
-                );
-                if (newProduct != null && newProduct.id != null) {
-                  viewModel.addProductUsage(
-                    newProduct.id!,
-                    newProduct.name,
-                    newProduct.unit,
-                  );
-                  controller.text = newProduct.name;
-                }
-              },
+            suffixIcon: const Icon(
+              Icons.search_rounded,
+              color: CustomColors.lightGrey,
             ),
             maxWidth: double.infinity,
           ),
@@ -5348,10 +5498,24 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             return filtered
                 .map(
                   (p) => ListTile(
-                    title: Text(p.name),
-                    subtitle: Text('${p.category} • Unit: ${p.unit}'),
+                    title: Text(p.name, style: context.fonts.black14w600),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        context.verticalSpace(4),
+                        Text(
+                          '${p.brand ?? "—"} • ${p.globalSku ?? "—"}',
+                          style: context.fonts.grey12w400,
+                        ),
+                        context.verticalSpace(2),
+                        Text(
+                          'Usage: ${p.usageType ?? "—"}',
+                          style: context.fonts.grey11w400,
+                        ),
+                      ],
+                    ),
                     onTap: () {
-                      viewModel.addProductUsage(p.id!, p.name, p.unit);
+                      viewModel.addProductUsage(p.id, p.name, 'Unit');
                       controller.closeView(p.name);
                     },
                   ),
@@ -5388,6 +5552,26 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       return '${unit}s';
     }
 
+    final TreatmentProductData? productData =
+        state.products.any((p) => p.id == entry.productId)
+        ? state.products.firstWhere((p) => p.id == entry.productId)
+        : null;
+
+    final String cleanStatus = (productData?.status ?? 'active').toLowerCase();
+    Color badgeColor = CustomColors.green;
+    String statusLabel = 'Active';
+
+    if (cleanStatus == 'draft') {
+      badgeColor = CustomColors.amber;
+      statusLabel = 'Draft';
+    } else if (cleanStatus == 'deactive' || cleanStatus == 'inactive') {
+      badgeColor = CustomColors.grey;
+      statusLabel = 'Inactive';
+    }
+
+    final imageUrl = productData?.image;
+    final hasValidImage = imageUrl != null && imageUrl.isNotEmpty;
+
     return Container(
       padding: context.appEdgeInsets(all: 20),
       decoration: BoxDecoration(
@@ -5399,17 +5583,122 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(entry.productName, style: context.fonts.black14w700),
-                  Text(
-                    'Unit of Measure: ${entry.unit}',
-                    style: context.fonts.grey12w400,
-                  ),
-                ],
+              // Product Image
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: CustomColors.whiteGrey,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: hasValidImage
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              color: CustomColors.grey,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      )
+                    : const Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          color: CustomColors.grey,
+                          size: 24,
+                        ),
+                      ),
+              ),
+              context.horizontalSpace(16),
+              // Product Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            entry.productName,
+                            style: context.fonts.black14w700,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        context.horizontalSpace(8),
+                        IconButton(
+                          tooltip: 'View Product Details',
+                          icon: const Icon(
+                            Icons.visibility_outlined,
+                            color: CustomColors.purple,
+                            size: 18,
+                          ),
+                          onPressed: () async {
+                            try {
+                              await ref
+                                  .read(productViewModelProvider.notifier)
+                                  .fetchProductDetail(entry.productId);
+                              if (context.mounted) {
+                                context.push(ProductDetailScreen.routeName);
+                              }
+                            } catch (e) {
+                              // Handled gracefully inside view model
+                            }
+                          },
+                          constraints: const BoxConstraints(),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(4),
+                    Text(
+                      'Brand: ${productData?.brand ?? "—"} • Manufacturer: ${productData?.manufacturer ?? "—"}',
+                      style: context.fonts.grey12w400,
+                    ),
+                    context.verticalSpace(4),
+                    Text(
+                      'SKU: ${productData?.globalSku ?? "—"}',
+                      style: context.fonts.grey12w400,
+                    ),
+                    context.verticalSpace(4),
+                    Row(
+                      children: [
+                        Text(
+                          'Usage Type: ${productData?.usageType ?? "—"}',
+                          style: context.fonts.grey12w400,
+                        ),
+                        context.horizontalSpace(12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: badgeColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: badgeColor.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Text(
+                            statusLabel,
+                            style: context.fonts.grey10w700ls1.copyWith(
+                              color: badgeColor,
+                              fontSize: 9,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               IconButton(
                 onPressed: () => viewModel.removeProductUsage(entry.productId),
@@ -5422,62 +5711,23 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             ],
           ),
           context.verticalSpace(20),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: CustomDropdown<String>(
-                  label: 'Usage Type',
-                  hintText: 'Select',
-                  value: entry.usageType,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Required',
-                      child: Text('Required'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Optional',
-                      child: Text('Optional'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Variable',
-                      child: Text('Variable'),
-                    ),
-                    DropdownMenuItem(value: 'Setup', child: Text('Setup')),
-                    DropdownMenuItem(
-                      value: 'Post_Care',
-                      child: Text('Post Care'),
-                    ),
-                    DropdownMenuItem(value: 'Device', child: Text('Device')),
-                  ],
-                  onChanged: (val) =>
-                      viewModel.updateProductUsageEntry(index, usageType: val),
-                ),
+          CustomDropdown<String>(
+            label: 'Deduction Timing',
+            hintText: 'Select',
+            value: entry.deductionTiming,
+            items: const [
+              DropdownMenuItem(
+                value: 'On_Completion',
+                child: Text('On Completion'),
               ),
-              context.horizontalSpace(16),
-              Expanded(
-                child: CustomDropdown<String>(
-                  label: 'Deduction Timing',
-                  hintText: 'Select',
-                  value: entry.deductionTiming,
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'On_Completion',
-                      child: Text('On Completion'),
-                    ),
-                    DropdownMenuItem(value: 'Manual', child: Text('Manual')),
-                    DropdownMenuItem(
-                      value: 'Post_Confirmation',
-                      child: Text('Post Confirmation'),
-                    ),
-                  ],
-                  onChanged: (val) => viewModel.updateProductUsageEntry(
-                    index,
-                    deductionTiming: val,
-                  ),
-                ),
+              DropdownMenuItem(value: 'Manual', child: Text('Manual')),
+              DropdownMenuItem(
+                value: 'Post_Confirmation',
+                child: Text('Post Confirmation'),
               ),
             ],
+            onChanged: (val) =>
+                viewModel.updateProductUsageEntry(index, deductionTiming: val),
           ),
           context.verticalSpace(20),
           Row(
@@ -5525,7 +5775,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             ),
             context.verticalSpace(16),
             ...allSubAreas.map((subArea) {
-              final controllers = entry.getControllersForSubArea(subArea.name);
+              final controllers = entry.getControllersForSubArea(
+                subArea.name,
+                subAreaId: subArea.id,
+              );
               final pluralUnit = formatUnitPlural(entry.unit);
               return Padding(
                 padding: context.appEdgeInsets(bottom: 16),
@@ -5854,7 +6107,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     CategoryState categoryState,
   ) {
     final bool isLastStep = state.currentStep == 16;
-
     return Row(
       children: [
         if (state.currentStep > 0) ...[
@@ -5870,14 +6122,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           flex: 2,
           child: CustomPrimaryButton(
             onTap: () async {
+              log('CURRENT STEP: ${state.currentStep}');
               if (state.currentStep == 0) {
                 if (!await _validateAndFetchCategory(
                   context,
                   state,
                   viewModel,
                   categoryState,
-                ))
+                )) {
                   return;
+                }
               }
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
@@ -5894,9 +6148,134 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               if (state.currentStep == 9) {
                 if (!_validatePostPhotos(context, state)) return;
               }
+              if (state.currentStep == 10) {
+                if (!_validatePhaseNotifications(context, state)) {
+                  return;
+                }
+              }
+              if (state.currentStep == 14) {
+                if (!_validateFollowUps(context, state)) {
+                  return;
+                }
+              }
 
               if (state.currentStep < 16) {
-                viewModel.setStep(state.currentStep + 1);
+                if (state.currentStep == 0) {
+                  viewModel.setStep(state.currentStep + 1);
+                } else if (state.currentStep == 1) {
+                  final success = await viewModel.createBasicInfo(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 2) {
+                  final success = await viewModel.createTreatmentArea(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 3) {
+                  final success = await viewModel.callProductUsage(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 4) {
+                  final success = await viewModel.createSchedule(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 5) {
+                  final success = await viewModel.callStepPricing(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 6) {
+                  final bytes = await ProtocolFormPreview.getPdfBytes(
+                    state: state,
+                    dataState: dataState,
+                    categoryState: categoryState,
+                  );
+
+                  final success = await viewModel.callProtocol(
+                    bytes: bytes,
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 7) {
+                  final success = await viewModel.callPreTreatmentInstructions(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 8) {
+                  final success = await viewModel.callPostTreatmentInstructions(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 9) {
+                  final success = await viewModel.callPostTreatmentPhotos();
+                  if (success ?? false) {
+                    viewModel.setStep(10);
+                  }
+                } else if (state.currentStep == 10) {
+                  final success = await viewModel.callPhaseNotifications();
+                  if (success ?? false) {
+                    viewModel.setStep(11);
+                  }
+                } else if (state.currentStep == 11) {
+                  final success = await viewModel.callDownTimeLevels(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(12);
+                  }
+                } else if (state.currentStep == 12) {
+                  final success = await viewModel.callAllowedProviderRoles(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } else if (state.currentStep == 13) {
+                  final success = await viewModel.callSessionsSetup();
+                  if (success ?? false) {
+                    viewModel.setStep(14);
+                  }
+                } else if (state.currentStep == 14) {
+                  final success = await viewModel.callFollowUpConfig();
+                  if (success ?? false) {
+                    viewModel.setStep(15);
+                  }
+                } else if (state.currentStep == 15) {
+                  final success = await viewModel.callConsentFormSelection(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(16);
+                  }
+                } else if (state.currentStep == 16) {
+                  final success = await viewModel.callBusinessLogic();
+                  if (success ?? false) {
+                    viewModel.setStep(17);
+                  }
+                }
+                // // TODO : this is only for now to go on forward step have to remove once stepper API are completed
+                // else {
+                //   viewModel.setStep(state.currentStep + 1);
+                // }
               } else {
                 viewModel
                     .submitTreatment(
@@ -6027,7 +6406,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     for (final entry in state.productUsageEntries) {
       if (allSubAreas.isNotEmpty) {
         for (final subArea in allSubAreas) {
-          final controllers = entry.getControllersForSubArea(subArea.name);
+          final controllers = entry.getControllersForSubArea(
+            subArea.name,
+            subAreaId: subArea.id,
+          );
           final minVal = double.tryParse(controllers.minController.text) ?? 0.0;
           final maxVal = double.tryParse(controllers.maxController.text) ?? 0.0;
           if (minVal < 1 || maxVal < 1) {
@@ -6144,6 +6526,85 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           ),
         );
         return false;
+      }
+    }
+    return true;
+  }
+
+  bool _validatePhaseNotifications(BuildContext context, TreatmentState state) {
+    log(
+      'NOTIFICATION: ${state.preNotificationEntries.length} ${state.postNotificationEntries.length}',
+    );
+    if (state.preNotificationEntries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Should have at least one notification in Pre-Notifications',
+          ),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    } else if (state.postNotificationEntries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Should have at least one notification in Post-Notifications',
+          ),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+    for (final entry in [
+      ...state.postNotificationEntries,
+      ...state.preNotificationEntries,
+    ]) {
+      if (entry.type.isEmpty ||
+          entry.titleController.text.isEmpty ||
+          entry.timingUnit.isEmpty ||
+          entry.timingValueController.text.isEmpty ||
+          entry.messageController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Make sure each notification in both categories are valid!',
+            ),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool _validateFollowUps(BuildContext context, TreatmentState state) {
+    for (final session in state.sessions) {
+      if (session.totalFollowUpsController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Total Follow Up number is required!'),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+      for (final followUp in session.followUps) {
+        if (followUp.notesController.text.isEmpty ||
+            followUp.intervalUnit.isEmpty ||
+            followUp.intervalValueController.text.isEmpty ||
+            followUp.durationValueController.text.isEmpty ||
+            followUp.type.isEmpty ||
+            followUp.durationUnit.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ensure that each follow up is valid!'),
+              backgroundColor: CustomColors.red,
+            ),
+          );
+          return false;
+        }
       }
     }
     return true;
@@ -6398,7 +6859,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 ),
                 context.horizontalSpace(12),
                 CustomPrimaryButton(
-                  onTap: () {
+                  onTap: () async {
                     final name = nameController.text.trim();
                     final sku = skuController.text.trim().toUpperCase();
 
@@ -6603,6 +7064,10 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                       : null;
                 });
                 widget.onAreaToggle(area);
+
+                ref
+                    .read(treatmentViewModelProvider.notifier)
+                    .setSelectedTreatmentAreaIds(area.id);
               },
               onAddChild: () {
                 _showAddNodeDialog(
@@ -6610,7 +7075,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                   title: 'Create New Sub-Area in ${area.name}',
                   onAdd: (name, sku, icon) => widget.onAddSubArea(
                     // TODO: Add actual parent area id.
-                    parentAreaId: 0,
+                    parentAreaId: area.id,
                     parentAreaName: area.name,
                     name: name,
                     sku: sku,
@@ -6680,6 +7145,10 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                     _focusedSubAreaName = subArea.name;
                   });
                   widget.onSubAreaToggle(focusedArea, subArea);
+
+                  ref
+                      .read(treatmentViewModelProvider.notifier)
+                      .setSelectedTreatmentAreaIds(subArea.id);
                 },
                 onAddChild: () {
                   _showAddNodeDialog(
@@ -6745,7 +7214,10 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
             children: focusedSubArea.subAreas.map((child) {
               final subAreaConfig = areaEntry.subAreas.firstWhere(
                 (s) => s.name == focusedSubArea.name,
-                orElse: () => SubAreaConfig(name: focusedSubArea.name),
+                orElse: () => SubAreaConfig(
+                  name: focusedSubArea.name,
+                  id: focusedSubArea.id,
+                ),
               );
               final isSelected = subAreaConfig.children.any(
                 (c) => c.name == child.name,
@@ -6762,6 +7234,10 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                     focusedSubArea,
                     child,
                   );
+
+                  ref
+                      .read(treatmentViewModelProvider.notifier)
+                      .setSelectedTreatmentAreaIds(child.id);
                 },
                 onAddChild: () {
                   ScaffoldMessenger.of(context).showSnackBar(

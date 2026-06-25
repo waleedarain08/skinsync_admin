@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/view_models/area_view_model.dart';
 
@@ -285,29 +284,27 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     );
   }
 
-  void addSubArea({
+  Future<void> addSubArea({
     required int parentAreaId,
     required String parentAreaName,
     required String name,
     String? sku,
     String? icon,
-  }) {
-    // final finalSku = (sku == null || sku.isEmpty)
-    //     ? _generateUniqueAreaSku()
-    //     : sku;
-    // state = state.copyWith(
-    //   areas: state.areas.map((a) {
-    //     if (a.name == parentAreaName) {
-    //       return a.copyWith(
-    //         subAreas: [
-    //           ...a.subAreas,
-    //           AreaModel(id: 0, name: name, globalSku: finalSku, icon: icon),
-    //         ],
-    //       );
-    //     }
-    //     return a;
-    //   }).toList(),
-    // );
+  }) async {
+   final value =  await ref
+        .read(areaViewModelProvider.notifier)
+        .createSubArea(
+      name: name,
+      globalSku: sku!,
+      icon: icon!,
+      parentId:parentAreaId,
+    );
+
+    if (value == true) {
+    await  ref
+          .read(areaViewModelProvider.notifier)
+          .refreshAreas();
+    }
   }
 
   void editSubArea(

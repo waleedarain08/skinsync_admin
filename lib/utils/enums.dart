@@ -1,3 +1,4 @@
+
 enum SharedPreferencesKeys {
   themeModeKey('theme-mode'),
   accessTokenKey('access-token'),
@@ -18,7 +19,7 @@ enum AuthScreen { login, forgetPassword, verifyOtp, createNewPassword }
 enum Endpoint {
   // auth
   login('admin/login'),
-  refreshToken('clinic/auth/refresh'),
+  refreshToken('admin/auth/refresh'),
   forgotPassword('admin/forgot-password'),
   // resendOtp('admin/reset-password'),
   verifyResetOtp('admin/verify-reset-otp'),
@@ -36,7 +37,18 @@ enum Endpoint {
   categories('admin/categories'),
   categoryDetail('admin/categories/{id}'),
   createCategory('admin/categories'),
-  areas('admin/areas');
+  areas('admin/areas'),
+  subAreas('admin/areas/sub'),
+  productsByTreatmentId('admin/products/by-treatment'),
+  basicInfo('admin/treatments/create'),
+  getBrands('admin/brands'),
+  unitTypesList('admin/unit-types'),
+  packageTypeList('admin/package-types'),
+  usageType('admin/usage-types'),
+  treatmentArea('admin/treatments/step'),
+  adminTreatments('admin/treatments/list'),
+  manufacturersList('admin/manufacturers');
+
 
   final String path;
   const Endpoint(this.path);
@@ -58,3 +70,16 @@ enum BaseUrls {
 
   const BaseUrls(this.url);
 }
+
+// enum UsageType {
+//   treatment,
+//   retailer,
+//   both;
+// }
+
+// void test() {
+//   const type = UsageType.treatment;
+//   log('API: ${type.name}');
+//   log('DISPLAY: ${type.name.capitalize}');
+// }
+
