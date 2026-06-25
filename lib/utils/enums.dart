@@ -19,7 +19,7 @@ enum AuthScreen { login, forgetPassword, verifyOtp, createNewPassword }
 enum Endpoint {
   // auth
   login('admin/login'),
-  refreshToken('clinic/auth/refresh'),
+  refreshToken('admin/auth/refresh'),
   forgotPassword('admin/forgot-password'),
   // resendOtp('admin/reset-password'),
   verifyResetOtp('admin/verify-reset-otp'),
@@ -46,7 +46,7 @@ enum Endpoint {
   packageTypeList('admin/package-types'),
   usageType('admin/usage-types'),
   treatmentArea('admin/treatments/step'),
-  adminTreatments('admin-treatments'),
+  adminTreatments('admin/treatments/list'),
   manufacturersList('admin/manufacturers');
 
 
