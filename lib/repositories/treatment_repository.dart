@@ -13,7 +13,12 @@ import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 
 import '../models/requests/basic_info_request.dart';
 
+import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
+
 abstract class TreatmentRepository {
+  Future<TreatmentProductsResponse> getProductsByTreatment(
+    List<int> categoryIds,
+  );
   Future<TreatmentListResponse> getTreatments({
     int page = 1,
     int limit = 10,

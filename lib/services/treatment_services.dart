@@ -14,6 +14,7 @@ import '../models/responses/treatment_list_response.dart';
 import '../repositories/treatment_repository.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
+import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'api_base_helper.dart';
 
 class TreatmentServices implements TreatmentRepository {
@@ -268,4 +269,20 @@ class TreatmentServices implements TreatmentRepository {
   //   }
   //   return response.isSuccess;
   // }
+
+  @override
+  Future<TreatmentProductsResponse> getProductsByTreatment(
+    List<int> categoryIds,
+  ) async {
+    final String idsParam = categoryIds.join(',');
+    final jsonResponse = await _api.get(
+      Endpoint.productsByTreatmentId,
+      queryParams: {'category_ids': idsParam},
+    );
+    final response = TreatmentProductsResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
 }
