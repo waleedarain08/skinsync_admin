@@ -6235,6 +6235,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(11);
                   }
+                } else if (state.currentStep == 11) {
+                  final success = await viewModel.callDownTimeLevels(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(12);
+                  }
                 }
                 // TODO : this is only for now to go on forward step have to remove once stepper API are completed
                 else {

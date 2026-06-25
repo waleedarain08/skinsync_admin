@@ -9,6 +9,7 @@ import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 
 import '../models/requests/basic_info_request.dart';
+import '../models/requests/down_time_level_request.dart';
 import '../models/requests/treatment_schedule_request.dart';
 import '../models/responses/base_response_model.dart';
 import '../models/responses/treatment_products_response.dart';
@@ -64,5 +65,10 @@ abstract class TreatmentRepository {
   Future<BaseApiResponseModel> phaseNotifications({
     required int draftTreatmentId,
     required PhaseNotificationsRequest request,
+  });
+
+  Future<BaseApiResponseModel> downTimeLevels({
+    required DownTimeLevelRequest request,
+    required int draftTreatmentID,
   });
 }

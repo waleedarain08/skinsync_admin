@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
 import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
@@ -839,6 +840,48 @@ Body       : ${request.toJson()}
       );
 
       log('Step Pricing Created : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
+  Future<bool?> callDownTimeLevels({required int stepNumber}) async {
+    // Resolve the actual days from the selected level + category presets
+    final presets = state.selectedCategoryDetail?.downtimePresets;
+    final level = state.downtimeLevel;
+
+    final int? downtimeDays = switch (level) {
+      'None' => presets?.none ?? 0,
+      'Low' => presets?.low ?? 2,
+      'Moderate' => presets?.moderate ?? 5,
+      'High' => presets?.high ?? 10,
+      _ => null,
+    };
+
+    final request = DownTimeLevelRequest(
+      stepNumber: stepNumber,
+      downtimeLevel: level,
+      downtimeDays: downtimeDays,
+    );
+
+    log('''
+=========== DOWNTIME LEVEL REQUEST ===========
+Draft ID      : ${state.draftTreatmentID}
+Step No       : $stepNumber
+Downtime Level: $level
+Downtime Days : $downtimeDays
+Body          : ${request.toJson()}
+=============================================
+''');
+
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.downTimeLevels(
+        // ← correct endpoint
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
+
+      log('Step Downtime Saved : ${state.draftTreatmentID}');
 
       return true;
     });
