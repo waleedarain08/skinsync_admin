@@ -50,6 +50,7 @@ enum Endpoint {
   manufacturersList('admin/manufacturers');
 
 
+
   final String path;
   const Endpoint(this.path);
 
