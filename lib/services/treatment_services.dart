@@ -1,5 +1,7 @@
 import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/constent_form_selection_request.dart';
 import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
@@ -11,7 +13,6 @@ import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
 import '../models/requests/basic_info_request.dart';
 import '../models/requests/business_logic_request.dart';
-import '../models/requests/follow_up_request.dart';
 import '../models/requests/sessions_setup_request.dart';
 import '../models/requests/treatment_area_request.dart';
 import '../models/requests/treatment_schedule_request.dart';
@@ -247,6 +248,26 @@ class TreatmentServices implements TreatmentRepository {
   @override
   Future<BaseApiResponseModel> allowedProviderRoles({
     required AllowedProviderRolesRequest request,
+    required int draftTreatmentID,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+
+      body: request,
+      queryParams: {'treatment_id': draftTreatmentID.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+
+    return response;
+  }
+
+  @override
+  Future<BaseApiResponseModel> consentFormSelection({
+    required ConsentFormSelectionRequest request,
     required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(

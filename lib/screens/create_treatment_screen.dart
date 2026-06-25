@@ -6260,9 +6260,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     viewModel.setStep(15);
                   }
                 } else if (state.currentStep == 15) {
-                  final success = await viewModel.callBusinessLogic();
+                  final success = await viewModel.callConsentFormSelection(
+                    stepNumber: state.currentStep + 1,
+                  );
                   if (success ?? false) {
                     viewModel.setStep(16);
+                  }
+                } else if (state.currentStep == 16) {
+                  final success = await viewModel.callBusinessLogic();
+                  if (success ?? false) {
+                    viewModel.setStep(17);
                   }
                 }
                 // // TODO : this is only for now to go on forward step have to remove once stepper API are completed
