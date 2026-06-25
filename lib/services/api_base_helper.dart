@@ -84,7 +84,7 @@ class ApiBaseHelper {
       // log('URL: ${baseUrl.url}${endpoint.path}');
       // log('REQUEST: $body');
       final response = await _client.post(
-        Uri.parse('${baseUrl.url}${endpoint.path}'),
+        uri,
         headers: await _headers(),
         body: jsonEncode(body),
       );

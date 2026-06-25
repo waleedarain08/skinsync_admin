@@ -1,3 +1,7 @@
+import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/product_usage_request.dart';
+import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 
 import '../models/requests/treatment_schedule_request.dart';
@@ -20,7 +24,7 @@ abstract class TreatmentRepository {
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request);
   Future<BaseApiResponseModel> protocol({
     required ProtocolRequest request,
-    required int draftID,
+    required int draftTreatmentID,
   });
 
   Future<BaseApiResponseModel> createTreatmentArea(
@@ -31,4 +35,21 @@ abstract class TreatmentRepository {
     TreatmentScheduleRequest request,
     int id,
   );
+
+  Future<BaseApiResponseModel> productUsage({
+    required ProductUsagesRequest request,
+     required int draftTreatmentID,
+  });
+  Future<BaseApiResponseModel> stepPricing({
+    required StepPricingRequest request,
+     required int draftTreatmentID,
+  });
+   Future<BaseApiResponseModel> preTreatmentInstructions({
+    required PreTreatmentInstructionsRequest request,
+     required int draftTreatmentID,
+  });
+    Future<BaseApiResponseModel> postTreatmentInstructions({
+    required PostTreatmentInstructionsRequest request,
+     required int draftTreatmentID,
+  });
 }

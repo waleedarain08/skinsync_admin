@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
@@ -68,6 +69,102 @@ class MediaService {
     log('Uploaded file URL: $url');
     return url;
   }
+
+   Future<String?> uploadMedia({
+    required String path,
+    required dynamic file, // XFile | PlatformFile
+  }) async {
+    try {
+      late String fileName;
+      late Uint8List bytes;
+
+      // XFile
+      if (file is XFile) {
+        fileName = file.name;
+        bytes = await file.readAsBytes();
+      }
+
+      // PlatformFile
+      else if (file is PlatformFile) {
+        fileName = file.name;
+
+        if (file.bytes == null) {
+          throw Exception(
+            'PlatformFile.bytes is null. Use withData:true',
+          );
+        }
+
+        bytes = file.bytes!;
+      } else {
+        throw Exception('Unsupported file type');
+      }
+
+      final ext = fileName.split('.').last.toLowerCase();
+
+      final storagePath = switch (ext) {
+        'png' || 'jpg' || 'jpeg' || 'gif' || 'webp'
+            => '$path/image/$fileName',
+
+        'mp4' || 'mov' || 'avi' || 'mkv' || 'webm'
+            => '$path/video/$fileName',
+
+        'pdf'
+            => '$path/pdf/$fileName',
+
+        _
+            => '$path/file/$fileName',
+      };
+
+      log('UPLOAD STARTED');
+      log('PATH: $storagePath');
+
+      final ref = _storage.ref().child(storagePath);
+
+      final task = ref.putData(
+        bytes,
+        SettableMetadata(
+          contentType: _contentType(ext),
+        ),
+      );
+
+      await task.whenComplete(() {});
+
+      final url = await ref.getDownloadURL();
+
+      log('UPLOAD SUCCESS');
+      log('UPLOADED PATH: $storagePath');
+      log('UPLOADED URL: $url');
+
+      return url;
+    } catch (e, s) {
+      log(
+        'UPLOAD ERROR: $e',
+        stackTrace: s,
+      );
+      rethrow;
+    }
+  }
+
+  String _contentType(String ext) {
+    return switch (ext) {
+      'png' => 'image/png',
+      'jpg' || 'jpeg' => 'image/jpeg',
+      'gif' => 'image/gif',
+      'webp' => 'image/webp',
+
+      'mp4' => 'video/mp4',
+      'mov' => 'video/quicktime',
+      'avi' => 'video/x-msvideo',
+      'mkv' => 'video/x-matroska',
+      'webm' => 'video/webm',
+
+      'pdf' => 'application/pdf',
+
+      _ => 'application/octet-stream',
+    };
+  }
+
+ 
 
   Future<XFile?> downloadSimulationImage({
     int? simId,

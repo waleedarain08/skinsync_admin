@@ -1000,16 +1000,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         viewModel.preTreatmentInstructionsController.text.isNotEmpty;
     final instructionsText = hasInstructions ? 'Configured' : 'None';
 
-    final allPre = [
-      ...state.existingPreAttachments,
-      ...state.preTreatmentAttachments.map(
-        (f) => Attachment(
-          url: f.path ?? '',
-          type: _getPlatformFileTypeSummary(f),
-          name: f.name,
-        ),
-      ),
-    ];
+    final allPre = [...state.existingPreAttachments];
 
     final pdfs = allPre.where((a) => a.type == 'pdf').length;
     final images = allPre.where((a) => a.type == 'image').length;
@@ -1201,7 +1192,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                               ),
                               ...allSubAreas.map((subArea) {
                                 final controllers = entry
-                                    .getControllersForSubArea(subArea.name);
+                                    .getControllersForSubArea(
+                                      subArea.name,
+                                      subAreaId: subArea.id,
+                                    );
                                 final minText = controllers.minController.text;
                                 final maxText = controllers.maxController.text;
                                 return Padding(
@@ -2088,41 +2082,48 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           maxLines: 8,
         ),
         context.verticalSpace(32),
-        _buildAttachmentsField(
+        _buildUploadedAttachmentsField(
           context,
-          state.preTreatmentAttachments,
+          state.existingPreAttachments,
           () => viewModel.pickAttachments(true),
-          (idx) => viewModel.removeAttachment(true, idx),
+          (idx) => viewModel.removeExistingAttachment(true, idx),
         ),
       ],
     );
   }
 
   Widget _buildStepPostInstructions(
-    BuildContext context,
-    TreatmentState state,
-    TreatmentViewModel viewModel,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        BuildTextField(
-          label: 'Post-Treatment Instructions',
-          controller: viewModel.postTreatmentInstructionsController,
-          hintText: 'Aftercare and recovery guidelines...',
-          maxLines: 8,
-        ),
-        context.verticalSpace(32),
-        _buildAttachmentsField(
-          context,
-          state.postTreatmentAttachments,
-          () => viewModel.pickAttachments(false),
-          (idx) => viewModel.removeAttachment(false, idx),
-        ),
-      ],
-    );
-  }
+  BuildContext context,
+  TreatmentState state,
+  TreatmentViewModel viewModel,
+) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      BuildTextField(
+        label: 'Post-Treatment Instructions',
+        controller:
+            viewModel.postTreatmentInstructionsController,
+        hintText:
+            'Aftercare and recovery guidelines...',
+        maxLines: 8,
+      ),
 
+      context.verticalSpace(32),
+
+      _buildUploadedAttachmentsField(
+        context,
+        state.existingPostAttachments,
+        () => viewModel.pickAttachments(false),
+        (idx) =>
+            viewModel.removeExistingAttachment(
+          false,
+          idx,
+        ),
+      ),
+    ],
+  );
+}
   Widget _buildStepNotifications(
     BuildContext context,
     TreatmentState state,
@@ -4202,6 +4203,157 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     );
   }
 
+  Widget _buildUploadedAttachmentsField(
+    BuildContext context,
+    List<Attachment> files,
+    VoidCallback onPick,
+    void Function(int) onRemove,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Supporting Media (Optional)',
+              style: context.fonts.black14w600,
+            ),
+            TextButton.icon(
+              onPressed: onPick,
+              icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
+              label: const Text('Add Files'),
+              style: TextButton.styleFrom(foregroundColor: CustomColors.purple),
+            ),
+          ],
+        ),
+        context.verticalSpace(12),
+        if (files.isEmpty)
+          InkWell(
+            onTap: onPick,
+            child: Container(
+              width: double.infinity,
+              padding: context.appEdgeInsets(vertical: 20),
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(
+                  color: CustomColors.border,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.cloud_upload_outlined,
+                    color: CustomColors.grey,
+                    size: 24,
+                  ),
+                  context.verticalSpace(8),
+                  Text(
+                    'Upload PDFs, Images, or Videos',
+                    style: context.fonts.grey13w500,
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          Wrap(
+            spacing: context.w(12),
+            runSpacing: context.h(12),
+            children: List.generate(files.length, (index) {
+              final file = files[index];
+              return Container(
+                width: context.w(160),
+                padding: context.appEdgeInsets(all: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: context.appBorderRadius(all: 10),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: Column(
+                  children: [
+                    Stack(
+                      children: [
+                        Container(
+                          height: context.h(80),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: CustomColors.whiteGrey,
+                            borderRadius: context.appBorderRadius(all: 6),
+                          ),
+                          child: _buildUploadedAttachmentPreview(context, file),
+                        ),
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: InkWell(
+                            onTap: () => onRemove(index),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close_rounded,
+                                size: 14,
+                                color: CustomColors.red,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(8),
+                    Text(
+                      file.name,
+                      style: context.fonts.grey10w400,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildUploadedAttachmentPreview(
+    BuildContext context,
+    Attachment file,
+  ) {
+    if (file.type == 'image') {
+      return ClipRRect(
+        borderRadius: context.appBorderRadius(all: 6),
+        child: Image.network(file.url, fit: BoxFit.cover),
+      );
+    }
+    if (file.type == 'pdf') {
+      return const Icon(
+        Icons.picture_as_pdf_rounded,
+        color: CustomColors.red,
+        size: 32,
+      );
+    }
+    if (file.type == 'video') {
+      return const Icon(
+        Icons.video_collection_rounded,
+        color: CustomColors.purple,
+        size: 32,
+      );
+    }
+    return const Icon(
+      Icons.insert_drive_file_outlined,
+      color: CustomColors.grey,
+      size: 32,
+    );
+  }
+
   Widget _buildAttachmentsField(
     BuildContext context,
     List<PlatformFile> files,
@@ -4442,7 +4594,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     if (allSubAreas.isNotEmpty) {
       double sum = 0.0;
       for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(subArea.name);
+        final controllers = entry.getControllersForSubArea(
+          subArea.name,
+          subAreaId: subArea.id,
+        );
         sum += double.tryParse(controllers.minController.text) ?? 0.0;
       }
       return sum;
@@ -4458,7 +4613,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     if (allSubAreas.isNotEmpty) {
       double sum = 0.0;
       for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(subArea.name);
+        final controllers = entry.getControllersForSubArea(
+          subArea.name,
+          subAreaId: subArea.id,
+        );
         sum += double.tryParse(controllers.maxController.text) ?? 0.0;
       }
       return sum;
@@ -5030,7 +5188,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     if (index == -1) {
       final newEntry = AreaViewModelEntry();
       newEntry.areaController.text = area.name;
-      newEntry.subAreas = [SubAreaConfig(name: subArea.name)];
+      newEntry.subAreas = [SubAreaConfig(name: subArea.name, id: subArea.id)];
       viewModel.updateAreas([...cleanAreas, newEntry]);
     } else {
       final areaEntry = cleanAreas[index];
@@ -5040,7 +5198,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       if (subIndex == -1) {
         areaEntry.subAreas = [
           ...areaEntry.subAreas,
-          SubAreaConfig(name: subArea.name),
+          SubAreaConfig(name: subArea.name, id: subArea.id),
         ];
       } else {
         areaEntry.subAreas = areaEntry.subAreas
@@ -5070,6 +5228,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       newEntry.subAreas = [
         SubAreaConfig(
           name: subArea.name,
+          id: subArea.id,
           children: [SubAreaChildConfig(name: child.name)],
         ),
       ];
@@ -5084,6 +5243,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           ...areaEntry.subAreas,
           SubAreaConfig(
             name: subArea.name,
+            id: subArea.id,
             children: [SubAreaChildConfig(name: child.name)],
           ),
         ];
@@ -5495,7 +5655,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             ),
             context.verticalSpace(16),
             ...allSubAreas.map((subArea) {
-              final controllers = entry.getControllersForSubArea(subArea.name);
+              final controllers = entry.getControllersForSubArea(
+                subArea.name,
+                subAreaId: subArea.id,
+              );
               final pluralUnit = formatUnitPlural(entry.unit);
               return Padding(
                 padding: context.appEdgeInsets(bottom: 16),
@@ -5873,15 +6036,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 }
-                // TODO : remove this condition after complettion of api
-                else {
-                  final success = await viewModel.createBasicInfo(
-                    stepNumber: state.currentStep + 1,
-                  );
-                  if (success ?? false) {
-                    viewModel.setStep(state.currentStep + 1);
-                  }
-                }
+               
                 if (state.currentStep == 2) {
                   final success = await viewModel.createTreatmentArea(
                     stepNumber: state.currentStep + 1,
@@ -5889,8 +6044,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                } else {
-                  viewModel.setStep(state.currentStep + 1);
+                }
+                if (state.currentStep == 3) {
+                  final success = await viewModel.callProductUsage(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
                 }
                 if (state.currentStep == 4) {
                   final success = await viewModel.createSchedule(
@@ -5899,9 +6060,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                } else {
-                  viewModel.setStep(state.currentStep + 1);
-                }
+                } 
+                if (state.currentStep == 5) {
+                  final success = await viewModel.callStepPricing(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                } 
+
                 if (state.currentStep == 6) {
                   final bytes = await ProtocolFormPreview.getPdfBytes(
                     state: state,
@@ -5916,6 +6084,26 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
+                }
+                if (state.currentStep == 7) {
+                  final success = await viewModel.callPreTreatmentInstructions(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                }
+                 if (state.currentStep == 8) {
+                  final success = await viewModel.callPostTreatmentInstructions(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(state.currentStep + 1);
+                  }
+                }
+                // TODO : this is only for now to go on forward step have to remove once stepper API are completed
+                else {
+                  viewModel.setStep(state.currentStep + 1);
                 }
               } else {
                 viewModel
@@ -6047,7 +6235,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     for (final entry in state.productUsageEntries) {
       if (allSubAreas.isNotEmpty) {
         for (final subArea in allSubAreas) {
-          final controllers = entry.getControllersForSubArea(subArea.name);
+          final controllers = entry.getControllersForSubArea(
+            subArea.name,
+            subAreaId: subArea.id,
+          );
           final minVal = double.tryParse(controllers.minController.text) ?? 0.0;
           final maxVal = double.tryParse(controllers.maxController.text) ?? 0.0;
           if (minVal < 1 || maxVal < 1) {
@@ -6773,7 +6964,10 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
             children: focusedSubArea.subAreas.map((child) {
               final subAreaConfig = areaEntry.subAreas.firstWhere(
                 (s) => s.name == focusedSubArea.name,
-                orElse: () => SubAreaConfig(name: focusedSubArea.name),
+                orElse: () => SubAreaConfig(
+                  name: focusedSubArea.name,
+                  id: focusedSubArea.id,
+                ),
               );
               final isSelected = subAreaConfig.children.any(
                 (c) => c.name == child.name,

@@ -1,4 +1,8 @@
+import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/product_usage_request.dart';
 import 'package:skinsync_admin/models/requests/protocol_request.dart';
+import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
 import '../models/requests/treatment_area_request.dart';
@@ -72,13 +76,13 @@ class TreatmentServices implements TreatmentRepository {
   @override
   Future<BaseApiResponseModel> protocol({
     required ProtocolRequest request,
-    required int draftID,
+    required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.protocol,
+      Endpoint.treatmentArea,
 
       body: request,
-      queryParams: {'treatment_id': draftID.toString()},
+      queryParams: {'treatment_id': draftTreatmentID.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -88,6 +92,88 @@ class TreatmentServices implements TreatmentRepository {
 
     return response;
   }
+
+ @override
+  Future<BaseApiResponseModel> productUsage({
+    required ProductUsagesRequest request,
+    required int draftTreatmentID,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+
+      body: request,
+      queryParams: {'treatment_id': draftTreatmentID.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+
+    return response;
+  }
+
+@override
+  Future<BaseApiResponseModel> stepPricing({
+    required StepPricingRequest request,
+    required int draftTreatmentID,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+
+      body: request,
+      queryParams: {'treatment_id': draftTreatmentID.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+
+    return response;
+  }
+  
+  @override
+  Future<BaseApiResponseModel> preTreatmentInstructions({
+    required PreTreatmentInstructionsRequest request,
+    required int draftTreatmentID,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+
+      body: request,
+      queryParams: {'treatment_id': draftTreatmentID.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+
+    return response;
+  }
+  
+@override
+  Future<BaseApiResponseModel> postTreatmentInstructions({
+    required PostTreatmentInstructionsRequest request,
+    required int draftTreatmentID,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+
+      body: request,
+      queryParams: {'treatment_id': draftTreatmentID.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+
+    return response;
+  }
+  
+
 
   // @override
   // Future<List<TreatmentModel>> getAdminTreatments() async {

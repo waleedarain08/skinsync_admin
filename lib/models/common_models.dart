@@ -110,27 +110,33 @@ class DowntimePresets {
 }
 
 class SubAreaConsumption {
+  int subAreaId;
   String subAreaName;
   double minQuantity;
   double maxQuantity;
 
   SubAreaConsumption({
+    required this.subAreaId,
     required this.subAreaName,
     this.minQuantity = 0.0,
     this.maxQuantity = 0.0,
   });
 
   factory SubAreaConsumption.fromJson(Map<String, dynamic> json) => SubAreaConsumption(
+    subAreaId: json['sub_area_id'] ?? 0,
     subAreaName: json['sub_area_name'] ?? '',
     minQuantity: (json['min_quantity'] as num?)?.toDouble() ?? 0.0,
     maxQuantity: (json['max_quantity'] as num?)?.toDouble() ?? 0.0,
   );
 
   Map<String, dynamic> toJson() => {
+    'sub_area_id': subAreaId,
     'sub_area_name': subAreaName,
     'min_quantity': minQuantity,
     'max_quantity': maxQuantity,
   };
+
+  
 }
 
 class ProductUsageModel {

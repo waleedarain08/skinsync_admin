@@ -6,10 +6,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/product_usage_request.dart';
+import 'package:skinsync_admin/models/requests/protocol_request.dart';
+import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
-import 'package:skinsync_admin/models/requests/protocol_request.dart';
-
 import '../models/notification_entry.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
@@ -196,7 +199,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 url: uploadedFile,
               ),
             ),
-            draftID: state.draftTreatmentID ?? 0,
+            draftTreatmentID: state.draftTreatmentID ?? 0,
           );
 
           return response.isSuccess;
@@ -549,6 +552,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               .map(
                 (s) => SubAreaConfig(
                   name: s.name ?? '',
+                  id: s.id ?? 0,
                   basePrice: s.basePrice?.toString(),
                   unitPrices: s.unitPrices,
                 ),
@@ -762,6 +766,166 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         state.draftTreatmentID!,
       );
       log('Treatment Area Created : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
+  Future<bool?> callStepPricing({required int stepNumber}) async {
+    final request = StepPricingRequest(
+      stepNumber: stepNumber,
+
+      basePrice: int.tryParse(basePriceController.text.trim()),
+
+      unitPriceOverrides: state.productUsageEntries
+          .map((entry) {
+            final controller = getControllerForUnit(entry.unit);
+
+            final price = int.tryParse(controller.text.trim());
+
+            if (price == null) {
+              return null;
+            }
+
+            return UnitPriceOverride(
+              productId: entry.productId,
+              pricePerUnit: price,
+            );
+          })
+          .whereType<UnitPriceOverride>()
+          .toList(),
+    );
+    log('''
+=========== PRODUCT USAGE REQUEST ===========
+Draft ID   : ${state.draftTreatmentID}
+Step No    : $stepNumber
+Body       : ${request.toJson()}
+============================================
+''');
+
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.stepPricing(
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
+
+      log('Step Pricing Created : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
+  Future<bool?> callPreTreatmentInstructions({required int stepNumber}) async {
+    return await runSafely<bool>(() async {
+      final attachments = state.existingPreAttachments
+          .map(
+            (a) =>
+                PreTreatmentAttachment(name: a.name, url: a.url, type: a.type),
+          )
+          .toList();
+
+      final request = PreTreatmentInstructionsRequest(
+        stepNumber: stepNumber,
+        preTreatmentInstructions:
+            preTreatmentInstructionsController.text.trim().isEmpty
+            ? null
+            : preTreatmentInstructionsController.text.trim(),
+        preTreatmentAttachments: attachments.isEmpty ? null : attachments,
+      );
+      log('''
+=========== PRE-TREATMENT INSTRUCTIONS REQUEST ===========
+Draft ID   : ${state.draftTreatmentID}
+Step No    : $stepNumber
+Body       : ${request.toJson()}
+============================================
+''');
+
+      await _treatmentRepository.preTreatmentInstructions(
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
+
+      log('Pre-Treatment Instructions Created : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
+  Future<bool?> callPostTreatmentInstructions({required int stepNumber}) async {
+    return await runSafely<bool>(() async {
+      final attachments = state.existingPostAttachments
+          .map(
+            (a) =>
+                PostTreatmentAttachment(name: a.name, url: a.url, type: a.type),
+          )
+          .toList();
+
+      final request = PostTreatmentInstructionsRequest(
+        stepNumber: stepNumber,
+        postTreatmentInstructions:
+            postTreatmentInstructionsController.text.trim().isEmpty
+            ? null
+            : postTreatmentInstructionsController.text.trim(),
+        postTreatmentAttachments: attachments.isEmpty ? null : attachments,
+      );
+      log('''
+=========== POST-TREATMENT INSTRUCTIONS REQUEST ===========
+Draft ID   : ${state.draftTreatmentID}
+Step No    : $stepNumber
+Body       : ${request.toJson()}
+============================================
+''');
+
+      await _treatmentRepository.postTreatmentInstructions(
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
+
+      log('Post-Treatment Instructions Created : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
+  Future<bool?> callProductUsage({required int stepNumber}) async {
+    final request = ProductUsagesRequest(
+      stepNumber: stepNumber,
+      productUsages: state.productUsageEntries.map((e) {
+        final subAreaConsumptions = e.subAreaControllers.entries
+            .map(
+              (entry) => SubAreaConsumptionModel(
+                subAreaId: entry.value.subAreaId,
+                subAreaName: entry.key,
+                minQuantity: int.tryParse(entry.value.minController.text),
+                maxQuantity: int.tryParse(entry.value.maxController.text),
+              ),
+            )
+            .toList();
+
+        return ProductUsage(
+          productId: e.productId,
+          deductionTiming: e.deductionTiming,
+          allowSubstitution: e.allowSubstitution,
+          notes: e.notesController.text,
+          subAreaConsumptions: subAreaConsumptions.isEmpty
+              ? null
+              : subAreaConsumptions,
+        );
+      }).toList(),
+    );
+    log('''
+=========== PRODUCT USAGE REQUEST ===========
+Draft ID   : ${state.draftTreatmentID}
+Step No    : $stepNumber
+Body       : ${request.toJson()}
+============================================
+''');
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.productUsage(
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
+      log('Product Usage Created : ${state.draftTreatmentID}');
 
       return true;
     });
@@ -1147,7 +1311,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       final updatedAreas = [...state.areas];
       updatedAreas[areaIndex].subAreas = [
         ...updatedAreas[areaIndex].subAreas,
-        SubAreaConfig(name: val),
+        SubAreaConfig(name: val, id: 0),
       ];
       updatedAreas[areaIndex].subAreaController.clear();
       state = state.copyWith(areas: updatedAreas);
@@ -1285,41 +1449,81 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(postNotificationOffset: offset);
   }
 
-  Future<void> pickAttachments(bool isPreTreatment) async {
-    final FilePickerResult? result = await FilePicker.pickFiles(
-      allowMultiple: true,
-      type: FileType.custom,
-      allowedExtensions: [
-        'pdf',
-        'jpg',
-        'jpeg',
-        'png',
-        'webp',
-        'mp4',
-        'mov',
-        'avi',
-      ],
-    );
+Future<void> pickAttachments(bool isPreTreatment) async {
+  final FilePickerResult? result =
+      await FilePicker.pickFiles(
+    allowMultiple: true,
+    withData: true,
+    type: FileType.custom,
+    allowedExtensions: [
+      'pdf',
+      'jpg',
+      'jpeg',
+      'png',
+      'webp',
+      'mp4',
+      'mov',
+      'avi',
+      'mkv',
+      'webm',
+    ],
+  );
 
-    if (result != null) {
-      if (isPreTreatment) {
-        state = state.copyWith(
-          preTreatmentAttachments: [
-            ...state.preTreatmentAttachments,
-            ...result.files,
-          ],
-        );
-      } else {
-        state = state.copyWith(
-          postTreatmentAttachments: [
-            ...state.postTreatmentAttachments,
-            ...result.files,
-          ],
+  if (result == null) return;
+
+  await runSafely(() async {
+    final uploaded = <Attachment>[];
+
+    for (final file in result.files) {
+      log('Uploading: ${file.name}');
+
+      final url = await MediaService().uploadMedia(
+        path: 'treatments',
+        file: file,
+      );
+
+      if (url == null) {
+        throw UnknownException(
+          'Failed to upload ${file.name}',
         );
       }
-    }
-  }
 
+      uploaded.add(
+        Attachment(
+          url: url,
+          type: _getFileType(file),
+          name: file.name,
+        ),
+      );
+
+      log('Uploaded: $url');
+    }
+
+    if (isPreTreatment) {
+      state = state.copyWith(
+        existingPreAttachments: [
+          ...state.existingPreAttachments,
+          ...uploaded,
+        ],
+      );
+
+      log(
+        'PRE TOTAL: ${state.existingPreAttachments.length}',
+      );
+    } else {
+      state = state.copyWith(
+        existingPostAttachments: [
+          ...state.existingPostAttachments,
+          ...uploaded,
+        ],
+      );
+
+      log(
+        'POST TOTAL: ${state.existingPostAttachments.length}',
+      );
+    }
+  });
+}
   Future<void> pickConsentForm() async {
     final FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.custom,
@@ -1748,6 +1952,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 double.tryParse(controllers.maxController.text) ?? 0.0;
             subAreaConsumptions.add(
               SubAreaConsumption(
+                subAreaId: controllers.subAreaId ?? 0,
                 subAreaName: subName,
                 minQuantity: minVal,
                 maxQuantity: maxVal,
@@ -2073,6 +2278,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
                 double.tryParse(controllers.maxController.text) ?? 0.0;
             subAreaConsumptions.add(
               SubAreaConsumption(
+                subAreaId: controllers.subAreaId ?? 0,
                 subAreaName: subName,
                 minQuantity: minVal,
                 maxQuantity: maxVal,
@@ -2238,7 +2444,6 @@ class TreatmentState extends BaseStateModel {
   final List<TreatmentModel> filteredTreatments;
   final TreatmentModel? selectedTreatment;
   final int? selectedTreatmentId;
-
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
   final int currentStep;
@@ -2551,10 +2756,11 @@ class FollowUpEntry {
 }
 
 class SubAreaConsumptionControllers {
+  int? subAreaId;
   final minController = TextEditingController(text: '1');
   final maxController = TextEditingController(text: '1');
 
-  SubAreaConsumptionControllers({String? min, String? max}) {
+  SubAreaConsumptionControllers({this.subAreaId, String? min, String? max}) {
     if (min != null) minController.text = min;
     if (max != null) maxController.text = max;
   }
@@ -2600,6 +2806,7 @@ class ProductUsageEntry {
     if (initialSubAreaConsumptions != null) {
       for (final sac in initialSubAreaConsumptions) {
         subAreaControllers[sac.subAreaName] = SubAreaConsumptionControllers(
+          subAreaId: sac.subAreaId,
           min: sac.minQuantity.toString(),
           max: sac.maxQuantity.toString(),
         );
@@ -2607,11 +2814,22 @@ class ProductUsageEntry {
     }
   }
 
-  SubAreaConsumptionControllers getControllersForSubArea(String subAreaName) {
-    return subAreaControllers.putIfAbsent(
-      subAreaName,
-      SubAreaConsumptionControllers.new,
-    );
+  SubAreaConsumptionControllers getControllersForSubArea(
+    String subAreaName, {
+    int? subAreaId,
+  }) {
+    final existing = subAreaControllers[subAreaName];
+    if (existing != null) {
+      if (subAreaId != null &&
+          (existing.subAreaId == null || existing.subAreaId == 0)) {
+        existing.subAreaId = subAreaId;
+      }
+      return existing;
+    }
+
+    final controllers = SubAreaConsumptionControllers(subAreaId: subAreaId);
+    subAreaControllers[subAreaName] = controllers;
+    return controllers;
   }
 
   ProductUsageEntry copyWith({
@@ -2633,6 +2851,7 @@ class ProductUsageEntry {
     );
     subAreaControllers.forEach((key, val) {
       entry.subAreaControllers[key] = SubAreaConsumptionControllers(
+        subAreaId: val.subAreaId,
         min: val.minController.text,
         max: val.maxController.text,
       );
@@ -2688,12 +2907,14 @@ class SubAreaChildConfig {
 
 class SubAreaConfig {
   final String name;
+  final int id;
   final basePriceController = TextEditingController(text: '0');
   final Map<String, TextEditingController> unitPriceControllers = {};
   List<SubAreaChildConfig> children = [];
 
   SubAreaConfig({
     required this.name,
+    this.id = 0,
     String? basePrice,
     Map<String, double>? unitPrices,
     List<SubAreaChildConfig>? children,
