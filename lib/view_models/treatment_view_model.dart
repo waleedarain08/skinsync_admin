@@ -12,6 +12,7 @@ import 'package:skinsync_admin/models/requests/post_treatment_instruction_reques
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
 import 'package:skinsync_admin/models/requests/protocol_request.dart';
+import 'package:skinsync_admin/models/requests/sessions_setup_request.dart';
 import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
@@ -1002,6 +1003,20 @@ Body       : ${request.toJson()}
             );
           }).toList(),
         ),
+      );
+      return true;
+    });
+  }
+
+  Future<bool?> callSessionsSetup() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.sessionsSetup(
+        draftTreatmentId: treatmentId,
+        request: SessionsSetupRequest(totalSessions: state.totalSessions),
       );
       return true;
     });

@@ -10,6 +10,7 @@ import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 
 import '../models/requests/basic_info_request.dart';
 import '../models/requests/down_time_level_request.dart';
+import '../models/requests/sessions_setup_request.dart';
 import '../models/requests/treatment_schedule_request.dart';
 import '../models/responses/base_response_model.dart';
 import '../models/responses/treatment_products_response.dart';
@@ -70,5 +71,10 @@ abstract class TreatmentRepository {
   Future<BaseApiResponseModel> downTimeLevels({
     required DownTimeLevelRequest request,
     required int draftTreatmentID,
+  });
+
+  Future<BaseApiResponseModel> sessionsSetup({
+    required int draftTreatmentId,
+    required SessionsSetupRequest request,
   });
 }
