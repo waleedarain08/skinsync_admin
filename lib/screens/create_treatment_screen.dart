@@ -5423,7 +5423,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   ),
                   context.verticalSpace(12),
                   TextButton(
-                    onPressed: () => viewModel.fetchProductsByTreatmentCategory(),
+                    onPressed: () =>
+                        viewModel.fetchProductsByTreatmentCategory(),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -5496,10 +5497,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             return filtered
                 .map(
                   (p) => ListTile(
-                    title: Text(
-                      p.name,
-                      style: context.fonts.black14w600,
-                    ),
+                    title: Text(p.name, style: context.fonts.black14w600),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -5553,7 +5551,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       return '${unit}s';
     }
 
-    final TreatmentProductData? productData = state.products.any((p) => p.id == entry.productId)
+    final TreatmentProductData? productData =
+        state.products.any((p) => p.id == entry.productId)
         ? state.products.firstWhere((p) => p.id == entry.productId)
         : null;
 
@@ -5676,11 +5675,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                         ),
                         context.horizontalSpace(12),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: badgeColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: badgeColor.withOpacity(0.2)),
+                            border: Border.all(
+                              color: badgeColor.withOpacity(0.2),
+                            ),
                           ),
                           child: Text(
                             statusLabel,
@@ -6217,6 +6221,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   }
                 } else if (state.currentStep == 9) {
                   final success = await viewModel.callPostTreatmentPhotos();
+                  if (success ?? false) {
+                    viewModel.setStep(10);
+                  }
+                } else if (state.currentStep == 11) {
+                  final success = await viewModel.callDownTimeLevels(
+                    stepNumber: state.currentStep + 1,
+                  );
                   if (success ?? false) {
                     viewModel.setStep(10);
                   }

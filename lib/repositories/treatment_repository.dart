@@ -1,3 +1,4 @@
+import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
@@ -59,4 +60,10 @@ abstract class TreatmentRepository {
     required bool requirePostPhotos,
     required int count,
   });
+
+   Future<BaseApiResponseModel> downTimeLevels({
+    required DownTimeLevelRequest request,
+    required int draftTreatmentID,
+  });
+
 }
