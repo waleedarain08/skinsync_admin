@@ -9,7 +9,7 @@ class UnitTypesListResponse extends BaseApiResponseModel<List<UnitTypeModel>> {
 
   factory UnitTypesListResponse.fromJson(Map<String, dynamic> json) {
     return UnitTypesListResponse(
-      isSuccess: json['status'] as bool? ?? false,
+      isSuccess: json['is_success'] as bool? ?? false,
       message: json['message'] ?? '',
       data: json['data'] == null
           ? null

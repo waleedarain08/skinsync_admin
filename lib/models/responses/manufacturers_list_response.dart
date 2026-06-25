@@ -9,7 +9,7 @@ class ManufacturersListResponse extends BaseApiResponseModel<List<ManufacturersM
 
   factory ManufacturersListResponse.fromJson(Map<String, dynamic> json) {
     return ManufacturersListResponse(
-      isSuccess: json['status'] as bool? ?? false,
+      isSuccess: json['is_success'] as bool? ?? false,
       message: json['message'] ?? '',
       data: json['data'] == null
           ? null

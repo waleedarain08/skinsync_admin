@@ -1,3 +1,4 @@
+import '../product_model.dart';
 import 'base_response_model.dart';
 
 class ProductDetailResponse extends BaseApiResponseModel<ProductDetailModel> {
@@ -8,7 +9,7 @@ class ProductDetailResponse extends BaseApiResponseModel<ProductDetailModel> {
   });
 
   factory ProductDetailResponse.fromJson(Map<String, dynamic> json) {
-    final bool success = (json['is_success'] as bool?)  ?? false;
+    final bool success = (json['is_success'] as bool?) ?? false;
     return ProductDetailResponse(
       isSuccess: success,
       message: json['message'] ?? '',
@@ -17,8 +18,6 @@ class ProductDetailResponse extends BaseApiResponseModel<ProductDetailModel> {
           : ProductDetailModel.fromJson(json['data'] as Map<String, dynamic>),
     );
   }
-
-
 }
 
 class ProductDetailModel {
@@ -134,5 +133,34 @@ class ProductDetailModel {
       'lot_number': lotNumber,
       'expiration_date': expirationDate?.toIso8601String(),
     };
+  }
+
+  ProductModel toProductModel() {
+    return ProductModel(
+      id: id,
+      image: image,
+      name: name,
+      brand: brand,
+      globalSku: globalSku,
+      barcode: barcode,
+      productPurpose: usageType,
+      category: category,
+      selectedCategoryIds: selectedCategoryIds,
+      status: status,
+      description: description,
+      unit: unitType ?? '',
+      boxQuantity: boxQuantity,
+      itemQuantityPerBox: itemQuantityPerBox,
+      packageType: packageType,
+      billableUnit: billableUnit,
+      billableQuantityPerItem: billableQuantityPerItem,
+      totalBillableQuantity: totalBillableQuantity,
+      enforceLotTracking: enforceLotTracking,
+      clinicCost: clinicCost,
+      retailPricePerUnit: retailPricePerUnit,
+      supplier: supplier,
+      lotNumber: lotNumber,
+      expirationDate: expirationDate,
+    );
   }
 }

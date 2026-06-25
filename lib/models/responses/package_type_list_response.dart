@@ -9,7 +9,7 @@ class PackageTypeListResponse extends BaseApiResponseModel<List<PackageTypeModel
 
   factory PackageTypeListResponse.fromJson(Map<String, dynamic> json) {
     return PackageTypeListResponse(
-      isSuccess: json['status'] as bool? ?? false,
+      isSuccess: json['is_success'] as bool? ?? false,
       message: json['message'] ?? '',
       data: json['data'] == null
           ? null

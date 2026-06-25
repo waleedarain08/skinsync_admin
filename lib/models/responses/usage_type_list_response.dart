@@ -9,7 +9,7 @@ class UsageTypeListResponse extends BaseApiResponseModel<List<UsageTypeModel>> {
 
   factory UsageTypeListResponse.fromJson(Map<String, dynamic> json) {
     return UsageTypeListResponse(
-      isSuccess: json['status'] as bool? ?? false,
+      isSuccess: json['is_success'] as bool? ?? false,
       message: json['message'] ?? '',
       data: json['data'] == null
           ? null
