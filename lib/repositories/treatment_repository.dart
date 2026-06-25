@@ -72,6 +72,10 @@ abstract class TreatmentRepository {
     required DownTimeLevelRequest request,
     required int draftTreatmentID,
   });
+  Future<BaseApiResponseModel> allowedProviderRoles({
+    required AllowedProviderRolesRequest request,
+    required int draftTreatmentID,
+  });
 
   Future<BaseApiResponseModel> sessionsSetup({
     required int draftTreatmentId,

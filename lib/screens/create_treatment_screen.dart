@@ -6247,6 +6247,15 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(14);
                   }
+
+                } else if (state.currentStep == 12) {
+                  final success = await viewModel.callAllowedProviderRoles(
+                    stepNumber: state.currentStep + 1,
+                  );
+                  if (success ?? false) {
+                    viewModel.setStep(10);
+                  }
+                   viewModel.setStep(state.currentStep + 1);
                 }
                 // TODO : this is only for now to go on forward step have to remove once stepper API are completed
                 else {

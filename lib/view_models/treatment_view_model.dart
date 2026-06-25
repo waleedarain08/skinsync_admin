@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
 import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
@@ -888,6 +889,32 @@ Body          : ${request.toJson()}
     });
   }
 
+Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
+  final request = AllowedProviderRolesRequest(
+    stepNumber: stepNumber,
+    allowedRoles: state.selectedRoles, // ← matches state field from UI
+  );
+
+  log('''
+=========== ALLOWED PROVIDER ROLES REQUEST ===========
+Draft ID             : ${state.draftTreatmentID}
+Step No              : $stepNumber
+Allowed Roles        : ${state.selectedRoles.join(', ')}
+Body                 : ${request.toJson()}
+======================================================
+''');
+
+  return await runSafely<bool>(() async {
+    await _treatmentRepository.allowedProviderRoles(
+      request: request,
+      draftTreatmentID: state.draftTreatmentID!,
+    );
+
+    log('Step Allowed Provider Roles Saved : ${state.draftTreatmentID}');
+
+    return true;
+  });
+}
   Future<bool?> callPreTreatmentInstructions({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       final attachments = state.existingPreAttachments
