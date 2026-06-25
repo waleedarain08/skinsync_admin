@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/business_logic_request.dart';
 import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
 import 'package:skinsync_admin/models/requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
@@ -1080,6 +1081,23 @@ Body       : ${request.toJson()}
               }).toList(),
             );
           }).toList(),
+        ),
+      );
+      return true;
+    });
+  }
+
+  Future<bool?> callBusinessLogic() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.businessLogic(
+        draftTreatmentId: treatmentId,
+        request: BusinessLogicRequest(
+          enableByDefault: state.enableByDefault,
+          useInAiSimulator: state.useInAiSimulator,
         ),
       );
       return true;

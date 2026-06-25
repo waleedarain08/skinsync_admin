@@ -1,3 +1,4 @@
+import 'package:skinsync_admin/models/requests/business_logic_request.dart';
 import 'package:skinsync_admin/models/requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
@@ -87,5 +88,10 @@ abstract class TreatmentRepository {
   Future<BaseApiResponseModel> followUpConfig({
     required int draftTreatmentId,
     required FollowUpRequest request,
+  });
+
+  Future<BaseApiResponseModel> businessLogic({
+    required int draftTreatmentId,
+    required BusinessLogicRequest request,
   });
 }

@@ -6122,14 +6122,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           flex: 2,
           child: CustomPrimaryButton(
             onTap: () async {
+              log('CURRENT STEP: ${state.currentStep}');
               if (state.currentStep == 0) {
                 if (!await _validateAndFetchCategory(
                   context,
                   state,
                   viewModel,
                   categoryState,
-                ))
+                )) {
                   return;
+                }
               }
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(context, viewModel)) return;
@@ -6158,49 +6160,44 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               }
 
               if (state.currentStep < 16) {
-                if (state.currentStep == 1) {
+                if (state.currentStep == 0) {
+                  viewModel.setStep(state.currentStep + 1);
+                } else if (state.currentStep == 1) {
                   final success = await viewModel.createBasicInfo(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-
-                if (state.currentStep == 2) {
+                } else if (state.currentStep == 2) {
                   final success = await viewModel.createTreatmentArea(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 3) {
+                } else if (state.currentStep == 3) {
                   final success = await viewModel.callProductUsage(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 4) {
+                } else if (state.currentStep == 4) {
                   final success = await viewModel.createSchedule(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 5) {
+                } else if (state.currentStep == 5) {
                   final success = await viewModel.callStepPricing(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-
-                if (state.currentStep == 6) {
+                } else if (state.currentStep == 6) {
                   final bytes = await ProtocolFormPreview.getPdfBytes(
                     state: state,
                     dataState: dataState,
@@ -6214,16 +6211,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 7) {
+                } else if (state.currentStep == 7) {
                   final success = await viewModel.callPreTreatmentInstructions(
                     stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
-                }
-                if (state.currentStep == 8) {
+                } else if (state.currentStep == 8) {
                   final success = await viewModel.callPostTreatmentInstructions(
                     stepNumber: state.currentStep + 1,
                   );
@@ -6264,11 +6259,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     viewModel.setStep(15);
                   }
+                } else if (state.currentStep == 15) {
+                  final success = await viewModel.callBusinessLogic();
+                  if (success ?? false) {
+                    viewModel.setStep(16);
+                  }
                 }
-                // TODO : this is only for now to go on forward step have to remove once stepper API are completed
-                else {
-                  viewModel.setStep(state.currentStep + 1);
-                }
+                // // TODO : this is only for now to go on forward step have to remove once stepper API are completed
+                // else {
+                //   viewModel.setStep(state.currentStep + 1);
+                // }
               } else {
                 viewModel
                     .submitTreatment(
