@@ -1,4 +1,5 @@
 import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/constent_form_selection_request.dart';
 import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
 import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_photos_request.dart';
@@ -263,6 +264,27 @@ class TreatmentServices implements TreatmentRepository {
   }
 
 
+  @override
+  Future<BaseApiResponseModel> consentFormSelection({
+    required ConsentFormSelectionRequest request,
+    required int draftTreatmentID,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+
+      body: request,
+      queryParams: {'treatment_id': draftTreatmentID.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+
+    return response;
+  }
+
+
 
 
   @override
@@ -316,4 +338,5 @@ class TreatmentServices implements TreatmentRepository {
     }
     return response;
   }
+
 }

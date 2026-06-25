@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/constent_form_selection_request.dart';
 import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
 import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
@@ -889,13 +890,13 @@ Body          : ${request.toJson()}
     });
   }
 
-Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
-  final request = AllowedProviderRolesRequest(
-    stepNumber: stepNumber,
-    allowedRoles: state.selectedRoles, // ← matches state field from UI
-  );
+  Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
+    final request = AllowedProviderRolesRequest(
+      stepNumber: stepNumber,
+      allowedRoles: state.selectedRoles, // ← matches state field from UI
+    );
 
-  log('''
+    log('''
 =========== ALLOWED PROVIDER ROLES REQUEST ===========
 Draft ID             : ${state.draftTreatmentID}
 Step No              : $stepNumber
@@ -904,17 +905,52 @@ Body                 : ${request.toJson()}
 ======================================================
 ''');
 
-  return await runSafely<bool>(() async {
-    await _treatmentRepository.allowedProviderRoles(
-      request: request,
-      draftTreatmentID: state.draftTreatmentID!,
-    );
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.allowedProviderRoles(
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
 
-    log('Step Allowed Provider Roles Saved : ${state.draftTreatmentID}');
+      log('Step Allowed Provider Roles Saved : ${state.draftTreatmentID}');
 
-    return true;
-  });
-}
+      return true;
+    });
+  }
+
+  Future<bool?> callConsentFormSelection({required int stepNumber}) async {
+   final request = ConsentFormSelectionRequest(
+  stepNumber: stepNumber,
+  preTreatmentConsentForm: state.preTreatmentConsentForm != null
+      ? PreTreatmentConsentForm(
+          name: state.preTreatmentConsentForm!.name,
+          url: state.consentFormUrl,
+        )
+      : null,
+);
+
+    log('''
+=========== CONSENT FORM SELECTION REQUEST ===========
+Draft ID             : ${state.draftTreatmentID}
+Step No              : $stepNumber
+Consent Type         : ${state.consentType}
+Consent Form         : ${state.preTreatmentConsentForm?.name}
+Body                 : ${request.toJson()}
+======================================================
+''');
+
+    return await runSafely<bool>(() async {
+      await _treatmentRepository.consentFormSelection(
+        // ← correct endpoint
+        request: request,
+        draftTreatmentID: state.draftTreatmentID!,
+      );
+
+      log('Step Consent Form Selection Saved : ${state.draftTreatmentID}');
+
+      return true;
+    });
+  }
+
   Future<bool?> callPreTreatmentInstructions({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       final attachments = state.existingPreAttachments
@@ -1714,17 +1750,29 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<void> pickConsentForm() async {
-    final FilePickerResult? result = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
+ Future<void> pickConsentForm() async {
+  final FilePickerResult? result = await FilePicker.pickFiles(
+    type: FileType.custom,
+    allowedExtensions: ['pdf'],
+    withData: true,
+  );
+
+  if (result != null && result.files.isNotEmpty) {
+    final file = result.files.first;
+
+    final String? url = await MediaService().uploadMedia(
+      path: 'treatment',
+      file: file,
     );
 
-    if (result != null && result.files.isNotEmpty) {
-      state = state.copyWith(preTreatmentConsentForm: result.files.first);
+    if (url != null) {
+      state = state.copyWith(
+        preTreatmentConsentForm: file, // store PlatformFile
+        consentFormUrl: url,           // store uploaded URL separately
+      );
     }
   }
-
+}
   void removeConsentForm() {
     state = state.copyWith(
       preTreatmentConsentForm: null,
@@ -2696,6 +2744,7 @@ class TreatmentState extends BaseStateModel {
   final int minimumBookingNotice;
   final int maximumDaysInAdvance;
   final List<int> selectedTreatmentAreaIds;
+  final String? consentFormUrl;
 
   TreatmentState({
     super.loading,
@@ -2755,6 +2804,7 @@ class TreatmentState extends BaseStateModel {
     this.isLoadingProducts = false,
     this.products = const [],
     this.error,
+    this.consentFormUrl,
   }) : areas = areas ?? [AreaViewModelEntry()];
 
   TreatmentState copyWith({
@@ -2815,6 +2865,7 @@ class TreatmentState extends BaseStateModel {
     bool? isLoadingProducts,
     List<TreatmentProductData>? products,
     String? error,
+    String? consentFormUrl,
   }) {
     return TreatmentState(
       selectedCategoryDetail:
@@ -2893,6 +2944,7 @@ class TreatmentState extends BaseStateModel {
       isLoadingProducts: isLoadingProducts ?? this.isLoadingProducts,
       products: products ?? this.products,
       error: error ?? this.error,
+      consentFormUrl: consentFormUrl ?? this.consentFormUrl
     );
   }
 }
