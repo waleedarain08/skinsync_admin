@@ -6151,6 +6151,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   return;
                 }
               }
+              if (state.currentStep == 14) {
+                if (!_validateFollowUps(context, state)) {
+                  return;
+                }
+              }
 
               if (state.currentStep < 16) {
                 if (state.currentStep == 1) {
@@ -6253,6 +6258,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   final success = await viewModel.callSessionsSetup();
                   if (success ?? false) {
                     viewModel.setStep(14);
+                  }
+                } else if (state.currentStep == 14) {
+                  final success = await viewModel.callFollowUpConfig();
+                  if (success ?? false) {
+                    viewModel.setStep(15);
                   }
                 }
                 // TODO : this is only for now to go on forward step have to remove once stepper API are completed
@@ -6557,6 +6567,37 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           ),
         );
         return false;
+      }
+    }
+    return true;
+  }
+
+  bool _validateFollowUps(BuildContext context, TreatmentState state) {
+    for (final session in state.sessions) {
+      if (session.totalFollowUpsController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Total Follow Up number is required!'),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+      for (final followUp in session.followUps) {
+        if (followUp.notesController.text.isEmpty ||
+            followUp.intervalUnit.isEmpty ||
+            followUp.intervalValueController.text.isEmpty ||
+            followUp.durationValueController.text.isEmpty ||
+            followUp.type.isEmpty ||
+            followUp.durationUnit.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ensure that each follow up is valid!'),
+              backgroundColor: CustomColors.red,
+            ),
+          );
+          return false;
+        }
       }
     }
     return true;

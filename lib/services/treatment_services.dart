@@ -10,6 +10,7 @@ import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
 import '../models/requests/basic_info_request.dart';
+import '../models/requests/follow_up_request.dart';
 import '../models/requests/sessions_setup_request.dart';
 import '../models/requests/treatment_area_request.dart';
 import '../models/requests/treatment_schedule_request.dart';
@@ -221,7 +222,7 @@ class TreatmentServices implements TreatmentRepository {
     }
     return response;
   }
-  
+
   @override
   Future<BaseApiResponseModel> downTimeLevels({
     required DownTimeLevelRequest request,
@@ -242,7 +243,7 @@ class TreatmentServices implements TreatmentRepository {
     return response;
   }
 
-@override
+  @override
   Future<BaseApiResponseModel> allowedProviderRoles({
     required AllowedProviderRolesRequest request,
     required int draftTreatmentID,
@@ -261,9 +262,6 @@ class TreatmentServices implements TreatmentRepository {
 
     return response;
   }
-
-
-
 
   @override
   Future<TreatmentProductsResponse> getProductsByTreatment(
@@ -303,6 +301,24 @@ class TreatmentServices implements TreatmentRepository {
   Future<BaseApiResponseModel<dynamic>> sessionsSetup({
     required int draftTreatmentId,
     required SessionsSetupRequest request,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentArea,
+      body: request,
+      queryParams: {'treatment_id': draftTreatmentId.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<BaseApiResponseModel<dynamic>> followUpConfig({
+    required int draftTreatmentId,
+    required FollowUpRequest request,
   }) async {
     final jsonResponse = await _api.patch(
       Endpoint.treatmentArea,
