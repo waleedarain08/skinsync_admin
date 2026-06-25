@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
@@ -13,12 +14,12 @@ import 'package:skinsync_admin/models/requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 
 import '../models/notification_entry.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
-import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
@@ -930,6 +931,39 @@ Body       : ${request.toJson()}
     });
   }
 
+  Future<bool?> callPhaseNotifications() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.phaseNotifications(
+        draftTreatmentId: treatmentId,
+        request: PhaseNotificationsRequest(
+          preNotifications: state.preNotificationEntries.map((entry) {
+            return NotificationRequest(
+              message: entry.messageController.text,
+              timing: int.tryParse(entry.timingValueController.text),
+              timingUnit: entry.timingUnit,
+              title: entry.titleController.text,
+              type: entry.type,
+            );
+          }).toList(),
+          postNotifications: state.postNotificationEntries.map((entry) {
+            return NotificationRequest(
+              message: entry.messageController.text,
+              timing: int.tryParse(entry.timingValueController.text),
+              timingUnit: entry.timingUnit,
+              title: entry.titleController.text,
+              type: entry.type,
+            );
+          }).toList(),
+        ),
+      );
+      return true;
+    });
+  }
+
   Future<bool?> callProductUsage({required int stepNumber}) async {
     final request = ProductUsagesRequest(
       stepNumber: stepNumber,
@@ -1134,10 +1168,7 @@ Body       : ${request.toJson()}
         );
       }
     } catch (e) {
-      state = state.copyWith(
-        isLoadingProducts: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(isLoadingProducts: false, error: e.toString());
     }
   }
 

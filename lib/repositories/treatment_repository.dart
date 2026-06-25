@@ -1,3 +1,4 @@
+import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/product_usage_request.dart';
@@ -58,5 +59,10 @@ abstract class TreatmentRepository {
     required int draftTreatmentId,
     required bool requirePostPhotos,
     required int count,
+  });
+
+  Future<BaseApiResponseModel> phaseNotifications({
+    required int draftTreatmentId,
+    required PhaseNotificationsRequest request,
   });
 }

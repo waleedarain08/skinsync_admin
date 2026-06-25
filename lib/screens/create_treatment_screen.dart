@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -5423,7 +5424,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   ),
                   context.verticalSpace(12),
                   TextButton(
-                    onPressed: () => viewModel.fetchProductsByTreatmentCategory(),
+                    onPressed: () =>
+                        viewModel.fetchProductsByTreatmentCategory(),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -5496,10 +5498,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             return filtered
                 .map(
                   (p) => ListTile(
-                    title: Text(
-                      p.name,
-                      style: context.fonts.black14w600,
-                    ),
+                    title: Text(p.name, style: context.fonts.black14w600),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -5553,7 +5552,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       return '${unit}s';
     }
 
-    final TreatmentProductData? productData = state.products.any((p) => p.id == entry.productId)
+    final TreatmentProductData? productData =
+        state.products.any((p) => p.id == entry.productId)
         ? state.products.firstWhere((p) => p.id == entry.productId)
         : null;
 
@@ -5676,11 +5676,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                         ),
                         context.horizontalSpace(12),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: badgeColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: badgeColor.withOpacity(0.2)),
+                            border: Border.all(
+                              color: badgeColor.withOpacity(0.2),
+                            ),
                           ),
                           child: Text(
                             statusLabel,
@@ -6141,6 +6146,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               if (state.currentStep == 9) {
                 if (!_validatePostPhotos(context, state)) return;
               }
+              if (state.currentStep == 10) {
+                if (!_validatePhaseNotifications(context, state)) {
+                  return;
+                }
+              }
 
               if (state.currentStep < 16) {
                 if (state.currentStep == 1) {
@@ -6219,6 +6229,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   final success = await viewModel.callPostTreatmentPhotos();
                   if (success ?? false) {
                     viewModel.setStep(10);
+                  }
+                } else if (state.currentStep == 10) {
+                  final success = await viewModel.callPhaseNotifications();
+                  if (success ?? false) {
+                    viewModel.setStep(11);
                   }
                 }
                 // TODO : this is only for now to go on forward step have to remove once stepper API are completed
@@ -6470,6 +6485,54 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           SnackBar(
             content: Text(
               "Please select at least one sub-area for '${area.areaController.text}'",
+            ),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool _validatePhaseNotifications(BuildContext context, TreatmentState state) {
+    log(
+      'NOTIFICATION: ${state.preNotificationEntries.length} ${state.postNotificationEntries.length}',
+    );
+    if (state.preNotificationEntries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Should have at least one notification in Pre-Notifications',
+          ),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    } else if (state.postNotificationEntries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Should have at least one notification in Post-Notifications',
+          ),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+    for (final entry in [
+      ...state.postNotificationEntries,
+      ...state.preNotificationEntries,
+    ]) {
+      if (entry.type.isEmpty ||
+          entry.titleController.text.isEmpty ||
+          entry.timingUnit.isEmpty ||
+          entry.timingValueController.text.isEmpty ||
+          entry.messageController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Make sure each notification in both categories are valid!',
             ),
             backgroundColor: CustomColors.red,
           ),
