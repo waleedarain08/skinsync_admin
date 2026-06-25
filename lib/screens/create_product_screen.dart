@@ -356,7 +356,8 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isEdit = widget.productToEdit != null;
+    final bool isEdit = widget.productToEdit != null && widget.productToEdit!.id != null;
+    final bool isCategoryLocked = widget.productToEdit != null && widget.productToEdit!.id == null && widget.productToEdit!.category != null;
     final state = ref.watch(productViewModelProvider);
 
     return GradientScaffold(
@@ -599,23 +600,25 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                       'Category',
                                       style: context.fonts.black14w600,
                                     ),
-                                    IconButton(
-                                      onPressed: () =>
-                                          _showCategorySelectionDialog(context),
-                                      icon: const Icon(
-                                        Icons.add_circle_outline_rounded,
-                                        color: CustomColors.purple,
-                                        size: 20,
+                                    if (!isCategoryLocked)
+                                      IconButton(
+                                        onPressed: () =>
+                                            _showCategorySelectionDialog(context),
+                                        icon: const Icon(
+                                          Icons.add_circle_outline_rounded,
+                                          color: CustomColors.purple,
+                                          size: 20,
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
                                       ),
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                    ),
                                   ],
                                 ),
                                 SizedBox(height: 8.h),
                                 GestureDetector(
-                                  onTap: () =>
-                                      _showCategorySelectionDialog(context),
+                                  onTap: () => isCategoryLocked
+                                      ? null
+                                      : _showCategorySelectionDialog(context),
                                   child: AbsorbPointer(
                                     child: TextFormField(
                                       controller: TextEditingController(
@@ -627,12 +630,14 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                             context,
                                             hint: 'Select Category Hierarchy',
                                           ).copyWith(
-                                            suffixIcon: Icon(
-                                              Icons
-                                                  .keyboard_arrow_right_rounded,
-                                              color: CustomColors.lightGrey,
-                                              size: context.sp(20),
-                                            ),
+                                            suffixIcon: isCategoryLocked
+                                                ? null
+                                                : Icon(
+                                                    Icons
+                                                        .keyboard_arrow_right_rounded,
+                                                    color: CustomColors.lightGrey,
+                                                    size: context.sp(20),
+                                                  ),
                                           ),
                                       validator: (val) =>
                                           val == null || val.isEmpty

@@ -5451,25 +5451,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             readOnly: true,
             onTap: () => controller.openView(),
             hintText: 'Select product from inventory',
-            suffixIcon: IconButton(
-              icon: const Icon(
-                Icons.add_circle_outline_rounded,
-                color: CustomColors.purple,
-              ),
-              onPressed: () async {
-                final newProduct = await context.push<ProductModel>(
-                  CreateProductScreen.routeName,
-                  extra: null,
-                );
-                if (newProduct != null && newProduct.id != null) {
-                  viewModel.addProductUsage(
-                    newProduct.id!,
-                    newProduct.name,
-                    newProduct.unit,
-                  );
-                  controller.text = newProduct.name;
-                }
-              },
+            suffixIcon: const Icon(
+              Icons.search_rounded,
+              color: CustomColors.lightGrey,
             ),
             maxWidth: double.infinity,
           ),
