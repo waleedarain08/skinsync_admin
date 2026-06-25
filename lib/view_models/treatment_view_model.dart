@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/constent_form_selection_request.dart';
 import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
@@ -890,12 +891,13 @@ Body          : ${request.toJson()}
     });
   }
 
-  Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
-    final request = AllowedProviderRolesRequest(
-      stepNumber: stepNumber,
-      allowedRoles: state.selectedRoles, // ← matches state field from UI
-    );
+    Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
+      final request = AllowedProviderRolesRequest(
+        stepNumber: stepNumber,
+        allowedRoles: state.selectedRoles, // ← matches state field from UI
+      );
 
+    log('''
     log('''
 =========== ALLOWED PROVIDER ROLES REQUEST ===========
 Draft ID             : ${state.draftTreatmentID}
@@ -905,17 +907,18 @@ Body                 : ${request.toJson()}
 ======================================================
 ''');
 
-    return await runSafely<bool>(() async {
-      await _treatmentRepository.allowedProviderRoles(
-        request: request,
-        draftTreatmentID: state.draftTreatmentID!,
-      );
+      return await runSafely<bool>(() async {
+        await _treatmentRepository.allowedProviderRoles(
+          request: request,
+          draftTreatmentID: state.draftTreatmentID!,
+        );
 
       log('Step Allowed Provider Roles Saved : ${state.draftTreatmentID}');
+      log('Step Allowed Provider Roles Saved : ${state.draftTreatmentID}');
 
-      return true;
-    });
-  }
+        return true;
+      });
+    }
 
   Future<bool?> callConsentFormSelection({required int stepNumber}) async {
    final request = ConsentFormSelectionRequest(
@@ -950,6 +953,7 @@ Body                 : ${request.toJson()}
       return true;
     });
   }
+
 
   Future<bool?> callPreTreatmentInstructions({required int stepNumber}) async {
     return await runSafely<bool>(() async {
@@ -1080,6 +1084,41 @@ Body       : ${request.toJson()}
       await _treatmentRepository.sessionsSetup(
         draftTreatmentId: treatmentId,
         request: SessionsSetupRequest(totalSessions: state.totalSessions),
+      );
+      return true;
+    });
+  }
+
+  Future<bool?> callFollowUpConfig() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.followUpConfig(
+        draftTreatmentId: treatmentId,
+        request: FollowUpRequest(
+          sessions: state.sessions.map((session) {
+            return Session(
+              sessionNumber: session.sessionNumber,
+              followUps: session.followUps.map((followUp) {
+                return FollowUp(
+                  type: followUp.type,
+                  durationValue: num.parse(
+                    followUp.durationValueController.text,
+                  ),
+                  durationUnit: followUp.durationUnit,
+                  intervalValue: num.parse(
+                    followUp.intervalValueController.text,
+                  ),
+                  intervalUnit: followUp.intervalUnit,
+                  isImageRequired: followUp.isImageRequired,
+                  notes: followUp.notesController.text,
+                );
+              }).toList(),
+            );
+          }).toList(),
+        ),
       );
       return true;
     });
