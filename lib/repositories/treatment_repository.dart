@@ -8,6 +8,7 @@ import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 
+import '../models/requests/allowed_provider_role_request.dart';
 import '../models/requests/basic_info_request.dart';
 import '../models/requests/down_time_level_request.dart';
 import '../models/requests/sessions_setup_request.dart';
