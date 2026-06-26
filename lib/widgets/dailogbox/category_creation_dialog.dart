@@ -448,7 +448,7 @@ class _CategoryCreationDialogState
 
     try {
       if (!mounted) return;
-      final request = CreateCategoryResquest(
+      final request = CreateCategoryRequest(
         name: _nameController.text,
         icon: _selectedIcon,
         image: _selectedImage,

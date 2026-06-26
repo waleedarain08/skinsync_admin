@@ -1,6 +1,6 @@
 import 'package:skinsync_admin/models/common_models.dart';
 
-class CreateCategoryResquest {
+class CreateCategoryRequest {
   final String? name;
   final String? icon;
   final int? parentId;
@@ -14,7 +14,7 @@ class CreateCategoryResquest {
   final CategoryDowntimePresetModel? downtimePresets;
   final List<String>? defaultRoles;
 
-  CreateCategoryResquest({
+  CreateCategoryRequest({
     this.name,
     this.icon,
     this.parentId,

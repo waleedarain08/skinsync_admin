@@ -49,7 +49,7 @@ class CategoryServices implements CategoryRepository {
 
   @override
   Future<BaseApiResponseModel> createCategory(
-    CreateCategoryResquest request,
+    CreateCategoryRequest request,
   ) async {
     final jsonResponse = await _api.post(
       Endpoint.createCategory,

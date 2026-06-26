@@ -119,7 +119,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     );
   }
 
-  Future<bool?> createCategory({required CreateCategoryResquest request}) async {
+  Future<bool?> createCategory({required CreateCategoryRequest request}) async {
     return await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
