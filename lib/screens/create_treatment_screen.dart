@@ -1698,17 +1698,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(16),
               ),
-              image: state.treatmentImage != null
+              image: state.treatmentImageUrl != null
                   ? DecorationImage(
-                      image: kIsWeb
-                          ? NetworkImage(state.treatmentImage!.path)
-                          : FileImage(File(state.treatmentImage!.path))
-                                as ImageProvider,
+                      image: NetworkImage(state.treatmentImageUrl!),
                       fit: BoxFit.cover,
                     )
                   : null,
             ),
-            child: state.treatmentImage == null
+            child: state.treatmentImageUrl == null
                 ? const Center(
                     child: Icon(
                       Icons.image_outlined,
@@ -4549,7 +4546,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               child: _buildImageUploadTile(
                 context,
                 'Treatment Banner Image',
-                state.treatmentImage,
+                state.treatmentImageUrl,
                 () => viewModel.pickImage(false),
               ),
             ),
@@ -4558,7 +4555,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               child: _buildImageUploadTile(
                 context,
                 'Treatment Listing Icon',
-                state.treatmentIcon,
+                state.treatmentIconUrl,
                 () => viewModel.pickImage(true),
               ),
             ),
@@ -5999,7 +5996,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   Widget _buildImageUploadTile(
     BuildContext context,
     String label,
-    XFile? file,
+    String? imageUrl,
     VoidCallback onTap,
   ) {
     return Column(
@@ -6016,16 +6013,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               color: Colors.white,
               borderRadius: context.appBorderRadius(all: 16),
               border: Border.all(color: CustomColors.border, width: 2),
-              image: file != null
+              image: imageUrl != null
                   ? DecorationImage(
-                      image: kIsWeb
-                          ? NetworkImage(file.path)
-                          : FileImage(File(file.path)) as ImageProvider,
+                      image: NetworkImage(imageUrl),
                       fit: BoxFit.cover,
                     )
                   : null,
             ),
-            child: file == null
+            child: imageUrl == null
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

@@ -42,6 +42,9 @@ final treatmentViewModelProvider =
 class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   TreatmentViewModel._() : super(TreatmentState());
 
+  int _formSessionId = 0;
+  int get formSessionId => _formSessionId;
+
   static final List<TreatmentModel> _localTreatments = List.from(
     TreatmentData.dummyTreatments,
   );
@@ -285,6 +288,7 @@ Body                 : ${request.toJson()}
     fullDescriptionController.clear();
     shortDescriptionController.clear();
     basePriceController.clear();
+    
     durationHoursController.clear();
     durationMinutesController.clear();
     treatmentDurationController.clear();
@@ -307,6 +311,10 @@ Body                 : ${request.toJson()}
     categoryIdController.clear();
     categoryNameController.clear();
     categoryPathController.clear();
+
+    for (final controller in unitPriceControllers.values) {
+      controller.dispose();
+    }
     unitPriceControllers.clear();
 
     for (final entry in state.sessions) {
@@ -315,15 +323,26 @@ Body                 : ${request.toJson()}
     for (final entry in state.productUsageEntries) {
       entry.dispose();
     }
-
+    for (final entry in state.preNotificationEntries) {
+      entry.dispose();
+    }
+    for (final entry in state.postNotificationEntries) {
+      entry.dispose();
+    }
     for (final area in state.areas) {
       area.dispose();
     }
 
     state = state.copyWith(
       currentStep: 0,
-      treatmentImage: null,
-      treatmentIcon: null,
+      clearPreTreatmentConsentForm: true,
+      clearExistingConsentForm: true,
+      clearTreatmentImage: true,
+      clearTreatmentIcon: true,
+       
+clearTreatmentImageUrl: true,
+clearTreatmentIconUrl: true,
+
       preTreatmentAttachments: [],
       postTreatmentAttachments: [],
       existingPreAttachments: [],
@@ -637,8 +656,8 @@ Body                 : ${request.toJson()}
     state = state.copyWith(
       areas: newAreas,
       status: treatment.status,
-      treatmentImage: null,
-      treatmentIcon: null,
+      treatmentImageUrl: treatment.image,
+  treatmentIconUrl: treatment.icon,
       selectedProtocolIds: treatment.protocolIds ?? [],
       selectedProtocolNotes: treatment.protocolNotes ?? [],
       standaloneNotes: treatment.standaloneNotes ?? [],
@@ -1265,46 +1284,34 @@ Body       : ${request.toJson()}
     state = state.copyWith(selectedRoles: current);
   }
 
-  Future<bool?> createBasicInfo({required int stepNumber}) async {
-    return await runSafely<bool>(() async {
-      if (state.treatmentIcon == null || state.treatmentImage == null) {
-        throw const UnknownException('Please Select Image & Icon');
-      }
-      final String? imageUrl = await MediaService().uploadImage(
-        'treatment/image/',
-        state.treatmentImage!,
-      );
-      if (imageUrl == null) {
-        throw const UnknownException('Failed to upload image');
-      }
-      final String? iconUrl = await MediaService().uploadImage(
-        'treatment/icon/',
-        state.treatmentIcon!,
-      );
-      if (iconUrl == null) {
-        throw const UnknownException('Failed to upload Icon');
-      }
+Future<bool?> createBasicInfo({required int stepNumber}) async {
+  return await runSafely<bool>(() async {
+    final imageUrl = state.treatmentImageUrl;
+    final iconUrl = state.treatmentIconUrl;
 
-      final response = await _treatmentRepository.createBasicInfo(
-        BasicInfoRequest(
-          stepNumber: stepNumber,
-          selectedCategoryIds: state.selectedCategoryPath,
-          patientDisplayName: displayNameController.text,
-          image: imageUrl,
-          shortDescription: shortDescriptionController.text,
-          description: fullDescriptionController.text,
-          globalSku: globalSkuController.text,
-          icon: iconUrl,
-        ),
-      );
-      if (response.isSuccess) {
-        log('Basic Info Created : ${response.data?.id}');
-        state = state.copyWith(draftTreatmentID: response.data?.id);
-      }
-      return true;
-    });
-  }
+    if (imageUrl == null || iconUrl == null) {
+      throw const UnknownException('Please Select Image & Icon');
+    }
 
+    final response = await _treatmentRepository.createBasicInfo(
+      BasicInfoRequest(
+        stepNumber: stepNumber,
+        selectedCategoryIds: state.selectedCategoryPath,
+        patientDisplayName: displayNameController.text,
+        image: imageUrl,
+        shortDescription: shortDescriptionController.text,
+        description: fullDescriptionController.text,
+        globalSku: globalSkuController.text,
+        icon: iconUrl,
+      ),
+    );
+    if (response.isSuccess) {
+      log('Basic Info Created : ${response.data?.id}');
+      state = state.copyWith(draftTreatmentID: response.data?.id);
+    }
+    return true;
+  });
+}
   void setRoles(List<String> roles) =>
       state = state.copyWith(selectedRoles: roles);
 
@@ -1347,17 +1354,23 @@ Body       : ${request.toJson()}
     }
   }
 
-  Future<void> pickImage(bool isIcon) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      if (isIcon) {
-        state = state.copyWith(treatmentIcon: image);
-      } else {
-        state = state.copyWith(treatmentImage: image);
-      }
-    }
-  }
+Future<void> pickImage(bool isIcon) async {
+  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+  if (image == null) return;
 
+  await runSafely(() async {
+    final path = isIcon ? 'treatment/icon/' : 'treatment/image/';
+    final String? url = await MediaService().uploadImage(path, image);
+    if (url == null) {
+      throw const UnknownException('Failed to upload image');
+    }
+    if (isIcon) {
+      state = state.copyWith(treatmentIconUrl: url);
+    } else {
+      state = state.copyWith(treatmentImageUrl: url);
+    }
+  });
+}
   List<int> _findPathToCategory(
     List<CategoryModel> items,
     int id,
@@ -1830,8 +1843,8 @@ Body       : ${request.toJson()}
 
   void removeConsentForm() {
     state = state.copyWith(
-      preTreatmentConsentForm: null,
-      existingConsentForm: null,
+      clearPreTreatmentConsentForm: true,
+      clearExistingConsentForm: true,
     );
   }
 
@@ -2740,8 +2753,10 @@ class TreatmentState extends BaseStateModel {
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
   final int currentStep;
-  final XFile? treatmentImage;
-  final XFile? treatmentIcon;
+  
+  final String? treatmentImageUrl;
+  final String? treatmentIconUrl;
+
   final List<AreaViewModelEntry> areas;
   final List<int> selectedCategoryPath;
   final List<String> selectedProtocolIds;
@@ -2812,14 +2827,15 @@ class TreatmentState extends BaseStateModel {
     this.selectedTreatmentId,
     this.selectedCategoryDetail,
     this.currentStep = 0,
-    this.treatmentImage,
-    this.treatmentIcon,
+  
     this.selectedCategoryPath = const [],
     this.selectedProtocolIds = const [],
     this.selectedProtocolNotes = const [],
     this.standaloneNotes = const [],
     this.status = 'active',
     this.gender = 'both',
+    this.treatmentImageUrl,
+    this.treatmentIconUrl,
     this.draftTreatmentID,
     this.preNotificationOffset,
     this.postNotificationOffset,
@@ -2867,13 +2883,16 @@ class TreatmentState extends BaseStateModel {
     int? currentPage,
     int? totalPages,
     int? totalResults,
+    bool clearPreTreatmentConsentForm = false,
+    bool clearExistingConsentForm = false,
+    bool clearTreatmentImage = false,
+    bool clearTreatmentIcon = false,
     List<TreatmentModel>? treatments,
     List<TreatmentModel>? filteredTreatments,
     TreatmentModel? selectedTreatment,
     int? selectedTreatmentId,
     int? currentStep,
-    XFile? treatmentImage,
-    XFile? treatmentIcon,
+    
     int? draftTreatmentID,
     List<AreaViewModelEntry>? areas,
     List<int>? selectedCategoryPath,
@@ -2921,6 +2940,11 @@ class TreatmentState extends BaseStateModel {
     List<TreatmentProductData>? products,
     String? error,
     String? consentFormUrl,
+   bool clearTreatmentImageUrl = false,
+bool clearTreatmentIconUrl = false,
+String? treatmentImageUrl,
+String? treatmentIconUrl,
+
   }) {
     return TreatmentState(
       selectedCategoryDetail:
@@ -2935,8 +2959,7 @@ class TreatmentState extends BaseStateModel {
       selectedTreatment: selectedTreatment ?? this.selectedTreatment,
       selectedTreatmentId: selectedTreatmentId ?? this.selectedTreatmentId,
       currentStep: currentStep ?? this.currentStep,
-      treatmentImage: treatmentImage ?? this.treatmentImage,
-      treatmentIcon: treatmentIcon ?? this.treatmentIcon,
+      
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
       selectedProtocolIds: selectedProtocolIds ?? this.selectedProtocolIds,
@@ -2961,9 +2984,12 @@ class TreatmentState extends BaseStateModel {
           existingPreAttachments ?? this.existingPreAttachments,
       existingPostAttachments:
           existingPostAttachments ?? this.existingPostAttachments,
-      preTreatmentConsentForm:
-          preTreatmentConsentForm ?? this.preTreatmentConsentForm,
-      existingConsentForm: existingConsentForm ?? this.existingConsentForm,
+      preTreatmentConsentForm: clearPreTreatmentConsentForm
+          ? null
+          : (preTreatmentConsentForm ?? this.preTreatmentConsentForm),
+      existingConsentForm: clearExistingConsentForm
+          ? null
+          : (existingConsentForm ?? this.existingConsentForm),
       consentType: consentType ?? this.consentType,
       preNotificationSource:
           preNotificationSource ?? this.preNotificationSource,
@@ -3000,6 +3026,9 @@ class TreatmentState extends BaseStateModel {
       products: products ?? this.products,
       error: error ?? this.error,
       consentFormUrl: consentFormUrl ?? this.consentFormUrl,
+      treatmentImageUrl: clearTreatmentImageUrl ? null : (treatmentImageUrl ?? this.treatmentImageUrl),
+treatmentIconUrl: clearTreatmentIconUrl ? null : (treatmentIconUrl ?? this.treatmentIconUrl),
+
     );
   }
 }

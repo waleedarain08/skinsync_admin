@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,8 +5,8 @@ import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 
-import '../../widgets/custom_dropdown_widget.dart';
 import '../../widgets/app_network_image.dart';
+import '../../widgets/custom_dropdown_widget.dart';
 import '../utils/theme.dart';
 import '../view_models/treatment_view_model.dart';
 import '../widgets/app_search_field.dart';
