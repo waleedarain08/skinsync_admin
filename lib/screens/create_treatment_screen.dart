@@ -32,6 +32,7 @@ import '../widgets/custom_primary_button.dart';
 import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/app_network_image.dart';
+import '../widgets/icon_image_container.dart';
 import '../widgets/nested_category_selector.dart';
 import 'product_detail_screen.dart';
 
@@ -7019,17 +7020,22 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
             );
             final isFocused = _focusedAreaName == area.name;
 
-            return _AreaCard(
-              name: area.name,
-              sku: area.globalSku,
-              icon: area.icon,
+            return IconImageContainer(
+              title: area.name,
+              imageUrl: area.image,
+              iconUrl: area.icon,
               isSelected: isSelected || isFocused,
               onTap: () {
                 setState(() {
-                  _focusedAreaName = area.name;
-                  _focusedSubAreaName = area.subAreas.isNotEmpty
-                      ? area.subAreas.first.name
-                      : null;
+                  if (isSelected || isFocused) {
+                    _focusedAreaName = null;
+                    _focusedSubAreaName = null;
+                  } else {
+                    _focusedAreaName = area.name;
+                    _focusedSubAreaName = area.subAreas.isNotEmpty
+                        ? area.subAreas.first.name
+                        : null;
+                  }
                 });
                 widget.onAreaToggle(area);
 
@@ -7103,16 +7109,20 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
               );
               final isFocused = _focusedSubAreaName == subArea.name;
 
-              return _AreaCard(
-                name: subArea.name,
-                sku: subArea.globalSku,
-                icon: subArea.icon,
+              return IconImageContainer(
+                title: subArea.name,
+                imageUrl: subArea.image,
+                iconUrl: subArea.icon,
                 isSelected: isSelected || isFocused,
                 onTap: () {
-                  setState(() {
+                setState(() {
+                  if (isSelected || isFocused) {
+                    _focusedSubAreaName = null;
+                  } else {
                     _focusedSubAreaName = subArea.name;
-                  });
-                  widget.onSubAreaToggle(focusedArea, subArea);
+                  }
+                });
+                widget.onSubAreaToggle(focusedArea, subArea);
 
                   ref
                       .read(treatmentViewModelProvider.notifier)
@@ -7191,10 +7201,10 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 (c) => c.name == child.name,
               );
 
-              return _AreaCard(
-                name: child.name,
-                sku: child.globalSku,
-                icon: child.icon,
+              return IconImageContainer(
+                title: child.name,
+                imageUrl: child.image,
+                iconUrl: child.icon,
                 isSelected: isSelected,
                 onTap: () {
                   widget.onSubAreaChildToggle(
@@ -7260,144 +7270,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
   }
 }
 
-class _AreaCard extends StatelessWidget {
-  final String name;
-  final String sku;
-  final String? icon;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final VoidCallback onAddChild;
 
-  const _AreaCard({
-    required this.name,
-    required this.sku,
-    required this.icon,
-    required this.isSelected,
-    required this.onTap,
-    required this.onAddChild,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: context.appBorderRadius(all: 16),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: context.w(180),
-        padding: context.appEdgeInsets(all: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? CustomColors.purple : Colors.white,
-          borderRadius: context.appBorderRadius(all: 16),
-          border: Border.all(
-            color: isSelected ? CustomColors.purple : CustomColors.border,
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: CustomColors.purple.withValues(alpha: 0.2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : AppShadows.xs(context),
-        ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildIcon(context),
-                InkWell(
-                  onTap: onAddChild,
-                  borderRadius: BorderRadius.circular(100),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Colors.white.withValues(alpha: 0.2)
-                          : CustomColors.softGrey,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.add,
-                      size: 14,
-                      color: isSelected ? Colors.white : CustomColors.grey,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            context.verticalSpace(16),
-            Text(
-              name,
-              style: isSelected
-                  ? context.fonts.white14w600
-                  : context.fonts.black14w600,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            context.verticalSpace(4),
-            Text(
-              'SKU: $sku',
-              style: isSelected
-                  ? context.fonts.white12w400.copyWith(
-                      color: Colors.white.withValues(alpha: 0.8),
-                    )
-                  : context.fonts.grey12w400,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIcon(BuildContext context) {
-    if (icon != null && icon!.isNotEmpty) {
-      debugPrint('ICON: $icon');
-      return AppNetworkImage(
-        imageUrl: icon!,
-        width: 22,
-        height: 22,
-        fit: BoxFit.cover,
-        borderRadius: BorderRadius.circular(4),
-        errorIcon: Icons.image_outlined,
-        errorIconSize: 22,
-      );
-    }
-    return _fallbackIcon(context);
-  }
-
-  Widget _fallbackIcon(BuildContext context) {
-    return Icon(
-      _getIconData(icon),
-      size: context.sp(22),
-      color: isSelected ? Colors.white : CustomColors.purple,
-    );
-  }
-
-  IconData _getIconData(String? iconName) {
-    switch (iconName?.toLowerCase()) {
-      case 'face':
-        return Icons.face_retouching_natural_rounded;
-      case 'neck':
-        return Icons.line_weight_rounded;
-      case 'hands':
-        return Icons.back_hand_outlined;
-      case 'body':
-        return Icons.accessibility_new_outlined;
-      case 'scalp':
-        return Icons.spa_outlined;
-      default:
-        return Icons.location_on_outlined;
-    }
-  }
-}
 
 class _SelectedSummaryCard extends StatelessWidget {
   final String title;

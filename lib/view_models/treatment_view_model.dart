@@ -1389,7 +1389,18 @@ Future<void> pickImage(bool isIcon) async {
     return [];
   }
 
-  Future<void> onCategorySelected(CategoryModel category, String path) async {
+  Future<void> onCategorySelected(CategoryModel? category, String path) async {
+    if (category == null) {
+      categoryIdController.clear();
+      categoryNameController.clear();
+      categoryPathController.clear();
+      state = state.copyWith(
+        selectedCategoryDetail: null,
+        selectedCategoryPath: [],
+      );
+      fetchProductsByTreatmentCategory();
+      return;
+    }
     categoryIdController.text = category.id.toString();
     categoryNameController.text = category.name;
     categoryPathController.text = path;

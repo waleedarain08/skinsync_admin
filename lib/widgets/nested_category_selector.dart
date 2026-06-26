@@ -6,7 +6,6 @@ import '../models/responses/category_detail_response.dart';
 import '../models/responses/category_list_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
-import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/icon_image_container.dart';
 import 'dailogbox/category_creation_dialog.dart';
 
@@ -19,7 +18,7 @@ class NestedCategorySelector extends ConsumerStatefulWidget {
   });
   final List<CategoryModel> categories;
   final String? initialCategoryId;
-  final void Function(CategoryModel category, String path) onSelected;
+  final void Function(CategoryModel? category, String path) onSelected;
 
   @override
   ConsumerState<NestedCategorySelector> createState() =>
@@ -65,21 +64,28 @@ class _NestedCategorySelectorState
 
   void _onLevelSelect(int level, CategoryModel category) {
     setState(() {
-      if (level < _selectedPath.length) {
+      final isAlreadySelected = _selectedPath.length > level && _selectedPath[level] == category.id;
+      if (isAlreadySelected) {
         _selectedPath = _selectedPath.sublist(0, level);
+      } else {
+        if (level < _selectedPath.length) {
+          _selectedPath = _selectedPath.sublist(0, level);
+        }
+        _selectedPath.add(category.id);
       }
-      _selectedPath.add(category.id);
     });
 
     // Calculate full name path
     String pathName = '';
+    CategoryModel? activeCategory;
     for (int i = 0; i < _selectedPath.length; i++) {
       final node = _findCategoryInTree(widget.categories, _selectedPath[i]);
       if (node != null) {
         pathName += (i == 0 ? '' : ' > ') + node.name;
+        activeCategory = node;
       }
     }
-    widget.onSelected(category, pathName);
+    widget.onSelected(activeCategory, pathName);
   }
 
   @override
@@ -369,157 +375,22 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgImage = category.image;
-
-    return GestureDetector(
+    return IconImageContainer(
+      title: category.name,
+      imageUrl: category.image,
+      iconUrl: category.icon,
+      isSelected: isSelected,
       onTap: onTap,
-      child: Container(
-        width: context.w(180),
-        height: context.h(130),
-        decoration: BoxDecoration(
-          borderRadius: context.appBorderRadius(all: 16),
-          border: Border.all(
-            color: isSelected ? CustomColors.purple : CustomColors.border,
-            width: isSelected ? 2.5 : 1,
+      onAddChild: onAddChild,
+      onViewDetail: () {
+        showDialog(
+          context: context,
+          builder: (context) => CategoryCreationDialog(
+            categoryId: category.id,
+            isViewMode: true,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: CustomColors.purple.withValues(alpha: 0.35),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : AppShadows.xs(context),
-        ),
-        child: ClipRRect(
-          borderRadius: context.appBorderRadius(all: 14), // Account for border width
-          child: Stack(
-            children: [
-              // 1. Full-Cover Image Background
-              Positioned.fill(
-                child: AppNetworkImage(
-                  imageUrl: bgImage,
-                  fit: BoxFit.cover,
-                  placeholderColor: CustomColors.whiteGrey,
-                ),
-              ),
-
-              // 2. Selection Tint / Dark Overlay Gradient for readability
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: isSelected
-                          ? [
-                              CustomColors.purple.withValues(alpha: 0.25),
-                              CustomColors.purple.withValues(alpha: 0.65),
-                              CustomColors.purple.withValues(alpha: 0.9),
-                            ]
-                          : [
-                              Colors.transparent,
-                              Colors.black.withValues(alpha: 0.35),
-                              Colors.black.withValues(alpha: 0.7),
-                            ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // 3. Category Name Aligned to Bottom
-              Positioned(
-                bottom: context.h(12),
-                left: context.w(12),
-                right: context.w(12),
-                child: Text(
-                  category.name,
-                  style: context.fonts.white14w600.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-
-              // 4. Icon Container on Top Left (Using our new reusable IconImageContainer)
-              Positioned(
-                top: context.h(10),
-                left: context.w(10),
-                child: IconImageContainer(
-                  iconUrl: category.icon,
-                  width: context.w(28),
-                  height: context.w(28),
-                  borderRadius: 8,
-                  borderColor: Colors.white.withValues(alpha: 0.8),
-                  borderWidth: 1,
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-
-              // 5. Action Buttons on Top Right
-              Positioned(
-                top: context.h(10),
-                right: context.w(10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => CategoryCreationDialog(
-                            categoryId: category.id,
-                            isViewMode: true,
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(context.w(4)),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.4),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.visibility_outlined,
-                          size: context.sp(12),
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    context.horizontalSpace(6),
-                    GestureDetector(
-                      onTap: onAddChild,
-                      child: Container(
-                        padding: EdgeInsets.all(context.w(4)),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.4),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          size: context.sp(12),
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

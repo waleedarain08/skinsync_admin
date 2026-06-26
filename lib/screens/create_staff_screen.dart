@@ -266,7 +266,7 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
                       initialCategoryId: _categoryId,
                       onSelected: (cat, path) {
                         setState(() {
-                          _categoryId = cat.id.toString();
+                          _categoryId = cat?.id.toString();
                           _categoryPath = path;
                         });
                       },
