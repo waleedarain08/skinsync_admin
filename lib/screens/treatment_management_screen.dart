@@ -8,6 +8,7 @@ import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 
 import '../../widgets/custom_dropdown_widget.dart';
+import '../../widgets/app_network_image.dart';
 import '../utils/theme.dart';
 import '../view_models/treatment_view_model.dart';
 import '../widgets/app_search_field.dart';
@@ -93,13 +94,9 @@ class _TreatmentManagementScreenState
 
       final matchesStatus =
           _selectedStatusFilter == 'All Statuses' ||
-          (_selectedStatusFilter == 'Active' &&
-              t.status.toLowerCase() == 'active') ||
-          (_selectedStatusFilter == 'Inactive' &&
-              (t.status.toLowerCase() == 'deactive' ||
-                  t.status.toLowerCase() == 'inactive')) ||
-          (_selectedStatusFilter == 'Draft' &&
-              t.status.toLowerCase() == 'draft');
+          (_selectedStatusFilter == 'Active' && t.status.toLowerCase() == 'active') ||
+          (_selectedStatusFilter == 'Inactive' && (t.status.toLowerCase() == 'deactive' || t.status.toLowerCase() == 'inactive')) ||
+          (_selectedStatusFilter == 'Draft' && t.status.toLowerCase() == 'draft');
 
       return matchesQuery &&
           matchesCategory &&
@@ -362,7 +359,6 @@ class _TreatmentManagementScreenState
 
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
-      backgroundColor: Colors.red,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12.r),
         child: Table(
@@ -423,13 +419,11 @@ class _TreatmentManagementScreenState
   }
 
   Widget _treatmentNameCell(TreatmentModel treatment) {
-    log('treatment image${treatment.image}');
-    final displayImage =
-        (treatment.image != null && treatment.image!.isNotEmpty)
+    final displayImage = (treatment.image != null && treatment.image!.isNotEmpty)
         ? treatment.image
         : (treatment.icon != null && treatment.icon!.isNotEmpty)
-        ? treatment.icon
-        : null;
+            ? treatment.icon
+            : null;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
@@ -444,26 +438,12 @@ class _TreatmentManagementScreenState
               border: Border.all(color: CustomColors.border),
             ),
             child: (displayImage != null && displayImage.isNotEmpty)
-                ? ClipRRect(
+                ? AppNetworkImage(
+                    imageUrl: displayImage,
+                    width: 48.w,
+                    height: 48.w,
+                    fit: BoxFit.cover,
                     borderRadius: BorderRadius.circular(8.r),
-                    child: Image.network(
-                      displayImage,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        debugPrint('Image error: $error');
-                        debugPrint('Stack: $stackTrace');
-                        return const Center(
-                          child: Icon(
-                            Icons.broken_image_outlined,
-                            color: CustomColors.grey,
-                          ),
-                        );
-                      },
-                    ),
                   )
                 : const Center(
                     child: Icon(Icons.image_outlined, color: CustomColors.grey),
@@ -506,6 +486,8 @@ class _TreatmentManagementScreenState
       ),
     );
   }
+
+
 
   Widget _statusBadgeCell(String status) {
     final String cleanStatus = status.toLowerCase();

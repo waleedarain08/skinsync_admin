@@ -50,6 +50,7 @@ enum Endpoint {
   manufacturersList('admin/manufacturers');
 
 
+
   final String path;
   const Endpoint(this.path);
 
@@ -63,10 +64,8 @@ enum Endpoint {
 }
 
 enum BaseUrls {
-  // api('http://3.128.27.193/api/');
   api('https://api.skinsyncai.com/api/'),
   apiQa('https://api-qa.skinsyncai.com/api/');
-  // api('https://s21hn0m8-8084.asse.devtunnels.ms/api/');
 
   final String url;
 

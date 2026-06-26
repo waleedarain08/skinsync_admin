@@ -6,11 +6,13 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/master_data_view_model.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
+import 'package:skinsync_admin/view_models/category_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import '../widgets/build_textfield.dart';
-import '../widgets/dailogbox/product_dailogboxs.dart';
+import '../widgets/app_network_image.dart';
+import '../widgets/dailogbox/category_selection_dialog.dart';
 import '../widgets/select_or_create_dropdown_widget.dart';
 
 class CreateProductScreen extends ConsumerStatefulWidget {
@@ -224,27 +226,14 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
             child: state.uploadingImage
                 ? const Center(child: CircularProgressIndicator())
                 : image != null && image.isNotEmpty
-                ? ClipRRect(
+                ? AppNetworkImage(
+                    imageUrl: image,
+                    width: 140.w,
+                    height: 140.w,
+                    fit: BoxFit.cover,
                     borderRadius: BorderRadius.circular(12),
-
-                    child: Image.network(
-                      image,
-                      fit: BoxFit.cover,
-
-                      loadingBuilder: (context, child, progress) {
-                        if (progress == null) {
-                          return child;
-                        }
-
-                        return const Center(child: CircularProgressIndicator());
-                      },
-
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child: Icon(Icons.broken_image_outlined, size: 40),
-                        );
-                      },
-                    ),
+                    errorIcon: Icons.broken_image_outlined,
+                    errorIconSize: 40,
                   )
                 : const Center(child: Icon(Icons.add_a_photo)),
           ),
@@ -303,19 +292,28 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
     );
   }
 
-  void _showCategorySelectionDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => CategorySelectionDialog(
-        initialCategoryIds: _selectedCategoryIds,
-        onConfirmed: (result) {
-          setState(() {
-            _selectedCategory = result['path'] as String;
-            _selectedCategoryIds = result['ids'] as List<int>;
-          });
-        },
-      ),
-    );
+  Future<void> _showCategorySelectionDialog(BuildContext context) async {
+    try {
+      // Fetch categories with the default screen loader
+      await ref.read(categoryViewModelProvider.notifier).fetchCategories();
+      
+      if (!context.mounted) return;
+
+      await showDialog(
+        context: context,
+        builder: (context) => CategorySelectionDialog(
+          initialCategoryIds: _selectedCategoryIds,
+          onConfirmed: (result) {
+            setState(() {
+              _selectedCategory = result['path'] as String;
+              _selectedCategoryIds = result['ids'] as List<int>;
+            });
+          },
+        ),
+      );
+    } catch (e) {
+      // Any errors will be handled or logged automatically by runSafely in the view model
+    }
   }
 
   Widget _buildSwitchRow({

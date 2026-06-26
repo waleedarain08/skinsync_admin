@@ -104,8 +104,9 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     return url;
   }
 
-  Future<void> fetchCategories() async {
+  Future<void> fetchCategories({bool showLoading = true}) async {
     await runSafely(
+      showLoading: showLoading,
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
         final categories = await _categoryRepository.getCategories();
