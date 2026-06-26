@@ -4,8 +4,10 @@ import 'package:skinsync_admin/models/requests/create_category_request.dart';
 
 import '../models/responses/category_detail_response.dart';
 import '../models/responses/category_list_response.dart';
-import '../utils/theme.dart';
-import '../view_models/category_view_model.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/view_models/category_view_model.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
+import 'package:skinsync_admin/widgets/icon_image_container.dart';
 import 'dailogbox/category_creation_dialog.dart';
 
 class NestedCategorySelector extends ConsumerStatefulWidget {
@@ -367,44 +369,104 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    final bgImage = category.image;
+
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: context.appBorderRadius(all: 16),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         width: context.w(180),
-        padding: context.appEdgeInsets(all: 16),
+        height: context.h(130),
         decoration: BoxDecoration(
-          color: isSelected ? CustomColors.purple : Colors.white,
           borderRadius: context.appBorderRadius(all: 16),
           border: Border.all(
             color: isSelected ? CustomColors.purple : CustomColors.border,
-            width: isSelected ? 2 : 1,
+            width: isSelected ? 2.5 : 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: CustomColors.purple.withValues(alpha: 0.2),
+                    color: CustomColors.purple.withValues(alpha: 0.35),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                 ]
               : AppShadows.xs(context),
         ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(
-                  _getIconData(category.icon),
-                  size: context.sp(22),
-                  color: isSelected ? Colors.white : CustomColors.purple,
+        child: ClipRRect(
+          borderRadius: context.appBorderRadius(all: 14), // Account for border width
+          child: Stack(
+            children: [
+              // 1. Full-Cover Image Background
+              Positioned.fill(
+                child: AppNetworkImage(
+                  imageUrl: bgImage,
+                  fit: BoxFit.cover,
+                  placeholderColor: CustomColors.whiteGrey,
                 ),
-                Row(
+              ),
+
+              // 2. Selection Tint / Dark Overlay Gradient for readability
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: isSelected
+                          ? [
+                              CustomColors.purple.withValues(alpha: 0.25),
+                              CustomColors.purple.withValues(alpha: 0.65),
+                              CustomColors.purple.withValues(alpha: 0.9),
+                            ]
+                          : [
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.35),
+                              Colors.black.withValues(alpha: 0.7),
+                            ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // 3. Category Name Aligned to Bottom
+              Positioned(
+                bottom: context.h(12),
+                left: context.w(12),
+                right: context.w(12),
+                child: Text(
+                  category.name,
+                  style: context.fonts.white14w600.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+
+              // 4. Icon Container on Top Left (Using our new reusable IconImageContainer)
+              Positioned(
+                top: context.h(10),
+                left: context.w(10),
+                child: IconImageContainer(
+                  iconUrl: category.icon,
+                  width: context.w(28),
+                  height: context.w(28),
+                  borderRadius: 8,
+                  borderColor: Colors.white.withValues(alpha: 0.8),
+                  borderWidth: 1,
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+
+              // 5. Action Buttons on Top Right
+              Positioned(
+                top: context.h(10),
+                right: context.w(10),
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    InkWell(
+                    GestureDetector(
                       onTap: () {
                         showDialog(
                           context: context,
@@ -414,77 +476,50 @@ class _CategoryCard extends StatelessWidget {
                           ),
                         );
                       },
-                      borderRadius: BorderRadius.circular(100),
                       child: Container(
-                        padding: const EdgeInsets.all(4),
+                        padding: EdgeInsets.all(context.w(4)),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.white.withValues(alpha: 0.2)
-                              : CustomColors.softGrey,
+                          color: Colors.black.withValues(alpha: 0.4),
                           shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
                         ),
                         child: Icon(
                           Icons.visibility_outlined,
-                          size: 14,
-                          color: isSelected ? Colors.white : CustomColors.grey,
+                          size: context.sp(12),
+                          color: Colors.white,
                         ),
                       ),
                     ),
                     context.horizontalSpace(6),
-                    InkWell(
+                    GestureDetector(
                       onTap: onAddChild,
-                      borderRadius: BorderRadius.circular(100),
                       child: Container(
-                        padding: const EdgeInsets.all(4),
+                        padding: EdgeInsets.all(context.w(4)),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.white.withValues(alpha: 0.2)
-                              : CustomColors.softGrey,
+                          color: Colors.black.withValues(alpha: 0.4),
                           shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
                         ),
                         child: Icon(
                           Icons.add,
-                          size: 14,
-                          color: isSelected ? Colors.white : CustomColors.grey,
+                          size: context.sp(12),
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-            context.verticalSpace(16),
-            Text(
-              category.name,
-              style: isSelected
-                  ? context.fonts.white14w600
-                  : context.fonts.black14w600,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  IconData _getIconData(String? iconName) {
-    switch (iconName) {
-      case 'face':
-        return Icons.face_retouching_natural_rounded;
-      case 'spa':
-        return Icons.spa_outlined;
-      case 'cut':
-        return Icons.content_cut_rounded;
-      case 'medical':
-        return Icons.medical_services_outlined;
-      case 'wash':
-        return Icons.dry_cleaning_outlined;
-      case 'skin':
-        return Icons.clean_hands_outlined;
-      default:
-        return Icons.category_outlined;
-    }
   }
 }
