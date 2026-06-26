@@ -23,7 +23,6 @@ class CategorySelectionDialog extends ConsumerStatefulWidget {
 
 class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialog> {
   final List<int> _selectedIds = [];
-  final List<String> _selectedNames = [];
 
   @override
   void initState() {
@@ -33,27 +32,6 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
     });
 
     _selectedIds.addAll(widget.initialCategoryIds);
-  }
-
-  void _rebuildNamesPath() {
-    _selectedNames.clear();
-    final categories = ref.read(categoryViewModelProvider).categories;
-    
-    CategoryModel? findInList(List<CategoryModel> list, int id) {
-      for (final cat in list) {
-        if (cat.id == id) return cat;
-        final child = findInList(cat.subCategories, id);
-        if (child != null) return child;
-      }
-      return null;
-    }
-
-    for (final id in _selectedIds) {
-      final node = findInList(categories, id);
-      if (node != null) {
-        _selectedNames.add(node.name);
-      }
-    }
   }
 
   CategoryModel? _findCategoryInTree(List<CategoryModel> items, int id) {
@@ -72,8 +50,23 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
     final categoryState = ref.watch(categoryViewModelProvider);
     final categories = categoryState.categories;
 
-    // Dynamically rebuild names path every build to react to loaded categories
-    _rebuildNamesPath();
+    // Dynamically calculate selected names locally (pure computation, no side-effects in build)
+    final List<String> selectedNames = [];
+    CategoryModel? findInList(List<CategoryModel> list, int id) {
+      for (final cat in list) {
+        if (cat.id == id) return cat;
+        final child = findInList(cat.subCategories, id);
+        if (child != null) return child;
+      }
+      return null;
+    }
+
+    for (final id in _selectedIds) {
+      final node = findInList(categories, id);
+      if (node != null) {
+        selectedNames.add(node.name);
+      }
+    }
 
     final List<List<CategoryModel>> columns = [categories];
     for (int i = 0; i < _selectedIds.length; i++) {
@@ -86,9 +79,87 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
       }
     }
 
-    final selectedPathText = _selectedNames.isNotEmpty
-        ? _selectedNames.join(' → ')
+    final selectedPathText = selectedNames.isNotEmpty
+        ? selectedNames.join(' → ')
         : 'None';
+
+    // Build columns of categories horizontally
+    final List<Widget> columnWidgets = [];
+    for (int columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+      final items = columns[columnIndex];
+      final activeId = _selectedIds.length > columnIndex
+          ? _selectedIds[columnIndex]
+          : null;
+
+      if (columnIndex > 0) {
+        columnWidgets.add(
+          Container(
+            width: context.w(1),
+            height: context.h(300),
+            color: CustomColors.border,
+            margin: context.appEdgeInsets(horizontal: 12),
+          ),
+        );
+      }
+
+      columnWidgets.add(
+        SizedBox(
+          width: context.w(220),
+          height: context.h(300),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: items.map((item) {
+                final isSelected = activeId == item.id;
+                return Container(
+                  margin: context.appEdgeInsets(bottom: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? CustomColors.purple.withValues(alpha: 0.1)
+                        : Colors.white,
+                    borderRadius: context.appBorderRadius(all: 10),
+                    border: Border.all(
+                      color: isSelected
+                          ? CustomColors.purple
+                          : CustomColors.border,
+                      width: isSelected ? context.w(1.5) : context.w(1),
+                    ),
+                  ),
+                  child: ListTile(
+                    dense: true,
+                    contentPadding: context.appEdgeInsets(horizontal: 12, vertical: 4),
+                    title: Text(
+                      item.name,
+                      style: isSelected
+                          ? context.fonts.purple14w600
+                          : context.fonts.black14w400,
+                    ),
+                    trailing: item.subCategories.isNotEmpty
+                        ? Icon(
+                            Icons.chevron_right_rounded,
+                            color: isSelected
+                                ? CustomColors.purple
+                                : CustomColors.lightGrey,
+                            size: context.sp(20),
+                          )
+                        : null,
+                    onTap: () {
+                      setState(() {
+                        if (columnIndex < _selectedIds.length) {
+                          _selectedIds.removeRange(
+                              columnIndex, _selectedIds.length);
+                        }
+                        _selectedIds.add(item.id);
+                      });
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      );
+    }
 
     return StandardDialog(
       title: 'Select Category',
@@ -101,7 +172,7 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
             'Selected Path:',
             style: context.fonts.black14w600,
           ),
-          context.verticalSpace(8),
+          SizedBox(height: context.h(8)),
           Container(
             padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
             width: double.infinity,
@@ -115,82 +186,19 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
               style: context.fonts.purple14w600,
             ),
           ),
-          context.verticalSpace(24),
+          SizedBox(height: context.h(24)),
           SizedBox(
             height: context.h(300),
-            child: columns.isEmpty || categories.isEmpty
+            child: categories.isEmpty
                 ? const Center(child: CircularProgressIndicator())
-                : Scrollbar(
-                    thumbVisibility: true,
-                    child: ListView.separated(
+                : ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                    child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      itemCount: columns.length,
-                      separatorBuilder: (_, index) => Container(
-                        width: 1,
-                        color: CustomColors.border,
-                        margin: context.appEdgeInsets(horizontal: 12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: columnWidgets,
                       ),
-                      itemBuilder: (_, columnIndex) {
-                        final items = columns[columnIndex];
-                        final activeId = _selectedIds.length > columnIndex
-                            ? _selectedIds[columnIndex]
-                            : null;
-
-                        return SizedBox(
-                          width: context.w(220),
-                          child: ListView.builder(
-                            itemCount: items.length,
-                            itemBuilder: (_, itemIndex) {
-                              final item = items[itemIndex];
-                              final isSelected = activeId == item.id;
-
-                              return Container(
-                                margin: context.appEdgeInsets(bottom: 8),
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? CustomColors.purple.withValues(alpha: 0.1)
-                                      : Colors.white,
-                                  borderRadius: context.appBorderRadius(all: 10),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? CustomColors.purple
-                                        : CustomColors.border,
-                                    width: isSelected ? 1.5 : 1,
-                                  ),
-                                ),
-                                child: ListTile(
-                                  title: Text(
-                                    item.name,
-                                    style: isSelected
-                                        ? context.fonts.purple14w600
-                                        : context.fonts.black14w400,
-                                  ),
-                                  trailing: item.subCategories.isNotEmpty
-                                      ? Icon(
-                                          Icons.chevron_right_rounded,
-                                          color: isSelected
-                                              ? CustomColors.purple
-                                              : CustomColors.lightGrey,
-                                        )
-                                      : null,
-                                  onTap: () {
-                                    setState(() {
-                                      if (columnIndex < _selectedIds.length) {
-                                        _selectedIds.removeRange(
-                                            columnIndex, _selectedIds.length);
-                                        _selectedNames.removeRange(
-                                            columnIndex, _selectedNames.length);
-                                      }
-                                      _selectedIds.add(item.id);
-                                      _selectedNames.add(item.name);
-                                    });
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
                     ),
                   ),
           ),
@@ -207,21 +215,22 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
           },
           label: 'Clear Category',
         ),
-        const Spacer(),
+        //const Spacer(),
         CustomOutlinedButton(
           onTap: () => Navigator.pop(context),
           label: 'Cancel',
         ),
-        context.horizontalSpace(12),
+        SizedBox(width: context.w(12)),
         CustomPrimaryButton(
           onTap: () {
             widget.onConfirmed({
-              'path': _selectedNames.join(' > '),
+              'path': selectedNames.join(' > '),
               'ids': List<int>.from(_selectedIds),
             });
             Navigator.pop(context);
           },
           label: 'Select Category',
+          width: context.w(150),
         ),
       ],
     );
