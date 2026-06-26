@@ -33,7 +33,6 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
     });
 
     _selectedIds.addAll(widget.initialCategoryIds);
-    _rebuildNamesPath();
   }
 
   void _rebuildNamesPath() {
@@ -73,6 +72,9 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
     final categoryState = ref.watch(categoryViewModelProvider);
     final categories = categoryState.categories;
 
+    // Dynamically rebuild names path every build to react to loaded categories
+    _rebuildNamesPath();
+
     final List<List<CategoryModel>> columns = [categories];
     for (int i = 0; i < _selectedIds.length; i++) {
       final selectedId = _selectedIds[i];
@@ -99,13 +101,13 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
             'Selected Path:',
             style: context.fonts.black14w600,
           ),
-          SizedBox(height: context.h(8)),
+          context.verticalSpace(8),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: context.w(16), vertical: context.h(12)),
+            padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
             width: double.infinity,
             decoration: BoxDecoration(
               color: CustomColors.whiteGrey,
-              borderRadius: BorderRadius.circular(context.r(8)),
+              borderRadius: context.appBorderRadius(all: 8),
               border: Border.all(color: CustomColors.border),
             ),
             child: Text(
@@ -113,7 +115,7 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
               style: context.fonts.purple14w600,
             ),
           ),
-          SizedBox(height: context.h(24)),
+          context.verticalSpace(24),
           SizedBox(
             height: context.h(300),
             child: columns.isEmpty || categories.isEmpty
@@ -123,12 +125,12 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: columns.length,
-                      separatorBuilder: (context, index) => Container(
+                      separatorBuilder: (_, index) => Container(
                         width: 1,
                         color: CustomColors.border,
-                        margin: EdgeInsets.symmetric(horizontal: context.w(12)),
+                        margin: context.appEdgeInsets(horizontal: 12),
                       ),
-                      itemBuilder: (context, columnIndex) {
+                      itemBuilder: (_, columnIndex) {
                         final items = columns[columnIndex];
                         final activeId = _selectedIds.length > columnIndex
                             ? _selectedIds[columnIndex]
@@ -138,12 +140,12 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
                           width: context.w(220),
                           child: ListView.builder(
                             itemCount: items.length,
-                            itemBuilder: (context, itemIndex) {
+                            itemBuilder: (_, itemIndex) {
                               final item = items[itemIndex];
                               final isSelected = activeId == item.id;
 
                               return Container(
-                                margin: EdgeInsets.only(bottom: context.h(8)),
+                                margin: context.appEdgeInsets(bottom: 8),
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? CustomColors.purple.withValues(alpha: 0.1)
@@ -210,7 +212,7 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
           onTap: () => Navigator.pop(context),
           label: 'Cancel',
         ),
-        SizedBox(width: context.w(12)),
+        context.horizontalSpace(12),
         CustomPrimaryButton(
           onTap: () {
             widget.onConfirmed({
