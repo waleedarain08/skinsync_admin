@@ -11,7 +11,7 @@ import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import '../widgets/build_textfield.dart';
 import '../widgets/app_network_image.dart';
-import '../widgets/dailogbox/product_dailogboxs.dart';
+import '../widgets/dailogbox/category_selection_dialog.dart';
 import '../widgets/select_or_create_dropdown_widget.dart';
 
 class CreateProductScreen extends ConsumerStatefulWidget {
