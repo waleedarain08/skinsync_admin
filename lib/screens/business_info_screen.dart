@@ -9,6 +9,7 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 
 class BusinessInformationScreen extends StatefulWidget {
   const BusinessInformationScreen({super.key});
@@ -356,8 +357,8 @@ class _BusinessInformationScreenState extends State<BusinessInformationScreen> {
                 child: _selectedImage != null
                     ? ClipOval(
                         child: kIsWeb
-                            ? Image.network(
-                                _selectedImage!.path,
+                            ? AppNetworkImage(
+                                imageUrl: _selectedImage!.path,
                                 width: 64.w,
                                 height: 64.w,
                                 fit: BoxFit.cover,

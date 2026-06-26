@@ -31,6 +31,7 @@ import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/dailogbox/standard_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
+import '../widgets/app_network_image.dart';
 import '../widgets/nested_category_selector.dart';
 import 'product_detail_screen.dart';
 
@@ -4322,9 +4323,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     Attachment file,
   ) {
     if (file.type == 'image') {
-      return ClipRRect(
+      return AppNetworkImage(
+        imageUrl: file.url,
         borderRadius: context.appBorderRadius(all: 6),
-        child: Image.network(file.url, fit: BoxFit.cover),
+        fit: BoxFit.cover,
       );
     }
     if (file.type == 'pdf') {
@@ -4474,7 +4476,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       return ClipRRect(
         borderRadius: context.appBorderRadius(all: 6),
         child: kIsWeb
-            ? Image.network(file.path!, fit: BoxFit.cover)
+            ? AppNetworkImage(imageUrl: file.path!, fit: BoxFit.cover)
             : Image.file(File(file.path!), fit: BoxFit.cover),
       );
     } else if (ext == 'pdf') {
@@ -5583,36 +5585,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Product Image
-              Container(
+              AppNetworkImage(
+                imageUrl: hasValidImage ? imageUrl : '',
                 width: 64,
                 height: 64,
-                decoration: BoxDecoration(
-                  color: CustomColors.whiteGrey,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: CustomColors.border),
-                ),
-                child: hasValidImage
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Center(
-                            child: Icon(
-                              Icons.broken_image,
-                              color: CustomColors.grey,
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                      )
-                    : const Center(
-                        child: Icon(
-                          Icons.broken_image,
-                          color: CustomColors.grey,
-                          size: 24,
-                        ),
-                      ),
+                borderRadius: BorderRadius.circular(8),
+                fit: BoxFit.cover,
+                errorIcon: Icons.broken_image,
+                errorIconSize: 24,
               ),
               context.horizontalSpace(16),
               // Product Details
@@ -6813,20 +6793,13 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                   context.verticalSpace(8),
                   Row(
                     children: [
-                      Container(
+                      AppNetworkImage(
+                        imageUrl: pickedIconPath ?? '',
                         width: 48,
                         height: 48,
-                        decoration: BoxDecoration(
-                          color: CustomColors.whiteGrey,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: CustomColors.border),
-                        ),
-                        child: pickedIconPath != null
-                            ? Image.network(pickedIconPath!, fit: BoxFit.cover)
-                            : const Icon(
-                                Icons.image_outlined,
-                                color: CustomColors.grey,
-                              ),
+                        borderRadius: BorderRadius.circular(8),
+                        fit: BoxFit.cover,
+                        errorIcon: Icons.image_outlined,
                       ),
                       context.horizontalSpace(12),
                       CustomOutlinedButton(
@@ -7387,29 +7360,15 @@ class _AreaCard extends StatelessWidget {
   Widget _buildIcon(BuildContext context) {
     if (icon != null && icon!.isNotEmpty) {
       debugPrint('ICON: $icon');
-      // if (icon!.startsWith('http')) {
-      return ClipRRect(
+      return AppNetworkImage(
+        imageUrl: icon!,
+        width: 22,
+        height: 22,
+        fit: BoxFit.cover,
         borderRadius: BorderRadius.circular(4),
-        child: Image.network(
-          icon!,
-          width: 22,
-          height: 22,
-          fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => _fallbackIcon(context),
-        ),
+        errorIcon: Icons.image_outlined,
+        errorIconSize: 22,
       );
-      // } else if (icon!.contains('/') || icon!.contains('\\')) {
-      //   return ClipRRect(
-      //     borderRadius: BorderRadius.circular(4),
-      //     child: Image.file(
-      //       File(icon!),
-      //       width: 22,
-      //       height: 22,
-      //       fit: BoxFit.cover,
-      //       errorBuilder: (_, _, _) => _fallbackIcon(context),
-      //     ),
-      //   );
-      // }
     }
     return _fallbackIcon(context);
   }

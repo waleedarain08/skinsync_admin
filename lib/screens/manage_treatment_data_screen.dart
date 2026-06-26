@@ -13,6 +13,7 @@ import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/dailogbox/category_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 
 class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
   const ManageTreatmentDataScreen({super.key});
@@ -893,13 +894,12 @@ class _ManageTreatmentDataScreenState
             color: CustomColors.whiteGrey,
             borderRadius: context.borderRadius(all: 8),
           ),
-          child: icon != null
-              ? Image.network(
-                  icon,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.category_outlined),
-                )
-              : const Icon(Icons.category_outlined, color: CustomColors.purple),
+          child: AppNetworkImage(
+            imageUrl: icon ?? '',
+            fit: BoxFit.cover,
+            errorIcon: Icons.category_outlined,
+            errorIconColor: CustomColors.purple,
+          ),
         ),
         title: Text(name, style: context.fonts.black16w600),
         subtitle: Text(
@@ -949,20 +949,13 @@ class _ManageTreatmentDataScreenState
                         color: CustomColors.whiteGrey,
                         borderRadius: context.borderRadius(all: 6),
                       ),
-                      child: child.icon != null
-                          ? Image.network(
-                              child.icon!,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    Icons.subdirectory_arrow_right,
-                                    size: 16,
-                                  ),
-                            )
-                          : const Icon(
-                              Icons.subdirectory_arrow_right,
-                              size: 16,
-                              color: CustomColors.grey,
-                            ),
+                      child: AppNetworkImage(
+                        imageUrl: child.icon ?? '',
+                        fit: BoxFit.cover,
+                        errorIcon: Icons.subdirectory_arrow_right,
+                        errorIconSize: 16,
+                        errorIconColor: CustomColors.grey,
+                      ),
                     ),
                     title: Text(child.name, style: context.fonts.black14w400),
                     trailing: Row(
@@ -1039,13 +1032,12 @@ class _RecursiveCategoryTile extends StatelessWidget {
             color: CustomColors.whiteGrey,
             borderRadius: context.borderRadius(all: 8),
           ),
-          child: category.icon.isNotEmpty
-              ? Image.network(
-                  category.icon,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.category_outlined),
-                )
-              : const Icon(Icons.category_outlined, color: CustomColors.purple),
+          child: AppNetworkImage(
+            imageUrl: category.icon,
+            fit: BoxFit.cover,
+            errorIcon: Icons.category_outlined,
+            errorIconColor: CustomColors.purple,
+          ),
         ),
         title: Text(category.name, style: context.fonts.black16w600),
         subtitle: Text(
