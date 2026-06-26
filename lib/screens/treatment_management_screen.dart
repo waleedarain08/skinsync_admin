@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -91,9 +93,13 @@ class _TreatmentManagementScreenState
 
       final matchesStatus =
           _selectedStatusFilter == 'All Statuses' ||
-          (_selectedStatusFilter == 'Active' && t.status.toLowerCase() == 'active') ||
-          (_selectedStatusFilter == 'Inactive' && (t.status.toLowerCase() == 'deactive' || t.status.toLowerCase() == 'inactive')) ||
-          (_selectedStatusFilter == 'Draft' && t.status.toLowerCase() == 'draft');
+          (_selectedStatusFilter == 'Active' &&
+              t.status.toLowerCase() == 'active') ||
+          (_selectedStatusFilter == 'Inactive' &&
+              (t.status.toLowerCase() == 'deactive' ||
+                  t.status.toLowerCase() == 'inactive')) ||
+          (_selectedStatusFilter == 'Draft' &&
+              t.status.toLowerCase() == 'draft');
 
       return matchesQuery &&
           matchesCategory &&
@@ -356,6 +362,7 @@ class _TreatmentManagementScreenState
 
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
+      backgroundColor: Colors.red,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12.r),
         child: Table(
@@ -416,11 +423,13 @@ class _TreatmentManagementScreenState
   }
 
   Widget _treatmentNameCell(TreatmentModel treatment) {
-    final displayImage = (treatment.image != null && treatment.image!.isNotEmpty)
+    log('treatment image${treatment.image}');
+    final displayImage =
+        (treatment.image != null && treatment.image!.isNotEmpty)
         ? treatment.image
         : (treatment.icon != null && treatment.icon!.isNotEmpty)
-            ? treatment.icon
-            : null;
+        ? treatment.icon
+        : null;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
@@ -440,9 +449,20 @@ class _TreatmentManagementScreenState
                     child: Image.network(
                       displayImage,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Center(
-                        child: Icon(Icons.broken_image_outlined, color: CustomColors.grey),
-                      ),
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        debugPrint('Image error: $error');
+                        debugPrint('Stack: $stackTrace');
+                        return const Center(
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            color: CustomColors.grey,
+                          ),
+                        );
+                      },
                     ),
                   )
                 : const Center(
@@ -486,8 +506,6 @@ class _TreatmentManagementScreenState
       ),
     );
   }
-
-
 
   Widget _statusBadgeCell(String status) {
     final String cleanStatus = status.toLowerCase();
