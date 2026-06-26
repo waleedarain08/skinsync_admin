@@ -99,13 +99,13 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
             'Selected Path:',
             style: context.fonts.black14w600,
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: context.h(8)),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            padding: EdgeInsets.symmetric(horizontal: context.w(16), vertical: context.h(12)),
             width: double.infinity,
             decoration: BoxDecoration(
               color: CustomColors.whiteGrey,
-              borderRadius: BorderRadius.circular(8.r),
+              borderRadius: BorderRadius.circular(context.r(8)),
               border: Border.all(color: CustomColors.border),
             ),
             child: Text(
@@ -113,7 +113,7 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
               style: context.fonts.purple14w600,
             ),
           ),
-          SizedBox(height: 24.h),
+          SizedBox(height: context.h(24)),
           SizedBox(
             height: context.h(300),
             child: columns.isEmpty || categories.isEmpty
@@ -126,7 +126,7 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
                       separatorBuilder: (context, index) => Container(
                         width: 1,
                         color: CustomColors.border,
-                        margin: EdgeInsets.symmetric(horizontal: 12.w),
+                        margin: EdgeInsets.symmetric(horizontal: context.w(12)),
                       ),
                       itemBuilder: (context, columnIndex) {
                         final items = columns[columnIndex];
@@ -143,7 +143,7 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
                               final isSelected = activeId == item.id;
 
                               return Container(
-                                margin: EdgeInsets.only(bottom: 8.h),
+                                margin: EdgeInsets.only(bottom: context.h(8)),
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? CustomColors.purple.withValues(alpha: 0.1)
@@ -210,7 +210,7 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
           onTap: () => Navigator.pop(context),
           label: 'Cancel',
         ),
-        SizedBox(width: 12.w),
+        SizedBox(width: context.w(12)),
         CustomPrimaryButton(
           onTap: () {
             widget.onConfirmed({
