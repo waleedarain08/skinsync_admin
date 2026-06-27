@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/models/responses/usage_type_list_response.dart';
+import 'package:skinsync_admin/models/requests/create_product_request.dart';
 import '../models/responses/base_response_model.dart';
 import '../models/responses/brands_list_response.dart';
 import '../models/responses/manufacturers_list_response.dart';
@@ -8,6 +9,7 @@ import '../models/responses/package_type_list_response.dart';
 import '../models/responses/product_list_response.dart';
 import '../models/responses/product_detail_response.dart';
 import '../models/responses/unit_types_list_response.dart';
+import '../models/responses/supplier_list_response.dart';
 import '../repositories/product_repository.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
@@ -19,11 +21,10 @@ class ProductServices implements ProductRepository {
   ProductServices({required ApiBaseHelper api}) : _api = api;
 
   @override
-  Future<ProductModel> addProduct({required ProductModel req}) async {
+  Future<ProductModel> addProduct({required CreateProductRequest req}) async {
     final jsonResponse = await _api.post(Endpoint.products, body: req.toJson());
     final response = ProductResponse.fromJson(
       jsonResponse
-    
     );
 
     if (!response.isSuccess) {
@@ -141,6 +142,16 @@ class ProductServices implements ProductRepository {
   Future<UsageTypeListResponse> fetchUsageTypes() async {
     final jsonResponse = await _api.get(Endpoint.usageType);
     final response = UsageTypeListResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<SupplierListResponse> fetchSuppliers() async {
+    final jsonResponse = await _api.get(Endpoint.suppliers);
+    final response = SupplierListResponse.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }

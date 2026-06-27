@@ -6,11 +6,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/responses/usage_type_list_response.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import '../models/product_model.dart';
+import '../models/requests/create_product_request.dart';
 import '../models/responses/brands_list_response.dart';
 import '../models/responses/manufacturers_list_response.dart';
 import '../models/responses/package_type_list_response.dart';
 import '../models/responses/product_detail_response.dart';
 import '../models/responses/unit_types_list_response.dart';
+import '../models/responses/supplier_list_response.dart';
 import '../repositories/product_repository.dart';
 import '../services/locator.dart';
 import 'base_state_model.dart';
@@ -34,6 +36,7 @@ class ProductState extends BaseStateModel {
 
   final List<PackageTypeModel>? packageTypes;
   final List<UsageTypeModel>? usageType;
+  final List<SupplierModel>? suppliers;
 
 
 
@@ -52,6 +55,7 @@ class ProductState extends BaseStateModel {
     this.packageTypes,
     this.imageUrl,
     this.usageType,
+    this.suppliers,
     this.uploadingImage = false,
   });
 
@@ -71,6 +75,7 @@ class ProductState extends BaseStateModel {
     List<BrandModel>? brands,
     List<ManufacturersModel>? manufacturers,
     List<UsageTypeModel>? usageType,
+    List<SupplierModel>? suppliers,
   }) {
     return ProductState(
       loading: loading ?? this.loading,
@@ -87,6 +92,7 @@ class ProductState extends BaseStateModel {
       unitTypes: unitTypes ?? this.unitTypes,
       packageTypes: packageTypes ?? this.packageTypes,
       usageType: usageType ?? this.usageType,
+      suppliers: suppliers ?? this.suppliers,
       uploadingImage: uploadingImage ?? this.uploadingImage,
     );
   }
@@ -262,14 +268,40 @@ void setImageNull() {
   }
 
   // CRUD Actions backed by the actual API repository
-  Future<ProductModel?> addProduct(ProductModel req) async {
-    return await runSafely<ProductModel?>(
+  Future<bool?> createProduct(ProductModel req) async {
+    return await runSafely<bool?>(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
-        final productWithId = await _productRepository.addProduct(req: req);
+        final createRequest = CreateProductRequest(
+          image: req.image,
+          name: req.name,
+          brand: req.brand,
+          manufacturer: req.manufacturer,
+          globalSku: req.globalSku,
+          barcode: req.barcode,
+          usageType: req.productPurpose ?? req.usageType,
+          category: req.category,
+          selectedCategoryIds: req.selectedCategoryIds,
+          status: req.status,
+          description: req.description,
+          unitType: req.unitType,
+          boxQuantity: req.boxQuantity,
+          itemQuantityPerBox: req.itemQuantityPerBox,
+          packageType: req.packageType,
+          billableUnit: req.billableUnit,
+          billableQuantityPerItem: req.billableQuantityPerItem,
+          totalBillableQuantity: req.totalBillableQuantity,
+          enforceLotTracking: req.enforceLotTracking,
+          clinicCost: req.clinicCost,
+          retailPricePerUnit: req.retailPricePerUnit,
+          supplier: req.supplier,
+          lotNumber: req.lotNumber,
+          expirationDate: req.expirationDate?.toIso8601String(),
+        );
+        await _productRepository.addProduct(req: createRequest);
         await refreshProducts();
         EasyLoading.showSuccess('Product created successfully');
-        return productWithId;
+        return true;
       },
     );
   }
@@ -387,6 +419,24 @@ void setImageNull() {
           );
           state = state.copyWith(
             usageType: response.data,
+            errorMessage: null,
+          );
+        } catch (e) {
+          state = state.copyWith(errorMessage: e.toString());
+          rethrow;
+        }
+      },
+    );
+  }
+
+  Future<void> fetchSuppliers() async {
+    await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+          () async {
+        try {
+          final response = await _productRepository.fetchSuppliers();
+          state = state.copyWith(
+            suppliers: response.data,
             errorMessage: null,
           );
         } catch (e) {

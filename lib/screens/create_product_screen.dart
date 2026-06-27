@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
-import 'package:skinsync_admin/view_models/master_data_view_model.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
@@ -41,11 +40,11 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
   late final TextEditingController _totalBillableQuantityController;
   late final TextEditingController _clinicCostController;
   late final TextEditingController _retailPricePerUnitController;
-  late final TextEditingController _supplierController;
   late final TextEditingController _lotNumberController;
   late final TextEditingController _expirationDateController;
 
   String? _selectedBrand;
+  String? _selectedSupplier;
   String? _selectedManufacturer;
   String? _selectedPurpose;
   String? _selectedUnit;
@@ -105,9 +104,6 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
     _retailPricePerUnitController = TextEditingController(
       text: widget.productToEdit?.retailPricePerUnit?.toString() ?? '0',
     );
-    _supplierController = TextEditingController(
-      text: widget.productToEdit?.supplier,
-    );
     _lotNumberController = TextEditingController(
       text: widget.productToEdit?.lotNumber,
     );
@@ -123,6 +119,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
     }
 
     _selectedBrand = widget.productToEdit?.brand;
+    _selectedSupplier = widget.productToEdit?.supplier;
     _selectedManufacturer = widget.productToEdit?.manufacturer;
     _selectedPurpose = widget.productToEdit?.productPurpose;
     _selectedUnit = widget.productToEdit?.unit;
@@ -148,7 +145,6 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
     _totalBillableQuantityController.dispose();
     _clinicCostController.dispose();
     _retailPricePerUnitController.dispose();
-    _supplierController.dispose();
     _lotNumberController.dispose();
     _expirationDateController.dispose();
     super.dispose();
@@ -445,7 +441,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             retailPricePerUnit: double.tryParse(
                               _retailPricePerUnitController.text,
                             ),
-                            supplier: _supplierController.text,
+                            supplier: _selectedSupplier,
                             lotNumber: _lotNumberController.text,
                             expirationDate: _expirationDate?.toUtc(),
                             selectedCategoryIds: _selectedCategoryIds,
@@ -460,9 +456,9 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                               if (success && context.mounted) context.pop(true);
                             });
                           } else {
-                            notifier.addProduct(product).then((newProduct) {
-                              if (newProduct != null && context.mounted)
-                                context.pop(newProduct);
+                            notifier.createProduct(product).then((success) {
+                              if (success == true && context.mounted)
+                                context.pop(true);
                             });
                           }
                         },
@@ -1218,37 +1214,38 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                     children: [
                                       Consumer(
                                         builder: (context, ref, _) {
-                                          final units = ref
-                                              .watch(
-                                                masterDataViewModelProvider,
-                                              )
-                                              .units;
-                                          return _buildSelectOrCreateDropdown(
+                                          final unitTypes =
+                                              ref
+                                                  .watch(
+                                                    productViewModelProvider,
+                                                  )
+                                                  .unitTypes ??
+                                              [];
+                                          return SelectOrCreateDropdown<String>(
                                             label: 'Billable Unit',
                                             hint: 'Select Billable Unit',
                                             value: _selectedBillableUnit,
-                                            items: units,
+                                            items: unitTypes
+                                                .map((e) => e.name)
+                                                .toList(),
+                                            itemLabel: (unit) => unit,
                                             onChanged: (val) => setState(
                                               () => _selectedBillableUnit = val,
                                             ),
+                                            onOpen: () => ref
+                                                .read(
+                                                  productViewModelProvider
+                                                      .notifier,
+                                                )
+                                                .fetchUnitTypes(),
                                             onCreate: () =>
                                                 _showCreateMasterItemDialog(
                                                   context,
                                                   ref,
                                                   'Billable Unit',
-                                                  (name) {
-                                                    ref
-                                                        .read(
-                                                          masterDataViewModelProvider
-                                                              .notifier,
-                                                        )
-                                                        .addUnit(name);
-                                                    setState(
-                                                      () =>
-                                                          _selectedBillableUnit =
-                                                              name,
-                                                    );
-                                                  },
+                                                  (name) => setState(
+                                                    () => _selectedBillableUnit = name,
+                                                  ),
                                                 ),
                                           );
                                         },
@@ -1392,10 +1389,39 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      BuildTextField(
-                                        label: 'Supplier',
-                                        controller: _supplierController,
-                                        hintText: 'Enter supplier name...',
+                                      Consumer(
+                                        builder: (context, ref, _) {
+                                          final suppliers = ref
+                                                  .watch(productViewModelProvider)
+                                                  .suppliers ??
+                                              [];
+                                          return SelectOrCreateDropdown<String>(
+                                            label: 'Supplier',
+                                            hint: 'Select Supplier',
+                                            value: _selectedSupplier,
+                                            items: suppliers
+                                                .map((e) => e.name)
+                                                .toList(),
+                                            itemLabel: (supplier) => supplier,
+                                            onChanged: (val) => setState(
+                                              () => _selectedSupplier = val,
+                                            ),
+                                            onOpen: () => ref
+                                                .read(
+                                                  productViewModelProvider.notifier,
+                                                )
+                                                .fetchSuppliers(),
+                                            onCreate: () =>
+                                                _showCreateMasterItemDialog(
+                                                  context,
+                                                  ref,
+                                                  'Supplier',
+                                                  (name) => setState(
+                                                    () => _selectedSupplier = name,
+                                                  ),
+                                                ),
+                                          );
+                                        },
                                       ),
                                       SizedBox(height: 6.h),
                                       Text(
