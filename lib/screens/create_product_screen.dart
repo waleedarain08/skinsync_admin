@@ -79,7 +79,9 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
     _skuController = TextEditingController(
       text: widget.productToEdit?.sku ?? widget.productToEdit?.globalSku,
     );
-    _barcodeController = TextEditingController();
+    _barcodeController = TextEditingController(
+      text: widget.productToEdit?.barcode,
+    );
     _descriptionController = TextEditingController(
       text: widget.productToEdit?.description,
     );

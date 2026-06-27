@@ -152,10 +152,10 @@ void setImageNull() {
             limit: limit,
           );
           state = state.copyWith(
-            products: response.data ?? [],
-            currentPage: response.page ?? page,
-            pageSize: response.limit ?? limit,
-            totalPages: response.totalPages ?? 1,
+            products: (response.data ?? []).map((e) => e.toProductModel()).toList(),
+            currentPage: response.page,
+            pageSize: response.limit,
+            totalPages: response.totalPages,
             searchKeyword: search,
             errorMessage: null,
           );
@@ -227,18 +227,6 @@ void setImageNull() {
       page: state.currentPage,
       limit: state.pageSize,
     );
-  }
-
-  List<ProductModel> getAllProducts() {
-    return state.products;
-  }
-
-  ProductModel? findProductById(int id) {
-    try {
-      return state.products.firstWhere((prod) => prod.id == id);
-    } catch (_) {
-      return null;
-    }
   }
 
   final MediaService _mediaService = MediaService();

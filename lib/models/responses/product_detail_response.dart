@@ -25,6 +25,7 @@ class ProductDetailModel {
   final String image;
   final String name;
   final String? brand;
+  final String? manufacturer;
   final String? globalSku;
   final String? barcode;
   final String? usageType;
@@ -51,6 +52,7 @@ class ProductDetailModel {
     required this.image,
     required this.name,
     this.brand,
+    this.manufacturer,
     this.globalSku,
     this.barcode,
     this.usageType,
@@ -79,6 +81,7 @@ class ProductDetailModel {
       image: json['image'] ?? '',
       name: json['name'] ?? '',
       brand: json['brand'],
+      manufacturer: json['manufacturer'],
       globalSku: json['global_sku'],
       barcode: json['barcode'],
       usageType: json['usage_type'] ?? json['product_purpose'],
@@ -112,6 +115,7 @@ class ProductDetailModel {
       'image': image,
       'name': name,
       'brand': brand,
+      'manufacturer': manufacturer,
       'global_sku': globalSku,
       'barcode': barcode,
       'usage_type': usageType,
@@ -141,6 +145,7 @@ class ProductDetailModel {
       image: image,
       name: name,
       brand: brand,
+      manufacturer: manufacturer,
       globalSku: globalSku,
       barcode: barcode,
       productPurpose: usageType,
