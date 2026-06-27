@@ -288,7 +288,7 @@ Body                 : ${request.toJson()}
     fullDescriptionController.clear();
     shortDescriptionController.clear();
     basePriceController.clear();
-    
+
     durationHoursController.clear();
     durationMinutesController.clear();
     treatmentDurationController.clear();
@@ -339,9 +339,9 @@ Body                 : ${request.toJson()}
       clearExistingConsentForm: true,
       clearTreatmentImage: true,
       clearTreatmentIcon: true,
-       
-clearTreatmentImageUrl: true,
-clearTreatmentIconUrl: true,
+
+      clearTreatmentImageUrl: true,
+      clearTreatmentIconUrl: true,
 
       preTreatmentAttachments: [],
       postTreatmentAttachments: [],
@@ -657,7 +657,7 @@ clearTreatmentIconUrl: true,
       areas: newAreas,
       status: treatment.status,
       treatmentImageUrl: treatment.image,
-  treatmentIconUrl: treatment.icon,
+      treatmentIconUrl: treatment.icon,
       selectedProtocolIds: treatment.protocolIds ?? [],
       selectedProtocolNotes: treatment.protocolNotes ?? [],
       standaloneNotes: treatment.standaloneNotes ?? [],
@@ -1284,34 +1284,35 @@ Body       : ${request.toJson()}
     state = state.copyWith(selectedRoles: current);
   }
 
-Future<bool?> createBasicInfo({required int stepNumber}) async {
-  return await runSafely<bool>(() async {
-    final imageUrl = state.treatmentImageUrl;
-    final iconUrl = state.treatmentIconUrl;
+  Future<bool?> createBasicInfo({required int stepNumber}) async {
+    return await runSafely<bool>(() async {
+      final imageUrl = state.treatmentImageUrl;
+      final iconUrl = state.treatmentIconUrl;
 
-    if (imageUrl == null || iconUrl == null) {
-      throw const UnknownException('Please Select Image & Icon');
-    }
+      if (imageUrl == null || iconUrl == null) {
+        throw const UnknownException('Please Select Image & Icon');
+      }
 
-    final response = await _treatmentRepository.createBasicInfo(
-      BasicInfoRequest(
-        stepNumber: stepNumber,
-        selectedCategoryIds: state.selectedCategoryPath,
-        patientDisplayName: displayNameController.text,
-        image: imageUrl,
-        shortDescription: shortDescriptionController.text,
-        description: fullDescriptionController.text,
-        globalSku: globalSkuController.text,
-        icon: iconUrl,
-      ),
-    );
-    if (response.isSuccess) {
-      log('Basic Info Created : ${response.data?.id}');
-      state = state.copyWith(draftTreatmentID: response.data?.id);
-    }
-    return true;
-  });
-}
+      final response = await _treatmentRepository.createBasicInfo(
+        BasicInfoRequest(
+          stepNumber: stepNumber,
+          selectedCategoryIds: state.selectedCategoryPath,
+          patientDisplayName: displayNameController.text,
+          image: imageUrl,
+          shortDescription: shortDescriptionController.text,
+          description: fullDescriptionController.text,
+          globalSku: globalSkuController.text,
+          icon: iconUrl,
+        ),
+      );
+      if (response.isSuccess) {
+        log('Basic Info Created : ${response.data?.id}');
+        state = state.copyWith(draftTreatmentID: response.data?.id);
+      }
+      return true;
+    });
+  }
+
   void setRoles(List<String> roles) =>
       state = state.copyWith(selectedRoles: roles);
 
@@ -1354,23 +1355,24 @@ Future<bool?> createBasicInfo({required int stepNumber}) async {
     }
   }
 
-Future<void> pickImage(bool isIcon) async {
-  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-  if (image == null) return;
+  Future<void> pickImage(bool isIcon) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
 
-  await runSafely(() async {
-    final path = isIcon ? 'treatment/icon/' : 'treatment/image/';
-    final String? url = await MediaService().uploadImage(path, image);
-    if (url == null) {
-      throw const UnknownException('Failed to upload image');
-    }
-    if (isIcon) {
-      state = state.copyWith(treatmentIconUrl: url);
-    } else {
-      state = state.copyWith(treatmentImageUrl: url);
-    }
-  });
-}
+    await runSafely(() async {
+      final path = isIcon ? 'treatment/icon/' : 'treatment/image/';
+      final String? url = await MediaService().uploadImage(path, image);
+      if (url == null) {
+        throw const UnknownException('Failed to upload image');
+      }
+      if (isIcon) {
+        state = state.copyWith(treatmentIconUrl: url);
+      } else {
+        state = state.copyWith(treatmentImageUrl: url);
+      }
+    });
+  }
+
   List<int> _findPathToCategory(
     List<CategoryModel> items,
     int id,
@@ -2764,7 +2766,7 @@ class TreatmentState extends BaseStateModel {
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
   final int currentStep;
-  
+
   final String? treatmentImageUrl;
   final String? treatmentIconUrl;
 
@@ -2838,7 +2840,7 @@ class TreatmentState extends BaseStateModel {
     this.selectedTreatmentId,
     this.selectedCategoryDetail,
     this.currentStep = 0,
-  
+
     this.selectedCategoryPath = const [],
     this.selectedProtocolIds = const [],
     this.selectedProtocolNotes = const [],
@@ -2903,7 +2905,7 @@ class TreatmentState extends BaseStateModel {
     TreatmentModel? selectedTreatment,
     int? selectedTreatmentId,
     int? currentStep,
-    
+
     int? draftTreatmentID,
     List<AreaViewModelEntry>? areas,
     List<int>? selectedCategoryPath,
@@ -2951,11 +2953,10 @@ class TreatmentState extends BaseStateModel {
     List<TreatmentProductData>? products,
     String? error,
     String? consentFormUrl,
-   bool clearTreatmentImageUrl = false,
-bool clearTreatmentIconUrl = false,
-String? treatmentImageUrl,
-String? treatmentIconUrl,
-
+    bool clearTreatmentImageUrl = false,
+    bool clearTreatmentIconUrl = false,
+    String? treatmentImageUrl,
+    String? treatmentIconUrl,
   }) {
     return TreatmentState(
       selectedCategoryDetail:
@@ -2970,7 +2971,7 @@ String? treatmentIconUrl,
       selectedTreatment: selectedTreatment ?? this.selectedTreatment,
       selectedTreatmentId: selectedTreatmentId ?? this.selectedTreatmentId,
       currentStep: currentStep ?? this.currentStep,
-      
+
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
       selectedProtocolIds: selectedProtocolIds ?? this.selectedProtocolIds,
@@ -3037,9 +3038,12 @@ String? treatmentIconUrl,
       products: products ?? this.products,
       error: error ?? this.error,
       consentFormUrl: consentFormUrl ?? this.consentFormUrl,
-      treatmentImageUrl: clearTreatmentImageUrl ? null : (treatmentImageUrl ?? this.treatmentImageUrl),
-treatmentIconUrl: clearTreatmentIconUrl ? null : (treatmentIconUrl ?? this.treatmentIconUrl),
-
+      treatmentImageUrl: clearTreatmentImageUrl
+          ? null
+          : (treatmentImageUrl ?? this.treatmentImageUrl),
+      treatmentIconUrl: clearTreatmentIconUrl
+          ? null
+          : (treatmentIconUrl ?? this.treatmentIconUrl),
     );
   }
 }

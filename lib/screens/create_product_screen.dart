@@ -222,9 +222,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
               border: Border.all(),
             ),
 
-            child: state.uploadingImage
-                ? const Center(child: CircularProgressIndicator())
-                : image != null && image.isNotEmpty
+            child: image != null && image.isNotEmpty && image != ''
                 ? AppNetworkImage(
                     imageUrl: image,
                     width: 140.w,

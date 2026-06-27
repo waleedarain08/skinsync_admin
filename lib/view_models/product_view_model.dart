@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -28,7 +30,6 @@ class ProductState extends BaseStateModel {
   final String searchKeyword;
   final ProductDetailModel? selectedProduct;
   final String? imageUrl;
-  final bool uploadingImage;
 
   final List<BrandModel>? brands;
   final List<ManufacturersModel>? manufacturers;
@@ -37,8 +38,6 @@ class ProductState extends BaseStateModel {
   final List<PackageTypeModel>? packageTypes;
   final List<UsageTypeModel>? usageType;
   final List<SupplierModel>? suppliers;
-
-
 
   ProductState({
     super.loading,
@@ -56,7 +55,6 @@ class ProductState extends BaseStateModel {
     this.imageUrl,
     this.usageType,
     this.suppliers,
-    this.uploadingImage = false,
   });
 
   ProductState copyWith({
@@ -71,7 +69,7 @@ class ProductState extends BaseStateModel {
     List<UnitTypeModel>? unitTypes,
     List<PackageTypeModel>? packageTypes,
     String? imageUrl,
-    bool? uploadingImage,
+
     List<BrandModel>? brands,
     List<ManufacturersModel>? manufacturers,
     List<UsageTypeModel>? usageType,
@@ -93,7 +91,6 @@ class ProductState extends BaseStateModel {
       packageTypes: packageTypes ?? this.packageTypes,
       usageType: usageType ?? this.usageType,
       suppliers: suppliers ?? this.suppliers,
-      uploadingImage: uploadingImage ?? this.uploadingImage,
     );
   }
 }
@@ -122,8 +119,8 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     await fetchProducts(page: 1, limit: 20);
   }
 
-void setImageNull() {
-    state = state.copyWith(imageUrl: null);
+  void setImageNull() {
+    state = state.copyWith(imageUrl: '');
   }
 
   void clearDropdowns() {
@@ -152,7 +149,9 @@ void setImageNull() {
             limit: limit,
           );
           state = state.copyWith(
-            products: (response.data ?? []).map((e) => e.toProductModel()).toList(),
+            products: (response.data ?? [])
+                .map((e) => e.toProductModel())
+                .toList(),
             currentPage: response.page,
             pageSize: response.limit,
             totalPages: response.totalPages,
@@ -231,29 +230,31 @@ void setImageNull() {
 
   final MediaService _mediaService = MediaService();
 
-  Future<void> pickAndUploadImage() async {
-    try {
-      state = state.copyWith(uploadingImage: true);
+  Future<void> pickAndUploadImage({
+    bool showLoading = true,
+    bool showError = true,
+  }) async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.image,
+      withData: false,
+    );
 
-      final result = await FilePicker.pickFiles(
-        type: FileType.image,
-        withData: false,
-      );
+    if (result == null || result.files.first.path == null) {
+      return;
+    }
 
-      if (result == null || result.files.first.path == null) {
-        state = state.copyWith(uploadingImage: false);
-        return;
-      }
+    final file = XFile(result.files.first.path!);
 
-      final file = XFile(result.files.first.path!);
+    final url = await runSafely<String?>(
+      () => _mediaService.uploadImage('products/image', file),
+      showLoading: showLoading,
+      showError: showError,
+    );
 
-      final url = await _mediaService.uploadImage('products/image', file);
+    if (url != null) {
+      log('Product image uploaded: $url');
 
-      state = state.copyWith(imageUrl: url, uploadingImage: false);
-    } catch (e) {
-      state = state.copyWith(uploadingImage: false, errorMessage: e.toString());
-
-      EasyLoading.showError('Image upload failed');
+      state = state.copyWith(imageUrl: url);
     }
   }
 
@@ -336,7 +337,10 @@ void setImageNull() {
               lotNumber: req.lotNumber,
               expirationDate: req.expirationDate?.toIso8601String(),
             );
-            await _productRepository.updateProduct(id: req.id!, req: updateRequest);
+            await _productRepository.updateProduct(
+              id: req.id!,
+              req: updateRequest,
+            );
             await refreshProducts();
             EasyLoading.showSuccess('Product updated successfully');
             return true;
@@ -362,14 +366,10 @@ void setImageNull() {
   Future<void> fetchBrand() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-          () async {
+      () async {
         try {
-          final response = await _productRepository.fetchBrand(
-          );
-          state = state.copyWith(
-            brands: response.data,
-            errorMessage: null,
-          );
+          final response = await _productRepository.fetchBrand();
+          state = state.copyWith(brands: response.data, errorMessage: null);
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;
@@ -377,13 +377,13 @@ void setImageNull() {
       },
     );
   }
+
   Future<void> fetchManufacturer() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-          () async {
+      () async {
         try {
-          final response = await _productRepository.fetchManufacturer(
-          );
+          final response = await _productRepository.fetchManufacturer();
           state = state.copyWith(
             manufacturers: response.data,
             errorMessage: null,
@@ -396,18 +396,13 @@ void setImageNull() {
     );
   }
 
-
   Future<void> fetchUnitTypes() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-          () async {
+      () async {
         try {
-          final response = await _productRepository.fetchUnitTypes(
-          );
-          state = state.copyWith(
-            unitTypes: response.data,
-            errorMessage: null,
-          );
+          final response = await _productRepository.fetchUnitTypes();
+          state = state.copyWith(unitTypes: response.data, errorMessage: null);
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;
@@ -419,10 +414,9 @@ void setImageNull() {
   Future<void> fetchPackageTypes() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-          () async {
+      () async {
         try {
-          final response = await _productRepository.fetchPackageTypes(
-          );
+          final response = await _productRepository.fetchPackageTypes();
           state = state.copyWith(
             packageTypes: response.data,
             errorMessage: null,
@@ -438,14 +432,10 @@ void setImageNull() {
   Future<void> fetchUsageType() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-          () async {
+      () async {
         try {
-          final response = await _productRepository.fetchUsageTypes(
-          );
-          state = state.copyWith(
-            usageType: response.data,
-            errorMessage: null,
-          );
+          final response = await _productRepository.fetchUsageTypes();
+          state = state.copyWith(usageType: response.data, errorMessage: null);
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;
@@ -457,13 +447,10 @@ void setImageNull() {
   Future<void> fetchSuppliers() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-          () async {
+      () async {
         try {
           final response = await _productRepository.fetchSuppliers();
-          state = state.copyWith(
-            suppliers: response.data,
-            errorMessage: null,
-          );
+          state = state.copyWith(suppliers: response.data, errorMessage: null);
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;
@@ -471,5 +458,4 @@ void setImageNull() {
       },
     );
   }
-
 }
