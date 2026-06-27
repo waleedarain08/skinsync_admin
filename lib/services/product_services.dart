@@ -156,4 +156,21 @@ class ProductServices implements ProductRepository {
     }
     return response;
   }
+
+  @override
+  Future<BaseApiResponseModel> updateProductStatus({
+    required int productId,
+    required String status,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.productsStatus,
+      body: {'status': status},
+      queryParams: {'product_id': productId.toString()},
+    );
+    final response = BaseApiResponseModel<Null>.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
 }

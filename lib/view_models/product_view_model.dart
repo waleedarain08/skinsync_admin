@@ -363,6 +363,26 @@ class ProductViewModel extends BaseViewModel<ProductState> {
         false;
   }
 
+  Future<bool> updateProductStatus(int productId, String status) async {
+    return await runSafely<bool>(
+          onLoadingChange: (loading) =>
+              state = state.copyWith(loading: loading),
+          () async {
+            await _productRepository.updateProductStatus(
+              productId: productId,
+              status: status,
+            );
+            await refreshProducts();
+            if (state.selectedProduct?.id == productId) {
+              await fetchProductDetail(productId);
+            }
+            EasyLoading.showSuccess('Product status updated successfully');
+            return true;
+          },
+        ) ??
+        false;
+  }
+
   Future<void> fetchBrand() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),

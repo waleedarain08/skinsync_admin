@@ -18,18 +18,10 @@ abstract class ProductRepository {
   Future<ProductListResponse> getProducts({String search = '', int page = 1, int limit = 10});
   Future<ProductDetailResponse> getProductDetail({required int id});
   Future<BrandListResponse> fetchBrand();
-
   Future<ManufacturersListResponse> fetchManufacturer();
-
-
   Future<UnitTypesListResponse> fetchUnitTypes();
-
   Future<PackageTypeListResponse> fetchPackageTypes();
-
   Future<UsageTypeListResponse> fetchUsageTypes();
-
   Future<SupplierListResponse> fetchSuppliers();
-
-
-
+  Future<BaseApiResponseModel> updateProductStatus({required int productId, required String status});
 }

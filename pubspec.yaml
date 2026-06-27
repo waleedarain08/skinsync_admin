@@ -69,7 +69,7 @@ dependencies:
   printing: ^5.15.0
   pdf: ^3.13.0
   flutter_image_compress: ^2.4.0
-  
+  animated_toggle_switch: ^0.8.2
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,3 @@
-
 enum SharedPreferencesKeys {
   themeModeKey('theme-mode'),
   accessTokenKey('access-token'),
@@ -50,7 +49,8 @@ enum Endpoint {
   treatmentArea('admin/treatments/step'),
   adminTreatments('admin/treatments/list'),
   manufacturersList('admin/manufacturers'),
-  suppliers('admin/suppliers');
+  suppliers('admin/suppliers'),
+  productsStatus('admin/products/status');
 
 
 
@@ -86,4 +86,3 @@ enum BaseUrls {
 //   log('API: ${type.name}');
 //   log('DISPLAY: ${type.name.capitalize}');
 // }
-

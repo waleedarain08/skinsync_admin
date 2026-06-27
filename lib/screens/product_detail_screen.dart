@@ -1,3 +1,4 @@
+// Forced update with status switch
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
+import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   static const String routeName = '/product-detail';
@@ -134,24 +136,22 @@ class ProductDetailScreen extends ConsumerWidget {
                       ),
                     ),
                     context.horizontalSpace(16),
-                    _statusBadge(context, product.status ?? 'Active'),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        return StatusToggleSwitch(
+                          status: product.status,
+                          onChanged: (newStatus) {
+                            ref.read(productViewModelProvider.notifier).updateProductStatus(product.id!, newStatus);
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
                 context.verticalSpace(8),
                 Text(
                   _formatValue(product.brand),
                   style: context.fonts.purple14w600,
-                ),
-                context.verticalSpace(16),
-                Wrap(
-                  spacing: 12.w,
-                  runSpacing: 12.h,
-                  children: [
-                    _infoChip(context, Icons.tag_rounded, "SKU: ${_formatValue(product.globalSku)}"),
-                    _infoChip(context, Icons.barcode_reader, "Barcode: ${_formatValue(product.barcode)}"),
-                    _infoChip(context, Icons.category_outlined, _formatValue(product.category)),
-                    _infoChip(context, Icons.settings_input_component_outlined, _formatValue(product.usageType)),
-                  ],
                 ),
               ],
             ),
@@ -173,11 +173,13 @@ class ProductDetailScreen extends ConsumerWidget {
           _labelValueRow(context, 'Brand', _formatValue(product.brand)),
           _labelValueRow(context, 'Global SKU', _formatValue(product.globalSku)),
           _labelValueRow(context, 'Barcode', _formatValue(product.barcode)),
-          _labelValueRow(context, 'Category', _formatValue(product.category)),
-          _labelValueRow(context, 'Selected Category IDs', _formatValue(product.selectedCategoryIds?.join(', '))),
-          _labelValueRow(context, 'Status', _formatValue(product.status)),
+          _labelTopicCell(context, 'Manufacturer', _formatValue(product.manufacturer)),
+          _labelValueCell(context, 'Usage Type', _formatValue(product.usageType)),
+          _labelValueCell(context, 'Category', _formatValue(product.category)),
+          _labelValueCell(context, 'Selected Category IDs', _formatValue(product.selectedCategoryIds?.join(', '))),
+          _labelValueCell(context, 'Status', _formatValue(product.status)),
           const Divider(height: 32),
-          Text('Description', style: context.fonts.black14w700),
+          Text('Description', style: context.fonts.black16w600),
           context.verticalSpace(12),
           Text(
             product.description.isNotEmpty ? product.description : 'No description provided.',
@@ -186,6 +188,28 @@ class ProductDetailScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Widget _labelTopicCell(BuildContext context, String label, String value) {
+    return Padding(
+      padding: context.appEdgeInsets(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: context.w(180),
+            child: Text(label, style: context.fonts.grey14w500),
+          ),
+          Expanded(
+            child: Text(value, style: context.fonts.black14w600),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _labelValueCell(BuildContext context, String label, String value) {
+    return _labelTopicCell(context, label, value);
   }
 
   Widget _buildPackagingSection(BuildContext context, ProductDetailModel product) {
@@ -385,24 +409,6 @@ class ProductDetailScreen extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _statusBadge(BuildContext context, String status) {
-    final bool isActive = status.toLowerCase() == 'active';
-    return Container(
-      padding: context.appEdgeInsets(horizontal: 14, vertical: 6),
-      decoration: BoxDecoration(
-        color: isActive ? CustomColors.green.withValues(alpha: 0.1) : CustomColors.red.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: isActive ? CustomColors.green.withValues(alpha: 0.2) : CustomColors.red.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Text(
-        status.toUpperCase(),
-        style: isActive ? context.fonts.green11w600 : context.fonts.red11w600,
       ),
     );
   }

@@ -14,6 +14,7 @@ import '../../widgets/number_paginator.dart';
 import '../create_product_screen.dart';
 import '../product_detail_screen.dart';
 import '../../widgets/app_network_image.dart';
+import '../../widgets/status_toggle_switch.dart';
 
 class ProductManagement extends ConsumerStatefulWidget {
   const ProductManagement({super.key});
@@ -328,7 +329,8 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             2: FlexColumnWidth(2), // Purpose / Usage Type
             3: FlexColumnWidth(2), // Base Unit
             4: FlexColumnWidth(2), // Lot Tracking
-            5: FlexColumnWidth(2), // Actions
+            5: FlexColumnWidth(2.2), // Status
+            6: FlexColumnWidth(2.2), // Actions
           },
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
@@ -344,6 +346,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                 _tableHeaderCell('USAGE TYPE'),
                 _tableHeaderCell('BASE UNIT'),
                 _tableHeaderCell('LOT TRACKING'),
+                _tableHeaderCell('STATUS'),
                 _tableHeaderCell('ACTIONS'),
               ],
             ),
@@ -369,10 +372,11 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                     style: context.fonts.black14w600,
                   ),
                   _lotTrackingCell(p.enforceLotTracking ?? true),
+                  _statusCell(p, ref),
                   _actionsCell(p),
                 ],
               );
-            }),
+            }).toList(),
           ],
         ),
       ),
@@ -508,6 +512,18 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                 : context.fonts.grey12w600,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _statusCell(ProductModel p, WidgetRef ref) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: StatusToggleSwitch(
+        status: p.status,
+        onChanged: (newStatus) {
+          ref.read(productViewModelProvider.notifier).updateProductStatus(p.id!, newStatus);
+        },
       ),
     );
   }
