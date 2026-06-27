@@ -13,7 +13,7 @@ import '../models/responses/supplier_list_response.dart';
 
 abstract class ProductRepository {
   Future<ProductModel> addProduct({required CreateProductRequest req});
-  Future<ProductModel> updateProduct({required ProductModel req});
+  Future<ProductModel> updateProduct({required int id, required CreateProductRequest req});
   Future<BaseApiResponseModel> deleteProduct({required int id});
   Future<ProductListResponse> getProducts({String search = '', int page = 1, int limit = 10});
   Future<ProductDetailResponse> getProductDetail({required int id});

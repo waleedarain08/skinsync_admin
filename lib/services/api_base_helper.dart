@@ -129,6 +129,8 @@ class ApiBaseHelper {
       '${baseUrl.url}$urlPath',
     ).replace(queryParameters: queryParams);
     return _safeRequest(() async {
+      log('PATCH URL: $uri');
+      log('PATCH BODY: ${jsonEncode(body)}');
       final response = await _client.patch(
         uri,
         headers: await _headers(),

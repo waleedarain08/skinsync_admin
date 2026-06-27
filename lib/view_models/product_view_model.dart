@@ -310,7 +310,33 @@ void setImageNull() {
           onLoadingChange: (loading) =>
               state = state.copyWith(loading: loading),
           () async {
-            await _productRepository.updateProduct(req: req);
+            final updateRequest = CreateProductRequest(
+              image: req.image,
+              name: req.name,
+              brand: req.brand,
+              manufacturer: req.manufacturer,
+              globalSku: req.globalSku,
+              barcode: req.barcode,
+              usageType: req.productPurpose ?? req.usageType,
+              category: req.category,
+              selectedCategoryIds: req.selectedCategoryIds,
+              status: req.status,
+              description: req.description,
+              unitType: req.unitType,
+              boxQuantity: req.boxQuantity,
+              itemQuantityPerBox: req.itemQuantityPerBox,
+              packageType: req.packageType,
+              billableUnit: req.billableUnit,
+              billableQuantityPerItem: req.billableQuantityPerItem,
+              totalBillableQuantity: req.totalBillableQuantity,
+              enforceLotTracking: req.enforceLotTracking,
+              clinicCost: req.clinicCost,
+              retailPricePerUnit: req.retailPricePerUnit,
+              supplier: req.supplier,
+              lotNumber: req.lotNumber,
+              expirationDate: req.expirationDate?.toIso8601String(),
+            );
+            await _productRepository.updateProduct(id: req.id!, req: updateRequest);
             await refreshProducts();
             EasyLoading.showSuccess('Product updated successfully');
             return true;

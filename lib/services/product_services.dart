@@ -23,9 +23,7 @@ class ProductServices implements ProductRepository {
   @override
   Future<ProductModel> addProduct({required CreateProductRequest req}) async {
     final jsonResponse = await _api.post(Endpoint.products, body: req.toJson());
-    final response = ProductResponse.fromJson(
-      jsonResponse
-    );
+    final response = ProductResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -34,16 +32,16 @@ class ProductServices implements ProductRepository {
   }
 
   @override
-  Future<ProductModel> updateProduct({required ProductModel req}) async {
+  Future<ProductModel> updateProduct({
+    required int id,
+    required CreateProductRequest req,
+  }) async {
     final jsonResponse = await _api.patch(
       Endpoint.updateProduct,
       body: req.toJson(),
-      pathParams: {'id': req.id.toString()},
+      pathParams: {'id': id.toString()},
     );
-    final response = ProductResponse.fromJson(
-      jsonResponse,
-    
-    );
+    final response = ProductResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -54,13 +52,10 @@ class ProductServices implements ProductRepository {
   @override
   Future<BaseApiResponseModel> deleteProduct({required int id}) async {
     final jsonResponse = await _api.delete(
-      Endpoint.updateProduct,
+      Endpoint.deleteProduct,
       pathParams: {'id': id.toString()},
     );
-    final response = BaseApiResponseModel<Null>.fromJson(
-      jsonResponse,
-    
-    );
+    final response = BaseApiResponseModel<Null>.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -69,7 +64,11 @@ class ProductServices implements ProductRepository {
   }
 
   @override
-  Future<ProductListResponse> getProducts({String search = '', int page = 1, int limit = 10}) async {
+  Future<ProductListResponse> getProducts({
+    String search = '',
+    int page = 1,
+    int limit = 10,
+  }) async {
     final jsonResponse = await _api.get(
       Endpoint.products,
       queryParams: {

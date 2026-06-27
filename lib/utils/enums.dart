@@ -27,6 +27,8 @@ enum Endpoint {
   //products
   products('admin/products'),
   updateProduct('admin/products/{id}'),
+  deleteProduct('admin/products/{id}'),
+
   //clinics
   getClinics('clinics'),
   registerClinic('admin/clinic/register'),
