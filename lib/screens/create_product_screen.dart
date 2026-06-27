@@ -16,6 +16,7 @@ import '../widgets/select_or_create_dropdown_widget.dart';
 
 class CreateProductScreen extends ConsumerStatefulWidget {
   const CreateProductScreen({super.key, this.productToEdit});
+
   final ProductModel? productToEdit;
 
   static const String routeName = '/create-product';
@@ -71,7 +72,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(productViewModelProvider.notifier).setImageNull();
-      // ref.read(productViewModelProvider.notifier).fetchBrand();
+      ref.read(productViewModelProvider.notifier).clearDropdowns();
     });
 
     _nameController = TextEditingController(text: widget.productToEdit?.name);
@@ -292,7 +293,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
     try {
       // Fetch categories with the default screen loader
       await ref.read(categoryViewModelProvider.notifier).fetchCategories();
-      
+
       if (!context.mounted) return;
 
       await showDialog(
@@ -565,9 +566,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                         value: _selectedBrand,
                                         items: brands
                                             .map((e) => e.name)
-                                            .toList(), // ← convert to List<String>
-                                        itemLabel: (brand) =>
-                                            brand, // ← String displays itself
+                                            .toList(),
+                                        // ← convert to List<String>
+                                        itemLabel: (brand) => brand,
+                                        // ← String displays itself
                                         onChanged: (val) => setState(
                                           () => _selectedBrand = val,
                                         ),
@@ -715,9 +717,11 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                         value: _selectedManufacturer,
                                         items: manufacturers
                                             .map((e) => e.name)
-                                            .toList(), // ← convert to List<String>
+                                            .toList(),
+                                        // ← convert to List<String>
                                         itemLabel: (manufacturer) =>
-                                            manufacturer, // ← String displays itself
+                                            manufacturer,
+                                        // ← String displays itself
                                         onChanged: (val) => setState(
                                           () => _selectedManufacturer = val,
                                         ),
@@ -818,9 +822,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                         value: _selectedPurpose,
                                         items: usageType
                                             .map((e) => e.name)
-                                            .toList(), // ← convert to List<String>
-                                        itemLabel: (usageType) =>
-                                            usageType, // ← String displays itself
+                                            .toList(),
+                                        // ← convert to List<String>
+                                        itemLabel: (usageType) => usageType,
+                                        // ← String displays itself
                                         onChanged: (val) => setState(
                                           () => _selectedPurpose = val,
                                         ),
@@ -947,9 +952,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                             value: _selectedPackageType,
                                             items: packageTypes
                                                 .map((e) => e.name)
-                                                .toList(), // ← convert to List<String>
-                                            itemLabel: (brand) =>
-                                                brand, // ← String displays itself
+                                                .toList(),
+                                            // ← convert to List<String>
+                                            itemLabel: (brand) => brand,
+                                            // ← String displays itself
                                             onChanged: (val) => setState(
                                               () => _selectedPackageType = val,
                                             ),
@@ -1057,9 +1063,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                             value: _selectedUnit,
                                             items: unitTypes
                                                 .map((e) => e.name)
-                                                .toList(), // ← convert to List<String>
-                                            itemLabel: (unit) =>
-                                                unit, // ← String displays itself
+                                                .toList(),
+                                            // ← convert to List<String>
+                                            itemLabel: (unit) => unit,
+                                            // ← String displays itself
                                             onChanged: (val) => setState(
                                               () => _selectedUnit = val,
                                             ),
@@ -1244,7 +1251,9 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                                   ref,
                                                   'Billable Unit',
                                                   (name) => setState(
-                                                    () => _selectedBillableUnit = name,
+                                                    () =>
+                                                        _selectedBillableUnit =
+                                                            name,
                                                   ),
                                                 ),
                                           );
@@ -1391,8 +1400,11 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                     children: [
                                       Consumer(
                                         builder: (context, ref, _) {
-                                          final suppliers = ref
-                                                  .watch(productViewModelProvider)
+                                          final suppliers =
+                                              ref
+                                                  .watch(
+                                                    productViewModelProvider,
+                                                  )
                                                   .suppliers ??
                                               [];
                                           return SelectOrCreateDropdown<String>(
@@ -1408,7 +1420,8 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                             ),
                                             onOpen: () => ref
                                                 .read(
-                                                  productViewModelProvider.notifier,
+                                                  productViewModelProvider
+                                                      .notifier,
                                                 )
                                                 .fetchSuppliers(),
                                             onCreate: () =>
@@ -1417,7 +1430,8 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                                   ref,
                                                   'Supplier',
                                                   (name) => setState(
-                                                    () => _selectedSupplier = name,
+                                                    () => _selectedSupplier =
+                                                        name,
                                                   ),
                                                 ),
                                           );

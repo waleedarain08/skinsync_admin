@@ -126,6 +126,17 @@ void setImageNull() {
     state = state.copyWith(imageUrl: null);
   }
 
+  void clearDropdowns() {
+    state = state.copyWith(
+      brands: [],
+      manufacturers: [],
+      unitTypes: [],
+      packageTypes: [],
+      usageType: [],
+      suppliers: [],
+    );
+  }
+
   Future<void> fetchProducts({
     String search = '',
     int page = 1,
