@@ -2,8 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
+import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
+
+import '../services/location_service.dart';
 import '../services/locator.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
@@ -52,16 +55,25 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
   }
 
   Future<bool> updateClinic(int id, RegisterClinicReqModel req) async {
-    final success = await runSafely<bool?>(
+    final success =
+        await runSafely<bool?>(
           showLoading: false,
           onLoadingChange: (loading) {
             state = state.copyWith(loading: loading);
           },
           () async {
-            final updatedClinic = await _clinicRepository.updateClinic(id: id, req: req);
+            final updatedClinic = await _clinicRepository.updateClinic(
+              id: id,
+              req: req,
+            );
             final currentList = state.clinics ?? [];
-            final newList = currentList.map((c) => c.id == id ? updatedClinic : c).toList();
-            state = state.copyWith(clinics: newList, selectedClinic: updatedClinic);
+            final newList = currentList
+                .map((c) => c.id == id ? updatedClinic : c)
+                .toList();
+            state = state.copyWith(
+              clinics: newList,
+              selectedClinic: updatedClinic,
+            );
             return true;
           },
         ) ??
@@ -88,6 +100,21 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
     return success;
   }
+
+  Future<void> searchPlaces(String? query) async {
+    return await runSafely(() async {
+      if (query == null || query.isEmpty) {
+        clearSearchedPlaces();
+        return;
+      }
+      final places = await LocationService().fetchNearbyClinics(query);
+      state = state.copyWith(searchedPlaces: places);
+    });
+  }
+
+  void clearSearchedPlaces() {
+    state = state.copyWith(searchedPlaces: []);
+  }
 }
 
 class ClinicState extends BaseStateModel {
@@ -95,6 +122,7 @@ class ClinicState extends BaseStateModel {
   final List<InviteClinicModel>? inviteClinics;
   final InviteClinicModel? selectedInviteClinic;
   final ClinicModel? selectedClinic;
+  final List<Place> searchedPlaces;
 
   ClinicState({
     super.loading,
@@ -102,6 +130,7 @@ class ClinicState extends BaseStateModel {
     this.inviteClinics = const [],
     this.selectedInviteClinic,
     this.selectedClinic,
+    this.searchedPlaces = const [],
   });
 
   ClinicState copyWith({
@@ -110,6 +139,7 @@ class ClinicState extends BaseStateModel {
     List<InviteClinicModel>? inviteClinics,
     InviteClinicModel? selectedInviteClinic,
     ClinicModel? selectedClinic,
+    List<Place>? searchedPlaces,
   }) {
     return ClinicState(
       loading: loading ?? this.loading,
@@ -117,6 +147,7 @@ class ClinicState extends BaseStateModel {
       inviteClinics: inviteClinics ?? this.inviteClinics,
       selectedInviteClinic: selectedInviteClinic ?? this.selectedInviteClinic,
       selectedClinic: selectedClinic ?? this.selectedClinic,
+      searchedPlaces: searchedPlaces ?? this.searchedPlaces,
     );
   }
 }
