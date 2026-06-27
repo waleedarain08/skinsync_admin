@@ -13,7 +13,7 @@ import '../../widgets/gradient_scaffold.dart';
 import '../../widgets/number_paginator.dart';
 import '../create_product_screen.dart';
 import '../product_detail_screen.dart';
-import '../../widgets/custom_cashed_image_widget.dart';
+import '../../widgets/app_network_image.dart';
 
 class ProductManagement extends ConsumerStatefulWidget {
   const ProductManagement({super.key});
@@ -404,7 +404,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                       decoration: BoxDecoration(color: CustomColors.whiteGrey),
                       child: Icon(Icons.broken_image, color: CustomColors.grey),
                     )
-                  : CustomCachedImage(
+                  : AppNetworkImage(
                       imageUrl: product.image,
                       fit: BoxFit.cover,
                     ),

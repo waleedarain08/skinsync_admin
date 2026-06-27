@@ -9,7 +9,7 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-import 'package:skinsync_admin/widgets/custom_cashed_image_widget.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   static const String routeName = '/product-detail';
@@ -113,7 +113,7 @@ class ProductDetailScreen extends ConsumerWidget {
                       color: CustomColors.whiteGrey,
                       child: Icon(Icons.inventory_2_outlined, size: context.sp(48), color: CustomColors.grey),
                     )
-                  : CustomCachedImage(
+                  : AppNetworkImage(
                       imageUrl: product.image,
                       fit: BoxFit.cover,
                     ),
