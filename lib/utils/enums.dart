@@ -49,6 +49,7 @@ enum Endpoint {
   treatmentArea('admin/treatments/step'),
   adminTreatments('admin/treatments/list'),
   treatmentDetail('admin/treatments/{id}'),
+  updateTreatment('admin/treatments/update'),
   manufacturersList('admin/manufacturers'),
   suppliers('admin/suppliers'),
   productsStatus('admin/products/status'),

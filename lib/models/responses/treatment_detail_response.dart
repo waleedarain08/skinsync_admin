@@ -276,7 +276,7 @@ class TreatmentDetailData {
       image: image,
       basePrice: basePrice,
       unitPrices: mappedUnitPrices,
-      status: status ?? 'active',
+      status: (status ?? 'active').toLowerCase(),
       useInAiSimulator: useInAiSimulator ?? false,
       enableByDefault: enableByDefault ?? false,
       baseDurationHours: baseDuration != null ? baseDuration! ~/ 60 : 0,
@@ -318,7 +318,15 @@ class TreatmentDetailData {
                   isImageRequired: fu.isImageRequired ?? false,
                 )).toList() ?? const [],
           )).toList(),
-      downtimeLevel: downtimeLevel ?? 'None',
+      downtimeLevel: (() {
+        if (downtimeLevel == null) return 'None';
+        final l = downtimeLevel!.toLowerCase();
+        if (l == 'none') return 'None';
+        if (l == 'low') return 'Low';
+        if (l == 'moderate') return 'Moderate';
+        if (l == 'high') return 'High';
+        return 'None';
+      })(),
       allowedRoles: allowedRoles ?? const [],
       preTreatmentAttachments: preTreatmentAttachments,
       postTreatmentAttachments: postTreatmentAttachments,

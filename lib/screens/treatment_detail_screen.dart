@@ -38,11 +38,19 @@ class TreatmentDetailScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () {
-              ref
-                  .read(treatmentViewModelProvider.notifier)
-                  .selectTreatment(treatment);
-              context.push(EditTreatmentScreen.routeName);
+            onPressed: () async {
+              if (treatment.id != null) {
+                try {
+                  await ref
+                      .read(treatmentViewModelProvider.notifier)
+                      .fetchTreatmentDetail(treatment.id!);
+                  if (context.mounted) {
+                    await context.push(EditTreatmentScreen.routeName);
+                  }
+                } catch (e) {
+                  // Error handled gracefully
+                }
+              }
             },
           ),
           context.horizontalSpace(16),
