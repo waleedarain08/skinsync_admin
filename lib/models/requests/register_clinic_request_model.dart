@@ -42,8 +42,8 @@ class RegisterClinicReqModel {
     data['clinic_logo'] = clinicLogo;
     data['owner_name'] = ownerName;
     data['owner_email'] = ownerEmail;
-    data['lat'] = lat;
-    data['long'] = long;
+    data['clinic_latitude'] = lat;
+    data['clinic_latitude'] = long;
     data['website'] = website;
     data['description'] = description;
     if (availability != null) {
