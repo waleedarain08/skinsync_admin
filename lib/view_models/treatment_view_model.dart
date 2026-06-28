@@ -7,26 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
-import 'package:skinsync_admin/models/requests/business_logic_request.dart';
-import 'package:skinsync_admin/models/requests/constent_form_selection_request.dart';
-import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
-import 'package:skinsync_admin/models/requests/follow_up_request.dart';
-import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
-import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/product_usage_request.dart';
-import 'package:skinsync_admin/models/requests/protocol_request.dart';
-import 'package:skinsync_admin/models/requests/sessions_setup_request.dart';
-import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
-import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
-import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/constent_form_selection_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/follow_up_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/phase_notifications_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/post_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/pre_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/product_usage_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/protocol_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/sessions_setup_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/step_pricing_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 
 import '../models/notification_entry.dart';
-import '../models/requests/basic_info_request.dart';
+import '../models/requests/create_treatment_requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
 import '../repositories/category_repository.dart';
@@ -317,9 +317,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     );
   }
 
-  Future<bool?> callConsentFormSelection({required int stepNumber}) async {
+  Future<bool?> callConsentFormSelection() async {
     final request = ConsentFormSelectionRequest(
-      stepNumber: stepNumber,
       preTreatmentConsentForm: state.preTreatmentConsentForm != null
           ? PreTreatmentConsentForm(
               name: state.preTreatmentConsentForm!.name,
@@ -331,7 +330,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     log('''
 =========== CONSENT FORM SELECTION REQUEST ===========
 Draft ID             : ${state.draftTreatmentID}
-Step No              : $stepNumber
 Consent Type         : ${state.consentType}
 Consent Form         : ${state.preTreatmentConsentForm?.name}
 Body                 : ${request.toJson()}
@@ -914,11 +912,10 @@ Body                 : ${request.toJson()}
     state = state.copyWith(totalSessions: count, sessions: updated);
   }
 
-  Future<bool?> createTreatmentArea({required int stepNumber}) async {
+  Future<bool?> createTreatmentArea() async {
     return await runSafely<bool>(() async {
       await _treatmentRepository.createTreatmentArea(
         TreatmentAreaRequest(
-          stepNumber: stepNumber,
           selectedAreaIds: state.selectedTreatmentAreaIds,
         ),
         state.draftTreatmentID!,
@@ -973,7 +970,7 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callDownTimeLevels({required int stepNumber}) async {
+  Future<bool?> callDownTimeLevels() async {
     // Resolve the actual days from the selected level + category presets
     final presets = state.selectedCategoryDetail?.downtimePresets;
     final level = state.downtimeLevel;
@@ -987,7 +984,7 @@ Body       : ${request.toJson()}
     };
 
     final request = DownTimeLevelRequest(
-      stepNumber: stepNumber,
+    
       downtimeLevel: level,
       downtimeDays: downtimeDays,
     );
@@ -995,7 +992,6 @@ Body       : ${request.toJson()}
     log('''
 =========== DOWNTIME LEVEL REQUEST ===========
 Draft ID      : ${state.draftTreatmentID}
-Step No       : $stepNumber
 Downtime Level: $level
 Downtime Days : $downtimeDays
 Body          : ${request.toJson()}
@@ -1015,16 +1011,14 @@ Body          : ${request.toJson()}
     });
   }
 
-  Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
+  Future<bool?> callAllowedProviderRoles() async {
     final request = AllowedProviderRolesRequest(
-      stepNumber: stepNumber,
       allowedRoles: state.selectedRoles, // ← matches state field from UI
     );
 
     log('''
 =========== ALLOWED PROVIDER ROLES REQUEST ===========
 Draft ID             : ${state.draftTreatmentID}
-Step No              : $stepNumber
 Allowed Roles        : ${state.selectedRoles.join(', ')}
 Body                 : ${request.toJson()}
 ======================================================
@@ -1042,7 +1036,7 @@ Body                 : ${request.toJson()}
     });
   }
 
-  Future<bool?> callPreTreatmentInstructions({required int stepNumber}) async {
+  Future<bool?> callPreTreatmentInstructions() async {
     return await runSafely<bool>(() async {
       final attachments = state.existingPreAttachments
           .map(
@@ -1052,7 +1046,6 @@ Body                 : ${request.toJson()}
           .toList();
 
       final request = PreTreatmentInstructionsRequest(
-        stepNumber: stepNumber,
         preTreatmentInstructions:
             preTreatmentInstructionsController.text.trim().isEmpty
             ? null
@@ -1062,7 +1055,6 @@ Body                 : ${request.toJson()}
       log('''
 =========== PRE-TREATMENT INSTRUCTIONS REQUEST ===========
 Draft ID   : ${state.draftTreatmentID}
-Step No    : $stepNumber
 Body       : ${request.toJson()}
 ============================================
 ''');
@@ -1078,7 +1070,7 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callPostTreatmentInstructions({required int stepNumber}) async {
+  Future<bool?> callPostTreatmentInstructions() async {
     return await runSafely<bool>(() async {
       final attachments = state.existingPostAttachments
           .map(
@@ -1088,7 +1080,6 @@ Body       : ${request.toJson()}
           .toList();
 
       final request = PostTreatmentInstructionsRequest(
-        stepNumber: stepNumber,
         postTreatmentInstructions:
             postTreatmentInstructionsController.text.trim().isEmpty
             ? null
@@ -1098,7 +1089,6 @@ Body       : ${request.toJson()}
       log('''
 =========== POST-TREATMENT INSTRUCTIONS REQUEST ===========
 Draft ID   : ${state.draftTreatmentID}
-Step No    : $stepNumber
 Body       : ${request.toJson()}
 ============================================
 ''');
@@ -1228,9 +1218,8 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callProductUsage({required int stepNumber}) async {
+  Future<bool?> callProductUsage() async {
     final request = ProductUsagesRequest(
-      stepNumber: stepNumber,
       productUsages: state.productUsageEntries.map((e) {
         final subAreaConsumptions = e.subAreaControllers.entries
             .map(
@@ -1257,7 +1246,6 @@ Body       : ${request.toJson()}
     log('''
 =========== PRODUCT USAGE REQUEST ===========
 Draft ID   : ${state.draftTreatmentID}
-Step No    : $stepNumber
 Body       : ${request.toJson()}
 ============================================
 ''');
@@ -1276,7 +1264,6 @@ Body       : ${request.toJson()}
     return await runSafely<bool>(() async {
       await _treatmentRepository.createSchedule(
         TreatmentScheduleRequest(
-          stepNumber: stepNumber,
           baseDuration: int.parse(treatmentDurationController.text),
           productDurations: state.productUsageEntries
               .map(

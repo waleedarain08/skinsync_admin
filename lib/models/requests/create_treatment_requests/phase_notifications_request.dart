@@ -1,3 +1,5 @@
+import 'package:skinsync_admin/utils/enums.dart';
+
 class PhaseNotificationsRequest {
   final List<NotificationRequest> preNotifications;
   final List<NotificationRequest> postNotifications;
@@ -8,7 +10,7 @@ class PhaseNotificationsRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    'step_number': 11,
+    'keys': [CreateTreatmentSteps.phaseNotifications.name],
     'pre_notifications': List<dynamic>.from(
       preNotifications.map((x) => x.toJson()),
     ),

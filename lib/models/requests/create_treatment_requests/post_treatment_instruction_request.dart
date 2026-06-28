@@ -1,18 +1,18 @@
+import 'package:skinsync_admin/utils/enums.dart';
+
 class PostTreatmentInstructionsRequest {
-  final int? stepNumber;
   final String? postTreatmentInstructions;
   final List<PostTreatmentAttachment>? postTreatmentAttachments;
 
   PostTreatmentInstructionsRequest({
-    this.stepNumber,
     this.postTreatmentInstructions,
     this.postTreatmentAttachments,
   });
 
   Map<String, dynamic> toJson() => {
-    "step_number": stepNumber,
-    "post_treatment_instructions": postTreatmentInstructions,
-    "post_treatment_attachments": postTreatmentAttachments == null
+    'keys': [CreateTreatmentSteps.postTreatmentInstructions.name],
+    'post_treatment_instructions': postTreatmentInstructions,
+    'post_treatment_attachments': postTreatmentAttachments == null
         ? []
         : List<dynamic>.from(postTreatmentAttachments!.map((x) => x.toJson())),
   };

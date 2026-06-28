@@ -55,8 +55,6 @@ enum Endpoint {
   productsStatus('admin/products/status'),
   treatmentsStatus('admin/treatments/status');
 
-
-
   final String path;
   const Endpoint(this.path);
 
@@ -76,6 +74,29 @@ enum BaseUrls {
   final String url;
 
   const BaseUrls(this.url);
+}
+
+enum CreateTreatmentSteps {
+  allowedProviderRoles('allowed_provider_roles'),
+  patientConsent('patient_consent'),
+  phaseNotifications('phase_notifications'),
+  postTreatmentInstructions('post_treatment_instructions'),
+  preTreatmentInstructions('pre_treatment_instructions'),
+  inventoryProducts('inventory_products'),
+  protocols('protocols'),
+  sessionsSetup('sessions_setup'),
+  pricing('pricing'),
+  categories('categories'),
+  treatmentAreas('treatment_areas'),
+  scheduling('scheduling'),
+  postTreatmentPhotos('post_treatment_photos'),
+  downtimeLevel('downtime_level'),
+  followUpSetup('follow_up_setup'),
+  businessLogic('business_logic');
+
+  final String name;
+
+  const CreateTreatmentSteps(this.name);
 }
 
 // enum UsageType {

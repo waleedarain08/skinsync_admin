@@ -6135,7 +6135,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 }
               }
 
-              if (state.currentStep < 16) {
+              if (state.currentStep <= 16) {
                 if (state.currentStep == 0) {
                   viewModel.setStep(state.currentStep + 1);
                 } else if (state.currentStep == 1) {
@@ -6147,14 +6147,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   }
                 } else if (state.currentStep == 2) {
                   final success = await viewModel.createTreatmentArea(
-                    stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 } else if (state.currentStep == 3) {
                   final success = await viewModel.callProductUsage(
-                    stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
@@ -6189,14 +6187,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   }
                 } else if (state.currentStep == 7) {
                   final success = await viewModel.callPreTreatmentInstructions(
-                    stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 } else if (state.currentStep == 8) {
                   final success = await viewModel.callPostTreatmentInstructions(
-                    stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
@@ -6213,14 +6209,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   }
                 } else if (state.currentStep == 11) {
                   final success = await viewModel.callDownTimeLevels(
-                    stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(12);
                   }
                 } else if (state.currentStep == 12) {
                   final success = await viewModel.callAllowedProviderRoles(
-                    stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
@@ -6237,7 +6231,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   }
                 } else if (state.currentStep == 15) {
                   final success = await viewModel.callConsentFormSelection(
-                    stepNumber: state.currentStep + 1,
                   );
                   if (success ?? false) {
                     viewModel.setStep(16);
@@ -6245,7 +6238,15 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 } else if (state.currentStep == 16) {
                   final success = await viewModel.callBusinessLogic();
                   if (success ?? false) {
-                    viewModel.setStep(17);
+                    //viewModel.setStep(17);
+                    viewModel
+                    .submitTreatment(
+                      context,
+                      categories: categoryState.categories,
+                    )
+                    .then((_) {
+                      if (context.mounted) context.pop();
+                    });
                   }
                 }
                 // // TODO : this is only for now to go on forward step have to remove once stepper API are completed
