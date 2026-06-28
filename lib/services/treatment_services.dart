@@ -372,4 +372,21 @@ class TreatmentServices implements TreatmentRepository {
     }
     return response;
   }
+
+  @override
+  Future<BaseApiResponseModel> updateTreatmentStatus({
+    required int treatmentId,
+    required String status,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.treatmentsStatus,
+      body: {'status': status},
+      queryParams: {'treatment_id': treatmentId.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
 }

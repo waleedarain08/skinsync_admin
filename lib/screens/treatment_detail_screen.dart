@@ -5,10 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../models/treatment_model.dart';
 import '../utils/theme.dart';
 import '../view_models/treatment_view_model.dart';
-import '../widgets/app_badge.dart';
 import '../widgets/borderd_container_widget.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/app_network_image.dart';
+import '../widgets/status_toggle_switch.dart';
 import 'edit_treatment_screen.dart';
 
 class TreatmentDetailScreen extends ConsumerWidget {
@@ -154,13 +154,18 @@ class TreatmentDetailScreen extends ConsumerWidget {
                       style: context.fonts.black26w700,
                     ),
                     context.horizontalSpace(16),
-                    AppBadge(
-                      label: (treatment.status).toUpperCase(),
-                      variant: treatment.status == 'active'
-                          ? AppBadgeVariant.success
-                          : (treatment.status == 'draft'
-                                ? AppBadgeVariant.warning
-                                : AppBadgeVariant.neutral),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final String currentStatus = treatment.status.toLowerCase() == 'deactive' ? 'Inactive' : treatment.status;
+                        return StatusToggleSwitch(
+                          status: currentStatus,
+                          onChanged: (newStatus) {
+                            if (treatment.id != null) {
+                              ref.read(treatmentViewModelProvider.notifier).updateTreatmentStatus(treatment.id!, newStatus);
+                            }
+                          },
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -637,10 +642,11 @@ class TreatmentDetailScreen extends ConsumerWidget {
     int days = 0;
     if (level == 'Low') {
       days = 2;
-    } else if (level == 'Moderate')
+    } else if (level == 'Moderate') {
       days = 5;
-    else if (level == 'High')
+    } else if (level == 'High') {
       days = 10;
+    }
 
     return CollapsibleSection(
       title: 'Treatment Downtime Level',

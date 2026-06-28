@@ -100,4 +100,9 @@ abstract class TreatmentRepository {
     required ConsentFormSelectionRequest request,
     required int draftTreatmentID,
   });
+
+  Future<BaseApiResponseModel> updateTreatmentStatus({
+    required int treatmentId,
+    required String status,
+  });
 }

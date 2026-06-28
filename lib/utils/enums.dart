@@ -50,7 +50,8 @@ enum Endpoint {
   adminTreatments('admin/treatments/list'),
   manufacturersList('admin/manufacturers'),
   suppliers('admin/suppliers'),
-  productsStatus('admin/products/status');
+  productsStatus('admin/products/status'),
+  treatmentsStatus('admin/treatments/status');
 
 
 

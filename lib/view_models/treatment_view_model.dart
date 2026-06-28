@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
@@ -210,6 +211,32 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             rethrow;
           }
         }) ??
+        false;
+  }
+
+  Future<bool> updateTreatmentStatus(int treatmentId, String status) async {
+    return await runSafely<bool>(
+          onLoadingChange: (loading) =>
+              state = state.copyWith(loading: loading),
+          () async {
+            await _treatmentRepository.updateTreatmentStatus(
+              treatmentId: treatmentId,
+              status: status,
+            );
+            await getTreatments(page: state.currentPage);
+            
+            if (state.selectedTreatment?.id == treatmentId) {
+              final updated = state.treatments.firstWhere(
+                (t) => t.id == treatmentId,
+                orElse: () => state.selectedTreatment!,
+              );
+              state = state.copyWith(selectedTreatment: updated);
+            }
+            
+            EasyLoading.showSuccess('Treatment status updated successfully');
+            return true;
+          },
+        ) ??
         false;
   }
 

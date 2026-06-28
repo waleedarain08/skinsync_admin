@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:flutter/material.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 
 class StatusToggleSwitch extends StatelessWidget {

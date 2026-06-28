@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +7,7 @@ import 'package:skinsync_admin/view_models/category_view_model.dart';
 
 import '../../widgets/app_network_image.dart';
 import '../../widgets/custom_dropdown_widget.dart';
+import '../../widgets/status_toggle_switch.dart';
 import '../utils/theme.dart';
 import '../view_models/treatment_view_model.dart';
 import '../widgets/app_search_field.dart';
@@ -40,7 +40,6 @@ class _TreatmentManagementScreenState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(treatmentViewModelProvider.notifier).initialize();
-      // ref.read(categoryViewModelProvider.notifier).fetchCategories();
     });
   }
 
@@ -364,8 +363,8 @@ class _TreatmentManagementScreenState
           columnWidths: const {
             0: FlexColumnWidth(4), // Treatment Name / Category
             1: FlexColumnWidth(2), // Global SKU
-            2: FlexColumnWidth(2), // Status
-            3: FlexColumnWidth(2), // Actions
+            2: FlexColumnWidth(2.2), // Status
+            3: FlexColumnWidth(1.8), // Actions
           },
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
@@ -396,7 +395,7 @@ class _TreatmentManagementScreenState
                     t.globalSku ?? '—',
                     style: context.fonts.black14w600,
                   ),
-                  _statusBadgeCell(t.status),
+                  _statusBadgeCell(t, ref),
                   _actionsCell(t, viewModel),
                 ],
               );
@@ -486,42 +485,19 @@ class _TreatmentManagementScreenState
     );
   }
 
-
-
-  Widget _statusBadgeCell(String status) {
-    final String cleanStatus = status.toLowerCase();
-    Color badgeColor = CustomColors.green;
-    String label = 'Active';
-
-    if (cleanStatus == 'draft') {
-      badgeColor = CustomColors.amber;
-      label = 'Draft';
-    } else if (cleanStatus == 'deactive' || cleanStatus == 'inactive') {
-      badgeColor = CustomColors.grey;
-      label = 'Inactive';
-    }
+  Widget _statusBadgeCell(TreatmentModel t, WidgetRef ref) {
+    final status = t.status;
+    final String currentStatus = status.toLowerCase() == 'deactive' ? 'Inactive' : status;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: badgeColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20.r),
-              border: Border.all(color: badgeColor.withValues(alpha: 0.2)),
-            ),
-            child: Text(
-              label,
-              style: context.fonts.grey12w600.copyWith(
-                color: badgeColor,
-                fontSize: 10.sp,
-              ),
-            ),
-          ),
-        ],
+      child: StatusToggleSwitch(
+        status: currentStatus,
+        onChanged: (newStatus) {
+          if (t.id != null) {
+            ref.read(treatmentViewModelProvider.notifier).updateTreatmentStatus(t.id!, newStatus);
+          }
+        },
       ),
     );
   }
