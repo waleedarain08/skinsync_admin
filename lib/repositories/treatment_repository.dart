@@ -10,6 +10,7 @@ import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
+import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 
 import '../models/requests/allowed_provider_role_request.dart';
 import '../models/requests/basic_info_request.dart';
@@ -104,5 +105,9 @@ abstract class TreatmentRepository {
   Future<BaseApiResponseModel> updateTreatmentStatus({
     required int treatmentId,
     required String status,
+  });
+
+  Future<TreatmentDetailResponse> getTreatmentDetail({
+    required int id,
   });
 }

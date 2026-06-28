@@ -514,9 +514,19 @@ class _TreatmentManagementScreenState
               color: CustomColors.grey,
               size: 20.sp,
             ),
-            onPressed: () {
-              viewModel.selectTreatment(treatment);
-              context.push(TreatmentDetailScreen.routeName);
+            onPressed: () async {
+              if (treatment.id != null) {
+                try {
+                  await ref
+                      .read(treatmentViewModelProvider.notifier)
+                      .fetchTreatmentDetail(treatment.id!);
+                  if (mounted) {
+                    await context.push(TreatmentDetailScreen.routeName);
+                  }
+                } catch (e) {
+                  // Error handled gracefully by runSafely wrapper
+                }
+              }
             },
           ),
           IconButton(
@@ -526,9 +536,19 @@ class _TreatmentManagementScreenState
               color: CustomColors.purple,
               size: 20.sp,
             ),
-            onPressed: () {
-              viewModel.selectTreatment(treatment);
-              context.push(EditTreatmentScreen.routeName);
+            onPressed: () async {
+              if (treatment.id != null) {
+                try {
+                  await ref
+                      .read(treatmentViewModelProvider.notifier)
+                      .fetchTreatmentDetail(treatment.id!);
+                  if (mounted) {
+                    await context.push(EditTreatmentScreen.routeName);
+                  }
+                } catch (e) {
+                  // Error handled gracefully by runSafely wrapper
+                }
+              }
             },
           ),
         ],

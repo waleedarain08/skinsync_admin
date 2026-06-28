@@ -10,6 +10,7 @@ import 'package:skinsync_admin/models/requests/product_usage_request.dart';
 import 'package:skinsync_admin/models/requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
+import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 
 import '../models/requests/basic_info_request.dart';
 import '../models/requests/business_logic_request.dart';
@@ -384,6 +385,21 @@ class TreatmentServices implements TreatmentRepository {
       queryParams: {'treatment_id': treatmentId.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<TreatmentDetailResponse> getTreatmentDetail({
+    required int id,
+  }) async {
+    final jsonResponse = await _api.get(
+      Endpoint.treatmentDetail,
+      pathParams: {'id': id.toString()},
+    );
+    final response = TreatmentDetailResponse.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }

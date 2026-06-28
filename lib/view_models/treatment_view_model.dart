@@ -22,6 +22,7 @@ import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
+import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 
 import '../models/notification_entry.dart';
 import '../models/requests/basic_info_request.dart';
@@ -238,6 +239,47 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           },
         ) ??
         false;
+  }
+
+  Future<void> fetchTreatmentDetail(int id) async {
+    await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        try {
+          final response = await _treatmentRepository.getTreatmentDetail(id: id);
+          if (response.isSuccess && response.data != null) {
+            final treatmentDetail = response.data!;
+            final mappedTreatment = treatmentDetail.toTreatmentModel();
+            
+            // Put it into state
+            state = state.copyWith(
+              selectedTreatmentDetail: treatmentDetail,
+              selectedTreatment: mappedTreatment,
+              selectedTreatmentId: id,
+              error: null,
+            );
+            
+            // Initialize edit controllers and sub-states perfectly!
+            selectTreatment(mappedTreatment);
+            
+            // Populate category IDs and area IDs from details for categorization steps
+            if (treatmentDetail.selectedCategoryIds != null) {
+              state = state.copyWith(
+                selectedCategoryPath: treatmentDetail.selectedCategoryIds!,
+              );
+            }
+            if (treatmentDetail.selectedAreaIds != null) {
+              state = state.copyWith(
+                selectedTreatmentAreaIds: treatmentDetail.selectedAreaIds!,
+              );
+            }
+          }
+        } catch (e) {
+          state = state.copyWith(error: e.toString());
+          rethrow;
+        }
+      },
+    );
   }
 
   Future<bool?> callProtocol({
@@ -2789,6 +2831,7 @@ class TreatmentState extends BaseStateModel {
   final List<TreatmentModel> treatments;
   final List<TreatmentModel> filteredTreatments;
   final TreatmentModel? selectedTreatment;
+  final TreatmentDetailData? selectedTreatmentDetail;
   final int? selectedTreatmentId;
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
@@ -2864,6 +2907,7 @@ class TreatmentState extends BaseStateModel {
     this.treatments = const [],
     this.filteredTreatments = const [],
     this.selectedTreatment,
+    this.selectedTreatmentDetail,
     this.selectedTreatmentId,
     this.selectedCategoryDetail,
     this.currentStep = 0,
@@ -2930,6 +2974,7 @@ class TreatmentState extends BaseStateModel {
     List<TreatmentModel>? treatments,
     List<TreatmentModel>? filteredTreatments,
     TreatmentModel? selectedTreatment,
+    TreatmentDetailData? selectedTreatmentDetail,
     int? selectedTreatmentId,
     int? currentStep,
 
@@ -2996,6 +3041,7 @@ class TreatmentState extends BaseStateModel {
       treatments: treatments ?? this.treatments,
       filteredTreatments: filteredTreatments ?? this.filteredTreatments,
       selectedTreatment: selectedTreatment ?? this.selectedTreatment,
+      selectedTreatmentDetail: selectedTreatmentDetail ?? this.selectedTreatmentDetail,
       selectedTreatmentId: selectedTreatmentId ?? this.selectedTreatmentId,
       currentStep: currentStep ?? this.currentStep,
 
