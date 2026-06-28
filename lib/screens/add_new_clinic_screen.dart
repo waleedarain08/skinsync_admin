@@ -12,6 +12,7 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/app_loader.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
@@ -218,7 +219,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     final success = await ref
         .read(clinicViewModelProvider.notifier)
         .registerClinic(req);
-    if (success && mounted) {
+    if ((success ?? false) && mounted) {
       context.pop();
     }
   }
@@ -448,27 +449,40 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                   SizedBox(height: 32.h),
                   _buildAvailabilitySection(),
                   SizedBox(height: 48.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CustomOutlinedButton(
-                        onTap: () => context.pop(),
-                        label: 'Cancel',
-                        width: context.w(160),
-                        height: context.h(56),
-                        textColor: CustomColors.grey,
-                        color: CustomColors.border,
-                      ),
-                      context.horizontalSpace(24),
-                      SizedBox(
-                        width: context.w(240),
-                        child: CustomPrimaryButton(
-                          onTap: _submit,
-                          label: 'Register Clinic',
-                          height: context.h(56),
-                        ),
-                      ),
-                    ],
+                  Consumer(
+                    builder: (_, ref, _) {
+                      final loading = ref.watch(
+                        clinicViewModelProvider.select((s) => s.loading),
+                      );
+                      if (loading) {
+                        return Align(
+                          alignment: Alignment.centerRight,
+                          child: AppLoader(size: context.w(50)),
+                        );
+                      }
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          CustomOutlinedButton(
+                            onTap: () => context.pop(),
+                            label: 'Cancel',
+                            width: context.w(160),
+                            height: context.h(56),
+                            textColor: CustomColors.grey,
+                            color: CustomColors.border,
+                          ),
+                          context.horizontalSpace(24),
+                          SizedBox(
+                            width: context.w(240),
+                            child: CustomPrimaryButton(
+                              onTap: _submit,
+                              label: 'Register Clinic',
+                              height: context.h(56),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   SizedBox(height: 60.h),
                 ],

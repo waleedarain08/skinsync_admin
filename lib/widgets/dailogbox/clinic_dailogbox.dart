@@ -16,7 +16,8 @@ class RegisterClinicDialogBox extends StatefulWidget {
   const RegisterClinicDialogBox({super.key});
 
   @override
-  State<RegisterClinicDialogBox> createState() => _RegisterClinicDialogBoxState();
+  State<RegisterClinicDialogBox> createState() =>
+      _RegisterClinicDialogBoxState();
 }
 
 class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
@@ -25,9 +26,12 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
   final TextEditingController _clinicNameController = TextEditingController();
   final TextEditingController _clinicEmailController = TextEditingController();
   final TextEditingController _clinicPhoneController = TextEditingController();
-  final TextEditingController _clinicAddressController = TextEditingController();
-  final TextEditingController _clinicOwnerNameController = TextEditingController();
-  final TextEditingController _clinicOwnerEmailController = TextEditingController();
+  final TextEditingController _clinicAddressController =
+      TextEditingController();
+  final TextEditingController _clinicOwnerNameController =
+      TextEditingController();
+  final TextEditingController _clinicOwnerEmailController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -134,7 +138,9 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
             style: TextButton.styleFrom(
               foregroundColor: CustomColors.grey,
               padding: EdgeInsets.symmetric(horizontal: 24.w),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
             ),
             child: const Text('Cancel'),
           ),
@@ -146,20 +152,23 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
               onTap: () {
                 if (!_formKey.currentState!.validate() || state.loading) return;
                 final selectedCountry = ref.read(authViewModelProvider).country;
-                ref.read(clinicViewModelProvider.notifier).registerClinic(
-                  RegisterClinicReqModel(
-                    clinicName: _clinicNameController.text,
-                    clinicPhone: _clinicPhoneController.text,
-                    clinicEmail: _clinicEmailController.text,
-                    clinicAddress: _clinicAddressController.text,
-                    ownerName: _clinicOwnerNameController.text,
-                    ownerEmail: _clinicOwnerEmailController.text,
-                    cc: selectedCountry?.dialCode ?? '',
-                    country: selectedCountry?.name ?? '',
-                  ),
-                ).then((success) {
-                  if (success && context.mounted) context.pop();
-                });
+                ref
+                    .read(clinicViewModelProvider.notifier)
+                    .registerClinic(
+                      RegisterClinicReqModel(
+                        clinicName: _clinicNameController.text,
+                        clinicPhone: _clinicPhoneController.text,
+                        clinicEmail: _clinicEmailController.text,
+                        clinicAddress: _clinicAddressController.text,
+                        ownerName: _clinicOwnerNameController.text,
+                        ownerEmail: _clinicOwnerEmailController.text,
+                        cc: selectedCountry?.dialCode ?? '',
+                        country: selectedCountry?.name ?? '',
+                      ),
+                    )
+                    .then((success) {
+                      if ((success ?? false) && context.mounted) context.pop();
+                    });
               },
               label: 'Register Clinic',
               isLoading: state.loading,
@@ -175,7 +184,10 @@ class _RegisterClinicDialogBoxState extends State<RegisterClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: context.fonts.black16w600.copyWith(color: CustomColors.purple)),
+        Text(
+          title,
+          style: context.fonts.black16w600.copyWith(color: CustomColors.purple),
+        ),
         const Divider(),
       ],
     );
@@ -204,7 +216,9 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
     _clinicNameController = TextEditingController(text: widget.clinic?.name);
     _clinicEmailController = TextEditingController(text: widget.clinic?.email);
     _clinicPhoneController = TextEditingController(text: widget.clinic?.phone);
-    _clinicAddressController = TextEditingController(text: widget.clinic?.address);
+    _clinicAddressController = TextEditingController(
+      text: widget.clinic?.address,
+    );
   }
 
   @override
@@ -286,7 +300,9 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
             style: TextButton.styleFrom(
               foregroundColor: CustomColors.grey,
               padding: EdgeInsets.symmetric(horizontal: 24.w),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
             ),
             child: const Text('Cancel'),
           ),
@@ -314,7 +330,10 @@ class _EditClinicDialogBoxState extends State<EditClinicDialogBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: context.fonts.black16w600.copyWith(color: CustomColors.purple)),
+        Text(
+          title,
+          style: context.fonts.black16w600.copyWith(color: CustomColors.purple),
+        ),
         const Divider(),
       ],
     );

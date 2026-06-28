@@ -82,23 +82,19 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     return success;
   }
 
-  Future<bool> registerClinic(RegisterClinicReqModel req) async {
-    final success =
-        await runSafely<bool?>(
-          showLoading: false,
-          onLoadingChange: (loading) {
-            state = state.copyWith(loading: loading);
-          },
-          () async {
-            final clinic = await _clinicRepository.registerClinic(req: req);
-            final currentList = state.clinics ?? [];
-            state = state.copyWith(clinics: [...currentList, clinic]);
-            return true;
-          },
-        ) ??
-        false;
-
-    return success;
+  Future<bool?> registerClinic(RegisterClinicReqModel req) async {
+    return await runSafely<bool?>(
+      showLoading: false,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final clinic = await _clinicRepository.registerClinic(req: req);
+        final currentList = state.clinics ?? [];
+        state = state.copyWith(clinics: [...currentList, clinic]);
+        return true;
+      },
+    );
   }
 
   Future<void> searchPlaces(String? query) async {
