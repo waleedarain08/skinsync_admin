@@ -42,6 +42,10 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
   final TextEditingController _longController = TextEditingController();
   final TextEditingController _websiteController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _consultationFeeController =
+      TextEditingController();
+  final TextEditingController _initialDepositController =
+      TextEditingController();
 
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _selectedLogo;
@@ -83,6 +87,8 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     _websiteController.dispose();
     _descriptionController.dispose();
     _addressTimer?.cancel();
+    _consultationFeeController.dispose();
+    _initialDepositController.dispose();
     super.dispose();
   }
 
@@ -204,21 +210,23 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       clinicLogo:
           _selectedLogo?.path ??
           widget.invitedClinic?.logo ??
-          'https://example.com/logo.png', // Use prefilled logo if no new one selected
+          'https://example.com/logo.png',
       ownerName: _ownerNameController.text.trim(),
       ownerEmail: _ownerEmailController.text.trim(),
       cc: selectedCountry.dialCode ?? '+1',
       country: selectedCountry.code ?? 'US',
-      lat: _latController.text.trim(),
-      long: _longController.text.trim(),
+      lat: double.parse(_latController.text.trim()),
+      long: double.parse(_longController.text.trim()),
       website: _websiteController.text.trim(),
       description: _descriptionController.text.trim(),
+      consultationFee: num.parse(_initialDepositController.text.trim()),
+      initialDeposit: num.parse(_consultationFeeController.text.trim()),
       availability: availability,
     );
 
     final success = await ref
         .read(clinicViewModelProvider.notifier)
-        .registerClinic(req);
+        .registerClinic(req, _selectedLogo);
     if ((success ?? false) && mounted) {
       context.pop();
     }
@@ -275,29 +283,16 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                         ],
                       ),
                       SizedBox(height: 24.h),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Phone Number (Selection sets Country & CC)',
-                                  style: context.fonts.black14w600,
-                                ),
-                                SizedBox(height: 10.h),
-                                PhoneWidget(
-                                  controller: _clinicPhoneController,
-                                  filled: true,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 24.w),
-                          const Spacer(),
-                        ],
+                      Text(
+                        'Phone Number (Selection sets Country & CC)',
+                        style: context.fonts.black14w600,
                       ),
+                      SizedBox(height: 10.h),
+                      PhoneWidget(
+                        controller: _clinicPhoneController,
+                        filled: false,
+                      ),
+
                       SizedBox(height: 24.h),
                       BuildTextField(
                         label: 'Clinic Address',
@@ -363,6 +358,30 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                             ],
                           );
                         },
+                      ),
+                      SizedBox(height: 24.h),
+                      Row(
+                        spacing: 24.w,
+                        children: [
+                          Expanded(
+                            child: BuildTextField(
+                              label: 'Consultation Fees',
+                              controller: _consultationFeeController,
+                              hintText: '\$100',
+                              validator: Validators.empty,
+                              keyboardType: .number,
+                            ),
+                          ),
+                          Expanded(
+                            child: BuildTextField(
+                              label: 'Initial Deposit',
+                              controller: _initialDepositController,
+                              hintText: '\$10',
+                              validator: Validators.empty,
+                              keyboardType: .number,
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 24.h),
                       BuildTextField(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+
 import '../view_models/auth_view_model.dart';
 
 class PhoneWidget extends StatelessWidget {
@@ -39,26 +40,33 @@ class PhoneWidget extends StatelessWidget {
       },
       style: context.fonts.black14w400,
       keyboardType: TextInputType.phone,
-      decoration: InputDecoration(
-        filled: filled,
+      decoration: AppDecorations.input(
+        context,
         fillColor: CustomColors.white,
-        hintText: 'Enter phone number',
-        hintStyle: context.fonts.grey14w400,
+        hint: 'Enter phone number',
         prefixIcon: _buildPhoneNumberPicker(context: context),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: CustomColors.border, width: 1),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: CustomColors.border, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: CustomColors.purple, width: 1),
-        ),
       ),
+      // decoration: InputDecoration(
+      //   filled: filled,
+      //   fillColor: CustomColors.white,
+      //   hintText: 'Enter phone number',
+      //   hintStyle: context.fonts.grey14w400,
+      //   constraints: BoxConstraints(minHeight: context.h(65)),
+      //   prefixIcon: _buildPhoneNumberPicker(context: context),
+      //   // contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      //   border: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(12.r),
+      //     borderSide: const BorderSide(color: CustomColors.border, width: 1),
+      //   ),
+      //   enabledBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(12.r),
+      //     borderSide: const BorderSide(color: CustomColors.border, width: 1),
+      //   ),
+      //   focusedBorder: OutlineInputBorder(
+      //     borderRadius: BorderRadius.circular(12.r),
+      //     borderSide: const BorderSide(color: CustomColors.purple, width: 1),
+      //   ),
+      // ),
     );
   }
 

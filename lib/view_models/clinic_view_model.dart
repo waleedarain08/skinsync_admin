@@ -1,9 +1,11 @@
+import 'package:camera/camera.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
 import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
+import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
 
 import '../services/location_service.dart';
@@ -82,14 +84,26 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     return success;
   }
 
-  Future<bool?> registerClinic(RegisterClinicReqModel req) async {
+  Future<bool?> registerClinic(
+    RegisterClinicReqModel req,
+    XFile? clinicLogoFile,
+  ) async {
     return await runSafely<bool?>(
       showLoading: false,
       onLoadingChange: (loading) {
         state = state.copyWith(loading: loading);
       },
       () async {
-        final clinic = await _clinicRepository.registerClinic(req: req);
+        String? clinicLogo;
+        if (clinicLogoFile != null) {
+          clinicLogo = await MediaService().uploadImage(
+            '/clinics/logos/',
+            clinicLogoFile,
+          );
+        }
+        final clinic = await _clinicRepository.registerClinic(
+          req: req.copyWithLogo(clinicLogo),
+        );
         final currentList = state.clinics ?? [];
         state = state.copyWith(clinics: [...currentList, clinic]);
         return true;
