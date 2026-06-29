@@ -7,6 +7,7 @@ class SelectOrCreateDropdown<T> extends StatefulWidget {
   final String label;
   final String hint;
   final T? value;
+  final bool showAddIcon;
   final List<T> items;
   final String Function(T) itemLabel;
   final ValueChanged<T?> onChanged;
@@ -22,6 +23,7 @@ class SelectOrCreateDropdown<T> extends StatefulWidget {
     required this.itemLabel,
     required this.onChanged,
     required this.onCreate,
+    this.showAddIcon = false,
     this.onOpen,
   });
 
@@ -57,16 +59,17 @@ class _SelectOrCreateDropdownState<T> extends State<SelectOrCreateDropdown<T>> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(widget.label, style: context.fonts.black14w600),
-            IconButton(
-              onPressed: widget.onCreate,
-              icon: const Icon(
-                Icons.add_circle_outline_rounded,
-                color: CustomColors.purple,
-                size: 20,
+            if (widget.showAddIcon)
+              IconButton(
+                onPressed: widget.onCreate,
+                icon: const Icon(
+                  Icons.add_circle_outline_rounded,
+                  color: CustomColors.purple,
+                  size: 20,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
           ],
         ),
         SizedBox(height: 8.h),

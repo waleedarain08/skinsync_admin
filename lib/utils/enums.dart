@@ -99,6 +99,27 @@ enum CreateTreatmentSteps {
   const CreateTreatmentSteps(this.name);
 }
 
+enum TreatmentStatus {
+  all('All'),
+  active('Active'),
+  inactive('InActive'),
+  darft('Draft');
+
+  final String name;
+
+  const TreatmentStatus(this.name);
+}
+
+enum ProductStatus {
+  all('All'),
+  active('Active'),
+  inactive('InActive');
+
+  final String name;
+
+  const ProductStatus(this.name);
+}
+
 // enum UsageType {
 //   treatment,
 //   retailer,

@@ -84,7 +84,7 @@ class PhoneWidget extends StatelessWidget {
                 onChanged: authNotifier.setCountry,
                 dialogSize: Size(400.w, 500.h),
                 textStyle: context.fonts.black14w400,
-                initialSelection: authState.country?.code ?? 'US',
+                initialSelection: authState.country.code,
                 showCountryOnly: false,
                 showOnlyCountryWhenClosed: false,
                 alignLeft: false,

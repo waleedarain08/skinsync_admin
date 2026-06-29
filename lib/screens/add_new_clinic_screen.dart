@@ -13,6 +13,7 @@ import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/app_loader.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
@@ -56,6 +57,10 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(clinicViewModelProvider.notifier).removeBanner();
+      ref.read(clinicViewModelProvider.notifier).removeClinicImage();
+    });
     if (widget.invitedClinic != null) {
       _prefillData(widget.invitedClinic!);
     }
@@ -178,14 +183,6 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final selectedCountry = ref.read(authViewModelProvider).country;
-    if (selectedCountry == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a country in the phone field'),
-        ),
-      );
-      return;
-    }
 
     final List<AvailabilityModel> availability = _availabilityEntries.map((e) {
       String formatTimeOfDay(TimeOfDay? tod) {
@@ -253,9 +250,10 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionCard(
+                  _buildBannerAndLogoCard(
+                    context: context,
+                    ref: ref,
                     title: 'Clinic Logo',
-                    children: [_buildLogoPicker()],
                   ),
                   SizedBox(height: 32.h),
                   _buildSectionCard(
@@ -563,6 +561,134 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBannerAndLogoCard({
+    required BuildContext context,
+    required WidgetRef ref,
+
+    required String title,
+  }) {
+    final state = ref.watch(clinicViewModelProvider);
+    final viewModel = ref.read(clinicViewModelProvider.notifier);
+
+    //  final imageUrl = isBanner ? state.bannerImage : state.clinicImage;
+
+    return Container(
+      width: double.infinity,
+
+      padding: EdgeInsets.all(32.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        image: state.bannerImage != null && state.bannerImage != ''
+            ? DecorationImage(
+                image: NetworkImage(state.bannerImage ?? ''),
+                fit: BoxFit.cover,
+              )
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: context.fonts.black20w600.copyWith(
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              InkWell(
+                borderRadius: BorderRadius.circular(50.r),
+                onTap: () {
+                  if (state.bannerImage != null && state.bannerImage != '') {
+                    viewModel.removeBanner();
+                  } else {
+                    viewModel.pickImage(false);
+                  }
+                },
+                child: Container(
+                  width: 42.w,
+                  height: 42.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    state.bannerImage == null || state.bannerImage == ''
+                        ? Icons.add_a_photo_outlined
+                        : Icons.close,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          Center(
+            child: InkWell(
+              onTap: () => viewModel.pickImage(true),
+              borderRadius: BorderRadius.circular(100.r),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 120.w,
+                    height: 120.w,
+                    clipBehavior: .antiAlias,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.teal, width: 2),
+                    ),
+
+                    child: state.clinicImage != null && state.clinicImage != ''
+                        ? AppNetworkImage(
+                            imageUrl: state.clinicImage ?? '',
+                            width: 140.w,
+                            height: 140.w,
+                            fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(12),
+                            errorIcon: Icons.broken_image_outlined,
+                            errorIconSize: 40,
+                          )
+                        : Center(
+                            child: Icon(
+                              Icons.add_a_photo_outlined,
+                              size: 36.sp,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                  ),
+                  //  Container(
+                  //   width: 120.w,
+                  //   height: 120.w,
+                  //   decoration: BoxDecoration(
+                  //     shape: BoxShape.circle,
+                  //     border: Border.all(color: Colors.teal, width: 2),
+                  //   ),
+                  //   child: Icon(
+                  //     Icons.add_a_photo_outlined,
+                  //     size: 36.sp,
+                  //     color: Colors.deepPurple,
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

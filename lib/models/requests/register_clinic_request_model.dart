@@ -15,6 +15,7 @@ class RegisterClinicReqModel {
   final num? consultationFee;
   final num? initialDeposit;
   final List<AvailabilityModel> availability;
+  final String? bannerImage;
 
   RegisterClinicReqModel({
     required this.clinicName,
@@ -33,6 +34,7 @@ class RegisterClinicReqModel {
     this.consultationFee,
     this.initialDeposit,
     this.availability = const [],
+    this.bannerImage,
   });
 
   Map<String, dynamic> toJson() {
@@ -52,11 +54,12 @@ class RegisterClinicReqModel {
     data['description'] = description;
     data['consultation_fee'] = consultationFee;
     data['initial_deposit'] = initialDeposit;
+    data['banner'] = bannerImage;
     data['availability'] = availability.map((v) => v.toJson()).toList();
     return data;
   }
 
-  RegisterClinicReqModel copyWithLogo(String? clinicLogo) {
+  RegisterClinicReqModel copyWithLogo(String? clinicLogo, String? bannerImage) {
     return RegisterClinicReqModel(
       clinicName: clinicName,
       clinicEmail: clinicEmail,
@@ -74,6 +77,7 @@ class RegisterClinicReqModel {
       consultationFee: consultationFee,
       initialDeposit: initialDeposit,
       availability: availability,
+      bannerImage: bannerImage
     );
   }
 }

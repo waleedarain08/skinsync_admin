@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/utils/enums.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
+import 'package:skinsync_admin/widgets/select_or_create_dropdown_widget.dart';
 
 import '../../models/product_model.dart';
 import '../../utils/theme.dart';
@@ -27,13 +31,16 @@ class ProductManagement extends ConsumerStatefulWidget {
 class _ProductManagementState extends ConsumerState<ProductManagement> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedPurposeFilter = 'All Purposes';
-  String _selectedTrackingFilter = 'All Statuses';
+  ProductStatus _selectedStatus = ProductStatus.all;
+  String? _selectedPurpose;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(productViewModelProvider.notifier).fetchProducts(page: 1, limit: 20);
+      ref
+          .read(productViewModelProvider.notifier)
+          .fetchProducts(page: 1, limit: 20);
     });
   }
 
@@ -57,18 +64,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           (p.brand?.toLowerCase().contains(query) ?? false) ||
           (p.globalSku?.toLowerCase().contains(query) ?? false);
 
-      final matchesPurpose =
-          _selectedPurposeFilter == 'All Purposes' ||
-          p.productPurpose == _selectedPurposeFilter.toLowerCase();
-
-      final matchesTracking =
-          _selectedTrackingFilter == 'All Statuses' ||
-          (_selectedTrackingFilter == 'Tracking Enabled' &&
-              (p.enforceLotTracking ?? false)) ||
-          (_selectedTrackingFilter == 'Tracking Disabled' &&
-              !(p.enforceLotTracking ?? false));
-
-      return matchesQuery && matchesPurpose && matchesTracking;
+      return matchesQuery;
     }).toList();
 
     final paginatedProducts = filteredProducts;
@@ -94,7 +90,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                     totalPages: state.totalPages,
                     currentPage: state.currentPage - 1,
                     onPageChanged: (pageIndex) {
-                      ref.read(productViewModelProvider.notifier).fetchProducts(
+                      ref
+                          .read(productViewModelProvider.notifier)
+                          .fetchProducts(
                             search: state.searchKeyword,
                             page: pageIndex + 1,
                             limit: state.pageSize,
@@ -182,6 +180,49 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     );
   }
 
+  void _showCreateMasterItemDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String title,
+    void Function(String name) onAdd,
+  ) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Create New $title', style: context.fonts.black18w600),
+          content: BuildTextField(
+            label: 'Name',
+            controller: controller,
+            hintText: 'Enter name...',
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: CustomPrimaryButton(
+                onTap: () {
+                  final name = controller.text.trim();
+                  if (name.isNotEmpty) {
+                    onAdd(name);
+                    Navigator.pop(context);
+                  }
+                },
+                label: 'Add',
+                width: 100.w,
+              ),
+            ),
+            SizedBox(height: 10.h),
+            CustomOutlinedButton(
+              onTap: () => Navigator.pop(context),
+              label: 'Cancel',
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildCatalogStat(
     String title,
     String value,
@@ -238,49 +279,75 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               hintText:
                   'Search master catalog by product name, SKU or brand manufacturer...',
               onChanged: (val) {
-                ref.read(productViewModelProvider.notifier).fetchProducts(
-                      search: val,
-                      page: 1,
-                      limit: state.pageSize,
-                    );
+                ref
+                    .read(productViewModelProvider.notifier)
+                    .fetchProducts(search: val, page: 1, limit: state.pageSize);
               },
             ),
           ),
           SizedBox(width: 16.w),
           Expanded(
-            child: CustomDropdown<String>(
-              label: 'Product Purpose',
-              hintText: 'All Purposes',
-              value: _selectedPurposeFilter,
-              items: const [
-                'All Purposes',
-                'Variable',
-                'Required',
-                'Setup/Supply',
-                'Retail/Sale',
-                'Device',
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (val) {
-                setState(() {
-                  _selectedPurposeFilter = val ?? 'All Purposes';
-                });
+            child: Consumer(
+              builder: (context, ref, _) {
+                final usageType =
+                    ref.watch(productViewModelProvider).usageType ?? [];
+
+                return SelectOrCreateDropdown<String>(
+                  label: 'Usage Type',
+                  hint: 'Select Usage Type',
+                  value: _selectedPurpose,
+                  showAddIcon: false,
+                  items: usageType.map((e) => e.name).toList(),
+                  // ← convert to List<String>
+                  itemLabel: (usageType) => usageType,
+                  // ← String displays itself
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedPurpose = val;
+                    });
+                    ref
+                        .read(productViewModelProvider.notifier)
+                        .fetchProducts(
+                          search: state.searchKeyword,
+                          selectedPurpose: _selectedPurpose,
+                        );
+                  },
+                  onOpen: () => ref
+                      .read(productViewModelProvider.notifier)
+                      .fetchUsageType(),
+                  onCreate: () => _showCreateMasterItemDialog(
+                    context,
+                    ref,
+                    'UsageType',
+                    (name) => setState(() => _selectedPurpose = name),
+                  ),
+                );
               },
             ),
           ),
           SizedBox(width: 12.w),
           Expanded(
-            child: CustomDropdown<String>(
-              label: 'Lot Enforcement',
-              hintText: 'All Statuses',
-              value: _selectedTrackingFilter,
-              items: const [
-                'All Statuses',
-                'Tracking Enabled',
-                'Tracking Disabled',
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+            child: CustomDropdown<ProductStatus>(
+              label: 'Product Status',
+              hintText: 'Select a status',
+              value: _selectedStatus,
+              items: ProductStatus.values
+                  .map(
+                    (status) => DropdownMenuItem(
+                      value: status,
+                      child: Text(status.name),
+                    ),
+                  )
+                  .toList(),
               onChanged: (val) {
                 setState(() {
-                  _selectedTrackingFilter = val ?? 'All Statuses';
+                  _selectedStatus = val ?? ProductStatus.all;
+                  ref
+                      .read(productViewModelProvider.notifier)
+                      .fetchProducts(
+                        search: state.searchKeyword,
+                        status: _selectedStatus,
+                      );
                 });
               },
             ),
@@ -408,10 +475,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                       decoration: BoxDecoration(color: CustomColors.whiteGrey),
                       child: Icon(Icons.broken_image, color: CustomColors.grey),
                     )
-                  : AppNetworkImage(
-                      imageUrl: product.image,
-                      fit: BoxFit.cover,
-                    ),
+                  : AppNetworkImage(imageUrl: product.image, fit: BoxFit.cover),
             ),
           ),
           SizedBox(width: 16.w),
@@ -522,7 +586,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
       child: StatusToggleSwitch(
         status: p.status,
         onChanged: (newStatus) {
-          ref.read(productViewModelProvider.notifier).updateProductStatus(p.id!, newStatus);
+          ref
+              .read(productViewModelProvider.notifier)
+              .updateProductStatus(p.id!, newStatus);
         },
       ),
     );
@@ -568,7 +634,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   await ref
                       .read(productViewModelProvider.notifier)
                       .fetchProductDetail(product.id!);
-                  final detailedProduct = ref.read(productViewModelProvider).selectedProduct;
+                  final detailedProduct = ref
+                      .read(productViewModelProvider)
+                      .selectedProduct;
                   if (context.mounted && detailedProduct != null) {
                     context.push(
                       CreateProductScreen.routeName,

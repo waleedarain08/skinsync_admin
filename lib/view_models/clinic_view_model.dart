@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
@@ -7,6 +8,7 @@ import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
+import 'package:skinsync_admin/utils/exception.dart';
 
 import '../services/location_service.dart';
 import '../services/locator.dart';
@@ -41,6 +43,34 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
           },
         ) ??
         false;
+  }
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> pickImage(bool clinicImage) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    await runSafely(() async {
+      final path = clinicImage ? 'clinic/bannner/' : 'clinic/image/';
+      final String? url = await MediaService().uploadImage(path, image);
+      if (url == null) {
+        throw const UnknownException('Failed to upload image');
+      }
+      if (clinicImage) {
+        state = state.copyWith(clinicImage: url);
+      } else {
+        state = state.copyWith(bannerImage: url);
+      }
+    });
+  }
+
+  void removeBanner() {
+    state = state.copyWith(bannerImage: '');
+  }
+
+  void removeClinicImage() {
+    state = state.copyWith(clinicImage: '');
   }
 
   Future<void> getInviteClinics() async {
@@ -94,18 +124,15 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
         state = state.copyWith(loading: loading);
       },
       () async {
-        String? clinicLogo;
-        if (clinicLogoFile != null) {
-          clinicLogo = await MediaService().uploadImage(
-            '/clinics/logos/',
-            clinicLogoFile,
-          );
-        }
         final clinic = await _clinicRepository.registerClinic(
-          req: req.copyWithLogo(clinicLogo),
+          req: req.copyWithLogo(state.clinicImage, state.bannerImage),
         );
-        final currentList = state.clinics ?? [];
-        state = state.copyWith(clinics: [...currentList, clinic]);
+        if(clinic.isSuccess){
+          await getClinics();
+        }
+
+        // final currentList = state.clinics ?? [];
+        // state = state.copyWith(clinics: [...currentList, clinic]);
         return true;
       },
     );
@@ -133,6 +160,8 @@ class ClinicState extends BaseStateModel {
   final InviteClinicModel? selectedInviteClinic;
   final ClinicModel? selectedClinic;
   final List<Place> searchedPlaces;
+  final String? clinicImage;
+  final String? bannerImage;
 
   ClinicState({
     super.loading,
@@ -141,6 +170,8 @@ class ClinicState extends BaseStateModel {
     this.selectedInviteClinic,
     this.selectedClinic,
     this.searchedPlaces = const [],
+    this.bannerImage,
+    this.clinicImage,
   });
 
   ClinicState copyWith({
@@ -150,6 +181,8 @@ class ClinicState extends BaseStateModel {
     InviteClinicModel? selectedInviteClinic,
     ClinicModel? selectedClinic,
     List<Place>? searchedPlaces,
+    String? bannerImage,
+    String? clinicImage,
   }) {
     return ClinicState(
       loading: loading ?? this.loading,
@@ -158,6 +191,8 @@ class ClinicState extends BaseStateModel {
       selectedInviteClinic: selectedInviteClinic ?? this.selectedInviteClinic,
       selectedClinic: selectedClinic ?? this.selectedClinic,
       searchedPlaces: searchedPlaces ?? this.searchedPlaces,
+      bannerImage: bannerImage ?? this.bannerImage,
+      clinicImage: clinicImage ?? this.clinicImage,
     );
   }
 }

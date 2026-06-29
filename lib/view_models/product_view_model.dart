@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/responses/usage_type_list_response.dart';
 import 'package:skinsync_admin/services/media_service.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 import '../models/product_model.dart';
 import '../models/requests/create_product_request.dart';
 import '../models/responses/brands_list_response.dart';
@@ -138,6 +139,8 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     String search = '',
     int page = 1,
     int limit = 20,
+    String? selectedPurpose = '', ProductStatus status = ProductStatus.all
+
   }) async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
@@ -147,6 +150,8 @@ class ProductViewModel extends BaseViewModel<ProductState> {
             search: search,
             page: page,
             limit: limit,
+            selectedPurpose: selectedPurpose,
+            status: status
           );
           state = state.copyWith(
             products: (response.data ?? [])

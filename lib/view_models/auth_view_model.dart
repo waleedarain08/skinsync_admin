@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +17,8 @@ final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
 );
 
 class AuthViewModel extends BaseViewModel<AuthState> {
-  AuthViewModel._() : super(AuthState());
+  AuthViewModel._()
+    : super(AuthState(country: CountryCode.fromCountryCode('US')));
 
   final AuthRepository _authRepository = locator<AuthRepository>();
   final SecureStorageService _storageServices = SecureStorageService();
@@ -56,10 +59,7 @@ class AuthViewModel extends BaseViewModel<AuthState> {
 
   Future<bool> verifyOtp({required String email, required String otp}) async {
     return await runSafely<bool?>(showLoading: true, () async {
-          await _authRepository.verifyOtp(
-            email: email,
-            otp: otp,
-          );
+          await _authRepository.verifyOtp(email: email, otp: otp);
           EasyLoading.showSuccess('OTP Verified successfully');
           return true;
         }) ??
@@ -77,6 +77,7 @@ class AuthViewModel extends BaseViewModel<AuthState> {
 
   void setCountry(CountryCode country) {
     state = state.copyWith(country: country);
+    log('Selected ${country.code}');
   }
 }
 
@@ -84,14 +85,14 @@ class AuthState extends BaseStateModel {
   final bool isAuthenticated;
   final UserModel? user;
   final String? error;
-  final CountryCode? country;
+  final CountryCode country;
 
   AuthState({
     super.loading = false,
     this.isAuthenticated = false,
     this.error,
     this.user,
-    this.country,
+    required this.country,
   });
 
   AuthState copyWith({

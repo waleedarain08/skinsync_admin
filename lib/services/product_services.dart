@@ -66,6 +66,7 @@ class ProductServices implements ProductRepository {
   @override
   Future<ProductListResponse> getProducts({
     String search = '',
+    String? selectedPurpose, ProductStatus? status,
     int page = 1,
     int limit = 10,
   }) async {
@@ -73,6 +74,8 @@ class ProductServices implements ProductRepository {
       Endpoint.products,
       queryParams: {
         'search': search,
+        'status' : status == null || status == ProductStatus.all ? '' : status.name,
+        'usage' : selectedPurpose ?? '',
         'page': page.toString(),
         'limit': limit.toString(),
       },
