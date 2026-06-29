@@ -394,10 +394,8 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             0: FlexColumnWidth(4), // Product & Brand
             1: FlexColumnWidth(2), // SKU
             2: FlexColumnWidth(2), // Purpose / Usage Type
-            3: FlexColumnWidth(2), // Base Unit
-            4: FlexColumnWidth(2), // Lot Tracking
-            5: FlexColumnWidth(2.3), // Status
-            6: FlexColumnWidth(2.2), // Actions
+            3: FlexColumnWidth(2), // Status
+            4: FlexColumnWidth(2), // Actions
           },
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
@@ -411,8 +409,6 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                 _tableHeaderCell('PRODUCT & BRAND'),
                 _tableHeaderCell('GLOBAL SKU'),
                 _tableHeaderCell('USAGE TYPE'),
-                _tableHeaderCell('BASE UNIT'),
-                _tableHeaderCell('LOT TRACKING'),
                 _tableHeaderCell('STATUS'),
                 _tableHeaderCell('ACTIONS'),
               ],
@@ -428,17 +424,15 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                 children: [
                   _productNameCell(p),
                   _tableTextCell(
-                    p.globalSku ?? p.sku ?? 'N/A',
+                    (() {
+                      final sku = p.globalSku ?? p.sku ?? '';
+                      return sku.trim().isEmpty ? 'N/A' : sku;
+                    })(),
                     style: context.fonts.grey14w400,
                   ),
-                  _purposeBadgeCell(
-                    p.productPurpose ?? p.category ?? 'variable',
+                  _usageBadgeCell(
+                    p.usageType ?? '',
                   ),
-                  _tableTextCell(
-                    (p.unitType ?? p.unit).toUpperCase(),
-                    style: context.fonts.black14w600,
-                  ),
-                  _lotTrackingCell(p.enforceLotTracking ?? true),
                   _statusCell(p, ref),
                   _actionsCell(p),
                 ],
@@ -461,6 +455,8 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   }
 
   Widget _productNameCell(ProductModel product) {
+    final displayName = product.name.trim().isEmpty ? 'N/A' : product.name;
+    final displayBrand = product.brand == null || product.brand!.trim().isEmpty ? 'N/A' : product.brand!;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
@@ -484,14 +480,14 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  product.name,
+                  displayName,
                   style: context.fonts.black14w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  product.brand ?? 'Unknown Brand',
+                  displayBrand,
                   style: context.fonts.purple12w700,
                 ),
               ],
@@ -514,10 +510,37 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     );
   }
 
-  Widget _purposeBadgeCell(String purpose) {
-    final lower = purpose.toLowerCase();
+  Widget _usageBadgeCell(String purpose) {
+    final trimmed = purpose.trim();
+    if (trimmed.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+              decoration: BoxDecoration(
+                color: CustomColors.grey.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20.r),
+                border: Border.all(color: CustomColors.grey.withValues(alpha: 0.2)),
+              ),
+              child: Text(
+                'N/A',
+                style: context.fonts.amber10w800ls1.copyWith(
+                  color: CustomColors.grey,
+                  fontSize: 10.sp,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final lower = trimmed.toLowerCase();
     Color badgeColor = CustomColors.purple;
-    String label = 'Variable';
+    String label = trimmed;
 
     if (lower == 'required') {
       badgeColor = CustomColors.green;
@@ -531,6 +554,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     } else if (lower == 'device') {
       badgeColor = CustomColors.red;
       label = 'Device';
+    } else if (lower == 'variable') {
+      badgeColor = CustomColors.purple;
+      label = 'Variable';
     }
 
     return Padding(
@@ -558,27 +584,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     );
   }
 
-  Widget _lotTrackingCell(bool enforce) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: Row(
-        children: [
-          Icon(
-            enforce ? Icons.check_circle_rounded : Icons.cancel_rounded,
-            size: 18.sp,
-            color: enforce ? CustomColors.green : CustomColors.grey,
-          ),
-          SizedBox(width: 8.w),
-          Text(
-            enforce ? 'Enabled' : 'Disabled',
-            style: enforce
-                ? context.fonts.grey12w600.copyWith(color: CustomColors.green)
-                : context.fonts.grey12w600,
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _statusCell(ProductModel p, WidgetRef ref) {
     return Padding(

@@ -86,7 +86,7 @@ class ProductListItemModel {
       brand: brand,
       manufacturer: manufacturer,
       globalSku: globalSku,
-      productPurpose: usageType,
+      usageType: usageType,
       status: status,
       description: '',
       unit: '',
