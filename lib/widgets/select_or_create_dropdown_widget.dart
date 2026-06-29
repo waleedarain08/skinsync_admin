@@ -23,7 +23,7 @@ class SelectOrCreateDropdown<T> extends StatefulWidget {
     required this.itemLabel,
     required this.onChanged,
     required this.onCreate,
-    this.showAddIcon = false,
+    this.showAddIcon = true,
     this.onOpen,
   });
 
