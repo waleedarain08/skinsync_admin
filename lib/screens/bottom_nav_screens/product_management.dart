@@ -396,7 +396,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             2: FlexColumnWidth(2), // Purpose / Usage Type
             3: FlexColumnWidth(2), // Base Unit
             4: FlexColumnWidth(2), // Lot Tracking
-            5: FlexColumnWidth(2.2), // Status
+            5: FlexColumnWidth(2.3), // Status
             6: FlexColumnWidth(2.2), // Actions
           },
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -584,6 +584,8 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: StatusToggleSwitch(
+        height: 40,
+        width: 100,
         status: p.status,
         onChanged: (newStatus) {
           ref

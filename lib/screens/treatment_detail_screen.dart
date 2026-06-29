@@ -164,12 +164,22 @@ class TreatmentDetailScreen extends ConsumerWidget {
                     context.horizontalSpace(16),
                     Consumer(
                       builder: (context, ref, _) {
-                        final String currentStatus = treatment.status.toLowerCase() == 'deactive' ? 'Inactive' : treatment.status;
+                        final String currentStatus =
+                            treatment.status.toLowerCase() == 'deactive'
+                            ? 'Inactive'
+                            : treatment.status;
                         return StatusToggleSwitch(
+                          height: 40,
+                          width: 100,
                           status: currentStatus,
                           onChanged: (newStatus) {
                             if (treatment.id != null) {
-                              ref.read(treatmentViewModelProvider.notifier).updateTreatmentStatus(treatment.id!, newStatus);
+                              ref
+                                  .read(treatmentViewModelProvider.notifier)
+                                  .updateTreatmentStatus(
+                                    treatment.id!,
+                                    newStatus,
+                                  );
                             }
                           },
                         );
@@ -528,23 +538,21 @@ class TreatmentDetailScreen extends ConsumerWidget {
               style: context.fonts.grey12w400,
             )
           else
-            ...treatment.preNotifications
-                .map(
-                  (n) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0, left: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "• ${n.title ?? 'Reminder'} (Timing: ${n.timing ?? 0} ${n.timingUnit ?? 'hours'} before)",
-                          style: context.fonts.black13w600,
-                        ),
-                        Text(n.message ?? '', style: context.fonts.grey12w400),
-                      ],
+            ...treatment.preNotifications.map(
+              (n) => Padding(
+                padding: const EdgeInsets.only(bottom: 8.0, left: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "• ${n.title ?? 'Reminder'} (Timing: ${n.timing ?? 0} ${n.timingUnit ?? 'hours'} before)",
+                      style: context.fonts.black13w600,
                     ),
-                  ),
-                )
-                ,
+                    Text(n.message ?? '', style: context.fonts.grey12w400),
+                  ],
+                ),
+              ),
+            ),
 
           context.verticalSpace(20),
           const Divider(),
@@ -584,23 +592,21 @@ class TreatmentDetailScreen extends ConsumerWidget {
               style: context.fonts.grey12w400,
             )
           else
-            ...treatment.postNotifications
-                .map(
-                  (n) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0, left: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "• ${n.title ?? 'Aftercare'} (Timing: ${n.timing ?? 0} ${n.timingUnit ?? 'hours'} after)",
-                          style: context.fonts.black13w600,
-                        ),
-                        Text(n.message ?? '', style: context.fonts.grey12w400),
-                      ],
+            ...treatment.postNotifications.map(
+              (n) => Padding(
+                padding: const EdgeInsets.only(bottom: 8.0, left: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "• ${n.title ?? 'Aftercare'} (Timing: ${n.timing ?? 0} ${n.timingUnit ?? 'hours'} after)",
+                      style: context.fonts.black13w600,
                     ),
-                  ),
-                )
-                ,
+                    Text(n.message ?? '', style: context.fonts.grey12w400),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -1234,50 +1240,45 @@ class TreatmentDetailScreen extends ConsumerWidget {
                               context.verticalSpace(12),
                               const Divider(),
                               context.verticalSpace(12),
-                              ...pNote.notes
-                                  .map(
-                                    (note) => Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: 8.0,
-                                        left: 4.0,
+                              ...pNote.notes.map(
+                                (note) => Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 8.0,
+                                    left: 4.0,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Icon(
+                                        Icons.arrow_right_rounded,
+                                        color: CustomColors.purple,
+                                        size: 18,
                                       ),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Icon(
-                                            Icons.arrow_right_rounded,
-                                            color: CustomColors.purple,
-                                            size: 18,
-                                          ),
-                                          context.horizontalSpace(8),
-                                          Expanded(
-                                            child: RichText(
-                                              text: TextSpan(
-                                                children: [
-                                                  if (note.title != null &&
-                                                      note.title!.isNotEmpty)
-                                                    TextSpan(
-                                                      text: '${note.title}: ',
-                                                      style: context
-                                                          .fonts
-                                                          .black13w600,
-                                                    ),
-                                                  TextSpan(
-                                                    text: note.description,
-                                                    style: context
-                                                        .fonts
-                                                        .grey13w500,
-                                                  ),
-                                                ],
+                                      context.horizontalSpace(8),
+                                      Expanded(
+                                        child: RichText(
+                                          text: TextSpan(
+                                            children: [
+                                              if (note.title != null &&
+                                                  note.title!.isNotEmpty)
+                                                TextSpan(
+                                                  text: '${note.title}: ',
+                                                  style:
+                                                      context.fonts.black13w600,
+                                                ),
+                                              TextSpan(
+                                                text: note.description,
+                                                style: context.fonts.grey13w500,
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                  ,
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
                           ],
                         ),

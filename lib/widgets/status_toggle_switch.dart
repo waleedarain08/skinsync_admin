@@ -26,70 +26,81 @@ class StatusToggleSwitch extends StatelessWidget {
         : (isActive ? CustomColors.green : CustomColors.red);
 
     if (isDraft) {
-      return Container(
-        padding: context.appEdgeInsets(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: badgeColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color: badgeColor.withValues(alpha: 0.2),
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Container(
+          padding: context.appEdgeInsets(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: badgeColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(color: badgeColor.withValues(alpha: 0.2)),
           ),
-        ),
-        child: Text(
-          'DRAFT',
-          style: context.fonts.grey12w600.copyWith(color: CustomColors.grey),
+          child: Text(
+            'DRAFT',
+            style:
+                context.fonts.grey12w600.copyWith(color: CustomColors.grey),
+          ),
         ),
       );
     }
 
-    final double computedWidth = width ?? context.w(110);
-    final double computedHeight = height ?? context.h(32);
+    // Responsive sizing: clamp between sensible min/max values
+    // so it never stretches to fill a parent but still adapts to screen size.
+    final double screenW = MediaQuery.sizeOf(context).width;
+    final double screenH = MediaQuery.sizeOf(context).height;
 
-    return SizedBox(
-      width: computedWidth,
-      height: computedHeight,
-      child: AnimatedToggleSwitch<bool>.dual(
-        current: isActive,
-        first: false,
-        second: true,
-        onChanged: (val) {
-          onChanged(val ? 'Active' : 'Inactive');
-        },
-        styleBuilder: (val) => ToggleStyle(
-          indicatorColor: val ? CustomColors.green : CustomColors.red,
-          backgroundColor: val 
-              ? CustomColors.green.withValues(alpha: 0.1) 
-              : CustomColors.red.withValues(alpha: 0.1),
-          borderColor: val 
-              ? CustomColors.green.withValues(alpha: 0.3) 
-              : CustomColors.red.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(20),
+    final double computedWidth = width ??
+        (screenW * 0.12).clamp(90.0, 130.0); // e.g. 90–130px across screens
+    final double computedHeight = height ??
+        (screenH * 0.04).clamp(28.0, 38.0); // e.g. 28–38px across screens
+
+    final double iconSpacing = computedWidth * 0.28;
+
+    return UnconstrainedBox( // 👈 prevents the widget from inheriting parent constraints
+      child: SizedBox(
+        width: computedWidth,
+        height: computedHeight,
+        child: AnimatedToggleSwitch<bool>.dual(
+          current: isActive,
+          first: false,
+          second: true,
+          onChanged: (val) => onChanged(val ? 'Active' : 'Inactive'),
+          styleBuilder: (val) => ToggleStyle(
+            indicatorColor: val ? CustomColors.green : CustomColors.red,
+            backgroundColor: val
+                ? CustomColors.green.withValues(alpha: 0.1)
+                : CustomColors.red.withValues(alpha: 0.1),
+            borderColor: val
+                ? CustomColors.green.withValues(alpha: 0.3)
+                : CustomColors.red.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          spacing: iconSpacing,
+          iconBuilder: (val) => val
+              ? const Icon(Icons.check_rounded, color: Colors.white, size: 12)
+              : const Icon(Icons.close_rounded, color: Colors.white, size: 12),
+          textBuilder: (val) => val
+              ? Center(
+                  child: Text(
+                    'Active',
+                    style: TextStyle(
+                      color: CustomColors.green,
+                      fontSize: context.sp(10),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              : Center(
+                  child: Text(
+                    'Inactive',
+                    style: TextStyle(
+                      color: CustomColors.red,
+                      fontSize: context.sp(10),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
         ),
-        spacing: computedWidth * 0.28,
-        iconBuilder: (val) => val
-            ? const Icon(Icons.check_rounded, color: Colors.white, size: 12)
-            : const Icon(Icons.close_rounded, color: Colors.white, size: 12),
-        textBuilder: (val) => val
-            ? Center(
-                child: Text(
-                  'Active',
-                  style: TextStyle(
-                    color: CustomColors.green,
-                    fontSize: context.sp(10),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
-            : Center(
-                child: Text(
-                  'Inactive',
-                  style: TextStyle(
-                    color: CustomColors.red,
-                    fontSize: context.sp(10),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
       ),
     );
   }

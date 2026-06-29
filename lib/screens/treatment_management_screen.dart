@@ -492,6 +492,8 @@ class _TreatmentManagementScreenState
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: StatusToggleSwitch(
+        height: 40,
+        width: 100,
         status: currentStatus,
         onChanged: (newStatus) {
           if (t.id != null) {
