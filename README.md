@@ -4,6 +4,7 @@ SkinSync Admin is a robust, cross-platform administrative dashboard built with F
 
 ## 🚀 Key Features
 
+
 -   **Comprehensive Dashboard**: Real-time analytics and insights using interactive charts (Syncfusion & FL Chart).
 -   **Patient & User Management**: Full CRUD operations for patient profiles and system users.
 -   **Clinic & Staff Administration**: Manage multiple clinic locations, staff roles, and permissions.
