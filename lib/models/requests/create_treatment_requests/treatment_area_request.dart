@@ -1,16 +1,12 @@
+import 'package:skinsync_admin/utils/enums.dart';
+
 class TreatmentAreaRequest {
-  final int stepNumber;
   final List<int> selectedAreaIds;
 
-  TreatmentAreaRequest({
-    required this.stepNumber,
-   required this.selectedAreaIds,
-  });
-
-
+  TreatmentAreaRequest({required this.selectedAreaIds});
 
   Map<String, dynamic> toJson() => {
-    'step_number': stepNumber,
+    'keys': [CreateTreatmentSteps.treatmentAreas.name],
     'selected_area_ids': List<dynamic>.from(selectedAreaIds.map((x) => x)),
   };
 }

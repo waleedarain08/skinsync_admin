@@ -7,25 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
-import 'package:skinsync_admin/models/requests/business_logic_request.dart';
-import 'package:skinsync_admin/models/requests/constent_form_selection_request.dart';
-import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
-import 'package:skinsync_admin/models/requests/follow_up_request.dart';
-import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
-import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/product_usage_request.dart';
-import 'package:skinsync_admin/models/requests/protocol_request.dart';
-import 'package:skinsync_admin/models/requests/sessions_setup_request.dart';
-import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
-import 'package:skinsync_admin/models/requests/treatment_area_request.dart';
-import 'package:skinsync_admin/models/requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/constent_form_selection_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/follow_up_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/phase_notifications_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/post_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/pre_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/product_usage_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/protocol_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/sessions_setup_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/step_pricing_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
+import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 
 import '../models/notification_entry.dart';
-import '../models/requests/basic_info_request.dart';
+import '../models/requests/create_treatment_requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
 import '../repositories/category_repository.dart';
@@ -316,9 +317,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     );
   }
 
-  Future<bool?> callConsentFormSelection({required int stepNumber}) async {
+  Future<bool?> callConsentFormSelection() async {
     final request = ConsentFormSelectionRequest(
-      stepNumber: stepNumber,
       preTreatmentConsentForm: state.preTreatmentConsentForm != null
           ? PreTreatmentConsentForm(
               name: state.preTreatmentConsentForm!.name,
@@ -330,7 +330,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     log('''
 =========== CONSENT FORM SELECTION REQUEST ===========
 Draft ID             : ${state.draftTreatmentID}
-Step No              : $stepNumber
 Consent Type         : ${state.consentType}
 Consent Form         : ${state.preTreatmentConsentForm?.name}
 Body                 : ${request.toJson()}
@@ -913,11 +912,10 @@ Body                 : ${request.toJson()}
     state = state.copyWith(totalSessions: count, sessions: updated);
   }
 
-  Future<bool?> createTreatmentArea({required int stepNumber}) async {
+  Future<bool?> createTreatmentArea() async {
     return await runSafely<bool>(() async {
       await _treatmentRepository.createTreatmentArea(
         TreatmentAreaRequest(
-          stepNumber: stepNumber,
           selectedAreaIds: state.selectedTreatmentAreaIds,
         ),
         state.draftTreatmentID!,
@@ -972,7 +970,7 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callDownTimeLevels({required int stepNumber}) async {
+  Future<bool?> callDownTimeLevels() async {
     // Resolve the actual days from the selected level + category presets
     final presets = state.selectedCategoryDetail?.downtimePresets;
     final level = state.downtimeLevel;
@@ -986,7 +984,7 @@ Body       : ${request.toJson()}
     };
 
     final request = DownTimeLevelRequest(
-      stepNumber: stepNumber,
+    
       downtimeLevel: level,
       downtimeDays: downtimeDays,
     );
@@ -994,7 +992,6 @@ Body       : ${request.toJson()}
     log('''
 =========== DOWNTIME LEVEL REQUEST ===========
 Draft ID      : ${state.draftTreatmentID}
-Step No       : $stepNumber
 Downtime Level: $level
 Downtime Days : $downtimeDays
 Body          : ${request.toJson()}
@@ -1014,16 +1011,14 @@ Body          : ${request.toJson()}
     });
   }
 
-  Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
+  Future<bool?> callAllowedProviderRoles() async {
     final request = AllowedProviderRolesRequest(
-      stepNumber: stepNumber,
       allowedRoles: state.selectedRoles, // ← matches state field from UI
     );
 
     log('''
 =========== ALLOWED PROVIDER ROLES REQUEST ===========
 Draft ID             : ${state.draftTreatmentID}
-Step No              : $stepNumber
 Allowed Roles        : ${state.selectedRoles.join(', ')}
 Body                 : ${request.toJson()}
 ======================================================
@@ -1041,7 +1036,7 @@ Body                 : ${request.toJson()}
     });
   }
 
-  Future<bool?> callPreTreatmentInstructions({required int stepNumber}) async {
+  Future<bool?> callPreTreatmentInstructions() async {
     return await runSafely<bool>(() async {
       final attachments = state.existingPreAttachments
           .map(
@@ -1051,7 +1046,6 @@ Body                 : ${request.toJson()}
           .toList();
 
       final request = PreTreatmentInstructionsRequest(
-        stepNumber: stepNumber,
         preTreatmentInstructions:
             preTreatmentInstructionsController.text.trim().isEmpty
             ? null
@@ -1061,7 +1055,6 @@ Body                 : ${request.toJson()}
       log('''
 =========== PRE-TREATMENT INSTRUCTIONS REQUEST ===========
 Draft ID   : ${state.draftTreatmentID}
-Step No    : $stepNumber
 Body       : ${request.toJson()}
 ============================================
 ''');
@@ -1077,7 +1070,7 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callPostTreatmentInstructions({required int stepNumber}) async {
+  Future<bool?> callPostTreatmentInstructions() async {
     return await runSafely<bool>(() async {
       final attachments = state.existingPostAttachments
           .map(
@@ -1087,7 +1080,6 @@ Body       : ${request.toJson()}
           .toList();
 
       final request = PostTreatmentInstructionsRequest(
-        stepNumber: stepNumber,
         postTreatmentInstructions:
             postTreatmentInstructionsController.text.trim().isEmpty
             ? null
@@ -1097,7 +1089,6 @@ Body       : ${request.toJson()}
       log('''
 =========== POST-TREATMENT INSTRUCTIONS REQUEST ===========
 Draft ID   : ${state.draftTreatmentID}
-Step No    : $stepNumber
 Body       : ${request.toJson()}
 ============================================
 ''');
@@ -1227,9 +1218,8 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callProductUsage({required int stepNumber}) async {
+  Future<bool?> callProductUsage() async {
     final request = ProductUsagesRequest(
-      stepNumber: stepNumber,
       productUsages: state.productUsageEntries.map((e) {
         final subAreaConsumptions = e.subAreaControllers.entries
             .map(
@@ -1256,7 +1246,6 @@ Body       : ${request.toJson()}
     log('''
 =========== PRODUCT USAGE REQUEST ===========
 Draft ID   : ${state.draftTreatmentID}
-Step No    : $stepNumber
 Body       : ${request.toJson()}
 ============================================
 ''');
@@ -1275,7 +1264,6 @@ Body       : ${request.toJson()}
     return await runSafely<bool>(() async {
       await _treatmentRepository.createSchedule(
         TreatmentScheduleRequest(
-          stepNumber: stepNumber,
           baseDuration: int.parse(treatmentDurationController.text),
           productDurations: state.productUsageEntries
               .map(
@@ -2428,317 +2416,224 @@ Body       : ${request.toJson()}
     BuildContext context, {
     List<CategoryModel> categories = const [],
   }) async {
-    return await runSafely<void>(showLoading: true, () async {
-      final skuError = validateGlobalSku(
-        globalSkuController.text.trim(),
-        currentTreatmentId: state.selectedTreatment?.id,
-      );
-      if (skuError != null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(skuError)));
-        }
-        return;
-      }
+    final treatmentId = state.selectedTreatment?.id;
+    if (treatmentId == null) {
+      EasyLoading.showError('No treatment selected for update');
+      return;
+    }
 
-      CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
-      if (selectedCategory == null && categoryIdController.text.isNotEmpty) {
-        final categoryId = int.tryParse(categoryIdController.text);
-        if (categoryId != null) {
-          try {
-            selectedCategory = await _categoryRepository.getCategoryDetail(
-              categoryId,
+    return await runSafely<void>(
+          showLoading: true,
+          () async {
+            final skuError = validateGlobalSku(
+              globalSkuController.text.trim(),
+              currentTreatmentId: treatmentId,
             );
-          } catch (_) {}
-        }
-      }
-
-      List<SessionConfig> effectiveSessions = [];
-
-      List<NotificationConfig> effectivePreNotifications = [];
-      if (state.preNotificationSource == 'category') {
-        if (selectedCategory != null) {
-          effectivePreNotifications =
-              selectedCategory.preNotifications
-                  ?.map(
-                    (n) => NotificationConfig(
-                      title: n.title,
-                      message: n.message,
-                      timing: n.timing,
-                      timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
-                      type: typeValues.reverse[n.type] ?? 'reminder',
-                    ),
-                  )
-                  .toList() ??
-              [];
-        }
-      } else {
-        effectivePreNotifications = state.preNotificationEntries
-            .map((e) => e.toConfig())
-            .toList();
-      }
-
-      List<NotificationConfig> effectivePostNotifications = [];
-      if (state.postNotificationSource == 'category') {
-        if (selectedCategory != null) {
-          effectivePostNotifications =
-              selectedCategory.postNotifications
-                  ?.map(
-                    (n) => NotificationConfig(
-                      title: n.title,
-                      message: n.message,
-                      timing: n.timing,
-                      timingUnit: unitValues.reverse[n.timingUnit] ?? 'hours',
-                      type: typeValues.reverse[n.type] ?? 'care',
-                    ),
-                  )
-                  .toList() ??
-              [];
-        }
-      } else {
-        effectivePostNotifications = state.postNotificationEntries
-            .map((e) => e.toConfig())
-            .toList();
-      }
-
-      if (state.sessionSource == 'category') {
-        if (selectedCategory != null &&
-            selectedCategory.defaultSessions != null &&
-            selectedCategory.defaultSessions!.isNotEmpty) {
-          effectiveSessions =
-              selectedCategory.defaultSessions!
-                  ?.map(
-                    (s) => SessionConfig(
-                      sessionNumber: s.sessionNumber,
-                      followUps: s.followUps
-                          .map(
-                            (f) => FollowUpConfig(
-                              type: f.type ?? '',
-                              durationValue: f.durationValue ?? 0,
-                              durationUnit:
-                                  unitValues.reverse[f.durationUnit] ??
-                                  'minutes',
-                              notes: f.notes ?? '',
-                              intervalValue: f.intervalValue ?? 0,
-                              intervalUnit: f.intervalUnit ?? '',
-                              isImageRequired: f.isImageRequired ?? false,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  )
-                  .toList() ??
-              [];
-        } else {
-          final int sessionCount = selectedCategory?.totalSessions ?? 1;
-          for (int i = 0; i < sessionCount; i++) {
-            effectiveSessions.add(
-              SessionConfig(sessionNumber: i + 1, followUps: []),
-            );
-          }
-        }
-      } else {
-        effectiveSessions = state.sessions
-            .map(
-              (s) => SessionConfig(
-                sessionNumber: s.sessionNumber,
-                followUps: s.followUps
-                    .map(
-                      (fu) => FollowUpConfig(
-                        type: fu.type,
-                        durationValue: int.tryParse(
-                          fu.durationValueController.text,
-                        ),
-                        durationUnit: fu.durationUnit,
-                        notes: fu.notesController.text,
-                        intervalValue: int.tryParse(
-                          fu.intervalValueController.text,
-                        ),
-                        intervalUnit: fu.intervalUnit,
-                        isImageRequired: fu.isImageRequired,
-                      ),
-                    )
-                    .toList(),
-              ),
-            )
-            .toList();
-      }
-
-      final treatment = TreatmentModel(
-        id: state.selectedTreatment?.id,
-        globalSku: globalSkuController.text.trim(),
-        name: internalNameController.text,
-        patientDisplayName: displayNameController.text,
-        description: fullDescriptionController.text,
-        shortDescription: shortDescriptionController.text,
-        basePrice: double.tryParse(basePriceController.text),
-        unitPrices: (() {
-          final Map<String, double> up = {};
-          unitPriceControllers.forEach((unit, controller) {
-            final val = double.tryParse(controller.text);
-            if (val != null) {
-              up[unit] = val;
+            if (skuError != null) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(skuError)),
+                );
+              }
+              return;
             }
-          });
-          return up.isNotEmpty ? up : null;
-        })(),
-        baseDurationHours:
-            (int.tryParse(treatmentDurationController.text) ?? 0) ~/ 60,
-        baseDurationMinutes:
-            (int.tryParse(treatmentDurationController.text) ?? 0) % 60,
-        prepTime: int.tryParse(prepTimeController.text) ?? 0,
-        cleanupTime: int.tryParse(cleanupTimeController.text) ?? 0,
-        allowClinicOverride: state.allowClinicOverride,
-        allowProviderOverride: state.allowProviderOverride,
-        onlineBookable: state.onlineBookable,
-        manualApprovalRequired: state.manualApprovalRequired,
-        minimumBookingNotice:
-            int.tryParse(minimumBookingNoticeController.text) ?? 24,
-        maximumDaysInAdvance:
-            int.tryParse(maximumDaysInAdvanceController.text) ?? 90,
-        categoryId: categoryIdController.text,
-        categoryName: categoryNameController.text,
-        categoryPath: categoryPathController.text,
-        status: state.status,
-        useInAiSimulator: state.useInAiSimulator,
-        protocolIds: state.selectedProtocolIds,
-        protocolNotes: state.selectedProtocolNotes,
-        standaloneNotes: state.standaloneNotes,
-        preTreatmentInstructions: preTreatmentInstructionsController.text,
-        postTreatmentInstructions: postTreatmentInstructionsController.text,
-        preNotificationSource: state.preNotificationSource,
-        postNotificationSource: state.postNotificationSource,
-        preTreatmentNotificationTitle: preNotificationTitleController.text,
-        preTreatmentNotificationDescription:
-            preNotificationDescriptionController.text,
-        preTreatmentNotificationOffset: state.preNotificationOffset,
-        postTreatmentNotificationTitle: postNotificationTitleController.text,
-        postTreatmentNotificationDescription:
-            postNotificationDescriptionController.text,
-        postTreatmentNotificationOffset: state.postNotificationOffset,
-        preNotifications: effectivePreNotifications,
-        postNotifications: effectivePostNotifications,
-        sessionSource: state.sessionSource,
-        totalSessions: state.totalSessions,
-        sessions: effectiveSessions,
-        downtimeLevel: state.downtimeLevel,
-        providerRolesSource: state.providerRolesSource,
-        allowedRoles: state.selectedRoles,
-        preTreatmentAttachments: [
-          ...state.existingPreAttachments,
-          ...state.preTreatmentAttachments.map(
-            (f) => Attachment(
-              url: f.path ?? '',
-              type: _getFileType(f),
-              name: f.name,
-            ),
-          ),
-        ],
-        postTreatmentAttachments: [
-          ...state.existingPostAttachments,
-          ...state.postTreatmentAttachments.map(
-            (f) => Attachment(
-              url: f.path ?? '',
-              type: _getFileType(f),
-              name: f.name,
-            ),
-          ),
-        ],
-        preTreatmentConsentForm: state.consentType == 'custom'
-            ? (state.preTreatmentConsentForm != null
-                  ? Attachment(
-                      url: state.preTreatmentConsentForm!.path ?? '',
-                      type: 'pdf',
-                      name: state.preTreatmentConsentForm!.name,
-                    )
-                  : state.existingConsentForm)
-            : null,
-        requirePostTreatmentPhotos: state.requirePostTreatmentPhotos,
-        requiredPostTreatmentPhotoCount: state.requiredPostTreatmentPhotoCount,
-        isFollowUpRequired: state.isFollowUpRequired,
-        productUsages: state.productUsageEntries.map((e) {
-          final List<SubAreaConsumption> subAreaConsumptions = [];
-          e.subAreaControllers.forEach((subName, controllers) {
-            final minVal =
-                double.tryParse(controllers.minController.text) ?? 0.0;
-            final maxVal =
-                double.tryParse(controllers.maxController.text) ?? 0.0;
-            subAreaConsumptions.add(
-              SubAreaConsumption(
-                subAreaId: controllers.subAreaId ?? 0,
-                subAreaName: subName,
-                minQuantity: minVal,
-                maxQuantity: maxVal,
-              ),
+
+            // Compare and send only changed values to achieve true partial update!
+            final originalCategoryIds = state.selectedTreatmentDetail?.selectedCategoryIds ?? [];
+            final currentCategoryIds = state.selectedCategoryPath;
+            final bool categoryIdsChanged = originalCategoryIds.length != currentCategoryIds.length || 
+                !currentCategoryIds.every((id) => originalCategoryIds.contains(id));
+
+            final originalSku = state.selectedTreatmentDetail?.globalSku ?? '';
+            final currentSku = globalSkuController.text.trim();
+            final bool skuChanged = originalSku != currentSku;
+
+            final originalDisplayName = state.selectedTreatmentDetail?.patientDisplayName ?? '';
+            final currentDisplayName = displayNameController.text.trim();
+            final bool displayNameChanged = originalDisplayName != currentDisplayName;
+
+            final originalImage = state.selectedTreatmentDetail?.image ?? '';
+            final currentImage = state.treatmentImageUrl ?? '';
+            final bool imageChanged = originalImage != currentImage;
+
+            final originalIcon = state.selectedTreatmentDetail?.icon ?? '';
+            final currentIcon = state.treatmentIconUrl ?? '';
+            final bool iconChanged = originalIcon != currentIcon;
+
+            final originalShortDesc = state.selectedTreatmentDetail?.shortDescription ?? '';
+            final currentShortDesc = shortDescriptionController.text.trim();
+            final bool shortDescChanged = originalShortDesc != currentShortDesc;
+
+            final originalDesc = state.selectedTreatmentDetail?.description ?? '';
+            final currentDesc = fullDescriptionController.text.trim();
+            final bool descChanged = originalDesc != currentDesc;
+
+            final originalAreaIds = state.selectedTreatmentDetail?.selectedAreaIds ?? [];
+            final currentAreaIds = state.selectedTreatmentAreaIds;
+            final bool areaIdsChanged = originalAreaIds.length != currentAreaIds.length || 
+                !currentAreaIds.every((id) => originalAreaIds.contains(id));
+
+            final originalDuration = state.selectedTreatmentDetail?.baseDuration ?? 0;
+            final currentDuration = ((int.tryParse(durationHoursController.text) ?? 0) * 60) + (int.tryParse(durationMinutesController.text) ?? 0);
+            final bool durationChanged = originalDuration != currentDuration;
+
+            final originalPrep = state.selectedTreatmentDetail?.prepTime ?? 0;
+            final currentPrep = int.tryParse(prepTimeController.text) ?? 0;
+            final bool prepChanged = originalPrep != currentPrep;
+
+            final originalCleanup = state.selectedTreatmentDetail?.cleanupTime ?? 0;
+            final currentCleanup = int.tryParse(cleanupTimeController.text) ?? 0;
+            final bool cleanupChanged = originalCleanup != currentCleanup;
+
+            final originalClinicOverride = state.selectedTreatmentDetail?.allowClinicOverride ?? false;
+            final currentClinicOverride = state.allowClinicOverride;
+            final bool clinicOverrideChanged = originalClinicOverride != currentClinicOverride;
+
+            final originalProviderOverride = state.selectedTreatmentDetail?.allowProviderOverride ?? false;
+            final currentProviderOverride = state.allowProviderOverride;
+            final bool providerOverrideChanged = originalProviderOverride != currentProviderOverride;
+
+            final originalOnlineBookable = state.selectedTreatmentDetail?.onlineBookable ?? true;
+            final currentOnlineBookable = state.onlineBookable;
+            final bool onlineBookableChanged = originalOnlineBookable != currentOnlineBookable;
+
+            final originalManualApproval = state.selectedTreatmentDetail?.manualApprovalRequired ?? false;
+            final currentManualApproval = state.manualApprovalRequired;
+            final bool manualApprovalChanged = originalManualApproval != currentManualApproval;
+
+            final originalBookingNotice = state.selectedTreatmentDetail?.minimumBookingNotice ?? 24;
+            final currentBookingNotice = int.tryParse(minimumBookingNoticeController.text) ?? 24;
+            final bool bookingNoticeChanged = originalBookingNotice != currentBookingNotice;
+
+            final originalDaysInAdvance = state.selectedTreatmentDetail?.maximumDaysInAdvance ?? 90;
+            final currentDaysInAdvance = int.tryParse(maximumDaysInAdvanceController.text) ?? 90;
+            final bool daysInAdvanceChanged = originalDaysInAdvance != currentDaysInAdvance;
+
+            final originalBasePrice = state.selectedTreatmentDetail?.basePrice ?? 0.0;
+            final currentBasePrice = double.tryParse(basePriceController.text) ?? 0.0;
+            final bool basePriceChanged = originalBasePrice != currentBasePrice;
+
+            final originalUseInAi = state.selectedTreatmentDetail?.useInAiSimulator ?? false;
+            final currentUseInAi = state.useInAiSimulator;
+            final bool useInAiChanged = originalUseInAi != currentUseInAi;
+
+            final originalEnableDefault = state.selectedTreatmentDetail?.enableByDefault ?? false;
+            final currentEnableDefault = state.enableByDefault;
+            final bool enableDefaultChanged = originalEnableDefault != currentEnableDefault;
+
+            final originalDowntimeLevel = state.selectedTreatmentDetail?.downtimeLevel ?? 'None';
+            final currentDowntimeLevel = state.downtimeLevel;
+            final bool downtimeLevelChanged = originalDowntimeLevel != currentDowntimeLevel;
+
+            final originalRoles = state.selectedTreatmentDetail?.allowedRoles ?? [];
+            final currentRoles = state.selectedRoles;
+            final bool rolesChanged = originalRoles.length != currentRoles.length || 
+                !currentRoles.every((r) => originalRoles.contains(r));
+
+            final originalTotalSessions = state.selectedTreatmentDetail?.totalSessions ?? 1;
+            final currentTotalSessions = state.totalSessions;
+            final bool totalSessionsChanged = originalTotalSessions != currentTotalSessions;
+
+            final List<UpdateProductUsage> productUsages = state.productUsageEntries.map((e) => UpdateProductUsage(
+              productId: e.productId,
+              productName: e.productName,
+              usageType: e.usageType,
+              minQuantity: double.tryParse(e.minQuantityController.text) ?? 0.0,
+              maxQuantity: double.tryParse(e.maxQuantityController.text) ?? 0.0,
+              deductionTiming: e.deductionTiming,
+              allowSubstitution: e.allowSubstitution,
+              notes: e.notesController.text,
+              unit: e.unit,
+              perUnitDuration: double.tryParse(e.perUnitDurationController.text) ?? 0.0,
+            )).toList();
+
+            final List<UpdateNotification> preNotifications = state.preNotificationEntries.map((e) => UpdateNotification(
+              title: e.titleController.text,
+              message: e.messageController.text,
+              timing: int.tryParse(e.timingValueController.text) ?? 0,
+              timingUnit: e.timingUnit,
+              type: e.type,
+            )).toList();
+
+            final List<UpdateNotification> postNotifications = state.postNotificationEntries.map((e) => UpdateNotification(
+              title: e.titleController.text,
+              message: e.messageController.text,
+              timing: int.tryParse(e.timingValueController.text) ?? 0,
+              timingUnit: e.timingUnit,
+              type: e.type,
+            )).toList();
+
+            final List<UpdateSession> sessions = state.sessions.map((s) => UpdateSession(
+              sessionNumber: s.sessionNumber,
+              followUps: s.followUps.map((fu) => UpdateFollowUp(
+                type: fu.type,
+                durationValue: int.tryParse(fu.durationValueController.text) ?? 0,
+                durationUnit: fu.durationUnit,
+                notes: fu.notesController.text,
+                intervalValue: int.tryParse(fu.intervalValueController.text) ?? 0,
+                intervalUnit: fu.intervalUnit,
+                isImageRequired: fu.isImageRequired,
+              )).toList(),
+            )).toList();
+
+            final List<UpdateUnitPriceOverride> overrides = [];
+            unitPriceControllers.forEach((role, controller) {
+              final double? price = double.tryParse(controller.text);
+              if (price != null) {
+                overrides.add(UpdateUnitPriceOverride(role: role, price: price));
+              }
+            });
+
+            final UpdateConsentForm? consentForm = state.existingConsentForm != null 
+              ? UpdateConsentForm(id: 1, name: state.existingConsentForm!.name, url: state.existingConsentForm!.url) 
+              : null;
+
+            final request = UpdateTreatmentRequest(
+              selectedCategoryIds: categoryIdsChanged ? currentCategoryIds : null,
+              globalSku: skuChanged ? currentSku : null,
+              patientDisplayName: displayNameChanged ? currentDisplayName : null,
+              image: imageChanged ? currentImage : null,
+              icon: iconChanged ? currentIcon : null,
+              shortDescription: shortDescChanged ? currentShortDesc : null,
+              description: descChanged ? currentDesc : null,
+              selectedAreaIds: areaIdsChanged ? currentAreaIds : null,
+              productUsages: productUsages,
+              baseDuration: durationChanged ? currentDuration : null,
+              prepTime: prepChanged ? currentPrep : null,
+              cleanupTime: cleanupChanged ? currentCleanup : null,
+              allowClinicOverride: clinicOverrideChanged ? currentClinicOverride : null,
+              allowProviderOverride: providerOverrideChanged ? currentProviderOverride : null,
+              onlineBookable: onlineBookableChanged ? currentOnlineBookable : null,
+              manualApprovalRequired: manualApprovalChanged ? currentManualApproval : null,
+              minimumBookingNotice: bookingNoticeChanged ? currentBookingNotice : null,
+              maximumDaysInAdvance: daysInAdvanceChanged ? currentDaysInAdvance : null,
+              basePrice: basePriceChanged ? currentBasePrice : null,
+              unitPriceOverrides: overrides,
+              preTreatmentInstructions: state.selectedTreatmentDetail?.preTreatmentInstructions != preTreatmentInstructionsController.text ? preTreatmentInstructionsController.text : null,
+              postTreatmentInstructions: state.selectedTreatmentDetail?.postTreatmentInstructions != postTreatmentInstructionsController.text ? postTreatmentInstructionsController.text : null,
+              preNotifications: preNotifications,
+              postNotifications: postNotifications,
+              downtimeLevel: downtimeLevelChanged ? currentDowntimeLevel : null,
+              allowedRoles: rolesChanged ? currentRoles : null,
+              totalSessions: totalSessionsChanged ? currentTotalSessions : null,
+              sessions: sessions,
+              preTreatmentConsentForm: consentForm,
+              enableByDefault: enableDefaultChanged ? currentEnableDefault : null,
+              useInAiSimulator: useInAiChanged ? currentUseInAi : null,
             );
-          });
-          return ProductUsageModel(
-            productId: e.productId,
-            productName: e.productName,
-            usageType: e.usageType,
-            minQuantity: double.tryParse(e.minQuantityController.text),
-            maxQuantity: double.tryParse(e.maxQuantityController.text),
-            deductionTiming: e.deductionTiming,
-            allowSubstitution: e.allowSubstitution,
-            notes: e.notesController.text,
-            unit: e.unit,
-            perUnitDuration: double.tryParse(e.perUnitDurationController.text),
-            subAreaConsumptions: subAreaConsumptions,
-          );
-        }).toList(),
-        sideAreas: state.areas
-            .map(
-              (a) => SideAreaModel(
-                name: a.areaController.text,
-                subAreas: a.subAreas.map((s) {
-                  final Map<String, double> unitPrices = {};
-                  s.unitPriceControllers.forEach((unit, controller) {
-                    final val = double.tryParse(controller.text);
-                    if (val != null) {
-                      unitPrices[unit] = val;
-                    }
-                  });
-                  return SubAreaModel(
-                    name: s.name,
-                    basePrice: double.tryParse(s.basePriceController.text),
-                    unitPrices: unitPrices,
-                    children: s.children.map((c) {
-                      final Map<String, double> childUnitPrices = {};
-                      c.unitPriceControllers.forEach((unit, controller) {
-                        final val = double.tryParse(controller.text);
-                        if (val != null) {
-                          childUnitPrices[unit] = val;
-                        }
-                      });
-                      return SubAreaModel(
-                        name: c.name,
-                        basePrice: double.tryParse(c.basePriceController.text),
-                        unitPrices: childUnitPrices,
-                      );
-                    }).toList(),
-                  );
-                }).toList(),
-              ),
-            )
-            .toList(),
-      );
 
-      final idx = _localTreatments.indexWhere(
-        (t) => t.id == state.selectedTreatment!.id,
-      );
-      if (idx != -1) {
-        _localTreatments[idx] = treatment;
-      }
+            await _treatmentRepository.updateTreatment(
+              treatmentId: treatmentId,
+              request: request,
+            );
 
-      state = state.copyWith(
-        treatments: List.from(_localTreatments),
-        filteredTreatments: _getFilteredList(_localTreatments),
-      );
-
-      await Future.delayed(const Duration(seconds: 1));
-      await getTreatments();
-    });
+            // Successfully updated -> Refresh details & listing
+            await fetchTreatmentDetail(treatmentId);
+            await getTreatments(page: state.currentPage);
+            
+            EasyLoading.showSuccess('Treatment template updated successfully');
+          },
+        );
   }
 
   String? validateGlobalSku(String? sku, {int? currentTreatmentId}) {

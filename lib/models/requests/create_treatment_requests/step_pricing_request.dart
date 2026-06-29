@@ -1,3 +1,5 @@
+import 'package:skinsync_admin/utils/enums.dart';
+
 class StepPricingRequest {
   final int? stepNumber;
   final int? basePrice;
@@ -10,9 +12,9 @@ class StepPricingRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    "step_number": stepNumber,
-    "base_price": basePrice,
-    "unit_price_overrides": unitPriceOverrides == null
+    'keys': [CreateTreatmentSteps.pricing.name],
+    'base_price': basePrice,
+    'unit_price_overrides': unitPriceOverrides == null
         ? []
         : List<dynamic>.from(unitPriceOverrides!.map((x) => x.toJson())),
   };

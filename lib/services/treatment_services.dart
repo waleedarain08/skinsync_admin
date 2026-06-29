@@ -1,22 +1,23 @@
-import 'package:skinsync_admin/models/requests/allowed_provider_role_request.dart';
-import 'package:skinsync_admin/models/requests/constent_form_selection_request.dart';
-import 'package:skinsync_admin/models/requests/down_time_level_request.dart';
-import 'package:skinsync_admin/models/requests/follow_up_request.dart';
-import 'package:skinsync_admin/models/requests/phase_notifications_request.dart';
-import 'package:skinsync_admin/models/requests/post_photos_request.dart';
-import 'package:skinsync_admin/models/requests/post_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/pre_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/product_usage_request.dart';
-import 'package:skinsync_admin/models/requests/protocol_request.dart';
-import 'package:skinsync_admin/models/requests/step_pricing_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/constent_form_selection_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/follow_up_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/phase_notifications_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/post_photos_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/post_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/pre_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/product_usage_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/protocol_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
+import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 
-import '../models/requests/basic_info_request.dart';
-import '../models/requests/business_logic_request.dart';
-import '../models/requests/sessions_setup_request.dart';
-import '../models/requests/treatment_area_request.dart';
-import '../models/requests/treatment_schedule_request.dart';
+import '../models/requests/create_treatment_requests/basic_info_request.dart';
+import '../models/requests/create_treatment_requests/business_logic_request.dart';
+import '../models/requests/create_treatment_requests/sessions_setup_request.dart';
+import '../models/requests/create_treatment_requests/treatment_schedule_request.dart';
 import '../models/responses/basic_info_response.dart';
 import '../models/responses/treatment_list_response.dart';
 import '../models/responses/treatment_products_response.dart';
@@ -72,7 +73,7 @@ class TreatmentServices implements TreatmentRepository {
     int id,
   ) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
       body: request.toJson(),
       queryParams: {'treatment_id': id.toString()},
     );
@@ -91,7 +92,7 @@ class TreatmentServices implements TreatmentRepository {
     int id,
   ) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
       body: request.toJson(),
       queryParams: {'treatment_id': id.toString()},
     );
@@ -110,7 +111,7 @@ class TreatmentServices implements TreatmentRepository {
     required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
 
       body: request,
       queryParams: {'treatment_id': draftTreatmentID.toString()},
@@ -130,7 +131,7 @@ class TreatmentServices implements TreatmentRepository {
     required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
 
       body: request,
       queryParams: {'treatment_id': draftTreatmentID.toString()},
@@ -150,7 +151,7 @@ class TreatmentServices implements TreatmentRepository {
     required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
 
       body: request,
       queryParams: {'treatment_id': draftTreatmentID.toString()},
@@ -170,7 +171,7 @@ class TreatmentServices implements TreatmentRepository {
     required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
 
       body: request,
       queryParams: {'treatment_id': draftTreatmentID.toString()},
@@ -190,7 +191,7 @@ class TreatmentServices implements TreatmentRepository {
     required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
 
       body: request,
       queryParams: {'treatment_id': draftTreatmentID.toString()},
@@ -211,7 +212,7 @@ class TreatmentServices implements TreatmentRepository {
     required int count,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
       body: PostPhotosRequest(
         requirePostTreatmentPhotos: requirePostPhotos,
         requiredPostTreatmentPhotoCount: count,
@@ -232,7 +233,7 @@ class TreatmentServices implements TreatmentRepository {
     required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
 
       body: request,
       queryParams: {'treatment_id': draftTreatmentID.toString()},
@@ -252,7 +253,7 @@ class TreatmentServices implements TreatmentRepository {
     required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
 
       body: request,
       queryParams: {'treatment_id': draftTreatmentID.toString()},
@@ -272,7 +273,7 @@ class TreatmentServices implements TreatmentRepository {
     required int draftTreatmentID,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
 
       body: request,
       queryParams: {'treatment_id': draftTreatmentID.toString()},
@@ -308,7 +309,7 @@ class TreatmentServices implements TreatmentRepository {
     required PhaseNotificationsRequest request,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
       body: request,
       queryParams: {'treatment_id': draftTreatmentId.toString()},
     );
@@ -326,7 +327,7 @@ class TreatmentServices implements TreatmentRepository {
     required SessionsSetupRequest request,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
       body: request,
       queryParams: {'treatment_id': draftTreatmentId.toString()},
     );
@@ -344,7 +345,7 @@ class TreatmentServices implements TreatmentRepository {
     required FollowUpRequest request,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
       body: request,
       queryParams: {'treatment_id': draftTreatmentId.toString()},
     );
@@ -362,7 +363,7 @@ class TreatmentServices implements TreatmentRepository {
     required BusinessLogicRequest request,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.treatmentArea,
+      Endpoint.updateTreatment,
       body: request,
       queryParams: {'treatment_id': draftTreatmentId.toString()},
     );
@@ -400,6 +401,23 @@ class TreatmentServices implements TreatmentRepository {
       pathParams: {'id': id.toString()},
     );
     final response = TreatmentDetailResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<BaseApiResponseModel> updateTreatment({
+    required int treatmentId,
+    required UpdateTreatmentRequest request,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.updateTreatment,
+      body: request.toJson(),
+      queryParams: {'treatment_id': treatmentId.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }

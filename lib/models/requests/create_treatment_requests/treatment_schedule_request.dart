@@ -1,6 +1,6 @@
+import 'package:skinsync_admin/utils/enums.dart';
 
 class TreatmentScheduleRequest {
-  final int? stepNumber;
   final int? baseDuration;
   final int? prepTime;
   final int? cleanupTime;
@@ -13,9 +13,8 @@ class TreatmentScheduleRequest {
   final int? maximumDaysInAdvance;
 
   TreatmentScheduleRequest({
-    this.stepNumber,
     this.baseDuration,
-        this.prepTime,
+    this.prepTime,
     this.cleanupTime,
     this.productDurations,
     this.allowClinicOverride,
@@ -26,14 +25,14 @@ class TreatmentScheduleRequest {
     this.maximumDaysInAdvance,
   });
 
-
-
   Map<String, dynamic> toJson() => {
-    'step_number': stepNumber,
+    'keys': [CreateTreatmentSteps.scheduling.name],
     'base_duration': baseDuration,
     'prep_time': prepTime,
     'cleanup_time': cleanupTime,
-    'product_durations': productDurations == null ? [] : List<dynamic>.from(productDurations!.map((x) => x.toJson())),
+    'product_durations': productDurations == null
+        ? []
+        : List<dynamic>.from(productDurations!.map((x) => x.toJson())),
     'allow_clinic_override': allowClinicOverride,
     'allow_provider_override': allowProviderOverride,
     'online_bookable': onlineBookable,
@@ -47,13 +46,7 @@ class ProductDuration {
   final int? productId;
   final double? perUnitDuration;
 
-  ProductDuration({
-    this.productId,
-    this.perUnitDuration,
-  });
-
-
-
+  ProductDuration({this.productId, this.perUnitDuration});
 
   Map<String, dynamic> toJson() => {
     'product_id': productId,
