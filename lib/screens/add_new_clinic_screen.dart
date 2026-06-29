@@ -446,7 +446,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                             child: BuildTextField(
                               label: 'Owner Name',
                               controller: _ownerNameController,
-                              hintText: 'e.g. Waleed Ahmed',
+                              hintText: 'e.g. Dr Albert',
                               validator: Validators.empty,
                             ),
                           ),

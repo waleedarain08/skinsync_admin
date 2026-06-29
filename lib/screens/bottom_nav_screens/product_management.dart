@@ -589,15 +589,18 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   Widget _statusCell(ProductModel p, WidgetRef ref) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: StatusToggleSwitch(
-        height: 40,
-        width: 100,
-        status: p.status,
-        onChanged: (newStatus) {
-          ref
-              .read(productViewModelProvider.notifier)
-              .updateProductStatus(p.id!, newStatus);
-        },
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: StatusToggleSwitch(
+          height: 40,
+          width: 100,
+          status: p.status,
+          onChanged: (newStatus) {
+            ref
+                .read(productViewModelProvider.notifier)
+                .updateProductStatus(p.id!, newStatus);
+          },
+        ),
       ),
     );
   }
