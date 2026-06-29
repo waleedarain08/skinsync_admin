@@ -640,7 +640,8 @@ class _ManageTreatmentDataScreenState
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.categories.length,
-            separatorBuilder: (context, index) => context.verticalSpace(16),
+            separatorBuilder: (context, index) =>
+                SizedBox(height: context.h(16)),
             itemBuilder: (context, index) {
               return _RecursiveCategoryTile(
                 category: state.categories[index],
@@ -1158,10 +1159,13 @@ class _RecursiveCategoryTile extends StatelessWidget {
         ),
         children: category.subCategories
             .map(
-              (child) => _RecursiveCategoryTile(
-                category: child,
-                viewModel: viewModel,
-                level: level + 1,
+              (child) => Padding(
+                padding: EdgeInsets.only(right: 16.w, bottom: 16.h),
+                child: _RecursiveCategoryTile(
+                  category: child,
+                  viewModel: viewModel,
+                  level: level + 1,
+                ),
               ),
             )
             .toList(),
