@@ -113,7 +113,7 @@ enum TreatmentStatus {
 enum ProductStatus {
   all('All'),
   active('Active'),
-  inactive('InActive');
+  inactive('In Active');
 
   final String name;
 
