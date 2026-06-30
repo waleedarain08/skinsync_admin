@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
-import 'package:skinsync_admin/view_models/category_view_model.dart';
 
 import '../../widgets/app_network_image.dart';
 import '../../widgets/custom_dropdown_widget.dart';
@@ -31,8 +30,6 @@ class TreatmentManagementScreen extends ConsumerStatefulWidget {
 
 class _TreatmentManagementScreenState
     extends ConsumerState<TreatmentManagementScreen> {
-  String _selectedCategoryFilter = 'All Categories';
-  String _selectedSubcategoryFilter = 'All Subcategories';
   String _selectedStatusFilter = 'All Statuses';
 
   @override
@@ -47,21 +44,6 @@ class _TreatmentManagementScreenState
   Widget build(BuildContext context) {
     final state = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
-    final categoryState = ref.watch(categoryViewModelProvider);
-
-    // Parent categories (top-level)
-    final parentCategories = categoryState.categories;
-
-    // Find currently selected parent category if any
-    CategoryModel? selectedParent;
-    if (_selectedCategoryFilter != 'All Categories') {
-      selectedParent = parentCategories
-          .where((c) => c.name == _selectedCategoryFilter)
-          .firstOrNull;
-    }
-
-    // Subcategories of selected parent
-    final subCategories = selectedParent?.subCategories ?? [];
 
     // Filter treatments dynamically based on inline filters
     final filteredTreatments = state.treatments.where((t) {
@@ -72,34 +54,13 @@ class _TreatmentManagementScreenState
           (t.description?.toLowerCase().contains(query) ?? false) ||
           (t.shortDescription?.toLowerCase().contains(query) ?? false);
 
-      final matchesCategory =
-          _selectedCategoryFilter == 'All Categories' ||
-          t.categoryPath == null ||
-          (t.categoryPath?.toLowerCase().contains(
-                _selectedCategoryFilter.toLowerCase(),
-              ) ??
-              false) ||
-          (t.categoryName?.toLowerCase() ==
-              _selectedCategoryFilter.toLowerCase());
-
-      final matchesSubcategory =
-          _selectedSubcategoryFilter == 'All Subcategories' ||
-          t.categoryPath == null ||
-          (t.categoryPath?.toLowerCase().contains(
-                _selectedSubcategoryFilter.toLowerCase(),
-              ) ??
-              false);
-
       final matchesStatus =
           _selectedStatusFilter == 'All Statuses' ||
           (_selectedStatusFilter == 'Active' && t.status.toLowerCase() == 'active') ||
           (_selectedStatusFilter == 'Inactive' && (t.status.toLowerCase() == 'deactive' || t.status.toLowerCase() == 'inactive')) ||
           (_selectedStatusFilter == 'Draft' && t.status.toLowerCase() == 'draft');
 
-      return matchesQuery &&
-          matchesCategory &&
-          matchesSubcategory &&
-          matchesStatus;
+      return matchesQuery && matchesStatus;
     }).toList();
 
     return GradientScaffold(
@@ -112,7 +73,7 @@ class _TreatmentManagementScreenState
             context.verticalSpace(32),
             _buildQuickInsights(state),
             context.verticalSpace(32),
-            _buildFilters(viewModel, parentCategories, subCategories),
+            _buildFilters(viewModel),
             context.verticalSpace(24),
             _buildTreatmentTable(filteredTreatments, viewModel),
             if (state.totalPages > 1)
@@ -266,8 +227,6 @@ class _TreatmentManagementScreenState
 
   Widget _buildFilters(
     TreatmentViewModel viewModel,
-    List<CategoryModel> parentCategories,
-    List<CategoryModel> subCategories,
   ) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 16),
@@ -288,42 +247,6 @@ class _TreatmentManagementScreenState
             ),
           ),
           context.horizontalSpace(16),
-          Expanded(
-            child: CustomDropdown<String>(
-              label: 'Category',
-              hintText: 'All Categories',
-              value: _selectedCategoryFilter,
-              items: [
-                'All Categories',
-                ...parentCategories.map((c) => c.name),
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (val) {
-                setState(() {
-                  _selectedCategoryFilter = val ?? 'All Categories';
-                  _selectedSubcategoryFilter =
-                      'All Subcategories'; // Reset subcategory when parent changes
-                });
-              },
-            ),
-          ),
-          context.horizontalSpace(12),
-          Expanded(
-            child: CustomDropdown<String>(
-              label: 'Subcategory',
-              hintText: 'All Subcategories',
-              value: _selectedSubcategoryFilter,
-              items: [
-                'All Subcategories',
-                ...subCategories.map((c) => c.name),
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (val) {
-                setState(() {
-                  _selectedSubcategoryFilter = val ?? 'All Subcategories';
-                });
-              },
-            ),
-          ),
-          context.horizontalSpace(12),
           Expanded(
             child: CustomDropdown<String>(
               label: 'Status',
@@ -598,8 +521,6 @@ class _TreatmentManagementScreenState
                   onTap: () {
                     viewModel.searchController.clear();
                     setState(() {
-                      _selectedCategoryFilter = 'All Categories';
-                      _selectedSubcategoryFilter = 'All Subcategories';
                       _selectedStatusFilter = 'All Statuses';
                     });
                   },
