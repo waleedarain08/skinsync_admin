@@ -38,11 +38,13 @@ class TreatmentServices implements TreatmentRepository {
     int limit = 10,
     String search = '',
     int? categoryId,
+    TreatmentStatus? status,
   }) async {
     final Map<String, String> params = {
       'page': page.toString(),
       'limit': limit.toString(),
       'search': search,
+      'status':  status == null || status == TreatmentStatus.all ? '' : status.name.toLowerCase()
     };
     if (categoryId != null) {
       params['category_id'] = categoryId.toString();

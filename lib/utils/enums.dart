@@ -102,12 +102,12 @@ enum CreateTreatmentSteps {
 enum TreatmentStatus {
   all('All'),
   active('Active'),
-  inactive('InActive'),
-  darft('Draft');
+  inactive('In Active'),
+  draft('Draft');
 
-  final String name;
+  final String label;
 
-  const TreatmentStatus(this.name);
+  const TreatmentStatus(this.label);
 }
 
 enum ProductStatus {
@@ -115,9 +115,9 @@ enum ProductStatus {
   active('Active'),
   inactive('In Active');
 
-  final String name;
+  final String label;
 
-  const ProductStatus(this.name);
+  const ProductStatus(this.label);
 }
 
 // enum UsageType {

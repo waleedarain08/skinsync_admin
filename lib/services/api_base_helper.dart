@@ -57,7 +57,7 @@ class ApiBaseHelper {
       final uri = Uri.parse(
         '${baseUrl.url}$urlPath',
       ).replace(queryParameters: queryParams);
-      // log('URL: $uri');
+       log('URL: $uri');
       final headers = await _headers();
       // log('HEADERS: $headers');
       final response = await _client.get(uri, headers: headers);

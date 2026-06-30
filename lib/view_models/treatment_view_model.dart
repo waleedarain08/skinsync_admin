@@ -24,6 +24,7 @@ import 'package:skinsync_admin/models/requests/create_treatment_requests/treatme
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 
 import '../models/notification_entry.dart';
 import '../models/requests/create_treatment_requests/basic_info_request.dart';
@@ -179,8 +180,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     String search = '',
     int limit = 10,
     int? categoryId,
+    TreatmentStatus? status,
+    bool showLoading = false,
   }) async {
-    return await runSafely<bool?>(showLoading: false, () async {
+    return await runSafely<bool?>(showLoading: showLoading, () async {
           state = state.copyWith(loading: true, currentPage: page);
           try {
             final response = await _treatmentRepository.getTreatments(
@@ -188,6 +191,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               limit: limit,
               search: search,
               categoryId: categoryId,
+              status: status,
             );
             final list = (response.data ?? []).map((dto) {
               return TreatmentModel(

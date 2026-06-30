@@ -12,6 +12,7 @@ import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 
 import '../models/requests/create_treatment_requests/allowed_provider_role_request.dart';
 import '../models/requests/create_treatment_requests/basic_info_request.dart';
@@ -30,6 +31,7 @@ abstract class TreatmentRepository {
     int limit = 10,
     String search = '',
     int? categoryId,
+    TreatmentStatus? status,
   });
 
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request);

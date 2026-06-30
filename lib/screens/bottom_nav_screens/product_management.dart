@@ -336,7 +336,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   .map(
                     (status) => DropdownMenuItem(
                       value: status,
-                      child: Text(status.name),
+                      child: Text(status.label),
                     ),
                   )
                   .toList(),
