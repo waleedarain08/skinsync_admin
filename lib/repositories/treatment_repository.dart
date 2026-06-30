@@ -29,6 +29,7 @@ abstract class TreatmentRepository {
     int page = 1,
     int limit = 10,
     String search = '',
+    int? categoryId,
   });
 
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request);

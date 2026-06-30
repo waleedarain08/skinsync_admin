@@ -178,6 +178,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     int page = 1,
     String search = '',
     int limit = 10,
+    int? categoryId,
   }) async {
     return await runSafely<bool?>(showLoading: false, () async {
           state = state.copyWith(loading: true, currentPage: page);
@@ -186,6 +187,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               page: page,
               limit: limit,
               search: search,
+              categoryId: categoryId,
             );
             final list = (response.data ?? []).map((dto) {
               return TreatmentModel(

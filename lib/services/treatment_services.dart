@@ -37,14 +37,19 @@ class TreatmentServices implements TreatmentRepository {
     int page = 1,
     int limit = 10,
     String search = '',
+    int? categoryId,
   }) async {
+    final Map<String, String> params = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      'search': search,
+    };
+    if (categoryId != null) {
+      params['category_id'] = categoryId.toString();
+    }
     final jsonResponse = await _api.get(
       Endpoint.adminTreatments,
-      queryParams: {
-        'page': page.toString(),
-        'limit': limit.toString(),
-        'search': search,
-      },
+      queryParams: params,
     );
     final response = TreatmentListResponse.fromJson(jsonResponse);
     if (!response.isSuccess) {

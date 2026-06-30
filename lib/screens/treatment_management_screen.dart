@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
+import 'package:skinsync_admin/view_models/category_view_model.dart';
 
 import '../../widgets/app_network_image.dart';
 import '../../widgets/custom_dropdown_widget.dart';
@@ -31,12 +32,16 @@ class TreatmentManagementScreen extends ConsumerStatefulWidget {
 class _TreatmentManagementScreenState
     extends ConsumerState<TreatmentManagementScreen> {
   String _selectedStatusFilter = 'All Statuses';
+  bool _isCategoryView = false;
+  int? _activeCategoryId;
+  final Map<int?, int?> _expandedChildIdByParentId = {};
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(treatmentViewModelProvider.notifier).initialize();
+      ref.read(categoryViewModelProvider.notifier).fetchCategories();
     });
   }
 
@@ -75,20 +80,27 @@ class _TreatmentManagementScreenState
             context.verticalSpace(32),
             _buildFilters(viewModel),
             context.verticalSpace(24),
-            _buildTreatmentTable(filteredTreatments, viewModel),
-            if (state.totalPages > 1)
-              Padding(
-                padding: context.appEdgeInsets(vertical: 24),
-                child: Center(
-                  child: NumberPaginator(
-                    totalPages: state.totalPages,
-                    currentPage: state.currentPage - 1,
-                    onPageChanged: (pageIndex) {
-                      viewModel.getTreatments(page: pageIndex + 1);
-                    },
+            _isCategoryView
+                ? _buildCategoryViewSection(viewModel, state)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTreatmentTable(filteredTreatments, viewModel),
+                      if (state.totalPages > 1)
+                        Padding(
+                          padding: context.appEdgeInsets(vertical: 24),
+                          child: Center(
+                            child: NumberPaginator(
+                              totalPages: state.totalPages,
+                              currentPage: state.currentPage - 1,
+                              onPageChanged: (pageIndex) {
+                                viewModel.getTreatments(page: pageIndex + 1);
+                              },
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-              ),
           ],
         ),
       ),
@@ -246,6 +258,22 @@ class _TreatmentManagementScreenState
                 viewModel.getTreatments(page: 1, search: '');
               },
             ),
+          ),
+          context.horizontalSpace(16),
+          CustomOutlinedButton(
+            onTap: () {
+              setState(() {
+                _isCategoryView = !_isCategoryView;
+                if (!_isCategoryView) {
+                  _activeCategoryId = null;
+                  ref.read(treatmentViewModelProvider.notifier).getTreatments(page: 1);
+                }
+              });
+            },
+            icon: _isCategoryView ? Icons.table_rows_rounded : Icons.category_rounded,
+            label: _isCategoryView ? 'Table View' : 'Browse by Category',
+            textColor: CustomColors.purple,
+            color: Colors.white,
           ),
           context.horizontalSpace(16),
           Expanded(
@@ -544,6 +572,149 @@ class _TreatmentManagementScreenState
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCategoryViewSection(TreatmentViewModel viewModel, TreatmentState state) {
+    final categoryState = ref.watch(categoryViewModelProvider);
+
+    if (categoryState.loading && categoryState.categories.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 48),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (categoryState.categories.isEmpty) {
+      return BorderdContainerWidget(
+        padding: context.appEdgeInsets(all: 48),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.category_outlined, size: context.sp(48), color: CustomColors.grey),
+              context.verticalSpace(16),
+              Text('No categories found', style: context.fonts.black16w600),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return _buildCategoryTree(categoryState.categories, viewModel, state);
+  }
+
+  Widget _buildCategoryTree(List<CategoryModel> categories, TreatmentViewModel viewModel, TreatmentState state) {
+    return Column(
+      children: categories.map((cat) {
+        final bool isLeaf = cat.subCategories.isEmpty;
+        final bool isExpanded = _expandedChildIdByParentId[cat.parentId] == cat.id;
+
+        return Padding(
+          padding: context.appEdgeInsets(vertical: 4),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(
+                color: isExpanded ? CustomColors.purple.withValues(alpha: 0.3) : CustomColors.border,
+                width: isExpanded ? 1.5 : 1,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: context.appBorderRadius(all: 12),
+              child: ExpansionTile(
+                key: ValueKey('tile_${cat.id}_$isExpanded'),
+                initiallyExpanded: isExpanded,
+                onExpansionChanged: (expanded) {
+                  setState(() {
+                    if (expanded) {
+                      _expandedChildIdByParentId[cat.parentId] = cat.id;
+                      if (isLeaf) {
+                        _activeCategoryId = cat.id;
+                        ref.read(treatmentViewModelProvider.notifier).getTreatments(
+                              page: 1,
+                              categoryId: cat.id,
+                            );
+                      }
+                    } else {
+                      if (_expandedChildIdByParentId[cat.parentId] == cat.id) {
+                        _expandedChildIdByParentId[cat.parentId] = null;
+                      }
+                      if (isLeaf && _activeCategoryId == cat.id) {
+                        _activeCategoryId = null;
+                      }
+                    }
+                  });
+                },
+                leading: Container(
+                  width: context.w(36),
+                  height: context.w(36),
+                  decoration: BoxDecoration(
+                    color: CustomColors.whiteGrey,
+                    borderRadius: context.appBorderRadius(all: 6),
+                  ),
+                  child: cat.icon.isNotEmpty
+                      ? AppNetworkImage(
+                          imageUrl: cat.icon,
+                          width: context.w(36),
+                          height: context.w(36),
+                          borderRadius: context.appBorderRadius(all: 6),
+                        )
+                      : Icon(
+                          Icons.folder_outlined,
+                          color: CustomColors.purple,
+                          size: context.sp(18),
+                        ),
+                ),
+                title: Text(
+                  cat.name,
+                  style: context.fonts.black14w600.copyWith(
+                    color: isExpanded ? CustomColors.purple : CustomColors.black,
+                  ),
+                ),
+                childrenPadding: context.appEdgeInsets(horizontal: 16, vertical: 12),
+                backgroundColor: Colors.transparent,
+                collapsedBackgroundColor: Colors.transparent,
+                shape: const Border(),
+                collapsedShape: const Border(),
+                children: [
+                  if (!isLeaf)
+                    _buildCategoryTree(cat.subCategories, viewModel, state)
+                  else ...[
+                    if (state.loading && _activeCategoryId == cat.id)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else ...[
+                      _buildTreatmentTable(state.treatments, viewModel),
+                      if (state.totalPages > 1 && _activeCategoryId == cat.id)
+                        Padding(
+                          padding: context.appEdgeInsets(vertical: 24),
+                          child: Center(
+                            child: NumberPaginator(
+                              totalPages: state.totalPages,
+                              currentPage: state.currentPage - 1,
+                              onPageChanged: (pageIndex) {
+                                viewModel.getTreatments(
+                                  page: pageIndex + 1,
+                                  categoryId: cat.id,
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                    ],
+                  ],
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
