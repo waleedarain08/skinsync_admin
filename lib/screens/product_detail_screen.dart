@@ -143,12 +143,12 @@ class ProductDetailScreen extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    context.horizontalSpace(16),
+                    const Spacer(),
                     Consumer(
                       builder: (context, ref, _) {
                         return StatusToggleSwitch(
-                          height: 40,
-                          width: 100,
+                          height: context.h(45),
+                          width: context.w(100),
                           status: product.status,
                           onChanged: (newStatus) {
                             ref

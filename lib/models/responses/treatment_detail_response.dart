@@ -32,6 +32,7 @@ class TreatmentDetailData {
   final int? currentStep;
   final String? status;
   final List<int>? selectedCategoryIds;
+  final List<TreatmentCategoryDetail>? selectedCategories;
   final String? globalSku;
   final String? patientDisplayName;
   final String? image;
@@ -39,6 +40,7 @@ class TreatmentDetailData {
   final String? shortDescription;
   final String? description;
   final List<int>? selectedAreaIds;
+  final List<TreatmentAreaDetail>? selectedAreas;
   final List<TreatmentProductUsage>? productUsages;
   final int? baseDuration;
   final int? prepTime;
@@ -77,6 +79,7 @@ class TreatmentDetailData {
     this.currentStep,
     this.status,
     this.selectedCategoryIds,
+    this.selectedCategories,
     this.globalSku,
     this.patientDisplayName,
     this.image,
@@ -84,6 +87,7 @@ class TreatmentDetailData {
     this.shortDescription,
     this.description,
     this.selectedAreaIds,
+    this.selectedAreas,
     this.productUsages,
     this.baseDuration,
     this.prepTime,
@@ -125,6 +129,11 @@ class TreatmentDetailData {
       status: json['status'] as String?,
       selectedCategoryIds: json['selected_category_ids'] != null
           ? List<int>.from(json['selected_category_ids'])
+          :  null,
+      selectedCategories: json['selected_categories'] != null
+          ? (json['selected_categories'] as List)
+              .map((e) => TreatmentCategoryDetail.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
       globalSku: json['global_sku'] as String?,
       patientDisplayName: json['patient_display_name'] as String?,
@@ -134,6 +143,11 @@ class TreatmentDetailData {
       description: json['description'] as String?,
       selectedAreaIds: json['selected_area_ids'] != null
           ? List<int>.from(json['selected_area_ids'])
+          : null,
+      selectedAreas: json['selected_areas'] != null
+          ? (json['selected_areas'] as List)
+              .map((e) => TreatmentAreaDetail.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
       productUsages: json['product_usages'] != null
           ? (json['product_usages'] as List)
@@ -219,7 +233,9 @@ class TreatmentDetailData {
         'icon': icon,
         'short_description': shortDescription,
         'description': description,
+        'selected_categories': selectedCategories?.map((e) => e.toJson()).toList(),
         'selected_area_ids': selectedAreaIds,
+        'selected_areas': selectedAreas?.map((e) => e.toJson()).toList(),
         'product_usages': productUsages?.map((e) => e.toJson()).toList(),
         'base_duration': baseDuration,
         'prep_time': prepTime,
@@ -258,8 +274,8 @@ class TreatmentDetailData {
     final Map<String, double> mappedUnitPrices = {};
     if (unitPriceOverrides != null) {
       for (final override in unitPriceOverrides!) {
-        if (override.role != null && override.price != null) {
-          mappedUnitPrices[override.role!] = override.price!;
+        if (override.productId != null && override.pricePerUnit != null) {
+          mappedUnitPrices[override.productId!.toString()] = override.pricePerUnit!;
         }
       }
     }
@@ -344,6 +360,7 @@ class TreatmentDetailData {
             notes: u.notes,
             unit: u.unit ?? 'Units',
             perUnitDuration: u.perUnitDuration,
+            subAreaConsumptions: u.subAreaConsumptions,
           )).toList(),
       requirePostTreatmentPhotos: requirePostTreatmentPhotos ?? false,
       requiredPostTreatmentPhotoCount: requiredPostTreatmentPhotoCount ?? 0,
@@ -475,6 +492,7 @@ class TreatmentProductUsage {
   final String? notes;
   final String? unit;
   final double? perUnitDuration;
+  final List<SubAreaConsumption>? subAreaConsumptions;
 
   TreatmentProductUsage({
     this.productId,
@@ -487,6 +505,7 @@ class TreatmentProductUsage {
     this.notes,
     this.unit,
     this.perUnitDuration,
+    this.subAreaConsumptions,
   });
 
   factory TreatmentProductUsage.fromJson(Map<String, dynamic> json) => TreatmentProductUsage(
@@ -500,6 +519,11 @@ class TreatmentProductUsage {
         notes: json['notes'] as String?,
         unit: json['unit'] as String?,
         perUnitDuration: (json['per_unit_duration'] as num?)?.toDouble(),
+        subAreaConsumptions: json['sub_area_consumptions'] != null
+            ? (json['sub_area_consumptions'] as List)
+                .map((e) => SubAreaConsumption.fromJson(e as Map<String, dynamic>))
+                .toList()
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -513,43 +537,48 @@ class TreatmentProductUsage {
         'notes': notes,
         'unit': unit,
         'per_unit_duration': perUnitDuration,
+        if (subAreaConsumptions != null)
+          'sub_area_consumptions': subAreaConsumptions!.map((e) => e.toJson()).toList(),
       };
 }
 
 class TreatmentProductDuration {
   final int? productId;
   final String? productName;
-  final int? duration;
+  final double? perUnitDuration;
 
-  TreatmentProductDuration({this.productId, this.productName, this.duration});
+  TreatmentProductDuration({this.productId, this.productName, this.perUnitDuration});
 
   factory TreatmentProductDuration.fromJson(Map<String, dynamic> json) => TreatmentProductDuration(
         productId: json['product_id'] as int?,
         productName: json['product_name'] as String?,
-        duration: json['duration'] as int?,
+        perUnitDuration: (json['per_unit_duration'] as num?)?.toDouble(),
       );
 
   Map<String, dynamic> toJson() => {
         'product_id': productId,
         'product_name': productName,
-        'duration': duration,
+        'per_unit_duration': perUnitDuration,
       };
 }
 
 class TreatmentUnitPriceOverride {
-  final String? role;
-  final double? price;
+  final int? productId;
+  final String? productName;
+  final double? pricePerUnit;
 
-  TreatmentUnitPriceOverride({this.role, this.price});
+  TreatmentUnitPriceOverride({this.productId, this.productName, this.pricePerUnit});
 
   factory TreatmentUnitPriceOverride.fromJson(Map<String, dynamic> json) => TreatmentUnitPriceOverride(
-        role: json['role'] as String?,
-        price: (json['price'] as num?)?.toDouble(),
+        productId: json['product_id'] as int?,
+        productName: json['product_name'] as String?,
+        pricePerUnit: (json['price_per_unit'] as num?)?.toDouble(),
       );
 
   Map<String, dynamic> toJson() => {
-        'role': role,
-        'price': price,
+        'product_id': productId,
+        'product_name': productName,
+        'price_per_unit': pricePerUnit,
       };
 }
 
@@ -570,5 +599,77 @@ class TreatmentConsentForm {
         'id': id,
         'name': name,
         'url': url,
+      };
+}
+
+class TreatmentCategoryDetail {
+  final int? id;
+  final String? name;
+  final String? icon;
+  final String? image;
+  final String? shortDescription;
+  final String? status;
+
+  TreatmentCategoryDetail({
+    this.id,
+    this.name,
+    this.icon,
+    this.image,
+    this.shortDescription,
+    this.status,
+  });
+
+  factory TreatmentCategoryDetail.fromJson(Map<String, dynamic> json) => TreatmentCategoryDetail(
+        id: json['id'] as int?,
+        name: json['name'] as String?,
+        icon: json['icon'] as String?,
+        image: json['image'] as String?,
+        shortDescription: json['short_description'] as String?,
+        status: json['status'] as String?,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'icon': icon,
+        'image': image,
+        'short_description': shortDescription,
+        'status': status,
+      };
+}
+
+class TreatmentAreaDetail {
+  final int? id;
+  final String? name;
+  final String? globalSku;
+  final String? icon;
+  final String? image;
+  final String? status;
+
+  TreatmentAreaDetail({
+    this.id,
+    this.name,
+    this.globalSku,
+    this.icon,
+    this.image,
+    this.status,
+  });
+
+  factory TreatmentAreaDetail.fromJson(Map<String, dynamic> json) => TreatmentAreaDetail(
+        id: json['id'] as int?,
+        name: json['name'] as String?,
+        globalSku: json['global_sku'] as String?,
+        icon: json['icon'] as String?,
+        image: json['image'] as String?,
+        status: json['status'] as String?,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'global_sku': globalSku,
+        'icon': icon,
+        'image': image,
+        'status': status,
       };
 }

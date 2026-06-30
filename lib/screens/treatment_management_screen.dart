@@ -270,7 +270,7 @@ class _TreatmentManagementScreenState
     List<CategoryModel> subCategories,
   ) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(16.w),
+      padding: context.appEdgeInsets(all: 16),
       child: Row(
         children: [
           Expanded(
@@ -287,7 +287,7 @@ class _TreatmentManagementScreenState
               },
             ),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
           Expanded(
             child: CustomDropdown<String>(
               label: 'Category',
@@ -306,7 +306,7 @@ class _TreatmentManagementScreenState
               },
             ),
           ),
-          SizedBox(width: 12.w),
+          context.horizontalSpace(12),
           Expanded(
             child: CustomDropdown<String>(
               label: 'Subcategory',
@@ -323,7 +323,7 @@ class _TreatmentManagementScreenState
               },
             ),
           ),
-          SizedBox(width: 12.w),
+          context.horizontalSpace(12),
           Expanded(
             child: CustomDropdown<String>(
               label: 'Status',
@@ -358,7 +358,7 @@ class _TreatmentManagementScreenState
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: context.appBorderRadius(all: 12),
         child: Table(
           columnWidths: const {
             0: FlexColumnWidth(4), // Treatment Name / Category
@@ -396,7 +396,7 @@ class _TreatmentManagementScreenState
                     style: context.fonts.black14w600,
                   ),
                   _statusBadgeCell(t, ref),
-                  _actionsCell(t, viewModel),
+                  _actionsCell(t),
                 ],
               );
             }),
@@ -408,7 +408,7 @@ class _TreatmentManagementScreenState
 
   Widget _tableHeaderCell(String label) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Text(
         label,
         style: context.fonts.grey12w600.copyWith(letterSpacing: 1),
@@ -424,30 +424,30 @@ class _TreatmentManagementScreenState
             : null;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
         children: [
           Container(
-            width: 48.w,
-            height: 48.w,
+            width: context.w(48),
+            height: context.w(48),
             decoration: BoxDecoration(
               color: CustomColors.whiteGrey,
-              borderRadius: BorderRadius.circular(8.r),
+              borderRadius: context.appBorderRadius(all: 8),
               border: Border.all(color: CustomColors.border),
             ),
             child: (displayImage != null && displayImage.isNotEmpty)
                 ? AppNetworkImage(
                     imageUrl: displayImage,
-                    width: 48.w,
-                    height: 48.w,
+                    width: context.w(48),
+                    height: context.w(48),
                     fit: BoxFit.cover,
-                    borderRadius: BorderRadius.circular(8.r),
+                    borderRadius: context.appBorderRadius(all: 8),
                   )
                 : const Center(
                     child: Icon(Icons.image_outlined, color: CustomColors.grey),
                   ),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -458,7 +458,7 @@ class _TreatmentManagementScreenState
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 4.h),
+                context.verticalSpace(4),
                 Text(
                   treatment.shortDescription ?? 'General',
                   style: context.fonts.purple12w700,
@@ -475,7 +475,7 @@ class _TreatmentManagementScreenState
 
   Widget _tableTextCell(String text, {required TextStyle style}) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Text(
         text,
         style: style,
@@ -490,23 +490,25 @@ class _TreatmentManagementScreenState
     final String currentStatus = status.toLowerCase() == 'deactive' ? 'Inactive' : status;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: StatusToggleSwitch(
-        height: 40,
-        width: 100,
-        status: currentStatus,
-        onChanged: (newStatus) {
-          if (t.id != null) {
-            ref.read(treatmentViewModelProvider.notifier).updateTreatmentStatus(t.id!, newStatus);
-          }
-        },
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: StatusToggleSwitch(
+          width: context.w(100), height: context.h(45),
+          status: currentStatus,
+          onChanged: (newStatus) {
+            if (t.id != null) {
+              ref.read(treatmentViewModelProvider.notifier).updateTreatmentStatus(t.id!, newStatus);
+            }
+          },
+        ),
       ),
     );
   }
 
-  Widget _actionsCell(TreatmentModel treatment, TreatmentViewModel viewModel) {
+  Widget _actionsCell(TreatmentModel treatment) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
         children: [
           IconButton(
@@ -514,7 +516,7 @@ class _TreatmentManagementScreenState
             icon: Icon(
               Icons.visibility_outlined,
               color: CustomColors.grey,
-              size: 20.sp,
+              size: context.sp(20),
             ),
             onPressed: () async {
               if (treatment.id != null) {
@@ -536,7 +538,7 @@ class _TreatmentManagementScreenState
             icon: Icon(
               Icons.edit_road_rounded,
               color: CustomColors.purple,
-              size: 20.sp,
+              size: context.sp(20),
             ),
             onPressed: () async {
               if (treatment.id != null) {

@@ -71,16 +71,16 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(),
-            SizedBox(height: 32.h),
+            context.verticalSpace(32),
             _buildCatalogOverview(),
-            SizedBox(height: 32.h),
+            context.verticalSpace(32),
             _buildFilters(),
-            SizedBox(height: 24.h),
+            context.verticalSpace(24),
             _buildCatalogTable(paginatedProducts),
             if (state.totalPages >= 1)
               Padding(
@@ -115,7 +115,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Global Product Catalog', style: context.fonts.black32w700),
-            SizedBox(height: 8.h),
+            context.verticalSpace(8),
             Text(
               'Manage platform-wide product definitions and template specifications for clinics.',
               style: context.fonts.grey14w400,
@@ -128,7 +128,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           },
           icon: Icons.add_circle_outline,
           label: 'Create Catalog Product',
-          width: 240.w,
+          width: context.w(240),
         ),
       ],
     );
@@ -155,21 +155,21 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           Icons.inventory_2_outlined,
           CustomColors.purple,
         ),
-        SizedBox(width: 16.w),
+        context.horizontalSpace(16),
         _buildCatalogStat(
           'Published Brands',
           '$totalBrands',
           Icons.workspace_premium_outlined,
           CustomColors.amber,
         ),
-        SizedBox(width: 16.w),
+        context.horizontalSpace(16),
         _buildCatalogStat(
           'Lot Tracking Enabled',
           '$lotTrackingEnabled',
           Icons.pin_outlined,
           CustomColors.green,
         ),
-        SizedBox(width: 16.w),
+        context.horizontalSpace(16),
         _buildCatalogStat(
           'Device Catalog',
           '$devicesCount Devices',
@@ -209,10 +209,10 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   }
                 },
                 label: 'Add',
-                width: 100.w,
+                width: context.w(100),
               ),
             ),
-            SizedBox(height: 10.h),
+            context.verticalSpace(10),
             CustomOutlinedButton(
               onTap: () => Navigator.pop(context),
               label: 'Cancel',
@@ -231,18 +231,18 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   ) {
     return Expanded(
       child: BorderdContainerWidget(
-        padding: EdgeInsets.all(20.w),
+        padding: context.appEdgeInsets(all: 20),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(12.w),
+              padding: context.appEdgeInsets(all: 12),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius: context.appBorderRadius(all: 10),
               ),
-              child: Icon(icon, color: color, size: 24.sp),
+              child: Icon(icon, color: color, size: context.sp(24)),
             ),
-            SizedBox(width: 16.w),
+            context.horizontalSpace(16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,7 +269,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   Widget _buildFilters() {
     final state = ref.watch(productViewModelProvider);
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(16.w),
+      padding: context.appEdgeInsets(all: 16),
       child: Row(
         children: [
           Expanded(
@@ -285,7 +285,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               },
             ),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
           Expanded(
             child: Consumer(
               builder: (context, ref, _) {
@@ -325,7 +325,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               },
             ),
           ),
-          SizedBox(width: 12.w),
+          context.horizontalSpace(12),
           Expanded(
             child: CustomDropdown<ProductStatus>(
               label: 'Product Status',
@@ -360,21 +360,21 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   Widget _buildCatalogTable(List<ProductModel> products) {
     if (products.isEmpty) {
       return BorderdContainerWidget(
-        padding: EdgeInsets.all(40.w),
+        padding: context.appEdgeInsets(all: 40),
         child: Center(
           child: Column(
             children: [
               Icon(
                 Icons.inventory_2_outlined,
                 color: CustomColors.grey,
-                size: 48.sp,
+                size: context.sp(48),
               ),
-              SizedBox(height: 16.h),
+              context.verticalSpace(16),
               Text(
                 'No Matching Products Found',
                 style: context.fonts.black16w600,
               ),
-              SizedBox(height: 4.h),
+              context.verticalSpace(4),
               Text(
                 'Try refining your filters or search keywords.',
                 style: context.fonts.grey14w400,
@@ -388,7 +388,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: context.appBorderRadius(all: 12),
         child: Table(
           columnWidths: const {
             0: FlexColumnWidth(4), // Product & Brand
@@ -446,7 +446,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   Widget _tableHeaderCell(String label) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Text(
         label,
         style: context.fonts.grey12w600.copyWith(letterSpacing: 1),
@@ -458,14 +458,14 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     final displayName = product.name.trim().isEmpty ? 'N/A' : product.name;
     final displayBrand = product.brand == null || product.brand!.trim().isEmpty ? 'N/A' : product.brand!;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
+            borderRadius: context.appBorderRadius(all: 8),
             child: SizedBox(
-              width: 48.w,
-              height: 48.w,
+              width: context.w(48),
+              height: context.w(48),
               child: product.image.isEmpty
                   ? const DecoratedBox(
                       decoration: BoxDecoration(color: CustomColors.whiteGrey),
@@ -474,7 +474,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   : AppNetworkImage(imageUrl: product.image, fit: BoxFit.cover),
             ),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -485,7 +485,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 2.h),
+                context.verticalSpace(2),
                 Text(
                   displayBrand,
                   style: context.fonts.purple12w700,
@@ -500,7 +500,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   Widget _tableTextCell(String text, {required TextStyle style}) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Text(
         text,
         style: style,
@@ -514,22 +514,22 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     final trimmed = purpose.trim();
     if (trimmed.isEmpty) {
       return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+              padding: context.appEdgeInsets(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: CustomColors.grey.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20.r),
+                borderRadius: context.appBorderRadius(all: 20),
                 border: Border.all(color: CustomColors.grey.withValues(alpha: 0.2)),
               ),
               child: Text(
                 'N/A',
                 style: context.fonts.amber10w800ls1.copyWith(
                   color: CustomColors.grey,
-                  fontSize: 10.sp,
+                  fontSize: context.sp(10),
                 ),
               ),
             ),
@@ -560,22 +560,22 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+            padding: context.appEdgeInsets(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: badgeColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20.r),
+              borderRadius: context.appBorderRadius(all: 20),
               border: Border.all(color: badgeColor.withValues(alpha: 0.2)),
             ),
             child: Text(
               label,
               style: context.fonts.amber10w800ls1.copyWith(
                 color: badgeColor,
-                fontSize: 10.sp,
+                fontSize: context.sp(10),
               ),
             ),
           ),
@@ -588,18 +588,16 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   Widget _statusCell(ProductModel p, WidgetRef ref) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Align(
         alignment: Alignment.centerLeft,
         child: StatusToggleSwitch(
-          height: 40,
-          width: 100,
           status: p.status,
           onChanged: (newStatus) {
             ref
                 .read(productViewModelProvider.notifier)
                 .updateProductStatus(p.id!, newStatus);
-          },
+          }, width: context.w(100), height: context.h(45),
         ),
       ),
     );
@@ -607,7 +605,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   Widget _actionsCell(ProductModel product) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
         children: [
           IconButton(
@@ -615,7 +613,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             icon: Icon(
               Icons.visibility_outlined,
               color: CustomColors.grey,
-              size: 20.sp,
+              size: context.sp(20),
             ),
             onPressed: () async {
               if (product.id != null) {
@@ -637,7 +635,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             icon: Icon(
               Icons.edit_road_rounded,
               color: CustomColors.purple,
-              size: 20.sp,
+              size: context.sp(20),
             ),
             onPressed: () async {
               if (product.id != null) {
@@ -665,7 +663,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             icon: Icon(
               Icons.archive_outlined,
               color: CustomColors.red,
-              size: 20.sp,
+              size: context.sp(20),
             ),
             onPressed: () {
               if (product.id != null) {

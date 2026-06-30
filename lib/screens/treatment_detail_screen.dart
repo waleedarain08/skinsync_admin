@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/treatment_model.dart';
+import '../models/responses/treatment_detail_response.dart';
 import '../utils/theme.dart';
 import '../view_models/treatment_view_model.dart';
 import '../widgets/borderd_container_widget.dart';
@@ -19,6 +20,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(treatmentViewModelProvider);
     final treatment = state.selectedTreatment;
+    final detail = state.selectedTreatmentDetail;
 
     if (treatment == null) {
       return Scaffold(
@@ -64,7 +66,9 @@ class TreatmentDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildProfileHeader(context, treatment),
+                _buildProfileHeader(context, treatment, detail),
+                context.verticalSpace(32),
+                _buildSelectedCategories(context, detail),
                 context.verticalSpace(32),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,24 +90,30 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 context.verticalSpace(32),
                 _buildConsentSection(context, treatment),
                 context.verticalSpace(32),
-                _buildDowntimeSection(context, treatment),
+                _buildDowntimeSection(context, treatment, detail),
                 context.verticalSpace(32),
                 _buildRolesSection(context, treatment),
                 context.verticalSpace(32),
-                _buildAreasAndLogic(context, treatment),
+                _buildAreasAndLogic(context, treatment, detail),
                 context.verticalSpace(32),
-                _buildProtocolsSection(context, treatment),
+                _buildProtocolsSection(context, treatment, detail),
                 context.verticalSpace(32),
-                _buildSchedulingSection(context, treatment),
+                _buildSchedulingSection(context, treatment, detail),
                 if (treatment.productUsages != null &&
                     treatment.productUsages!.isNotEmpty) ...[
                   context.verticalSpace(32),
                   _buildProductUsages(context, treatment),
                 ],
                 context.verticalSpace(32),
-                _buildPricingSection(context, treatment),
+                _buildPricingSection(context, treatment, detail),
+                context.verticalSpace(32),
+                _buildBookingRulesSection(context, detail),
+                context.verticalSpace(32),
+                _buildProgressPhotosSection(context, detail),
                 context.verticalSpace(32),
                 _buildBusinessLogicSection(context, treatment),
+                context.verticalSpace(32),
+                _buildAuditFooter(context, detail),
                 context.verticalSpace(48),
               ],
             ),
@@ -113,7 +123,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, TreatmentModel treatment) {
+  Widget _buildProfileHeader(BuildContext context, TreatmentModel treatment, TreatmentDetailData? detail) {
     double productDuration = 0.0;
     if (treatment.productUsages != null) {
       for (final usage in treatment.productUsages!) {
@@ -157,11 +167,21 @@ class TreatmentDetailScreen extends ConsumerWidget {
               children: [
                 Row(
                   children: [
+                    if (treatment.icon != null && treatment.icon!.isNotEmpty) ...[
+                      AppNetworkImage(
+                        imageUrl: treatment.icon!,
+                        width: 32,
+                        height: 32,
+                        borderRadius: BorderRadius.circular(16),
+                        fit: BoxFit.cover,
+                      ),
+                      context.horizontalSpace(12),
+                    ],
                     Text(
                       treatment.name ?? 'N/A',
                       style: context.fonts.black26w700,
                     ),
-                    context.horizontalSpace(16),
+                    const Spacer(),
                     Consumer(
                       builder: (context, ref, _) {
                         final String currentStatus =
@@ -169,8 +189,8 @@ class TreatmentDetailScreen extends ConsumerWidget {
                             ? 'Inactive'
                             : treatment.status;
                         return StatusToggleSwitch(
-                          height: 40,
-                          width: 100,
+                          height: context.h(45),
+                          width: context.w(100),
                           status: currentStatus,
                           onChanged: (newStatus) {
                             if (treatment.id != null) {
@@ -651,16 +671,9 @@ class TreatmentDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDowntimeSection(BuildContext context, TreatmentModel treatment) {
+  Widget _buildDowntimeSection(BuildContext context, TreatmentModel treatment, TreatmentDetailData? detail) {
     final level = treatment.downtimeLevel;
-    int days = 0;
-    if (level == 'Low') {
-      days = 2;
-    } else if (level == 'Moderate') {
-      days = 5;
-    } else if (level == 'High') {
-      days = 10;
-    }
+    final days = detail?.downtimeDays ?? 0;
 
     return CollapsibleSection(
       title: 'Treatment Downtime Level',
@@ -751,13 +764,64 @@ class TreatmentDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAreasAndLogic(BuildContext context, TreatmentModel treatment) {
+  Widget _buildAreasAndLogic(BuildContext context, TreatmentModel treatment, TreatmentDetailData? detail) {
+    final selectedAreas = detail?.selectedAreas ?? [];
+    final sideAreas = treatment.sideAreas ?? [];
+
     return CollapsibleSection(
       title: 'Target Areas & Sub-Area Logic',
       icon: Icons.location_on_outlined,
-      content: treatment.sideAreas == null || treatment.sideAreas!.isEmpty
-          ? const Text('No specific area logic defined.')
-          : GridView.builder(
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (selectedAreas.isNotEmpty) ...[
+            Text('Selected Target Areas:', style: context.fonts.purple14w700),
+            context.verticalSpace(12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: selectedAreas.map((area) {
+                return Container(
+                  padding: context.appEdgeInsets(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: CustomColors.palePurple,
+                    borderRadius: context.appBorderRadius(all: 6),
+                    border: Border.all(color: CustomColors.purple.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (area.icon != null && area.icon!.isNotEmpty) ...[
+                        AppNetworkImage(
+                          imageUrl: area.icon!,
+                          width: 18,
+                          height: 18,
+                          fit: BoxFit.contain,
+                        ),
+                        context.horizontalSpace(8),
+                      ] else ...[
+                        const Icon(Icons.location_on_outlined, color: CustomColors.purple, size: 16),
+                        context.horizontalSpace(8),
+                      ],
+                      Text(
+                        "${area.name ?? 'N/A'} (${area.globalSku ?? 'N/A'})",
+                        style: context.fonts.black12w600,
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+            context.verticalSpace(24),
+            const Divider(),
+            context.verticalSpace(16),
+          ],
+          if (sideAreas == null || sideAreas.isEmpty)
+            const Text('No specific area logic defined.')
+          else ...[
+            Text('Sub-Area Config:', style: context.fonts.black13w600),
+            context.verticalSpace(12),
+            GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -766,12 +830,15 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 mainAxisSpacing: 24,
                 childAspectRatio: 2.2,
               ),
-              itemCount: treatment.sideAreas!.length,
+              itemCount: sideAreas.length,
               itemBuilder: (context, index) {
-                final area = treatment.sideAreas![index];
+                final area = sideAreas[index];
                 return _buildAreaCard(context, area);
               },
             ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -959,7 +1026,9 @@ class TreatmentDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPricingSection(BuildContext context, TreatmentModel treatment) {
+  Widget _buildPricingSection(BuildContext context, TreatmentModel treatment, TreatmentDetailData? detail) {
+    final priceOverrides = detail?.unitPriceOverrides ?? [];
+
     return CollapsibleSection(
       title: 'Treatment Pricing Information',
       icon: Icons.monetization_on_outlined,
@@ -971,22 +1040,24 @@ class TreatmentDetailScreen extends ConsumerWidget {
             'Base Treatment Price',
             "\$${treatment.basePrice?.toStringAsFixed(2) ?? '0.00'}",
           ),
-          if (treatment.unitPrices != null &&
-              treatment.unitPrices!.isNotEmpty) ...[
+          if (priceOverrides.isNotEmpty) ...[
             context.verticalSpace(16),
             const Divider(),
             context.verticalSpace(12),
-            Text('Unit Price Overrides:', style: context.fonts.black13w600),
+            Text('Product Unit Price Overrides:', style: context.fonts.black13w600),
             context.verticalSpace(8),
-            ...treatment.unitPrices!.entries.map(
-              (e) => Padding(
-                padding: const EdgeInsets.only(bottom: 4.0),
+            ...priceOverrides.map(
+              (override) => Padding(
+                padding: const EdgeInsets.only(bottom: 6.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(e.key.toUpperCase(), style: context.fonts.black12w400),
                     Text(
-                      '\$${e.value.toStringAsFixed(2)}',
+                      override.productName ?? 'Product Override',
+                      style: context.fonts.black12w400,
+                    ),
+                    Text(
+                      '\$${override.pricePerUnit?.toStringAsFixed(2) ?? "0.00"} / unit',
                       style: context.fonts.black12w600,
                     ),
                   ],
@@ -1070,6 +1141,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
   Widget _buildSchedulingSection(
     BuildContext context,
     TreatmentModel treatment,
+    TreatmentDetailData? detail,
   ) {
     final int baseMin =
         (treatment.baseDurationHours ?? 0) * 60 +
@@ -1077,6 +1149,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
 
     double productDuration = 0.0;
     final List<Widget> productDurationRows = [];
+    final pDurations = detail?.productDurations ?? [];
 
     if (treatment.productUsages != null) {
       for (final usage in treatment.productUsages!) {
@@ -1147,6 +1220,23 @@ class TreatmentDetailScreen extends ConsumerWidget {
               Text('$baseMin Minutes', style: context.fonts.black14w700),
             ],
           ),
+          if (pDurations.isNotEmpty) ...[
+            context.verticalSpace(16),
+            const Divider(),
+            context.verticalSpace(12),
+            Text('Product Setup Durations', style: context.fonts.purple12w700),
+            context.verticalSpace(8),
+            ...pDurations.map((pd) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('• ${pd.productName ?? 'Product'}', style: context.fonts.black13w500),
+                      Text('${pd.perUnitDuration?.toStringAsFixed(1) ?? '0.0'} Min / Unit', style: context.fonts.grey13w500),
+                    ],
+                  ),
+                )),
+          ],
           if (productDurationRows.isNotEmpty) ...[
             context.verticalSpace(16),
             const Divider(),
@@ -1197,13 +1287,52 @@ class TreatmentDetailScreen extends ConsumerWidget {
   Widget _buildProtocolsSection(
     BuildContext context,
     TreatmentModel treatment,
+    TreatmentDetailData? detail,
   ) {
     final List<TreatmentProtocolNote> notes = treatment.protocolNotes ?? [];
     final List<TreatmentProtocolNoteItem> standalone =
         treatment.standaloneNotes ?? [];
+    final pdf = detail?.clinicalProtocolPdf;
 
     return Column(
       children: [
+        if (pdf != null && pdf.url != null) ...[
+          CollapsibleSection(
+            title: 'Clinical Protocol PDF Form',
+            icon: Icons.picture_as_pdf_rounded,
+            content: Container(
+              padding: context.appEdgeInsets(all: 16),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.05),
+                borderRadius: context.appBorderRadius(all: 10),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.15)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.picture_as_pdf_rounded, color: Colors.red, size: 36),
+                  context.horizontalSpace(16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          pdf.name ?? 'Clinical Protocol PDF',
+                          style: context.fonts.black14w600,
+                        ),
+                        context.verticalSpace(4),
+                        Text(
+                          'Authorized template form for procedure protocols.',
+                          style: context.fonts.grey12w400,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          context.verticalSpace(32),
+        ],
         CollapsibleSection(
           title: 'Clinical Protocols & Patient Guidance',
           icon: Icons.assignment_turned_in_outlined,
@@ -1346,6 +1475,180 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSelectedCategories(BuildContext context, TreatmentDetailData? detail) {
+    final categories = detail?.selectedCategories ?? [];
+    if (categories.isEmpty) return const SizedBox.shrink();
+
+    return CollapsibleSection(
+      title: 'Assigned Laser Categories',
+      icon: Icons.category_outlined,
+      content: Wrap(
+        spacing: 16,
+        runSpacing: 16,
+        children: categories.map((cat) {
+          return Container(
+            width: context.w(220),
+            padding: context.appEdgeInsets(all: 12),
+            decoration: BoxDecoration(
+              color: CustomColors.palePurple.withValues(alpha: 0.1),
+              borderRadius: context.appBorderRadius(all: 10),
+              border: Border.all(color: CustomColors.purple.withValues(alpha: 0.15)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.stars_rounded, color: CustomColors.purple, size: 24),
+                context.horizontalSpace(12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        cat.name ?? 'Category',
+                        style: context.fonts.black13w600,
+                      ),
+                      context.verticalSpace(2),
+                      Text(
+                        'Status: ${cat.status ?? "Active"}',
+                        style: context.fonts.grey11w400,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildBookingRulesSection(BuildContext context, TreatmentDetailData? detail) {
+    if (detail == null) return const SizedBox.shrink();
+
+    return CollapsibleSection(
+      title: 'Clinic Settings & Booking Rules',
+      icon: Icons.calendar_month_outlined,
+      content: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Allow Clinic Override Config', style: context.fonts.black13w600),
+              Text(
+                detail.allowClinicOverride == true ? 'Allowed (YES)' : 'Disallowed (NO)',
+                style: detail.allowClinicOverride == true ? context.fonts.green14w600 : context.fonts.grey14w400,
+              ),
+            ],
+          ),
+          context.verticalSpace(12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Allow Provider Customization', style: context.fonts.black13w600),
+              Text(
+                detail.allowProviderOverride == true ? 'Allowed (YES)' : 'Disallowed (NO)',
+                style: detail.allowProviderOverride == true ? context.fonts.green14w600 : context.fonts.grey14w400,
+              ),
+            ],
+          ),
+          context.verticalSpace(12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Online Bookable on App', style: context.fonts.black13w600),
+              Text(
+                detail.onlineBookable == true ? 'Enabled (YES)' : 'Disabled (NO)',
+                style: detail.onlineBookable == true ? context.fonts.purple12w700 : context.fonts.grey14w400,
+              ),
+            ],
+          ),
+          context.verticalSpace(12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Requires Manual Approval', style: context.fonts.black13w600),
+              Text(
+                detail.manualApprovalRequired == true ? 'Yes (Required)' : 'No (Instant Book)',
+                style: detail.manualApprovalRequired == true ? context.fonts.green14w600 : context.fonts.grey14w400,
+              ),
+            ],
+          ),
+          context.verticalSpace(12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Minimum Booking Notice Time', style: context.fonts.black13w600),
+              Text('${detail.minimumBookingNotice ?? 24} Hours', style: context.fonts.black13w600),
+            ],
+          ),
+          context.verticalSpace(12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Maximum Lead Booking Days', style: context.fonts.black13w600),
+              Text('${detail.maximumDaysInAdvance ?? 90} Days', style: context.fonts.black13w600),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressPhotosSection(BuildContext context, TreatmentDetailData? detail) {
+    if (detail == null) return const SizedBox.shrink();
+
+    return CollapsibleSection(
+      title: 'Progress Photos Setup',
+      icon: Icons.camera_alt_outlined,
+      content: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Require Post-Treatment Photos', style: context.fonts.black13w600),
+              Text(
+                detail.requirePostTreatmentPhotos == true ? 'Required (YES)' : 'Optional (NO)',
+                style: detail.requirePostTreatmentPhotos == true ? context.fonts.green14w600 : context.fonts.grey14w400,
+              ),
+            ],
+          ),
+          if (detail.requirePostTreatmentPhotos == true) ...[
+            context.verticalSpace(12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Required Photo Upload Count', style: context.fonts.black13w600),
+                Text('${detail.requiredPostTreatmentPhotoCount ?? 0} Photos', style: context.fonts.black13w600),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAuditFooter(BuildContext context, TreatmentDetailData? detail) {
+    if (detail == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 32),
+      child: Center(
+        child: Column(
+          children: [
+            Text(
+              'Template Created At: ${detail.createdAt ?? "N/A"}',
+              style: context.fonts.grey11w400,
+            ),
+            context.verticalSpace(4),
+            Text(
+              'Last Updated At: ${detail.updatedAt ?? "N/A"}',
+              style: context.fonts.grey11w400,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

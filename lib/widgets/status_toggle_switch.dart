@@ -5,15 +5,15 @@ import 'package:skinsync_admin/utils/theme.dart';
 class StatusToggleSwitch extends StatelessWidget {
   final String? status;
   final void Function(String newStatus) onChanged;
-  final double? width;
-  final double? height;
+  final double width;
+  final double height;
 
   const StatusToggleSwitch({
     super.key,
     this.status,
     required this.onChanged,
-    this.width,
-    this.height,
+    required this.width,
+    required this.height,
   });
 
   @override
@@ -44,63 +44,50 @@ class StatusToggleSwitch extends StatelessWidget {
       );
     }
 
-    // Responsive sizing: clamp between sensible min/max values
-    // so it never stretches to fill a parent but still adapts to screen size.
-    final double screenW = MediaQuery.sizeOf(context).width;
-    final double screenH = MediaQuery.sizeOf(context).height;
-
-    final double computedWidth = width ??
-        (screenW * 0.12).clamp(90.0, 130.0); // e.g. 90–130px across screens
-    final double computedHeight = height ??
-        (screenH * 0.04).clamp(28.0, 38.0); // e.g. 28–38px across screens
-
-    final double iconSpacing = computedWidth * 0.28;
-
-    return UnconstrainedBox( // 👈 prevents the widget from inheriting parent constraints
-      child: SizedBox(
-        width: computedWidth,
-        height: computedHeight,
-        child: AnimatedToggleSwitch<bool>.dual(
-          current: isActive,
-          first: false,
-          second: true,
-          onChanged: (val) => onChanged(val ? 'Active' : 'Inactive'),
-          styleBuilder: (val) => ToggleStyle(
-            indicatorColor: val ? CustomColors.green : CustomColors.red,
-            backgroundColor: val
-                ? CustomColors.green.withValues(alpha: 0.1)
-                : CustomColors.red.withValues(alpha: 0.1),
-            borderColor: val
-                ? CustomColors.green.withValues(alpha: 0.3)
-                : CustomColors.red.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          spacing: iconSpacing,
-          iconBuilder: (val) => val
-              ? const Icon(Icons.check_rounded, color: Colors.white, size: 12)
-              : const Icon(Icons.close_rounded, color: Colors.white, size: 12),
-          textBuilder: (val) => val
-              ? Center(
-                  child: Text(
-                    'Active',
-                    style: TextStyle(
-                      color: CustomColors.green,
-                      fontSize: context.sp(10),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                )
-              : Center(
-                  child: Text(
-                    'Inactive',
-                    style: TextStyle(
-                      color: CustomColors.red,
-                      fontSize: context.sp(10),
-                      fontWeight: FontWeight.bold,
-                    ),
+    return SizedBox(
+      width: width,
+      child: AnimatedToggleSwitch<bool>.dual(
+        height: height,
+        spacing: context.sp(10),
+        indicatorSize: Size.fromWidth(height),
+        current: isActive,
+        first: false,
+        second: true,
+        onChanged: (val) => onChanged(val ? 'Active' : 'Inactive'),
+        styleBuilder: (val) => ToggleStyle(
+          indicatorColor: val ? CustomColors.green : CustomColors.red,
+          backgroundColor: val
+              ? CustomColors.green.withValues(alpha: 0.1)
+              : CustomColors.red.withValues(alpha: 0.1),
+          borderColor: val
+              ? CustomColors.green.withValues(alpha: 0.3)
+              : CustomColors.red.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        iconBuilder: (val) => val
+            ? Icon(Icons.check_rounded, color: Colors.white, size: context.sp(12))
+            : Icon(Icons.close_rounded, color: Colors.white, size: context.sp(12)),
+        textBuilder: (val) => val
+            ? Center(
+                child: Text(
+                  'Active',
+                  style: TextStyle(
+                    color: CustomColors.green,
+                    fontSize: context.sp(10),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-        ),
+              )
+            : Center(
+                child: Text(
+                  'Inactive',
+                  style: TextStyle(
+                    color: CustomColors.red,
+                    fontSize: context.sp(10),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
       ),
     );
   }
