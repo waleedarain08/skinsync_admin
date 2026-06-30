@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/utils/enums.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
+import 'package:skinsync_admin/widgets/select_or_create_dropdown_widget.dart';
 
 import '../../models/product_model.dart';
 import '../../utils/theme.dart';
@@ -13,7 +17,8 @@ import '../../widgets/gradient_scaffold.dart';
 import '../../widgets/number_paginator.dart';
 import '../create_product_screen.dart';
 import '../product_detail_screen.dart';
-import '../../widgets/custom_cashed_image_widget.dart';
+import '../../widgets/app_network_image.dart';
+import '../../widgets/status_toggle_switch.dart';
 
 class ProductManagement extends ConsumerStatefulWidget {
   const ProductManagement({super.key});
@@ -26,7 +31,8 @@ class ProductManagement extends ConsumerStatefulWidget {
 class _ProductManagementState extends ConsumerState<ProductManagement> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedPurposeFilter = 'All Purposes';
-  String _selectedTrackingFilter = 'All Statuses';
+  ProductStatus _selectedStatus = ProductStatus.all;
+  String? _selectedPurpose;
 
   @override
   void initState() {
@@ -58,34 +64,23 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           (p.brand?.toLowerCase().contains(query) ?? false) ||
           (p.globalSku?.toLowerCase().contains(query) ?? false);
 
-      final matchesPurpose =
-          _selectedPurposeFilter == 'All Purposes' ||
-          p.productPurpose == _selectedPurposeFilter.toLowerCase();
-
-      final matchesTracking =
-          _selectedTrackingFilter == 'All Statuses' ||
-          (_selectedTrackingFilter == 'Tracking Enabled' &&
-              (p.enforceLotTracking ?? false)) ||
-          (_selectedTrackingFilter == 'Tracking Disabled' &&
-              !(p.enforceLotTracking ?? false));
-
-      return matchesQuery && matchesPurpose && matchesTracking;
+      return matchesQuery;
     }).toList();
 
     final paginatedProducts = filteredProducts;
 
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(),
-            SizedBox(height: 32.h),
+            context.verticalSpace(32),
             _buildCatalogOverview(),
-            SizedBox(height: 32.h),
+            context.verticalSpace(32),
             _buildFilters(),
-            SizedBox(height: 24.h),
+            context.verticalSpace(24),
             _buildCatalogTable(paginatedProducts),
             if (state.totalPages >= 1)
               Padding(
@@ -120,7 +115,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Global Product Catalog', style: context.fonts.black32w700),
-            SizedBox(height: 8.h),
+            context.verticalSpace(8),
             Text(
               'Manage platform-wide product definitions and template specifications for clinics.',
               style: context.fonts.grey14w400,
@@ -133,7 +128,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           },
           icon: Icons.add_circle_outline,
           label: 'Create Catalog Product',
-          width: 240.w,
+          width: context.w(240),
         ),
       ],
     );
@@ -160,21 +155,21 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           Icons.inventory_2_outlined,
           CustomColors.purple,
         ),
-        SizedBox(width: 16.w),
+        context.horizontalSpace(16),
         _buildCatalogStat(
           'Published Brands',
           '$totalBrands',
           Icons.workspace_premium_outlined,
           CustomColors.amber,
         ),
-        SizedBox(width: 16.w),
+        context.horizontalSpace(16),
         _buildCatalogStat(
           'Lot Tracking Enabled',
           '$lotTrackingEnabled',
           Icons.pin_outlined,
           CustomColors.green,
         ),
-        SizedBox(width: 16.w),
+        context.horizontalSpace(16),
         _buildCatalogStat(
           'Device Catalog',
           '$devicesCount Devices',
@@ -182,6 +177,49 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           CustomColors.black,
         ),
       ],
+    );
+  }
+
+  void _showCreateMasterItemDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String title,
+    void Function(String name) onAdd,
+  ) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Create New $title', style: context.fonts.black18w600),
+          content: BuildTextField(
+            label: 'Name',
+            controller: controller,
+            hintText: 'Enter name...',
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: CustomPrimaryButton(
+                onTap: () {
+                  final name = controller.text.trim();
+                  if (name.isNotEmpty) {
+                    onAdd(name);
+                    Navigator.pop(context);
+                  }
+                },
+                label: 'Add',
+                width: context.w(100),
+              ),
+            ),
+            context.verticalSpace(10),
+            CustomOutlinedButton(
+              onTap: () => Navigator.pop(context),
+              label: 'Cancel',
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -193,18 +231,18 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   ) {
     return Expanded(
       child: BorderdContainerWidget(
-        padding: EdgeInsets.all(20.w),
+        padding: context.appEdgeInsets(all: 20),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(12.w),
+              padding: context.appEdgeInsets(all: 12),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius: context.appBorderRadius(all: 10),
               ),
-              child: Icon(icon, color: color, size: 24.sp),
+              child: Icon(icon, color: color, size: context.sp(24)),
             ),
-            SizedBox(width: 16.w),
+            context.horizontalSpace(16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,7 +269,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   Widget _buildFilters() {
     final state = ref.watch(productViewModelProvider);
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(16.w),
+      padding: context.appEdgeInsets(all: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -248,41 +286,69 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               },
             ),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
           Expanded(
-            child: CustomDropdown<String>(
-              label: 'Product Purpose',
-              hintText: 'All Purposes',
-              value: _selectedPurposeFilter,
-              items: const [
-                'All Purposes',
-                'Variable',
-                'Required',
-                'Setup/Supply',
-                'Retail/Sale',
-                'Device',
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (val) {
-                setState(() {
-                  _selectedPurposeFilter = val ?? 'All Purposes';
-                });
+            child: Consumer(
+              builder: (context, ref, _) {
+                final usageType =
+                    ref.watch(productViewModelProvider).usageType ?? [];
+
+                return SelectOrCreateDropdown<String>(
+                  label: 'Usage Type',
+                  hint: 'Select Usage Type',
+                  value: _selectedPurpose,
+                  showAddIcon: false,
+                  items: usageType.map((e) => e.name).toList(),
+                  // ← convert to List<String>
+                  itemLabel: (usageType) => usageType,
+                  // ← String displays itself
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedPurpose = val;
+                    });
+                    ref
+                        .read(productViewModelProvider.notifier)
+                        .fetchProducts(
+                          search: state.searchKeyword,
+                          selectedPurpose: _selectedPurpose,
+                        );
+                  },
+                  onOpen: () => ref
+                      .read(productViewModelProvider.notifier)
+                      .fetchUsageType(),
+                  onCreate: () => _showCreateMasterItemDialog(
+                    context,
+                    ref,
+                    'UsageType',
+                    (name) => setState(() => _selectedPurpose = name),
+                  ),
+                );
               },
             ),
           ),
-          SizedBox(width: 12.w),
+          context.horizontalSpace(12),
           Expanded(
-            child: CustomDropdown<String>(
-              label: 'Lot Enforcement',
-              hintText: 'All Statuses',
-              value: _selectedTrackingFilter,
-              items: const [
-                'All Statuses',
-                'Tracking Enabled',
-                'Tracking Disabled',
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+            child: CustomDropdown<ProductStatus>(
+              label: 'Product Status',
+              hintText: 'Select a status',
+              value: _selectedStatus,
+              items: ProductStatus.values
+                  .map(
+                    (status) => DropdownMenuItem(
+                      value: status,
+                      child: Text(status.name),
+                    ),
+                  )
+                  .toList(),
               onChanged: (val) {
                 setState(() {
-                  _selectedTrackingFilter = val ?? 'All Statuses';
+                  _selectedStatus = val ?? ProductStatus.all;
+                  ref
+                      .read(productViewModelProvider.notifier)
+                      .fetchProducts(
+                        search: state.searchKeyword,
+                        status: _selectedStatus,
+                      );
                 });
               },
             ),
@@ -295,21 +361,21 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   Widget _buildCatalogTable(List<ProductModel> products) {
     if (products.isEmpty) {
       return BorderdContainerWidget(
-        padding: EdgeInsets.all(40.w),
+        padding: context.appEdgeInsets(all: 40),
         child: Center(
           child: Column(
             children: [
               Icon(
                 Icons.inventory_2_outlined,
                 color: CustomColors.grey,
-                size: 48.sp,
+                size: context.sp(48),
               ),
-              SizedBox(height: 16.h),
+              context.verticalSpace(16),
               Text(
                 'No Matching Products Found',
                 style: context.fonts.black16w600,
               ),
-              SizedBox(height: 4.h),
+              context.verticalSpace(4),
               Text(
                 'Try refining your filters or search keywords.',
                 style: context.fonts.grey14w400,
@@ -323,15 +389,14 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: context.appBorderRadius(all: 12),
         child: Table(
           columnWidths: const {
             0: FlexColumnWidth(4), // Product & Brand
             1: FlexColumnWidth(2), // SKU
             2: FlexColumnWidth(2), // Purpose / Usage Type
-            3: FlexColumnWidth(2), // Base Unit
-            4: FlexColumnWidth(2), // Lot Tracking
-            5: FlexColumnWidth(2), // Actions
+            3: FlexColumnWidth(2), // Status
+            4: FlexColumnWidth(2), // Actions
           },
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
@@ -345,8 +410,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                 _tableHeaderCell('PRODUCT & BRAND'),
                 _tableHeaderCell('GLOBAL SKU'),
                 _tableHeaderCell('USAGE TYPE'),
-                _tableHeaderCell('BASE UNIT'),
-                _tableHeaderCell('LOT TRACKING'),
+                _tableHeaderCell('STATUS'),
                 _tableHeaderCell('ACTIONS'),
               ],
             ),
@@ -361,21 +425,20 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                 children: [
                   _productNameCell(p),
                   _tableTextCell(
-                    p.globalSku ?? p.sku ?? 'N/A',
+                    (() {
+                      final sku = p.globalSku ?? p.sku ?? '';
+                      return sku.trim().isEmpty ? 'N/A' : sku;
+                    })(),
                     style: context.fonts.grey14w400,
                   ),
-                  _purposeBadgeCell(
-                    p.productPurpose ?? p.category ?? 'variable',
+                  _usageBadgeCell(
+                    p.usageType ?? '',
                   ),
-                  _tableTextCell(
-                    (p.unitType ?? p.unit).toUpperCase(),
-                    style: context.fonts.black14w600,
-                  ),
-                  _lotTrackingCell(p.enforceLotTracking ?? true),
+                  _statusCell(p, ref),
                   _actionsCell(p),
                 ],
               );
-            }),
+            }).toList(),
           ],
         ),
       ),
@@ -384,7 +447,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   Widget _tableHeaderCell(String label) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Text(
         label,
         style: context.fonts.grey12w600.copyWith(letterSpacing: 1),
@@ -393,40 +456,39 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   }
 
   Widget _productNameCell(ProductModel product) {
+    final displayName = product.name.trim().isEmpty ? 'N/A' : product.name;
+    final displayBrand = product.brand == null || product.brand!.trim().isEmpty ? 'N/A' : product.brand!;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
+            borderRadius: context.appBorderRadius(all: 8),
             child: SizedBox(
-              width: 48.w,
-              height: 48.w,
+              width: context.w(48),
+              height: context.w(48),
               child: product.image.isEmpty
                   ? const DecoratedBox(
                       decoration: BoxDecoration(color: CustomColors.whiteGrey),
                       child: Icon(Icons.broken_image, color: CustomColors.grey),
                     )
-                  : CustomCachedImage(
-                      imageUrl: product.image,
-                      fit: BoxFit.cover,
-                    ),
+                  : AppNetworkImage(imageUrl: product.image, fit: BoxFit.cover),
             ),
           ),
-          SizedBox(width: 16.w),
+          context.horizontalSpace(16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  product.name,
+                  displayName,
                   style: context.fonts.black14w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 2.h),
+                context.verticalSpace(2),
                 Text(
-                  product.brand ?? 'Unknown Brand',
+                  displayBrand,
                   style: context.fonts.purple12w700,
                 ),
               ],
@@ -439,7 +501,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   Widget _tableTextCell(String text, {required TextStyle style}) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Text(
         text,
         style: style,
@@ -449,10 +511,37 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     );
   }
 
-  Widget _purposeBadgeCell(String purpose) {
-    final lower = purpose.toLowerCase();
+  Widget _usageBadgeCell(String purpose) {
+    final trimmed = purpose.trim();
+    if (trimmed.isEmpty) {
+      return Padding(
+        padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: context.appEdgeInsets(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: CustomColors.grey.withValues(alpha: 0.1),
+                borderRadius: context.appBorderRadius(all: 20),
+                border: Border.all(color: CustomColors.grey.withValues(alpha: 0.2)),
+              ),
+              child: Text(
+                'N/A',
+                style: context.fonts.amber10w800ls1.copyWith(
+                  color: CustomColors.grey,
+                  fontSize: context.sp(10),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final lower = trimmed.toLowerCase();
     Color badgeColor = CustomColors.purple;
-    String label = 'Variable';
+    String label = trimmed;
 
     if (lower == 'required') {
       badgeColor = CustomColors.green;
@@ -466,25 +555,28 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     } else if (lower == 'device') {
       badgeColor = CustomColors.red;
       label = 'Device';
+    } else if (lower == 'variable') {
+      badgeColor = CustomColors.purple;
+      label = 'Variable';
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+            padding: context.appEdgeInsets(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: badgeColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20.r),
+              borderRadius: context.appBorderRadius(all: 20),
               border: Border.all(color: badgeColor.withValues(alpha: 0.2)),
             ),
             child: Text(
               label,
               style: context.fonts.amber10w800ls1.copyWith(
                 color: badgeColor,
-                fontSize: 10.sp,
+                fontSize: context.sp(10),
               ),
             ),
           ),
@@ -493,31 +585,28 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     );
   }
 
-  Widget _lotTrackingCell(bool enforce) {
+
+
+  Widget _statusCell(ProductModel p, WidgetRef ref) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: Row(
-        children: [
-          Icon(
-            enforce ? Icons.check_circle_rounded : Icons.cancel_rounded,
-            size: 18.sp,
-            color: enforce ? CustomColors.green : CustomColors.grey,
-          ),
-          SizedBox(width: 8.w),
-          Text(
-            enforce ? 'Enabled' : 'Disabled',
-            style: enforce
-                ? context.fonts.grey12w600.copyWith(color: CustomColors.green)
-                : context.fonts.grey12w600,
-          ),
-        ],
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: StatusToggleSwitch(
+          status: p.status,
+          onChanged: (newStatus) {
+            ref
+                .read(productViewModelProvider.notifier)
+                .updateProductStatus(p.id!, newStatus);
+          }, width: context.w(100), height: context.h(45),
+        ),
       ),
     );
   }
 
   Widget _actionsCell(ProductModel product) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
         children: [
           IconButton(
@@ -525,7 +614,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             icon: Icon(
               Icons.visibility_outlined,
               color: CustomColors.grey,
-              size: 20.sp,
+              size: context.sp(20),
             ),
             onPressed: () async {
               if (product.id != null) {
@@ -547,10 +636,27 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             icon: Icon(
               Icons.edit_road_rounded,
               color: CustomColors.purple,
-              size: 20.sp,
+              size: context.sp(20),
             ),
-            onPressed: () {
-              context.push(CreateProductScreen.routeName, extra: product);
+            onPressed: () async {
+              if (product.id != null) {
+                try {
+                  await ref
+                      .read(productViewModelProvider.notifier)
+                      .fetchProductDetail(product.id!);
+                  final detailedProduct = ref
+                      .read(productViewModelProvider)
+                      .selectedProduct;
+                  if (context.mounted && detailedProduct != null) {
+                    context.push(
+                      CreateProductScreen.routeName,
+                      extra: detailedProduct.toProductModel(),
+                    );
+                  }
+                } catch (e) {
+                  // Error handled gracefully by runSafely wrapper
+                }
+              }
             },
           ),
           IconButton(
@@ -558,7 +664,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             icon: Icon(
               Icons.archive_outlined,
               color: CustomColors.red,
-              size: 20.sp,
+              size: context.sp(20),
             ),
             onPressed: () {
               if (product.id != null) {

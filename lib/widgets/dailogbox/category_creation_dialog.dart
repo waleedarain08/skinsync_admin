@@ -16,6 +16,7 @@ import '../../view_models/category_view_model.dart';
 import '../build_textfield.dart';
 import '../custom_dropdown_widget.dart';
 import '../custom_primary_button.dart';
+import '../app_network_image.dart';
 import 'standard_dialog.dart';
 
 class CategoryCreationDialog extends ConsumerStatefulWidget {
@@ -447,10 +448,10 @@ class _CategoryCreationDialogState
 
     try {
       if (!mounted) return;
-      final request = CreateCategoryResquest(
+      final request = CreateCategoryRequest(
         name: _nameController.text,
         icon: _selectedIcon,
-        imageUrl: _selectedImage,
+        image: _selectedImage,
         parentId: widget.categoryId,
         totalSessions: int.tryParse(_totalSessionsController.text) ?? 1,
         consentFormUrl: _consentFormUrl,
@@ -473,7 +474,7 @@ class _CategoryCreationDialogState
 
       ref
           .read(categoryViewModelProvider.notifier)
-          .creatCategory(request: request)
+          .createCategory(request: request)
           .then((value) {
             if (value == true) {
               Navigator.pop(context);
@@ -555,29 +556,11 @@ class _CategoryCreationDialogState
 
   Widget _buildIconPreview() {
     if (_selectedIcon.isNotEmpty && _selectedIcon.startsWith('http')) {
-      return Image.network(
-        _selectedIcon,
+      return AppNetworkImage(
+        imageUrl: _selectedIcon,
         fit: BoxFit.cover,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                  : null,
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return const Center(
-            child: Icon(
-              Icons.broken_image,
-              color: CustomColors.lightGrey,
-              size: 32,
-            ),
-          );
-        },
+        errorIcon: Icons.broken_image,
+        errorIconSize: 32.sp,
       );
     }
 
@@ -602,18 +585,11 @@ class _CategoryCreationDialogState
 
   Widget _buildImagePreview() {
     if (_selectedImage.isNotEmpty && _selectedImage.startsWith('http')) {
-      return Image.network(
-        _selectedImage,
+      return AppNetworkImage(
+        imageUrl: _selectedImage,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return const Center(
-            child: Icon(
-              Icons.broken_image,
-              color: CustomColors.lightGrey,
-              size: 32,
-            ),
-          );
-        },
+        errorIcon: Icons.broken_image,
+        errorIconSize: 32.sp,
       );
     }
     return Center(

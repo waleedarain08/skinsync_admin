@@ -134,7 +134,8 @@ class $AssetsSvgGen {
 class $AssetsFontsGen {
   const $AssetsFontsGen();
 
-  final String geist = 'assets/fonts/Geist-VariableFont_wght.ttf';
+  final String geistVariableFontWght =
+      'assets/fonts/Geist-VariableFont_wght.ttf';
 }
 
 class AssetGenImage {

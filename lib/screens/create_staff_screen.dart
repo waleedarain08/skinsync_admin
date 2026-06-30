@@ -11,6 +11,7 @@ import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/nested_category_selector.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 
 import 'business_info_screen.dart';
 
@@ -265,7 +266,7 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
                       initialCategoryId: _categoryId,
                       onSelected: (cat, path) {
                         setState(() {
-                          _categoryId = cat.id.toString();
+                          _categoryId = cat?.id.toString();
                           _categoryPath = path;
                         });
                       },
@@ -339,8 +340,8 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
                 child: _selectedImage != null
                     ? ClipOval(
                         child: kIsWeb
-                            ? Image.network(
-                                _selectedImage!.path,
+                            ? AppNetworkImage(
+                                imageUrl: _selectedImage!.path,
                                 width: context.w(64),
                                 height: context.w(64),
                                 fit: BoxFit.cover,

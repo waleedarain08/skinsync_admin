@@ -51,7 +51,7 @@ class AreaServices implements AreaRepository {
       Endpoint.subAreas,
       body: request.toJson(),
     );
-    final response = BaseApiResponseModel<Null>.fromJson(
+    final response = BaseApiResponseModel.fromJson(
       jsonResponse,
         
     );

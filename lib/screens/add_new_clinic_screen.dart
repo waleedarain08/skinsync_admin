@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,8 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/app_loader.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
@@ -32,24 +35,32 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
   final TextEditingController _clinicNameController = TextEditingController();
   final TextEditingController _clinicEmailController = TextEditingController();
   final TextEditingController _clinicPhoneController = TextEditingController();
-  final TextEditingController _clinicAddressController = TextEditingController();
+  final TextEditingController _clinicAddressController =
+      TextEditingController();
   final TextEditingController _ownerNameController = TextEditingController();
   final TextEditingController _ownerEmailController = TextEditingController();
   final TextEditingController _latController = TextEditingController();
   final TextEditingController _longController = TextEditingController();
   final TextEditingController _websiteController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _consultationFeeController =
+      TextEditingController();
+  final TextEditingController _initialDepositController =
+      TextEditingController();
 
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _selectedLogo;
 
-  final List<AvailabilityEntry> _availabilityEntries = [
-    AvailabilityEntry(),
-  ];
+  final List<AvailabilityEntry> _availabilityEntries = [AvailabilityEntry()];
+  Timer? _addressTimer;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(clinicViewModelProvider.notifier).removeBanner();
+      ref.read(clinicViewModelProvider.notifier).removeClinicImage();
+    });
     if (widget.invitedClinic != null) {
       _prefillData(widget.invitedClinic!);
     }
@@ -80,6 +91,9 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     _longController.dispose();
     _websiteController.dispose();
     _descriptionController.dispose();
+    _addressTimer?.cancel();
+    _consultationFeeController.dispose();
+    _initialDepositController.dispose();
     super.dispose();
   }
 
@@ -105,12 +119,20 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                     color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
-                  child: const Icon(Icons.photo_library_outlined, color: Colors.blue),
+                  child: const Icon(
+                    Icons.photo_library_outlined,
+                    color: Colors.blue,
+                  ),
                 ),
-                title: Text('Choose from Gallery', style: context.fonts.black14w600),
+                title: Text(
+                  'Choose from Gallery',
+                  style: context.fonts.black14w600,
+                ),
                 onTap: () async {
                   Navigator.pop(context);
-                  final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+                  final XFile? image = await _imagePicker.pickImage(
+                    source: ImageSource.gallery,
+                  );
                   if (image != null) setState(() => _selectedLogo = image);
                 },
               ),
@@ -122,12 +144,17 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                     color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
-                  child: const Icon(Icons.camera_alt_outlined, color: Colors.green),
+                  child: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Colors.green,
+                  ),
                 ),
                 title: Text('Take a Photo', style: context.fonts.black14w600),
                 onTap: () async {
                   Navigator.pop(context);
-                  final XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
+                  final XFile? image = await _imagePicker.pickImage(
+                    source: ImageSource.camera,
+                  );
                   if (image != null) setState(() => _selectedLogo = image);
                 },
               ),
@@ -156,12 +183,6 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final selectedCountry = ref.read(authViewModelProvider).country;
-    if (selectedCountry == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a country in the phone field')),
-      );
-      return;
-    }
 
     final List<AvailabilityModel> availability = _availabilityEntries.map((e) {
       String formatTimeOfDay(TimeOfDay? tod) {
@@ -183,20 +204,27 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       clinicEmail: _clinicEmailController.text.trim(),
       clinicPhone: _clinicPhoneController.text.trim(),
       clinicAddress: _clinicAddressController.text.trim(),
-      clinicLogo: _selectedLogo?.path ?? widget.invitedClinic?.logo ?? 'https://example.com/logo.png', // Use prefilled logo if no new one selected
+      clinicLogo:
+          _selectedLogo?.path ??
+          widget.invitedClinic?.logo ??
+          'https://example.com/logo.png',
       ownerName: _ownerNameController.text.trim(),
       ownerEmail: _ownerEmailController.text.trim(),
       cc: selectedCountry.dialCode ?? '+1',
       country: selectedCountry.code ?? 'US',
-      lat: _latController.text.trim(),
-      long: _longController.text.trim(),
+      lat: double.parse(_latController.text.trim()),
+      long: double.parse(_longController.text.trim()),
       website: _websiteController.text.trim(),
       description: _descriptionController.text.trim(),
+      consultationFee: num.parse(_initialDepositController.text.trim()),
+      initialDeposit: num.parse(_consultationFeeController.text.trim()),
       availability: availability,
     );
 
-    final success = await ref.read(clinicViewModelProvider.notifier).registerClinic(req);
-    if (success && mounted) {
+    final success = await ref
+        .read(clinicViewModelProvider.notifier)
+        .registerClinic(req, _selectedLogo);
+    if ((success ?? false) && mounted) {
       context.pop();
     }
   }
@@ -222,11 +250,10 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionCard(
+                  _buildBannerAndLogoCard(
+                    context: context,
+                    ref: ref,
                     title: 'Clinic Logo',
-                    children: [
-                      _buildLogoPicker(),
-                    ],
                   ),
                   SizedBox(height: 32.h),
                   _buildSectionCard(
@@ -254,32 +281,105 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                         ],
                       ),
                       SizedBox(height: 24.h),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Phone Number (Selection sets Country & CC)', style: context.fonts.black14w600),
-                                SizedBox(height: 10.h),
-                                PhoneWidget(
-                                  controller: _clinicPhoneController,
-                                  filled: true,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 24.w),
-                          const Spacer(),
-                        ],
+                      Text(
+                        'Phone Number (Selection sets Country & CC)',
+                        style: context.fonts.black14w600,
                       ),
+                      SizedBox(height: 10.h),
+                      PhoneWidget(
+                        controller: _clinicPhoneController,
+                        filled: false,
+                      ),
+
                       SizedBox(height: 24.h),
                       BuildTextField(
                         label: 'Clinic Address',
                         controller: _clinicAddressController,
                         hintText: '123 Main Street, New York, NY 10001',
                         validator: Validators.empty,
+                        onChanged: (value) {
+                          _addressTimer?.cancel();
+                          _addressTimer = Timer(
+                            const Duration(milliseconds: 300),
+                            () {
+                              ref
+                                  .read(clinicViewModelProvider.notifier)
+                                  .searchPlaces(value);
+                            },
+                          );
+                        },
+                      ),
+                      Consumer(
+                        builder: (_, ref, _) {
+                          final places = ref.watch(
+                            clinicViewModelProvider.select(
+                              (s) => s.searchedPlaces,
+                            ),
+                          );
+                          if (places.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          return Column(
+                            crossAxisAlignment: .start,
+                            spacing: context.h(10),
+                            children: [
+                              Text(
+                                'Suggestions',
+                                style: context.fonts.black14w600,
+                              ),
+                              ...List.generate(places.length, (index) {
+                                final place = places[index];
+                                return Card(
+                                  child: ListTile(
+                                    onTap: () {
+                                      _latController.text =
+                                          '${place.location?.latitude ?? ''}';
+                                      _longController.text =
+                                          '${place.location?.longitude ?? ''}';
+                                      _clinicAddressController.text =
+                                          place.shortFormattedAddress ?? '';
+                                      ref
+                                          .read(
+                                            clinicViewModelProvider.notifier,
+                                          )
+                                          .clearSearchedPlaces();
+                                    },
+                                    title: Text(
+                                      place.displayName?.text ?? 'N/A',
+                                    ),
+                                    subtitle: Text(
+                                      place.shortFormattedAddress ?? 'N/A',
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          );
+                        },
+                      ),
+                      SizedBox(height: 24.h),
+                      Row(
+                        spacing: 24.w,
+                        children: [
+                          Expanded(
+                            child: BuildTextField(
+                              label: 'Consultation Fees',
+                              controller: _consultationFeeController,
+                              hintText: '\$100',
+                              validator: Validators.empty,
+                              keyboardType: .number,
+                            ),
+                          ),
+                          Expanded(
+                            child: BuildTextField(
+                              label: 'Initial Deposit',
+                              controller: _initialDepositController,
+                              hintText: '\$10',
+                              validator: Validators.empty,
+                              keyboardType: .number,
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 24.h),
                       BuildTextField(
@@ -303,8 +403,15 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                               controller: _latController,
                               hintText: 'e.g. 40.7128',
                               validator: Validators.empty,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              prefixIcon: const Icon(Icons.location_on_outlined, color: CustomColors.grey),
+                              readOnly: true,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              prefixIcon: const Icon(
+                                Icons.location_on_outlined,
+                                color: CustomColors.grey,
+                              ),
                             ),
                           ),
                           SizedBox(width: 24.w),
@@ -314,8 +421,15 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                               controller: _longController,
                               hintText: 'e.g. -74.0060',
                               validator: Validators.empty,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              prefixIcon: const Icon(Icons.location_on_outlined, color: CustomColors.grey),
+                              readOnly: true,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              prefixIcon: const Icon(
+                                Icons.location_on_outlined,
+                                color: CustomColors.grey,
+                              ),
                             ),
                           ),
                         ],
@@ -332,7 +446,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                             child: BuildTextField(
                               label: 'Owner Name',
                               controller: _ownerNameController,
-                              hintText: 'e.g. Waleed Ahmed',
+                              hintText: 'e.g. Dr Albert',
                               validator: Validators.empty,
                             ),
                           ),
@@ -352,27 +466,40 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                   SizedBox(height: 32.h),
                   _buildAvailabilitySection(),
                   SizedBox(height: 48.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CustomOutlinedButton(
-                        onTap: () => context.pop(),
-                        label: 'Cancel',
-                        width: context.w(160),
-                        height: context.h(56),
-                        textColor: CustomColors.grey,
-                        color: CustomColors.border,
-                      ),
-                      context.horizontalSpace(24),
-                      SizedBox(
-                        width: context.w(240),
-                        child: CustomPrimaryButton(
-                          onTap: _submit,
-                          label: 'Register Clinic',
-                          height: context.h(56),
-                        ),
-                      ),
-                    ],
+                  Consumer(
+                    builder: (_, ref, _) {
+                      final loading = ref.watch(
+                        clinicViewModelProvider.select((s) => s.loading),
+                      );
+                      if (loading) {
+                        return Align(
+                          alignment: Alignment.centerRight,
+                          child: AppLoader(size: context.w(50)),
+                        );
+                      }
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          CustomOutlinedButton(
+                            onTap: () => context.pop(),
+                            label: 'Cancel',
+                            width: context.w(160),
+                            height: context.h(56),
+                            textColor: CustomColors.grey,
+                            color: CustomColors.border,
+                          ),
+                          context.horizontalSpace(24),
+                          SizedBox(
+                            width: context.w(240),
+                            child: CustomPrimaryButton(
+                              onTap: _submit,
+                              label: 'Register Clinic',
+                              height: context.h(56),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   SizedBox(height: 60.h),
                 ],
@@ -396,23 +523,35 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
               decoration: BoxDecoration(
                 color: CustomColors.whiteGrey,
                 shape: BoxShape.circle,
-                border: Border.all(color: CustomColors.green.withValues(alpha: 0.5), width: 2),
+                border: Border.all(
+                  color: CustomColors.green.withValues(alpha: 0.5),
+                  width: 2,
+                ),
                 image: _selectedLogo != null
                     ? DecorationImage(
-                        image: kIsWeb 
-                          ? NetworkImage(_selectedLogo!.path) 
-                          : FileImage(File(_selectedLogo!.path)) as ImageProvider,
+                        image: kIsWeb
+                            ? NetworkImage(_selectedLogo!.path)
+                            : FileImage(File(_selectedLogo!.path))
+                                  as ImageProvider,
                         fit: BoxFit.cover,
                       )
-                    : (widget.invitedClinic?.logo != null && widget.invitedClinic!.logo!.isNotEmpty)
-                        ? DecorationImage(
-                            image: NetworkImage(widget.invitedClinic!.logo!),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    : (widget.invitedClinic?.logo != null &&
+                          widget.invitedClinic!.logo!.isNotEmpty)
+                    ? DecorationImage(
+                        image: NetworkImage(widget.invitedClinic!.logo!),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
-              child: (_selectedLogo == null && (widget.invitedClinic?.logo == null || widget.invitedClinic!.logo!.isEmpty))
-                  ? Icon(Icons.add_a_photo_outlined, size: 40.sp, color: CustomColors.purple)
+              child:
+                  (_selectedLogo == null &&
+                      (widget.invitedClinic?.logo == null ||
+                          widget.invitedClinic!.logo!.isEmpty))
+                  ? Icon(
+                      Icons.add_a_photo_outlined,
+                      size: 40.sp,
+                      color: CustomColors.purple,
+                    )
                   : null,
             ),
             SizedBox(height: 12.h),
@@ -426,7 +565,138 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     );
   }
 
-  Widget _buildSectionCard({required String title, required List<Widget> children}) {
+  Widget _buildBannerAndLogoCard({
+    required BuildContext context,
+    required WidgetRef ref,
+
+    required String title,
+  }) {
+    final state = ref.watch(clinicViewModelProvider);
+    final viewModel = ref.read(clinicViewModelProvider.notifier);
+
+    //  final imageUrl = isBanner ? state.bannerImage : state.clinicImage;
+
+    return Container(
+      width: double.infinity,
+
+      padding: EdgeInsets.all(32.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        image: state.bannerImage != null && state.bannerImage != ''
+            ? DecorationImage(
+                image: NetworkImage(state.bannerImage ?? ''),
+                fit: BoxFit.cover,
+              )
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: context.fonts.black20w600.copyWith(
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              InkWell(
+                borderRadius: BorderRadius.circular(50.r),
+                onTap: () {
+                  if (state.bannerImage != null && state.bannerImage != '') {
+                    viewModel.removeBanner();
+                  } else {
+                    viewModel.pickImage(false);
+                  }
+                },
+                child: Container(
+                  width: 42.w,
+                  height: 42.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    state.bannerImage == null || state.bannerImage == ''
+                        ? Icons.add_a_photo_outlined
+                        : Icons.close,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          Center(
+            child: InkWell(
+              onTap: () => viewModel.pickImage(true),
+              borderRadius: BorderRadius.circular(100.r),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 120.w,
+                    height: 120.w,
+                    clipBehavior: .antiAlias,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.teal, width: 2),
+                    ),
+
+                    child: state.clinicImage != null && state.clinicImage != ''
+                        ? AppNetworkImage(
+                            imageUrl: state.clinicImage ?? '',
+                            width: 140.w,
+                            height: 140.w,
+                            fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(12),
+                            errorIcon: Icons.broken_image_outlined,
+                            errorIconSize: 40,
+                          )
+                        : Center(
+                            child: Icon(
+                              Icons.add_a_photo_outlined,
+                              size: 36.sp,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                  ),
+                  //  Container(
+                  //   width: 120.w,
+                  //   height: 120.w,
+                  //   decoration: BoxDecoration(
+                  //     shape: BoxShape.circle,
+                  //     border: Border.all(color: Colors.teal, width: 2),
+                  //   ),
+                  //   child: Icon(
+                  //     Icons.add_a_photo_outlined,
+                  //     size: 36.sp,
+                  //     color: Colors.deepPurple,
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({
+    required String title,
+    required List<Widget> children,
+  }) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(32.w),
@@ -544,34 +814,45 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
         Wrap(
           spacing: 12.w,
           runSpacing: 12.h,
-          children: [
-            'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
-          ].map((day) {
-            final isSelected = entry.selectedDays.contains(day);
-            return FilterChip(
-              label: Text(day),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() {
-                  if (selected) {
-                    entry.selectedDays.add(day);
-                  } else {
-                    entry.selectedDays.remove(day);
-                  }
-                });
-              },
-              backgroundColor: Colors.white,
-              selectedColor: CustomColors.purple.withValues(alpha: 0.1),
-              checkmarkColor: CustomColors.purple,
-              labelStyle: isSelected ? context.fonts.purple13w700 : context.fonts.grey13w500,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.r),
-                side: BorderSide(
-                  color: isSelected ? CustomColors.purple : CustomColors.grey.withValues(alpha: 0.3),
-                ),
-              ),
-            );
-          }).toList(),
+          children:
+              [
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+                'Sunday',
+              ].map((day) {
+                final isSelected = entry.selectedDays.contains(day);
+                return FilterChip(
+                  label: Text(day),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    setState(() {
+                      if (selected) {
+                        entry.selectedDays.add(day);
+                      } else {
+                        entry.selectedDays.remove(day);
+                      }
+                    });
+                  },
+                  backgroundColor: Colors.white,
+                  selectedColor: CustomColors.purple.withValues(alpha: 0.1),
+                  checkmarkColor: CustomColors.purple,
+                  labelStyle: isSelected
+                      ? context.fonts.purple13w700
+                      : context.fonts.grey13w500,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                    side: BorderSide(
+                      color: isSelected
+                          ? CustomColors.purple
+                          : CustomColors.grey.withValues(alpha: 0.3),
+                    ),
+                  ),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -605,7 +886,11 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
               controller: controller,
               hintText: 'Select Time',
               readOnly: true,
-              suffixIcon: const Icon(Icons.access_time_rounded, size: 20, color: CustomColors.purple),
+              suffixIcon: const Icon(
+                Icons.access_time_rounded,
+                size: 20,
+                color: CustomColors.purple,
+              ),
             ),
           ),
         ),

@@ -1,34 +1,40 @@
 class RegisterClinicReqModel {
-  String? clinicName;
-  String? clinicEmail;
-  String? clinicPhone;
-  String? cc;
-  String? country;
-  String? clinicAddress;
-  String? clinicLogo;
-  String? ownerName;
-  String? ownerEmail;
-  String? lat;
-  String? long;
-  String? website;
-  String? description;
-  List<AvailabilityModel>? availability;
+  final String clinicName;
+  final String clinicEmail;
+  final String clinicPhone;
+  final String cc;
+  final String country;
+  final String clinicAddress;
+  final String clinicLogo;
+  final String? ownerName;
+  final String? ownerEmail;
+  final double? lat;
+  final double? long;
+  final String website;
+  final String description;
+  final num? consultationFee;
+  final num? initialDeposit;
+  final List<AvailabilityModel> availability;
+  final String? bannerImage;
 
   RegisterClinicReqModel({
-    this.clinicName,
-    this.clinicEmail,
-    this.clinicPhone,
-    this.cc,
-    this.country,
-    this.clinicAddress,
-    this.clinicLogo = 'https://example.com/logo.png',
+    required this.clinicName,
+    required this.clinicEmail,
+    required this.clinicPhone,
+    required this.cc,
+    required this.country,
+    required this.clinicAddress,
+    required this.clinicLogo,
     this.ownerName,
     this.ownerEmail,
     this.lat,
     this.long,
-    this.website,
-    this.description,
-    this.availability,
+    required this.website,
+    required this.description,
+    this.consultationFee,
+    this.initialDeposit,
+    this.availability = const [],
+    this.bannerImage,
   });
 
   Map<String, dynamic> toJson() {
@@ -42,14 +48,37 @@ class RegisterClinicReqModel {
     data['clinic_logo'] = clinicLogo;
     data['owner_name'] = ownerName;
     data['owner_email'] = ownerEmail;
-    data['lat'] = lat;
-    data['long'] = long;
+    data['clinic_latitude'] = lat;
+    data['clinic_longitude'] = long;
     data['website'] = website;
     data['description'] = description;
-    if (availability != null) {
-      data['availability'] = availability!.map((v) => v.toJson()).toList();
-    }
+    data['consultation_fee'] = consultationFee;
+    data['initial_deposit'] = initialDeposit;
+    data['banner'] = bannerImage;
+    data['availability'] = availability.map((v) => v.toJson()).toList();
     return data;
+  }
+
+  RegisterClinicReqModel copyWithLogo(String? clinicLogo, String? bannerImage) {
+    return RegisterClinicReqModel(
+      clinicName: clinicName,
+      clinicEmail: clinicEmail,
+      clinicPhone: clinicPhone,
+      cc: cc,
+      country: country,
+      clinicAddress: clinicAddress,
+      clinicLogo: clinicLogo ?? this.clinicLogo,
+      ownerName: ownerName,
+      ownerEmail: ownerEmail,
+      lat: lat,
+      long: long,
+      website: website,
+      description: description,
+      consultationFee: consultationFee,
+      initialDeposit: initialDeposit,
+      availability: availability,
+      bannerImage: bannerImage
+    );
   }
 }
 

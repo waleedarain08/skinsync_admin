@@ -1,10 +1,10 @@
 import 'package:skinsync_admin/models/common_models.dart';
 
-class CreateCategoryResquest {
+class CreateCategoryRequest {
   final String? name;
   final String? icon;
   final int? parentId;
-  final String? imageUrl;
+  final String? image;
   final int? totalSessions;
   final String? consentFormUrl;
   final String? consentFormName;
@@ -14,7 +14,7 @@ class CreateCategoryResquest {
   final CategoryDowntimePresetModel? downtimePresets;
   final List<String>? defaultRoles;
 
-  CreateCategoryResquest({
+  CreateCategoryRequest({
     this.name,
     this.icon,
     this.parentId,
@@ -22,7 +22,7 @@ class CreateCategoryResquest {
     this.consentFormUrl,
     this.consentFormName,
     this.defaultSessions,
-    this.imageUrl,
+    this.image,
     this.preNotifications,
     this.postNotifications,
     this.downtimePresets,
@@ -34,7 +34,7 @@ class CreateCategoryResquest {
     "name": name,
     "icon": icon,
     "parent_id": parentId,
-   // "imageUrl" : imageUrl,
+    "image" : image,
     "total_sessions": totalSessions,
     "consent_form_url": consentFormUrl,
     "consent_form_name": consentFormName,

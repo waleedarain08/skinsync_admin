@@ -27,7 +27,6 @@ class AppTheme {
       scaffoldBackgroundColor: Colors.transparent,
       primaryColor: CustomColors.purple,
       splashColor: CustomColors.purple.withValues(alpha: 0.05),
-      
       colorScheme: const ColorScheme.light(
         primary: CustomColors.purple,
         onPrimary: CustomColors.white,
@@ -40,15 +39,9 @@ class AppTheme {
         surfaceContainerHighest: CustomColors.softGrey,
       ),
 
-      iconTheme: IconThemeData(
-        color: CustomColors.grey,
-        size: 20.sp,
-      ),
+      iconTheme: IconThemeData(color: CustomColors.grey, size: 20.sp),
 
-      primaryIconTheme: IconThemeData(
-        color: CustomColors.purple,
-        size: 20.sp,
-      ),
+      primaryIconTheme: IconThemeData(color: CustomColors.purple, size: 20.sp),
 
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -92,7 +85,9 @@ class AppTheme {
           elevation: 0,
           minimumSize: Size(0, buttonHeight),
           padding: EdgeInsets.symmetric(horizontal: 24.w),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
           textStyle: CustomFonts.white14w600,
         ),
       ),
@@ -102,9 +97,13 @@ class AppTheme {
           foregroundColor: CustomColors.purple,
           minimumSize: Size(0, buttonHeight),
           padding: EdgeInsets.symmetric(horizontal: 24.w),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
           side: BorderSide(color: CustomColors.purple, width: borderWidth),
-          textStyle: CustomFonts.black14w600.copyWith(color: CustomColors.purple),
+          textStyle: CustomFonts.black14w600.copyWith(
+            color: CustomColors.purple,
+          ),
         ),
       ),
 
@@ -112,7 +111,9 @@ class AppTheme {
         style: TextButton.styleFrom(
           foregroundColor: CustomColors.purple,
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-          textStyle: CustomFonts.black14w600.copyWith(color: CustomColors.purple),
+          textStyle: CustomFonts.black14w600.copyWith(
+            color: CustomColors.purple,
+          ),
         ),
       ),
 
@@ -141,18 +142,30 @@ class AppTheme {
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         hintStyle: CustomFonts.grey12w400,
         labelStyle: CustomFonts.black14w400,
-        constraints: BoxConstraints(minHeight: inputHeight, maxHeight: inputHeight),
+        // constraints: BoxConstraints(
+        //   minHeight: inputHeight,
+        //   maxHeight: inputHeight,
+        // ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: BorderSide(color: CustomColors.border, width: borderWidth),
+          borderSide: BorderSide(
+            color: CustomColors.border,
+            width: borderWidth,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: BorderSide(color: CustomColors.border, width: borderWidth),
+          borderSide: BorderSide(
+            color: CustomColors.border,
+            width: borderWidth,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: BorderSide(color: CustomColors.purple, width: borderWidth * 1.5),
+          borderSide: BorderSide(
+            color: CustomColors.purple,
+            width: borderWidth * 1.5,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
@@ -167,7 +180,15 @@ extension AppScreenUtilContext on BuildContext {
   double get screenWidth => MediaQuery.of(this).size.width;
   double get screenHeight => MediaQuery.of(this).size.height;
 
-  EdgeInsets appEdgeInsets({double? horizontal, double? vertical, double? all, double? left, double? top, double? right, double? bottom}) {
+  EdgeInsets appEdgeInsets({
+    double? horizontal,
+    double? vertical,
+    double? all,
+    double? left,
+    double? top,
+    double? right,
+    double? bottom,
+  }) {
     if (all != null) return EdgeInsets.all(r(all));
     return EdgeInsets.only(
       left: w(left ?? horizontal ?? 0),
@@ -177,7 +198,13 @@ extension AppScreenUtilContext on BuildContext {
     );
   }
 
-  BorderRadius appBorderRadius({double? all, double? topLeft, double? topRight, double? bottomLeft, double? bottomRight}) {
+  BorderRadius appBorderRadius({
+    double? all,
+    double? topLeft,
+    double? topRight,
+    double? bottomLeft,
+    double? bottomRight,
+  }) {
     if (all != null) return BorderRadius.circular(r(all));
     return BorderRadius.only(
       topLeft: Radius.circular(r(topLeft ?? 0)),
@@ -201,9 +228,8 @@ class AppDecorations {
     ),
   );
 
-  static BoxDecoration sidebarItem(BuildContext context) => BoxDecoration(
-    borderRadius: context.appBorderRadius(all: 8),
-  );
+  static BoxDecoration sidebarItem(BuildContext context) =>
+      BoxDecoration(borderRadius: context.appBorderRadius(all: 8));
 
   static InputDecoration input(
     BuildContext context, {
@@ -213,36 +239,37 @@ class AppDecorations {
     Color? fillColor,
     EdgeInsets? contentPadding,
     int maxLines = 1,
-  }) =>
-      InputDecoration(
-        hintText: hint,
-        hintStyle: context.fonts.grey12w400,
-        prefixIcon: prefixIcon,
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: fillColor ?? CustomColors.white,
-        contentPadding: contentPadding ?? context.appEdgeInsets(horizontal: 16, vertical: 14),
-        constraints: BoxConstraints(
-          minHeight: context.h(52), 
-          maxHeight: maxLines > 1 ? double.infinity : context.h(52)
-        ),
-        border: OutlineInputBorder(
-          borderRadius: context.appBorderRadius(all: 12),
-          borderSide: const BorderSide(color: CustomColors.border, width: 1),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: context.appBorderRadius(all: 12),
-          borderSide: const BorderSide(color: CustomColors.border, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: context.appBorderRadius(all: 12),
-          borderSide: const BorderSide(color: CustomColors.purple, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: context.appBorderRadius(all: 12),
-          borderSide: const BorderSide(color: CustomColors.red, width: 1),
-        ),
-      );
+  }) => InputDecoration(
+    hintText: hint,
+    hintStyle: context.fonts.grey12w400,
+    prefixIcon: prefixIcon,
+    suffixIcon: suffixIcon,
+    filled: true,
+    isDense: true,
+    fillColor: fillColor ?? CustomColors.white,
+    contentPadding:
+        contentPadding ?? context.appEdgeInsets(horizontal: 16, vertical: 14),
+    // constraints: BoxConstraints(
+    //   minHeight: context.h(65),
+    //   maxHeight: maxLines > 1 ? double.infinity : context.h(65),
+    // ),
+    border: OutlineInputBorder(
+      borderRadius: context.appBorderRadius(all: 12),
+      borderSide: const BorderSide(color: CustomColors.border, width: 1),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: context.appBorderRadius(all: 12),
+      borderSide: const BorderSide(color: CustomColors.border, width: 1),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: context.appBorderRadius(all: 12),
+      borderSide: const BorderSide(color: CustomColors.purple, width: 1.5),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: context.appBorderRadius(all: 12),
+      borderSide: const BorderSide(color: CustomColors.red, width: 1),
+    ),
+  );
 }
 
 class AppSpacing {
@@ -253,7 +280,7 @@ class AppSpacing {
   static double xl(BuildContext context) => context.w(24);
   static double xxl(BuildContext context) => context.w(32);
   static double xxxl(BuildContext context) => context.w(40);
-  
+
   static double pagePaddingH(BuildContext context) => context.w(28);
   static double pagePaddingV(BuildContext context) => context.h(28);
   static double topBarHeight(BuildContext context) => context.h(72);
@@ -276,26 +303,34 @@ class AppRadius {
 
 class AppShadows {
   static List<BoxShadow> card(BuildContext context) => [
-        BoxShadow(
-          color: CustomColors.black.withValues(alpha: 0.05),
-          blurRadius: context.r(10),
-          offset: Offset(0, context.h(4)),
-        ),
-      ];
+    BoxShadow(
+      color: CustomColors.black.withValues(alpha: 0.05),
+      blurRadius: context.r(10),
+      offset: Offset(0, context.h(4)),
+    ),
+  ];
 
   static List<BoxShadow> cardHover(BuildContext context) => [
-        BoxShadow(
-          color: CustomColors.black.withValues(alpha: 0.1),
-          blurRadius: context.r(20),
-          offset: Offset(0, context.h(8)),
-        ),
-      ];
+    BoxShadow(
+      color: CustomColors.black.withValues(alpha: 0.1),
+      blurRadius: context.r(20),
+      offset: Offset(0, context.h(8)),
+    ),
+  ];
 
   static List<BoxShadow> lg(BuildContext context) => [
-    BoxShadow(color: CustomColors.black.withValues(alpha: 0.1), blurRadius: context.r(30), offset: Offset(0, context.h(10)))
+    BoxShadow(
+      color: CustomColors.black.withValues(alpha: 0.1),
+      blurRadius: context.r(30),
+      offset: Offset(0, context.h(10)),
+    ),
   ];
-  
+
   static List<BoxShadow> xs(BuildContext context) => [
-    BoxShadow(color: CustomColors.black.withValues(alpha: 0.05), blurRadius: 10.r, offset: const Offset(0, 2))
+    BoxShadow(
+      color: CustomColors.black.withValues(alpha: 0.05),
+      blurRadius: 10.r,
+      offset: const Offset(0, 2),
+    ),
   ];
 }

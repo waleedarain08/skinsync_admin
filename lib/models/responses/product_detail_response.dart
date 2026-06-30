@@ -1,3 +1,4 @@
+import '../product_model.dart';
 import 'base_response_model.dart';
 
 class ProductDetailResponse extends BaseApiResponseModel<ProductDetailModel> {
@@ -8,7 +9,7 @@ class ProductDetailResponse extends BaseApiResponseModel<ProductDetailModel> {
   });
 
   factory ProductDetailResponse.fromJson(Map<String, dynamic> json) {
-    final bool success = (json['is_success'] as bool?)  ?? false;
+    final bool success = (json['is_success'] as bool?) ?? false;
     return ProductDetailResponse(
       isSuccess: success,
       message: json['message'] ?? '',
@@ -17,8 +18,6 @@ class ProductDetailResponse extends BaseApiResponseModel<ProductDetailModel> {
           : ProductDetailModel.fromJson(json['data'] as Map<String, dynamic>),
     );
   }
-
-
 }
 
 class ProductDetailModel {
@@ -26,6 +25,7 @@ class ProductDetailModel {
   final String image;
   final String name;
   final String? brand;
+  final String? manufacturer;
   final String? globalSku;
   final String? barcode;
   final String? usageType;
@@ -52,6 +52,7 @@ class ProductDetailModel {
     required this.image,
     required this.name,
     this.brand,
+    this.manufacturer,
     this.globalSku,
     this.barcode,
     this.usageType,
@@ -80,6 +81,7 @@ class ProductDetailModel {
       image: json['image'] ?? '',
       name: json['name'] ?? '',
       brand: json['brand'],
+      manufacturer: json['manufacturer'],
       globalSku: json['global_sku'],
       barcode: json['barcode'],
       usageType: json['usage_type'] ?? json['product_purpose'],
@@ -113,6 +115,7 @@ class ProductDetailModel {
       'image': image,
       'name': name,
       'brand': brand,
+      'manufacturer': manufacturer,
       'global_sku': globalSku,
       'barcode': barcode,
       'usage_type': usageType,
@@ -134,5 +137,35 @@ class ProductDetailModel {
       'lot_number': lotNumber,
       'expiration_date': expirationDate?.toIso8601String(),
     };
+  }
+
+  ProductModel toProductModel() {
+    return ProductModel(
+      id: id,
+      image: image,
+      name: name,
+      brand: brand,
+      manufacturer: manufacturer,
+      globalSku: globalSku,
+      barcode: barcode,
+      productPurpose: usageType,
+      category: category,
+      selectedCategoryIds: selectedCategoryIds,
+      status: status,
+      description: description,
+      unit: unitType ?? '',
+      boxQuantity: boxQuantity,
+      itemQuantityPerBox: itemQuantityPerBox,
+      packageType: packageType,
+      billableUnit: billableUnit,
+      billableQuantityPerItem: billableQuantityPerItem,
+      totalBillableQuantity: totalBillableQuantity,
+      enforceLotTracking: enforceLotTracking,
+      clinicCost: clinicCost,
+      retailPricePerUnit: retailPricePerUnit,
+      supplier: supplier,
+      lotNumber: lotNumber,
+      expirationDate: expirationDate,
+    );
   }
 }

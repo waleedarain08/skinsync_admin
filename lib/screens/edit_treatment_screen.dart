@@ -22,7 +22,8 @@ class EditTreatmentScreen extends ConsumerStatefulWidget {
   static const String routeName = '/edit-treatment';
 
   @override
-  ConsumerState<EditTreatmentScreen> createState() => _EditTreatmentScreenState();
+  ConsumerState<EditTreatmentScreen> createState() =>
+      _EditTreatmentScreenState();
 }
 
 class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
@@ -34,7 +35,9 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
       ref.read(productViewModelProvider.notifier).fetchProducts();
       await ref.read(areaViewModelProvider.notifier).fetchAreas();
       final fetchedAreas = ref.read(areaViewModelProvider).areas;
-      ref.read(treatmentDataViewModelProvider.notifier).setAreasFromBackend(fetchedAreas);
+      ref
+          .read(treatmentDataViewModelProvider.notifier)
+          .setAreasFromBackend(fetchedAreas);
     });
   }
 
@@ -274,8 +277,14 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
                   value: state.status,
                   items: const [
                     DropdownMenuItem(value: 'active', child: Text('Active')),
-                    DropdownMenuItem(value: 'inactive', child: Text('Inactive')),
-                    DropdownMenuItem(value: 'deactive', child: Text('Deactive')),
+                    DropdownMenuItem(
+                      value: 'inactive',
+                      child: Text('Inactive'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'deactive',
+                      child: Text('Deactive'),
+                    ),
                     DropdownMenuItem(value: 'draft', child: Text('Draft')),
                   ],
                   onChanged: (val) {
@@ -340,7 +349,10 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
                       ),
                       if (state.areas.length > 1)
                         IconButton(
-                          icon: const Icon(Icons.delete_outline, color: CustomColors.red),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: CustomColors.red,
+                          ),
                           onPressed: () => viewModel.removeArea(index),
                         ),
                     ],
@@ -360,14 +372,16 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
                     label: 'Sub Areas',
                     hint: 'e.g. Forehead',
                     controller: areaEntry.subAreaController,
-                    suggestions: dataState.areas.isEmpty 
-                        ? [] 
+                    suggestions: dataState.areas.isEmpty
+                        ? []
                         : dataState.areas
-                            .firstWhere((a) => a.name == areaEntry.areaController.text,
-                                orElse: () => dataState.areas.first)
-                            .subAreas
-                            .map((s) => s.name)
-                            .toList(),
+                              .firstWhere(
+                                (a) => a.name == areaEntry.areaController.text,
+                                orElse: () => dataState.areas.first,
+                              )
+                              .subAreas
+                              .map((s) => s.name)
+                              .toList(),
                     onSelected: (val) => viewModel.addSubArea(index, val),
                   ),
                   if (areaEntry.subAreas.isNotEmpty) ...[
@@ -377,8 +391,12 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
                       runSpacing: 8,
                       children: areaEntry.subAreas.map((sub) {
                         return Chip(
-                          label: Text(sub.name, style: context.fonts.black12w400),
-                          onDeleted: () => viewModel.removeSubArea(index, sub.name),
+                          label: Text(
+                            sub.name,
+                            style: context.fonts.black12w400,
+                          ),
+                          onDeleted: () =>
+                              viewModel.removeSubArea(index, sub.name),
                           backgroundColor: CustomColors.whiteGrey,
                         );
                       }).toList(),
@@ -428,7 +446,13 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
               separatorBuilder: (_, __) => context.verticalSpace(16),
               itemBuilder: (context, index) {
                 final material = state.productUsageEntries[index];
-                return _buildMaterialCard(context, index, material, state, viewModel);
+                return _buildMaterialCard(
+                  context,
+                  index,
+                  material,
+                  state,
+                  viewModel,
+                );
               },
             ),
         ],
@@ -458,8 +482,13 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
             children: [
               Text(material.productName, style: context.fonts.black14w700),
               IconButton(
-                icon: const Icon(Icons.close, size: 18, color: CustomColors.red),
-                onPressed: () => viewModel.removeProductUsage(material.productId),
+                icon: const Icon(
+                  Icons.close,
+                  size: 18,
+                  color: CustomColors.red,
+                ),
+                onPressed: () =>
+                    viewModel.removeProductUsage(material.productId),
               ),
             ],
           ),
@@ -472,9 +501,18 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
                   hintText: 'Select',
                   value: material.usageType,
                   items: const [
-                    DropdownMenuItem(value: 'Required', child: Text('Required')),
-                    DropdownMenuItem(value: 'Optional', child: Text('Optional')),
-                    DropdownMenuItem(value: 'Variable', child: Text('Variable')),
+                    DropdownMenuItem(
+                      value: 'Required',
+                      child: Text('Required'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Optional',
+                      child: Text('Optional'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Variable',
+                      child: Text('Variable'),
+                    ),
                   ],
                   onChanged: (val) {
                     if (val != null) {

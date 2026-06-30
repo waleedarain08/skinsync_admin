@@ -4,8 +4,9 @@ import 'package:skinsync_admin/models/requests/create_category_request.dart';
 
 import '../models/responses/category_detail_response.dart';
 import '../models/responses/category_list_response.dart';
-import '../utils/theme.dart';
-import '../view_models/category_view_model.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/view_models/category_view_model.dart';
+import 'package:skinsync_admin/widgets/icon_image_container.dart';
 import 'dailogbox/category_creation_dialog.dart';
 
 class NestedCategorySelector extends ConsumerStatefulWidget {
@@ -17,7 +18,7 @@ class NestedCategorySelector extends ConsumerStatefulWidget {
   });
   final List<CategoryModel> categories;
   final String? initialCategoryId;
-  final void Function(CategoryModel category, String path) onSelected;
+  final void Function(CategoryModel? category, String path) onSelected;
 
   @override
   ConsumerState<NestedCategorySelector> createState() =>
@@ -63,21 +64,28 @@ class _NestedCategorySelectorState
 
   void _onLevelSelect(int level, CategoryModel category) {
     setState(() {
-      if (level < _selectedPath.length) {
+      final isAlreadySelected = _selectedPath.length > level && _selectedPath[level] == category.id;
+      if (isAlreadySelected) {
         _selectedPath = _selectedPath.sublist(0, level);
+      } else {
+        if (level < _selectedPath.length) {
+          _selectedPath = _selectedPath.sublist(0, level);
+        }
+        _selectedPath.add(category.id);
       }
-      _selectedPath.add(category.id);
     });
 
     // Calculate full name path
     String pathName = '';
+    CategoryModel? activeCategory;
     for (int i = 0; i < _selectedPath.length; i++) {
       final node = _findCategoryInTree(widget.categories, _selectedPath[i]);
       if (node != null) {
         pathName += (i == 0 ? '' : ' > ') + node.name;
+        activeCategory = node;
       }
     }
-    widget.onSelected(category, pathName);
+    widget.onSelected(activeCategory, pathName);
   }
 
   @override
@@ -367,124 +375,22 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return IconImageContainer(
+      title: category.name,
+      imageUrl: category.image,
+      iconUrl: category.icon,
+      isSelected: isSelected,
       onTap: onTap,
-      borderRadius: context.appBorderRadius(all: 16),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: context.w(180),
-        padding: context.appEdgeInsets(all: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? CustomColors.purple : Colors.white,
-          borderRadius: context.appBorderRadius(all: 16),
-          border: Border.all(
-            color: isSelected ? CustomColors.purple : CustomColors.border,
-            width: isSelected ? 2 : 1,
+      onAddChild: onAddChild,
+      onViewDetail: () {
+        showDialog(
+          context: context,
+          builder: (context) => CategoryCreationDialog(
+            categoryId: category.id,
+            isViewMode: true,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: CustomColors.purple.withValues(alpha: 0.2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : AppShadows.xs(context),
-        ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(
-                  _getIconData(category.icon),
-                  size: context.sp(22),
-                  color: isSelected ? Colors.white : CustomColors.purple,
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => CategoryCreationDialog(
-                            categoryId: category.id,
-                            isViewMode: true,
-                          ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(100),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.white.withValues(alpha: 0.2)
-                              : CustomColors.softGrey,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.visibility_outlined,
-                          size: 14,
-                          color: isSelected ? Colors.white : CustomColors.grey,
-                        ),
-                      ),
-                    ),
-                    context.horizontalSpace(6),
-                    InkWell(
-                      onTap: onAddChild,
-                      borderRadius: BorderRadius.circular(100),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.white.withValues(alpha: 0.2)
-                              : CustomColors.softGrey,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          size: 14,
-                          color: isSelected ? Colors.white : CustomColors.grey,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            context.verticalSpace(16),
-            Text(
-              category.name,
-              style: isSelected
-                  ? context.fonts.white14w600
-                  : context.fonts.black14w600,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
-  }
-
-  IconData _getIconData(String? iconName) {
-    switch (iconName) {
-      case 'face':
-        return Icons.face_retouching_natural_rounded;
-      case 'spa':
-        return Icons.spa_outlined;
-      case 'cut':
-        return Icons.content_cut_rounded;
-      case 'medical':
-        return Icons.medical_services_outlined;
-      case 'wash':
-        return Icons.dry_cleaning_outlined;
-      case 'skin':
-        return Icons.clean_hands_outlined;
-      default:
-        return Icons.category_outlined;
-    }
   }
 }
