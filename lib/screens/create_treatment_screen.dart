@@ -5675,6 +5675,67 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                         ),
                       ],
                     ),
+                    if (entry.packageType != null || entry.boxQuantity != null || entry.clinicCost != null || entry.retailPricePerUnit != null) ...[
+                      context.verticalSpace(8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          if (entry.packageType != null && entry.packageType!.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: CustomColors.whiteGrey,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: CustomColors.border),
+                              ),
+                              child: Text(
+                                'Package: ${entry.packageType}',
+                                style: context.fonts.grey12w400,
+                              ),
+                            ),
+                          if (entry.boxQuantity != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: CustomColors.whiteGrey,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: CustomColors.border),
+                              ),
+                              child: Text(
+                                'Box Qty: ${entry.boxQuantity}',
+                                style: context.fonts.grey12w400,
+                              ),
+                            ),
+                          if (entry.clinicCost != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: CustomColors.whiteGrey,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: CustomColors.border),
+                              ),
+                              child: Text(
+                                'Cost: \$${entry.clinicCost}',
+                                style: context.fonts.grey12w400,
+                              ),
+                            ),
+                          if (entry.retailPricePerUnit != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: CustomColors.whiteGrey,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: CustomColors.border),
+                              ),
+                              child: Text(
+                                'Retail/Unit: \$${entry.retailPricePerUnit}',
+                                style: context.fonts.grey12w400,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),

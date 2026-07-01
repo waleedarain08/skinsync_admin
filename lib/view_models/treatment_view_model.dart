@@ -32,6 +32,7 @@ import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
 import '../repositories/category_repository.dart';
 import '../repositories/treatment_repository.dart';
+import '../repositories/product_repository.dart';
 import '../services/locator.dart';
 import '../services/media_service.dart';
 import '../utils/dummy_data.dart';
@@ -1775,13 +1776,43 @@ Body       : ${request.toJson()}
     state = state.copyWith(enableByDefault: value ?? false);
   }
 
-  void addProductUsage(int productId, String productName, String unit) {
+  Future<void> addProductUsage(int productId, String productName, String unit) async {
     if (state.productUsageEntries.any((e) => e.productId == productId)) return;
+
+    EasyLoading.show(status: 'Fetching product details...');
+    String resolvedUnit = unit;
+    String? resolvedPackageType;
+    int? resolvedBoxQuantity;
+    double? resolvedClinicCost;
+    double? resolvedRetailPrice;
+
+    try {
+      final productRepo = locator<ProductRepository>();
+      final detail = await productRepo.getProductDetail(id: productId);
+      if (detail.data != null) {
+        final pData = detail.data!;
+        if (pData.unitType != null && pData.unitType!.isNotEmpty) {
+          resolvedUnit = pData.unitType!;
+        }
+        resolvedPackageType = pData.packageType;
+        resolvedBoxQuantity = pData.boxQuantity;
+        resolvedClinicCost = pData.clinicCost;
+        resolvedRetailPrice = pData.retailPricePerUnit;
+      }
+    } catch (e) {
+      log('Error fetching product detail: $e');
+    } finally {
+      EasyLoading.dismiss();
+    }
 
     final newEntry = ProductUsageEntry(
       productId: productId,
       productName: productName,
-      unit: unit,
+      unit: resolvedUnit,
+      packageType: resolvedPackageType,
+      boxQuantity: resolvedBoxQuantity,
+      clinicCost: resolvedClinicCost,
+      retailPricePerUnit: resolvedRetailPrice,
     );
 
     state = state.copyWith(
@@ -3112,6 +3143,11 @@ class ProductUsageEntry {
   final TextEditingController perUnitDurationController;
   final Map<String, SubAreaConsumptionControllers> subAreaControllers = {};
 
+  final String? packageType;
+  final int? boxQuantity;
+  final double? clinicCost;
+  final double? retailPricePerUnit;
+
   ProductUsageEntry({
     required this.productId,
     required this.productName,
@@ -3124,6 +3160,10 @@ class ProductUsageEntry {
     TextEditingController? notesController,
     TextEditingController? perUnitDurationController,
     List<SubAreaConsumption>? initialSubAreaConsumptions,
+    this.packageType,
+    this.boxQuantity,
+    this.clinicCost,
+    this.retailPricePerUnit,
   }) : minQuantityController =
            minQuantityController ?? TextEditingController(text: '1'),
        maxQuantityController =
@@ -3164,11 +3204,12 @@ class ProductUsageEntry {
     String? usageType,
     String? deductionTiming,
     bool? allowSubstitution,
+    String? unit,
   }) {
     final entry = ProductUsageEntry(
       productId: productId,
       productName: productName,
-      unit: unit,
+      unit: unit ?? this.unit,
       usageType: usageType ?? this.usageType,
       deductionTiming: deductionTiming ?? this.deductionTiming,
       allowSubstitution: allowSubstitution ?? this.allowSubstitution,
@@ -3176,6 +3217,10 @@ class ProductUsageEntry {
       maxQuantityController: maxQuantityController,
       notesController: notesController,
       perUnitDurationController: perUnitDurationController,
+      packageType: packageType,
+      boxQuantity: boxQuantity,
+      clinicCost: clinicCost,
+      retailPricePerUnit: retailPricePerUnit,
     );
     subAreaControllers.forEach((key, val) {
       entry.subAreaControllers[key] = SubAreaConsumptionControllers(
