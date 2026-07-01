@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/requests/create_category_request.dart';
+import 'package:skinsync_admin/models/responses/category_detail_response.dart';
+import 'package:skinsync_admin/models/responses/category_list_response.dart';
 
-import '../models/responses/category_detail_response.dart';
-import '../models/responses/category_list_response.dart';
-import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/view_models/category_view_model.dart';
-import 'package:skinsync_admin/widgets/icon_image_container.dart';
+import '../utils/theme.dart';
+import '../view_models/category_view_model.dart';
 import 'dailogbox/category_creation_dialog.dart';
+import 'icon_image_container.dart';
 
 class NestedCategorySelector extends ConsumerStatefulWidget {
   const NestedCategorySelector({
@@ -25,22 +25,22 @@ class NestedCategorySelector extends ConsumerStatefulWidget {
       _NestedCategorySelectorState();
 }
 
-class _NestedCategorySelectorState
-    extends ConsumerState<NestedCategorySelector> {
-  List<int> _selectedPath = [];
+class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector> {
+  int? _selectedCategoryId;
 
   @override
   void initState() {
     super.initState();
     if (widget.initialCategoryId != null) {
-      final id = int.tryParse(widget.initialCategoryId!);
-      if (id != null) {
-        _selectedPath = _findPathToCategory(
-          widget.categories,
-          id,
-          [],
-        );
-      }
+      _selectedCategoryId = int.tryParse(widget.initialCategoryId!);
+    }
+  }
+
+  @override
+  void didUpdateWidget(NestedCategorySelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialCategoryId != oldWidget.initialCategoryId && widget.initialCategoryId != null) {
+      _selectedCategoryId = int.tryParse(widget.initialCategoryId!);
     }
   }
 
@@ -62,30 +62,25 @@ class _NestedCategorySelectorState
     return [];
   }
 
-  void _onLevelSelect(int level, CategoryModel category) {
-    setState(() {
-      final isAlreadySelected = _selectedPath.length > level && _selectedPath[level] == category.id;
-      if (isAlreadySelected) {
-        _selectedPath = _selectedPath.sublist(0, level);
-      } else {
-        if (level < _selectedPath.length) {
-          _selectedPath = _selectedPath.sublist(0, level);
-        }
-        _selectedPath.add(category.id);
-      }
-    });
-
-    // Calculate full name path
+  String _getPathName(List<int> path) {
     String pathName = '';
-    CategoryModel? activeCategory;
-    for (int i = 0; i < _selectedPath.length; i++) {
-      final node = _findCategoryInTree(widget.categories, _selectedPath[i]);
+    for (int i = 0; i < path.length; i++) {
+      final node = _findCategoryInTree(widget.categories, path[i]);
       if (node != null) {
         pathName += (i == 0 ? '' : ' > ') + node.name;
-        activeCategory = node;
       }
     }
-    widget.onSelected(activeCategory, pathName);
+    return pathName;
+  }
+
+  void _onCategorySelected(CategoryModel category) {
+    setState(() {
+      _selectedCategoryId = category.id;
+    });
+
+    final path = _findPathToCategory(widget.categories, category.id, []);
+    final pathName = _getPathName(path);
+    widget.onSelected(category, pathName);
   }
 
   @override
@@ -94,140 +89,74 @@ class _NestedCategorySelectorState
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Level 0
-        _buildCategoryLevel(
-          context,
-          title: 'Main Category',
-          items: widget.categories,
-          selectedId: _selectedPath.isNotEmpty ? _selectedPath[0] : null,
-              onSelect: (item) => _onLevelSelect(0, item),
-              onAddChild: (parent) => _showAddChildDialog(
-            context,
-            parent,
-            (result) {
-              categoryViewModel.addCategory(
-                result['name'],
-                icon: result['icon'],
-                parentId: parent.id,
-                consentFormName: result['consentFormName'],
-                consentFormUrl: result['consentFormUrl'],
-                defaultSessions: result['sessions'],
-                totalSessions: result['totalSessions'],
-                preNotifications: result['preNotifications'],
-                postNotifications: result['postNotifications'],
-                downtimePresets: result['downtimePresets'],
-                defaultRoles: result['defaultRoles'],
-              );
-            },
-          ),
-          onAddRoot: () => _showCreationDialog(context, null, (result) {
-            categoryViewModel.addCategory(
-              result['name'],
-              icon: result['icon'],
-              consentFormName: result['consentFormName'],
-              consentFormUrl: result['consentFormUrl'],
-              defaultSessions: result['sessions'],
-              totalSessions: result['totalSessions'],
-              preNotifications: result['preNotifications'],
-              postNotifications: result['postNotifications'],
-              downtimePresets: result['downtimePresets'],
-              defaultRoles: result['defaultRoles'],
-            );
-          }),
-        ),
-
-        // Nested Levels
-        ...List.generate(_selectedPath.length, (index) {
-          final parentId = _selectedPath[index];
-          final parentNode = _findCategoryInTree(widget.categories, parentId);
-
-          if (parentNode == null || parentNode.subCategories.isEmpty) {
-            return const SizedBox.shrink();
-          }
-
-          return Padding(
-            padding: context.appEdgeInsets(top: 24),
-            child: _buildCategoryLevel(
-              context,
-              title: 'Subcategory of ${parentNode.name}',
-              items: parentNode.subCategories,
-              selectedId: _selectedPath.length > index + 1
-                  ? _selectedPath[index + 1]
-                  : null,
-              onSelect: (item) => _onLevelSelect(index + 1, item),
-              onAddChild: (parent) => _showAddChildDialog(
-                context,
-                parent,
-                (result) {
-                  categoryViewModel.addCategory(
-                    result['name'],
-                    icon: result['icon'],
-                    parentId: parent.id,
-                    consentFormName: result['consentFormName'],
-                    consentFormUrl: result['consentFormUrl'],
-                    defaultSessions: result['sessions'],
-                    totalSessions: result['totalSessions'],
-                    preNotifications: result['preNotifications'],
-                    postNotifications: result['postNotifications'],
-                    downtimePresets: result['downtimePresets'],
-                    defaultRoles: result['defaultRoles'],
-                  );
-                },
-              ),
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  Widget _buildCategoryLevel(
-    BuildContext context, {
-    required String title,
-    required List<CategoryModel> items,
-    required int? selectedId,
-    required void Function(CategoryModel) onSelect,
-    required void Function(CategoryModel) onAddChild,
-    VoidCallback? onAddRoot,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title, style: context.fonts.black14w600),
-            if (onAddRoot != null) ...[
-              context.horizontalSpace(12),
-              IconButton(
-                onPressed: onAddRoot,
-                icon: const Icon(
-                  Icons.add_circle_outline_rounded,
-                  size: 20,
-                  color: CustomColors.purple,
-                ),
-                tooltip: 'Add Root Category',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
+            Text('Browse Categories', style: context.fonts.black16w600),
+            TextButton.icon(
+              onPressed: () => _showCreationDialog(context, null, (result) {
+                categoryViewModel.addCategory(
+                  result['name'],
+                  icon: result['icon'],
+                  consentFormName: result['consentFormName'],
+                  consentFormUrl: result['consentFormUrl'],
+                  defaultSessions: result['sessions'],
+                  totalSessions: result['totalSessions'],
+                  preNotifications: result['preNotifications'],
+                  postNotifications: result['postNotifications'],
+                  downtimePresets: result['downtimePresets'],
+                  defaultRoles: result['defaultRoles'],
+                );
+              }),
+              icon: const Icon(Icons.add_circle_outline, size: 18),
+              label: const Text('Add Root Category'),
+              style: TextButton.styleFrom(
+                foregroundColor: CustomColors.purple,
               ),
-            ],
+            ),
           ],
         ),
         context.verticalSpace(16),
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: items.map((category) {
-            final isSelected = category.id == selectedId;
-            return _CategoryCard(
-              category: category,
-              isSelected: isSelected,
-              onTap: () => onSelect(category),
-              onAddChild: () => onAddChild(category),
-            );
-          }).toList(),
-        ),
+        if (widget.categories.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Center(
+              child: Text(
+                'No categories available. Please add a root category.',
+                style: context.fonts.grey14w400,
+              ),
+            ),
+          )
+        else
+          Column(
+            children: widget.categories.map((category) {
+              return _RecursiveCategoryTile(
+                category: category,
+                selectedCategoryId: _selectedCategoryId,
+                onSelected: _onCategorySelected,
+                onAddSubcategory: (parent) => _showAddChildDialog(
+                  context,
+                  parent,
+                  (result) {
+                    categoryViewModel.addCategory(
+                      result['name'],
+                      icon: result['icon'],
+                      parentId: parent.id,
+                      consentFormName: result['consentFormName'],
+                      consentFormUrl: result['consentFormUrl'],
+                      defaultSessions: result['sessions'],
+                      totalSessions: result['totalSessions'],
+                      preNotifications: result['preNotifications'],
+                      postNotifications: result['postNotifications'],
+                      downtimePresets: result['downtimePresets'],
+                      defaultRoles: result['defaultRoles'],
+                    );
+                  },
+                ),
+              );
+            }).toList(),
+          ),
       ],
     );
   }
@@ -291,51 +220,54 @@ class _NestedCategorySelectorState
       initialConsentName: detail.consentFormName,
       initialConsentFormUrl: detail.consentFormUrl,
       initialSessions: detail.defaultSessions
-          ?.map(
-            (session) => CategorySessionModel(
-              sessionNumber: session.sessionNumber,
-              followUps: session.followUps
-    .map(
-      (followUp) => CategoryFollowUpModel(
-        type: followUp.type ?? '',
-        durationValue: followUp.durationValue ?? 0,
-        durationUnit:
-            unitValues.reverse[followUp.durationUnit] ??
-            'minutes',
-        intervalValue: followUp.intervalValue ?? 0,
-        intervalUnit: followUp.intervalUnit ?? '',
-        isImageRequired:
-            followUp.isImageRequired ?? false,
-        notes: followUp.notes ?? '',
-      ),
-    )
-    .toList(),
-            ),
-          )
-          .toList() ?? [],
+              ?.map(
+                (session) => CategorySessionModel(
+                  sessionNumber: session.sessionNumber,
+                  followUps: session.followUps
+                      .map(
+                        (followUp) => CategoryFollowUpModel(
+                          type: followUp.type ?? '',
+                          durationValue: followUp.durationValue ?? 0,
+                          durationUnit:
+                              unitValues.reverse[followUp.durationUnit] ??
+                              'minutes',
+                          intervalValue: followUp.intervalValue ?? 0,
+                          intervalUnit: followUp.intervalUnit ?? '',
+                          isImageRequired:
+                              followUp.isImageRequired ?? false,
+                          notes: followUp.notes ?? '',
+                        ),
+                      )
+                      .toList(),
+                ),
+              )
+              .toList() ??
+          [],
       initialTotalSessions: detail.totalSessions,
       initialPreNotifications: detail.preNotifications
-          ?.map(
-            (notification) => CategoryNotificationModel(
-              title: notification.title,
-              message: notification.message,
-              timing: notification.timing,
-              timingUnit: unitValues.reverse[notification.timingUnit],
-              type: typeValues.reverse[notification.type],
-            ),
-          )
-          .toList() ?? [],
+              ?.map(
+                (notification) => CategoryNotificationModel(
+                  title: notification.title,
+                  message: notification.message,
+                  timing: notification.timing,
+                  timingUnit: unitValues.reverse[notification.timingUnit],
+                  type: typeValues.reverse[notification.type],
+                ),
+              )
+              .toList() ??
+          [],
       initialPostNotifications: detail.postNotifications
-          ?.map(
-            (notification) => CategoryNotificationModel(
-              title: notification.title,
-              message: notification.message,
-              timing: notification.timing,
-              timingUnit: unitValues.reverse[notification.timingUnit],
-              type: typeValues.reverse[notification.type],
-            ),
-          )
-          .toList() ?? [],
+              ?.map(
+                (notification) => CategoryNotificationModel(
+                  title: notification.title,
+                  message: notification.message,
+                  timing: notification.timing,
+                  timingUnit: unitValues.reverse[notification.timingUnit],
+                  type: typeValues.reverse[notification.type],
+                ),
+              )
+              .toList() ??
+          [],
       initialDowntimePresets: CategoryDowntimePresetModel(
         none: detail.downtimePresets?.none ?? 0,
         low: detail.downtimePresets?.low ?? 0,
@@ -343,9 +275,10 @@ class _NestedCategorySelectorState
         high: detail.downtimePresets?.high ?? 0,
       ),
       initialDefaultRoles: detail.defaultRoles
-          ?.map((role) => defaultRoleValues.reverse[role] ?? '')
-          .where((role) => role.isNotEmpty)
-          .toList() ?? [],
+              ?.map((role) => defaultRoleValues.reverse[role] ?? '')
+              .where((role) => role.isNotEmpty)
+              .toList() ??
+          [],
     );
   }
 
@@ -361,36 +294,126 @@ class _NestedCategorySelectorState
   }
 }
 
-class _CategoryCard extends StatelessWidget {
-  const _CategoryCard({
-    required this.category,
-    required this.isSelected,
-    required this.onTap,
-    required this.onAddChild,
-  });
+class _RecursiveCategoryTile extends StatelessWidget {
   final CategoryModel category;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final VoidCallback onAddChild;
+  final int? selectedCategoryId;
+  final ValueChanged<CategoryModel> onSelected;
+  final ValueChanged<CategoryModel> onAddSubcategory;
+  final int depth;
+
+  const _RecursiveCategoryTile({
+    required this.category,
+    required this.selectedCategoryId,
+    required this.onSelected,
+    required this.onAddSubcategory,
+    this.depth = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return IconImageContainer(
-      title: category.name,
-      imageUrl: category.image,
-      iconUrl: category.icon,
-      isSelected: isSelected,
-      onTap: onTap,
-      onAddChild: onAddChild,
-      onViewDetail: () {
-        showDialog(
-          context: context,
-          builder: (context) => CategoryCreationDialog(
-            categoryId: category.id,
-            isViewMode: true,
+    final isSelected = category.id == selectedCategoryId;
+    final hasSubcategories = category.subCategories.isNotEmpty;
+
+    final leadingWidget = Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: category.icon.isNotEmpty
+          ? IconImageContainer(
+              iconUrl: category.icon,
+              width: 36,
+              height: 36,
+            )
+          : const Icon(
+              Icons.category_outlined,
+              color: CustomColors.purple,
+              size: 18,
+            ),
+    );
+
+    final titleWidget = Row(
+      children: [
+        Expanded(
+          child: Text(
+            category.name,
+            style: context.fonts.black14w600.copyWith(
+              color: isSelected ? CustomColors.purple : CustomColors.black,
+            ),
           ),
-        );
-      },
+        ),
+        IconButton(
+          icon: Icon(
+            isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+            color: isSelected ? CustomColors.purple : CustomColors.grey,
+            size: 20,
+          ),
+          onPressed: () => onSelected(category),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        ),
+      ],
+    );
+
+    final trailingWidget = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.add_circle_outline, size: 20, color: CustomColors.purple),
+          onPressed: () => onAddSubcategory(category),
+          tooltip: 'Add Subcategory',
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        ),
+        if (hasSubcategories) ...[
+          const SizedBox(width: 8),
+          const Icon(Icons.expand_more),
+        ],
+      ],
+    );
+
+    return Container(
+      margin: EdgeInsets.only(left: depth * 16.0, bottom: 8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isSelected ? CustomColors.purple : CustomColors.border,
+          width: isSelected ? 1.5 : 1,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: hasSubcategories
+            ? ExpansionTile(
+                initiallyExpanded: isSelected,
+                onExpansionChanged: (expanded) {
+                  onSelected(category);
+                },
+                shape: const RoundedRectangleBorder(side: BorderSide.none),
+                leading: leadingWidget,
+                title: titleWidget,
+                trailing: trailingWidget,
+                childrenPadding: const EdgeInsets.all(12),
+                children: category.subCategories.map((sub) {
+                  return _RecursiveCategoryTile(
+                    category: sub,
+                    selectedCategoryId: selectedCategoryId,
+                    onSelected: onSelected,
+                    onAddSubcategory: onAddSubcategory,
+                    depth: depth + 1,
+                  );
+                }).toList(),
+              )
+            : ListTile(
+                onTap: () => onSelected(category),
+                leading: leadingWidget,
+                title: titleWidget,
+                trailing: trailingWidget,
+              ),
+      ),
     );
   }
 }
