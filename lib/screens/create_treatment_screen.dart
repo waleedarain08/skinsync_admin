@@ -8092,14 +8092,18 @@ class _SelectedSummaryCard extends StatelessWidget {
               Expanded(
                 child: Text(item.label, style: context.fonts.black12w400),
               ),
-              InkWell(
-                onTap: item.onRemove,
-                child: const Icon(
-                  Icons.close_rounded,
-                  size: 14,
-                  color: CustomColors.softGrey,
+              if (!summary)
+                InkWell(
+                  onTap: item.onRemove,
+                  child: const Padding(
+                    padding: EdgeInsets.all(2.0),
+                    child: Icon(
+                      Icons.cancel,
+                      size: 14,
+                      color: CustomColors.purple,
+                    ),
+                  ),
                 ),
-              ),
             ],
           ),
           if (item.children.isNotEmpty)
