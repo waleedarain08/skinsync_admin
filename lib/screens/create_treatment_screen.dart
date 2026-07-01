@@ -843,12 +843,27 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   (a) => a.name == areaEntry.areaController.text,
                 );
 
-                final List<String> subNames = areaEntry.subAreas.map((s) {
+                final List<PreviewItem> subItems = areaEntry.subAreas.map((s) {
                   // Find corresponding subarea SKU
-                  final subItem = areaItem?.subAreas.firstWhereOrNull(
+                  final subAreaModel = areaItem?.subAreas.firstWhereOrNull(
                     (sa) => sa.name == s.name,
                   );
-                  return '${s.name} (${subItem?.globalSku ?? 'N/A'})';
+
+                  final List<PreviewItem> childItems = s.children.map((c) {
+                    final childModel = subAreaModel?.subAreas.firstWhereOrNull(
+                      (ca) => ca.name == c.name,
+                    );
+                    return PreviewItem(
+                      label: '${c.name} (${childModel?.globalSku ?? 'N/A'})',
+                      onRemove: () {},
+                    );
+                  }).toList();
+
+                  return PreviewItem(
+                    label: '${s.name} (${subAreaModel?.globalSku ?? 'N/A'})',
+                    onRemove: () {},
+                    children: childItems,
+                  );
                 }).toList();
 
                 return _SelectedSummaryCard(
@@ -856,12 +871,58 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   sku: areaItem?.globalSku ?? 'N/A',
                   icon: areaItem?.icon,
                   subLabel: 'Selected Sub-Areas:',
-                  items: subNames,
+                  items: subItems,
+                  onRemove: () {},
+                  summary: true,
                 );
               }).toList(),
             ),
     );
   }
+
+  // Widget _buildAreasSummary(
+  //   BuildContext context,
+  //   TreatmentState state,
+  //   TreatmentDataState dataState,
+  // ) {
+  //   final activeAreas = state.areas
+  //       .where((a) => a.areaController.text.isNotEmpty)
+  //       .toList();
+  //
+  //   return _blueprintSection(
+  //     context,
+  //     '2. Selected Areas & Sub-Areas Summary',
+  //     activeAreas.isEmpty
+  //         ? Text('No areas selected', style: context.fonts.grey12w400)
+  //         : Wrap(
+  //             spacing: 12,
+  //             runSpacing: 12,
+  //             children: activeAreas.map((areaEntry) {
+  //               // Find corresponding AreaModel in dataState.areas
+  //               final areaItem = dataState.areas.firstWhereOrNull(
+  //                 (a) => a.name == areaEntry.areaController.text,
+  //               );
+  //
+  //               final List<String> subNames = areaEntry.subAreas.map((s) {
+  //                 // Find corresponding subarea SKU
+  //                 final subItem = areaItem?.subAreas.firstWhereOrNull(
+  //                   (sa) => sa.name == s.name,
+  //                 );
+  //                 return '${s.name} (${subItem?.globalSku ?? 'N/A'})';
+  //               }).toList();
+  //
+  //               return _SelectedSummaryCard(
+  //                 title: areaItem?.name ?? 'N/A',
+  //                 sku: areaItem?.globalSku ?? 'N/A',
+  //                 icon: areaItem?.icon,
+  //                 subLabel: 'Selected Sub-Areas:',
+  //                 items: subNames,
+  //                 onRemove: () {},
+  //               );
+  //             }).toList(),
+  //           ),
+  //   );
+  // }
 
   Widget _buildSessionsSummary(
     BuildContext context,
@@ -6269,14 +6330,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 } else if (state.currentStep == 2) {
-                  final success = await viewModel.createTreatmentArea(
-                  );
+                  final success = await viewModel.createTreatmentArea();
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 } else if (state.currentStep == 3) {
-                  final success = await viewModel.callProductUsage(
-                  );
+                  final success = await viewModel.callProductUsage();
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
@@ -6309,14 +6368,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 } else if (state.currentStep == 7) {
-                  final success = await viewModel.callPreTreatmentInstructions(
-                  );
+                  final success = await viewModel
+                      .callPreTreatmentInstructions();
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
                 } else if (state.currentStep == 8) {
-                  final success = await viewModel.callPostTreatmentInstructions(
-                  );
+                  final success = await viewModel
+                      .callPostTreatmentInstructions();
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
@@ -6331,14 +6390,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     viewModel.setStep(11);
                   }
                 } else if (state.currentStep == 11) {
-                  final success = await viewModel.callDownTimeLevels(
-                  );
+                  final success = await viewModel.callDownTimeLevels();
                   if (success ?? false) {
                     viewModel.setStep(12);
                   }
                 } else if (state.currentStep == 12) {
-                  final success = await viewModel.callAllowedProviderRoles(
-                  );
+                  final success = await viewModel.callAllowedProviderRoles();
                   if (success ?? false) {
                     viewModel.setStep(state.currentStep + 1);
                   }
@@ -6353,8 +6410,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     viewModel.setStep(15);
                   }
                 } else if (state.currentStep == 15) {
-                  final success = await viewModel.callConsentFormSelection(
-                  );
+                  final success = await viewModel.callConsentFormSelection();
                   if (success ?? false) {
                     viewModel.setStep(16);
                   }
@@ -6363,13 +6419,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   if (success ?? false) {
                     //viewModel.setStep(17);
                     viewModel
-                    .submitTreatment(
-                      context,
-                      categories: categoryState.categories,
-                    )
-                    .then((_) {
-                      if (context.mounted) context.pop();
-                    });
+                        .submitTreatment(
+                          context,
+                          categories: categoryState.categories,
+                        )
+                        .then((_) {
+                          if (context.mounted) context.pop();
+                        });
                   }
                 }
                 // // TODO : this is only for now to go on forward step have to remove once stepper API are completed
@@ -6899,9 +6955,9 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
   @override
   void initState() {
     super.initState();
-    if (widget.areas.isNotEmpty) {
-      _focusedAreaName = widget.areas.first.name;
-    }
+    // if (widget.areas.isNotEmpty) {
+    //   _focusedAreaName = widget.areas.first.name;
+    // }
   }
 
   void _showAddNodeDialog({
@@ -7042,8 +7098,132 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
     );
   }
 
+  // Widget _buildLiveSelectionPreview(BuildContext context) {
+  //   // Find all selected areas and render them hierarchically as beautiful cards
+  //   final List<Widget> previewNodes = [];
+  //
+  //   for (final area in widget.areas) {
+  //     final isAreaSelected = widget.selectedAreas.any(
+  //       (a) => a.areaController.text == area.name,
+  //     );
+  //     final areaEntry = widget.selectedAreas.firstWhere(
+  //       (a) => a.areaController.text == area.name,
+  //       orElse: AreaViewModelEntry.new,
+  //     );
+  //
+  //     final selectedSubAreas = area.subAreas.where((s) {
+  //       return areaEntry.subAreas.any((sa) => sa.name == s.name);
+  //     }).toList();
+  //
+  //     if (isAreaSelected || selectedSubAreas.isNotEmpty) {
+  //       // Build children widgets
+  //       final List<String> subAreaStrings = [];
+  //       for (final s in selectedSubAreas) {
+  //         final subAreaConfig = areaEntry.subAreas.firstWhere(
+  //           (sa) => sa.name == s.name,
+  //         );
+  //
+  //         final selectedChildren = s.subAreas.where((c) {
+  //           return subAreaConfig.children.any((sac) => sac.name == c.name);
+  //         }).toList();
+  //
+  //         if (selectedChildren.isNotEmpty) {
+  //           final childrenNames = selectedChildren
+  //               .map((c) => '${c.name} (${c.globalSku})')
+  //               .join(', ');
+  //           subAreaStrings.add(
+  //             '${s.name} (${s.globalSku}) -> [$childrenNames]',
+  //           );
+  //         } else {
+  //           subAreaStrings.add('${s.name} (${s.globalSku})');
+  //         }
+  //       }
+  //
+  //       previewNodes.add(
+  //         _SelectedSummaryCard(
+  //           title: area.name,
+  //           sku: area.globalSku,
+  //           icon: area.icon,
+  //           subLabel: 'Selected Sub-Areas:',
+  //           items: subAreaStrings,
+  //         ),
+  //       );
+  //     }
+  //   }
+  //
+  //   if (previewNodes.isEmpty) {
+  //     return Text('No areas selected', style: context.fonts.grey13w500);
+  //   }
+  //
+  //   return Wrap(spacing: 16, runSpacing: 16, children: previewNodes);
+  // }
+
+  ///new once
+  // Widget _buildLiveSelectionPreview(BuildContext context) {
+  //   final List<Widget> previewNodes = [];
+  //
+  //   for (final area in widget.areas) {
+  //     final isAreaSelected = widget.selectedAreas.any(
+  //       (a) => a.areaController.text == area.name,
+  //     );
+  //     final areaEntry = widget.selectedAreas.firstWhere(
+  //       (a) => a.areaController.text == area.name,
+  //       orElse: AreaViewModelEntry.new,
+  //     );
+  //
+  //     final selectedSubAreas = area.subAreas.where((s) {
+  //       return areaEntry.subAreas.any((sa) => sa.name == s.name);
+  //     }).toList();
+  //
+  //     if (isAreaSelected || selectedSubAreas.isNotEmpty) {
+  //       final List<PreviewItem> subAreaItems = [];
+  //
+  //       for (final s in selectedSubAreas) {
+  //         final subAreaConfig = areaEntry.subAreas.firstWhere(
+  //           (sa) => sa.name == s.name,
+  //         );
+  //
+  //         final selectedChildren = s.subAreas.where((c) {
+  //           return subAreaConfig.children.any((sac) => sac.name == c.name);
+  //         }).toList();
+  //
+  //         final childItems = selectedChildren.map((c) {
+  //           return PreviewItem(
+  //             label: '${c.name} (${c.globalSku})',
+  //             onRemove: () => widget.onSubAreaChildToggle(area, s, c),
+  //           );
+  //         }).toList();
+  //
+  //         subAreaItems.add(
+  //           PreviewItem(
+  //             label: '${s.name} (${s.globalSku})',
+  //             onRemove: () => widget.onSubAreaToggle(area, s),
+  //             children: childItems,
+  //           ),
+  //         );
+  //       }
+  //
+  //       previewNodes.add(
+  //         _SelectedSummaryCard(
+  //           title: area.name,
+  //           sku: area.globalSku,
+  //           icon: area.icon,
+  //           subLabel: 'Selected Sub-Areas:',
+  //           items: subAreaItems,
+  //           onRemove: () => widget.onAreaToggle(area),
+  //         ),
+  //       );
+  //     }
+  //   }
+  //
+  //   if (previewNodes.isEmpty) {
+  //     return Text('No areas selected', style: context.fonts.grey13w500);
+  //   }
+  //
+  //   return Wrap(spacing: 16, runSpacing: 16, children: previewNodes);
+  // }
+
   Widget _buildLiveSelectionPreview(BuildContext context) {
-    // Find all selected areas and render them hierarchically as beautiful cards
     final List<Widget> previewNodes = [];
 
     for (final area in widget.areas) {
@@ -7060,8 +7240,8 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
       }).toList();
 
       if (isAreaSelected || selectedSubAreas.isNotEmpty) {
-        // Build children widgets
-        final List<String> subAreaStrings = [];
+        final List<PreviewItem> subAreaItems = [];
+
         for (final s in selectedSubAreas) {
           final subAreaConfig = areaEntry.subAreas.firstWhere(
             (sa) => sa.name == s.name,
@@ -7071,16 +7251,34 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
             return subAreaConfig.children.any((sac) => sac.name == c.name);
           }).toList();
 
-          if (selectedChildren.isNotEmpty) {
-            final childrenNames = selectedChildren
-                .map((c) => '${c.name} (${c.globalSku})')
-                .join(', ');
-            subAreaStrings.add(
-              '${s.name} (${s.globalSku}) -> [$childrenNames]',
+          final childItems = selectedChildren.map((c) {
+            return PreviewItem(
+              label: '${c.name} (${c.globalSku})',
+              onRemove: () {
+                widget.onSubAreaChildToggle(area, s, c);
+                // Removing a child never affects area/sub-area focus,
+                // so no focus cleanup needed here.
+              },
             );
-          } else {
-            subAreaStrings.add('${s.name} (${s.globalSku})');
-          }
+          }).toList();
+
+          subAreaItems.add(
+            PreviewItem(
+              label: '${s.name} (${s.globalSku})',
+              onRemove: () {
+                widget.onSubAreaToggle(area, s);
+                // If the sub-area we just removed was focused, clear it
+                // so its (now stale) child section disappears too.
+                if (_focusedAreaName == area.name &&
+                    _focusedSubAreaName == s.name) {
+                  setState(() {
+                    _focusedSubAreaName = null;
+                  });
+                }
+              },
+              children: childItems,
+            ),
+          );
         }
 
         previewNodes.add(
@@ -7089,7 +7287,19 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
             sku: area.globalSku,
             icon: area.icon,
             subLabel: 'Selected Sub-Areas:',
-            items: subAreaStrings,
+            items: subAreaItems,
+            summary: false,
+            onRemove: () {
+              widget.onAreaToggle(area);
+              // If the area we just removed was focused, clear focus at
+              // both levels so its sub-area/child sections collapse too.
+              if (_focusedAreaName == area.name) {
+                setState(() {
+                  _focusedAreaName = null;
+                  _focusedSubAreaName = null;
+                });
+              }
+            },
           ),
         );
       }
@@ -7104,31 +7314,58 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
 
   @override
   Widget build(BuildContext context) {
-    if (_focusedAreaName == null ||
+    // if (_focusedAreaName == null ||
+    //     !widget.areas.any((a) => a.name == _focusedAreaName)) {
+    //   _focusedAreaName = widget.areas.isNotEmpty
+    //       ? widget.areas.first.name
+    //       : null;
+    // }
+    //
+    // final focusedArea = widget.areas.firstWhere(
+    //   (a) => a.name == _focusedAreaName,
+    //   orElse: () => widget.areas.first,
+    // );
+    //
+    // final areaEntry = widget.selectedAreas.firstWhere(
+    //   (a) => a.areaController.text == focusedArea.name,
+    //   orElse: AreaViewModelEntry.new,
+    // );
+    //
+    // if (_focusedSubAreaName == null ||
+    //     !focusedArea.subAreas.any((s) => s.name == _focusedSubAreaName)) {
+    //   _focusedSubAreaName = focusedArea.subAreas.isNotEmpty
+    //       ? focusedArea.subAreas.first.name
+    //       : null;
+    // }
+    //
+    // final focusedSubArea = focusedArea.subAreas.firstWhereOrNull(
+    //   (s) => s.name == _focusedSubAreaName,
+    // );
+    if (_focusedAreaName != null &&
         !widget.areas.any((a) => a.name == _focusedAreaName)) {
-      _focusedAreaName = widget.areas.isNotEmpty
-          ? widget.areas.first.name
-          : null;
+      _focusedAreaName = null;
+      _focusedSubAreaName = null;
     }
 
-    final focusedArea = widget.areas.firstWhere(
-      (a) => a.name == _focusedAreaName,
-      orElse: () => widget.areas.first,
-    );
+    final focusedArea = _focusedAreaName == null
+        ? null
+        : widget.areas.firstWhereOrNull((a) => a.name == _focusedAreaName);
 
-    final areaEntry = widget.selectedAreas.firstWhere(
-      (a) => a.areaController.text == focusedArea.name,
-      orElse: AreaViewModelEntry.new,
-    );
+    final areaEntry = focusedArea == null
+        ? AreaViewModelEntry()
+        : widget.selectedAreas.firstWhere(
+            (a) => a.areaController.text == focusedArea.name,
+            orElse: AreaViewModelEntry.new,
+          );
 
-    if (_focusedSubAreaName == null ||
+    // Same fix at the sub-area level: only clear if stale, never default.
+    if (focusedArea != null &&
+        _focusedSubAreaName != null &&
         !focusedArea.subAreas.any((s) => s.name == _focusedSubAreaName)) {
-      _focusedSubAreaName = focusedArea.subAreas.isNotEmpty
-          ? focusedArea.subAreas.first.name
-          : null;
+      _focusedSubAreaName = null;
     }
 
-    final focusedSubArea = focusedArea.subAreas.firstWhereOrNull(
+    final focusedSubArea = focusedArea?.subAreas.firstWhereOrNull(
       (s) => s.name == _focusedSubAreaName,
     );
 
@@ -7175,29 +7412,41 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
               iconUrl: area.icon,
               isSelected: isSelected || isFocused,
               onTap: () {
+                if (!isSelected) {
+                  widget.onAreaToggle(area);
+                  ref
+                      .read(treatmentViewModelProvider.notifier)
+                      .setSelectedTreatmentAreaIds(area.id);
+                }
+                // Always just move focus — selecting or re-visiting never deselects here.
                 setState(() {
-                  if (isSelected || isFocused) {
-                    _focusedAreaName = null;
-                    _focusedSubAreaName = null;
-                  } else {
-                    _focusedAreaName = area.name;
-                    _focusedSubAreaName = area.subAreas.isNotEmpty
-                        ? area.subAreas.first.name
-                        : null;
-                  }
+                  _focusedAreaName = area.name;
+                  _focusedSubAreaName = null;
                 });
-                widget.onAreaToggle(area);
-
-                ref
-                    .read(treatmentViewModelProvider.notifier)
-                    .setSelectedTreatmentAreaIds(area.id);
+                // setState(() {
+                //   if (isSelected) {
+                //     // Deselecting -> collapse focus and clear the whole
+                //     // detail panel (sub-area + sub-child sections go away).
+                //     _focusedAreaName = null;
+                //     _focusedSubAreaName = null;
+                //   } else {
+                //     // Selecting -> focus this area only.
+                //     // Do NOT pre-pick a sub-area here.
+                //     _focusedAreaName = area.name;
+                //     _focusedSubAreaName = null;
+                //   }
+                // });
+                // widget.onAreaToggle(area);
+                //
+                // ref
+                //     .read(treatmentViewModelProvider.notifier)
+                //     .setSelectedTreatmentAreaIds(area.id);
               },
               onAddChild: () {
                 _showAddNodeDialog(
                   context: context,
                   title: 'Create New Sub-Area in ${area.name}',
                   onAdd: (name, sku, icon) => widget.onAddSubArea(
-                    // TODO: Add actual parent area id.
                     parentAreaId: area.id,
                     parentAreaName: area.name,
                     name: name,
@@ -7210,8 +7459,8 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
           }).toList(),
         ),
 
-        // Level 1: Sub-Areas
-        if (focusedArea.subAreas.isNotEmpty) ...[
+        // Level 1: Sub-Areas — only rendered when something is actually focused
+        if (focusedArea != null && focusedArea.subAreas.isNotEmpty) ...[
           context.verticalSpace(32),
           const Divider(),
           context.verticalSpace(24),
@@ -7228,8 +7477,8 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                     context: context,
                     title: 'Create New Sub-Area in ${focusedArea.name}',
                     onAdd: (name, sku, icon) => widget.onAddSubArea(
-                      // TODO: Send actual parent area id here;
-                      parentAreaId: 0,
+                      parentAreaId:
+                          focusedArea.id, // was hardcoded to 0 — fixed
                       parentAreaName: focusedArea.name,
                       name: name,
                       sku: sku,
@@ -7264,18 +7513,28 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 iconUrl: subArea.icon,
                 isSelected: isSelected || isFocused,
                 onTap: () {
-                setState(() {
-                  if (isSelected || isFocused) {
-                    _focusedSubAreaName = null;
-                  } else {
-                    _focusedSubAreaName = subArea.name;
+                  if (!isSelected) {
+                    widget.onSubAreaToggle(focusedArea, subArea);
+                    ref
+                        .read(treatmentViewModelProvider.notifier)
+                        .setSelectedTreatmentAreaIds(subArea.id);
                   }
-                });
-                widget.onSubAreaToggle(focusedArea, subArea);
-
-                  ref
-                      .read(treatmentViewModelProvider.notifier)
-                      .setSelectedTreatmentAreaIds(subArea.id);
+                  setState(() {
+                    _focusedSubAreaName = subArea.name;
+                  });
+                  // setState(() {
+                  //   if (isSelected) {
+                  //     // Deselecting -> collapse the child-area panel too.
+                  //     _focusedSubAreaName = null;
+                  //   } else {
+                  //     _focusedSubAreaName = subArea.name;
+                  //   }
+                  // });
+                  // widget.onSubAreaToggle(focusedArea, subArea);
+                  //
+                  // ref
+                  //     .read(treatmentViewModelProvider.notifier)
+                  //     .setSelectedTreatmentAreaIds(subArea.id);
                 },
                 onAddChild: () {
                   _showAddNodeDialog(
@@ -7295,7 +7554,6 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
           ),
         ],
 
-        // Level 2: Sub-Area Children
         if (focusedSubArea != null &&
             focusedSubArea.name.isNotEmpty &&
             focusedSubArea.subAreas.isNotEmpty) ...[
@@ -7315,7 +7573,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                     context: context,
                     title: 'Create New Child in ${focusedSubArea.name}',
                     onAdd: (name, sku, icon) => widget.onAddSubAreaChild(
-                      focusedArea.name,
+                      focusedArea!.name,
                       focusedSubArea.name,
                       name,
                       sku,
@@ -7356,15 +7614,27 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 iconUrl: child.icon,
                 isSelected: isSelected,
                 onTap: () {
-                  widget.onSubAreaChildToggle(
-                    focusedArea,
-                    focusedSubArea,
-                    child,
-                  );
+                  if (!isSelected) {
+                    widget.onSubAreaChildToggle(
+                      focusedArea!,
+                      focusedSubArea,
+                      child,
+                    );
+                    ref
+                        .read(treatmentViewModelProvider.notifier)
+                        .setSelectedTreatmentAreaIds(child.id);
+                  }
+                  // No deeper level to focus into, so nothing else to do once selected.
 
-                  ref
-                      .read(treatmentViewModelProvider.notifier)
-                      .setSelectedTreatmentAreaIds(child.id);
+                  // widget.onSubAreaChildToggle(
+                  //   focusedArea!,
+                  //   focusedSubArea,
+                  //   child,
+                  // );
+                  //
+                  // ref
+                  //     .read(treatmentViewModelProvider.notifier)
+                  //     .setSelectedTreatmentAreaIds(child.id);
                 },
                 onAddChild: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -7380,7 +7650,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
           ),
         ],
 
-        // Live Selection Preview Card Section
+        // Live Selection Preview — unchanged
         context.verticalSpace(32),
         const Divider(),
         context.verticalSpace(24),
@@ -7416,99 +7686,426 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
         ),
       ],
     );
+
+    // return Column(
+    //   crossAxisAlignment: CrossAxisAlignment.start,
+    //   children: [
+    //     // Level 0: Main Areas
+    //     Row(
+    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //       children: [
+    //         Text('Main Body Areas', style: context.fonts.black14w600),
+    //         IconButton(
+    //           onPressed: () {
+    //             _showAddNodeDialog(
+    //               context: context,
+    //               title: 'Create New Main Area',
+    //               onAdd: (name, sku, icon) => widget.onAddArea(name, sku, icon),
+    //             );
+    //           },
+    //           icon: const Icon(
+    //             Icons.add_circle_outline_rounded,
+    //             size: 20,
+    //             color: CustomColors.purple,
+    //           ),
+    //           tooltip: 'Add Root Area',
+    //           padding: EdgeInsets.zero,
+    //           constraints: const BoxConstraints(),
+    //         ),
+    //       ],
+    //     ),
+    //     context.verticalSpace(16),
+    //     Wrap(
+    //       spacing: 16,
+    //       runSpacing: 16,
+    //       children: widget.areas.map((area) {
+    //         final isSelected = widget.selectedAreas.any(
+    //           (a) => a.areaController.text == area.name,
+    //         );
+    //         final isFocused = _focusedAreaName == area.name;
+    //
+    //         return IconImageContainer(
+    //           title: area.name,
+    //           imageUrl: area.image,
+    //           iconUrl: area.icon,
+    //           isSelected: isSelected || isFocused,
+    //           onTap: () {
+    //             setState(() {
+    //               if (isSelected || isFocused) {
+    //                 _focusedAreaName = null;
+    //                 _focusedSubAreaName = null;
+    //               } else {
+    //                 _focusedAreaName = area.name;
+    //                 _focusedSubAreaName = area.subAreas.isNotEmpty
+    //                     ? area.subAreas.first.name
+    //                     : null;
+    //               }
+    //             });
+    //             widget.onAreaToggle(area);
+    //
+    //             ref
+    //                 .read(treatmentViewModelProvider.notifier)
+    //                 .setSelectedTreatmentAreaIds(area.id);
+    //           },
+    //           onAddChild: () {
+    //             _showAddNodeDialog(
+    //               context: context,
+    //               title: 'Create New Sub-Area in ${area.name}',
+    //               onAdd: (name, sku, icon) => widget.onAddSubArea(
+    //                 // TODO: Add actual parent area id.
+    //                 parentAreaId: area.id,
+    //                 parentAreaName: area.name,
+    //                 name: name,
+    //                 sku: sku,
+    //                 icon: icon,
+    //               ),
+    //             );
+    //           },
+    //         );
+    //       }).toList(),
+    //     ),
+    //
+    //     // Level 1: Sub-Areas
+    //     if (focusedArea!.subAreas.isNotEmpty) ...[
+    //       context.verticalSpace(32),
+    //       const Divider(),
+    //       context.verticalSpace(24),
+    //       Row(
+    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //         children: [
+    //           Text(
+    //             'Sub-Areas of ${focusedArea.name}',
+    //             style: context.fonts.black14w600,
+    //           ),
+    //           IconButton(
+    //             onPressed: () {
+    //               _showAddNodeDialog(
+    //                 context: context,
+    //                 title: 'Create New Sub-Area in ${focusedArea.name}',
+    //                 onAdd: (name, sku, icon) => widget.onAddSubArea(
+    //                   // TODO: Send actual parent area id here;
+    //                   parentAreaId: 0,
+    //                   parentAreaName: focusedArea.name,
+    //                   name: name,
+    //                   sku: sku,
+    //                   icon: icon,
+    //                 ),
+    //               );
+    //             },
+    //             icon: const Icon(
+    //               Icons.add_circle_outline_rounded,
+    //               size: 20,
+    //               color: CustomColors.purple,
+    //             ),
+    //             tooltip: 'Add Sub-Area',
+    //             padding: EdgeInsets.zero,
+    //             constraints: const BoxConstraints(),
+    //           ),
+    //         ],
+    //       ),
+    //       context.verticalSpace(16),
+    //       Wrap(
+    //         spacing: 16,
+    //         runSpacing: 16,
+    //         children: focusedArea.subAreas.map((subArea) {
+    //           final isSelected = areaEntry.subAreas.any(
+    //             (s) => s.name == subArea.name,
+    //           );
+    //           final isFocused = _focusedSubAreaName == subArea.name;
+    //
+    //           return IconImageContainer(
+    //             title: subArea.name,
+    //             imageUrl: subArea.image,
+    //             iconUrl: subArea.icon,
+    //             isSelected: isSelected || isFocused,
+    //             onTap: () {
+    //               setState(() {
+    //                 if (isSelected || isFocused) {
+    //                   _focusedSubAreaName = null;
+    //                 } else {
+    //                   _focusedSubAreaName = subArea.name;
+    //                 }
+    //               });
+    //               widget.onSubAreaToggle(focusedArea, subArea);
+    //
+    //               ref
+    //                   .read(treatmentViewModelProvider.notifier)
+    //                   .setSelectedTreatmentAreaIds(subArea.id);
+    //             },
+    //             onAddChild: () {
+    //               _showAddNodeDialog(
+    //                 context: context,
+    //                 title: 'Create New Child Area in ${subArea.name}',
+    //                 onAdd: (name, sku, icon) => widget.onAddSubAreaChild(
+    //                   focusedArea.name,
+    //                   subArea.name,
+    //                   name,
+    //                   sku,
+    //                   icon,
+    //                 ),
+    //               );
+    //             },
+    //           );
+    //         }).toList(),
+    //       ),
+    //     ],
+    //
+    //     // Level 2: Sub-Area Children
+    //     if (focusedSubArea != null &&
+    //         focusedSubArea.name.isNotEmpty &&
+    //         focusedSubArea.subAreas.isNotEmpty) ...[
+    //       context.verticalSpace(32),
+    //       const Divider(),
+    //       context.verticalSpace(24),
+    //       Row(
+    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //         children: [
+    //           Text(
+    //             'Child Areas of ${focusedSubArea.name}',
+    //             style: context.fonts.black14w600,
+    //           ),
+    //           IconButton(
+    //             onPressed: () {
+    //               _showAddNodeDialog(
+    //                 context: context,
+    //                 title: 'Create New Child in ${focusedSubArea.name}',
+    //                 onAdd: (name, sku, icon) => widget.onAddSubAreaChild(
+    //                   focusedArea.name,
+    //                   focusedSubArea.name,
+    //                   name,
+    //                   sku,
+    //                   icon,
+    //                 ),
+    //               );
+    //             },
+    //             icon: const Icon(
+    //               Icons.add_circle_outline_rounded,
+    //               size: 20,
+    //               color: CustomColors.purple,
+    //             ),
+    //             tooltip: 'Add Child Area',
+    //             padding: EdgeInsets.zero,
+    //             constraints: const BoxConstraints(),
+    //           ),
+    //         ],
+    //       ),
+    //       context.verticalSpace(16),
+    //       Wrap(
+    //         spacing: 16,
+    //         runSpacing: 16,
+    //         children: focusedSubArea.subAreas.map((child) {
+    //           final subAreaConfig = areaEntry.subAreas.firstWhere(
+    //             (s) => s.name == focusedSubArea.name,
+    //             orElse: () => SubAreaConfig(
+    //               name: focusedSubArea.name,
+    //               id: focusedSubArea.id,
+    //             ),
+    //           );
+    //           final isSelected = subAreaConfig.children.any(
+    //             (c) => c.name == child.name,
+    //           );
+    //
+    //           return IconImageContainer(
+    //             title: child.name,
+    //             imageUrl: child.image,
+    //             iconUrl: child.icon,
+    //             isSelected: isSelected,
+    //             onTap: () {
+    //               widget.onSubAreaChildToggle(
+    //                 focusedArea,
+    //                 focusedSubArea,
+    //                 child,
+    //               );
+    //
+    //               ref
+    //                   .read(treatmentViewModelProvider.notifier)
+    //                   .setSelectedTreatmentAreaIds(child.id);
+    //             },
+    //             onAddChild: () {
+    //               ScaffoldMessenger.of(context).showSnackBar(
+    //                 const SnackBar(
+    //                   content: Text(
+    //                     'Deepest level reached. Cannot add further children.',
+    //                   ),
+    //                 ),
+    //               );
+    //             },
+    //           );
+    //         }).toList(),
+    //       ),
+    //     ],
+    //
+    //     // Live Selection Preview Card Section
+    //     context.verticalSpace(32),
+    //     const Divider(),
+    //     context.verticalSpace(24),
+    //     Container(
+    //       width: double.infinity,
+    //       padding: context.appEdgeInsets(all: 20),
+    //       decoration: BoxDecoration(
+    //         color: CustomColors.softGrey.withValues(alpha: 0.1),
+    //         borderRadius: context.appBorderRadius(all: 12),
+    //         border: Border.all(color: CustomColors.border),
+    //       ),
+    //       child: Column(
+    //         crossAxisAlignment: CrossAxisAlignment.start,
+    //         children: [
+    //           Row(
+    //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //             children: [
+    //               Text(
+    //                 'Selected Anatomical Structure Preview',
+    //                 style: context.fonts.black16w700,
+    //               ),
+    //               const Icon(
+    //                 Icons.analytics_outlined,
+    //                 color: CustomColors.purple,
+    //                 size: 20,
+    //               ),
+    //             ],
+    //           ),
+    //           context.verticalSpace(16),
+    //           _buildLiveSelectionPreview(context),
+    //         ],
+    //       ),
+    //     ),
+    //   ],
+    // );
   }
 }
-
-
 
 class _SelectedSummaryCard extends StatelessWidget {
   final String title;
   final String sku;
+  final bool summary;
   final String? icon;
   final String subLabel;
-  final List<String> items;
+  final List<PreviewItem> items;
+  final VoidCallback onRemove;
 
   const _SelectedSummaryCard({
     required this.title,
     required this.sku,
+    required this.summary,
     required this.icon,
     required this.subLabel,
     required this.items,
+    required this.onRemove,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: context.w(300),
-      padding: context.appEdgeInsets(all: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: context.appBorderRadius(all: 16),
-        border: Border.all(color: CustomColors.border),
-        boxShadow: AppShadows.xs(context),
-      ),
+    return Stack(
+      children: [
+        Container(
+          width: context.w(300),
+          padding: context.appEdgeInsets(all: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: context.appBorderRadius(all: 16),
+            border: Border.all(color: CustomColors.border),
+            boxShadow: AppShadows.xs(context),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: CustomColors.purple.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        _getIconData(icon),
+                        size: 16,
+                        color: CustomColors.purple,
+                      ),
+                    ),
+                  ),
+                  context.horizontalSpace(12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title, style: context.fonts.black14w600),
+                        Text('SKU: $sku', style: context.fonts.grey12w400),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              if (items.isNotEmpty) ...[
+                context.verticalSpace(12),
+                const Divider(),
+                context.verticalSpace(8),
+                Text(
+                  subLabel,
+                  style: context.fonts.black12w600.copyWith(
+                    color: CustomColors.purple,
+                  ),
+                ),
+                context.verticalSpace(6),
+                ...items.map((item) => _buildItemRow(context, item, depth: 0)),
+              ],
+            ],
+          ),
+        ),
+        if (!summary)
+          Positioned(
+            right: 2,
+            top: 2,
+            child: InkWell(
+              onTap: onRemove,
+              child: Icon(
+                Icons.cancel,
+                size: 18.sp,
+                color: CustomColors.purple,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildItemRow(
+    BuildContext context,
+    PreviewItem item, {
+    required int depth,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(left: depth * 16.0, bottom: 4.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: CustomColors.purple.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: Icon(
-                    _getIconData(icon),
-                    size: 16,
-                    color: CustomColors.purple,
-                  ),
-                ),
+              const Icon(
+                Icons.check_circle_outline_rounded,
+                size: 12,
+                color: CustomColors.purple,
               ),
-              context.horizontalSpace(12),
+              context.horizontalSpace(6),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: context.fonts.black14w600),
-                    Text('SKU: $sku', style: context.fonts.grey12w400),
-                  ],
+                child: Text(item.label, style: context.fonts.black12w400),
+              ),
+              InkWell(
+                onTap: item.onRemove,
+                child: const Icon(
+                  Icons.close_rounded,
+                  size: 14,
+                  color: CustomColors.softGrey,
                 ),
               ),
             ],
           ),
-          if (items.isNotEmpty) ...[
-            context.verticalSpace(12),
-            const Divider(),
-            context.verticalSpace(8),
-            Text(
-              subLabel,
-              style: context.fonts.black12w600.copyWith(
-                color: CustomColors.purple,
-              ),
+          if (item.children.isNotEmpty)
+            ...item.children.map(
+              (c) => _buildItemRow(context, c, depth: depth + 1),
             ),
-            context.verticalSpace(6),
-            ...items.map(
-              (item) => Padding(
-                padding: const EdgeInsets.only(bottom: 4.0),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.check_circle_outline_rounded,
-                      size: 12,
-                      color: CustomColors.purple,
-                    ),
-                    context.horizontalSpace(6),
-                    Expanded(
-                      child: Text(item, style: context.fonts.black12w400),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -7531,6 +8128,135 @@ class _SelectedSummaryCard extends StatelessWidget {
     }
   }
 }
+// class _SelectedSummaryCard extends StatelessWidget {
+//   final String title;
+//   final String sku;
+//   final String? icon;
+//   final String subLabel;
+//   final List<String> items;
+//   final VoidCallback onRemove;
+//
+//   const _SelectedSummaryCard({
+//     required this.title,
+//     required this.sku,
+//     required this.icon,
+//     required this.subLabel,
+//     required this.items,
+//     required this.onRemove,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Stack(
+//       children: [
+//         Container(
+//           width: context.w(300),
+//           padding: context.appEdgeInsets(all: 16),
+//           decoration: BoxDecoration(
+//             color: Colors.white,
+//             borderRadius: context.appBorderRadius(all: 16),
+//             border: Border.all(color: CustomColors.border),
+//             boxShadow: AppShadows.xs(context),
+//           ),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Row(
+//                 children: [
+//                   Container(
+//                     width: 32,
+//                     height: 32,
+//                     decoration: BoxDecoration(
+//                       color: CustomColors.purple.withValues(alpha: 0.1),
+//                       borderRadius: BorderRadius.circular(8),
+//                     ),
+//                     child: Center(
+//                       child: Icon(
+//                         _getIconData(icon),
+//                         size: 16,
+//                         color: CustomColors.purple,
+//                       ),
+//                     ),
+//                   ),
+//                   context.horizontalSpace(12),
+//                   Expanded(
+//                     child: Column(
+//                       crossAxisAlignment: CrossAxisAlignment.start,
+//                       children: [
+//                         Text(title, style: context.fonts.black14w600),
+//                         Text('SKU: $sku', style: context.fonts.grey12w400),
+//                       ],
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               if (items.isNotEmpty) ...[
+//                 context.verticalSpace(12),
+//                 const Divider(),
+//                 context.verticalSpace(8),
+//                 Text(
+//                   subLabel,
+//                   style: context.fonts.black12w600.copyWith(
+//                     color: CustomColors.purple,
+//                   ),
+//                 ),
+//                 context.verticalSpace(6),
+//                 ...items.map(
+//                   (item) => Padding(
+//                     padding: const EdgeInsets.only(bottom: 4.0),
+//                     child: Row(
+//                       children: [
+//                         const Icon(
+//                           Icons.check_circle_outline_rounded,
+//                           size: 12,
+//                           color: CustomColors.purple,
+//                         ),
+//                         context.horizontalSpace(6),
+//                         Expanded(
+//                           child: Text(item, style: context.fonts.black12w400),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ],
+//           ),
+//         ),
+//
+//          Positioned(
+//            right: 2,
+//           top: 2,
+//           child: InkWell(
+//             onTap: onRemove,
+//             child: Icon(
+//               Icons.cancel,
+//               size: 18.sp,
+//               color: CustomColors.purple,
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+//
+//   IconData _getIconData(String? iconName) {
+//     switch (iconName?.toLowerCase()) {
+//       case 'face':
+//         return Icons.face_retouching_natural_rounded;
+//       case 'neck':
+//         return Icons.line_weight_rounded;
+//       case 'hands':
+//         return Icons.back_hand_outlined;
+//       case 'body':
+//         return Icons.accessibility_new_outlined;
+//       case 'scalp':
+//         return Icons.spa_outlined;
+//       default:
+//         return Icons.location_on_outlined;
+//     }
+//   }
+// }
 
 class ProtocolNotesCard extends StatefulWidget {
   final ProtocolItem protocol;
@@ -7739,4 +8465,16 @@ class _ProtocolNotesCardState extends State<ProtocolNotesCard> {
       ),
     );
   }
+}
+
+class PreviewItem {
+  final String label;
+  final VoidCallback onRemove;
+  final List<PreviewItem> children;
+
+  PreviewItem({
+    required this.label,
+    required this.onRemove,
+    this.children = const [],
+  });
 }

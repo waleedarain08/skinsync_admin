@@ -326,7 +326,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             icon: _isManufacturerView
                 ? Icons.table_rows_rounded
                 : Icons.business_outlined,
-            label: _isManufacturerView ? 'Table View' : 'Browse by Manufacturer',
+            label: _isManufacturerView ? 'Products List View' : 'Browse by Manufacturer',
             textColor: CustomColors.purple,
             color: Colors.white,
           ),

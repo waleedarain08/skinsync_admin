@@ -267,7 +267,7 @@ class _TreatmentManagementScreenState
             icon: _isCategoryView
                 ? Icons.table_rows_rounded
                 : Icons.category_rounded,
-            label: _isCategoryView ? 'Table View' : 'Browse by Category',
+            label: _isCategoryView ? 'Treatments List View' : 'Browse by Category',
             textColor: CustomColors.purple,
             color: Colors.white,
           ),

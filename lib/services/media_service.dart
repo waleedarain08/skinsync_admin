@@ -40,11 +40,11 @@ class MediaService {
   String _imageContentType(String fileName) {
     final ext = fileName.split('.').last.toLowerCase();
     return switch (ext) {
-      // 'png' => 'image/png',
+      'png' => 'image/png',
       'jpg' || 'jpeg' => 'image/jpeg',
       // 'gif' => 'image/gif',
       // 'webp' => 'image/webp',
-      _ => throw Exception('Any format other than jpeg is not supported!'),
+      _ => throw Exception('Any format other than jpeg and png is not supported!'),
     };
   }
 
@@ -102,10 +102,11 @@ class MediaService {
       final ext = fileName.split('.').last.toLowerCase();
 
       final storagePath = switch (ext) {
-        'png' || 'gif' || 'webp' => throw Exception(
+        /*'png' || */'gif' || 'webp' => throw Exception(
           'Any format other than jpeg is not supported!',
         ),
-        'jpg' || 'jpeg' => '$path/image/$fileName',
+
+        'jpg' || 'jpeg' || 'png' => '$path/image/$fileName',
         'mp4' || 'mov' || 'avi' || 'mkv' || 'webm' => '$path/video/$fileName',
         'pdf' => '$path/pdf/$fileName',
         _ => '$path/file/$fileName',
