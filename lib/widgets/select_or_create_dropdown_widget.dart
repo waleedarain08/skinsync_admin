@@ -203,20 +203,19 @@ class _SelectOrCreateDropdownState<T> extends State<SelectOrCreateDropdown<T>> {
                           ),
                         ),
                         SizedBox(width: 8.w),
-                        /*  _isLoading
-                            ? SizedBox(
-                          width: 16.w,
-                          height: 16.h,
-                          child: const CircularProgressIndicator(
-                            color: CustomColors.purple,
-                            strokeWidth: 2,
-                            constraints: BoxConstraints(
-                              maxWidth: 16,
-                              maxHeight: 16,
+                        if (widget.value != null) ...[
+                          GestureDetector(
+                            onTap: () {
+                              widget.onChanged(null);
+                            },
+                            child: Icon(
+                              Icons.clear_rounded,
+                              color: CustomColors.lightGrey,
+                              size: 18.sp,
                             ),
                           ),
-                        )
-                            : */
+                          SizedBox(width: 4.w),
+                        ],
                         Icon(
                           Icons.keyboard_arrow_down_rounded,
                           color: CustomColors.lightGrey,

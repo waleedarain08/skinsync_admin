@@ -69,6 +69,7 @@ class ProductServices implements ProductRepository {
     String? selectedPurpose, ProductStatus? status,
     int page = 1,
     int limit = 10,
+    int? brandId,
   }) async {
     final jsonResponse = await _api.get(
       Endpoint.products,
@@ -78,6 +79,7 @@ class ProductServices implements ProductRepository {
         'usage' : selectedPurpose ?? '',
         'page': page.toString(),
         'limit': limit.toString(),
+        if (brandId != null) 'brand': brandId.toString(),
       },
     );
     final response = ProductListResponse.fromJson(jsonResponse);

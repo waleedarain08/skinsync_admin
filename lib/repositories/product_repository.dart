@@ -16,7 +16,7 @@ abstract class ProductRepository {
   Future<ProductModel> addProduct({required CreateProductRequest req});
   Future<ProductModel> updateProduct({required int id, required CreateProductRequest req});
   Future<BaseApiResponseModel> deleteProduct({required int id});
-  Future<ProductListResponse> getProducts({String search = '', int page = 1, int limit = 10,String? selectedPurpose, ProductStatus status});
+  Future<ProductListResponse> getProducts({String search = '', int page = 1, int limit = 10,String? selectedPurpose, ProductStatus? status, int? brandId});
   Future<ProductDetailResponse> getProductDetail({required int id});
   Future<BrandListResponse> fetchBrand();
   Future<ManufacturersListResponse> fetchManufacturer();

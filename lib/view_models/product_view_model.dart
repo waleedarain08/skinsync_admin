@@ -159,8 +159,8 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     String search = '',
     int page = 1,
     int limit = 20,
-    String? selectedPurpose = '', ProductStatus status = ProductStatus.all
-
+    String? selectedPurpose = '', ProductStatus status = ProductStatus.all,
+    int? brandId,
   }) async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
@@ -171,7 +171,8 @@ class ProductViewModel extends BaseViewModel<ProductState> {
             page: page,
             limit: limit,
             selectedPurpose: selectedPurpose,
-            status: status
+            status: status,
+            brandId: brandId,
           );
           state = state.copyWith(
             products: (response.data ?? [])

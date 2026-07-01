@@ -515,11 +515,6 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                       children: man.brand.map((brand) {
                         final bool isBrandExpanded = _activeBrandId == brand.id;
 
-                        // Filter products of this brand dynamically from catalog
-                        final brandProducts = state.products.where((p) =>
-                            p.brand?.toLowerCase().trim() == brand.name.toLowerCase().trim()
-                        ).toList();
-
                         return Padding(
                           padding: context.appEdgeInsets(vertical: 4),
                           child: DecoratedBox(
@@ -539,6 +534,11 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                                 setState(() {
                                   if (expanded) {
                                     _activeBrandId = brand.id;
+                                    ref.read(productViewModelProvider.notifier).fetchProducts(
+                                      brandId: brand.id,
+                                      page: 1,
+                                      limit: state.pageSize,
+                                    );
                                   } else {
                                     if (_activeBrandId == brand.id) {
                                       _activeBrandId = null;
@@ -561,7 +561,17 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                               shape: const Border(),
                               collapsedShape: const Border(),
                               children: [
-                                _buildCatalogTable(brandProducts),
+                                if (state.loading && _activeBrandId == brand.id)
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 24),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: CustomColors.purple,
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  _buildCatalogTable(state.products),
                               ],
                             ),
                           ),
