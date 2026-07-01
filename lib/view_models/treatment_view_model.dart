@@ -84,6 +84,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final cleanupTimeController = TextEditingController();
   final minimumBookingNoticeController = TextEditingController();
   final maximumDaysInAdvanceController = TextEditingController();
+  final fixedDurationController = TextEditingController();
 
   // Step - Treatment Instructions Controllers
   final preTreatmentInstructionsController = TextEditingController();
@@ -133,6 +134,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     durationHoursController.dispose();
     durationMinutesController.dispose();
     treatmentDurationController.dispose();
+    fixedDurationController.dispose();
     prepTimeController.dispose();
     cleanupTimeController.dispose();
     minimumBookingNoticeController.dispose();
@@ -367,6 +369,7 @@ Body                 : ${request.toJson()}
     durationHoursController.clear();
     durationMinutesController.clear();
     treatmentDurationController.clear();
+    fixedDurationController.clear();
     prepTimeController.clear();
     cleanupTimeController.clear();
     minimumBookingNoticeController.clear();
@@ -898,6 +901,10 @@ Body                 : ${request.toJson()}
       state = state.copyWith(onlineBookable: val ?? false);
   void toggleManualApprovalRequired(bool? val) =>
       state = state.copyWith(manualApprovalRequired: val ?? false);
+  void toggleIsFixedDuration(bool? val) =>
+      state = state.copyWith(isFixedDuration: val ?? false);
+  void updateFixedDuration(String val) =>
+      state = state.copyWith(fixedDuration: int.tryParse(val) ?? 0);
 
   void setTotalSessions(String val) {
     final count = int.tryParse(val) ?? 1;
@@ -1267,29 +1274,70 @@ Body       : ${request.toJson()}
     });
   }
 
+  double getProductMinQuantity(ProductUsageEntry entry) {
+    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+    if (allSubAreas.isNotEmpty) {
+      double total = 0.0;
+      for (final subArea in allSubAreas) {
+        final controllers = entry.getControllersForSubArea(subArea.name, subAreaId: subArea.id);
+        final val = double.tryParse(controllers.minController.text) ?? 0.0;
+        total += val;
+      }
+      return total;
+    } else {
+      return double.tryParse(entry.minQuantityController.text) ?? 0.0;
+    }
+  }
+
+  double calculateProductUsageDuration() {
+    double total = 0.0;
+    for (final entry in state.productUsageEntries) {
+      final minQty = getProductMinQuantity(entry);
+      final perUnit =
+          double.tryParse(entry.perUnitDurationController.text) ?? 0.0;
+      total += minQty * perUnit;
+    }
+    return total;
+  }
+
+  int calculateTotalDuration() {
+    final baseDuration =
+        int.tryParse(treatmentDurationController.text) ?? 0;
+    final productDuration = calculateProductUsageDuration().toInt();
+    final prepTime =
+        int.tryParse(prepTimeController.text) ?? 0;
+    final cleanupTime =
+        int.tryParse(cleanupTimeController.text) ?? 0;
+    return baseDuration + productDuration + prepTime + cleanupTime;
+  }
+
   Future<bool?> createSchedule({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       await _treatmentRepository.createSchedule(
         TreatmentScheduleRequest(
-          baseDuration: int.parse(treatmentDurationController.text),
-          productDurations: state.productUsageEntries
-              .map(
-                (e) => ProductDuration(
-                  productId: e.productId,
-                  perUnitDuration: double.tryParse(
-                    e.perUnitDurationController.text,
-                  ),
-                ),
-              )
-              .toList(),
-          prepTime: state.prepTime,
-          cleanupTime: state.cleanupTime,
+          baseDuration: state.isFixedDuration ? null : (int.tryParse(treatmentDurationController.text) ?? 0),
+          productDurations: state.isFixedDuration
+              ? []
+              : state.productUsageEntries
+                  .map(
+                    (e) => ProductDuration(
+                      productId: e.productId,
+                      perUnitDuration: double.tryParse(
+                        e.perUnitDurationController.text,
+                      ),
+                    ),
+                  )
+                  .toList(),
+          prepTime: state.isFixedDuration ? null : (int.tryParse(prepTimeController.text) ?? 0),
+          cleanupTime: state.isFixedDuration ? null : (int.tryParse(cleanupTimeController.text) ?? 0),
           allowClinicOverride: state.allowClinicOverride,
           allowProviderOverride: state.allowProviderOverride,
           onlineBookable: state.onlineBookable,
           manualApprovalRequired: state.manualApprovalRequired,
           minimumBookingNotice: state.minimumBookingNotice,
           maximumDaysInAdvance: state.maximumDaysInAdvance,
+          calculatedTotalDuration: state.isFixedDuration ? null : calculateTotalDuration(),
+          fixedDuration: state.isFixedDuration ? (int.tryParse(fixedDurationController.text) ?? 0) : null,
         ),
         state.draftTreatmentID!,
       );
@@ -2828,6 +2876,8 @@ class TreatmentState extends BaseStateModel {
   final bool manualApprovalRequired;
   final int minimumBookingNotice;
   final int maximumDaysInAdvance;
+  final bool isFixedDuration;
+  final int fixedDuration;
   final List<int> selectedTreatmentAreaIds;
   final String? consentFormUrl;
 
@@ -2886,6 +2936,8 @@ class TreatmentState extends BaseStateModel {
     this.manualApprovalRequired = false,
     this.minimumBookingNotice = 24,
     this.maximumDaysInAdvance = 90,
+    this.isFixedDuration = false,
+    this.fixedDuration = 0,
     List<AreaViewModelEntry>? areas,
     this.selectedTreatmentAreaIds = const [],
     this.isLoadingProducts = false,
@@ -2951,6 +3003,8 @@ class TreatmentState extends BaseStateModel {
     bool? manualApprovalRequired,
     int? minimumBookingNotice,
     int? maximumDaysInAdvance,
+    bool? isFixedDuration,
+    int? fixedDuration,
     CategoryDetailDto? selectedCategoryDetail,
     List<int>? selectedTreatmentAreaIds,
     bool? isLoadingProducts,
@@ -3037,6 +3091,8 @@ class TreatmentState extends BaseStateModel {
           manualApprovalRequired ?? this.manualApprovalRequired,
       minimumBookingNotice: minimumBookingNotice ?? this.minimumBookingNotice,
       maximumDaysInAdvance: maximumDaysInAdvance ?? this.maximumDaysInAdvance,
+      isFixedDuration: isFixedDuration ?? this.isFixedDuration,
+      fixedDuration: fixedDuration ?? this.fixedDuration,
       selectedTreatmentAreaIds:
           selectedTreatmentAreaIds ?? this.selectedTreatmentAreaIds,
       isLoadingProducts: isLoadingProducts ?? this.isLoadingProducts,

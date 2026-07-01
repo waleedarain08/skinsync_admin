@@ -11,6 +11,8 @@ class TreatmentScheduleRequest {
   final bool? manualApprovalRequired;
   final int? minimumBookingNotice;
   final int? maximumDaysInAdvance;
+  final int? calculatedTotalDuration;
+  final int? fixedDuration;
 
   TreatmentScheduleRequest({
     this.baseDuration,
@@ -23,6 +25,8 @@ class TreatmentScheduleRequest {
     this.manualApprovalRequired,
     this.minimumBookingNotice,
     this.maximumDaysInAdvance,
+    this.calculatedTotalDuration,
+    this.fixedDuration,
   });
 
   Map<String, dynamic> toJson() => {
@@ -39,6 +43,8 @@ class TreatmentScheduleRequest {
     'manual_approval_required': manualApprovalRequired,
     'minimum_booking_notice': minimumBookingNotice,
     'maximum_days_in_advance': maximumDaysInAdvance,
+    'calculated_total_duration': calculatedTotalDuration,
+    'fixed_duration': fixedDuration,
   };
 }
 

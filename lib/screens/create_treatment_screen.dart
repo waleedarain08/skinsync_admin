@@ -4647,216 +4647,276 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle(context, 'Base Duration'),
-        context.verticalSpace(24),
-        Row(
-          children: [
-            Expanded(
-              child: BuildTextField(
-                label: 'Base Duration (Minutes)',
-                controller: viewModel.treatmentDurationController,
-                hintText: 'e.g. 60',
-                keyboardType: TextInputType.number,
-                validator: Validators.empty,
-                onChanged: (val) {
-                  // Trigger state refresh for live updates
-                  viewModel.updateProductPerUnitDuration(0, '');
-                },
-              ),
-            ),
-          ],
-        ),
-        context.verticalSpace(32),
-        _sectionTitle(context, 'Product Usage Duration'),
-        context.verticalSpace(16),
-        if (state.productUsageEntries.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
-              'No products selected in the Inventory Products step.',
-              style: context.fonts.grey14w400,
-            ),
-          )
-        else
-          ...state.productUsageEntries.asMap().entries.map((item) {
-            final idx = item.key;
-            final entry = item.value;
-            final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
-            final minQty = _getProductMinQuantity(entry, allSubAreas);
-            final maxQty = _getProductMaxQuantity(entry, allSubAreas);
-
-            return Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              padding: context.appEdgeInsets(all: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: context.appBorderRadius(all: 12),
-                border: Border.all(color: CustomColors.border),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(entry.productName, style: context.fonts.black14w700),
-                  context.verticalSpace(8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: context.appBorderRadius(all: 12),
+            border: Border.all(color: CustomColors.border),
+          ),
+          child: Padding(
+            padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Unit of Measure: ${entry.unit}',
-                        style: context.fonts.grey13w500,
+                        'Use Fixed Duration',
+                        style: context.fonts.black14w600,
                       ),
+                      context.verticalSpace(4),
                       Text(
-                        'Min Qty: ${minQty.toStringAsFixed(minQty % 1 == 0 ? 0 : 1)} | Max Qty: ${maxQty.toStringAsFixed(maxQty % 1 == 0 ? 0 : 1)}',
-                        style: context.fonts.grey13w500,
+                        'Specify a flat fixed duration instead of dynamically calculating from product usage.',
+                        style: context.fonts.grey12w400,
                       ),
                     ],
                   ),
-                  context.verticalSpace(12),
-                  BuildTextField(
-                    label:
-                        'Per ${_formatUnitLabel(entry.unit)} Duration (minutes)',
-                    controller: entry.perUnitDurationController,
-                    hintText: '0.0',
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    onChanged: (val) {
-                      viewModel.updateProductPerUnitDuration(idx, val ?? '');
-                    },
-                  ),
-                ],
-              ),
-            );
-          }),
-        context.verticalSpace(32),
-        Row(
-          children: [
-            Expanded(
-              child: BuildTextField(
-                label: 'Preparation Time (Minutes)',
-                controller: viewModel.prepTimeController,
-                hintText: 'e.g. 10',
-                keyboardType: TextInputType.number,
-                onChanged: (val) {
-                  // Trigger state refresh for live updates
-                  viewModel.updateProductPerUnitDuration(0, '');
-                },
-              ),
+                ),
+                Switch(
+                  value: state.isFixedDuration,
+                  onChanged: (val) {
+                    viewModel.toggleIsFixedDuration(val);
+                  },
+                  activeColor: CustomColors.purple,
+                ),
+              ],
             ),
-            context.horizontalSpace(24),
-            Expanded(
-              child: BuildTextField(
-                label: 'Finish / Cleanup Time (Minutes)',
-                controller: viewModel.cleanupTimeController,
-                hintText: 'e.g. 5',
-                keyboardType: TextInputType.number,
-                onChanged: (val) {
-                  // Trigger state refresh for live updates
-                  viewModel.updateProductPerUnitDuration(0, '');
-                },
-              ),
-            ),
-          ],
+          ),
         ),
         context.verticalSpace(32),
-        _sectionTitle(context, 'Total Duration'),
-        context.verticalSpace(16),
-        Builder(
-          builder: (context) {
-            final baseDuration =
-                double.tryParse(viewModel.treatmentDurationController.text) ??
-                0.0;
-            final productDuration = _calculateProductUsageDuration(state);
-            final prepTime =
-                double.tryParse(viewModel.prepTimeController.text) ?? 0.0;
-            final cleanupTime =
-                double.tryParse(viewModel.cleanupTimeController.text) ?? 0.0;
-            final totalDuration =
-                baseDuration + productDuration + prepTime + cleanupTime;
-
-            return Container(
-              padding: context.appEdgeInsets(all: 16),
-              decoration: BoxDecoration(
-                color: CustomColors.purple.withValues(alpha: 0.05),
-                borderRadius: context.appBorderRadius(all: 10),
-                border: Border.all(
-                  color: CustomColors.purple.withValues(alpha: 0.2),
+        if (state.isFixedDuration) ...[
+          _sectionTitle(context, 'Fixed Duration'),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: 'Fixed Duration (Minutes)',
+                  controller: viewModel.fixedDurationController,
+                  hintText: 'e.g. 45',
+                  keyboardType: TextInputType.number,
+                  validator: Validators.empty,
+                  onChanged: (val) {
+                    viewModel.updateFixedDuration(val ?? '0');
+                  },
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Base Duration:', style: context.fonts.black14w600),
-                      Text(
-                        '${baseDuration.toStringAsFixed(baseDuration % 1 == 0 ? 0 : 1)} Minutes',
-                        style: context.fonts.black14w600,
-                      ),
-                    ],
-                  ),
-                  context.verticalSpace(8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Product Usage Duration:',
-                        style: context.fonts.black14w400,
-                      ),
-                      Text(
-                        '${productDuration.toStringAsFixed(productDuration % 1 == 0 ? 0 : 1)} Minutes',
-                        style: context.fonts.purple14w700,
-                      ),
-                    ],
-                  ),
-                  context.verticalSpace(8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Preparation Time:',
-                        style: context.fonts.black14w400,
-                      ),
-                      Text(
-                        '${prepTime.toStringAsFixed(prepTime % 1 == 0 ? 0 : 1)} Minutes',
-                        style: context.fonts.black14w600,
-                      ),
-                    ],
-                  ),
-                  context.verticalSpace(8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Cleanup Time:', style: context.fonts.black14w400),
-                      Text(
-                        '${cleanupTime.toStringAsFixed(cleanupTime % 1 == 0 ? 0 : 1)} Minutes',
-                        style: context.fonts.black14w600,
-                      ),
-                    ],
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Divider(),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Calculated Total Duration:',
-                        style: context.fonts.purple14w700,
-                      ),
-                      Text(
-                        '${totalDuration.toStringAsFixed(totalDuration % 1 == 0 ? 0 : 1)} Minutes',
-                        style: context.fonts.purple16w700,
-                      ),
-                    ],
-                  ),
-                ],
+            ],
+          ),
+        ] else ...[
+          _sectionTitle(context, 'Base Duration'),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: 'Base Duration (Minutes)',
+                  controller: viewModel.treatmentDurationController,
+                  hintText: 'e.g. 60',
+                  keyboardType: TextInputType.number,
+                  validator: Validators.empty,
+                  onChanged: (val) {
+                    // Trigger state refresh for live updates
+                    viewModel.updateProductPerUnitDuration(0, '');
+                  },
+                ),
               ),
-            );
-          },
-        ),
+            ],
+          ),
+          context.verticalSpace(32),
+          _sectionTitle(context, 'Product Usage Duration'),
+          context.verticalSpace(16),
+          if (state.productUsageEntries.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                'No products selected in the Inventory Products step.',
+                style: context.fonts.grey14w400,
+              ),
+            )
+          else
+            ...state.productUsageEntries.asMap().entries.map((item) {
+              final idx = item.key;
+              final entry = item.value;
+              final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
+              final minQty = _getProductMinQuantity(entry, allSubAreas);
+              final maxQty = _getProductMaxQuantity(entry, allSubAreas);
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: context.appEdgeInsets(all: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: context.appBorderRadius(all: 12),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(entry.productName, style: context.fonts.black14w700),
+                    context.verticalSpace(8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Unit of Measure: ${entry.unit}',
+                          style: context.fonts.grey13w500,
+                        ),
+                        Text(
+                          'Min Qty: ${minQty.toStringAsFixed(minQty % 1 == 0 ? 0 : 1)} | Max Qty: ${maxQty.toStringAsFixed(maxQty % 1 == 0 ? 0 : 1)}',
+                          style: context.fonts.grey13w500,
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(12),
+                    BuildTextField(
+                      label:
+                          'Per ${_formatUnitLabel(entry.unit)} Duration (minutes)',
+                      controller: entry.perUnitDurationController,
+                      hintText: '0.0',
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      onChanged: (val) {
+                        viewModel.updateProductPerUnitDuration(idx, val ?? '');
+                      },
+                    ),
+                  ],
+                ),
+              );
+            }),
+          context.verticalSpace(32),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: 'Preparation Time (Minutes)',
+                  controller: viewModel.prepTimeController,
+                  hintText: 'e.g. 10',
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) {
+                    // Trigger state refresh for live updates
+                    viewModel.updateProductPerUnitDuration(0, '');
+                  },
+                ),
+              ),
+              context.horizontalSpace(24),
+              Expanded(
+                child: BuildTextField(
+                  label: 'Finish / Cleanup Time (Minutes)',
+                  controller: viewModel.cleanupTimeController,
+                  hintText: 'e.g. 5',
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) {
+                    // Trigger state refresh for live updates
+                    viewModel.updateProductPerUnitDuration(0, '');
+                  },
+                ),
+              ),
+            ],
+          ),
+          context.verticalSpace(32),
+          _sectionTitle(context, 'Total Duration'),
+          context.verticalSpace(16),
+          Builder(
+            builder: (context) {
+              final baseDuration =
+                  double.tryParse(viewModel.treatmentDurationController.text) ??
+                  0.0;
+              final productDuration = _calculateProductUsageDuration(state);
+              final prepTime =
+                  double.tryParse(viewModel.prepTimeController.text) ?? 0.0;
+              final cleanupTime =
+                  double.tryParse(viewModel.cleanupTimeController.text) ?? 0.0;
+              final totalDuration =
+                  baseDuration + productDuration + prepTime + cleanupTime;
+
+              return Container(
+                padding: context.appEdgeInsets(all: 16),
+                decoration: BoxDecoration(
+                  color: CustomColors.purple.withValues(alpha: 0.05),
+                  borderRadius: context.appBorderRadius(all: 10),
+                  border: Border.all(
+                    color: CustomColors.purple.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Base Duration:', style: context.fonts.black14w600),
+                        Text(
+                          '${baseDuration.toStringAsFixed(baseDuration % 1 == 0 ? 0 : 1)} Minutes',
+                          style: context.fonts.black14w600,
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Product Usage Duration:',
+                          style: context.fonts.black14w400,
+                        ),
+                        Text(
+                          '${productDuration.toStringAsFixed(productDuration % 1 == 0 ? 0 : 1)} Minutes',
+                          style: context.fonts.purple14w700,
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Preparation Time:',
+                          style: context.fonts.black14w400,
+                        ),
+                        Text(
+                          '${prepTime.toStringAsFixed(prepTime % 1 == 0 ? 0 : 1)} Minutes',
+                          style: context.fonts.black14w600,
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Cleanup Time:', style: context.fonts.black14w400),
+                        Text(
+                          '${cleanupTime.toStringAsFixed(cleanupTime % 1 == 0 ? 0 : 1)} Minutes',
+                          style: context.fonts.black14w600,
+                        ),
+                      ],
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Divider(),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Calculated Total Duration:',
+                          style: context.fonts.purple14w700,
+                        ),
+                        Text(
+                          '${totalDuration.toStringAsFixed(totalDuration % 1 == 0 ? 0 : 1)} Minutes',
+                          style: context.fonts.purple16w700,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
         context.verticalSpace(32),
         _sectionTitle(context, 'Override & Booking Controls'),
         context.verticalSpace(24),
@@ -6529,6 +6589,31 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 
   bool _validateScheduling(BuildContext context, TreatmentViewModel viewModel) {
+    final state = ref.read(treatmentViewModelProvider);
+    if (state.isFixedDuration) {
+      if (viewModel.fixedDurationController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please enter a valid fixed duration'),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+      final duration =
+          int.tryParse(viewModel.fixedDurationController.text) ?? 0;
+      if (duration <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Fixed duration must be greater than 0'),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+      return true;
+    }
+
     if (viewModel.treatmentDurationController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
