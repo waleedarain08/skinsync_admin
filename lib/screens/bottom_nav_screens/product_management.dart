@@ -7,6 +7,7 @@ import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/select_or_create_dropdown_widget.dart';
 
 import '../../models/product_model.dart';
+import '../../models/responses/manufacturers_list_response.dart';
 import '../../utils/theme.dart';
 import '../../view_models/product_view_model.dart';
 import '../../widgets/app_search_field.dart';
@@ -17,6 +18,7 @@ import '../../widgets/gradient_scaffold.dart';
 import '../../widgets/number_paginator.dart';
 import '../create_product_screen.dart';
 import '../product_detail_screen.dart';
+import '../manage_inventory_data_screen.dart';
 import '../../widgets/app_network_image.dart';
 import '../../widgets/status_toggle_switch.dart';
 
@@ -30,9 +32,12 @@ class ProductManagement extends ConsumerStatefulWidget {
 
 class _ProductManagementState extends ConsumerState<ProductManagement> {
   final TextEditingController _searchController = TextEditingController();
-  String _selectedPurposeFilter = 'All Purposes';
   ProductStatus _selectedStatus = ProductStatus.all;
   String? _selectedPurpose;
+
+  bool _isManufacturerView = false;
+  int? _expandedManufacturerId;
+  int? _activeBrandId;
 
   @override
   void initState() {
@@ -81,26 +86,33 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             context.verticalSpace(32),
             _buildFilters(),
             context.verticalSpace(24),
-            _buildCatalogTable(paginatedProducts),
-            if (state.totalPages >= 1)
-              Padding(
-                padding: context.appEdgeInsets(vertical: 24),
-                child: Center(
-                  child: NumberPaginator(
-                    totalPages: state.totalPages,
-                    currentPage: state.currentPage - 1,
-                    onPageChanged: (pageIndex) {
-                      ref
-                          .read(productViewModelProvider.notifier)
-                          .fetchProducts(
-                            search: state.searchKeyword,
-                            page: pageIndex + 1,
-                            limit: state.pageSize,
-                          );
-                    },
+            _isManufacturerView
+                ? _buildManufacturerViewSection(state)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildCatalogTable(paginatedProducts),
+                      if (state.totalPages >= 1)
+                        Padding(
+                          padding: context.appEdgeInsets(vertical: 24),
+                          child: Center(
+                            child: NumberPaginator(
+                              totalPages: state.totalPages,
+                              currentPage: state.currentPage - 1,
+                              onPageChanged: (pageIndex) {
+                                ref
+                                    .read(productViewModelProvider.notifier)
+                                    .fetchProducts(
+                                      search: state.searchKeyword,
+                                      page: pageIndex + 1,
+                                      limit: state.pageSize,
+                                    );
+                              },
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-              ),
           ],
         ),
       ),
@@ -122,13 +134,25 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             ),
           ],
         ),
-        CustomPrimaryButton(
-          onTap: () {
-            context.push(CreateProductScreen.routeName, extra: null);
-          },
-          icon: Icons.add_circle_outline,
-          label: 'Create Catalog Product',
-          width: context.w(240),
+        Row(
+          children: [
+            CustomOutlinedButton(
+              onTap: () => context.push(ManageInventoryDataScreen.routeName),
+              icon: Icons.tune_rounded,
+              label: 'Configure Meta-Data',
+              color: Colors.white,
+              textColor: CustomColors.purple,
+            ),
+            context.horizontalSpace(16),
+            CustomPrimaryButton(
+              onTap: () {
+                context.push(CreateProductScreen.routeName, extra: null);
+              },
+              icon: Icons.add_circle_outline,
+              label: 'Create Catalog Product',
+              width: context.w(240),
+            ),
+          ],
         ),
       ],
     );
@@ -287,6 +311,26 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             ),
           ),
           context.horizontalSpace(16),
+          CustomOutlinedButton(
+            onTap: () {
+              setState(() {
+                _isManufacturerView = !_isManufacturerView;
+                if (_isManufacturerView) {
+                  ref.read(productViewModelProvider.notifier).fetchManufacturer();
+                } else {
+                  _expandedManufacturerId = null;
+                  _activeBrandId = null;
+                }
+              });
+            },
+            icon: _isManufacturerView
+                ? Icons.table_rows_rounded
+                : Icons.business_outlined,
+            label: _isManufacturerView ? 'Table View' : 'Browse by Manufacturer',
+            textColor: CustomColors.purple,
+            color: Colors.white,
+          ),
+          context.horizontalSpace(16),
           Expanded(
             child: Consumer(
               builder: (context, ref, _) {
@@ -355,6 +399,181 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildManufacturerViewSection(ProductState state) {
+    if (state.loading && (state.manufacturers == null || state.manufacturers!.isEmpty)) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 48),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (state.manufacturers == null || state.manufacturers!.isEmpty) {
+      return BorderdContainerWidget(
+        padding: context.appEdgeInsets(all: 48),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.business_outlined,
+                size: context.sp(48),
+                color: CustomColors.grey,
+              ),
+              context.verticalSpace(16),
+              Text('No manufacturers found', style: context.fonts.black16w600),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return _buildManufacturerTree(state.manufacturers!, state);
+  }
+
+  Widget _buildManufacturerTree(
+    List<ManufacturersModel> manufacturers,
+    ProductState state,
+  ) {
+    return Column(
+      children: manufacturers.map((man) {
+        final bool isExpanded = _expandedManufacturerId == man.id;
+
+        return Padding(
+          padding: context.appEdgeInsets(vertical: 4),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(
+                color: isExpanded
+                    ? CustomColors.purple.withValues(alpha: 0.3)
+                    : CustomColors.border,
+                width: isExpanded ? 1.5 : 1,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: context.appBorderRadius(all: 12),
+              child: ExpansionTile(
+                key: ValueKey('man_tile_${man.id}_$isExpanded'),
+                initiallyExpanded: isExpanded,
+                onExpansionChanged: (expanded) {
+                  setState(() {
+                    if (expanded) {
+                      _expandedManufacturerId = man.id;
+                    } else {
+                      if (_expandedManufacturerId == man.id) {
+                        _expandedManufacturerId = null;
+                      }
+                    }
+                  });
+                },
+                leading: Container(
+                  width: context.w(36),
+                  height: context.w(36),
+                  decoration: BoxDecoration(
+                    color: CustomColors.whiteGrey,
+                    borderRadius: context.appBorderRadius(all: 6),
+                  ),
+                  child: Icon(
+                    Icons.business_outlined,
+                    color: CustomColors.purple,
+                    size: context.sp(18),
+                  ),
+                ),
+                title: Text(
+                  man.name,
+                  style: context.fonts.black14w600.copyWith(
+                    color: isExpanded
+                        ? CustomColors.purple
+                        : CustomColors.black,
+                  ),
+                ),
+                childrenPadding: context.appEdgeInsets(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                backgroundColor: Colors.transparent,
+                collapsedBackgroundColor: Colors.transparent,
+                shape: const Border(),
+                collapsedShape: const Border(),
+                children: [
+                  if (man.brand.isEmpty)
+                    Padding(
+                      padding: context.appEdgeInsets(vertical: 8),
+                      child: Text(
+                        'No brands associated with this manufacturer.',
+                        style: context.fonts.grey12w400,
+                      ),
+                    )
+                  else
+                    Column(
+                      children: man.brand.map((brand) {
+                        final bool isBrandExpanded = _activeBrandId == brand.id;
+
+                        // Filter products of this brand dynamically from catalog
+                        final brandProducts = state.products.where((p) =>
+                            p.brand?.toLowerCase().trim() == brand.name.toLowerCase().trim()
+                        ).toList();
+
+                        return Padding(
+                          padding: context.appEdgeInsets(vertical: 4),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: CustomColors.whiteGrey,
+                              borderRadius: context.appBorderRadius(all: 8),
+                              border: Border.all(
+                                color: isBrandExpanded
+                                    ? CustomColors.purple.withValues(alpha: 0.2)
+                                    : CustomColors.border.withValues(alpha: 0.5),
+                              ),
+                            ),
+                            child: ExpansionTile(
+                              key: ValueKey('brand_tile_${brand.id}_$isBrandExpanded'),
+                              initiallyExpanded: isBrandExpanded,
+                              onExpansionChanged: (expanded) {
+                                setState(() {
+                                  if (expanded) {
+                                    _activeBrandId = brand.id;
+                                  } else {
+                                    if (_activeBrandId == brand.id) {
+                                      _activeBrandId = null;
+                                    }
+                                  }
+                                });
+                              },
+                              leading: Icon(
+                                Icons.branding_watermark_outlined,
+                                color: isBrandExpanded ? CustomColors.purple : CustomColors.grey,
+                                size: context.sp(18),
+                              ),
+                              title: Text(
+                                brand.name,
+                                style: context.fonts.black13w600.copyWith(
+                                  color: isBrandExpanded ? CustomColors.purple : CustomColors.black,
+                                ),
+                              ),
+                              childrenPadding: context.appEdgeInsets(horizontal: 12, vertical: 12),
+                              shape: const Border(),
+                              collapsedShape: const Border(),
+                              children: [
+                                _buildCatalogTable(brandProducts),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 

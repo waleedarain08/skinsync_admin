@@ -23,6 +23,7 @@ import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
 import 'package:skinsync_admin/screens/invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
+import 'package:skinsync_admin/screens/manage_inventory_data_screen.dart';
 import 'package:skinsync_admin/screens/patient_detail_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/product_detail_screen.dart';
@@ -167,6 +168,11 @@ class RouteGenerator {
             name: CreateProductScreen.routeName,
             path: CreateProductScreen.routeName,
             builder: (context, state) => CreateProductScreen(productToEdit: state.extra as ProductModel?),
+          ),
+          GoRoute(
+            name: ManageInventoryDataScreen.routeName,
+            path: ManageInventoryDataScreen.routeName,
+            builder: (_, _) => const ManageInventoryDataScreen(),
           ),
           GoRoute(
             name: AppointmentDetailScreen.routeName,

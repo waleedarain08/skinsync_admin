@@ -135,6 +135,26 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     );
   }
 
+  void clearMetadata() {
+    state = ProductState(
+      loading: state.loading,
+      currentPage: state.currentPage,
+      totalPages: state.totalPages,
+      products: state.products,
+      errorMessage: state.errorMessage,
+      pageSize: state.pageSize,
+      searchKeyword: state.searchKeyword,
+      selectedProduct: state.selectedProduct,
+      imageUrl: state.imageUrl,
+      brands: null,
+      manufacturers: null,
+      unitTypes: null,
+      packageTypes: null,
+      usageType: null,
+      suppliers: null,
+    );
+  }
+
   Future<void> fetchProducts({
     String search = '',
     int page = 1,
