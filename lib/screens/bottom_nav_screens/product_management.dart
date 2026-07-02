@@ -404,12 +404,13 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   Widget _buildManufacturerViewSection(ProductState state) {
     if (state.loading && (state.manufacturers == null || state.manufacturers!.isEmpty)) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 48),
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return  const SizedBox();
+      // const Center(
+      //   child: Padding(
+      //     padding: EdgeInsets.symmetric(vertical: 48),
+      //     child: CircularProgressIndicator(),
+      //   ),
+      // );
     }
 
     if (state.manufacturers == null || state.manufacturers!.isEmpty) {

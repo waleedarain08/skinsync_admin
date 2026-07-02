@@ -168,7 +168,7 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
     required Widget Function(T item, int index) itemBuilder,
   }) {
     if (items == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const SizedBox();
     }
     if (items.isEmpty) {
       return Center(

@@ -219,8 +219,8 @@ class _CategoryCreationDialogState
                     isImageRequired: f.isImageRequired ?? false,
                     notes: f.notes ?? '',
                   ),
-                ) ??
-                [],
+                ) 
+                
           ),
         ),
       ) ??

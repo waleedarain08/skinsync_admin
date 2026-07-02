@@ -325,7 +325,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         _infoSection('Subscription Info', [
           _statRow(Icons.card_membership_outlined, 'Current Plan', clinic.subscriptionPlan ?? 'Standard'),
           _statRow(Icons.access_time_rounded, 'Working Hours', clinic.workingHours ?? '09:00 - 17:00'),
-          _statRow(Icons.update_rounded, 'Last Updated', clinic.updatedAt.toString() ?? 'N/A'),
+          _statRow(Icons.update_rounded, 'Last Updated', clinic.updatedAt.toString() ),
         ]),
       ],
     );
