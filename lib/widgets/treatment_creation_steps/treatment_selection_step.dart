@@ -87,11 +87,11 @@ class TreatmentSelectionStep extends ConsumerWidget {
                 label: 'Global SKU (Treatment Identifier)',
                 controller: viewModel.globalSkuController,
                 hintText: 'e.g. TRT-XXXX-XXXX',
-                validator: (val) => viewModel.validateGlobalSku(val),
+                validator: viewModel.validateGlobalSku,
                 tooltip:
                     'Global SKU is a unique identifier used across all clinics and systems.',
                 suffixIcon: TextButton(
-                  onPressed: () => viewModel.generateSku(),
+                  onPressed: viewModel.generateSku,
                   child: Text(
                     'Generate SKU',
                     style: context.fonts.purple12w700,

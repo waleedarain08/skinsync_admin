@@ -23,18 +23,18 @@ class NotificationModel {
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) =>
       NotificationModel(
-        title: json["title"],
-        message: json["message"],
-        timing: json["timing"],
-        timingUnit: unitValues.map[json["timing_unit"]],
-        type: typeValues.map[json["type"]],
+        title: json['title'],
+        message: json['message'],
+        timing: json['timing'],
+        timingUnit: unitValues.map[json['timing_unit']],
+        type: typeValues.map[json['type']],
       );
 
   Map<String, dynamic> toJson() => {
-        "title": title,
-        "message": message,
-        "timing": timing,
-        "timing_unit": unitValues.reverse[timingUnit],
-        "type": typeValues.reverse[type],
+        'title': title,
+        'message': message,
+        'timing': timing,
+        'timing_unit': unitValues.reverse[timingUnit],
+        'type': typeValues.reverse[type],
       };
 }

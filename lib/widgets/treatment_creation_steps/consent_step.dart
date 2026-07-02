@@ -210,8 +210,8 @@ class ConsentStep extends ConsumerWidget {
           _buildConsentFormSection(
             context,
             state.preTreatmentConsentForm,
-            () => viewModel.pickConsentForm(),
-            () => viewModel.removeConsentForm(),
+            viewModel.pickConsentForm,
+            viewModel.removeConsentForm,
           ),
         ],
         context.verticalSpace(24),

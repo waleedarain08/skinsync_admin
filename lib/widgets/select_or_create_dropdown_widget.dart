@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:skinsync_admin/widgets/app_loader.dart';
-import '../utils/color_constant.dart';
 import '../utils/theme.dart';
 
 class SelectOrCreateDropdown<T> extends StatefulWidget {

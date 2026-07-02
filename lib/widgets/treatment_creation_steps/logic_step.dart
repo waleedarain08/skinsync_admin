@@ -32,7 +32,7 @@ class LogicStep extends ConsumerWidget {
               height: context.w(24),
               child: Checkbox(
                 value: state.enableByDefault,
-                onChanged: (val) => viewModel.toggleEnableByDefault(val),
+                onChanged: viewModel.toggleEnableByDefault,
                 shape: RoundedRectangleBorder(
                   borderRadius: context.appBorderRadius(all: 4),
                 ),
@@ -68,7 +68,7 @@ class LogicStep extends ConsumerWidget {
               height: context.w(24),
               child: Checkbox(
                 value: state.useInAiSimulator,
-                onChanged: (val) => viewModel.toggleAiSimulator(val),
+                onChanged: viewModel.toggleAiSimulator,
                 shape: RoundedRectangleBorder(
                   borderRadius: context.appBorderRadius(all: 4),
                 ),

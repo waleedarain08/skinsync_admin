@@ -110,7 +110,7 @@ class DowntimeStep extends ConsumerWidget {
         _downtimeOption(
           context,
           'None',
-          '${noneDays} Days',
+          '$noneDays Days',
           'No booking restrictions.',
           state.downtimeLevel == 'None',
           () => viewModel.setDowntimeLevel('None'),
@@ -119,7 +119,7 @@ class DowntimeStep extends ConsumerWidget {
         _downtimeOption(
           context,
           'Low',
-          '${lowDays} Days',
+          '$lowDays Days',
           'Short recovery window.',
           state.downtimeLevel == 'Low',
           () => viewModel.setDowntimeLevel('Low'),
@@ -128,7 +128,7 @@ class DowntimeStep extends ConsumerWidget {
         _downtimeOption(
           context,
           'Moderate',
-          '${moderateDays} Days',
+          '$moderateDays Days',
           'Standard clinical recovery.',
           state.downtimeLevel == 'Moderate',
           () => viewModel.setDowntimeLevel('Moderate'),
@@ -137,7 +137,7 @@ class DowntimeStep extends ConsumerWidget {
         _downtimeOption(
           context,
           'High',
-          '${highDays} Days',
+          '$highDays Days',
           'Extended recovery required.',
           state.downtimeLevel == 'High',
           () => viewModel.setDowntimeLevel('High'),

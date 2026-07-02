@@ -18,16 +18,16 @@ class DowntimePresetsModel {
   String toRawJson() => json.encode(toJson());
 
   factory DowntimePresetsModel.fromJson(Map<String, dynamic> json) => DowntimePresetsModel(
-    high: json["high"],
-    low: json["low"],
-    moderate: json["moderate"],
-    none: json["none"],
+    high: json['high'],
+    low: json['low'],
+    moderate: json['moderate'],
+    none: json['none'],
   );
 
   Map<String, dynamic> toJson() => {
-    "high": high,
-    "low": low,
-    "moderate": moderate,
-    "none": none,
+    'high': high,
+    'low': low,
+    'moderate': moderate,
+    'none': none,
   };
 }

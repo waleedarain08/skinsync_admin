@@ -18,5 +18,5 @@ class ClinicalProtocolPdf {
 
   ClinicalProtocolPdf({this.name, this.url});
 
-  Map<String, dynamic> toJson() => {"name": name, "url": url};
+  Map<String, dynamic> toJson() => {'name': name, 'url': url};
 }

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../models/treatment_model.dart';
 import '../models/responses/treatment_detail_response.dart';
+import '../models/treatment_model.dart';
 import '../utils/theme.dart';
 import '../view_models/treatment_view_model.dart';
+import '../widgets/app_network_image.dart';
 import '../widgets/borderd_container_widget.dart';
 import '../widgets/gradient_scaffold.dart';
-import '../widgets/app_network_image.dart';
 import '../widgets/status_toggle_switch.dart';
 import 'edit_treatment_screen.dart';
 
@@ -816,7 +816,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
             const Divider(),
             context.verticalSpace(16),
           ],
-          if (sideAreas == null || sideAreas.isEmpty)
+          if (sideAreas.isEmpty)
             const Text('No specific area logic defined.')
           else ...[
             Text('Sub-Area Config:', style: context.fonts.black13w600),

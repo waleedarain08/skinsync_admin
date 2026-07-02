@@ -31,25 +31,25 @@ class CreateCategoryRequest {
 
   Map<String, dynamic> toJson() => {
 
-    "name": name,
-    "icon": icon,
-    "parent_id": parentId,
-    "image" : image,
-    "total_sessions": totalSessions,
-    "consent_form_url": consentFormUrl,
-    "consent_form_name": consentFormName,
-    "default_sessions": defaultSessions == null
+    'name': name,
+    'icon': icon,
+    'parent_id': parentId,
+    'image' : image,
+    'total_sessions': totalSessions,
+    'consent_form_url': consentFormUrl,
+    'consent_form_name': consentFormName,
+    'default_sessions': defaultSessions == null
         ? []
         : List<dynamic>.from(defaultSessions!.map((x) => x.toJson())),
-    "pre_notifications": preNotifications == null
+    'pre_notifications': preNotifications == null
         ? []
         : List<dynamic>.from(preNotifications!.map((x) => x.toJson())),
-    "post_notifications": postNotifications == null
+    'post_notifications': postNotifications == null
         ? []
         : List<dynamic>.from(postNotifications!.map((x) => x.toJson())),
-    "downtime_presets": downtimePresets?.toJson(),
+    'downtime_presets': downtimePresets?.toJson(),
     
-    "default_roles": defaultRoles == null
+    'default_roles': defaultRoles == null
         ? []
         : List<dynamic>.from(defaultRoles!.map((x) => x)),
   };

@@ -29,11 +29,11 @@ class ProductUsage {
   });
 
   Map<String, dynamic> toJson() => {
-    "product_id": productId,
-    "deduction_timing": deductionTiming,
-    "allow_substitution": allowSubstitution,
-    "notes": notes,
-    "sub_area_consumptions": subAreaConsumptions == null
+    'product_id': productId,
+    'deduction_timing': deductionTiming,
+    'allow_substitution': allowSubstitution,
+    'notes': notes,
+    'sub_area_consumptions': subAreaConsumptions == null
         ? []
         : List<dynamic>.from(subAreaConsumptions!.map((x) => x.toJson())),
   };
@@ -53,9 +53,9 @@ class SubAreaConsumptionModel {
   });
 
   Map<String, dynamic> toJson() => {
-    "sub_area_id": subAreaId,
-    "sub_area_name": subAreaName,
-    "min_quantity": minQuantity,
-    "max_quantity": maxQuantity,
+    'sub_area_id': subAreaId,
+    'sub_area_name': subAreaName,
+    'min_quantity': minQuantity,
+    'max_quantity': maxQuantity,
   };
 }

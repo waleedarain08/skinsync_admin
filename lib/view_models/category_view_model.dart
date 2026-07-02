@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/create_category_request.dart';
-import '../models/responses/category_list_response.dart';
+
 import '../models/responses/category_detail_response.dart';
+import '../models/responses/category_list_response.dart';
 import '../repositories/category_repository.dart';
 import '../services/locator.dart';
 import '../services/media_service.dart';
@@ -47,11 +48,6 @@ class CategoryState extends BaseStateModel {
 class CategoryViewModel extends BaseViewModel<CategoryState> {
   CategoryViewModel() : super(CategoryState());
 
-  @override
-  void init() {
-    super.init();
-    // fetchCategories(); // Can fetch here or in UI as per instructions
-  }
 
   final CategoryRepository _categoryRepository = locator<CategoryRepository>();
   final MediaService _mediaService = MediaService();

@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:skinsync_admin/models/sessions_model.dart';
 
 import '../common_models.dart';
-import 'base_response_model.dart';
 import '../notification_model.dart';
+import 'base_response_model.dart';
 
 class CategoryDetailResponse extends BaseApiResponseModel<CategoryDetailDto> {
   const CategoryDetailResponse({
@@ -72,66 +72,66 @@ class CategoryDetailDto {
   String toRawJson() => json.encode(toJson());
 
   factory CategoryDetailDto.fromJson(Map<String, dynamic> json) => CategoryDetailDto(
-    id: json["id"],
-    name: json["name"],
-    icon: json["icon"],
-    image: json["image"],
-    parentId: json["parent_id"],
-    totalSessions: json["total_sessions"],
-    consentFormUrl: json["consent_form_url"],
-    consentFormName: json["consent_form_name"],
-    defaultSessions: json["default_sessions"] == null
+    id: json['id'],
+    name: json['name'],
+    icon: json['icon'],
+    image: json['image'],
+    parentId: json['parent_id'],
+    totalSessions: json['total_sessions'],
+    consentFormUrl: json['consent_form_url'],
+    consentFormName: json['consent_form_name'],
+    defaultSessions: json['default_sessions'] == null
         ? null
         : List<SessionsModel>.from(
-            json["default_sessions"].map((x) => SessionsModel.fromJson(x))),
-    preNotifications: json["pre_notifications"] == null
+            json['default_sessions'].map((x) => SessionsModel.fromJson(x))),
+    preNotifications: json['pre_notifications'] == null
         ? null
         : List<NotificationModel>.from(
-            json["pre_notifications"].map((x) => NotificationModel.fromJson(x))),
-    postNotifications: json["post_notifications"] == null
+            json['pre_notifications'].map((x) => NotificationModel.fromJson(x))),
+    postNotifications: json['post_notifications'] == null
         ? null
         : List<NotificationModel>.from(
-            json["post_notifications"].map((x) => NotificationModel.fromJson(x))),
-    downtimePresets: json["downtime_presets"] == null
+            json['post_notifications'].map((x) => NotificationModel.fromJson(x))),
+    downtimePresets: json['downtime_presets'] == null
         ? null
-        : DowntimePresets.fromJson(json["downtime_presets"]),
-    defaultRoles: json["default_roles"] == null
+        : DowntimePresets.fromJson(json['downtime_presets']),
+    defaultRoles: json['default_roles'] == null
         ? null
         : List<DefaultRole>.from(
-            json["default_roles"].map((x) => defaultRoleValues.map[x]!)),
-    createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
-    updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
-    subCategories: json["sub_categories"] == null
+            json['default_roles'].map((x) => defaultRoleValues.map[x]!)),
+    createdAt: json['created_at'] == null ? null : DateTime.parse(json['created_at']),
+    updatedAt: json['updated_at'] == null ? null : DateTime.parse(json['updated_at']),
+    subCategories: json['sub_categories'] == null
         ? null
         : List<CategoryDetailDto>.from(
-            json["sub_categories"].map((x) => CategoryDetailDto.fromJson(x))),
+            json['sub_categories'].map((x) => CategoryDetailDto.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "icon": icon,
-    "image": image,
-    "parent_id": parentId,
-    "total_sessions": totalSessions,
-    "consent_form_url": consentFormUrl,
-    "consent_form_name": consentFormName,
-    "default_sessions": defaultSessions == null
+    'id': id,
+    'name': name,
+    'icon': icon,
+    'image': image,
+    'parent_id': parentId,
+    'total_sessions': totalSessions,
+    'consent_form_url': consentFormUrl,
+    'consent_form_name': consentFormName,
+    'default_sessions': defaultSessions == null
         ? null
         : List<dynamic>.from(defaultSessions!.map((x) => x.toJson())),
-    "pre_notifications": preNotifications == null
+    'pre_notifications': preNotifications == null
         ? null
         : List<dynamic>.from(preNotifications!.map((x) => x.toJson())),
-    "post_notifications": postNotifications == null
+    'post_notifications': postNotifications == null
         ? null
         : List<dynamic>.from(postNotifications!.map((x) => x.toJson())),
-    "downtime_presets": downtimePresets?.toJson(),
-    "default_roles": defaultRoles == null
+    'downtime_presets': downtimePresets?.toJson(),
+    'default_roles': defaultRoles == null
         ? null
         : List<dynamic>.from(defaultRoles!.map((x) => defaultRoleValues.reverse[x])),
-    "created_at": createdAt?.toIso8601String(),
-    "updated_at": updatedAt?.toIso8601String(),
-    "sub_categories": subCategories == null
+    'created_at': createdAt?.toIso8601String(),
+    'updated_at': updatedAt?.toIso8601String(),
+    'sub_categories': subCategories == null
         ? null
         : List<dynamic>.from(subCategories!.map((x) => x.toJson())),
   };
@@ -146,11 +146,11 @@ enum DefaultRole {
 }
 
 final defaultRoleValues = EnumValues({
-  "Aesthetician": DefaultRole.AESTHETICIAN,
-  "Injector": DefaultRole.INJECTOR,
-  "MD": DefaultRole.MD,
-  "Specialist": DefaultRole.SPECIALIST,
-  "Nurse": DefaultRole.NURSE
+  'Aesthetician': DefaultRole.AESTHETICIAN,
+  'Injector': DefaultRole.INJECTOR,
+  'MD': DefaultRole.MD,
+  'Specialist': DefaultRole.SPECIALIST,
+  'Nurse': DefaultRole.NURSE
 });
 
 
@@ -161,8 +161,8 @@ enum Unit {
 }
 
 final unitValues = EnumValues({
-  "hours": Unit.HOURS,
-  "minutes": Unit.MINUTES
+  'hours': Unit.HOURS,
+  'minutes': Unit.MINUTES
 });
 
 
@@ -173,8 +173,8 @@ enum Type {
 }
 
 final typeValues = EnumValues({
-  "care": Type.CARE,
-  "instruction": Type.INSTRUCTION
+  'care': Type.CARE,
+  'instruction': Type.INSTRUCTION
 });
 
 class EnumValues<T> {

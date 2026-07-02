@@ -1,8 +1,8 @@
 import 'package:skinsync_admin/models/requests/create_category_request.dart';
 
 import '../models/responses/base_response_model.dart';
-import '../models/responses/category_list_response.dart';
 import '../models/responses/category_detail_response.dart';
+import '../models/responses/category_list_response.dart';
 import '../repositories/category_repository.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';

@@ -443,7 +443,7 @@ class _EditTreatmentScreenState extends ConsumerState<EditTreatmentScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: state.productUsageEntries.length,
-              separatorBuilder: (_, __) => context.verticalSpace(16),
+              separatorBuilder: (_, _) => context.verticalSpace(16),
               itemBuilder: (context, index) {
                 final material = state.productUsageEntries[index];
                 return _buildMaterialCard(

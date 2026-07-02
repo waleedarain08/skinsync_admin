@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
+import 'package:skinsync_admin/screens/product_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
+import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
-import 'package:skinsync_admin/screens/product_detail_screen.dart';
-import 'package:go_router/go_router.dart';
 
 class MaterialsStep extends ConsumerWidget {
   const MaterialsStep({super.key});
@@ -620,8 +620,7 @@ class MaterialsStep extends ConsumerWidget {
                   ),
                   context.verticalSpace(12),
                   TextButton(
-                    onPressed: () =>
-                        viewModel.fetchProductsByTreatmentCategory(),
+                    onPressed: viewModel.fetchProductsByTreatmentCategory,
                     child: const Text('Retry'),
                   ),
                 ],

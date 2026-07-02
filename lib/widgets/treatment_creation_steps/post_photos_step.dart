@@ -53,8 +53,7 @@ class PostPhotosStep extends ConsumerWidget {
             Switch.adaptive(
               value: state.requirePostTreatmentPhotos,
               activeColor: CustomColors.purple,
-              onChanged: (val) =>
-                  viewModel.toggleRequirePostTreatmentPhotos(val),
+              onChanged: viewModel.toggleRequirePostTreatmentPhotos,
             ),
           ],
         ),

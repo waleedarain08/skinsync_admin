@@ -1,7 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:collection/collection.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
@@ -35,7 +35,7 @@ class PreviewItem {
   });
 }
 
-class _SelectedSummaryCard extends StatelessWidget {
+class SelectedSummaryCard extends StatelessWidget {
   final String title;
   final String sku;
   final bool summary;
@@ -44,7 +44,7 @@ class _SelectedSummaryCard extends StatelessWidget {
   final List<PreviewItem> items;
   final VoidCallback onRemove;
 
-  const _SelectedSummaryCard({
+  const SelectedSummaryCard({super.key, 
     required this.title,
     required this.sku,
     required this.summary,
@@ -427,7 +427,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
         }
 
         previewNodes.add(
-          _SelectedSummaryCard(
+          SelectedSummaryCard(
             title: area.name,
             sku: area.globalSku,
             icon: area.icon,

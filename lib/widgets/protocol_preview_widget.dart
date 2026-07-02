@@ -238,7 +238,7 @@ class ProtocolFormPreview extends StatelessWidget {
                           Icon(
                             IconData(m.Icons.info_outline.codePoint),
                             size: 14,
-                            color: PdfColor.fromInt(CustomColors.purple.value),
+                            color: PdfColor.fromInt(CustomColors.purple.toARGB32()),
                           ),
                           SizedBox(width: 8),
                           if (note.title != null && note.title!.isNotEmpty)
@@ -292,7 +292,7 @@ class _ProtocolNotesWidget extends StatelessWidget {
   _ProtocolNotesWidget({required this.protocolName, required this.notes});
 
   @override
-  Widget build(context) {
+  Widget build(Context context) {
     final protocolNote = notes.firstWhere(
       (n) => n.protocolName == protocolName,
       orElse: () =>

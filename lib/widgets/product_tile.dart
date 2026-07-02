@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/product_model.dart';
-import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/screens/create_product_screen.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
+
 import '../utils/color_constant.dart';
 import '../utils/custom_fonts.dart';
 import '../view_models/product_view_model.dart';

@@ -27,7 +27,7 @@ class UnitPriceOverride {
   UnitPriceOverride({this.productId, this.pricePerUnit});
 
   Map<String, dynamic> toJson() => {
-    "product_id": productId,
-    "price_per_unit": pricePerUnit,
+    'product_id': productId,
+    'price_per_unit': pricePerUnit,
   };
 }

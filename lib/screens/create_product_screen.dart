@@ -4,13 +4,14 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
-import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-import '../widgets/build_textfield.dart';
+
 import '../widgets/app_network_image.dart';
+import '../widgets/build_textfield.dart';
 import '../widgets/dailogbox/category_selection_dialog.dart';
 import '../widgets/select_or_create_dropdown_widget.dart';
 
@@ -268,7 +269,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
         ),
         SizedBox(height: 8.h),
         DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           isExpanded: true,
           items: items
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
@@ -342,7 +343,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: CustomColors.purple,
+            activeThumbColor: CustomColors.purple,
           ),
         ],
       ),
@@ -397,8 +398,9 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                       CustomPrimaryButton(
                         onTap: () {
                           if (!_formKey.currentState!.validate() ||
-                              state.loading)
+                              state.loading) {
                             return;
+                          }
                           final product = ProductModel(
                             id: widget.productToEdit?.id,
                             name: _nameController.text,
@@ -458,8 +460,9 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             });
                           } else {
                             notifier.createProduct(product).then((success) {
-                              if (success == true && context.mounted)
+                              if (success == true && context.mounted) {
                                 context.pop(true);
+                              }
                             });
                           }
                         },
@@ -998,9 +1001,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                         hintText: 'e.g. 10',
                                         keyboardType: TextInputType.number,
                                         onChanged: (_) {
-                                          setState(() {
-                                            _updateTotalBillableQuantity();
-                                          });
+                                          setState(_updateTotalBillableQuantity);
                                         },
                                       ),
                                       SizedBox(height: 6.h),
@@ -1029,9 +1030,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                         hintText: 'e.g. 1',
                                         keyboardType: TextInputType.number,
                                         onChanged: (_) {
-                                          setState(() {
-                                            _updateTotalBillableQuantity();
-                                          });
+                                          setState(_updateTotalBillableQuantity);
                                         },
                                       ),
                                       SizedBox(height: 6.h),
@@ -1193,7 +1192,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                       SizedBox(width: 12.w),
                                       Expanded(
                                         child: Text(
-                                          "Total ${packName}s in 1 $unitName = $boxQty boxes × $itemQty ${packName}s = $totalItems ${packName}s.",
+                                          'Total ${packName}s in 1 $unitName = $boxQty boxes × $itemQty ${packName}s = $totalItems ${packName}s.',
                                           style: context.fonts.purple14w600,
                                         ),
                                       ),
@@ -1283,9 +1282,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                               decimal: true,
                                             ),
                                         onChanged: (_) {
-                                          setState(() {
-                                            _updateTotalBillableQuantity();
-                                          });
+                                          setState(_updateTotalBillableQuantity);
                                         },
                                       ),
                                       SizedBox(height: 6.h),

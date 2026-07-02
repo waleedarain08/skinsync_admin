@@ -7,13 +7,13 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/area_view_model.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/dailogbox/category_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-import 'package:skinsync_admin/widgets/app_network_image.dart';
 
 class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
   const ManageTreatmentDataScreen({super.key});
@@ -723,7 +723,7 @@ class _ManageTreatmentDataScreenState
       length: 2,
       child: Column(
         children: [
-          Container(
+          ColoredBox(
             color: Colors.white.withValues(alpha: 0.5),
             child: const TabBar(
               labelColor: CustomColors.purple,

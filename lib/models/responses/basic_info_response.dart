@@ -14,9 +14,9 @@ class BasicInfoResponse  extends BaseApiResponseModel<BasicInfo>{
 
 
   factory BasicInfoResponse.fromJson(Map<String, dynamic> json) => BasicInfoResponse(
-    data: json["data"] == null ? null : BasicInfo.fromJson(json["data"]),
-    isSuccess: json["is_success"],
-    message: json["message"],
+    data: json['data'] == null ? null : BasicInfo.fromJson(json['data']),
+    isSuccess: json['is_success'],
+    message: json['message'],
   );
 
 
@@ -120,7 +120,7 @@ class BasicInfo {
     id: json['id'],
     currentStep: json['current_step'],
     status: json['status'],
-    selectedCategoryIds: json['selected_category_ids'] == null ? [] : List<int>.from(json["selected_category_ids"]!.map((x) => x)),
+    selectedCategoryIds: json['selected_category_ids'] == null ? [] : List<int>.from(json['selected_category_ids']!.map((x) => x)),
     globalSku: json['global_sku'],
     patientDisplayName: json['patient_display_name'],
     image: json['image'],

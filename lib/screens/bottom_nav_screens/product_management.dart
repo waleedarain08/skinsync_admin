@@ -10,17 +10,17 @@ import '../../models/product_model.dart';
 import '../../models/responses/manufacturers_list_response.dart';
 import '../../utils/theme.dart';
 import '../../view_models/product_view_model.dart';
+import '../../widgets/app_network_image.dart';
 import '../../widgets/app_search_field.dart';
 import '../../widgets/borderd_container_widget.dart';
 import '../../widgets/custom_dropdown_widget.dart';
 import '../../widgets/custom_primary_button.dart';
 import '../../widgets/gradient_scaffold.dart';
 import '../../widgets/number_paginator.dart';
-import '../create_product_screen.dart';
-import '../product_detail_screen.dart';
-import '../manage_inventory_data_screen.dart';
-import '../../widgets/app_network_image.dart';
 import '../../widgets/status_toggle_switch.dart';
+import '../create_product_screen.dart';
+import '../manage_inventory_data_screen.dart';
+import '../product_detail_screen.dart';
 
 class ProductManagement extends ConsumerStatefulWidget {
   const ProductManagement({super.key});
@@ -667,7 +667,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   _actionsCell(p),
                 ],
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

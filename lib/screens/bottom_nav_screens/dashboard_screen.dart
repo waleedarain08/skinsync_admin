@@ -256,7 +256,7 @@ class DashboardScreen extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               itemCount: 5,
-              itemBuilder: (context, index) => _buildClinicItem(context, index),
+              itemBuilder: _buildClinicItem,
             ),
           ),
           // ...List.generate(5, (index) => _buildClinicItem(context, index)),

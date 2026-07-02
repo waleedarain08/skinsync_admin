@@ -35,7 +35,7 @@ class CategoryStep extends ConsumerWidget {
         NestedCategorySelector(
           categories: categoryState.categories,
           initialCategoryId: viewModel.categoryIdController.text,
-          onSelected: (cat, path) => viewModel.onCategorySelected(cat, path),
+          onSelected: viewModel.onCategorySelected,
         ),
         context.verticalSpace(32),
         if (viewModel.categoryPathController.text.isNotEmpty)

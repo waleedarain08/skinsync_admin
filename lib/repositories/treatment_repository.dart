@@ -1,6 +1,5 @@
 import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/constent_form_selection_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/post_treatment_instruction_request.dart';
@@ -8,10 +7,11 @@ import 'package:skinsync_admin/models/requests/create_treatment_requests/pre_tre
 import 'package:skinsync_admin/models/requests/create_treatment_requests/product_usage_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/step_pricing_request.dart';
-import 'package:skinsync_admin/models/responses/basic_info_response.dart';
-import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
-import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
+import 'package:skinsync_admin/models/responses/basic_info_response.dart';
+import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
+import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 
 import '../models/requests/create_treatment_requests/allowed_provider_role_request.dart';

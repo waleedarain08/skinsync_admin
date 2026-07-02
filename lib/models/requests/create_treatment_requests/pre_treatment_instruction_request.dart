@@ -25,5 +25,5 @@ class PreTreatmentAttachment {
 
   PreTreatmentAttachment({this.name, this.url, this.type});
 
-  Map<String, dynamic> toJson() => {"name": name, "url": url, "type": type};
+  Map<String, dynamic> toJson() => {'name': name, 'url': url, 'type': type};
 }

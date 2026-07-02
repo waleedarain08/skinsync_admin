@@ -13,10 +13,10 @@ import '../../models/notification_entry.dart';
 import '../../models/responses/category_detail_response.dart';
 import '../../utils/theme.dart';
 import '../../view_models/category_view_model.dart';
+import '../app_network_image.dart';
 import '../build_textfield.dart';
 import '../custom_dropdown_widget.dart';
 import '../custom_primary_button.dart';
-import '../app_network_image.dart';
 import 'standard_dialog.dart';
 
 class CategoryCreationDialog extends ConsumerStatefulWidget {
@@ -208,7 +208,7 @@ class _CategoryCreationDialogState
         (s) => CategorySessionModel(
           sessionNumber: s.sessionNumber,
           followUps: List.from(
-            s.followUps?.map(
+            s.followUps.map(
                   (f) => CategoryFollowUpModel(
                     type: f.type ?? '',
                     durationValue: f.durationValue ?? 0,
@@ -255,9 +255,9 @@ class _CategoryCreationDialogState
       ) ?? [],
     );
 
-    _downtimeLowController.text = cat.downtimePresets?.low.toString() ?? "";
-    _downtimeModerateController.text = cat.downtimePresets?.moderate.toString() ?? "";
-    _downtimeHighController.text = cat.downtimePresets?.high.toString() ?? "";
+    _downtimeLowController.text = cat.downtimePresets?.low.toString() ?? '';
+    _downtimeModerateController.text = cat.downtimePresets?.moderate.toString() ?? '';
+    _downtimeHighController.text = cat.downtimePresets?.high.toString() ?? '';
 
     _selectedRoles = List.from(
       cat.defaultRoles?.map((r) => defaultRoleValues.reverse[r] ?? '') ?? [],
@@ -367,7 +367,7 @@ class _CategoryCreationDialogState
     });
   }
 
-  void _viewConsentPdf() async {
+  Future<void> _viewConsentPdf() async {
     final pdfUrl = _consentFormUrl ?? widget.initialConsentFormUrl;
     if (pdfUrl == null || pdfUrl.isEmpty) {
       _showPdfError();
@@ -389,7 +389,7 @@ class _CategoryCreationDialogState
     showDialog(
       context: context,
       builder: (context) => StandardDialog(
-        title: "Consent Form Preview",
+        title: 'Consent Form Preview',
         width: context.w(400),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -400,13 +400,13 @@ class _CategoryCreationDialogState
               size: 48,
             ),
             context.verticalSpace(12),
-            Text("PDF Not Available", style: context.fonts.black14w600),
+            Text('PDF Not Available', style: context.fonts.black14w600),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Close"),
+            child: const Text('Close'),
           ),
         ],
       ),

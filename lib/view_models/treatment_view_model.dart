@@ -10,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/constent_form_selection_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/down_time_level_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/phase_notifications_request.dart';
@@ -20,10 +19,11 @@ import 'package:skinsync_admin/models/requests/create_treatment_requests/product
 import 'package:skinsync_admin/models/requests/create_treatment_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/sessions_setup_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/step_pricing_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_schedule_request.dart';
-import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
-import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
+import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
+import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 
 import '../models/notification_entry.dart';
@@ -31,8 +31,8 @@ import '../models/requests/create_treatment_requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
 import '../repositories/category_repository.dart';
-import '../repositories/treatment_repository.dart';
 import '../repositories/product_repository.dart';
+import '../repositories/treatment_repository.dart';
 import '../services/locator.dart';
 import '../services/media_service.dart';
 import '../utils/dummy_data.dart';
@@ -47,7 +47,7 @@ final treatmentViewModelProvider =
 class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   TreatmentViewModel._() : super(TreatmentState());
 
-  int _formSessionId = 0;
+  final int _formSessionId = 0;
   int get formSessionId => _formSessionId;
 
   static final List<TreatmentModel> _localTreatments = List.from(
@@ -2527,7 +2527,7 @@ Body       : ${request.toJson()}
             final originalCategoryIds = state.selectedTreatmentDetail?.selectedCategoryIds ?? [];
             final currentCategoryIds = state.selectedCategoryPath;
             final bool categoryIdsChanged = originalCategoryIds.length != currentCategoryIds.length || 
-                !currentCategoryIds.every((id) => originalCategoryIds.contains(id));
+                !currentCategoryIds.every(originalCategoryIds.contains);
 
             final originalSku = state.selectedTreatmentDetail?.globalSku ?? '';
             final currentSku = globalSkuController.text.trim();
@@ -2556,7 +2556,7 @@ Body       : ${request.toJson()}
             final originalAreaIds = state.selectedTreatmentDetail?.selectedAreaIds ?? [];
             final currentAreaIds = state.selectedTreatmentAreaIds;
             final bool areaIdsChanged = originalAreaIds.length != currentAreaIds.length || 
-                !currentAreaIds.every((id) => originalAreaIds.contains(id));
+                !currentAreaIds.every(originalAreaIds.contains);
 
             final originalDuration = state.selectedTreatmentDetail?.baseDuration ?? 0;
             final currentDuration = ((int.tryParse(durationHoursController.text) ?? 0) * 60) + (int.tryParse(durationMinutesController.text) ?? 0);
@@ -2613,7 +2613,7 @@ Body       : ${request.toJson()}
             final originalRoles = state.selectedTreatmentDetail?.allowedRoles ?? [];
             final currentRoles = state.selectedRoles;
             final bool rolesChanged = originalRoles.length != currentRoles.length || 
-                !currentRoles.every((r) => originalRoles.contains(r));
+                !currentRoles.every(originalRoles.contains);
 
             final originalTotalSessions = state.selectedTreatmentDetail?.totalSessions ?? 1;
             final currentTotalSessions = state.totalSessions;

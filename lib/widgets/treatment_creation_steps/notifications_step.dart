@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/models/notification_entry.dart';
 import 'package:skinsync_admin/models/notification_model.dart';
 import 'package:skinsync_admin/models/responses/category_detail_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
-import 'package:skinsync_admin/models/notification_entry.dart';
 
 class NotificationsStep extends ConsumerWidget {
   const NotificationsStep({super.key});
@@ -146,7 +146,7 @@ class NotificationsStep extends ConsumerWidget {
                   unitValues.reverse[config.timingUnit] ?? 'hours';
               return _buildNotificationPreview(
                 context,
-                title: "${config.title} $typeText (Read-only)",
+                title: '${config.title} $typeText (Read-only)',
                 message: config.message,
                 timing:
                     "${config.timing} $timingUnitStr ${isPre ? 'Before' : 'After'}",

@@ -6,11 +6,11 @@ import 'package:skinsync_admin/models/responses/product_detail_response.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
+import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
@@ -118,7 +118,7 @@ class ProductDetailScreen extends ConsumerWidget {
               width: context.w(120),
               height: context.w(120),
               child: product.image.isEmpty
-                  ? Container(
+                  ? ColoredBox(
                       color: CustomColors.whiteGrey,
                       child: Icon(
                         Icons.inventory_2_outlined,
@@ -431,7 +431,7 @@ class ProductDetailScreen extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: treatments.length,
-              separatorBuilder: (_, __) => context.verticalSpace(12),
+              separatorBuilder: (_, _) => context.verticalSpace(12),
               itemBuilder: (context, index) {
                 final treatment = treatments[index];
                 return InkWell(

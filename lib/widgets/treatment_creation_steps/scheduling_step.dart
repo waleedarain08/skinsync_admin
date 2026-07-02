@@ -109,10 +109,8 @@ class SchedulingStep extends ConsumerWidget {
                 ),
                 Switch(
                   value: state.isFixedDuration,
-                  onChanged: (val) {
-                    viewModel.toggleIsFixedDuration(val);
-                  },
-                  activeColor: CustomColors.purple,
+                  onChanged: viewModel.toggleIsFixedDuration,
+                  activeThumbColor: CustomColors.purple,
                 ),
               ],
             ),
@@ -360,7 +358,7 @@ class SchedulingStep extends ConsumerWidget {
               height: context.w(24),
               child: Checkbox(
                 value: state.allowClinicOverride,
-                onChanged: (val) => viewModel.toggleAllowClinicOverride(val),
+                onChanged: viewModel.toggleAllowClinicOverride,
                 activeColor: CustomColors.purple,
               ),
             ),
@@ -379,7 +377,7 @@ class SchedulingStep extends ConsumerWidget {
               height: context.w(24),
               child: Checkbox(
                 value: state.allowProviderOverride,
-                onChanged: (val) => viewModel.toggleAllowProviderOverride(val),
+                onChanged: viewModel.toggleAllowProviderOverride,
                 activeColor: CustomColors.purple,
               ),
             ),
@@ -398,7 +396,7 @@ class SchedulingStep extends ConsumerWidget {
               height: context.w(24),
               child: Checkbox(
                 value: state.onlineBookable,
-                onChanged: (val) => viewModel.toggleOnlineBookable(val),
+                onChanged: viewModel.toggleOnlineBookable,
                 activeColor: CustomColors.purple,
               ),
             ),
@@ -414,7 +412,7 @@ class SchedulingStep extends ConsumerWidget {
               height: context.w(24),
               child: Checkbox(
                 value: state.manualApprovalRequired,
-                onChanged: (val) => viewModel.toggleManualApprovalRequired(val),
+                onChanged: viewModel.toggleManualApprovalRequired,
                 activeColor: CustomColors.purple,
               ),
             ),
