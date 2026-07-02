@@ -34,6 +34,7 @@ import '../widgets/gradient_scaffold.dart';
 import '../widgets/app_network_image.dart';
 import '../widgets/icon_image_container.dart';
 import '../widgets/nested_category_selector.dart';
+import '../widgets/treatment_creation_steps/treatment_creation_steps.dart';
 import 'product_detail_screen.dart';
 
 class CreateTreatmentScreen extends ConsumerStatefulWidget {
@@ -2014,50 +2015,39 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   ) {
     switch (state.currentStep) {
       case 0:
-        return _buildStepCategory(context, state, viewModel, categoryState);
+        return const CategoryStep();
       case 1:
-        return _buildStepDetails(context, state, viewModel);
+        return const TreatmentSelectionStep();
       case 2:
-        return _buildStepAreas(context, state, viewModel, dataState, ref);
+        return const AreasStep();
       case 3:
-        return _buildStepMaterials(context, state, viewModel, dataState, ref);
+        return const MaterialsStep();
       case 4:
-        return _buildStepScheduling(context, state, viewModel);
+        return const SchedulingStep();
       case 5:
-        return _buildStepPricing(context, state, viewModel);
+        return const PricingStep();
       case 6:
-        return _buildStepProtocolsStep(
-          context,
-          state,
-          viewModel,
-          dataState,
-          ref,
-        );
+        return const ProtocolsStep();
       case 7:
-        return _buildStepPreInstructions(context, state, viewModel);
+        return const PreInstructionsStep();
       case 8:
-        return _buildStepPostInstructions(context, state, viewModel);
+        return const PostInstructionsStep();
       case 9:
-        return _buildPostTreatmentPhotosStep(context, state, viewModel);
+        return const PostPhotosStep();
       case 10:
-        return _buildStepNotifications(
-          context,
-          state,
-          viewModel,
-          categoryState,
-        );
+        return const NotificationsStep();
       case 11:
-        return _buildStepDowntime(context, state, viewModel, categoryState);
+        return const DowntimeStep();
       case 12:
-        return _buildStepRoles(context, state, viewModel, categoryState);
+        return const RolesStep();
       case 13:
-        return _buildStepSessions(context, state, viewModel, categoryState);
+        return const SessionsStep();
       case 14:
-        return _buildStepFollowUp(context, state, viewModel, dataState);
+        return const FollowUpStep();
       case 15:
-        return _buildStepConsent(context, state, viewModel, ref);
+        return const ConsentStep();
       case 16:
-        return _buildStepLogic(context, state, viewModel);
+        return const LogicStep();
       default:
         return const SizedBox.shrink();
     }
