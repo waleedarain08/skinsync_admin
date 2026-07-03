@@ -210,7 +210,7 @@ class SessionsStep extends ConsumerWidget {
                         width: context.w(150),
                         onTap: () {
                           viewModel.setActiveSessionIndex(index);
-                          viewModel.setStep(3);
+                          viewModel.setSessionStep(3);
                           context.push(CreateSessionScreen.routeName);
                         },
                         label: 'Edit Detail',
@@ -220,7 +220,7 @@ class SessionsStep extends ConsumerWidget {
                         width: context.w(150),
                         onTap: () {
                           viewModel.setActiveSessionIndex(index);
-                          viewModel.setStep(3);
+                          viewModel.setSessionStep(3);
                           context.push(CreateSessionScreen.routeName);
                         },
                         label: 'Enter Detail',

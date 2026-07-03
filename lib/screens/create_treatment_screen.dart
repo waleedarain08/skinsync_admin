@@ -40,12 +40,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   }
 
   int _getStepIndex(int currentStep) {
-    if (currentStep == 0) return 0;
-    if (currentStep == 1) return 1;
-    if (currentStep == 2) return 2;
-    if (currentStep == 13) return 3;
-    if (currentStep == 16) return 4;
-    return 0;
+    return currentStep;
   }
 
   @override
@@ -296,9 +291,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         return const TreatmentSelectionStep();
       case 2:
         return const AreasStep();
-      case 13:
+      case 3:
         return const SessionsStep();
-      case 16:
+      case 4:
         return const LogicStep();
       default:
         return const SizedBox.shrink();
@@ -318,13 +313,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           Expanded(
             child: CustomOutlinedButton(
               onTap: () {
-                if (state.currentStep == 16) {
-                  viewModel.setStep(13);
-                } else if (state.currentStep == 13) {
-                  viewModel.setStep(2);
-                } else {
-                  viewModel.setStep(state.currentStep - 1);
-                }
+                viewModel.setStep(state.currentStep - 1);
               },
               label: 'Previous Step',
             ),
@@ -354,27 +343,17 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               final scaffoldMessenger = ScaffoldMessenger.of(context);
               if (state.currentStep == 1) {
                 if (!_validateStepDetails(scaffoldMessenger, viewModel)) return;
-                final success = await viewModel.createBasicInfo(
-                  stepNumber: 2,
-                );
-                if (!mounted) return;
-                if (success ?? false) {
-                  viewModel.setStep(2);
-                }
+                viewModel.setStep(2);
                 return;
               }
 
               if (state.currentStep == 2) {
                 if (!_validateSubAreas(scaffoldMessenger, state)) return;
-                final success = await viewModel.createTreatmentArea();
-                if (!mounted) return;
-                if (success ?? false) {
-                  viewModel.setStep(13);
-                }
+                viewModel.setStep(3);
                 return;
               }
 
-              if (state.currentStep == 13) {
+              if (state.currentStep == 3) {
                 final bool allSessionsDetailed = state.sessions.isNotEmpty &&
                     state.sessions.every((s) => s.isDetailedEntered);
 
@@ -388,28 +367,23 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   return;
                 }
 
-                // If all sessions are configured, let's proceed to Business Logic (Step 16)
-                viewModel.setStep(16);
+                // If all sessions are configured, let's proceed to Business Logic (Step 4)
+                viewModel.setStep(4);
                 return;
               }
 
-              if (state.currentStep == 16) {
-                final success = await viewModel.callBusinessLogic();
-                if (!mounted) return;
-                if (success ?? false) {
-                  viewModel.submitTreatment(
-                    context,
-                    categories: categoryState.categories,
-                  ).then((_) {
-                    if (context.mounted) {
-                      context.go('/treatment-management');
-                    }
-                  });
-                }
-                return;
+              if (state.currentStep == 4) {
+                viewModel.submitTreatment(
+                  context,
+                  categories: categoryState.categories,
+                ).then((_) {
+                  if (context.mounted) {
+                    context.go('/treatment-management');
+                  }
+                });
               }
             },
-            label: state.currentStep == 16 ? 'Finish & Create Treatment' : 'Next Step',
+            label: state.currentStep == 4 ? 'Finish & Create Treatment' : 'Next Step',
           ),
         ),
       ],

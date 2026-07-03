@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/widgets/protocol_preview_widget.dart';
 
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
@@ -45,11 +44,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     });
   }
 
-  int _getSessionOffsetStep(int currentStep) {
-    if (currentStep < 13) {
-      return currentStep - 3;
+  int _getSessionOffsetStep(int sessionStep) {
+    if (sessionStep < 13) {
+      return sessionStep - 3;
     } else {
-      return currentStep - 4;
+      return sessionStep - 4;
     }
   }
 
@@ -64,20 +63,25 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     final bool isTablet =
         context.screenWidth > 800 && context.screenWidth <= 1200;
 
-    return GradientScaffold(
-      appBar: AppBar(
-        flexibleSpace: AppDecorations.appBarGradient,
-        elevation: 0,
-        centerTitle: true,
-        title: Text('Treatment Builder', style: context.fonts.black18w600),
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: CustomColors.black),
-          onPressed: () {
-            viewModel.resetForm();
-            context.go('/treatment-management');
-          },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        context.pop();
+      },
+      child: GradientScaffold(
+        appBar: AppBar(
+          flexibleSpace: AppDecorations.appBarGradient,
+          elevation: 0,
+          centerTitle: true,
+          title: Text('Session Detail Builder', style: context.fonts.black18w600),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: CustomColors.black),
+            onPressed: () {
+              context.pop();
+            },
+          ),
         ),
-      ),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -147,7 +151,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
             ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildLeftSidebar(
@@ -170,7 +174,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       'Patient Consent',
     ];
 
-    final currentOffsetStep = _getSessionOffsetStep(state.currentStep);
+    final currentOffsetStep = _getSessionOffsetStep(state.sessionStep);
 
     return Container(
       width: context.w(280),
@@ -229,9 +233,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                   onTap: index < currentOffsetStep
                       ? () {
                           if (index < 10) {
-                            viewModel.setStep(index + 3);
+                            viewModel.setSessionStep(index + 3);
                           } else {
-                            viewModel.setStep(index + 4);
+                            viewModel.setSessionStep(index + 4);
                           }
                         }
                       : null,
@@ -353,7 +357,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       Icons.fact_check_outlined,
     ];
 
-    final int stepIndex = _getSessionOffsetStep(state.currentStep);
+    final int stepIndex = _getSessionOffsetStep(state.sessionStep);
     if (stepIndex < 0 || stepIndex >= titles.length) {
       return const SizedBox.shrink();
     }
@@ -380,10 +384,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    titles[stepIndex],
-                    style: context.fonts.black20w600,
-                  ),
+                  Text(titles[stepIndex], style: context.fonts.black20w600),
                   Text(
                     descriptions[stepIndex],
                     style: context.fonts.grey14w400,
@@ -1906,7 +1907,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
 
   Widget _buildMobileProgress(BuildContext context, TreatmentState state) {
     const stepsCount = 12;
-    final currentOffsetStep = _getSessionOffsetStep(state.currentStep);
+    final currentOffsetStep = _getSessionOffsetStep(state.sessionStep);
     return Container(
       padding: context.appEdgeInsets(horizontal: 24, vertical: 16),
       color: Colors.white,
@@ -1947,7 +1948,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     CategoryState categoryState,
     WidgetRef ref,
   ) {
-    switch (state.currentStep) {
+    switch (state.sessionStep) {
       case 3:
         return const MaterialsStep();
       case 4:
@@ -2015,28 +2016,27 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentDataState dataState,
     CategoryState categoryState,
   ) {
-    final bool isLastStep = state.currentStep == 15;
+    final bool isLastStep = state.sessionStep == 15;
     return Row(
       children: [
-        if (state.currentStep > 3) ...[
+        if (state.sessionStep > 3) ...[
           Expanded(
             child: CustomOutlinedButton(
               onTap: () {
-                if (state.currentStep == 14) {
-                  viewModel.setStep(12);
+                if (state.sessionStep == 14) {
+                  viewModel.setSessionStep(12);
                 } else {
-                  viewModel.setStep(state.currentStep - 1);
+                  viewModel.setSessionStep(state.sessionStep - 1);
                 }
               },
               label: 'Previous Step',
             ),
           ),
           context.horizontalSpace(16),
-        ] else if (state.currentStep == 3) ...[
+        ] else if (state.sessionStep == 3) ...[
           Expanded(
             child: CustomOutlinedButton(
               onTap: () {
-                viewModel.setStep(13); // Go back to Sessions Setup in CreateTreatmentScreen
                 context.pop();
               },
               label: 'Previous Step',
@@ -2048,106 +2048,55 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           flex: 2,
           child: CustomPrimaryButton(
             onTap: () async {
-              log('CURRENT STEP: ${state.currentStep}');
-              if (state.currentStep == 3) {
+              log('CURRENT STEP: ${state.sessionStep}');
+              if (state.sessionStep == 3) {
                 if (!_validateProductQuantities(context, state)) return;
               }
-              if (state.currentStep == 4) {
+              if (state.sessionStep == 4) {
                 if (!_validateScheduling(context, viewModel)) return;
               }
-              if (state.currentStep == 9) {
+              if (state.sessionStep == 9) {
                 if (!_validatePostPhotos(context, state)) return;
               }
-              if (state.currentStep == 10) {
+              if (state.sessionStep == 10) {
                 if (!_validatePhaseNotifications(context, state)) {
                   return;
                 }
               }
-              if (state.currentStep == 14) {
+              if (state.sessionStep == 14) {
                 if (!_validateFollowUps(context, state)) {
                   return;
                 }
               }
 
-              if (state.currentStep < 15) {
-                if (state.currentStep == 3) {
-                  final success = await viewModel.callProductUsage();
-                  if (success ?? false) {
-                    viewModel.setStep(state.currentStep + 1);
-                  }
-                } else if (state.currentStep == 4) {
-                  final success = await viewModel.createSchedule(
-                    stepNumber: state.currentStep + 1,
-                  );
-                  if (success ?? false) {
-                    viewModel.setStep(state.currentStep + 1);
-                  }
-                } else if (state.currentStep == 5) {
-                  final success = await viewModel.callStepPricing(
-                    stepNumber: state.currentStep + 1,
-                  );
-                  if (success ?? false) {
-                    viewModel.setStep(state.currentStep + 1);
-                  }
-                } else if (state.currentStep == 6) {
-                  final bytes = await ProtocolFormPreview.getPdfBytes(
-                    state: state,
-                    dataState: dataState,
-                    categoryState: categoryState,
-                  );
-
-                  final success = await viewModel.callProtocol(
-                    bytes: bytes,
-                    stepNumber: state.currentStep + 1,
-                  );
-                  if (success ?? false) {
-                    viewModel.setStep(state.currentStep + 1);
-                  }
-                } else if (state.currentStep == 7) {
-                  final success = await viewModel
-                      .callPreTreatmentInstructions();
-                  if (success ?? false) {
-                    viewModel.setStep(state.currentStep + 1);
-                  }
-                } else if (state.currentStep == 8) {
-                  final success = await viewModel
-                      .callPostTreatmentInstructions();
-                  if (success ?? false) {
-                    viewModel.setStep(state.currentStep + 1);
-                  }
-                } else if (state.currentStep == 9) {
-                  final success = await viewModel.callPostTreatmentPhotos();
-                  if (success ?? false) {
-                    viewModel.setStep(10);
-                  }
-                } else if (state.currentStep == 10) {
-                  final success = await viewModel.callPhaseNotifications();
-                  if (success ?? false) {
-                    viewModel.setStep(11);
-                  }
-                } else if (state.currentStep == 11) {
-                  final success = await viewModel.callDownTimeLevels();
-                  if (success ?? false) {
-                    viewModel.setStep(12);
-                  }
-                } else if (state.currentStep == 12) {
-                  final success = await viewModel.callAllowedProviderRoles();
-                  if (success ?? false) {
-                    viewModel.setStep(14); // Skip step 13 (Sessions Setup) as it's already done!
-                  }
-                } else if (state.currentStep == 14) {
-                  final success = await viewModel.callFollowUpConfig();
-                  if (success ?? false) {
-                    viewModel.setStep(15);
-                  }
+              if (state.sessionStep < 15) {
+                if (state.sessionStep == 3) {
+                  viewModel.setSessionStep(state.sessionStep + 1);
+                } else if (state.sessionStep == 4) {
+                  viewModel.setSessionStep(state.sessionStep + 1);
+                } else if (state.sessionStep == 5) {
+                  viewModel.setSessionStep(state.sessionStep + 1);
+                } else if (state.sessionStep == 6) {
+                  viewModel.setSessionStep(state.sessionStep + 1);
+                } else if (state.sessionStep == 7) {
+                  viewModel.setSessionStep(state.sessionStep + 1);
+                } else if (state.sessionStep == 8) {
+                  viewModel.setSessionStep(state.sessionStep + 1);
+                } else if (state.sessionStep == 9) {
+                  viewModel.setSessionStep(10);
+                } else if (state.sessionStep == 10) {
+                  viewModel.setSessionStep(11);
+                } else if (state.sessionStep == 11) {
+                  viewModel.setSessionStep(12);
+                } else if (state.sessionStep == 12) {
+                  viewModel.setSessionStep(14);
+                } else if (state.sessionStep == 14) {
+                  viewModel.setSessionStep(15);
                 }
-              } else if (state.currentStep == 15) {
-                final success = await viewModel.callConsentFormSelection();
-                if (success ?? false) {
-                  viewModel.markActiveSessionAsDetailed();
-                  if (context.mounted) {
-                    context.pop();
-                  }
+              } else if (state.sessionStep == 15) {
+                viewModel.markActiveSessionAsDetailed();
+                if (context.mounted) {
+                  context.pop();
                 }
               } else {
                 viewModel.markActiveSessionAsDetailed();

@@ -414,6 +414,7 @@ Body                 : ${request.toJson()}
 
     state = state.copyWith(
       currentStep: 0,
+      sessionStep: 3,
       clearPreTreatmentConsentForm: true,
       clearExistingConsentForm: true,
       clearTreatmentImage: true,
@@ -1454,6 +1455,10 @@ Body       : ${request.toJson()}
     if (step == 3) {
       fetchProductsByTreatmentCategory();
     }
+  }
+
+  void setSessionStep(int step) {
+    state = state.copyWith(sessionStep: step);
   }
 
   Future<void> fetchProductsByTreatmentCategory() async {
@@ -2881,6 +2886,7 @@ class TreatmentState extends BaseStateModel {
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
   final int currentStep;
+  final int sessionStep;
 
   final String? treatmentImageUrl;
   final String? treatmentIconUrl;
@@ -2959,6 +2965,7 @@ class TreatmentState extends BaseStateModel {
     this.selectedTreatmentId,
     this.selectedCategoryDetail,
     this.currentStep = 0,
+    this.sessionStep = 3,
 
     this.selectedCategoryPath = const [],
     this.selectedProtocolIds = const [],
@@ -3028,6 +3035,7 @@ class TreatmentState extends BaseStateModel {
     TreatmentDetailData? selectedTreatmentDetail,
     int? selectedTreatmentId,
     int? currentStep,
+    int? sessionStep,
 
     int? draftTreatmentID,
     List<AreaViewModelEntry>? areas,
@@ -3098,6 +3106,7 @@ class TreatmentState extends BaseStateModel {
       selectedTreatmentDetail: selectedTreatmentDetail ?? this.selectedTreatmentDetail,
       selectedTreatmentId: selectedTreatmentId ?? this.selectedTreatmentId,
       currentStep: currentStep ?? this.currentStep,
+      sessionStep: sessionStep ?? this.sessionStep,
 
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
