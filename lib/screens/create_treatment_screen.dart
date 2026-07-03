@@ -13,7 +13,6 @@ import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/session_creation_steps/treatment_creation_steps.dart';
-import 'create_session_screen.dart';
 
 class CreateTreatmentScreen extends ConsumerStatefulWidget {
   const CreateTreatmentScreen({super.key});
@@ -45,6 +44,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     if (currentStep == 1) return 1;
     if (currentStep == 2) return 2;
     if (currentStep == 13) return 3;
+    if (currentStep == 16) return 4;
     return 0;
   }
 
@@ -123,80 +123,95 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   Widget _buildUpperStepper(BuildContext context, int stepIndex) {
     final steps = [
       {'title': 'Categorization', 'icon': Icons.category_outlined},
-      {'title': 'Basic Information', 'icon': Icons.description_outlined},
+      {'title': 'Basic Info', 'icon': Icons.description_outlined},
       {'title': 'Body Areas', 'icon': Icons.accessibility_new_outlined},
       {'title': 'Sessions Setup', 'icon': Icons.event_repeat_rounded},
+      {'title': 'Business Logic', 'icon': Icons.settings_suggest_outlined},
     ];
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(steps.length, (index) {
-        final step = steps[index];
-        final bool isActive = stepIndex == index;
-        final bool isCompleted = stepIndex > index;
+    final bool isCompact = context.screenWidth < 1100;
 
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Step circle with Icon/Number
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: context.w(40),
-              height: context.w(40),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isCompleted
-                    ? CustomColors.green
-                    : (isActive ? CustomColors.purple : Colors.white),
-                border: Border.all(
-                  color: isActive || isCompleted
-                      ? Colors.transparent
-                      : CustomColors.border,
-                  width: 2,
-                ),
-                boxShadow: isActive
-                    ? [
-                        BoxShadow(
-                          color: CustomColors.purple.withValues(alpha: 0.2),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Center(
-                child: isCompleted
-                    ? const Icon(Icons.check, color: Colors.white, size: 20)
-                    : Icon(
-                        step['icon'] as IconData,
-                        color: isActive ? Colors.white : CustomColors.grey,
-                        size: 20,
+    return Center(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: context.appEdgeInsets(horizontal: 16),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(steps.length, (index) {
+              final step = steps[index];
+              final bool isActive = stepIndex == index;
+              final bool isCompleted = stepIndex > index;
+
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Step circle with Icon/Number
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: context.w(36),
+                    height: context.w(36),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isCompleted
+                          ? CustomColors.green
+                          : (isActive ? CustomColors.purple : Colors.white),
+                      border: Border.all(
+                        color: isActive || isCompleted
+                            ? Colors.transparent
+                            : CustomColors.border,
+                        width: 2,
                       ),
-              ),
-            ),
-            context.horizontalSpace(12),
-            // Step Title
-            Text(
-              step['title'] as String,
-              style: isActive
-                  ? context.fonts.purple14w600
-                  : (isCompleted
-                      ? context.fonts.black14w600
-                      : context.fonts.grey14w500),
-            ),
-            // Connector line (except for the last step)
-            if (index < steps.length - 1) ...[
-              context.horizontalSpace(16),
-              Container(
-                width: context.w(60),
-                height: 2,
-                color: isCompleted ? CustomColors.green : CustomColors.border,
-              ),
-              context.horizontalSpace(16),
-            ],
-          ],
-        );
-      }),
+                      boxShadow: isActive
+                          ? [
+                              BoxShadow(
+                                color: CustomColors.purple.withValues(alpha: 0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Center(
+                      child: isCompleted
+                          ? const Icon(Icons.check, color: Colors.white, size: 18)
+                          : Icon(
+                              step['icon'] as IconData,
+                              color: isActive ? Colors.white : CustomColors.grey,
+                              size: 18,
+                            ),
+                    ),
+                  ),
+                  if (!isCompact || isActive) ...[
+                    context.horizontalSpace(8),
+                    // Step Title
+                    Text(
+                      step['title'] as String,
+                      style: isActive
+                          ? context.fonts.purple14w600
+                          : (isCompleted
+                              ? context.fonts.black14w600
+                              : context.fonts.grey14w500),
+                    ),
+                  ],
+                  // Connector line (except for the last step)
+                  if (index < steps.length - 1) ...[
+                    context.horizontalSpace(isCompact ? 8 : 16),
+                    Container(
+                      width: context.w(isCompact ? 24 : 40),
+                      height: 2,
+                      color: isCompleted ? CustomColors.green : CustomColors.border,
+                    ),
+                    context.horizontalSpace(isCompact ? 8 : 16),
+                  ],
+                ],
+              );
+            }),
+          ),
+        ),
+      ),
     );
   }
 
@@ -206,18 +221,21 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       'Basic Information',
       'Body Areas',
       'Sessions Setup',
+      'Business Logic',
     ];
     final descriptions = [
       'Organize treatments to help patients and staff find them easily.',
       'Core identification details including status.',
       'Define mandatory sub-areas.',
       'Manage total sessions and procedural frequency.',
+      'Manage system-wide treatment behaviors and onboarding settings.',
     ];
     final icons = [
       Icons.category_outlined,
       Icons.description_outlined,
       Icons.accessibility_new_outlined,
       Icons.event_repeat_rounded,
+      Icons.settings_suggest_outlined,
     ];
 
     if (stepIndex < 0 || stepIndex >= titles.length) {
@@ -280,6 +298,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         return const AreasStep();
       case 13:
         return const SessionsStep();
+      case 16:
+        return const LogicStep();
       default:
         return const SizedBox.shrink();
     }
@@ -298,7 +318,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           Expanded(
             child: CustomOutlinedButton(
               onTap: () {
-                if (state.currentStep == 13) {
+                if (state.currentStep == 16) {
+                  viewModel.setStep(13);
+                } else if (state.currentStep == 13) {
                   viewModel.setStep(2);
                 } else {
                   viewModel.setStep(state.currentStep - 1);
@@ -353,17 +375,41 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               }
 
               if (state.currentStep == 13) {
-                final success = await viewModel.callSessionsSetup();
+                final bool allSessionsDetailed = state.sessions.isNotEmpty &&
+                    state.sessions.every((s) => s.isDetailedEntered);
+
+                if (!allSessionsDetailed) {
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter details for all sessions before continuing.'),
+                      backgroundColor: CustomColors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                // If all sessions are configured, let's proceed to Business Logic (Step 16)
+                viewModel.setStep(16);
+                return;
+              }
+
+              if (state.currentStep == 16) {
+                final success = await viewModel.callBusinessLogic();
                 if (!mounted) return;
                 if (success ?? false) {
-                  viewModel.setStep(3); // Go to Step 3 (Inventory Products) inside CreateSessionScreen
-                  // ignore: use_build_context_synchronously
-                  context.push(CreateSessionScreen.routeName);
+                  viewModel.submitTreatment(
+                    context,
+                    categories: categoryState.categories,
+                  ).then((_) {
+                    if (context.mounted) {
+                      context.go('/treatment-management');
+                    }
+                  });
                 }
                 return;
               }
             },
-            label: 'Next Step',
+            label: state.currentStep == 16 ? 'Finish & Create Treatment' : 'Next Step',
           ),
         ),
       ],

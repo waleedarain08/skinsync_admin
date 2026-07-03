@@ -8,6 +8,15 @@ import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 class FollowUpStep extends ConsumerWidget {
   const FollowUpStep({super.key});
 
+  Widget _sectionTitle(BuildContext context, String title, {double? fontSize}) {
+    return Text(
+      title,
+      style: context.fonts.black18w600.copyWith(
+        fontSize: fontSize != null ? context.sp(fontSize) : null,
+      ),
+    );
+  }
+
   Widget _buildFollowUpEntryCardV2(
     BuildContext context,
     int sIdx,
@@ -34,7 +43,7 @@ class FollowUpStep extends ConsumerWidget {
                   borderRadius: context.appBorderRadius(all: 20),
                 ),
                 child: Text(
-                  'S${sIdx + 1} - Follow-Up ${fuIdx + 1}',
+                  'Follow-Up ${fuIdx + 1}',
                   style: context.fonts.purple12w700,
                 ),
               ),
@@ -48,7 +57,7 @@ class FollowUpStep extends ConsumerWidget {
                 child: CustomDropdown<String>(
                   label: 'Appointment Type',
                   hintText: 'Select type',
-                  value: entry.type,
+                  value: entry.type.isEmpty ? null : entry.type,
                   items: const [
                     DropdownMenuItem(value: 'virtual', child: Text('Virtual')),
                     DropdownMenuItem(
@@ -100,7 +109,7 @@ class FollowUpStep extends ConsumerWidget {
                                 border: Border.all(color: CustomColors.border),
                               ),
                               child: DropdownButton<String>(
-                                value: entry.durationUnit,
+                                value: entry.durationUnit.isEmpty ? 'minutes' : entry.durationUnit,
                                 isExpanded: true,
                                 icon: const Icon(
                                   Icons.arrow_drop_down,
@@ -176,7 +185,7 @@ class FollowUpStep extends ConsumerWidget {
                                 border: Border.all(color: CustomColors.border),
                               ),
                               child: DropdownButton<String>(
-                                value: entry.intervalUnit,
+                                value: entry.intervalUnit.isEmpty ? 'days' : entry.intervalUnit,
                                 isExpanded: true,
                                 icon: const Icon(
                                   Icons.arrow_drop_down,
@@ -265,84 +274,82 @@ class FollowUpStep extends ConsumerWidget {
     final state = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
 
+    final int sIdx = state.activeSessionIndex ?? 0;
+    if (sIdx >= state.sessions.length) {
+      return const SizedBox.shrink();
+    }
+    final session = state.sessions[sIdx];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Configure Follow-Ups per Session',
-          style: context.fonts.black18w600,
-        ),
+        _sectionTitle(context, 'Follow-Up Configuration'),
         context.verticalSpace(8),
         Text(
-          'Each session in the journey can have its own dedicated clinical check-ins.',
+          'Configure dedicated clinical check-ins and follow-ups.',
           style: context.fonts.grey14w400,
         ),
         context.verticalSpace(32),
 
-        ...state.sessions.asMap().entries.map((sessionEntry) {
-          final int sIdx = sessionEntry.key;
-          final session = sessionEntry.value;
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: context.appEdgeInsets(all: 20),
-                decoration: BoxDecoration(
-                  color: CustomColors.purple.withValues(alpha: 0.05),
-                  borderRadius: context.appBorderRadius(all: 12),
-                  border: Border.all(
-                    color: CustomColors.purple.withValues(alpha: 0.1),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.event_note_rounded,
-                      color: CustomColors.purple,
-                    ),
-                    context.horizontalSpace(12),
-                    Text(
-                      'SESSION ${session.sessionNumber}',
-                      style: context.fonts.purple14w700,
-                    ),
-                    const Spacer(),
-                    SizedBox(
-                      width: context.w(150),
-                      child: BuildTextField(
-                        label: 'Follow-Ups',
-                        controller: session.totalFollowUpsController,
-                        hintText: '0',
-                        keyboardType: TextInputType.number,
-                        onChanged: (val) => viewModel
-                            .updateSessionFollowUpCount(sIdx, val ?? '0'),
-                      ),
-                    ),
-                  ],
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: context.appEdgeInsets(all: 20),
+              decoration: BoxDecoration(
+                color: CustomColors.purple.withValues(alpha: 0.05),
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(
+                  color: CustomColors.purple.withValues(alpha: 0.1),
                 ),
               ),
-              if (session.followUps.isNotEmpty) ...[
-                context.verticalSpace(20),
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: session.followUps.length,
-                  separatorBuilder: (_, _) => context.verticalSpace(16),
-                  itemBuilder: (context, fuIdx) {
-                    return _buildFollowUpEntryCardV2(
-                      context,
-                      sIdx,
-                      fuIdx,
-                      session.followUps[fuIdx],
-                      viewModel,
-                    );
-                  },
-                ),
-              ],
-              context.verticalSpace(32),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.event_note_rounded,
+                    color: CustomColors.purple,
+                  ),
+                  context.horizontalSpace(12),
+                  Text(
+                    'Total Follow-Ups',
+                    style: context.fonts.purple14w700,
+                  ),
+                  const Spacer(),
+                  SizedBox(
+                    width: context.w(150),
+                    child: BuildTextField(
+                      label: 'Follow-Ups',
+                      controller: session.totalFollowUpsController,
+                      hintText: '0',
+                      keyboardType: TextInputType.number,
+                      onChanged: (val) => viewModel
+                          .updateSessionFollowUpCount(sIdx, val ?? '0'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (session.followUps.isNotEmpty) ...[
+              context.verticalSpace(20),
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: session.followUps.length,
+                separatorBuilder: (_, _) => context.verticalSpace(16),
+                itemBuilder: (context, fuIdx) {
+                  return _buildFollowUpEntryCardV2(
+                    context,
+                    sIdx,
+                    fuIdx,
+                    session.followUps[fuIdx],
+                    viewModel,
+                  );
+                },
+              ),
             ],
-          );
-        }),
+            context.verticalSpace(32),
+          ],
+        ),
       ],
     );
   }

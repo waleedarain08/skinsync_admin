@@ -7,26 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/constent_form_selection_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/down_time_level_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/follow_up_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/phase_notifications_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/post_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/pre_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/product_usage_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/protocol_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/constent_form_selection_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/follow_up_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/phase_notifications_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/post_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/pre_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/product_usage_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/sessions_setup_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/step_pricing_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 
 import '../models/notification_entry.dart';
+import '../models/requests/create_session_requests/down_time_level_request.dart';
 import '../models/requests/create_treatment_requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
@@ -834,6 +834,26 @@ Body                 : ${request.toJson()}
       state = state.copyWith(downtimeLevel: level);
   void setProviderRolesSource(String source) =>
       state = state.copyWith(providerRolesSource: source);
+
+  void setActiveSessionIndex(int? index) {
+    state = state.copyWith(activeSessionIndex: index);
+  }
+
+  void markActiveSessionAsDetailed() {
+    if (state.activeSessionIndex != null) {
+      final List<SessionViewModelEntry> updatedSessions = List.from(state.sessions);
+      if (state.activeSessionIndex! < updatedSessions.length) {
+        final activeEntry = updatedSessions[state.activeSessionIndex!];
+        updatedSessions[state.activeSessionIndex!] = SessionViewModelEntry(
+          sessionNumber: activeEntry.sessionNumber,
+          totalFollowUpsController: activeEntry.totalFollowUpsController,
+          followUps: activeEntry.followUps,
+          isDetailedEntered: true,
+        );
+        state = state.copyWith(sessions: updatedSessions);
+      }
+    }
+  }
 
   void setSessionSource(String source, {CategoryDetailDto? category}) {
     state = state.copyWith(sessionSource: source);
@@ -2834,11 +2854,13 @@ class SessionViewModelEntry {
   final int sessionNumber;
   final TextEditingController totalFollowUpsController;
   List<FollowUpEntry> followUps;
+  final bool isDetailedEntered;
 
   SessionViewModelEntry({
     required this.sessionNumber,
     TextEditingController? totalFollowUpsController,
     this.followUps = const [],
+    this.isDetailedEntered = false,
   }) : totalFollowUpsController =
            totalFollowUpsController ?? TextEditingController();
 
@@ -2888,6 +2910,7 @@ class TreatmentState extends BaseStateModel {
   final String downtimeLevel; // None | Low | Moderate | High
   final String providerRolesSource; // category | custom
   final List<String> selectedRoles;
+  final int? activeSessionIndex;
   final List<SessionViewModelEntry> sessions;
   final String sessionSource; // category | custom
   final int totalSessions;
@@ -2960,6 +2983,7 @@ class TreatmentState extends BaseStateModel {
     this.downtimeLevel = 'None',
     this.providerRolesSource = 'category',
     this.selectedRoles = const [],
+    this.activeSessionIndex,
     this.sessions = const [],
     this.sessionSource = 'category',
     this.totalSessions = 1,
@@ -3029,6 +3053,7 @@ class TreatmentState extends BaseStateModel {
     String? downtimeLevel,
     String? providerRolesSource,
     List<String>? selectedRoles,
+    int? activeSessionIndex,
     List<SessionViewModelEntry>? sessions,
     String? sessionSource,
     int? totalSessions,
@@ -3112,6 +3137,7 @@ class TreatmentState extends BaseStateModel {
       downtimeLevel: downtimeLevel ?? this.downtimeLevel,
       providerRolesSource: providerRolesSource ?? this.providerRolesSource,
       selectedRoles: selectedRoles ?? this.selectedRoles,
+      activeSessionIndex: activeSessionIndex ?? this.activeSessionIndex,
       sessions: sessions ?? this.sessions,
       sessionSource: sessionSource ?? this.sessionSource,
       totalSessions: totalSessions ?? this.totalSessions,

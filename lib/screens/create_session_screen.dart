@@ -18,7 +18,6 @@ import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_area_selector.dart';
-import '../widgets/session_creation_steps/materials_step.dart';
 import '../widgets/session_creation_steps/treatment_creation_steps.dart';
 
 class CreateSessionScreen extends ConsumerStatefulWidget {
@@ -169,7 +168,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       'Allowed Provider Roles',
       'Follow-Up Setup',
       'Patient Consent',
-      'Business Logic',
     ];
 
     final currentOffsetStep = _getSessionOffsetStep(state.currentStep);
@@ -325,7 +323,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       'Allowed Provider Roles',
       'Follow-Up Configuration',
       'Patient Consent Form',
-      'Business Logic',
     ];
     final descriptions = [
       'Configure required products from inventory and area-wise consumption.',
@@ -340,7 +337,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       'Define which provider roles are authorized to perform this treatment.',
       'Manage rules and scheduling for post-procedure clinical check-ins.',
       'Upload and manage legal procedural consent documentation.',
-      'Manage system-wide treatment behaviors and onboarding settings.',
     ];
     final icons = [
       Icons.inventory_2_outlined,
@@ -355,7 +351,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       Icons.badge_outlined,
       Icons.replay_outlined,
       Icons.fact_check_outlined,
-      Icons.settings_suggest_outlined,
     ];
 
     final int stepIndex = _getSessionOffsetStep(state.currentStep);
@@ -1910,7 +1905,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   }
 
   Widget _buildMobileProgress(BuildContext context, TreatmentState state) {
-    const stepsCount = 13;
+    const stepsCount = 12;
     final currentOffsetStep = _getSessionOffsetStep(state.currentStep);
     return Container(
       padding: context.appEdgeInsets(horizontal: 24, vertical: 16),
@@ -1977,8 +1972,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         return const FollowUpStep();
       case 15:
         return const ConsentStep();
-      case 16:
-        return const LogicStep();
       default:
         return const SizedBox.shrink();
     }
@@ -2022,7 +2015,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentDataState dataState,
     CategoryState categoryState,
   ) {
-    final bool isLastStep = state.currentStep == 16;
+    final bool isLastStep = state.currentStep == 15;
     return Row(
       children: [
         if (state.currentStep > 3) ...[
@@ -2076,7 +2069,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 }
               }
 
-              if (state.currentStep <= 16) {
+              if (state.currentStep < 15) {
                 if (state.currentStep == 3) {
                   final success = await viewModel.callProductUsage();
                   if (success ?? false) {
@@ -2147,42 +2140,23 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                   if (success ?? false) {
                     viewModel.setStep(15);
                   }
-                } else if (state.currentStep == 15) {
-                  final success = await viewModel.callConsentFormSelection();
-                  if (success ?? false) {
-                    viewModel.setStep(16);
-                  }
-                } else if (state.currentStep == 16) {
-                  final success = await viewModel.callBusinessLogic();
-                  if (success ?? false) {
-                    if (!mounted) return;
-                    viewModel
-                        .submitTreatment(
-                          // ignore: use_build_context_synchronously
-                          context,
-                          categories: categoryState.categories,
-                        )
-                        .then((_) {
-                          if (context.mounted) {
-                            context.go('/treatment-management');
-                          }
-                        });
+                }
+              } else if (state.currentStep == 15) {
+                final success = await viewModel.callConsentFormSelection();
+                if (success ?? false) {
+                  viewModel.markActiveSessionAsDetailed();
+                  if (context.mounted) {
+                    context.pop();
                   }
                 }
               } else {
-                viewModel
-                    .submitTreatment(
-                      context,
-                      categories: categoryState.categories,
-                    )
-                    .then((_) {
-                      if (context.mounted) {
-                        context.go('/treatment-management');
-                      }
-                    });
+                viewModel.markActiveSessionAsDetailed();
+                if (context.mounted) {
+                  context.pop();
+                }
               }
             },
-            label: isLastStep ? 'Finish & Create Treatment' : 'Next Step',
+            label: isLastStep ? 'Save Session Details' : 'Next Step',
           ),
         ),
       ],
@@ -2367,14 +2341,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
 
   bool _validateFollowUps(BuildContext context, TreatmentState state) {
     for (final session in state.sessions) {
-      if (session.totalFollowUpsController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Total Follow Up number is required!'),
-            backgroundColor: CustomColors.red,
-          ),
-        );
-        return false;
+      final count = int.tryParse(session.totalFollowUpsController.text) ?? 0;
+      if (count == 0) {
+        continue; // 0 or empty follow-ups is completely valid
       }
       for (final followUp in session.followUps) {
         if (followUp.notesController.text.isEmpty ||

@@ -4,6 +4,7 @@ export 'consent_step.dart';
 export 'downtime_step.dart';
 export 'follow_up_step.dart';
 export 'logic_step.dart';
+export 'materials_step.dart';
 export 'notifications_step.dart';
 export 'post_instructions_step.dart';
 export 'post_photos_step.dart';

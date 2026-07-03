@@ -23,48 +23,7 @@ class MaterialsStep extends ConsumerWidget {
     );
   }
 
-  double _getProductMinQuantity(
-    ProductUsageEntry entry,
-    List<dynamic> allSubAreas,
-  ) {
-    if (allSubAreas.isNotEmpty) {
-      double sum = 0.0;
-      for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(
-          subArea.name,
-          subAreaId: subArea.id,
-        );
-        sum += double.tryParse(controllers.minController.text) ?? 0.0;
-      }
-      return sum;
-    } else {
-      return double.tryParse(entry.minQuantityController.text) ?? 0.0;
-    }
-  }
 
-  double _getProductMaxQuantity(
-    ProductUsageEntry entry,
-    List<dynamic> allSubAreas,
-  ) {
-    if (allSubAreas.isNotEmpty) {
-      double sum = 0.0;
-      for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(
-          subArea.name,
-          subAreaId: subArea.id,
-        );
-        sum += double.tryParse(controllers.maxController.text) ?? 0.0;
-      }
-      return sum;
-    } else {
-      return double.tryParse(entry.maxQuantityController.text) ?? 0.0;
-    }
-  }
-
-  String _formatUnitLabel(String unit) {
-    if (unit.isEmpty) return 'Unit';
-    return unit[0].toUpperCase() + unit.substring(1);
-  }
 
   String _formatUnitPlural(String unit) {
     if (unit.isEmpty) return 'Units';
@@ -562,25 +521,7 @@ class MaterialsStep extends ConsumerWidget {
               ],
             ),
           ],
-          context.verticalSpace(24),
-          const Divider(),
-          context.verticalSpace(16),
-          Text(
-            'Usage Timing & Setup Duration',
-            style: context.fonts.black14w600,
-          ),
-          context.verticalSpace(16),
-          BuildTextField(
-            label: 'Per ${_formatUnitLabel(entry.unit)} Duration (minutes)',
-            controller: entry.perUnitDurationController,
-            hintText: '0.0',
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-            ),
-            onChanged: (val) {
-              viewModel.updateProductPerUnitDuration(index, val ?? '');
-            },
-          ),
+
         ],
       ),
     );
