@@ -845,11 +845,37 @@ Body                 : ${request.toJson()}
       final List<SessionViewModelEntry> updatedSessions = List.from(state.sessions);
       if (state.activeSessionIndex! < updatedSessions.length) {
         final activeEntry = updatedSessions[state.activeSessionIndex!];
+        
+        final durationText = '${treatmentDurationController.text} mins (Prep: ${prepTimeController.text}m, Clean: ${cleanupTimeController.text}m)';
+        final priceText = '\$${basePriceController.text}';
+        
+        final protocols = state.selectedProtocolIds.toList();
+        final preInstructions = preTreatmentInstructionsController.text;
+        final postInstructions = postTreatmentInstructionsController.text;
+        
+        final preNotifs = state.preNotificationEntries.map((n) => '${n.timingValueController.text} ${n.timingUnit} before: ${n.titleController.text}').toList();
+        final postNotifs = state.postNotificationEntries.map((n) => '${n.timingValueController.text} ${n.timingUnit} after: ${n.titleController.text}').toList();
+
         updatedSessions[state.activeSessionIndex!] = SessionViewModelEntry(
           sessionNumber: activeEntry.sessionNumber,
           totalFollowUpsController: activeEntry.totalFollowUpsController,
-          followUps: activeEntry.followUps,
+          followUps: List.from(activeEntry.followUps),
           isDetailedEntered: true,
+          productUsageSnapshot: List<ProductUsageEntry>.from(state.productUsageEntries),
+          durationSnapshot: durationText,
+          priceSnapshot: priceText,
+          protocolSnapshot: protocols,
+          preInstructionsSnapshot: preInstructions,
+          postInstructionsSnapshot: postInstructions,
+          requirePhotosSnapshot: state.requirePostTreatmentPhotos,
+          photosCountSnapshot: state.requiredPostTreatmentPhotoCount,
+          preNotificationsSnapshot: preNotifs,
+          postNotificationsSnapshot: postNotifs,
+          downtimeSnapshot: state.downtimeLevel,
+          rolesSnapshot: List.from(state.selectedRoles),
+          consentSnapshot: state.consentType == 'category'
+              ? (state.selectedCategoryDetail?.consentFormName ?? 'Category Consent Form')
+              : (state.preTreatmentConsentForm?.name ?? state.existingConsentForm?.name ?? 'Custom Consent'),
         );
         state = state.copyWith(sessions: updatedSessions);
       }
@@ -2861,11 +2887,39 @@ class SessionViewModelEntry {
   List<FollowUpEntry> followUps;
   final bool isDetailedEntered;
 
+  // Configuration snapshot fields
+  List<ProductUsageEntry> productUsageSnapshot;
+  String durationSnapshot;
+  String priceSnapshot;
+  List<String> protocolSnapshot;
+  String preInstructionsSnapshot;
+  String postInstructionsSnapshot;
+  bool requirePhotosSnapshot;
+  int photosCountSnapshot;
+  List<String> preNotificationsSnapshot;
+  List<String> postNotificationsSnapshot;
+  String downtimeSnapshot;
+  List<String> rolesSnapshot;
+  String consentSnapshot;
+
   SessionViewModelEntry({
     required this.sessionNumber,
     TextEditingController? totalFollowUpsController,
     this.followUps = const [],
     this.isDetailedEntered = false,
+    this.productUsageSnapshot = const [],
+    this.durationSnapshot = '',
+    this.priceSnapshot = '',
+    this.protocolSnapshot = const [],
+    this.preInstructionsSnapshot = '',
+    this.postInstructionsSnapshot = '',
+    this.requirePhotosSnapshot = false,
+    this.photosCountSnapshot = 0,
+    this.preNotificationsSnapshot = const [],
+    this.postNotificationsSnapshot = const [],
+    this.downtimeSnapshot = '',
+    this.rolesSnapshot = const [],
+    this.consentSnapshot = '',
   }) : totalFollowUpsController =
            totalFollowUpsController ?? TextEditingController();
 
