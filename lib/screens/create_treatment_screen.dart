@@ -342,7 +342,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               // ignore: use_build_context_synchronously
               final scaffoldMessenger = ScaffoldMessenger.of(context);
               if (state.currentStep == 1) {
-                if (!_validateStepDetails(scaffoldMessenger, viewModel)) return;
+                // If they have selected an existing treatment, bypass validation
+                if (state.selectedTreatment == null) {
+                  if (!_validateStepDetails(scaffoldMessenger, viewModel, state)) return;
+                }
                 viewModel.setStep(2);
                 return;
               }
@@ -485,6 +488,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   bool _validateStepDetails(
     ScaffoldMessengerState scaffoldMessenger,
     TreatmentViewModel viewModel,
+    TreatmentState state,
   ) {
     final skuError = viewModel.validateGlobalSku(
       viewModel.globalSkuController.text.trim(),
@@ -495,10 +499,46 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       );
       return false;
     }
-    if (viewModel.displayNameController.text.isEmpty) {
+    if (viewModel.displayNameController.text.trim().isEmpty) {
       scaffoldMessenger.showSnackBar(
         const SnackBar(
           content: Text('Please enter Patient Display Name'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+    if (state.treatmentImageUrl == null || state.treatmentImageUrl!.isEmpty) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Please upload a Treatment Banner Image'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+    if (state.treatmentIconUrl == null || state.treatmentIconUrl!.isEmpty) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Please upload a Treatment Listing Icon'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+    if (viewModel.shortDescriptionController.text.trim().isEmpty) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a Short Description'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+    if (viewModel.fullDescriptionController.text.trim().isEmpty) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a Full Description'),
           backgroundColor: CustomColors.red,
         ),
       );
