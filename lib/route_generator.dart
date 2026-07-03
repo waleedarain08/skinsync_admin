@@ -19,6 +19,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/create_product_screen.dart';
 import 'package:skinsync_admin/screens/create_subscription_plan_screen.dart';
+import 'package:skinsync_admin/screens/create_session_screen.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/edit_treatment_screen.dart';
@@ -31,7 +32,7 @@ import 'package:skinsync_admin/screens/product_detail_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
 import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
-import 'package:skinsync_admin/screens/treatment_management_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/treatment_management_screen.dart';
 
 class RouteGenerator {
   static final GoRouter router = GoRouter(
@@ -107,6 +108,11 @@ class RouteGenerator {
             name: CreateTreatmentScreen.routeName,
             path: CreateTreatmentScreen.routeName,
             builder: (_, _) => const CreateTreatmentScreen(),
+          ),
+          GoRoute(
+            name: CreateSessionScreen.routeName,
+            path: CreateSessionScreen.routeName,
+            builder: (_, _) => const CreateSessionScreen(),
           ),
           GoRoute(
             name: TreatmentDetailScreen.routeName,

@@ -6,20 +6,20 @@ import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 
-import '../../widgets/app_network_image.dart';
-import '../../widgets/custom_dropdown_widget.dart';
-import '../../widgets/status_toggle_switch.dart';
-import '../utils/theme.dart';
-import '../view_models/treatment_view_model.dart';
-import '../widgets/app_search_field.dart';
-import '../widgets/borderd_container_widget.dart';
-import '../widgets/custom_outlined_button.dart';
-import '../widgets/custom_primary_button.dart';
-import '../widgets/gradient_scaffold.dart';
-import '../widgets/number_paginator.dart';
-import 'edit_treatment_screen.dart';
-import 'manage_treatment_data_screen.dart';
-import 'treatment_detail_screen.dart';
+import '../../../widgets/app_network_image.dart';
+import '../../../widgets/custom_dropdown_widget.dart';
+import '../../../widgets/status_toggle_switch.dart';
+import '../../utils/theme.dart';
+import '../../view_models/treatment_view_model.dart';
+import '../../widgets/app_search_field.dart';
+import '../../widgets/borderd_container_widget.dart';
+import '../../widgets/custom_outlined_button.dart';
+import '../../widgets/custom_primary_button.dart';
+import '../../widgets/gradient_scaffold.dart';
+import '../../widgets/number_paginator.dart';
+import '../edit_treatment_screen.dart';
+import '../manage_treatment_data_screen.dart';
+import '../treatment_detail_screen.dart';
 
 class TreatmentManagementScreen extends ConsumerStatefulWidget {
   const TreatmentManagementScreen({super.key});
