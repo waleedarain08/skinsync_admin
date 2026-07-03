@@ -40,6 +40,7 @@ import '../utils/exception.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 import 'category_view_model.dart';
+import 'treatment_data_view_model.dart';
 
 final treatmentViewModelProvider =
     NotifierProvider<TreatmentViewModel, TreatmentState>(TreatmentViewModel._);
@@ -2782,8 +2783,50 @@ Body       : ${request.toJson()}
     );
   }
 
+  List<int> _getDynamicSelectedAreaIds(List<AreaViewModelEntry> areas) {
+    final List<int> ids = [];
+    final dataState = ref.read(treatmentDataViewModelProvider);
+
+    for (final areaEntry in areas) {
+      if (areaEntry.areaController.text.isEmpty) continue;
+
+      final dynamic areaModel = dataState.areas.cast<dynamic>().firstWhere(
+        (a) => a?.name == areaEntry.areaController.text,
+        orElse: () => null,
+      );
+      if (areaModel != null) {
+        ids.add(areaModel.id);
+
+        for (final subAreaConfig in areaEntry.subAreas) {
+          final dynamic subAreaModel = areaModel.subAreas.cast<dynamic>().firstWhere(
+            (sa) => sa != null && (sa.id == subAreaConfig.id || sa.name == subAreaConfig.name),
+            orElse: () => null,
+          );
+          if (subAreaModel != null) {
+            ids.add(subAreaModel.id);
+
+            for (final childConfig in subAreaConfig.children) {
+              final dynamic childModel = subAreaModel.subAreas.cast<dynamic>().firstWhere(
+                (ca) => ca?.name == childConfig.name,
+                orElse: () => null,
+              );
+              if (childModel != null) {
+                ids.add(childModel.id);
+              }
+            }
+          }
+        }
+      }
+    }
+    return ids;
+  }
+
   void updateAreas(List<AreaViewModelEntry> areas) {
-    state = state.copyWith(areas: areas);
+    final dynamicIds = _getDynamicSelectedAreaIds(areas);
+    state = state.copyWith(
+      areas: areas,
+      selectedTreatmentAreaIds: dynamicIds,
+    );
   }
 }
 
