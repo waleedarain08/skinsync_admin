@@ -1444,7 +1444,7 @@ Body       : ${request.toJson()}
     state = state.copyWith(selectedRoles: current);
   }
 
-  Future<bool?> createBasicInfo({required int stepNumber}) async {
+  Future<bool?> createBasicInfo() async {
     return await runSafely<bool>(() async {
       final imageUrl = state.treatmentImageUrl;
       final iconUrl = state.treatmentIconUrl;
@@ -1455,7 +1455,6 @@ Body       : ${request.toJson()}
 
       final response = await _treatmentRepository.createBasicInfo(
         BasicInfoRequest(
-          stepNumber: stepNumber,
           selectedCategoryIds: state.selectedCategoryPath,
           patientDisplayName: displayNameController.text,
           image: imageUrl,

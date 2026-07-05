@@ -1,6 +1,5 @@
 
 class BasicInfoRequest {
-  final int stepNumber;
   final List<int> selectedCategoryIds;
   final String globalSku;
   final String patientDisplayName;
@@ -10,7 +9,6 @@ class BasicInfoRequest {
   final String description;
 
   BasicInfoRequest({
-    required this.stepNumber,
     required this.selectedCategoryIds,
     required this.globalSku,
     required this.patientDisplayName,
@@ -22,7 +20,7 @@ class BasicInfoRequest {
 
 
   Map<String, dynamic> toJson() => {
-    'step_number': stepNumber,
+    'step_number': 2,
     'selected_category_ids': List<dynamic>.from(selectedCategoryIds.map((x) => x)),
     'global_sku': globalSku,
     'patient_display_name': patientDisplayName,

@@ -15,13 +15,16 @@ class TreatmentSelectionStep extends ConsumerStatefulWidget {
       _TreatmentSelectionStepState();
 }
 
-class _TreatmentSelectionStepState extends ConsumerState<TreatmentSelectionStep> {
+class _TreatmentSelectionStepState
+    extends ConsumerState<TreatmentSelectionStep> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final categoryIdStr =
-          ref.read(treatmentViewModelProvider.notifier).categoryIdController.text;
+      final categoryIdStr = ref
+          .read(treatmentViewModelProvider.notifier)
+          .categoryIdController
+          .text;
       final categoryId = int.tryParse(categoryIdStr);
       if (categoryId != null) {
         ref
@@ -208,8 +211,13 @@ class _TreatmentSelectionStepState extends ConsumerState<TreatmentSelectionStep>
                           SizedBox(
                             width: context.w(150),
                             child: CustomPrimaryButton(
-                              onTap: () {
-                                Navigator.of(context).pop();
+                              onTap: () async {
+                                final result = await ref
+                                    .read(treatmentViewModelProvider.notifier)
+                                    .createBasicInfo();
+                                if (result == true) {
+                                  Navigator.of(context).pop();
+                                }
                               },
                               label: 'Apply & Close',
                             ),
@@ -302,7 +310,7 @@ class _TreatmentSelectionStepState extends ConsumerState<TreatmentSelectionStep>
             children: state.treatments.map((t) {
               final bool isSelected =
                   viewModel.globalSkuController.text.trim().isNotEmpty &&
-                      viewModel.globalSkuController.text.trim() == t.globalSku;
+                  viewModel.globalSkuController.text.trim() == t.globalSku;
 
               return IconImageContainer(
                 title: t.patientDisplayName ?? t.name ?? 'N/A',
@@ -311,7 +319,7 @@ class _TreatmentSelectionStepState extends ConsumerState<TreatmentSelectionStep>
                 isSelected: isSelected,
                 showActions: false,
                 onTap: () => viewModel.selectTreatment(t),
-               // width: context.w(220),
+                // width: context.w(220),
                 //height: context.h(130),
               );
             }).toList(),
