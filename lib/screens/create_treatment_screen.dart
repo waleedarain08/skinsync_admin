@@ -342,9 +342,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               // ignore: use_build_context_synchronously
               final scaffoldMessenger = ScaffoldMessenger.of(context);
               if (state.currentStep == 1) {
-                // If they have selected an existing treatment, bypass validation
                 if (state.selectedTreatment == null) {
-                  if (!_validateStepDetails(scaffoldMessenger, viewModel, state)) return;
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Please select a treatment template before continuing.'),
+                      backgroundColor: CustomColors.red,
+                    ),
+                  );
+                  return;
                 }
                 viewModel.setStep(2);
                 return;
