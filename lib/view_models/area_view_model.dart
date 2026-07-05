@@ -1,10 +1,10 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/models/requests/area_request.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:skinsync_admin/models/requests/create_area_request.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/exception.dart';
-import '../models/requests/create_sub_area_request.dart';
 import '../models/responses/area_list_response.dart';
 import '../repositories/area_repository.dart';
 import '../services/locator.dart';
@@ -19,12 +19,16 @@ class AreaState extends BaseStateModel {
   final List<AreaModel> areas;
   final List<AreaModel> flattenedAreas;
   final String? errorMessage;
+    final String? areaIconUrl;
+  final String? areaImageUrl;
 
   AreaState({
     super.loading,
     this.areas = const [],
     this.flattenedAreas = const [],
     this.errorMessage,
+    this.areaIconUrl,
+    this.areaImageUrl,
   });
 
   AreaState copyWith({
@@ -32,12 +36,16 @@ class AreaState extends BaseStateModel {
     List<AreaModel>? areas,
     List<AreaModel>? flattenedAreas,
     String? errorMessage,
+     String? areaIconUrl,
+    String? areaImageUrl
   }) {
     return AreaState(
       loading: loading ?? this.loading,
       areas: areas ?? this.areas,
       flattenedAreas: flattenedAreas ?? this.flattenedAreas,
       errorMessage: errorMessage ?? this.errorMessage,
+      areaIconUrl: areaIconUrl ?? this.areaIconUrl,
+      areaImageUrl: areaImageUrl ?? this.areaImageUrl,
     );
   }
 }
@@ -46,7 +54,7 @@ class AreaViewModel extends BaseViewModel<AreaState> {
   AreaViewModel() : super(AreaState());
 
   final AreaRepository _areaRepository = locator<AreaRepository>();
-
+   final ImagePicker _picker = ImagePicker();
   Future<void> fetchAreas() async {
     state = state.copyWith(errorMessage: null);
     await runSafely(
@@ -64,43 +72,40 @@ class AreaViewModel extends BaseViewModel<AreaState> {
     );
   }
 
-  Future<AreaModel?> createArea({
+  // Future<AreaModel?> createArea({
+  //   required String name,
+  //   required String globalSku,
+  //   required String icon,
+  // }) async {
+  //   return await runSafely<AreaModel?>(() async {
+  //     final String? imageUrl = await MediaService().uploadImage(
+  //       'areas/icons/',
+  //       XFile(icon),
+  //     );
+  //     if (imageUrl == null) {
+  //       throw const UnknownException('Failed to upload image');
+  //     }
+  //     return await _areaRepository.createArea(
+  //       AreaRequest(name: name, globalSku: globalSku, icon: imageUrl),
+  //     );
+  //   });
+  // }
+
+
+  Future<bool?> createArea({
     required String name,
     required String globalSku,
     required String icon,
-  }) async {
-    return await runSafely<AreaModel?>(() async {
-      final String? imageUrl = await MediaService().uploadImage(
-        'areas/icons/',
-        XFile(icon),
-      );
-      if (imageUrl == null) {
-        throw const UnknownException('Failed to upload image');
-      }
-      return await _areaRepository.createArea(
-        AreaRequest(name: name, globalSku: globalSku, icon: imageUrl),
-      );
-    });
-  }
-
-
-  Future<bool?> createSubArea({
-    required String name,
-    required String globalSku,
-    required String icon,
-    required int parentId,
+    required int? parentId,
+    required String imageUrl,
   }) async {
     return await runSafely<bool>(() async {
-      final String? imageUrl = await MediaService().uploadImage(
-        'areas/icons/',
-        XFile(icon),
+     
+      
+       await _areaRepository.createArea(
+        CreateAreaRequest(parentId: parentId, name: name, globalSku: globalSku, icon: icon, image: imageUrl),
       );
-      if (imageUrl == null) {
-        throw const UnknownException('Failed to upload image');
-      }
-       await _areaRepository.createSubArea(
-        CreateSubAreaRequest(parentId: parentId, name: name, globalSku: globalSku, icon: imageUrl),
-      );
+       await refreshAreas();
       return true;
     });
   }
@@ -135,6 +140,25 @@ class AreaViewModel extends BaseViewModel<AreaState> {
     final parent = findAreaById(parentId);
     return parent?.subAreas ?? [];
   }
+
+  Future<void> pickImage(bool isIcon) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    await runSafely(() async {
+      final path = isIcon ? 'area/icon/' : 'area/image/';
+      final String? url = await MediaService().uploadImage(path, image);
+      if (url == null) {
+        throw const UnknownException('Failed to upload image');
+      }
+      if (isIcon) {
+        state = state.copyWith(areaIconUrl: url);
+      } else {
+        state = state.copyWith(areaImageUrl: url);
+      }
+    });
+  }
+
 
   List<DropdownMenuItem<int>> getAreaDropdownItems({int? parentId}) {
     final list = parentId == null ? state.areas : getSubAreas(parentId);

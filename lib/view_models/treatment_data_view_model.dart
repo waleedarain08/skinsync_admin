@@ -249,18 +249,21 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     return generated;
   }
 
-  Future<void> addArea(String name, {String? sku, required String icon}) async {
+  Future<void> addArea(String name, {String? sku, required String icon, required String image}) async {
     if (name.isEmpty) return;
     final finalSku = (sku == null || sku.isEmpty)
         ? _generateUniqueAreaSku()
         : sku;
-    final newArea = await ref
+   // final newArea = 
+    await ref
         .read(areaViewModelProvider.notifier)
-        .createArea(name: name, globalSku: finalSku, icon: icon);
-    state = state.copyWith(areas: [...state.areas, ?newArea]);
+        .createArea(
+          parentId: null,
+          name: name, globalSku: finalSku, icon: icon, imageUrl: image);
+   // state = state.copyWith(areas: [...state.areas, newArea]);
   }
 
-  void editArea(String oldName, String newName, {String? sku, String? icon}) {
+  void editArea(String oldName, String newName, {String? sku, String? icon,String? image}) {
     state = state.copyWith(
       areas: state.areas.map((a) {
         if (a.name == oldName) {
@@ -271,6 +274,7 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
             name: newName,
             globalSku: finalSku,
             icon: icon ?? a.icon,
+            image: image ?? a.image,
           );
         }
         return a;
@@ -289,15 +293,16 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     required String parentAreaName,
     required String name,
     String? sku,
-    String? icon,
+    String? icon, String? image,
   }) async {
    final value =  await ref
         .read(areaViewModelProvider.notifier)
-        .createSubArea(
+        .createArea(
       name: name,
       globalSku: sku!,
       icon: icon!,
       parentId:parentAreaId,
+      imageUrl: image!,
     );
 
     if (value == true) {
@@ -313,6 +318,7 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     String newName, {
     String? sku,
     String? icon,
+    String? image,
   }) {
     state = state.copyWith(
       areas: state.areas.map((a) {
@@ -329,6 +335,7 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
                   name: newName,
                   globalSku: finalSku,
                   icon: icon ?? s.icon,
+                  image: image ?? s.image,
                 );
               }
               return s;
@@ -359,6 +366,7 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     String name, {
     String? sku,
     String? icon,
+    String? image,
   }) {
     // final finalSku = (sku == null || sku.isEmpty)
     //     ? _generateUniqueAreaSku()

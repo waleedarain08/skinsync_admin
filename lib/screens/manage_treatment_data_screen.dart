@@ -89,11 +89,13 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     required String title,
     String? initialName,
     String? initialIcon,
+    String? initialImage,
     bool showIconField = true,
-    required void Function(String, String) onConfirm,
+    required void Function(String, String,String) onConfirm,
   }) {
     final nameController = TextEditingController(text: initialName);
     final iconController = TextEditingController(text: initialIcon);
+    final imageController = TextEditingController(text: initialImage);
 
     showDialog(
       context: context,
@@ -129,6 +131,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
                 onConfirm(
                   nameController.text.trim(),
                   iconController.text.trim(),
+                  imageController.text.trim(),
                 );
                 Navigator.pop(context);
               }
@@ -671,8 +674,8 @@ class _ManageTreatmentDataScreenState
             onAdd: () => ManageTreatmentDataScreen._showItemDialog(
               context: context,
               title: 'Add New Area',
-              onConfirm: (String name, String icon) =>
-                  viewModel.addArea(name, icon: icon),
+              onConfirm: (String name, String icon,String image) =>
+                  viewModel.addArea(name, icon: icon,image:image),
             ),
           ),
           context.verticalSpace(24),
@@ -689,21 +692,22 @@ class _ManageTreatmentDataScreenState
                 icon: area.icon,
                 childrenCount: area.subAreas.length,
                 children: area.subAreas
-                    .map((s) => _ChildItemData(name: s.name, icon: s.icon))
+                    .map((s) => _ChildItemData(name: s.name, icon: s.icon,image: s.image))
                     .toList(),
-                onEdit: (name, icon) =>
-                    viewModel.editArea(area.name, name, icon: icon),
+                onEdit: (name, icon,image) =>
+                    viewModel.editArea(area.name, name, icon: icon,image:image),
                 onDelete: () => viewModel.deleteArea(area.name),
-                onAddChild: (name, icon) =>
+                onAddChild: (name, icon,image) =>
                     // TODO: Add area id instead of 0
                     viewModel.addSubArea(
                       parentAreaId: 0,
                       parentAreaName: area.name,
                       name: name,
                       icon: icon,
+                      image:image
                     ),
-                onEditChild: (old, name, icon) =>
-                    viewModel.editSubArea(area.name, old, name, icon: icon),
+                onEditChild: (old, name, icon,image) =>
+                    viewModel.editSubArea(area.name, old, name, icon: icon,image:image),
                 onDeleteChild: (name) =>
                     viewModel.deleteSubArea(area.name, name),
               );
@@ -873,16 +877,17 @@ class _ManageTreatmentDataScreenState
   }
 
   Widget _buildHierarchicalItem({
-    required BuildContext context,
-    required String name,
-    String? icon,
-    required int childrenCount,
-    required List<_ChildItemData> children,
-    required void Function(String, String?) onEdit,
-    required VoidCallback onDelete,
-    required void Function(String, String?) onAddChild,
-    required void Function(String, String, String?) onEditChild,
-    required void Function(String) onDeleteChild,
+     required BuildContext context,
+  required String name,
+  String? icon,
+  String? image,
+  required int childrenCount,
+  required List<_ChildItemData> children,
+  required void Function(String, String, String) onEdit,       
+  required VoidCallback onDelete,
+  required void Function(String, String, String) onAddChild,   
+  required void Function(String, String, String, String) onEditChild, 
+  required void Function(String) onDeleteChild,
   }) {
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
@@ -917,6 +922,7 @@ class _ManageTreatmentDataScreenState
                 title: 'Edit Item',
                 initialName: name,
                 initialIcon: icon,
+                initialImage: image,
                 onConfirm: onEdit,
               ),
             ),
@@ -970,8 +976,8 @@ class _ManageTreatmentDataScreenState
                                 title: 'Edit Sub-item',
                                 initialName: child.name,
                                 initialIcon: child.icon,
-                                onConfirm: (newName, newIcon) =>
-                                    onEditChild(child.name, newName, newIcon),
+                                onConfirm: (newName, newIcon,newImage) =>
+                                    onEditChild(child.name, newName, newIcon,newImage),
                               ),
                         ),
                         IconButton(
@@ -1175,7 +1181,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
 }
 
 class _ChildItemData {
-  _ChildItemData({required this.name, this.icon});
+  _ChildItemData({required this.name, this.icon,this.image});
   final String name;
   final String? icon;
+  final String? image;
 }

@@ -180,20 +180,21 @@ class AreasStep extends ConsumerWidget {
                     state,
                     viewModel,
                   ),
-          onAddArea: (String name, String sku, String icon) async {
+          onAddArea: (String name, String sku, String icon,String image) async {
             await ref
                 .read(treatmentDataViewModelProvider.notifier)
-                .addArea(name, sku: sku, icon: icon);
+                .addArea(name, sku: sku, icon: icon,image: image );
           },
-          onAddSubArea: ({required int parentAreaId, required String parentAreaName, required String name, String? sku, String? icon}) =>
+          onAddSubArea: ({required int parentAreaId, required String parentAreaName, required String name, String? sku, String? icon,String? image}) =>
               ref.read(treatmentDataViewModelProvider.notifier).addSubArea(
                     parentAreaId: parentAreaId,
                     parentAreaName: parentAreaName,
                     name: name,
                     sku: sku,
                     icon: icon,
+                    image: image,
                   ),
-          onAddSubAreaChild: (parentArea, parentSubArea, name, sku, icon) {
+          onAddSubAreaChild: (parentArea, parentSubArea, name, sku, icon,image) {
             ref
                 .read(treatmentDataViewModelProvider.notifier)
                 .addSubAreaChild(
@@ -202,6 +203,7 @@ class AreasStep extends ConsumerWidget {
                   name,
                   sku: sku,
                   icon: icon,
+                  image: image
                 );
           },
         ),

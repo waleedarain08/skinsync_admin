@@ -1,9 +1,11 @@
+import 'dart:developer';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/view_models/area_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
@@ -20,8 +22,8 @@ typedef SubAreaSetter =
       required String name,
       String? sku,
       String? icon,
+      String? image,
     });
-
 
 class PreviewItem {
   final String label;
@@ -44,7 +46,8 @@ class SelectedSummaryCard extends StatelessWidget {
   final List<PreviewItem> items;
   final VoidCallback onRemove;
 
-  const SelectedSummaryCard({super.key, 
+  const SelectedSummaryCard({
+    super.key,
     required this.title,
     required this.sku,
     required this.summary,
@@ -203,7 +206,8 @@ class NestedAreaSelector extends ConsumerStatefulWidget {
   onSubAreaChildToggle;
 
   // Creation callbacks
-  final void Function(String name, String sku, String icon) onAddArea;
+  final void Function(String name, String sku, String icon, String image)
+  onAddArea;
   final SubAreaSetter onAddSubArea;
   final void Function(
     String parentArea,
@@ -211,6 +215,7 @@ class NestedAreaSelector extends ConsumerStatefulWidget {
     String name,
     String sku,
     String? icon,
+    String? image,
   )
   onAddSubAreaChild;
 
@@ -237,17 +242,25 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
   void _showAddNodeDialog({
     required BuildContext context,
     required String title,
-    required void Function(String name, String sku, String iconPath) onAdd,
+    required void Function(
+      String name,
+      String sku,
+      String iconUrl,
+      String imageUrl,
+    )
+    onAdd,
   }) {
     final nameController = TextEditingController();
     final skuController = TextEditingController();
-    String? pickedIconPath;
+    String? iconUrl;
+    String? imageUrl;
 
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
+//final areaState = ref.watch(areaViewModelProvider);
             return StandardDialog(
               title: title,
               width: context.w(450),
@@ -274,7 +287,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                   Row(
                     children: [
                       AppNetworkImage(
-                        imageUrl: pickedIconPath ?? '',
+                        imageUrl: iconUrl ?? '',
                         width: 48,
                         height: 48,
                         borderRadius: BorderRadius.circular(8),
@@ -284,17 +297,48 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                       context.horizontalSpace(12),
                       CustomOutlinedButton(
                         onTap: () async {
-                          final picker = ImagePicker();
-                          final file = await picker.pickImage(
-                            source: ImageSource.gallery,
-                          );
-                          if (file != null) {
+                          final state = ref.watch(areaViewModelProvider);
+                          await ref
+                              .read(areaViewModelProvider.notifier)
+                              .pickImage(false);
+                          if (state.areaIconUrl != null) {
                             setDialogState(() {
-                              pickedIconPath = file.path;
+                              iconUrl = state.areaIconUrl;
+                              log('Icon URL: $iconUrl');
                             });
                           }
                         },
                         label: 'Upload Icon',
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+                  Row(
+                    children: [
+                      AppNetworkImage(
+                        imageUrl: imageUrl ?? '',
+                        width: 48,
+                        height: 48,
+                        borderRadius: BorderRadius.circular(8),
+                        fit: BoxFit.cover,
+                        errorIcon: Icons.image_outlined,
+                      ),
+                      context.horizontalSpace(12),
+                      CustomOutlinedButton(
+                        onTap: () async {
+                          final state = ref.watch(areaViewModelProvider);
+                          await ref
+                              .read(areaViewModelProvider.notifier)
+                              .pickImage(true);
+                          if (state.areaImageUrl != null) {
+                            log('Selected Image URL: $imageUrl');
+                            setDialogState(() {
+                              imageUrl = state.areaImageUrl;
+                              log('Selected Image URL: $imageUrl');
+                            });
+                          }
+                        },
+                        label: 'Upload Image',
                       ),
                     ],
                   ),
@@ -305,7 +349,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                   onTap: () => Navigator.pop(context),
                   label: 'Cancel',
                 ),
-                context.horizontalSpace(12),
+                // context.horizontalSpace(12),
                 CustomPrimaryButton(
                   onTap: () async {
                     final name = nameController.text.trim();
@@ -350,7 +394,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                       return;
                     }
 
-                    if (pickedIconPath == null) {
+                    if (iconUrl == null || imageUrl == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Area icon must be selected!'),
@@ -359,7 +403,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                       );
                       return;
                     }
-                    onAdd(name, sku, pickedIconPath!);
+                    onAdd(name, sku, iconUrl!, imageUrl!);
                     Navigator.pop(context);
                   },
                   label: 'Add',
@@ -496,7 +540,8 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 _showAddNodeDialog(
                   context: context,
                   title: 'Create New Main Area',
-                  onAdd: (name, sku, icon) => widget.onAddArea(name, sku, icon),
+                  onAdd: (name, sku, icon, image) =>
+                      widget.onAddArea(name, sku, icon, image),
                 );
               },
               icon: const Icon(
@@ -541,12 +586,13 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 _showAddNodeDialog(
                   context: context,
                   title: 'Create New Sub-Area in ${area.name}',
-                  onAdd: (name, sku, icon) => widget.onAddSubArea(
+                  onAdd: (name, sku, icon, image) => widget.onAddSubArea(
                     parentAreaId: area.id,
                     parentAreaName: area.name,
                     name: name,
                     sku: sku,
                     icon: icon,
+                    image: image,
                   ),
                 );
               },
@@ -570,12 +616,13 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                   _showAddNodeDialog(
                     context: context,
                     title: 'Create New Sub-Area in ${focusedArea.name}',
-                    onAdd: (name, sku, icon) => widget.onAddSubArea(
+                    onAdd: (name, sku, icon, image) => widget.onAddSubArea(
                       parentAreaId: focusedArea.id,
                       parentAreaName: focusedArea.name,
                       name: name,
                       sku: sku,
                       icon: icon,
+                      image: image,
                     ),
                   );
                 },
@@ -620,12 +667,13 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                   _showAddNodeDialog(
                     context: context,
                     title: 'Create New Child Area in ${subArea.name}',
-                    onAdd: (name, sku, icon) => widget.onAddSubAreaChild(
+                    onAdd: (name, sku, icon, image) => widget.onAddSubAreaChild(
                       focusedArea.name,
                       subArea.name,
                       name,
                       sku,
                       icon,
+                      image,
                     ),
                   );
                 },
@@ -652,12 +700,13 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                   _showAddNodeDialog(
                     context: context,
                     title: 'Create New Child in ${focusedSubArea.name}',
-                    onAdd: (name, sku, icon) => widget.onAddSubAreaChild(
+                    onAdd: (name, sku, icon, image) => widget.onAddSubAreaChild(
                       focusedArea!.name,
                       focusedSubArea.name,
                       name,
                       sku,
                       icon,
+                      image,
                     ),
                   );
                 },
