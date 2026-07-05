@@ -7,26 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/constent_form_selection_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/down_time_level_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/follow_up_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/phase_notifications_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/post_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/pre_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/product_usage_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/protocol_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/constent_form_selection_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/follow_up_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/phase_notifications_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/post_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/pre_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/product_usage_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/sessions_setup_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/step_pricing_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 
 import '../models/notification_entry.dart';
+import '../models/requests/create_session_requests/down_time_level_request.dart';
 import '../models/requests/create_treatment_requests/basic_info_request.dart';
 import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
@@ -40,6 +40,7 @@ import '../utils/exception.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 import 'category_view_model.dart';
+import 'treatment_data_view_model.dart';
 
 final treatmentViewModelProvider =
     NotifierProvider<TreatmentViewModel, TreatmentState>(TreatmentViewModel._);
@@ -413,6 +414,7 @@ Body                 : ${request.toJson()}
 
     state = state.copyWith(
       currentStep: 0,
+      sessionStep: 3,
       clearPreTreatmentConsentForm: true,
       clearExistingConsentForm: true,
       clearTreatmentImage: true,
@@ -833,6 +835,52 @@ Body                 : ${request.toJson()}
       state = state.copyWith(downtimeLevel: level);
   void setProviderRolesSource(String source) =>
       state = state.copyWith(providerRolesSource: source);
+
+  void setActiveSessionIndex(int? index) {
+    state = state.copyWith(activeSessionIndex: index);
+  }
+
+  void markActiveSessionAsDetailed() {
+    if (state.activeSessionIndex != null) {
+      final List<SessionViewModelEntry> updatedSessions = List.from(state.sessions);
+      if (state.activeSessionIndex! < updatedSessions.length) {
+        final activeEntry = updatedSessions[state.activeSessionIndex!];
+        
+        final durationText = '${treatmentDurationController.text} mins (Prep: ${prepTimeController.text}m, Clean: ${cleanupTimeController.text}m)';
+        final priceText = '\$${basePriceController.text}';
+        
+        final protocols = state.selectedProtocolIds.toList();
+        final preInstructions = preTreatmentInstructionsController.text;
+        final postInstructions = postTreatmentInstructionsController.text;
+        
+        final preNotifs = state.preNotificationEntries.map((n) => '${n.timingValueController.text} ${n.timingUnit} before: ${n.titleController.text}').toList();
+        final postNotifs = state.postNotificationEntries.map((n) => '${n.timingValueController.text} ${n.timingUnit} after: ${n.titleController.text}').toList();
+
+        updatedSessions[state.activeSessionIndex!] = SessionViewModelEntry(
+          sessionNumber: activeEntry.sessionNumber,
+          totalFollowUpsController: activeEntry.totalFollowUpsController,
+          followUps: List.from(activeEntry.followUps),
+          isDetailedEntered: true,
+          productUsageSnapshot: List<ProductUsageEntry>.from(state.productUsageEntries),
+          durationSnapshot: durationText,
+          priceSnapshot: priceText,
+          protocolSnapshot: protocols,
+          preInstructionsSnapshot: preInstructions,
+          postInstructionsSnapshot: postInstructions,
+          requirePhotosSnapshot: state.requirePostTreatmentPhotos,
+          photosCountSnapshot: state.requiredPostTreatmentPhotoCount,
+          preNotificationsSnapshot: preNotifs,
+          postNotificationsSnapshot: postNotifs,
+          downtimeSnapshot: state.downtimeLevel,
+          rolesSnapshot: List.from(state.selectedRoles),
+          consentSnapshot: state.consentType == 'category'
+              ? (state.selectedCategoryDetail?.consentFormName ?? 'Category Consent Form')
+              : (state.preTreatmentConsentForm?.name ?? state.existingConsentForm?.name ?? 'Custom Consent'),
+        );
+        state = state.copyWith(sessions: updatedSessions);
+      }
+    }
+  }
 
   void setSessionSource(String source, {CategoryDetailDto? category}) {
     state = state.copyWith(sessionSource: source);
@@ -1433,6 +1481,10 @@ Body       : ${request.toJson()}
     if (step == 3) {
       fetchProductsByTreatmentCategory();
     }
+  }
+
+  void setSessionStep(int step) {
+    state = state.copyWith(sessionStep: step);
   }
 
   Future<void> fetchProductsByTreatmentCategory() async {
@@ -2782,8 +2834,50 @@ Body       : ${request.toJson()}
     );
   }
 
+  List<int> _getDynamicSelectedAreaIds(List<AreaViewModelEntry> areas) {
+    final List<int> ids = [];
+    final dataState = ref.read(treatmentDataViewModelProvider);
+
+    for (final areaEntry in areas) {
+      if (areaEntry.areaController.text.isEmpty) continue;
+
+      final dynamic areaModel = dataState.areas.cast<dynamic>().firstWhere(
+        (a) => a?.name == areaEntry.areaController.text,
+        orElse: () => null,
+      );
+      if (areaModel != null) {
+        ids.add(areaModel.id);
+
+        for (final subAreaConfig in areaEntry.subAreas) {
+          final dynamic subAreaModel = areaModel.subAreas.cast<dynamic>().firstWhere(
+            (sa) => sa != null && (sa.id == subAreaConfig.id || sa.name == subAreaConfig.name),
+            orElse: () => null,
+          );
+          if (subAreaModel != null) {
+            ids.add(subAreaModel.id);
+
+            for (final childConfig in subAreaConfig.children) {
+              final dynamic childModel = subAreaModel.subAreas.cast<dynamic>().firstWhere(
+                (ca) => ca?.name == childConfig.name,
+                orElse: () => null,
+              );
+              if (childModel != null) {
+                ids.add(childModel.id);
+              }
+            }
+          }
+        }
+      }
+    }
+    return ids;
+  }
+
   void updateAreas(List<AreaViewModelEntry> areas) {
-    state = state.copyWith(areas: areas);
+    final dynamicIds = _getDynamicSelectedAreaIds(areas);
+    state = state.copyWith(
+      areas: areas,
+      selectedTreatmentAreaIds: dynamicIds,
+    );
   }
 }
 
@@ -2791,11 +2885,41 @@ class SessionViewModelEntry {
   final int sessionNumber;
   final TextEditingController totalFollowUpsController;
   List<FollowUpEntry> followUps;
+  final bool isDetailedEntered;
+
+  // Configuration snapshot fields
+  List<ProductUsageEntry> productUsageSnapshot;
+  String durationSnapshot;
+  String priceSnapshot;
+  List<String> protocolSnapshot;
+  String preInstructionsSnapshot;
+  String postInstructionsSnapshot;
+  bool requirePhotosSnapshot;
+  int photosCountSnapshot;
+  List<String> preNotificationsSnapshot;
+  List<String> postNotificationsSnapshot;
+  String downtimeSnapshot;
+  List<String> rolesSnapshot;
+  String consentSnapshot;
 
   SessionViewModelEntry({
     required this.sessionNumber,
     TextEditingController? totalFollowUpsController,
     this.followUps = const [],
+    this.isDetailedEntered = false,
+    this.productUsageSnapshot = const [],
+    this.durationSnapshot = '',
+    this.priceSnapshot = '',
+    this.protocolSnapshot = const [],
+    this.preInstructionsSnapshot = '',
+    this.postInstructionsSnapshot = '',
+    this.requirePhotosSnapshot = false,
+    this.photosCountSnapshot = 0,
+    this.preNotificationsSnapshot = const [],
+    this.postNotificationsSnapshot = const [],
+    this.downtimeSnapshot = '',
+    this.rolesSnapshot = const [],
+    this.consentSnapshot = '',
   }) : totalFollowUpsController =
            totalFollowUpsController ?? TextEditingController();
 
@@ -2816,6 +2940,7 @@ class TreatmentState extends BaseStateModel {
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
   final int currentStep;
+  final int sessionStep;
 
   final String? treatmentImageUrl;
   final String? treatmentIconUrl;
@@ -2845,6 +2970,7 @@ class TreatmentState extends BaseStateModel {
   final String downtimeLevel; // None | Low | Moderate | High
   final String providerRolesSource; // category | custom
   final List<String> selectedRoles;
+  final int? activeSessionIndex;
   final List<SessionViewModelEntry> sessions;
   final String sessionSource; // category | custom
   final int totalSessions;
@@ -2893,6 +3019,7 @@ class TreatmentState extends BaseStateModel {
     this.selectedTreatmentId,
     this.selectedCategoryDetail,
     this.currentStep = 0,
+    this.sessionStep = 3,
 
     this.selectedCategoryPath = const [],
     this.selectedProtocolIds = const [],
@@ -2917,6 +3044,7 @@ class TreatmentState extends BaseStateModel {
     this.downtimeLevel = 'None',
     this.providerRolesSource = 'category',
     this.selectedRoles = const [],
+    this.activeSessionIndex,
     this.sessions = const [],
     this.sessionSource = 'category',
     this.totalSessions = 1,
@@ -2961,6 +3089,7 @@ class TreatmentState extends BaseStateModel {
     TreatmentDetailData? selectedTreatmentDetail,
     int? selectedTreatmentId,
     int? currentStep,
+    int? sessionStep,
 
     int? draftTreatmentID,
     List<AreaViewModelEntry>? areas,
@@ -2986,6 +3115,7 @@ class TreatmentState extends BaseStateModel {
     String? downtimeLevel,
     String? providerRolesSource,
     List<String>? selectedRoles,
+    int? activeSessionIndex,
     List<SessionViewModelEntry>? sessions,
     String? sessionSource,
     int? totalSessions,
@@ -3030,6 +3160,7 @@ class TreatmentState extends BaseStateModel {
       selectedTreatmentDetail: selectedTreatmentDetail ?? this.selectedTreatmentDetail,
       selectedTreatmentId: selectedTreatmentId ?? this.selectedTreatmentId,
       currentStep: currentStep ?? this.currentStep,
+      sessionStep: sessionStep ?? this.sessionStep,
 
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
@@ -3069,6 +3200,7 @@ class TreatmentState extends BaseStateModel {
       downtimeLevel: downtimeLevel ?? this.downtimeLevel,
       providerRolesSource: providerRolesSource ?? this.providerRolesSource,
       selectedRoles: selectedRoles ?? this.selectedRoles,
+      activeSessionIndex: activeSessionIndex ?? this.activeSessionIndex,
       sessions: sessions ?? this.sessions,
       sessionSource: sessionSource ?? this.sessionSource,
       totalSessions: totalSessions ?? this.totalSessions,

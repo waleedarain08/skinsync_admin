@@ -1,5 +1,5 @@
-export 'areas_step.dart';
-export 'category_step.dart';
+export '../treatment_creation_steps/areas_step.dart';
+export '../treatment_creation_steps/category_step.dart';
 export 'consent_step.dart';
 export 'downtime_step.dart';
 export 'follow_up_step.dart';
@@ -13,5 +13,5 @@ export 'pricing_step.dart';
 export 'protocols_step.dart';
 export 'roles_step.dart';
 export 'scheduling_step.dart';
-export 'sessions_step.dart';
-export 'treatment_selection_step.dart';
+export '../treatment_creation_steps/sessions_step.dart';
+export '../treatment_creation_steps/treatment_selection_step.dart';

@@ -11,7 +11,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/subscription_plans.dar
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
-import 'package:skinsync_admin/screens/treatment_management_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/treatment_management_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 

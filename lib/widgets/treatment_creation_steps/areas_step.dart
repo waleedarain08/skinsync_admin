@@ -30,14 +30,19 @@ class AreasStep extends ConsumerWidget {
       (a) => a.areaController.text == area.name,
     );
     if (index == -1) {
+      // New area selected. Dispose any previously selected areas.
+      for (final a in cleanAreas) {
+        a.dispose();
+      }
       final newEntry = AreaViewModelEntry();
       newEntry.areaController.text = area.name;
-      viewModel.updateAreas([...cleanAreas, newEntry]);
+      viewModel.updateAreas([newEntry]);
     } else {
+      // Same area deselected.
       final updated = [...cleanAreas];
       updated[index].dispose();
       updated.removeAt(index);
-      viewModel.updateAreas(updated.isEmpty ? [AreaViewModelEntry()] : updated);
+      viewModel.updateAreas([AreaViewModelEntry()]);
     }
   }
 
@@ -54,10 +59,14 @@ class AreasStep extends ConsumerWidget {
       (a) => a.areaController.text == area.name,
     );
     if (index == -1) {
+      // Subarea of a different area selected. Clear others.
+      for (final a in cleanAreas) {
+        a.dispose();
+      }
       final newEntry = AreaViewModelEntry();
       newEntry.areaController.text = area.name;
       newEntry.subAreas = [SubAreaConfig(name: subArea.name, id: subArea.id)];
-      viewModel.updateAreas([...cleanAreas, newEntry]);
+      viewModel.updateAreas([newEntry]);
     } else {
       final areaEntry = cleanAreas[index];
       final subIndex = areaEntry.subAreas.indexWhere(
@@ -91,6 +100,10 @@ class AreasStep extends ConsumerWidget {
       (a) => a.areaController.text == area.name,
     );
     if (index == -1) {
+      // Child of a subarea of a different area selected. Clear others.
+      for (final a in cleanAreas) {
+        a.dispose();
+      }
       final newEntry = AreaViewModelEntry();
       newEntry.areaController.text = area.name;
       newEntry.subAreas = [
@@ -100,7 +113,7 @@ class AreasStep extends ConsumerWidget {
           children: [SubAreaChildConfig(name: child.name)],
         ),
       ];
-      viewModel.updateAreas([...cleanAreas, newEntry]);
+      viewModel.updateAreas([newEntry]);
     } else {
       final areaEntry = cleanAreas[index];
       final subIndex = areaEntry.subAreas.indexWhere(
