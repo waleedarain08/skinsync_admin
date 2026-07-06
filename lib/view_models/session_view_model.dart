@@ -605,6 +605,8 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     return baseDuration + productDuration + prepTime + cleanupTime;
   }
 
+  
+
   // Original callProtocol Implementation
   Future<bool?> callProtocol({
     required int stepNumber,

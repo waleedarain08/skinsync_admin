@@ -150,7 +150,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   Widget _buildLeftSidebar(
     BuildContext context,
     TreatmentState state,
-    TreatmentViewModel viewModel,
+    SessionViewModel viewModel,
   ) {
     final steps = [
       'Inventory Products',
@@ -2016,7 +2016,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   Widget _buildActionButtons(
     BuildContext context,
     TreatmentState state,
-    TreatmentViewModel viewModel,
+    SessionViewModel viewModel,
     TreatmentDataState dataState,
     CategoryState categoryState,
   ) {

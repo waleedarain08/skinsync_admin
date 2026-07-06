@@ -54,7 +54,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     final dataState = ref.watch(treatmentDataViewModelProvider);
     final categoryState = ref.watch(categoryViewModelProvider);
 
-    final int stepIndex = _getStepIndex(state.currentStep);
+    final int stepIndex = _getStepIndex(state.treatmentStep);
 
     return GradientScaffold(
       appBar: AppBar(
@@ -290,7 +290,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     CategoryState categoryState,
     WidgetRef ref,
   ) {
-    switch (state.currentStep) {
+    switch (state.treatmentStep) {
       case 0:
         return const CategoryStep();
       case 1:
@@ -316,11 +316,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     final sessionState = ref.watch(sessionViewModelProvider);
     return Row(
       children: [
-        if (state.currentStep > 0) ...[
+        if (state.treatmentStep > 0) ...[
           Expanded(
             child: CustomOutlinedButton(
               onTap: () {
-                viewModel.setStep(state.currentStep - 1);
+                viewModel.setStep(state.treatmentStep - 1);
               },
               label: 'Previous Step',
             ),
@@ -331,7 +331,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           flex: 2,
           child: CustomPrimaryButton(
             onTap: () async {
-              if (state.currentStep == 0) {
+              if (state.treatmentStep == 0) {
                 final success = await _validateAndFetchCategory(
                   context,
                   state,
@@ -348,7 +348,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
 
               // ignore: use_build_context_synchronously
               final scaffoldMessenger = ScaffoldMessenger.of(context);
-              if (state.currentStep == 1) {
+              if (state.treatmentStep == 1) {
                 if (state.selectedTreatment == null) {
                   
                   scaffoldMessenger.showSnackBar(
@@ -366,7 +366,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 return;
               }
 
-              if (state.currentStep == 2) {
+              if (state.treatmentStep == 2) {
                 if (state.selectedTreatment?.id == null) {
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
@@ -394,7 +394,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 return;
               }
 
-              if (state.currentStep == 3) {
+              if (state.treatmentStep == 3) {
                 if (sessionState.sessions.isEmpty) {
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
@@ -421,7 +421,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 return;
               }
 
-              if (state.currentStep == 4) {
+              if (state.treatmentStep == 4) {
                 await viewModel.submitTreatment(
                   context,
                   categories: categoryState.categories,
@@ -431,7 +431,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 }
               }
             },
-            label: state.currentStep == 4
+            label: state.treatmentStep == 4
                 ? 'Finish & Create Treatment'
                 : 'Next Step',
           ),

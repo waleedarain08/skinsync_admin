@@ -178,7 +178,7 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(treatmentViewModelProvider);
-    final viewModel = ref.read(treatmentViewModelProvider.notifier);
+    final viewModel = ref.read(sessionViewModelProvider.notifier);
     final sessionState = ref.watch(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
 
