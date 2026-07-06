@@ -49,6 +49,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final dataState = ref.watch(treatmentDataViewModelProvider);
     final categoryState = ref.watch(categoryViewModelProvider);
 
@@ -79,7 +80,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (isDesktop || isTablet)
-            _buildLeftSidebar(context, state, viewModel),
+            _buildLeftSidebar(context, state, sessionViewModel),
           Expanded(
             child: Column(
               children: [
@@ -121,7 +122,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                             _buildActionButtons(
                               context,
                               state,
-                              viewModel,
+                              sessionViewModel,
                               dataState,
                               categoryState,
                             ),
@@ -2236,7 +2237,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     return true;
   }
 
-  bool _validateScheduling(BuildContext context, TreatmentViewModel viewModel) {
+  bool _validateScheduling(BuildContext context, SessionViewModel viewModel) {
     final sessionState = ref.read(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     if (sessionState.isFixedDuration) {
