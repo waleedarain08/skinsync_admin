@@ -2077,14 +2077,26 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               }
 
               if (state.sessionStep < 15) {
-                if (state.sessionStep == 3) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
+                if (state.sessionStep == 3)  {
+                  final result = await ref.read(sessionViewModelProvider.notifier).callProductUsage();
+                  if(result == true){
+                      viewModel.setSessionStep(state.sessionStep + 1);
+                  }
                 } else if (state.sessionStep == 4) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
+                  final result = await ref.read(sessionViewModelProvider.notifier).createSchedule(stepNumber: state.sessionStep +1);
+                  if(result == true){
+                      viewModel.setSessionStep(state.sessionStep + 1);
+                  }
+                  
                 } else if (state.sessionStep == 5) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
+                  final result = await ref.read(sessionViewModelProvider.notifier).callStepPricing(stepNumber: state.sessionStep +1);
+                  if(result == true){
+                      viewModel.setSessionStep(state.sessionStep + 1);
+                  }
+                 
                 } else if (state.sessionStep == 6) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
+
+                  
                 } else if (state.sessionStep == 7) {
                   viewModel.setSessionStep(state.sessionStep + 1);
                 } else if (state.sessionStep == 8) {
