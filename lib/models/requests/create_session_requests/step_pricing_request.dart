@@ -16,13 +16,14 @@ class StepPricingRequest {
   });
 
   Map<String, dynamic> toJson() => {
+    'step_number': 6,
     'keys': [CreateTreatmentSteps.pricing.name],
     'base_price': basePrice,
     'unit_price_overrides': unitPriceOverrides == null
         ? []
         : List<dynamic>.from(unitPriceOverrides!.map((x) => x.toJson())),
-    'is_fixed_price': isFixedPrice,
-    'fixed_price': fixedPrice,
+    // 'is_fixed_price': isFixedPrice,
+    // 'fixed_price': fixedPrice,
   };
 }
 
