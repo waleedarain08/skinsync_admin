@@ -2108,7 +2108,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               } else {
                 final durationText =
                     '${sessionViewModel.treatmentDurationController.text} mins (Prep: ${sessionViewModel.prepTimeController.text}m, Clean: ${sessionViewModel.cleanupTimeController.text}m)';
-                final priceText = '\$${sessionViewModel.basePriceController.text}';
+                final priceText = sessionState.isFixedPrice
+                    ? '\$${sessionViewModel.fixedPriceController.text} (Fixed)'
+                    : '\$${sessionViewModel.basePriceController.text}';
 
                 final protocols = sessionState.selectedProtocolIds.toList();
                 final preInstructions = sessionViewModel.preTreatmentInstructionsController.text;

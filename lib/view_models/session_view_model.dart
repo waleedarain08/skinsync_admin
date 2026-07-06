@@ -73,6 +73,7 @@ class SessionState extends BaseStateModel {
   final bool onlineBookable;
   final bool manualApprovalRequired;
   final bool isFixedDuration;
+  final bool isFixedPrice;
 
   final int totalSessions;
   final int? preNotificationOffset;
@@ -115,6 +116,7 @@ class SessionState extends BaseStateModel {
     this.onlineBookable = false,
     this.manualApprovalRequired = false,
     this.isFixedDuration = false,
+    this.isFixedPrice = false,
     this.totalSessions = 0,
     this.preNotificationOffset,
     this.postNotificationOffset,
@@ -157,6 +159,7 @@ class SessionState extends BaseStateModel {
     bool? onlineBookable,
     bool? manualApprovalRequired,
     bool? isFixedDuration,
+    bool? isFixedPrice,
     int? totalSessions,
     int? preNotificationOffset,
     int? postNotificationOffset,
@@ -198,6 +201,7 @@ class SessionState extends BaseStateModel {
       onlineBookable: onlineBookable ?? this.onlineBookable,
       manualApprovalRequired: manualApprovalRequired ?? this.manualApprovalRequired,
       isFixedDuration: isFixedDuration ?? this.isFixedDuration,
+      isFixedPrice: isFixedPrice ?? this.isFixedPrice,
       totalSessions: totalSessions ?? this.totalSessions,
       preNotificationOffset: preNotificationOffset ?? this.preNotificationOffset,
       postNotificationOffset: postNotificationOffset ?? this.postNotificationOffset,
@@ -214,6 +218,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
 
   // Text Controllers for Session Creation Scratchpad
   final basePriceController = TextEditingController(text: '0');
+  final fixedPriceController = TextEditingController(text: '0');
   final Map<String, TextEditingController> unitPriceControllers = {};
 
   final durationHoursController = TextEditingController();
@@ -846,6 +851,10 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     state = state.copyWith(isFixedDuration: val ?? false);
   }
 
+  void toggleIsFixedPrice(bool? val) {
+    state = state.copyWith(isFixedPrice: val ?? false);
+  }
+
   void setSessionStep(int step) {
     state = state.copyWith(sessionStep: step);
   }
@@ -853,6 +862,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   @override
   void dispose() {
     basePriceController.dispose();
+    fixedPriceController.dispose();
     for (final controller in unitPriceControllers.values) {
       controller.dispose();
     }

@@ -15,7 +15,6 @@ import '../../utils/theme.dart';
 import '../../view_models/category_view_model.dart';
 import '../app_network_image.dart';
 import '../build_textfield.dart';
-import '../custom_dropdown_widget.dart';
 import '../custom_primary_button.dart';
 import 'standard_dialog.dart';
 
@@ -28,8 +27,6 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
     this.initialImage,
     this.initialConsentName,
     this.initialConsentFormUrl,
-    this.initialSessions,
-    this.initialTotalSessions,
     this.initialPreNotifications,
     this.initialPostNotifications,
     this.initialDowntimePresets,
@@ -44,8 +41,6 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
   final String? initialImage;
   final String? initialConsentName;
   final String? initialConsentFormUrl;
-  final List<CategorySessionModel>? initialSessions;
-  final int? initialTotalSessions;
   final List<CategoryNotificationModel>? initialPreNotifications;
   final List<CategoryNotificationModel>? initialPostNotifications;
   final CategoryDowntimePresetModel? initialDowntimePresets;
@@ -61,14 +56,11 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
 class _CategoryCreationDialogState
     extends ConsumerState<CategoryCreationDialog> {
   late final TextEditingController _nameController;
-  late final TextEditingController _totalSessionsController;
-  final List<TextEditingController> _sessionFollowUpsCountControllers = [];
   late String _selectedIcon;
   late String _selectedImage;
   final ImagePicker _imagePicker = ImagePicker();
   String? _existingConsentName;
   String? _consentFormUrl;
-  List<CategorySessionModel> _sessions = [];
   bool _isLoadingDetail = false;
   bool _isSubmitting = false;
 
@@ -93,30 +85,10 @@ class _CategoryCreationDialogState
     super.initState();
     _nameController = TextEditingController(text: widget.initialName);
 
-    final int initialTotalSessions = widget.initialTotalSessions ?? 1;
-    _totalSessionsController = TextEditingController(
-      text: initialTotalSessions.toString(),
-    );
     _selectedIcon = widget.initialIcon ?? 'category';
     _selectedImage = widget.initialImage ?? '';
     _existingConsentName = widget.initialConsentName;
     _consentFormUrl = widget.initialConsentFormUrl;
-
-    if (widget.initialSessions != null && widget.initialSessions!.isNotEmpty) {
-      _sessions = List.from(
-        widget.initialSessions!.map(
-          (s) => CategorySessionModel(
-            sessionNumber: s.sessionNumber,
-            followUps: List.from(s.followUps),
-          ),
-        ),
-      );
-    } else {
-      _sessions = List.generate(initialTotalSessions, (index) {
-        return CategorySessionModel(sessionNumber: index + 1, followUps: []);
-      });
-    }
-    _syncFollowUpsCountControllers();
 
     _preNotificationEntries = widget.initialPreNotifications != null
         ? List.from(
@@ -196,35 +168,11 @@ class _CategoryCreationDialogState
   }
 
   void _populateFromCategory(CategoryDetailDto cat) {
-    _nameController.text = cat.name ?? '' ;
-    _totalSessionsController.text = cat.totalSessions.toString();
+    _nameController.text = cat.name ?? '';
     _selectedIcon = cat.icon ?? '';
     _selectedImage = cat.image ?? '';
     _existingConsentName = cat.consentFormName;
     _consentFormUrl = cat.consentFormUrl;
-
-  _sessions = List.from(
-  cat.defaultSessions?.map(
-        (s) => CategorySessionModel(
-          sessionNumber: s.sessionNumber,
-          followUps: List.from(
-            s.followUps.map(
-                  (f) => CategoryFollowUpModel(
-                    type: f.type ?? '',
-                    durationValue: f.durationValue ?? 0,
-                    durationUnit:
-                        unitValues.reverse[f.durationUnit] ?? 'minutes',
-                    intervalValue: f.intervalValue ?? 0,
-                    intervalUnit: f.intervalUnit ?? '',
-                    isImageRequired: f.isImageRequired ?? false,
-                    notes: f.notes ?? '',
-                  ),
-                ) ,
-          ),
-        ),
-      ) ??
-      [],
-); _syncFollowUpsCountControllers();
 
     _preNotificationEntries = List.from(
       cat.preNotifications?.map(
@@ -263,29 +211,9 @@ class _CategoryCreationDialogState
     );
   }
 
-  void _syncFollowUpsCountControllers() {
-    while (_sessionFollowUpsCountControllers.length < _sessions.length) {
-      final sIdx = _sessionFollowUpsCountControllers.length;
-      final initialCount = _sessions[sIdx].followUps.length;
-      _sessionFollowUpsCountControllers.add(
-        TextEditingController(
-          text: initialCount == 0 ? '0' : initialCount.toString(),
-        ),
-      );
-    }
-    while (_sessionFollowUpsCountControllers.length > _sessions.length) {
-      _sessionFollowUpsCountControllers.last.dispose();
-      _sessionFollowUpsCountControllers.removeLast();
-    }
-  }
-
   @override
   void dispose() {
     _nameController.dispose();
-    _totalSessionsController.dispose();
-    for (final controller in _sessionFollowUpsCountControllers) {
-      controller.dispose();
-    }
     for (final entry in _preNotificationEntries) {
       entry.dispose();
     }
@@ -296,45 +224,6 @@ class _CategoryCreationDialogState
     _downtimeModerateController.dispose();
     _downtimeHighController.dispose();
     super.dispose();
-  }
-
-  void _updateSessionsCount(String val) {
-    if (widget.isViewMode) return;
-    final count = int.tryParse(val) ?? 1;
-    if (count < 1) return;
-    setState(() {
-      if (count > _sessions.length) {
-        for (int i = _sessions.length; i < count; i++) {
-          _sessions.add(
-            CategorySessionModel(sessionNumber: i + 1, followUps: []),
-          );
-        }
-      } else if (count < _sessions.length) {
-        _sessions = _sessions.sublist(0, count);
-      }
-      _syncFollowUpsCountControllers();
-    });
-  }
-
-  void _updateSessionFollowUpCount(int sIdx, String val) {
-    if (widget.isViewMode) return;
-    final count = int.tryParse(val) ?? 0;
-    if (count < 0) return;
-    setState(() {
-      final session = _sessions[sIdx];
-      final currentFus = List<CategoryFollowUpModel>.from(session.followUps);
-      if (count > currentFus.length) {
-        for (int i = currentFus.length; i < count; i++) {
-          currentFus.add(CategoryFollowUpModel(type: 'virtual'));
-        }
-      } else if (count < currentFus.length) {
-        currentFus.removeRange(count, currentFus.length);
-      }
-      _sessions[sIdx] = CategorySessionModel(
-        sessionNumber: session.sessionNumber,
-        followUps: currentFus,
-      );
-    });
   }
 
   Future<void> _pickConsent() async {
@@ -473,33 +362,10 @@ class _CategoryCreationDialogState
           .read(categoryViewModelProvider.notifier)
           .createCategory(request: request)
           .then((value) {
-            if (value == true) {
+            if (value == true && mounted) {
               Navigator.pop(context);
             }
           });
-
-      // Navigator.pop(context, {
-      //   'name': _nameController.text,
-      //   'totalSessions': int.tryParse(_totalSessionsController.text) ?? 1,
-      //   'icon': _selectedIcon,
-      //   'image': _selectedImage,
-      //   'consentFormUrl': _consentFormUrl,
-      //   'consentFormName': _existingConsentName,
-      //   'sessions': _sessions,
-      //   'preNotifications': _preNotificationEntries
-      //       .map((e) => e.toConfig())
-      //       .toList(),
-      //   'postNotifications': _postNotificationEntries
-      //       .map((e) => e.toConfig())
-      //       .toList(),
-      //   'downtimePresets': CategoryDowntimePresetModel(
-      //     none: 0,
-      //     low: int.tryParse(_downtimeLowController.text) ?? 2,
-      //     moderate: int.tryParse(_downtimeModerateController.text) ?? 5,
-      //     high: int.tryParse(_downtimeHighController.text) ?? 10,
-      //   ),
-      //   'defaultRoles': _selectedRoles,
-      // });
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
@@ -842,199 +708,6 @@ class _CategoryCreationDialogState
             },
           ),
       ],
-    );
-  }
-
-  Widget _buildSessionFollowUpCard(int sIdx, int fuIdx) {
-    final config = _sessions[sIdx].followUps[fuIdx];
-    final intervalController = TextEditingController(
-      text: config.intervalValue?.toString() ?? '',
-    );
-    final durationController = TextEditingController(
-      text: config.durationValue?.toString() ?? '',
-    );
-
-    return Container(
-      padding: context.appEdgeInsets(all: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: context.appBorderRadius(all: 12),
-        border: Border.all(color: CustomColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Follow-Up ${fuIdx + 1}', style: context.fonts.purple12w700),
-          context.verticalSpace(12),
-          Row(
-            children: [
-              Expanded(
-                child: CustomDropdown<String>(
-                  label: 'Type',
-                  hintText: 'Select',
-                  value: config.type,
-                  items: const [
-                    DropdownMenuItem(value: 'virtual', child: Text('Virtual')),
-                    DropdownMenuItem(
-                      value: 'in_person',
-                      child: Text('In-Person'),
-                    ),
-                  ],
-                  onChanged: widget.isViewMode
-                      ? null
-                      : (val) {
-                          if (val != null) {
-                            setState(() {
-                              final newFus = List<CategoryFollowUpModel>.from(
-                                _sessions[sIdx].followUps,
-                              );
-                              newFus[fuIdx] = newFus[fuIdx].copyWith(type: val);
-                              _sessions[sIdx] = _sessions[sIdx].copyWith(
-                                followUps: newFus,
-                              );
-                            });
-                          }
-                        },
-                ),
-              ),
-              context.horizontalSpace(12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Duration', style: context.fonts.black14w600),
-                    context.verticalSpace(8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: durationController,
-                            keyboardType: TextInputType.number,
-                            readOnly: widget.isViewMode,
-                            decoration: AppDecorations.input(
-                              context,
-                              hint: '30',
-                            ),
-                            onChanged: (v) {
-                              final value = int.tryParse(v);
-                              setState(() {
-                                final newFus = List<CategoryFollowUpModel>.from(
-                                  _sessions[sIdx].followUps,
-                                );
-                                newFus[fuIdx] = newFus[fuIdx].copyWith(
-                                  durationValue: value,
-                                );
-                                _sessions[sIdx] = _sessions[sIdx].copyWith(
-                                  followUps: newFus,
-                                );
-                              });
-                            },
-                          ),
-                        ),
-                        context.horizontalSpace(4),
-                        Expanded(
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: config.durationUnit,
-                              isExpanded: true,
-                              items: const [
-                                DropdownMenuItem(
-                                  value: 'minutes',
-                                  child: Text('m'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'hours',
-                                  child: Text('h'),
-                                ),
-                              ],
-                              onChanged: widget.isViewMode
-                                  ? null
-                                  : (v) {
-                                      if (v != null) {
-                                        setState(() {
-                                          final newFus =
-                                              List<CategoryFollowUpModel>.from(
-                                                _sessions[sIdx].followUps,
-                                              );
-                                          newFus[fuIdx] = newFus[fuIdx]
-                                              .copyWith(durationUnit: v);
-                                          _sessions[sIdx] = _sessions[sIdx]
-                                              .copyWith(followUps: newFus);
-                                        });
-                                      }
-                                    },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          context.verticalSpace(12),
-          Text('Interval (After Procedure)', style: context.fonts.black14w600),
-          context.verticalSpace(8),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: intervalController,
-                  keyboardType: TextInputType.number,
-                  readOnly: widget.isViewMode,
-                  decoration: AppDecorations.input(context, hint: '1'),
-                  onChanged: (v) {
-                    final value = int.tryParse(v);
-                    setState(() {
-                      final newFus = List<CategoryFollowUpModel>.from(
-                        _sessions[sIdx].followUps,
-                      );
-                      newFus[fuIdx] = newFus[fuIdx].copyWith(
-                        intervalValue: value,
-                      );
-                      _sessions[sIdx] = _sessions[sIdx].copyWith(
-                        followUps: newFus,
-                      );
-                    });
-                  },
-                ),
-              ),
-              context.horizontalSpace(12),
-              Expanded(
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: config.intervalUnit,
-                    isExpanded: true,
-                    items: const [
-                      DropdownMenuItem(value: 'days', child: Text('Days')),
-                      DropdownMenuItem(value: 'weeks', child: Text('Weeks')),
-                    ],
-                    onChanged: widget.isViewMode
-                        ? null
-                        : (v) {
-                            if (v != null) {
-                              setState(() {
-                                final newFus = List<CategoryFollowUpModel>.from(
-                                  _sessions[sIdx].followUps,
-                                );
-                                newFus[fuIdx] = newFus[fuIdx].copyWith(
-                                  intervalUnit: v,
-                                );
-                                _sessions[sIdx] = _sessions[sIdx].copyWith(
-                                  followUps: newFus,
-                                );
-                              });
-                            }
-                          },
-                  ),
-                ),
-              ),
-              const Spacer(),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
