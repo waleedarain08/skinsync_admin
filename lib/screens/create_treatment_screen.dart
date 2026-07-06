@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../models/responses/area_list_response.dart';
 
 import '../models/treatment_data_models.dart';
 import '../utils/theme.dart';
@@ -364,7 +365,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               }
 
               if (state.currentStep == 2) {
-                if (!_validateSubAreas(scaffoldMessenger, state)) return;
+                if (!_validateSubAreas(scaffoldMessenger, state, dataState.areas)) return;
                 final result = await ref.read(treatmentViewModelProvider.notifier).createTreatmentArea();
                 if(result ==true){
                    viewModel.setStep(3);
@@ -509,85 +510,97 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     return true;
   }
 
-  bool _validateStepDetails(
-    ScaffoldMessengerState scaffoldMessenger,
-    TreatmentViewModel viewModel,
-    TreatmentState state,
-  ) {
-    final skuError = viewModel.validateGlobalSku(
-      viewModel.globalSkuController.text.trim(),
-    );
-    if (skuError != null) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text(skuError), backgroundColor: CustomColors.red),
-      );
-      return false;
-    }
-    if (viewModel.displayNameController.text.trim().isEmpty) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Please enter Patient Display Name'),
-          backgroundColor: CustomColors.red,
-        ),
-      );
-      return false;
-    }
-    if (state.treatmentImageUrl == null || state.treatmentImageUrl!.isEmpty) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Please upload a Treatment Banner Image'),
-          backgroundColor: CustomColors.red,
-        ),
-      );
-      return false;
-    }
-    if (state.treatmentIconUrl == null || state.treatmentIconUrl!.isEmpty) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Please upload a Treatment Listing Icon'),
-          backgroundColor: CustomColors.red,
-        ),
-      );
-      return false;
-    }
-    if (viewModel.shortDescriptionController.text.trim().isEmpty) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a Short Description'),
-          backgroundColor: CustomColors.red,
-        ),
-      );
-      return false;
-    }
-    if (viewModel.fullDescriptionController.text.trim().isEmpty) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a Full Description'),
-          backgroundColor: CustomColors.red,
-        ),
-      );
-      return false;
-    }
-    return true;
-  }
-
   bool _validateSubAreas(
     ScaffoldMessengerState scaffoldMessenger,
     TreatmentState state,
+    List<AreaModel> allAreas,
   ) {
-    for (final area in state.areas) {
-      if (area.subAreas.isEmpty) {
+    final cleanAreas = state.areas
+        .where((a) => a.areaController.text.trim().isNotEmpty)
+        .toList();
+
+    if (cleanAreas.isEmpty) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Please select a body area.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
+    final selectedAreaEntry = cleanAreas.first;
+    final mainAreaModel = allAreas.firstWhere(
+      (a) => a.name == selectedAreaEntry.areaController.text,
+      orElse: () => AreaModel(
+        id: 0,
+        name: '',
+        globalSku: '',
+        icon: '',
+        image: '',
+        subAreasCount: 0,
+      ),
+    );
+
+    if (mainAreaModel.id == 0) {
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Please select a valid body area.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
+    // Check if main area has subareas
+    if (mainAreaModel.subAreas.isNotEmpty) {
+      if (selectedAreaEntry.subAreas.isEmpty) {
         scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text(
-              "Please select at least one sub-area for '${area.areaController.text}'",
-            ),
+            content: Text('Please select a sub-area under ${mainAreaModel.name}.'),
             backgroundColor: CustomColors.red,
           ),
         );
         return false;
       }
+
+      final selectedSubAreaEntry = selectedAreaEntry.subAreas.first;
+      final subAreaModel = mainAreaModel.subAreas.firstWhere(
+        (s) => s.name == selectedSubAreaEntry.name,
+        orElse: () => AreaModel(
+          id: 0,
+          name: '',
+          globalSku: '',
+          icon: '',
+          image: '',
+          subAreasCount: 0,
+        ),
+      );
+
+      if (subAreaModel.id == 0) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text('Please select a valid sub-area under ${mainAreaModel.name}.'),
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+
+      // Check if subarea has further sub-subareas
+      if (subAreaModel.subAreas.isNotEmpty) {
+        if (selectedSubAreaEntry.children.isEmpty) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text('Please select a child area under ${subAreaModel.name}.'),
+              backgroundColor: CustomColors.red,
+            ),
+          );
+          return false;
+        }
+      }
     }
+
     return true;
   }
 }

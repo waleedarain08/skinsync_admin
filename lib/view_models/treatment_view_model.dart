@@ -997,7 +997,7 @@ Body                 : ${request.toJson()}
     return await runSafely<bool>(() async {
       await _treatmentRepository.createTreatmentArea(
         TreatmentAreaRequest(selectedAreaIds: state.selectedTreatmentAreaIds),
-        state.selectedTreatment!.id! ,
+        state.selectedTreatment!.id!,
       );
       log('Treatment Area Created : ${state.selectedTreatment!.id!}');
 

@@ -69,18 +69,15 @@ class AreasStep extends ConsumerWidget {
       viewModel.updateAreas([newEntry]);
     } else {
       final areaEntry = cleanAreas[index];
-      final subIndex = areaEntry.subAreas.indexWhere(
+      final isCurrentlySelected = areaEntry.subAreas.any(
         (s) => s.name == subArea.name,
       );
-      if (subIndex == -1) {
-        areaEntry.subAreas = [
-          ...areaEntry.subAreas,
-          SubAreaConfig(name: subArea.name, id: subArea.id),
-        ];
+      if (isCurrentlySelected) {
+        // Deselect
+        areaEntry.subAreas = [];
       } else {
-        areaEntry.subAreas = areaEntry.subAreas
-            .where((s) => s.name != subArea.name)
-            .toList();
+        // Exclusive single selection
+        areaEntry.subAreas = [SubAreaConfig(name: subArea.name, id: subArea.id)];
       }
       viewModel.updateAreas(cleanAreas);
     }
@@ -121,7 +118,6 @@ class AreasStep extends ConsumerWidget {
       );
       if (subIndex == -1) {
         areaEntry.subAreas = [
-          ...areaEntry.subAreas,
           SubAreaConfig(
             name: subArea.name,
             id: subArea.id,
@@ -130,18 +126,15 @@ class AreasStep extends ConsumerWidget {
         ];
       } else {
         final subConfig = areaEntry.subAreas[subIndex];
-        final childIndex = subConfig.children.indexWhere(
+        final isCurrentlySelected = subConfig.children.any(
           (c) => c.name == child.name,
         );
-        if (childIndex == -1) {
-          subConfig.children = [
-            ...subConfig.children,
-            SubAreaChildConfig(name: child.name),
-          ];
+        if (isCurrentlySelected) {
+          // Deselect
+          subConfig.children = [];
         } else {
-          subConfig.children = subConfig.children
-              .where((c) => c.name != child.name)
-              .toList();
+          // Exclusive single selection
+          subConfig.children = [SubAreaChildConfig(name: child.name)];
         }
       }
       viewModel.updateAreas(cleanAreas);

@@ -239,6 +239,21 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
   String? _focusedAreaName;
   String? _focusedSubAreaName;
 
+  @override
+  void initState() {
+    super.initState();
+    final cleanSelected = widget.selectedAreas
+        .where((a) => a.areaController.text.trim().isNotEmpty)
+        .toList();
+    if (cleanSelected.isNotEmpty) {
+      final selectedEntry = cleanSelected.first;
+      _focusedAreaName = selectedEntry.areaController.text.trim();
+      if (selectedEntry.subAreas.isNotEmpty) {
+        _focusedSubAreaName = selectedEntry.subAreas.first.name.trim();
+      }
+    }
+  }
+
   void _showAddNodeDialog({
     required BuildContext context,
     required String title,
