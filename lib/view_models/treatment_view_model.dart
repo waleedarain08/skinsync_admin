@@ -34,7 +34,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     TreatmentData.dummyTreatments,
   );
 
-  final TreatmentRepository _treatmentRepository = locator<TreatmentRepository>();
+  final TreatmentRepository _treatmentRepository =
+      locator<TreatmentRepository>();
   final CategoryRepository _categoryRepository = locator<CategoryRepository>();
 
   // Step 1 Controllers (Basic Info)
@@ -152,7 +153,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               state = state.copyWith(selectedTreatment: updated);
             }
 
-            await EasyLoading.showSuccess('Treatment status updated successfully');
+            await EasyLoading.showSuccess(
+              'Treatment status updated successfully',
+            );
             return true;
           },
         ) ??
@@ -320,7 +323,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   Future<bool> fetchAndPopulateCategoryDefaults(int categoryId) async {
     return await runSafely<bool>(showLoading: true, () async {
           final detail = await _categoryRepository.getCategoryDetail(
-            categoryId);
+            categoryId,
+          );
           state = state.copyWith(selectedCategoryDetail: detail);
           return true;
         }) ??
@@ -489,8 +493,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   void toggleTreatmentStatus(int treatmentId) {
     final index = _localTreatments.indexWhere((t) => t.id == treatmentId);
-    if (index != -1) {
-    }
+    if (index != -1) {}
 
     state = state.copyWith(
       treatments: List.from(_localTreatments),
@@ -649,10 +652,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     String? status,
     String? gender,
   }) {
-    state = state.copyWith(
-      areas: areas,
-      status: status,
-    );
+    state = state.copyWith(areas: areas, status: status);
   }
 
   List<int> _getDynamicSelectedAreaIds(List<AreaViewModelEntry> areas) {
