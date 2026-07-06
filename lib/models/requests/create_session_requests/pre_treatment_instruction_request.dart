@@ -10,6 +10,7 @@ class PreTreatmentInstructionsRequest {
   });
 
   Map<String, dynamic> toJson() => {
+    'step_number': 5,
     'keys': [CreateTreatmentSteps.preTreatmentInstructions.name],
     'pre_treatment_instructions': preTreatmentInstructions,
     'pre_treatment_attachments': preTreatmentAttachments == null

@@ -16,7 +16,7 @@ class StepPricingRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    'step_number': 6,
+    'step_number': 3,
     'keys': [CreateTreatmentSteps.pricing.name],
     'base_price': basePrice,
     'unit_price_overrides': unitPriceOverrides == null

@@ -6,6 +6,7 @@ class ConsentFormSelectionRequest {
   ConsentFormSelectionRequest({this.preTreatmentConsentForm});
 
   Map<String, dynamic> toJson() => {
+    'step_number': 12,
     'keys': [CreateTreatmentSteps.patientConsent.name],
     'pre_treatment_consent_form': preTreatmentConsentForm?.toJson(),
   };

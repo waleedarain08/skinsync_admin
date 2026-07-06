@@ -10,6 +10,7 @@ class PhaseNotificationsRequest {
   });
 
   Map<String, dynamic> toJson() => {
+    'step_number': 8,
     'keys': [CreateTreatmentSteps.phaseNotifications.name],
     'pre_notifications': List<dynamic>.from(
       preNotifications.map((x) => x.toJson()),

@@ -32,6 +32,7 @@ class TreatmentScheduleRequest {
   });
 
   Map<String, dynamic> toJson() => {
+    'step_number': 2,
     'keys': [CreateTreatmentSteps.scheduling.name],
     'base_duration': baseDuration,
     'prep_time': prepTime,

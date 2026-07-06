@@ -7,6 +7,7 @@ class DownTimeLevelRequest {
   DownTimeLevelRequest({this.downtimeLevel, this.downtimeDays});
 
   Map<String, dynamic> toJson() => {
+    'step_number': 9,
     'keys': [CreateTreatmentSteps.downtimeLevel.name],
     'downtime_level': downtimeLevel,
     'downtime_days': downtimeDays,

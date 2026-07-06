@@ -6,6 +6,7 @@ class FollowUpRequest {
   FollowUpRequest({required this.sessions});
 
   Map<String, dynamic> toJson() => {
+    'step_number': 15,
     'keys': [CreateTreatmentSteps.followUpSetup.name],
     'sessions': List<dynamic>.from(sessions.map((x) => x.toJson())),
   };

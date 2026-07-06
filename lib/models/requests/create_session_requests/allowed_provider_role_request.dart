@@ -6,6 +6,7 @@ class AllowedProviderRolesRequest {
   AllowedProviderRolesRequest({this.allowedRoles});
 
   Map<String, dynamic> toJson() => {
+    'step_number': 10,
     'keys': [CreateTreatmentSteps.allowedProviderRoles.name],
     'allowed_roles': allowedRoles == null
         ? []

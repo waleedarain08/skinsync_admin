@@ -7,6 +7,7 @@ class SessionsSetupRequest {
 
   Map<String, dynamic> toJson() {
     return {
+      'step_number': 14,
       'keys': [CreateTreatmentSteps.sessionsSetup.name],
       'total_sessions': totalSessions,
     };

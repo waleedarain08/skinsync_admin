@@ -10,6 +10,7 @@ class BusinessLogicRequest {
   });
 
   Map<String, dynamic> toJson() => {
+    'step_number': 17,
     'keys': [CreateTreatmentSteps.businessLogic.name],
     'enable_by_default': enableByDefault,
     'use_in_ai_simulator': useInAiSimulator,
