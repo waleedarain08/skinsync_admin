@@ -331,6 +331,7 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                             CustomPrimaryButton(
                               width: context.w(130),
                               onTap: () {
+                                sessionViewModel.setSessionId(sessionEntry.sessionId);
                                 sessionViewModel.setActiveSessionIndex(index);
                                 viewModel.setSessionStep(3);
                                 context.push(CreateSessionScreen.routeName);
