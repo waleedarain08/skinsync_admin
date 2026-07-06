@@ -955,40 +955,39 @@ Body                 : ${request.toJson()}
   }
 
  Future<bool?> callFollowUpConfig() async {
-    return await runSafely(() async {
-      final sessionId = state.sessionId;
-      if (sessionId == null) {
-        throw const UnknownException('Session not found!');
-      }
-      await _sessionRepository.followUpConfig(
-        id: sessionId,
-        request: FollowUpRequest(
-          sessions: state.sessions.map((session) {
-            return Session(
-              sessionNumber: session.sessionNumber,
-              followUps: session.followUps.map((followUp) {
-                return FollowUp(
-                  type: followUp.type,
-                  durationValue: num.parse(
-                    followUp.durationValueController.text,
-                  ),
-                  durationUnit: followUp.durationUnit,
-                  intervalValue: num.parse(
-                    followUp.intervalValueController.text,
-                  ),
-                  intervalUnit: followUp.intervalUnit,
-                  isImageRequired: followUp.isImageRequired,
-                  notes: followUp.notesController.text,
-                );
-              }).toList(),
-            );
-          }).toList(),
-        ),
-      );
-      return true;
-    });
-  }
+  return await runSafely(() async {
+    final sessionId = state.sessionId;
+    if (sessionId == null) {
+      throw const UnknownException('Session not found!');
+    }
 
+    await _sessionRepository.followUpConfig(
+      id: sessionId,
+      request: FollowUpRequest(
+        followUps: state.sessions
+            .expand((session) => session.followUps)
+            .map(
+              (followUp) => FollowUp(
+                type: followUp.type,
+                durationValue: num.parse(
+                  followUp.durationValueController.text,
+                ),
+                durationUnit: followUp.durationUnit,
+                intervalValue: num.parse(
+                  followUp.intervalValueController.text,
+                ),
+                intervalUnit: followUp.intervalUnit,
+                isImageRequired: followUp.isImageRequired,
+                notes: followUp.notesController.text,
+              ),
+            )
+            .toList(),
+      ),
+    );
+
+    return true;
+  });
+}
   void toggleProtocolSelection(
     String protocolId, {
     String? protocolName,
