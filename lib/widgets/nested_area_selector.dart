@@ -297,63 +297,189 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                         'Must follow pattern AAAA-1234 (4 letters, hyphen, 4 digits) and be unique.',
                   ),
                   context.verticalSpace(16),
-                  Text('Icon', style: context.fonts.black14w600),
-                  context.verticalSpace(8),
+                  context.verticalSpace(20),
                   Row(
                     children: [
-                      AppNetworkImage(
-                        imageUrl: iconUrl ?? '',
-                        width: 48,
-                        height: 48,
-                        borderRadius: BorderRadius.circular(8),
-                        fit: BoxFit.cover,
-                        errorIcon: Icons.image_outlined,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Area Icon', style: context.fonts.black14w600),
+                            context.verticalSpace(12),
+                            iconUrl == null || iconUrl!.isEmpty
+                                ? InkWell(
+                                    onTap: () async {
+                                      await ref.read(areaViewModelProvider.notifier).pickImage(true);
+                                      final uploaded = ref.read(areaViewModelProvider).areaIconUrl;
+                                      if (uploaded != null) {
+                                        setDialogState(() {
+                                          iconUrl = uploaded;
+                                        });
+                                      }
+                                    },
+                                    borderRadius: context.appBorderRadius(all: 12),
+                                    child: Container(
+                                      height: 110,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: CustomColors.whiteGrey,
+                                        borderRadius: context.appBorderRadius(all: 12),
+                                        border: Border.all(color: CustomColors.border),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.add_photo_alternate_outlined,
+                                            color: CustomColors.lightGrey,
+                                            size: 24,
+                                          ),
+                                          context.verticalSpace(4),
+                                          Text(
+                                            'Upload Icon',
+                                            style: context.fonts.grey11w400,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    height: 110,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: context.appBorderRadius(all: 12),
+                                      border: Border.all(color: CustomColors.border),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: context.appBorderRadius(all: 12),
+                                      child: Stack(
+                                        children: [
+                                          AppNetworkImage(
+                                            imageUrl: iconUrl!,
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          ),
+                                          Positioned(
+                                            top: 4,
+                                            right: 4,
+                                            child: InkWell(
+                                              onTap: () {
+                                                setDialogState(() {
+                                                  iconUrl = '';
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.delete_outline_rounded,
+                                                  color: CustomColors.red,
+                                                  size: 16,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                          ],
+                        ),
                       ),
-                      context.horizontalSpace(12),
-                      CustomOutlinedButton(
-                        onTap: () async {
-                          final state = ref.watch(areaViewModelProvider);
-                          await ref
-                              .read(areaViewModelProvider.notifier)
-                              .pickImage(false);
-                          if (state.areaIconUrl != null) {
-                            setDialogState(() {
-                              iconUrl = state.areaIconUrl;
-                              log('Icon URL: $iconUrl');
-                            });
-                          }
-                        },
-                        label: 'Upload Icon',
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  Row(
-                    children: [
-                      AppNetworkImage(
-                        imageUrl: imageUrl ?? '',
-                        width: 48,
-                        height: 48,
-                        borderRadius: BorderRadius.circular(8),
-                        fit: BoxFit.cover,
-                        errorIcon: Icons.image_outlined,
-                      ),
-                      context.horizontalSpace(12),
-                      CustomOutlinedButton(
-                        onTap: () async {
-                          final state = ref.watch(areaViewModelProvider);
-                          await ref
-                              .read(areaViewModelProvider.notifier)
-                              .pickImage(true);
-                          if (state.areaImageUrl != null) {
-                            log('Selected Image URL: $imageUrl');
-                            setDialogState(() {
-                              imageUrl = state.areaImageUrl;
-                              log('Selected Image URL: $imageUrl');
-                            });
-                          }
-                        },
-                        label: 'Upload Image',
+                      context.horizontalSpace(16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Banner Image', style: context.fonts.black14w600),
+                            context.verticalSpace(12),
+                            imageUrl == null || imageUrl!.isEmpty
+                                ? InkWell(
+                                    onTap: () async {
+                                      await ref.read(areaViewModelProvider.notifier).pickImage(false);
+                                      final uploaded = ref.read(areaViewModelProvider).areaImageUrl;
+                                      if (uploaded != null) {
+                                        setDialogState(() {
+                                          imageUrl = uploaded;
+                                        });
+                                      }
+                                    },
+                                    borderRadius: context.appBorderRadius(all: 12),
+                                    child: Container(
+                                      height: 110,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: CustomColors.whiteGrey,
+                                        borderRadius: context.appBorderRadius(all: 12),
+                                        border: Border.all(color: CustomColors.border),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.add_photo_alternate_outlined,
+                                            color: CustomColors.lightGrey,
+                                            size: 24,
+                                          ),
+                                          context.verticalSpace(4),
+                                          Text(
+                                            'Upload Image',
+                                            style: context.fonts.grey11w400,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    height: 110,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: context.appBorderRadius(all: 12),
+                                      border: Border.all(color: CustomColors.border),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: context.appBorderRadius(all: 12),
+                                      child: Stack(
+                                        children: [
+                                          AppNetworkImage(
+                                            imageUrl: imageUrl!,
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          ),
+                                          Positioned(
+                                            top: 4,
+                                            right: 4,
+                                            child: InkWell(
+                                              onTap: () {
+                                                setDialogState(() {
+                                                  imageUrl = '';
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.delete_outline_rounded,
+                                                  color: CustomColors.red,
+                                                  size: 16,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
