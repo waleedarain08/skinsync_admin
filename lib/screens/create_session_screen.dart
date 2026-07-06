@@ -352,7 +352,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       Icons.fact_check_outlined,
     ];
 
-    final int stepIndex = _getSessionOffsetStep(state.sessionStep);
+    final sessionState = ref.watch(sessionViewModelProvider);
+    final int stepIndex = _getSessionOffsetStep(sessionState.sessionStep);
     if (stepIndex < 0 || stepIndex >= titles.length) {
       return const SizedBox.shrink();
     }
