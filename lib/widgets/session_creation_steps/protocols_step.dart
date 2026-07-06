@@ -553,17 +553,27 @@ class _ProtocolNotesCardState extends State<ProtocolNotesCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.assignment_turned_in_outlined,
-                    color: CustomColors.purple,
-                    size: 20,
-                  ),
-                  context.horizontalSpace(12),
-                  Text(widget.protocol.title, style: context.fonts.black16w600),
-                ],
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.assignment_turned_in_outlined,
+                      color: CustomColors.purple,
+                      size: 20,
+                    ),
+                    context.horizontalSpace(12),
+                    Expanded(
+                      child: Text(
+                        widget.protocol.title,
+                        style: context.fonts.black16w600,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              context.horizontalSpace(16),
               TextButton.icon(
                 onPressed: () {
                   setState(() {
