@@ -32,15 +32,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   @override
   void initState() {
     super.initState();
-    // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    //   ref.read(categoryViewModelProvider.notifier).fetchCategories();
-    //   ref.read(productViewModelProvider.notifier).fetchProducts();
-    //   await ref.read(areaViewModelProvider.notifier).fetchAreas();
-    //   final fetchedAreas = ref.read(areaViewModelProvider).areas;
-    //   ref
-    //       .read(treatmentDataViewModelProvider.notifier)
-    //       .setAreasFromBackend(fetchedAreas);
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.read(sessionViewModelProvider.notifier).fetchProductsByTreatmentCategory();
+    });
   }
 
   int _getSessionOffsetStep(int sessionStep) {
