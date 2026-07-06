@@ -960,7 +960,6 @@ Body                 : ${request.toJson()}
     if (sessionId == null) {
       throw const UnknownException('Session not found!');
     }
-
     await _sessionRepository.followUpConfig(
       id: sessionId,
       request: FollowUpRequest(

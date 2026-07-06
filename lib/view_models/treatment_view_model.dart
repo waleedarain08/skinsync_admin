@@ -5,6 +5,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/basic_info_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/category_detail_response.dart';
@@ -255,7 +256,22 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(currentStep: step);
   }
 
-  
+  Future<bool?> callBusinessLogic() async {
+    return await runSafely(() async {
+      final treatmentId = state.draftTreatmentID;
+      if (treatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
+      await _treatmentRepository.businessLogic(
+        draftTreatmentId: treatmentId,
+        request: BusinessLogicRequest(
+          enableByDefault: state.enableByDefault,
+          useInAiSimulator: state.useInAiSimulator,
+        ),
+      );
+      return true;
+    });
+  }
 
   // ignore: avoid_positional_boolean_parameters
   Future<void> pickImage(bool isIcon) async {
