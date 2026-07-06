@@ -424,7 +424,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
 
     try {
       final response = await _sessionRepository.getProductsByTreatment(
-        treatmentState.selectedCategoryPath,
+        // treatmentState.selectedCategoryPath,
       );
       if (response.isSuccess) {
         state = state.copyWith(
