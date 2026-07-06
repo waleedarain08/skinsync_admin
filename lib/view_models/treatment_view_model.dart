@@ -255,9 +255,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(currentStep: step);
   }
 
-  void setSessionStep(int step) {
-    state = state.copyWith(sessionStep: step);
-  }
+  
 
   // ignore: avoid_positional_boolean_parameters
   Future<void> pickImage(bool isIcon) async {
@@ -713,7 +711,7 @@ class TreatmentState extends BaseStateModel {
   final int? selectedTreatmentId;
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
-  final int currentStep;
+  final int treatmentStep;
   final int sessionStep;
 
   final String? treatmentImageUrl;
@@ -739,7 +737,7 @@ class TreatmentState extends BaseStateModel {
     this.selectedTreatment,
     this.selectedTreatmentId,
     this.selectedCategoryDetail,
-    this.currentStep = 0,
+    this.treatmentStep = 0,
     this.sessionStep = 3,
     this.selectedCategoryPath = const [],
     this.status = 'active',
@@ -792,7 +790,7 @@ class TreatmentState extends BaseStateModel {
       filteredTreatments: filteredTreatments ?? this.filteredTreatments,
       selectedTreatment: selectedTreatment ?? this.selectedTreatment,
       selectedTreatmentId: selectedTreatmentId ?? this.selectedTreatmentId,
-      currentStep: currentStep ?? this.currentStep,
+      treatmentStep: currentStep ?? this.treatmentStep,
       sessionStep: sessionStep ?? this.sessionStep,
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,
