@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/create_session_screen.dart';
@@ -9,8 +10,32 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 
-class SessionsStep extends ConsumerWidget {
+class SessionsStep extends ConsumerStatefulWidget {
   const SessionsStep({super.key});
+
+  @override
+  ConsumerState<SessionsStep> createState() => _SessionsStepState();
+}
+
+class _SessionsStepState extends ConsumerState<SessionsStep> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final state = ref.read(treatmentViewModelProvider);
+      final treatmentId = state.selectedTreatment?.id;
+      final areaId = state.selectedTreatmentAreaIds.isNotEmpty
+          ? state.selectedTreatmentAreaIds.last
+          : null;
+
+      if (treatmentId != null && areaId != null) {
+        await ref.read(sessionViewModelProvider.notifier).fetchSessions(
+              treatmentId: treatmentId,
+              areaId: areaId,
+            );
+      }
+    });
+  }
 
   Widget _sectionTitle(BuildContext context, String title, {double? fontSize}) {
     return Text(
@@ -65,7 +90,11 @@ class SessionsStep extends ConsumerWidget {
     );
   }
 
-  void _showAddSessionDialog(BuildContext context, SessionViewModel sessionViewModel) {
+  void _showAddSessionDialog(
+    BuildContext context,
+    SessionViewModel sessionViewModel,
+    TreatmentState state,
+  ) {
     final titleController = TextEditingController();
     final numberController = TextEditingController();
 
@@ -105,14 +134,37 @@ class SessionsStep extends ConsumerWidget {
             SizedBox(
               width: context.w(120),
               child: CustomPrimaryButton(
-                onTap: () {
+                onTap: () async {
                   final title = titleController.text.trim();
                   final numVal = int.tryParse(numberController.text.trim()) ?? 1;
-                  sessionViewModel.addCustomSession(
-                    title.isEmpty ? 'Session $numVal' : title,
-                    numVal,
+
+                  final resolvedTitle = title.isEmpty ? 'Session $numVal' : title;
+                  final treatmentId = state.selectedTreatment?.id;
+                  if (treatmentId == null) {
+                    await EasyLoading.showError('Invalid treatment template. Please select one in Step 1.');
+                    return;
+                  }
+
+                  if (state.selectedTreatmentAreaIds.isEmpty) {
+                    await EasyLoading.showError('No body area selected. Please select one in Step 2.');
+                    return;
+                  }
+
+                  final areaId = state.selectedTreatmentAreaIds.last;
+
+                  final success = await sessionViewModel.createSession(
+                    treatmentId: treatmentId,
+                    areaId: areaId,
+                    title: resolvedTitle,
+                    sessionNumber: numVal,
                   );
-                  Navigator.of(context).pop();
+
+                  if (success == true) {
+                    await EasyLoading.showSuccess('Session created successfully!');
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  }
                 },
                 label: 'Add',
               ),
@@ -124,7 +176,8 @@ class SessionsStep extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final state = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
     final sessionState = ref.watch(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
@@ -147,7 +200,7 @@ class SessionsStep extends ConsumerWidget {
               ],
             ),
             ElevatedButton.icon(
-              onPressed: () => _showAddSessionDialog(context, sessionViewModel),
+              onPressed: () => _showAddSessionDialog(context, sessionViewModel, state),
               icon: const Icon(Icons.add, color: Colors.white, size: 18),
               label: Text(
                 'Add Session',
@@ -250,13 +303,18 @@ class SessionsStep extends ConsumerWidget {
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: CustomColors.red.withValues(alpha: 0.1),
+                                      color: (sessionEntry.status.toLowerCase() == 'completed'
+                                              ? CustomColors.green
+                                              : CustomColors.red)
+                                          .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
-                                    child: const Text(
-                                      'Pending Detail',
+                                    child: Text(
+                                      sessionEntry.status,
                                       style: TextStyle(
-                                        color: CustomColors.red,
+                                        color: sessionEntry.status.toLowerCase() == 'completed'
+                                            ? CustomColors.green
+                                            : CustomColors.red,
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -338,22 +396,31 @@ class SessionsStep extends ConsumerWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: CustomColors.green.withValues(alpha: 0.1),
+                              color: (sessionEntry.status.toLowerCase() == 'draft'
+                                      ? CustomColors.red
+                                      : CustomColors.green)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  Icons.check,
-                                  color: CustomColors.green,
+                                  sessionEntry.status.toLowerCase() == 'draft'
+                                      ? Icons.close
+                                      : Icons.check,
+                                  color: sessionEntry.status.toLowerCase() == 'draft'
+                                      ? CustomColors.red
+                                      : CustomColors.green,
                                   size: 10,
                                 ),
-                                SizedBox(width: 4),
+                                const SizedBox(width: 4),
                                 Text(
-                                  'Details Entered',
+                                  sessionEntry.status,
                                   style: TextStyle(
-                                    color: CustomColors.green,
+                                    color: sessionEntry.status.toLowerCase() == 'draft'
+                                        ? CustomColors.red
+                                        : CustomColors.green,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                   ),

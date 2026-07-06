@@ -5,6 +5,7 @@ import 'package:skinsync_admin/models/responses/treatment_products_response.dart
 import 'package:skinsync_admin/screens/product_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
+import 'package:skinsync_admin/view_models/session_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
@@ -530,7 +531,7 @@ class MaterialsStep extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(treatmentViewModelProvider);
-    final viewModel = ref.read(treatmentViewModelProvider.notifier);
+    final viewModel = ref.read(sessionViewModelProvider.notifier);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

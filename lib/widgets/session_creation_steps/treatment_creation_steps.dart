@@ -3,7 +3,7 @@ export '../treatment_creation_steps/category_step.dart';
 export 'consent_step.dart';
 export 'downtime_step.dart';
 export 'follow_up_step.dart';
-export 'logic_step.dart';
+export '../treatment_creation_steps/logic_step.dart';
 export 'materials_step.dart';
 export 'notifications_step.dart';
 export 'post_instructions_step.dart';

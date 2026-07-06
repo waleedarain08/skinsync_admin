@@ -10,9 +10,9 @@ import '../utils/theme.dart';
 import '../view_models/area_view_model.dart';
 import '../view_models/category_view_model.dart';
 import '../view_models/product_view_model.dart';
+import '../view_models/session_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
-import '../view_models/session_view_model.dart';
 import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/gradient_scaffold.dart';
@@ -33,8 +33,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ref.read(categoryViewModelProvider.notifier).fetchCategories();
-      ref.read(productViewModelProvider.notifier).fetchProducts();
+      await ref.read(categoryViewModelProvider.notifier).fetchCategories();
+      await ref.read(productViewModelProvider.notifier).fetchProducts();
       await ref.read(areaViewModelProvider.notifier).fetchAreas();
       final fetchedAreas = ref.read(areaViewModelProvider).areas;
       ref
@@ -367,6 +367,24 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               }
 
               if (state.currentStep == 2) {
+                if (state.selectedTreatment?.id == null) {
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Please select a valid treatment template in Step 1.'),
+                      backgroundColor: CustomColors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (state.selectedTreatmentAreaIds.isEmpty) {
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Please select at least one treatment area before continuing.'),
+                      backgroundColor: CustomColors.red,
+                    ),
+                  );
+                  return;
+                }
                 if (!_validateSubAreas(scaffoldMessenger, state, dataState.areas)) return;
                 final result = await ref.read(treatmentViewModelProvider.notifier).createTreatmentArea();
                 if(result ==true){
@@ -387,11 +405,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   return;
                 }
 
-                final bool allSessionsDetailed = sessionState.sessions.every((s) => s.isDetailedEntered);
-                if (!allSessionsDetailed) {
+                final bool hasDraftSession = sessionState.sessions.any((s) => s.status.toLowerCase() == 'draft');
+                if (hasDraftSession) {
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
-                      content: Text('Please enter details for all sessions before continuing.'),
+                      content: Text('Please configure all sessions. Some sessions are still in Draft status.'),
                       backgroundColor: CustomColors.red,
                     ),
                   );
@@ -404,16 +422,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               }
 
               if (state.currentStep == 4) {
-                viewModel
-                    .submitTreatment(
-                      context,
-                      categories: categoryState.categories,
-                    )
-                    .then((_) {
-                      if (context.mounted) {
-                        context.go('/treatment-management');
-                      }
-                    });
+                await viewModel.submitTreatment(
+                  context,
+                  categories: categoryState.categories,
+                );
+                if (context.mounted) {
+                  context.go('/treatment-management');
+                }
               }
             },
             label: state.currentStep == 4

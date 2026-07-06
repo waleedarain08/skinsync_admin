@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/responses/category_detail_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/view_models/session_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 
 class DowntimeStep extends ConsumerWidget {
@@ -88,7 +89,7 @@ class DowntimeStep extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(treatmentViewModelProvider);
-    final viewModel = ref.read(treatmentViewModelProvider.notifier);
+    final viewModel = ref.read(sessionViewModelProvider.notifier);
     final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
     final presets = selectedCategory?.downtimePresets;
     final lowDays = presets?.low ?? 2;

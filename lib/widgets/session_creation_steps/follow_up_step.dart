@@ -272,7 +272,7 @@ class FollowUpStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.read(treatmentViewModelProvider.notifier);
+    final viewModel = ref.read(sessionViewModelProvider.notifier);
     final sessionState = ref.watch(sessionViewModelProvider);
 
     final int sIdx = sessionState.activeSessionIndex ?? 0;

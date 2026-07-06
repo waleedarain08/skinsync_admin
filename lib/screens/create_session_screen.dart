@@ -8,9 +8,7 @@ import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
 import '../utils/list_utils.dart';
 import '../utils/theme.dart';
-import '../view_models/area_view_model.dart';
 import '../view_models/category_view_model.dart';
-import '../view_models/product_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
 import '../view_models/session_view_model.dart';
@@ -34,15 +32,15 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ref.read(categoryViewModelProvider.notifier).fetchCategories();
-      ref.read(productViewModelProvider.notifier).fetchProducts();
-      await ref.read(areaViewModelProvider.notifier).fetchAreas();
-      final fetchedAreas = ref.read(areaViewModelProvider).areas;
-      ref
-          .read(treatmentDataViewModelProvider.notifier)
-          .setAreasFromBackend(fetchedAreas);
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   ref.read(categoryViewModelProvider.notifier).fetchCategories();
+    //   ref.read(productViewModelProvider.notifier).fetchProducts();
+    //   await ref.read(areaViewModelProvider.notifier).fetchAreas();
+    //   final fetchedAreas = ref.read(areaViewModelProvider).areas;
+    //   ref
+    //       .read(treatmentDataViewModelProvider.notifier)
+    //       .setAreasFromBackend(fetchedAreas);
+    // });
   }
 
   int _getSessionOffsetStep(int sessionStep) {
@@ -532,12 +530,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     TreatmentViewModel viewModel,
   ) {
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final baseDuration =
-        double.tryParse(viewModel.treatmentDurationController.text) ?? 0.0;
+        double.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0.0;
     final productDuration = _calculateProductUsageDuration(state);
-    final prepTime = double.tryParse(viewModel.prepTimeController.text) ?? 0.0;
+    final prepTime = double.tryParse(sessionViewModel.prepTimeController.text) ?? 0.0;
     final cleanupTime =
-        double.tryParse(viewModel.cleanupTimeController.text) ?? 0.0;
+        double.tryParse(sessionViewModel.cleanupTimeController.text) ?? 0.0;
     final totalDuration =
         baseDuration + productDuration + prepTime + cleanupTime;
 
@@ -595,12 +594,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           _blueprintRow(
             context,
             'Minimum Booking Notice',
-            "${viewModel.minimumBookingNoticeController.text.isEmpty ? '24' : viewModel.minimumBookingNoticeController.text} Hours",
+            "${sessionViewModel.minimumBookingNoticeController.text.isEmpty ? '24' : sessionViewModel.minimumBookingNoticeController.text} Hours",
           ),
           _blueprintRow(
             context,
             'Maximum Days in Advance',
-            "${viewModel.maximumDaysInAdvanceController.text.isEmpty ? '90' : viewModel.maximumDaysInAdvanceController.text} Days",
+            "${sessionViewModel.maximumDaysInAdvanceController.text.isEmpty ? '90' : sessionViewModel.maximumDaysInAdvanceController.text} Days",
           ),
         ],
       ),
@@ -658,6 +657,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     CategoryDetailDto? selectedCategory,
   ) {
     final sessionState = ref.watch(sessionViewModelProvider);
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final basicOk =
         viewModel.validateGlobalSku(
               viewModel.globalSkuController.text.trim(),
@@ -665,8 +665,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
             null &&
         viewModel.categoryIdController.text.isNotEmpty;
     final schedOk =
-        viewModel.treatmentDurationController.text.isNotEmpty &&
-        (int.tryParse(viewModel.treatmentDurationController.text) ?? 0) > 0;
+        sessionViewModel.treatmentDurationController.text.isNotEmpty &&
+        (int.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0) > 0;
     final areasOk = state.areas.any((a) => a.areaController.text.isNotEmpty);
     final sessionsOk = state.totalSessions > 0;
     final followUpsOk = sessionState.sessions.any((s) => s.followUps.isNotEmpty);
@@ -680,7 +680,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         state.preNotificationOffset != null ||
         state.postNotificationOffset != null;
     final productsOk = state.productUsageEntries.isNotEmpty;
-    final pricingOk = viewModel.basePriceController.text.isNotEmpty;
+    final pricingOk = sessionViewModel.basePriceController.text.isNotEmpty;
     final rolesOk =
         state.providerRolesSource == 'category' ||
         state.selectedRoles.isNotEmpty;
@@ -970,9 +970,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       consentFileName =
           selectedCategory?.consentFormName ?? 'Category Consent Form';
     } else {
-      consentFileName =
-          state.preTreatmentConsentForm?.name ??
-          state.existingConsentForm?.name ??
+      final dynamic preForm = state.preTreatmentConsentForm;
+      final dynamic exForm = state.existingConsentForm;
+      consentFileName = (preForm?.name as String?) ??
+          (exForm?.name as String?) ??
           'No PDF uploaded';
     }
 
@@ -998,8 +999,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     TreatmentViewModel viewModel,
   ) {
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final hasInstructions =
-        viewModel.preTreatmentInstructionsController.text.isNotEmpty;
+        sessionViewModel.preTreatmentInstructionsController.text.isNotEmpty;
     final instructionsText = hasInstructions ? 'Configured' : 'None';
 
     final allPre = [...state.existingPreAttachments];
@@ -1230,7 +1232,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     TreatmentViewModel viewModel,
   ) {
-    final basePrice = viewModel.basePriceController.text;
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
+    final basePrice = sessionViewModel.basePriceController.text;
 
     final uniqueUnits = state.productUsageEntries
         .map((e) => e.unit)
@@ -1239,7 +1242,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         .toList();
 
     final configuredUnits = uniqueUnits.where((u) {
-      final ctrl = viewModel.getControllerForUnit(u);
+      final ctrl = sessionViewModel.getControllerForUnit(u);
       return ctrl.text.isNotEmpty && ctrl.text != '0';
     }).toList();
 
@@ -1265,7 +1268,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
             context.verticalSpace(12),
             Text('Unit Pricing Overrides:', style: context.fonts.black12w600),
             ...configuredUnits.map((unit) {
-              final ctrl = viewModel.getControllerForUnit(unit);
+              final ctrl = sessionViewModel.getControllerForUnit(unit);
               final formattedUnit = unit.isNotEmpty
                   ? (unit[0].toUpperCase() + unit.substring(1))
                   : unit;
@@ -1385,6 +1388,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     CategoryState categoryState,
   ) {
     final sessionState = ref.watch(sessionViewModelProvider);
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
 
     final int totalFus = sessionState.sessions.fold(0, (sum, s) => sum + s.followUps.length);
 
@@ -1401,12 +1405,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           _previewRow(
             context,
             'Instructions',
-            viewModel.preTreatmentInstructionsController.text.isNotEmpty,
+            sessionViewModel.preTreatmentInstructionsController.text.isNotEmpty,
           ),
           _previewRow(
             context,
             'Aftercare',
-            viewModel.postTreatmentInstructionsController.text.isNotEmpty,
+            sessionViewModel.postTreatmentInstructionsController.text.isNotEmpty,
           ),
           _previewRow(
             context,
@@ -1670,6 +1674,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentViewModel viewModel,
     TreatmentState state,
   ) {
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -1724,7 +1729,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                       ),
                     ),
                     Text(
-                      "\$${viewModel.basePriceController.text.isEmpty ? "0" : viewModel.basePriceController.text}",
+                      "\$${sessionViewModel.basePriceController.text.isEmpty ? "0" : sessionViewModel.basePriceController.text}",
                       style: context.fonts.purple16w700,
                     ),
                   ],
@@ -1750,7 +1755,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                     ),
                     context.horizontalSpace(8),
                     Text(
-                      '${viewModel.durationHoursController.text}h ${viewModel.durationMinutesController.text}m',
+                      '${sessionViewModel.durationHoursController.text}h ${sessionViewModel.durationMinutesController.text}m',
                       style: context.fonts.black12w600,
                     ),
                     const Spacer(),
@@ -2090,12 +2095,12 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 }
               } else {
                 final durationText =
-                    '${viewModel.treatmentDurationController.text} mins (Prep: ${viewModel.prepTimeController.text}m, Clean: ${viewModel.cleanupTimeController.text}m)';
-                final priceText = '\$${viewModel.basePriceController.text}';
+                    '${sessionViewModel.treatmentDurationController.text} mins (Prep: ${sessionViewModel.prepTimeController.text}m, Clean: ${sessionViewModel.cleanupTimeController.text}m)';
+                final priceText = '\$${sessionViewModel.basePriceController.text}';
 
                 final protocols = state.selectedProtocolIds.toList();
-                final preInstructions = viewModel.preTreatmentInstructionsController.text;
-                final postInstructions = viewModel.postTreatmentInstructionsController.text;
+                final preInstructions = sessionViewModel.preTreatmentInstructionsController.text;
+                final postInstructions = sessionViewModel.postTreatmentInstructionsController.text;
 
                 final preNotifs = state.preNotificationEntries
                     .map(
@@ -2223,8 +2228,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
 
   bool _validateScheduling(BuildContext context, TreatmentViewModel viewModel) {
     final state = ref.read(treatmentViewModelProvider);
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     if (state.isFixedDuration) {
-      if (viewModel.fixedDurationController.text.isEmpty) {
+      if (sessionViewModel.fixedDurationController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please enter a valid fixed duration'),
@@ -2234,7 +2240,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         return false;
       }
       final duration =
-          int.tryParse(viewModel.fixedDurationController.text) ?? 0;
+          int.tryParse(sessionViewModel.fixedDurationController.text) ?? 0;
       if (duration <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -2247,7 +2253,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       return true;
     }
 
-    if (viewModel.treatmentDurationController.text.isEmpty) {
+    if (sessionViewModel.treatmentDurationController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter a valid treatment duration'),
@@ -2257,7 +2263,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       return false;
     }
     final duration =
-        int.tryParse(viewModel.treatmentDurationController.text) ?? 0;
+        int.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0;
     if (duration <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

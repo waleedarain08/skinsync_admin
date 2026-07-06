@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -281,14 +281,14 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     }
   }
 
-  List<DropdownMenuItem<int>> getProductDropdownItems() {
-    return state.products
-        .map(
-          (prod) =>
-              DropdownMenuItem(value: prod.id ?? 0, child: Text(prod.name)),
-        )
-        .toList();
-  }
+  // List<DropdownMenuItem<int>> getProductDropdownItems() {
+  //   return state.products
+  //       .map(
+  //         (prod) =>
+  //             DropdownMenuItem(value: prod.id ?? 0, child: Text(prod.name)),
+  //       )
+  //       .toList();
+  // }
 
   // CRUD Actions backed by the actual API repository
   Future<bool?> createProduct(ProductModel req) async {

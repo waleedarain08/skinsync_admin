@@ -48,6 +48,8 @@ enum Endpoint {
   usageType('admin/usage-types'),
   treatmentArea('admin/treatments/step'),
   adminTreatments('admin/treatments/list'),
+  createSession('admin/sessions'),
+  sessionsList('admin/sessions/list'),
   treatmentDetail('admin/treatments/{id}'),
   updateTreatment('admin/treatments/update'),
   manufacturersList('admin/manufacturers'),
