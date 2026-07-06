@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:skinsync_admin/models/notification_entry.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/basic_info_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/category_detail_response.dart';
-import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
@@ -18,7 +16,6 @@ import 'package:skinsync_admin/repositories/treatment_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/exception.dart';
-import 'session_view_model.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 import 'category_view_model.dart';
@@ -188,25 +185,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       useInAiSimulator: false,
       enableByDefault: false,
       status: 'active',
-      productUsageEntries: [],
-      products: [],
-      preNotificationEntries: [],
-      postNotificationEntries: [],
-      selectedProtocolIds: [],
-      selectedProtocolNotes: [],
-      standaloneNotes: [],
-      selectedRoles: [],
-      providerRolesSource: 'Category_Default',
-      allowClinicOverride: false,
-      allowProviderOverride: false,
-      onlineBookable: false,
-      manualApprovalRequired: false,
-      isFixedDuration: false,
-      totalSessions: 0,
-      preNotificationOffset: null,
-      postNotificationOffset: null,
-      sessionSource: 'custom',
-      isFollowUpRequired: false,
     );
   }
 
@@ -668,8 +646,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   void updateTreatmentState({
     List<AreaViewModelEntry>? areas,
-    bool? requirePostTreatmentPhotos,
-    int? requiredPostTreatmentPhotoCount,
     String? status,
     String? gender,
   }) {
@@ -728,180 +704,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     final dynamicIds = _getDynamicSelectedAreaIds(areas);
     state = state.copyWith(areas: areas, selectedTreatmentAreaIds: dynamicIds);
   }
-
-  // Getters/methods delegate (Required by SessionViewModel)
-  Future<void> pickConsentForm() async {
-    // Consent form picking logic
-  }
-
-  void removeConsentForm() {
-    state = state.copyWith(preTreatmentConsentForm: null, existingConsentForm: null);
-  }
-
-  // Delegated Session Methods (Forwards calls to SessionViewModel)
-  void addProductUsage(int productId, String productName, String unit) {
-    ref.read(sessionViewModelProvider.notifier).addProductUsage(productId, productName, unit);
-  }
-
-  void updateProductUsageEntry(
-    int index, {
-    String? usageType,
-    String? deductionTiming,
-    bool? allowSubstitution,
-    String? minQty,
-    String? maxQuantity,
-    String? usageDuration,
-    String? usageDose,
-    String? usageUnit,
-    String? frequencyValue,
-    String? frequencyInterval,
-    String? instruction,
-    String? usageTypeVal,
-    String? minQuantity,
-  }) {
-    ref.read(sessionViewModelProvider.notifier).updateProductUsageEntry(
-      index,
-      usageType: usageType,
-      deductionTiming: deductionTiming,
-      allowSubstitution: allowSubstitution,
-      minQty: minQty,
-      maxQuantity: maxQuantity,
-      usageDuration: usageDuration,
-      usageDose: usageDose,
-      usageUnit: usageUnit,
-      frequencyValue: frequencyValue,
-      frequencyInterval: frequencyInterval,
-      instruction: instruction,
-      usageTypeVal: usageTypeVal,
-      minQuantity: minQuantity,
-    );
-  }
-
-  void updateProductPerUnitDuration(int index, String durationVal) {
-    ref.read(sessionViewModelProvider.notifier).updateProductPerUnitDuration(index, durationVal);
-  }
-
-  void removeProductUsage(int productId) {
-    ref.read(sessionViewModelProvider.notifier).removeProductUsage(productId);
-  }
-
-  void updateSessionFollowUpEntry(
-    int sessionIndex,
-    int fuIndex, {
-    String? type,
-    String? durationUnit,
-    String? intervalUnit,
-    bool? isImageRequired,
-  }) {
-    ref.read(sessionViewModelProvider.notifier).updateSessionFollowUpEntry(
-      sessionIndex,
-      fuIndex,
-      type: type,
-      durationUnit: durationUnit,
-      intervalUnit: intervalUnit,
-      isImageRequired: isImageRequired,
-    );
-  }
-
-  void updateStandaloneNotes(List<TreatmentProtocolNoteItem> notes) {
-    ref.read(sessionViewModelProvider.notifier).updateStandaloneNotes(notes);
-  }
-
-  void addPreNotificationEntry() {
-    ref.read(sessionViewModelProvider.notifier).addPreNotificationEntry();
-  }
-
-  void removePreNotificationEntry(int index) {
-    ref.read(sessionViewModelProvider.notifier).removePreNotificationEntry(index);
-  }
-
-  void addPostNotificationEntry() {
-    ref.read(sessionViewModelProvider.notifier).addPostNotificationEntry();
-  }
-
-  void removePostNotificationEntry(int index) {
-    ref.read(sessionViewModelProvider.notifier).removePostNotificationEntry(index);
-  }
-
-  void updateRequiredPostTreatmentPhotoCount(String value) {
-    ref.read(sessionViewModelProvider.notifier).updateRequiredPostTreatmentPhotoCount(value);
-  }
-
-  void setConsentType(String type) {
-    ref.read(sessionViewModelProvider.notifier).setConsentType(type);
-  }
-
-  void removeExistingAttachment(bool isPreTreatment, int index) {
-    ref.read(sessionViewModelProvider.notifier).removeExistingAttachment(isPreTreatment, index);
-  }
-
-  void pickAttachments(bool isPreTreatment) {
-    ref.read(sessionViewModelProvider.notifier).pickAttachments(isPreTreatment);
-  }
-
-  void toggleRole(String role) {
-    ref.read(sessionViewModelProvider.notifier).toggleRole(role);
-  }
-
-  void setRoles(List<String> roles) {
-    ref.read(sessionViewModelProvider.notifier).setRoles(roles);
-  }
-
-  void updateSessionFollowUpCount(int sessionIndex, String val) {
-    ref.read(sessionViewModelProvider.notifier).updateSessionFollowUpCount(sessionIndex, val);
-  }
-
-  void toggleRequirePostTreatmentPhotos(bool? value) {
-    ref.read(sessionViewModelProvider.notifier).toggleRequirePostTreatmentPhotos(value);
-  }
-
-  void toggleAllowClinicOverride(bool? val) {
-    ref.read(sessionViewModelProvider.notifier).toggleAllowClinicOverride(val);
-  }
-
-  void toggleAllowProviderOverride(bool? val) {
-    ref.read(sessionViewModelProvider.notifier).toggleAllowProviderOverride(val);
-  }
-
-  void toggleOnlineBookable(bool? val) {
-    ref.read(sessionViewModelProvider.notifier).toggleOnlineBookable(val);
-  }
-
-  void toggleManualApprovalRequired(bool? val) {
-    ref.read(sessionViewModelProvider.notifier).toggleManualApprovalRequired(val);
-  }
-
-  void toggleIsFixedDuration(bool? val) {
-    ref.read(sessionViewModelProvider.notifier).toggleIsFixedDuration(val);
-  }
-
-  void setPreNotificationSource(String source, {dynamic category}) {
-    ref.read(sessionViewModelProvider.notifier).setPreNotificationSource(source, category: category);
-  }
-
-  void setPostNotificationSource(String source, {dynamic category}) {
-    ref.read(sessionViewModelProvider.notifier).setPostNotificationSource(source, category: category);
-  }
-
-  void setDowntimeLevel(String level) {
-    ref.read(sessionViewModelProvider.notifier).setDowntimeLevel(level);
-  }
-
-  void setProviderRolesSource(String source) {
-    ref.read(sessionViewModelProvider.notifier).setProviderRolesSource(source);
-  }
-
-  void toggleProtocolSelection(
-    String protocolId, {
-    String? protocolName,
-    List<ProtocolItem>? masterProtocols,
-  }) {
-    ref.read(sessionViewModelProvider.notifier).toggleProtocolSelection(
-          protocolId,
-          protocolName: protocolName,
-          masterProtocols: masterProtocols,
-        );
-  }
 }
 
 class TreatmentState extends BaseStateModel {
@@ -927,50 +729,6 @@ class TreatmentState extends BaseStateModel {
 
   final List<int> selectedTreatmentAreaIds;
 
-  // Session step state fields (Maintained in TreatmentState for Step Widgets compatibility)
-  final List<SessionViewModelEntry> sessions;
-  final int activeSessionIndex;
-  final List<ProductUsageEntry> productUsageEntries;
-  final List<TreatmentProductData> products;
-  final bool isLoadingProducts;
-  final String? error;
-
-  final List<String> selectedProtocolIds;
-  final List<TreatmentProtocolNote> selectedProtocolNotes;
-  final List<TreatmentProtocolNoteItem> standaloneNotes;
-
-  final String preNotificationSource;
-  final String postNotificationSource;
-  final List<NotificationEntry> preNotificationEntries;
-  final List<NotificationEntry> postNotificationEntries;
-
-  final bool requirePostTreatmentPhotos;
-  final int requiredPostTreatmentPhotoCount;
-
-  final String consentType;
-  final dynamic preTreatmentConsentForm;
-  final dynamic existingConsentForm;
-  final String consentFormUrl;
-
-  final List<Attachment> existingPreAttachments;
-  final List<Attachment> existingPostAttachments;
-
-  final String downtimeLevel;
-  final List<String> selectedRoles;
-
-  final String providerRolesSource;
-  final bool allowClinicOverride;
-  final bool allowProviderOverride;
-  final bool onlineBookable;
-  final bool manualApprovalRequired;
-  final bool isFixedDuration;
-
-  final int totalSessions;
-  final int? preNotificationOffset;
-  final int? postNotificationOffset;
-  final String sessionSource;
-  final bool isFollowUpRequired;
-
   TreatmentState({
     super.loading,
     super.currentPage,
@@ -993,43 +751,6 @@ class TreatmentState extends BaseStateModel {
     this.enableByDefault = false,
     List<AreaViewModelEntry>? areas,
     this.selectedTreatmentAreaIds = const [],
-
-    // Session fields
-    this.sessions = const [],
-    this.activeSessionIndex = 0,
-    this.productUsageEntries = const [],
-    this.products = const [],
-    this.isLoadingProducts = false,
-    this.error,
-    this.selectedProtocolIds = const [],
-    this.selectedProtocolNotes = const [],
-    this.standaloneNotes = const [],
-    this.preNotificationSource = 'Category_Default',
-    this.postNotificationSource = 'Category_Default',
-    this.preNotificationEntries = const [],
-    this.postNotificationEntries = const [],
-    this.requirePostTreatmentPhotos = false,
-    this.requiredPostTreatmentPhotoCount = 0,
-    this.consentType = 'No_Consent',
-    this.preTreatmentConsentForm,
-    this.existingConsentForm,
-    this.consentFormUrl = '',
-    this.existingPreAttachments = const [],
-    this.existingPostAttachments = const [],
-    this.downtimeLevel = 'No_Downtime',
-    this.selectedRoles = const [],
-    this.providerRolesSource = 'Category_Default',
-    this.allowClinicOverride = false,
-    this.allowProviderOverride = false,
-    this.onlineBookable = false,
-    this.manualApprovalRequired = false,
-    this.isFixedDuration = false,
-
-    this.totalSessions = 0,
-    this.preNotificationOffset,
-    this.postNotificationOffset,
-    this.sessionSource = 'custom',
-    this.isFollowUpRequired = false,
   }) : areas = areas ?? [AreaViewModelEntry()];
 
   TreatmentState copyWith({
@@ -1058,43 +779,6 @@ class TreatmentState extends BaseStateModel {
     bool clearTreatmentIconUrl = false,
     String? treatmentImageUrl,
     String? treatmentIconUrl,
-
-    // Session fields copyWith
-    List<SessionViewModelEntry>? sessions,
-    int? activeSessionIndex,
-    List<ProductUsageEntry>? productUsageEntries,
-    List<TreatmentProductData>? products,
-    bool? isLoadingProducts,
-    String? error,
-    List<String>? selectedProtocolIds,
-    List<TreatmentProtocolNote>? selectedProtocolNotes,
-    List<TreatmentProtocolNoteItem>? standaloneNotes,
-    String? preNotificationSource,
-    String? postNotificationSource,
-    List<NotificationEntry>? preNotificationEntries,
-    List<NotificationEntry>? postNotificationEntries,
-    bool? requirePostTreatmentPhotos,
-    int? requiredPostTreatmentPhotoCount,
-    String? consentType,
-    dynamic preTreatmentConsentForm,
-    dynamic existingConsentForm,
-    String? consentFormUrl,
-    List<Attachment>? existingPreAttachments,
-    List<Attachment>? existingPostAttachments,
-    String? downtimeLevel,
-    List<String>? selectedRoles,
-    String? providerRolesSource,
-    bool? allowClinicOverride,
-    bool? allowProviderOverride,
-    bool? onlineBookable,
-    bool? manualApprovalRequired,
-    bool? isFixedDuration,
-
-    int? totalSessions,
-    int? preNotificationOffset,
-    int? postNotificationOffset,
-    String? sessionSource,
-    bool? isFollowUpRequired,
   }) {
     return TreatmentState(
       selectedCategoryDetail:
@@ -1124,43 +808,6 @@ class TreatmentState extends BaseStateModel {
       treatmentIconUrl: clearTreatmentIconUrl
           ? null
           : (treatmentIconUrl ?? this.treatmentIconUrl),
-
-      // Session fields mapping
-      sessions: sessions ?? this.sessions,
-      activeSessionIndex: activeSessionIndex ?? this.activeSessionIndex,
-      productUsageEntries: productUsageEntries ?? this.productUsageEntries,
-      products: products ?? this.products,
-      isLoadingProducts: isLoadingProducts ?? this.isLoadingProducts,
-      error: error ?? this.error,
-      selectedProtocolIds: selectedProtocolIds ?? this.selectedProtocolIds,
-      selectedProtocolNotes: selectedProtocolNotes ?? this.selectedProtocolNotes,
-      standaloneNotes: standaloneNotes ?? this.standaloneNotes,
-      preNotificationSource: preNotificationSource ?? this.preNotificationSource,
-      postNotificationSource: postNotificationSource ?? this.postNotificationSource,
-      preNotificationEntries: preNotificationEntries ?? this.preNotificationEntries,
-      postNotificationEntries: postNotificationEntries ?? this.postNotificationEntries,
-      requirePostTreatmentPhotos: requirePostTreatmentPhotos ?? this.requirePostTreatmentPhotos,
-      requiredPostTreatmentPhotoCount: requiredPostTreatmentPhotoCount ?? this.requiredPostTreatmentPhotoCount,
-      consentType: consentType ?? this.consentType,
-      preTreatmentConsentForm: preTreatmentConsentForm ?? this.preTreatmentConsentForm,
-      existingConsentForm: existingConsentForm ?? this.existingConsentForm,
-      consentFormUrl: consentFormUrl ?? this.consentFormUrl,
-      existingPreAttachments: existingPreAttachments ?? this.existingPreAttachments,
-      existingPostAttachments: existingPostAttachments ?? this.existingPostAttachments,
-      downtimeLevel: downtimeLevel ?? this.downtimeLevel,
-      selectedRoles: selectedRoles ?? this.selectedRoles,
-      providerRolesSource: providerRolesSource ?? this.providerRolesSource,
-      allowClinicOverride: allowClinicOverride ?? this.allowClinicOverride,
-      allowProviderOverride: allowProviderOverride ?? this.allowProviderOverride,
-      onlineBookable: onlineBookable ?? this.onlineBookable,
-      manualApprovalRequired: manualApprovalRequired ?? this.manualApprovalRequired,
-      isFixedDuration: isFixedDuration ?? this.isFixedDuration,
-
-      totalSessions: totalSessions ?? this.totalSessions,
-      preNotificationOffset: preNotificationOffset ?? this.preNotificationOffset,
-      postNotificationOffset: postNotificationOffset ?? this.postNotificationOffset,
-      sessionSource: sessionSource ?? this.sessionSource,
-      isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
     );
   }
 }

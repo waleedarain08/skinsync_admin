@@ -45,7 +45,7 @@ class MaterialsStep extends ConsumerWidget {
   Widget _buildProductSelector(
     BuildContext context,
     List<TreatmentProductData> products,
-    TreatmentViewModel viewModel,
+    SessionViewModel viewModel,
     TreatmentState state,
   ) {
     return Column(
@@ -109,14 +109,15 @@ class MaterialsStep extends ConsumerWidget {
     WidgetRef ref,
     int index,
     ProductUsageEntry entry,
-    TreatmentViewModel viewModel,
+    SessionViewModel viewModel,
     TreatmentState state,
   ) {
     final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
 
+    final sessionState = ref.read(sessionViewModelProvider);
     final TreatmentProductData? productData =
-        state.products.any((p) => p.id == entry.productId)
-        ? state.products.firstWhere((p) => p.id == entry.productId)
+        sessionState.products.any((p) => p.id == entry.productId)
+        ? sessionState.products.firstWhere((p) => p.id == entry.productId)
         : null;
 
     final String cleanStatus = (productData?.status ?? 'active').toLowerCase();
@@ -530,7 +531,8 @@ class MaterialsStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(treatmentViewModelProvider);
+    final state = ref.watch(sessionViewModelProvider);
+    final treatmentState = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
 
     return Column(
@@ -578,7 +580,7 @@ class MaterialsStep extends ConsumerWidget {
             ),
           ),
         ] else ...[
-          _buildProductSelector(context, state.products, viewModel, state),
+          _buildProductSelector(context, state.products, viewModel, treatmentState),
         ],
         if (state.productUsageEntries.isNotEmpty) ...[
           context.verticalSpace(32),
@@ -594,7 +596,7 @@ class MaterialsStep extends ConsumerWidget {
                 index,
                 state.productUsageEntries[index],
                 viewModel,
-                state,
+                treatmentState,
               );
             },
           ),

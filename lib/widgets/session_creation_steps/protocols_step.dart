@@ -4,7 +4,6 @@ import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
@@ -66,7 +65,7 @@ class ProtocolsStep extends ConsumerWidget {
     BuildContext context,
     int? editIndex,
     TreatmentProtocolNoteItem? existingNote,
-    TreatmentViewModel viewModel,
+    SessionViewModel viewModel,
     List<TreatmentProtocolNoteItem> currentNotes,
   ) {
     final titleController = TextEditingController(text: existingNote?.title);
@@ -274,8 +273,8 @@ class ProtocolsStep extends ConsumerWidget {
 
   Widget _buildStandaloneNotesSection(
     BuildContext context,
-    TreatmentState state,
-    TreatmentViewModel viewModel,
+    SessionState state,
+    SessionViewModel viewModel,
   ) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 20),
@@ -427,7 +426,7 @@ class ProtocolsStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(treatmentViewModelProvider);
+    final state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
     final dataState = ref.watch(treatmentDataViewModelProvider);
 

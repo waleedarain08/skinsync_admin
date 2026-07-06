@@ -84,9 +84,9 @@ class RolesStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(treatmentViewModelProvider);
+    final state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
-    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
+    final CategoryDetailDto? selectedCategory = ref.watch(treatmentViewModelProvider).selectedCategoryDetail;
 
     final List<String> availableRoles = [
       'Injector',
