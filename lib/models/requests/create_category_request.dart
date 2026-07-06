@@ -5,10 +5,8 @@ class CreateCategoryRequest {
   final String? icon;
   final int? parentId;
   final String? image;
-  final int? totalSessions;
   final String? consentFormUrl;
   final String? consentFormName;
-  final List<CategorySessionModel>? defaultSessions;
   final List<NotificationConfig>? preNotifications;
   final List<NotificationConfig>? postNotifications;
   final CategoryDowntimePresetModel? downtimePresets;
@@ -18,10 +16,8 @@ class CreateCategoryRequest {
     this.name,
     this.icon,
     this.parentId,
-    this.totalSessions,
     this.consentFormUrl,
     this.consentFormName,
-    this.defaultSessions,
     this.image,
     this.preNotifications,
     this.postNotifications,
@@ -30,17 +26,12 @@ class CreateCategoryRequest {
   });
 
   Map<String, dynamic> toJson() => {
-
     'name': name,
     'icon': icon,
     'parent_id': parentId,
     'image' : image,
-    'total_sessions': totalSessions,
     'consent_form_url': consentFormUrl,
     'consent_form_name': consentFormName,
-    'default_sessions': defaultSessions == null
-        ? []
-        : List<dynamic>.from(defaultSessions!.map((x) => x.toJson())),
     'pre_notifications': preNotifications == null
         ? []
         : List<dynamic>.from(preNotifications!.map((x) => x.toJson())),
@@ -48,117 +39,116 @@ class CreateCategoryRequest {
         ? []
         : List<dynamic>.from(postNotifications!.map((x) => x.toJson())),
     'downtime_presets': downtimePresets?.toJson(),
-    
     'default_roles': defaultRoles == null
         ? []
         : List<dynamic>.from(defaultRoles!.map((x) => x)),
   };
 }
 
-class CategorySessionModel {
-  final int sessionNumber;
-  final List<CategoryFollowUpModel> followUps;
+// class CategorySessionModel {
+//   final int sessionNumber;
+//   final List<CategoryFollowUpModel> followUps;
+//
+//   CategorySessionModel({
+//     required this.sessionNumber,
+//     this.followUps = const [],
+//   });
+//
+//   factory CategorySessionModel.fromJson(Map<String, dynamic> json) {
+//     return CategorySessionModel(
+//       sessionNumber: json['session_number'] ?? 1,
+//       followUps:
+//           (json['follow_ups'] as List?)
+//               ?.map(
+//                 (e) =>
+//                     CategoryFollowUpModel.fromJson(e as Map<String, dynamic>),
+//               )
+//               .toList() ??
+//           [],
+//     );
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'session_number': sessionNumber,
+//       'follow_ups': followUps.map((e) => e.toJson()).toList(),
+//     };
+//   }
+//
+//   CategorySessionModel copyWith({
+//     int? sessionNumber,
+//     List<CategoryFollowUpModel>? followUps,
+//   }) {
+//     return CategorySessionModel(
+//       sessionNumber: sessionNumber ?? this.sessionNumber,
+//       followUps: followUps ?? this.followUps,
+//     );
+//   }
+// }
 
-  CategorySessionModel({
-    required this.sessionNumber,
-    this.followUps = const [],
-  });
-
-  factory CategorySessionModel.fromJson(Map<String, dynamic> json) {
-    return CategorySessionModel(
-      sessionNumber: json['session_number'] ?? 1,
-      followUps:
-          (json['follow_ups'] as List?)
-              ?.map(
-                (e) =>
-                    CategoryFollowUpModel.fromJson(e as Map<String, dynamic>),
-              )
-              .toList() ??
-          [],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'session_number': sessionNumber,
-      'follow_ups': followUps.map((e) => e.toJson()).toList(),
-    };
-  }
-
-  CategorySessionModel copyWith({
-    int? sessionNumber,
-    List<CategoryFollowUpModel>? followUps,
-  }) {
-    return CategorySessionModel(
-      sessionNumber: sessionNumber ?? this.sessionNumber,
-      followUps: followUps ?? this.followUps,
-    );
-  }
-}
-
-class CategoryFollowUpModel {
-  final String type;
-  final int? durationValue;
-  final String durationUnit;
-  final int? intervalValue;
-  final String? intervalUnit;
-  final bool isImageRequired;
-  final String? notes;
-
-  CategoryFollowUpModel({
-    required this.type,
-    this.durationValue,
-    this.durationUnit = 'minutes',
-    this.intervalValue,
-    this.intervalUnit = 'days',
-    this.isImageRequired = false,
-    this.notes,
-  });
-
-  factory CategoryFollowUpModel.fromJson(Map<String, dynamic> json) {
-    return CategoryFollowUpModel(
-      type: json['type'] ?? 'virtual',
-      durationValue: json['duration_value'] as int?,
-      durationUnit: json['duration_unit'] ?? 'minutes',
-      intervalValue: json['interval_value'] as int?,
-      intervalUnit: json['interval_unit'],
-      isImageRequired: json['is_image_required'] ?? false,
-      notes: json['notes'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'type': type,
-      'duration_value': durationValue,
-      'duration_unit': durationUnit,
-      'interval_value': intervalValue,
-      'interval_unit': intervalUnit,
-      'is_image_required': isImageRequired,
-      'notes': notes,
-    };
-  }
-
-  CategoryFollowUpModel copyWith({
-    String? type,
-    int? durationValue,
-    String? durationUnit,
-    int? intervalValue,
-    String? intervalUnit,
-    bool? isImageRequired,
-    String? notes,
-  }) {
-    return CategoryFollowUpModel(
-      type: type ?? this.type,
-      durationValue: durationValue ?? this.durationValue,
-      durationUnit: durationUnit ?? this.durationUnit,
-      intervalValue: intervalValue ?? this.intervalValue,
-      intervalUnit: intervalUnit ?? this.intervalUnit,
-      isImageRequired: isImageRequired ?? this.isImageRequired,
-      notes: notes ?? this.notes,
-    );
-  }
-}
+// class CategoryFollowUpModel {
+//   final String type;
+//   final int? durationValue;
+//   final String durationUnit;
+//   final int? intervalValue;
+//   final String? intervalUnit;
+//   final bool isImageRequired;
+//   final String? notes;
+//
+//   CategoryFollowUpModel({
+//     required this.type,
+//     this.durationValue,
+//     this.durationUnit = 'minutes',
+//     this.intervalValue,
+//     this.intervalUnit = 'days',
+//     this.isImageRequired = false,
+//     this.notes,
+//   });
+//
+//   factory CategoryFollowUpModel.fromJson(Map<String, dynamic> json) {
+//     return CategoryFollowUpModel(
+//       type: json['type'] ?? 'virtual',
+//       durationValue: json['duration_value'] as int?,
+//       durationUnit: json['duration_unit'] ?? 'minutes',
+//       intervalValue: json['interval_value'] as int?,
+//       intervalUnit: json['interval_unit'],
+//       isImageRequired: json['is_image_required'] ?? false,
+//       notes: json['notes'],
+//     );
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'type': type,
+//       'duration_value': durationValue,
+//       'duration_unit': durationUnit,
+//       'interval_value': intervalValue,
+//       'interval_unit': intervalUnit,
+//       'is_image_required': isImageRequired,
+//       'notes': notes,
+//     };
+//   }
+//
+//   CategoryFollowUpModel copyWith({
+//     String? type,
+//     int? durationValue,
+//     String? durationUnit,
+//     int? intervalValue,
+//     String? intervalUnit,
+//     bool? isImageRequired,
+//     String? notes,
+//   }) {
+//     return CategoryFollowUpModel(
+//       type: type ?? this.type,
+//       durationValue: durationValue ?? this.durationValue,
+//       durationUnit: durationUnit ?? this.durationUnit,
+//       intervalValue: intervalValue ?? this.intervalValue,
+//       intervalUnit: intervalUnit ?? this.intervalUnit,
+//       isImageRequired: isImageRequired ?? this.isImageRequired,
+//       notes: notes ?? this.notes,
+//     );
+//   }
+// }
 
 class CategoryNotificationModel {
   final String? title;

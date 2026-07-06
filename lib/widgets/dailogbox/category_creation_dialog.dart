@@ -452,10 +452,8 @@ class _CategoryCreationDialogState
         icon: _selectedIcon,
         image: _selectedImage,
         parentId: widget.categoryId,
-        totalSessions: int.tryParse(_totalSessionsController.text) ?? 1,
         consentFormUrl: _consentFormUrl,
         consentFormName: _existingConsentName,
-        defaultSessions: _sessions,
         preNotifications: _preNotificationEntries
             .map((e) => e.toConfig())
             .toList(),
@@ -1143,81 +1141,6 @@ class _CategoryCreationDialogState
               ),
             ],
           ),
-          context.verticalSpace(32),
-          const Divider(),
-          context.verticalSpace(24),
-          Text('Sessions Configuration', style: context.fonts.black16w600),
-          context.verticalSpace(8),
-          Text(
-            'Configure sessions and their respective follow-ups for this category.',
-            style: context.fonts.grey12w400,
-          ),
-          context.verticalSpace(20),
-          BuildTextField(
-            label: 'Total Sessions',
-            controller: _totalSessionsController,
-            hintText: '1',
-            keyboardType: TextInputType.number,
-            readOnly: widget.isViewMode,
-            onChanged: (val) => _updateSessionsCount(val ?? ''),
-          ),
-          if (_sessions.isNotEmpty) ...[
-            context.verticalSpace(24),
-            ...List.generate(_sessions.length, (sIdx) {
-              final session = _sessions[sIdx];
-              return Container(
-                margin: context.appEdgeInsets(bottom: 24),
-                padding: context.appEdgeInsets(all: 20),
-                decoration: BoxDecoration(
-                  color: CustomColors.purple.withValues(alpha: 0.02),
-                  borderRadius: context.appBorderRadius(all: 12),
-                  border: Border.all(
-                    color: CustomColors.purple.withValues(alpha: 0.1),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.event_note_rounded,
-                          color: CustomColors.purple,
-                        ),
-                        context.horizontalSpace(12),
-                        Text(
-                          'SESSION ${session.sessionNumber}',
-                          style: context.fonts.purple14w700,
-                        ),
-                        const Spacer(),
-                        SizedBox(
-                          width: context.w(150),
-                          child: BuildTextField(
-                            label: 'Total Follow-Ups',
-                            controller: _sessionFollowUpsCountControllers[sIdx],
-                            hintText: '0',
-                            keyboardType: TextInputType.number,
-                            readOnly: widget.isViewMode,
-                            onChanged: (val) =>
-                                _updateSessionFollowUpCount(sIdx, val ?? ''),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (session.followUps.isNotEmpty) ...[
-                      context.verticalSpace(20),
-                      ...List.generate(session.followUps.length, (fuIdx) {
-                        return Padding(
-                          padding: context.appEdgeInsets(bottom: 16),
-                          child: _buildSessionFollowUpCard(sIdx, fuIdx),
-                        );
-                      }),
-                    ],
-                  ],
-                ),
-              );
-            }),
-          ],
           context.verticalSpace(32),
           const Divider(),
           context.verticalSpace(24),

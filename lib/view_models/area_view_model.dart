@@ -10,6 +10,7 @@ import '../repositories/area_repository.dart';
 import '../services/locator.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
+import 'treatment_data_view_model.dart';
 
 final areaViewModelProvider = NotifierProvider<AreaViewModel, AreaState>(
   AreaViewModel.new,
@@ -64,6 +65,7 @@ class AreaViewModel extends BaseViewModel<AreaState> {
           final fetched = await _areaRepository.getAreas();
           final flattened = _flattenAreas(fetched);
           state = state.copyWith(areas: fetched, flattenedAreas: flattened);
+          ref.read(treatmentDataViewModelProvider.notifier).setAreasFromBackend(fetched);
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;
