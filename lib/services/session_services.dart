@@ -87,10 +87,10 @@ class SessionServices implements SessionRepository {
     required int id,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
 
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -107,9 +107,9 @@ class SessionServices implements SessionRepository {
     int id,
   ) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
       body: request.toJson(),
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
 
     final response = BaseApiResponseModel.fromJson(jsonResponse);
@@ -125,10 +125,10 @@ class SessionServices implements SessionRepository {
     required int id,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
 
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -145,10 +145,10 @@ class SessionServices implements SessionRepository {
     required int id,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
 
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -166,10 +166,10 @@ class SessionServices implements SessionRepository {
     required int id,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
 
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -186,10 +186,10 @@ class SessionServices implements SessionRepository {
     required int id,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
 
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -207,12 +207,12 @@ class SessionServices implements SessionRepository {
     required int count,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
       body: PostPhotosRequest(
         requirePostTreatmentPhotos: requirePostPhotos,
         requiredPostTreatmentPhotoCount: count,
       ),
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -228,10 +228,10 @@ class SessionServices implements SessionRepository {
     required int id,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
 
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -248,10 +248,10 @@ class SessionServices implements SessionRepository {
     required int id,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
 
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -268,10 +268,10 @@ class SessionServices implements SessionRepository {
     required int id,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
 
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -289,9 +289,9 @@ class SessionServices implements SessionRepository {
     required PhaseNotificationsRequest request,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 
@@ -307,9 +307,9 @@ class SessionServices implements SessionRepository {
     required FollowUpRequest request,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateTreatment,
+      Endpoint.sessionUpdate,
       body: request,
-      queryParams: {'treatment_id': id.toString()},
+      queryParams: {'session_id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 

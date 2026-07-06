@@ -6,6 +6,7 @@ class ProductUsagesRequest {
   ProductUsagesRequest({this.productUsages});
 
   Map<String, dynamic> toJson() => {
+    'step_number': 4,
     'keys': [CreateTreatmentSteps.inventoryProducts.name],
     'product_usages': productUsages == null
         ? []
@@ -29,6 +30,7 @@ class ProductUsage {
   });
 
   Map<String, dynamic> toJson() => {
+    
     'product_id': productId,
     'deduction_timing': deductionTiming,
     'allow_substitution': allowSubstitution,

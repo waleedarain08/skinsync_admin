@@ -33,7 +33,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ref.read(sessionViewModelProvider.notifier).fetchProductsByTreatmentCategory();
+      ref
+          .read(sessionViewModelProvider.notifier)
+          .fetchProductsByTreatmentCategory();
     });
   }
 
@@ -68,7 +70,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           flexibleSpace: AppDecorations.appBarGradient,
           elevation: 0,
           centerTitle: true,
-          title: Text('Session Detail Builder', style: context.fonts.black18w600),
+          title: Text(
+            'Session Detail Builder',
+            style: context.fonts.black18w600,
+          ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: CustomColors.black),
             onPressed: () {
@@ -76,76 +81,81 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
             },
           ),
         ),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (isDesktop || isTablet)
-            _buildLeftSidebar(context, state, sessionViewModel),
-          Expanded(
-            child: Column(
-              children: [
-                if (!isDesktop && !isTablet)
-                  _buildMobileProgress(context, state),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: context.appEdgeInsets(
-                      horizontal: 24,
-                      vertical: 32,
-                    ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: context.w(isDesktop ? 800 : 900),
-                        ),
-                        child: Column(
-                          children: [
-                            _buildStepHeader(context, state),
-                            context.verticalSpace(32),
-                            Container(
-                              padding: context.appEdgeInsets(all: 32),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: context.appBorderRadius(all: 16),
-                                border: Border.all(color: CustomColors.border),
-                                boxShadow: AppShadows.card(context),
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (isDesktop || isTablet)
+              _buildLeftSidebar(context, state, sessionViewModel),
+            Expanded(
+              child: Column(
+                children: [
+                  if (!isDesktop && !isTablet)
+                    _buildMobileProgress(context, state),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: context.appEdgeInsets(
+                        horizontal: 24,
+                        vertical: 32,
+                      ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: context.w(isDesktop ? 800 : 900),
+                          ),
+                          child: Column(
+                            children: [
+                              _buildStepHeader(context, state),
+                              context.verticalSpace(32),
+                              Container(
+                                padding: context.appEdgeInsets(all: 32),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: context.appBorderRadius(
+                                    all: 16,
+                                  ),
+                                  border: Border.all(
+                                    color: CustomColors.border,
+                                  ),
+                                  boxShadow: AppShadows.card(context),
+                                ),
+                                child: _buildCurrentStepContent(
+                                  context,
+                                  state,
+                                  viewModel,
+                                  dataState,
+                                  categoryState,
+                                  ref,
+                                ),
                               ),
-                              child: _buildCurrentStepContent(
+                              context.verticalSpace(48),
+                              _buildActionButtons(
                                 context,
                                 state,
-                                viewModel,
+                                sessionViewModel,
                                 dataState,
                                 categoryState,
-                                ref,
                               ),
-                            ),
-                            context.verticalSpace(48),
-                            _buildActionButtons(
-                              context,
-                              state,
-                              sessionViewModel,
-                              dataState,
-                              categoryState,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          if (isDesktop)
-            _buildRightSidebar(
-              context,
-              state,
-              viewModel,
-              dataState,
-              categoryState,
-            ),
-        ],
+            if (isDesktop)
+              _buildRightSidebar(
+                context,
+                state,
+                viewModel,
+                dataState,
+                categoryState,
+              ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildLeftSidebar(
@@ -529,9 +539,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     final sessionState = ref.watch(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final baseDuration =
-        double.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0.0;
+        double.tryParse(sessionViewModel.treatmentDurationController.text) ??
+        0.0;
     final productDuration = _calculateProductUsageDuration(state);
-    final prepTime = double.tryParse(sessionViewModel.prepTimeController.text) ?? 0.0;
+    final prepTime =
+        double.tryParse(sessionViewModel.prepTimeController.text) ?? 0.0;
     final cleanupTime =
         double.tryParse(sessionViewModel.cleanupTimeController.text) ?? 0.0;
     final totalDuration =
@@ -663,10 +675,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         viewModel.categoryIdController.text.isNotEmpty;
     final schedOk =
         sessionViewModel.treatmentDurationController.text.isNotEmpty &&
-        (int.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0) > 0;
+        (int.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0) >
+            0;
     final areasOk = state.areas.any((a) => a.areaController.text.isNotEmpty);
     final sessionsOk = sessionState.totalSessions > 0;
-    final followUpsOk = sessionState.sessions.any((s) => s.followUps.isNotEmpty);
+    final followUpsOk = sessionState.sessions.any(
+      (s) => s.followUps.isNotEmpty,
+    );
     final consentOk =
         sessionState.consentType == 'category' ||
         sessionState.preTreatmentConsentForm != null ||
@@ -913,7 +928,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                       'Session ${session.sessionNumber} (Total Follow-Ups: ${session.followUps.length})',
                       style: context.fonts.black12w600,
                     ),
-                    if (session.followUps != null && session.followUps.isNotEmpty)
+                    if (session.followUps != null &&
+                        session.followUps.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(left: 12, top: 4),
                         child: Column(
@@ -970,7 +986,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     } else {
       final dynamic preForm = sessionState.preTreatmentConsentForm;
       final dynamic exForm = sessionState.existingConsentForm;
-      consentFileName = (preForm?.name as String?) ??
+      consentFileName =
+          (preForm?.name as String?) ??
           (exForm?.name as String?) ??
           'No PDF uploaded';
     }
@@ -1395,7 +1412,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     final sessionState = ref.watch(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
 
-    final int totalFus = sessionState.sessions.fold(0, (sum, s) => sum + s.followUps.length);
+    final int totalFus = sessionState.sessions.fold(
+      0,
+      (sum, s) => sum + s.followUps.length,
+    );
 
     return Container(
       padding: context.appEdgeInsets(all: 20),
@@ -1415,7 +1435,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           _previewRow(
             context,
             'Aftercare',
-            sessionViewModel.postTreatmentInstructionsController.text.isNotEmpty,
+            sessionViewModel
+                .postTreatmentInstructionsController
+                .text
+                .isNotEmpty,
           ),
           _previewRow(
             context,
@@ -1590,13 +1613,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                     ),
                     Builder(
                       builder: (context) {
-                        final pNote = sessionState.selectedProtocolNotes.firstWhere(
-                          (n) => n.protocolName == p.title,
-                          orElse: () => TreatmentProtocolNote(
-                            protocolName: p.title,
-                            notes: [],
-                          ),
-                        );
+                        final pNote = sessionState.selectedProtocolNotes
+                            .firstWhere(
+                              (n) => n.protocolName == p.title,
+                              orElse: () => TreatmentProtocolNote(
+                                protocolName: p.title,
+                                notes: [],
+                              ),
+                            );
                         if (pNote.notes.isNotEmpty) {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2080,14 +2104,28 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               }
 
               if (sessionState.sessionStep < 15) {
-                if (sessionState.sessionStep == 3) {
-                  viewModel.setSessionStep(sessionState.sessionStep + 1);
-                } else if (sessionState.sessionStep == 4) {
-                  viewModel.setSessionStep(sessionState.sessionStep + 1);
-                } else if (sessionState.sessionStep == 5) {
-                  viewModel.setSessionStep(sessionState.sessionStep + 1);
-                } else if (sessionState.sessionStep == 6) {
-                  viewModel.setSessionStep(sessionState.sessionStep + 1);
+                if (state.sessionStep == 3) {
+                  final result = await ref
+                      .read(sessionViewModelProvider.notifier)
+                      .callProductUsage();
+                  if (result == true) {
+                    viewModel.setSessionStep(state.sessionStep + 1);
+                  }
+                } else if (state.sessionStep == 4) {
+                  final result = await ref
+                      .read(sessionViewModelProvider.notifier)
+                      .createSchedule(stepNumber: state.sessionStep + 1);
+                  if (result == true) {
+                    viewModel.setSessionStep(state.sessionStep + 1);
+                  }
+                } else if (state.sessionStep == 5) {
+                  final result = await ref
+                      .read(sessionViewModelProvider.notifier)
+                      .callStepPricing(stepNumber: state.sessionStep + 1);
+                  if (result == true) {
+                    viewModel.setSessionStep(state.sessionStep + 1);
+                  }
+                } else if (state.sessionStep == 6) {
                 } else if (sessionState.sessionStep == 7) {
                   viewModel.setSessionStep(sessionState.sessionStep + 1);
                 } else if (sessionState.sessionStep == 8) {
@@ -2111,8 +2149,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                     : '\$${sessionViewModel.basePriceController.text}';
 
                 final protocols = sessionState.selectedProtocolIds.toList();
-                final preInstructions = sessionViewModel.preTreatmentInstructionsController.text;
-                final postInstructions = sessionViewModel.postTreatmentInstructionsController.text;
+                final preInstructions =
+                    sessionViewModel.preTreatmentInstructionsController.text;
+                final postInstructions =
+                    sessionViewModel.postTreatmentInstructionsController.text;
 
                 final preNotifs = sessionState.preNotificationEntries
                     .map(
@@ -2133,8 +2173,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                   protocols: protocols,
                   preInstructions: preInstructions,
                   postInstructions: postInstructions,
-                  requirePhotosSnapshot: sessionState.requirePostTreatmentPhotos,
-                  photosCountSnapshot: sessionState.requiredPostTreatmentPhotoCount,
+                  requirePhotosSnapshot:
+                      sessionState.requirePostTreatmentPhotos,
+                  photosCountSnapshot:
+                      sessionState.requiredPostTreatmentPhotoCount,
                   preNotifs: preNotifs,
                   postNotifs: postNotifs,
                   downtimeLevel: sessionState.downtimeLevel,
