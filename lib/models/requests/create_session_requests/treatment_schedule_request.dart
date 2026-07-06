@@ -13,6 +13,7 @@ class TreatmentScheduleRequest {
   final int? maximumDaysInAdvance;
   final int? calculatedTotalDuration;
   final int? fixedDuration;
+  final bool? isFixedDuration;
 
   TreatmentScheduleRequest({
     this.baseDuration,
@@ -27,6 +28,7 @@ class TreatmentScheduleRequest {
     this.maximumDaysInAdvance,
     this.calculatedTotalDuration,
     this.fixedDuration,
+    this.isFixedDuration,
   });
 
   Map<String, dynamic> toJson() => {
@@ -45,6 +47,7 @@ class TreatmentScheduleRequest {
     'maximum_days_in_advance': maximumDaysInAdvance,
     'calculated_total_duration': calculatedTotalDuration,
     'fixed_duration': fixedDuration,
+    //'is_fixed_duration': isFixedDuration,
   };
 }
 

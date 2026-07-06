@@ -644,26 +644,29 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   Future<bool?> callStepPricing({required int stepNumber}) async {
     final request = StepPricingRequest(
       stepNumber: stepNumber,
-
-      basePrice: int.tryParse(basePriceController.text.trim()),
-
-      unitPriceOverrides: state.productUsageEntries
-          .map((entry) {
-            final controller = getControllerForUnit(entry.unit);
-
-            final price = int.tryParse(controller.text.trim());
-
-            if (price == null) {
-              return null;
-            }
-
-            return UnitPriceOverride(
-              productId: entry.productId,
-              pricePerUnit: price,
-            );
-          })
-          .whereType<UnitPriceOverride>()
-          .toList(),
+      basePrice: state.isFixedPrice
+          ? null
+          : int.tryParse(basePriceController.text.trim()),
+      unitPriceOverrides: state.isFixedPrice
+          ? []
+          : state.productUsageEntries
+              .map((entry) {
+                final controller = getControllerForUnit(entry.unit);
+                final price = int.tryParse(controller.text.trim());
+                if (price == null) {
+                  return null;
+                }
+                return UnitPriceOverride(
+                  productId: entry.productId,
+                  pricePerUnit: price,
+                );
+              })
+              .whereType<UnitPriceOverride>()
+              .toList(),
+      isFixedPrice: state.isFixedPrice,
+      fixedPrice: state.isFixedPrice
+          ? int.tryParse(fixedPriceController.text.trim())
+          : null,
     );
     log('''
 =========== PRODUCT USAGE REQUEST ===========
@@ -909,6 +912,7 @@ Body       : ${request.toJson()}
           fixedDuration: state.isFixedDuration
               ? (int.tryParse(fixedDurationController.text) ?? 0)
               : null,
+          isFixedDuration: state.isFixedDuration,
         ),
         state.sessionId!,
       );
