@@ -178,7 +178,6 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(treatmentViewModelProvider);
-    final viewModel = ref.read(sessionViewModelProvider.notifier);
     final sessionState = ref.watch(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
 
@@ -333,7 +332,7 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                               onTap: () {
                                 sessionViewModel.setSessionId(sessionEntry.sessionId);
                                 sessionViewModel.setActiveSessionIndex(index);
-                                viewModel.setSessionStep(3);
+                                sessionViewModel.setSessionStep(1);
                                 context.push(CreateSessionScreen.routeName);
                               },
                               label: 'Enter Detail',
@@ -443,7 +442,7 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                             height: context.h(32),
                             onTap: () {
                               sessionViewModel.setActiveSessionIndex(index);
-                              viewModel.setSessionStep(3);
+                              sessionViewModel.setSessionStep(1);
                               context.push(CreateSessionScreen.routeName);
                             },
                             label: 'Edit Detail',

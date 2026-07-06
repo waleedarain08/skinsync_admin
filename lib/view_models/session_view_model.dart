@@ -97,7 +97,7 @@ class SessionState extends BaseStateModel {
     super.totalResults,
     this.sessions = const [],
     this.activeSessionIndex = 0,
-    this.sessionStep = 3,
+    this.sessionStep = 1,
     this.sessionId,
     this.productUsageEntries = const [],
     this.products = const [],
