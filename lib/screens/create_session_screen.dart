@@ -153,6 +153,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     SessionViewModel viewModel,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     final steps = [
       'Inventory Products',
       'Scheduling',
@@ -168,7 +169,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       'Patient Consent',
     ];
 
-    final currentOffsetStep = _getSessionOffsetStep(state.sessionStep);
+    final currentOffsetStep = _getSessionOffsetStep(sessionState.sessionStep);
 
     return Container(
       width: context.w(280),
@@ -1910,8 +1911,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   }
 
   Widget _buildMobileProgress(BuildContext context, TreatmentState state) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     const stepsCount = 12;
-    final currentOffsetStep = _getSessionOffsetStep(state.sessionStep);
+    final currentOffsetStep = _getSessionOffsetStep(sessionState.sessionStep);
     return Container(
       padding: context.appEdgeInsets(horizontal: 24, vertical: 16),
       color: Colors.white,
@@ -1952,7 +1954,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     CategoryState categoryState,
     WidgetRef ref,
   ) {
-    switch (state.sessionStep) {
+    final sessionState = ref.watch(sessionViewModelProvider);
+    switch (sessionState.sessionStep) {
       case 3:
         return const MaterialsStep();
       case 4:
@@ -2023,24 +2026,24 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   ) {
     final sessionState = ref.watch(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
-    final bool isLastStep = state.sessionStep == 15;
+    final bool isLastStep = sessionState.sessionStep == 15;
     return Row(
       children: [
-        if (state.sessionStep > 3) ...[
+        if (sessionState.sessionStep > 3) ...[
           Expanded(
             child: CustomOutlinedButton(
               onTap: () {
-                if (state.sessionStep == 14) {
+                if (sessionState.sessionStep == 14) {
                   viewModel.setSessionStep(12);
                 } else {
-                  viewModel.setSessionStep(state.sessionStep - 1);
+                  viewModel.setSessionStep(sessionState.sessionStep - 1);
                 }
               },
               label: 'Previous Step',
             ),
           ),
           context.horizontalSpace(16),
-        ] else if (state.sessionStep == 3) ...[
+        ] else if (sessionState.sessionStep == 3) ...[
           Expanded(
             child: CustomOutlinedButton(
               onTap: () {
@@ -2055,49 +2058,49 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           flex: 2,
           child: CustomPrimaryButton(
             onTap: () async {
-              log('CURRENT STEP: ${state.sessionStep}');
-              if (state.sessionStep == 3) {
+              log('CURRENT STEP: ${sessionState.sessionStep}');
+              if (sessionState.sessionStep == 3) {
                 if (!_validateProductQuantities(context, state)) return;
               }
-              if (state.sessionStep == 4) {
+              if (sessionState.sessionStep == 4) {
                 if (!_validateScheduling(context, viewModel)) return;
               }
-              if (state.sessionStep == 9) {
+              if (sessionState.sessionStep == 9) {
                 if (!_validatePostPhotos(context, state)) return;
               }
-              if (state.sessionStep == 10) {
+              if (sessionState.sessionStep == 10) {
                 if (!_validatePhaseNotifications(context, state)) {
                   return;
                 }
               }
-              if (state.sessionStep == 14) {
+              if (sessionState.sessionStep == 14) {
                 if (!_validateFollowUps(context, sessionState)) {
                   return;
                 }
               }
 
-              if (state.sessionStep < 15) {
-                if (state.sessionStep == 3) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
-                } else if (state.sessionStep == 4) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
-                } else if (state.sessionStep == 5) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
-                } else if (state.sessionStep == 6) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
-                } else if (state.sessionStep == 7) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
-                } else if (state.sessionStep == 8) {
-                  viewModel.setSessionStep(state.sessionStep + 1);
-                } else if (state.sessionStep == 9) {
+              if (sessionState.sessionStep < 15) {
+                if (sessionState.sessionStep == 3) {
+                  viewModel.setSessionStep(sessionState.sessionStep + 1);
+                } else if (sessionState.sessionStep == 4) {
+                  viewModel.setSessionStep(sessionState.sessionStep + 1);
+                } else if (sessionState.sessionStep == 5) {
+                  viewModel.setSessionStep(sessionState.sessionStep + 1);
+                } else if (sessionState.sessionStep == 6) {
+                  viewModel.setSessionStep(sessionState.sessionStep + 1);
+                } else if (sessionState.sessionStep == 7) {
+                  viewModel.setSessionStep(sessionState.sessionStep + 1);
+                } else if (sessionState.sessionStep == 8) {
+                  viewModel.setSessionStep(sessionState.sessionStep + 1);
+                } else if (sessionState.sessionStep == 9) {
                   viewModel.setSessionStep(10);
-                } else if (state.sessionStep == 10) {
+                } else if (sessionState.sessionStep == 10) {
                   viewModel.setSessionStep(11);
-                } else if (state.sessionStep == 11) {
+                } else if (sessionState.sessionStep == 11) {
                   viewModel.setSessionStep(12);
-                } else if (state.sessionStep == 12) {
+                } else if (sessionState.sessionStep == 12) {
                   viewModel.setSessionStep(14);
-                } else if (state.sessionStep == 14) {
+                } else if (sessionState.sessionStep == 14) {
                   viewModel.setSessionStep(15);
                 }
               } else {
