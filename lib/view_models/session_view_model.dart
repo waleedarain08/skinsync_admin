@@ -13,7 +13,6 @@ import 'package:skinsync_admin/models/responses/treatment_products_response.dart
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/repositories/product_repository.dart';
 import 'package:skinsync_admin/repositories/session_repository.dart';
-import 'package:skinsync_admin/repositories/treatment_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
@@ -389,7 +388,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     state = state.copyWith(isLoadingProducts: true);
 
     try {
-      final response = await locator<TreatmentRepository>().getProductsByTreatment(
+      final response = await locator<SessionRepository>().getProductsByTreatment(
         treatmentState.selectedCategoryPath,
       );
       if (response.isSuccess) {
@@ -524,9 +523,9 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     );
 
     return await runSafely<bool>(() async {
-      await locator<TreatmentRepository>().productUsage(
+      await locator<SessionRepository>().productUsage(
         request: request,
-        draftTreatmentID: treatmentState.selectedTreatment?.id ?? treatmentState.draftTreatmentID ?? 0,
+        id: treatmentState.selectedTreatment?.id ?? treatmentState.draftTreatmentID ?? 0,
       );
       return true;
     });
@@ -588,7 +587,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
           PlatformFile(name: pdfName, size: bytes.length, bytes: bytes),
         );
         if (uploadedFile != null) {
-          final response = await locator<TreatmentRepository>().protocol(
+          final response = await locator<SessionRepository>().protocol(
             request: ProtocolRequest(
               stepNumber: stepNumber,
               clinicalProtocolPdf: ClinicalProtocolPdf(
@@ -596,7 +595,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
                 url: uploadedFile,
               ),
             ),
-            draftTreatmentID: treatmentId,
+            id: treatmentId,
           );
 
           return response.isSuccess;
