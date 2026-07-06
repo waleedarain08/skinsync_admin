@@ -12,6 +12,7 @@ import '../view_models/category_view_model.dart';
 import '../view_models/product_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
+import '../view_models/session_view_model.dart';
 import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/gradient_scaffold.dart';
@@ -312,6 +313,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     TreatmentDataState dataState,
     CategoryState categoryState,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     return Row(
       children: [
         if (state.currentStep > 0) ...[
@@ -375,16 +377,21 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               }
 
               if (state.currentStep == 3) {
-                final bool allSessionsDetailed =
-                    state.sessions.isNotEmpty &&
-                    state.sessions.every((s) => s.isDetailedEntered);
+                if (sessionState.sessions.isEmpty) {
+                  scaffoldMessenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Please add at least one clinical session before continuing.'),
+                      backgroundColor: CustomColors.red,
+                    ),
+                  );
+                  return;
+                }
 
+                final bool allSessionsDetailed = sessionState.sessions.every((s) => s.isDetailedEntered);
                 if (!allSessionsDetailed) {
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
-                      content: Text(
-                        'Please enter details for all sessions before continuing.',
-                      ),
+                      content: Text('Please enter details for all sessions before continuing.'),
                       backgroundColor: CustomColors.red,
                     ),
                   );

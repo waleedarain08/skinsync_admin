@@ -438,9 +438,9 @@ Body                 : ${request.toJson()}
       providerRolesSource: 'category',
       selectedRoles: [],
       areas: [AreaViewModelEntry()],
-      sessions: [SessionViewModelEntry(sessionNumber: 1)],
+      sessions: [],
       sessionSource: 'category',
-      totalSessions: 1,
+      totalSessions: 0,
       productUsageEntries: [],
       requirePostTreatmentPhotos: false,
       requiredPostTreatmentPhotoCount: 0,
@@ -872,6 +872,7 @@ Body                 : ${request.toJson()}
 
         updatedSessions[state.activeSessionIndex!] = SessionViewModelEntry(
           sessionNumber: activeEntry.sessionNumber,
+          title: activeEntry.title,
           totalFollowUpsController: activeEntry.totalFollowUpsController,
           followUps: List.from(activeEntry.followUps),
           isDetailedEntered: true,
@@ -898,6 +899,29 @@ Body                 : ${request.toJson()}
         );
         state = state.copyWith(sessions: updatedSessions);
       }
+    }
+  }
+
+  void addCustomSession(String title, int number) {
+    final newSession = SessionViewModelEntry(
+      sessionNumber: number,
+      title: title,
+    );
+    state = state.copyWith(
+      sessions: [...state.sessions, newSession],
+      totalSessions: state.sessions.length + 1,
+    );
+  }
+
+  void removeCustomSession(int index) {
+    if (index >= 0 && index < state.sessions.length) {
+      final updated = List<SessionViewModelEntry>.from(state.sessions);
+      final removed = updated.removeAt(index);
+      removed.dispose();
+      state = state.copyWith(
+        sessions: updated,
+        totalSessions: updated.length,
+      );
     }
   }
 
@@ -1506,9 +1530,9 @@ Body       : ${request.toJson()}
 
   void setStep(int step) {
     state = state.copyWith(currentStep: step);
-    if (step == 3) {
-      fetchProductsByTreatmentCategory();
-    }
+    // if (step == 3) {
+    //   fetchProductsByTreatmentCategory();
+    // }
   }
 
   void setSessionStep(int step) {
@@ -2993,6 +3017,7 @@ Body       : ${request.toJson()}
 
 class SessionViewModelEntry {
   final int sessionNumber;
+  final String? title;
   final TextEditingController totalFollowUpsController;
   List<FollowUpEntry> followUps;
   final bool isDetailedEntered;
@@ -3014,6 +3039,7 @@ class SessionViewModelEntry {
 
   SessionViewModelEntry({
     required this.sessionNumber,
+    this.title,
     TextEditingController? totalFollowUpsController,
     this.followUps = const [],
     this.isDetailedEntered = false,

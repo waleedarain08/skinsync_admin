@@ -13,6 +13,7 @@ import '../view_models/category_view_model.dart';
 import '../view_models/product_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
+import '../view_models/session_view_model.dart';
 import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/gradient_scaffold.dart';
@@ -656,6 +657,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentViewModel viewModel,
     CategoryDetailDto? selectedCategory,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     final basicOk =
         viewModel.validateGlobalSku(
               viewModel.globalSkuController.text.trim(),
@@ -667,7 +669,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         (int.tryParse(viewModel.treatmentDurationController.text) ?? 0) > 0;
     final areasOk = state.areas.any((a) => a.areaController.text.isNotEmpty);
     final sessionsOk = state.totalSessions > 0;
-    final followUpsOk = state.sessions.any((s) => s.followUps.isNotEmpty);
+    final followUpsOk = sessionState.sessions.any((s) => s.followUps.isNotEmpty);
     final consentOk =
         state.consentType == 'category' ||
         state.preTreatmentConsentForm != null ||
@@ -871,6 +873,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     CategoryDetailDto? selectedCategory,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     final isCategory = state.sessionSource == 'category';
 
     return _blueprintSection(
@@ -900,10 +903,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
             ],
           ),
           context.verticalSpace(10),
-          if (state.sessions.isEmpty)
+          if (sessionState.sessions.isEmpty)
             Text('No sessions defined', style: context.fonts.grey12w400)
           else
-            ...state.sessions.map((session) {
+            ...sessionState.sessions.map((session) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Column(
@@ -913,7 +916,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                       'Session ${session.sessionNumber} (Total Follow-Ups: ${session.followUps.length})',
                       style: context.fonts.black12w600,
                     ),
-                    if (session.followUps.isNotEmpty)
+                    if (session.followUps != null && session.followUps.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(left: 12, top: 4),
                         child: Column(
@@ -1381,19 +1384,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentViewModel viewModel,
     CategoryState categoryState,
   ) {
-    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
+    final sessionState = ref.watch(sessionViewModelProvider);
 
-    int totalFus = 0;
-    if (state.sessionSource == 'custom') {
-      totalFus = state.sessions.fold(0, (sum, s) => sum + s.followUps.length);
-    } else if (selectedCategory != null) {
-      if (selectedCategory.defaultSessions?.isNotEmpty ?? false) {
-        totalFus = selectedCategory.defaultSessions!.fold(
-          0,
-          (sum, s) => sum + s.followUps.length,
-        );
-      }
-    }
+    final int totalFus = sessionState.sessions.fold(0, (sum, s) => sum + s.followUps.length);
 
     return Container(
       padding: context.appEdgeInsets(all: 20),
@@ -2016,6 +2009,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentDataState dataState,
     CategoryState categoryState,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final bool isLastStep = state.sessionStep == 15;
     return Row(
       children: [
@@ -2064,7 +2059,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 }
               }
               if (state.sessionStep == 14) {
-                if (!_validateFollowUps(context, state)) {
+                if (!_validateFollowUps(context, sessionState)) {
                   return;
                 }
               }
@@ -2093,13 +2088,48 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 } else if (state.sessionStep == 14) {
                   viewModel.setSessionStep(15);
                 }
-              } else if (state.sessionStep == 15) {
-                viewModel.markActiveSessionAsDetailed();
-                if (context.mounted) {
-                  context.pop();
-                }
               } else {
-                viewModel.markActiveSessionAsDetailed();
+                final durationText =
+                    '${viewModel.treatmentDurationController.text} mins (Prep: ${viewModel.prepTimeController.text}m, Clean: ${viewModel.cleanupTimeController.text}m)';
+                final priceText = '\$${viewModel.basePriceController.text}';
+
+                final protocols = state.selectedProtocolIds.toList();
+                final preInstructions = viewModel.preTreatmentInstructionsController.text;
+                final postInstructions = viewModel.postTreatmentInstructionsController.text;
+
+                final preNotifs = state.preNotificationEntries
+                    .map(
+                      (n) =>
+                          '${n.timingValueController.text} ${n.timingUnit} before: ${n.titleController.text}',
+                    )
+                    .toList();
+                final postNotifs = state.postNotificationEntries
+                    .map(
+                      (n) =>
+                          '${n.timingValueController.text} ${n.timingUnit} after: ${n.titleController.text}',
+                    )
+                    .toList();
+
+                sessionViewModel.markActiveSessionAsDetailed(
+                  durationText: durationText,
+                  priceText: priceText,
+                  protocols: protocols,
+                  preInstructions: preInstructions,
+                  postInstructions: postInstructions,
+                  requirePhotosSnapshot: state.requirePostTreatmentPhotos,
+                  photosCountSnapshot: state.requiredPostTreatmentPhotoCount,
+                  preNotifs: preNotifs,
+                  postNotifs: postNotifs,
+                  downtimeLevel: state.downtimeLevel,
+                  selectedRoles: state.selectedRoles,
+                  consentSnapshot: state.consentType == 'category'
+                      ? (state.selectedCategoryDetail?.consentFormName ??
+                            'Category Consent Form')
+                      : (state.preTreatmentConsentForm?.name ??
+                            state.existingConsentForm?.name ??
+                            'Custom Consent'),
+                  productUsageEntries: state.productUsageEntries,
+                );
                 if (context.mounted) {
                   context.pop();
                 }
@@ -2288,8 +2318,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     return true;
   }
 
-  bool _validateFollowUps(BuildContext context, TreatmentState state) {
-    for (final session in state.sessions) {
+  bool _validateFollowUps(BuildContext context, SessionState sessionState) {
+    for (final session in sessionState.sessions) {
       final count = int.tryParse(session.totalFollowUpsController.text) ?? 0;
       if (count == 0) {
         continue; // 0 or empty follow-ups is completely valid
