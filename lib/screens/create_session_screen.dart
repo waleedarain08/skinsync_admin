@@ -530,6 +530,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     TreatmentViewModel viewModel,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final baseDuration =
         double.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0.0;
@@ -574,22 +575,22 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           _blueprintRow(
             context,
             'Online Bookable',
-            state.onlineBookable ? 'Yes' : 'No',
+            sessionState.onlineBookable ? 'Yes' : 'No',
           ),
           _blueprintRow(
             context,
             'Manual Approval Required',
-            state.manualApprovalRequired ? 'Yes' : 'No',
+            sessionState.manualApprovalRequired ? 'Yes' : 'No',
           ),
           _blueprintRow(
             context,
             'Allow Clinic Override',
-            state.allowClinicOverride ? 'Yes' : 'No',
+            sessionState.allowClinicOverride ? 'Yes' : 'No',
           ),
           _blueprintRow(
             context,
             'Allow Provider Override',
-            state.allowProviderOverride ? 'Yes' : 'No',
+            sessionState.allowProviderOverride ? 'Yes' : 'No',
           ),
           _blueprintRow(
             context,
@@ -668,22 +669,22 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         sessionViewModel.treatmentDurationController.text.isNotEmpty &&
         (int.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0) > 0;
     final areasOk = state.areas.any((a) => a.areaController.text.isNotEmpty);
-    final sessionsOk = state.totalSessions > 0;
+    final sessionsOk = sessionState.totalSessions > 0;
     final followUpsOk = sessionState.sessions.any((s) => s.followUps.isNotEmpty);
     final consentOk =
-        state.consentType == 'category' ||
-        state.preTreatmentConsentForm != null ||
-        state.existingConsentForm != null;
+        sessionState.consentType == 'category' ||
+        sessionState.preTreatmentConsentForm != null ||
+        sessionState.existingConsentForm != null;
     final notifOk =
-        state.preNotificationSource == 'category' ||
-        state.postNotificationSource == 'category' ||
-        state.preNotificationOffset != null ||
-        state.postNotificationOffset != null;
-    final productsOk = state.productUsageEntries.isNotEmpty;
+        sessionState.preNotificationSource == 'category' ||
+        sessionState.postNotificationSource == 'category' ||
+        sessionState.preNotificationOffset != null ||
+        sessionState.postNotificationOffset != null;
+    final productsOk = sessionState.productUsageEntries.isNotEmpty;
     final pricingOk = sessionViewModel.basePriceController.text.isNotEmpty;
     final rolesOk =
-        state.providerRolesSource == 'category' ||
-        state.selectedRoles.isNotEmpty;
+        sessionState.providerRolesSource == 'category' ||
+        sessionState.selectedRoles.isNotEmpty;
 
     return _blueprintSection(
       context,
@@ -874,7 +875,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     CategoryDetailDto? selectedCategory,
   ) {
     final sessionState = ref.watch(sessionViewModelProvider);
-    final isCategory = state.sessionSource == 'category';
+    final isCategory = sessionState.sessionSource == 'category';
 
     return _blueprintSection(
       context,
@@ -964,14 +965,15 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     CategoryDetailDto? selectedCategory,
   ) {
-    final isCategory = state.consentType == 'category';
+    final sessionState = ref.watch(sessionViewModelProvider);
+    final isCategory = sessionState.consentType == 'category';
     String consentFileName = 'No PDF uploaded';
     if (isCategory) {
       consentFileName =
           selectedCategory?.consentFormName ?? 'Category Consent Form';
     } else {
-      final dynamic preForm = state.preTreatmentConsentForm;
-      final dynamic exForm = state.existingConsentForm;
+      final dynamic preForm = sessionState.preTreatmentConsentForm;
+      final dynamic exForm = sessionState.existingConsentForm;
       consentFileName = (preForm?.name as String?) ??
           (exForm?.name as String?) ??
           'No PDF uploaded';
@@ -999,12 +1001,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     TreatmentViewModel viewModel,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final hasInstructions =
         sessionViewModel.preTreatmentInstructionsController.text.isNotEmpty;
     final instructionsText = hasInstructions ? 'Configured' : 'None';
 
-    final allPre = [...state.existingPreAttachments];
+    final allPre = [...sessionState.existingPreAttachments];
 
     final pdfs = allPre.where((a) => a.type == 'pdf').length;
     final images = allPre.where((a) => a.type == 'image').length;
@@ -1030,8 +1033,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     CategoryDetailDto? selectedCategory,
   ) {
-    final isPreCategory = state.preNotificationSource == 'category';
-    final isPostCategory = state.postNotificationSource == 'category';
+    final sessionState = ref.watch(sessionViewModelProvider);
+    final isPreCategory = sessionState.preNotificationSource == 'category';
+    final isPostCategory = sessionState.postNotificationSource == 'category';
 
     String preSummary = 'Not configured';
     if (isPreCategory) {
@@ -1040,7 +1044,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           : 'Category Default';
     } else {
       preSummary =
-          '${state.preNotificationEntries.length} Custom Notifications';
+          '${sessionState.preNotificationEntries.length} Custom Notifications';
     }
 
     String postSummary = 'Not configured';
@@ -1050,7 +1054,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           : 'Category Default';
     } else {
       postSummary =
-          '${state.postNotificationEntries.length} Custom Notifications';
+          '${sessionState.postNotificationEntries.length} Custom Notifications';
     }
 
     return _blueprintSection(
@@ -1081,7 +1085,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     CategoryDetailDto? selectedCategory,
   ) {
-    final level = state.downtimeLevel;
+    final sessionState = ref.watch(sessionViewModelProvider);
+    final level = sessionState.downtimeLevel;
     int days = 0;
     if (selectedCategory != null) {
       final presets = selectedCategory.downtimePresets;
@@ -1120,13 +1125,14 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     CategoryDetailDto? selectedCategory,
   ) {
-    final isCategory = state.providerRolesSource == 'category';
+    final sessionState = ref.watch(sessionViewModelProvider);
+    final isCategory = sessionState.providerRolesSource == 'category';
     final List<String> roles = isCategory
         ? (selectedCategory?.defaultRoles
                   ?.map((r) => r.name[0] + r.name.substring(1).toLowerCase())
                   .toList() ??
               [])
-        : state.selectedRoles;
+        : sessionState.selectedRoles;
 
     return _blueprintSection(
       context,
@@ -1150,14 +1156,15 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   }
 
   Widget _buildProductsSummary(BuildContext context, TreatmentState state) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     return _blueprintSection(
       context,
       '3. Products Configuration',
-      state.productUsageEntries.isEmpty
+      sessionState.productUsageEntries.isEmpty
           ? Text('No products configured', style: context.fonts.grey12w400)
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: state.productUsageEntries.map((entry) {
+              children: sessionState.productUsageEntries.map((entry) {
                 final allSubAreas = state.areas
                     .expand((a) => a.subAreas)
                     .toList();
@@ -1232,10 +1239,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     TreatmentViewModel viewModel,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final basePrice = sessionViewModel.basePriceController.text;
 
-    final uniqueUnits = state.productUsageEntries
+    final uniqueUnits = sessionState.productUsageEntries
         .map((e) => e.unit)
         .where((unit) => unit.trim().isNotEmpty)
         .toSet()
@@ -1287,29 +1295,30 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   }
 
   Widget _buildInheritanceSummary(BuildContext context, TreatmentState state) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     final List<String> inherited = [];
     final List<String> overrides = [];
 
-    if (state.sessionSource == 'category') {
+    if (sessionState.sessionSource == 'category') {
       inherited.addAll(['Sessions', 'Follow-Ups']);
     } else {
       overrides.addAll(['Custom Sessions', 'Custom Follow-Ups']);
     }
 
-    if (state.consentType == 'category') {
+    if (sessionState.consentType == 'category') {
       inherited.add('Consent Form');
     } else {
       overrides.add('Custom Consent Form');
     }
 
-    if (state.preNotificationSource == 'category' &&
-        state.postNotificationSource == 'category') {
+    if (sessionState.preNotificationSource == 'category' &&
+        sessionState.postNotificationSource == 'category') {
       inherited.add('Notifications');
     } else {
       overrides.add('Custom Notifications');
     }
 
-    if (state.providerRolesSource == 'category') {
+    if (sessionState.providerRolesSource == 'category') {
       inherited.add('Provider Roles');
     } else {
       overrides.add('Custom Provider Roles');
@@ -1415,11 +1424,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           _previewRow(
             context,
             'Notifications',
-            state.preNotificationOffset != null ||
-                state.postNotificationOffset != null,
+            sessionState.preNotificationOffset != null ||
+                sessionState.postNotificationOffset != null,
           ),
           _previewRow(context, 'Sessions Defined', true),
-          _previewText(context, '${state.totalSessions} Sessions'),
+          _previewText(context, '${sessionState.totalSessions} Sessions'),
           _previewRow(context, 'Follow-Ups Active', totalFus > 0),
           if (totalFus > 0) _previewText(context, '$totalFus Total Follow-Ups'),
         ],
@@ -1434,8 +1443,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentDataState dataState,
     CategoryState categoryState,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     final selectedProtocols = dataState.protocols
-        .where((p) => state.selectedProtocolIds.contains(p.id))
+        .where((p) => sessionState.selectedProtocolIds.contains(p.id))
         .toList();
     final checkboxes = selectedProtocols
         .where((p) => p.type == ProtocolType.checkbox)
@@ -1447,8 +1457,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
 
     List<TreatmentProtocolNoteItem> notesToShow = [];
-    if (state.standaloneNotes.isNotEmpty) {
-      notesToShow = state.standaloneNotes;
+    if (sessionState.standaloneNotes.isNotEmpty) {
+      notesToShow = sessionState.standaloneNotes;
     } else if (selectedCategory != null) {
       notesToShow = _getCategoryDefaultNotes(selectedCategory);
     }
@@ -1517,7 +1527,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                           Text(p.title, style: context.fonts.black13w400),
                           Builder(
                             builder: (context) {
-                              final pNote = state.selectedProtocolNotes
+                              final pNote = sessionState.selectedProtocolNotes
                                   .firstWhere(
                                     (n) => n.protocolName == p.title,
                                     orElse: () => TreatmentProtocolNote(
@@ -1584,7 +1594,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                     ),
                     Builder(
                       builder: (context) {
-                        final pNote = state.selectedProtocolNotes.firstWhere(
+                        final pNote = sessionState.selectedProtocolNotes.firstWhere(
                           (n) => n.protocolName == p.title,
                           orElse: () => TreatmentProtocolNote(
                             protocolName: p.title,
@@ -1786,18 +1796,19 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     TreatmentState state,
     TreatmentDataState dataState,
   ) {
+    final sessionState = ref.watch(sessionViewModelProvider);
     final checkboxCount = dataState.protocols
         .where(
           (p) =>
               p.type == ProtocolType.checkbox &&
-              state.selectedProtocolIds.contains(p.id),
+              sessionState.selectedProtocolIds.contains(p.id),
         )
         .length;
     final textCount = dataState.protocols
         .where(
           (p) =>
               p.type == ProtocolType.text &&
-              state.selectedProtocolIds.contains(p.id),
+              sessionState.selectedProtocolIds.contains(p.id),
         )
         .length;
 
@@ -1829,17 +1840,17 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
             '$textCount Text Protocols',
             Icons.text_snippet_outlined,
           ),
-        if (state.preTreatmentConsentForm != null ||
-            state.existingConsentForm != null)
+        if (sessionState.preTreatmentConsentForm != null ||
+            sessionState.existingConsentForm != null)
           _summaryChip(context, 'Consent Required', Icons.fact_check_outlined),
-        if (state.isFollowUpRequired)
+        if (sessionState.isFollowUpRequired)
           _summaryChip(context, 'Follow-Up Required', Icons.replay_outlined),
         if (state.useInAiSimulator)
           _summaryChip(context, 'AI Compatible', Icons.auto_awesome_outlined),
-        if (state.requirePostTreatmentPhotos)
+        if (sessionState.requirePostTreatmentPhotos)
           _summaryChip(
             context,
-            '${state.requiredPostTreatmentPhotoCount} Photos Required',
+            '${sessionState.requiredPostTreatmentPhotoCount} Photos Required',
             Icons.add_a_photo_outlined,
           ),
         _summaryChip(
@@ -1996,9 +2007,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   }
 
   double _calculateProductUsageDuration(TreatmentState state) {
+    final sessionState = ref.read(sessionViewModelProvider);
     final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
     double total = 0.0;
-    for (final entry in state.productUsageEntries) {
+    for (final entry in sessionState.productUsageEntries) {
       final minQty = _getProductMinQuantity(entry, allSubAreas);
       final perUnit =
           double.tryParse(entry.perUnitDurationController.text) ?? 0.0;
@@ -2098,17 +2110,17 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                     '${sessionViewModel.treatmentDurationController.text} mins (Prep: ${sessionViewModel.prepTimeController.text}m, Clean: ${sessionViewModel.cleanupTimeController.text}m)';
                 final priceText = '\$${sessionViewModel.basePriceController.text}';
 
-                final protocols = state.selectedProtocolIds.toList();
+                final protocols = sessionState.selectedProtocolIds.toList();
                 final preInstructions = sessionViewModel.preTreatmentInstructionsController.text;
                 final postInstructions = sessionViewModel.postTreatmentInstructionsController.text;
 
-                final preNotifs = state.preNotificationEntries
+                final preNotifs = sessionState.preNotificationEntries
                     .map(
                       (n) =>
                           '${n.timingValueController.text} ${n.timingUnit} before: ${n.titleController.text}',
                     )
                     .toList();
-                final postNotifs = state.postNotificationEntries
+                final postNotifs = sessionState.postNotificationEntries
                     .map(
                       (n) =>
                           '${n.timingValueController.text} ${n.timingUnit} after: ${n.titleController.text}',
@@ -2121,19 +2133,19 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                   protocols: protocols,
                   preInstructions: preInstructions,
                   postInstructions: postInstructions,
-                  requirePhotosSnapshot: state.requirePostTreatmentPhotos,
-                  photosCountSnapshot: state.requiredPostTreatmentPhotoCount,
+                  requirePhotosSnapshot: sessionState.requirePostTreatmentPhotos,
+                  photosCountSnapshot: sessionState.requiredPostTreatmentPhotoCount,
                   preNotifs: preNotifs,
                   postNotifs: postNotifs,
-                  downtimeLevel: state.downtimeLevel,
-                  selectedRoles: state.selectedRoles,
-                  consentSnapshot: state.consentType == 'category'
+                  downtimeLevel: sessionState.downtimeLevel,
+                  selectedRoles: sessionState.selectedRoles,
+                  consentSnapshot: sessionState.consentType == 'category'
                       ? (state.selectedCategoryDetail?.consentFormName ??
                             'Category Consent Form')
-                      : (state.preTreatmentConsentForm?.name ??
-                            state.existingConsentForm?.name ??
+                      : (sessionState.preTreatmentConsentForm?.name ??
+                            sessionState.existingConsentForm?.name ??
                             'Custom Consent'),
-                  productUsageEntries: state.productUsageEntries,
+                  productUsageEntries: sessionState.productUsageEntries,
                 );
                 if (context.mounted) {
                   context.pop();
@@ -2148,8 +2160,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   }
 
   bool _validatePostPhotos(BuildContext context, TreatmentState state) {
-    if (state.requirePostTreatmentPhotos) {
-      if (state.requiredPostTreatmentPhotoCount <= 0) {
+    final sessionState = ref.read(sessionViewModelProvider);
+    if (sessionState.requirePostTreatmentPhotos) {
+      if (sessionState.requiredPostTreatmentPhotoCount <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please specify the required number of photos.'),
@@ -2163,8 +2176,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   }
 
   bool _validateProductQuantities(BuildContext context, TreatmentState state) {
+    final sessionState = ref.read(sessionViewModelProvider);
     final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
-    for (final entry in state.productUsageEntries) {
+    for (final entry in sessionState.productUsageEntries) {
       if (allSubAreas.isNotEmpty) {
         for (final subArea in allSubAreas) {
           final controllers = entry.getControllersForSubArea(
@@ -2227,9 +2241,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   }
 
   bool _validateScheduling(BuildContext context, TreatmentViewModel viewModel) {
-    final state = ref.read(treatmentViewModelProvider);
+    final sessionState = ref.read(sessionViewModelProvider);
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
-    if (state.isFixedDuration) {
+    if (sessionState.isFixedDuration) {
       if (sessionViewModel.fixedDurationController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -2277,10 +2291,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   }
 
   bool _validatePhaseNotifications(BuildContext context, TreatmentState state) {
+    final sessionState = ref.read(sessionViewModelProvider);
     log(
-      'NOTIFICATION: ${state.preNotificationEntries.length} ${state.postNotificationEntries.length}',
+      'NOTIFICATION: ${sessionState.preNotificationEntries.length} ${sessionState.postNotificationEntries.length}',
     );
-    if (state.preNotificationEntries.isEmpty) {
+    if (sessionState.preNotificationEntries.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -2290,7 +2305,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         ),
       );
       return false;
-    } else if (state.postNotificationEntries.isEmpty) {
+    } else if (sessionState.postNotificationEntries.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -2302,8 +2317,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       return false;
     }
     for (final entry in [
-      ...state.postNotificationEntries,
-      ...state.preNotificationEntries,
+      ...sessionState.postNotificationEntries,
+      ...sessionState.preNotificationEntries,
     ]) {
       if (entry.type.isEmpty ||
           entry.titleController.text.isEmpty ||

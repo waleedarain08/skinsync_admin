@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
@@ -23,7 +22,7 @@ class FollowUpStep extends ConsumerWidget {
     int sIdx,
     int fuIdx,
     FollowUpEntry entry,
-    TreatmentViewModel viewModel,
+    SessionViewModel viewModel,
   ) {
     return Container(
       padding: context.appEdgeInsets(all: 24),
@@ -275,7 +274,7 @@ class FollowUpStep extends ConsumerWidget {
     final viewModel = ref.read(sessionViewModelProvider.notifier);
     final sessionState = ref.watch(sessionViewModelProvider);
 
-    final int sIdx = sessionState.activeSessionIndex ?? 0;
+    final int sIdx = sessionState.activeSessionIndex;
     if (sIdx >= sessionState.sessions.length) {
       return const SizedBox.shrink();
     }

@@ -88,9 +88,9 @@ class DowntimeStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(treatmentViewModelProvider);
+    final state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
-    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
+    final CategoryDetailDto? selectedCategory = ref.watch(treatmentViewModelProvider).selectedCategoryDetail;
     final presets = selectedCategory?.downtimePresets;
     final lowDays = presets?.low ?? 2;
     final moderateDays = presets?.moderate ?? 5;

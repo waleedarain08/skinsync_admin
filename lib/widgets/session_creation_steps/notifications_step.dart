@@ -108,9 +108,9 @@ class NotificationsStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(treatmentViewModelProvider);
+    final SessionState state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
-    final selectedCategory = state.selectedCategoryDetail;
+    final selectedCategory = ref.watch(treatmentViewModelProvider).selectedCategoryDetail;
 
     return StatefulBuilder(
       builder: (context, setState) {

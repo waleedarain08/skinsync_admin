@@ -8,33 +8,38 @@ import '../models/responses/category_detail_response.dart';
 import '../models/treatment_data_models.dart';
 import '../utils/theme.dart';
 import '../view_models/category_view_model.dart';
+import '../view_models/session_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
 
 class ProtocolFormPreview extends StatelessWidget {
   final TreatmentState state;
+  final SessionState sessionState;
   final TreatmentDataState dataState;
   final CategoryState categoryState;
 
   ProtocolFormPreview({
     required this.state,
+    required this.sessionState,
     required this.dataState,
     required this.categoryState,
   });
 
   static Future<Uint8List> getPdfBytes({
     required TreatmentState state,
+    required SessionState sessionState,
     required TreatmentDataState dataState,
     required CategoryState categoryState,
   }) async {
     final document = Document();
     document.addPage(
       MultiPage(
-        pageFormat: .a4,
+        pageFormat: PdfPageFormat.a4,
         build: (_) {
           return [
             ProtocolFormPreview(
               state: state,
+              sessionState: sessionState,
               dataState: dataState,
               categoryState: categoryState,
             ),
@@ -48,7 +53,7 @@ class ProtocolFormPreview extends StatelessWidget {
   @override
   Widget build(Context mContext) {
     final selectedProtocols = dataState.protocols
-        .where((p) => state.selectedProtocolIds.contains(p.id))
+        .where((p) => sessionState.selectedProtocolIds.contains(p.id))
         .toList();
 
     final checkboxes = selectedProtocols
@@ -63,8 +68,8 @@ class ProtocolFormPreview extends StatelessWidget {
 
     List<TreatmentProtocolNoteItem> notesToShow = [];
 
-    if (state.standaloneNotes.isNotEmpty) {
-      notesToShow = state.standaloneNotes;
+    if (sessionState.standaloneNotes.isNotEmpty) {
+      notesToShow = sessionState.standaloneNotes;
     } else if (selectedCategory != null) {
       notesToShow = _getCategoryDefaultNotes(selectedCategory);
     }
@@ -76,17 +81,14 @@ class ProtocolFormPreview extends StatelessWidget {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
-        // padding: context.appEdgeInsets(all: 20),
         decoration: BoxDecoration(
           color: PdfColors.white,
           borderRadius: BorderRadius.circular(12),
-          // borderRadius: context.appBorderRadius(all: 12),
           border: Border.all(color: border),
         ),
         child: Center(
           child: Text(
             'No clinical protocols configured yet.',
-            // style: context.fonts.grey12w400,
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.normal,
@@ -100,11 +102,9 @@ class ProtocolFormPreview extends StatelessWidget {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
-        // padding: context.appEdgeInsets(all: 20),
         decoration: BoxDecoration(
           color: PdfColors.white,
           borderRadius: BorderRadius.circular(12),
-          // borderRadius: context.appBorderRadius(all: 12),
           border: Border.all(color: border),
         ),
         child: Column(
@@ -113,13 +113,12 @@ class ProtocolFormPreview extends StatelessWidget {
             if (checkboxes.isNotEmpty) ...[
               Text(
                 'CHECKLIST',
-                style: const TextStyle(fontSize: 10, fontWeight: .bold),
-              ), // context.fonts.grey10w700ls1),
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 12),
               ...checkboxes.map(
                 (p) => Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  // padding: context.appEdgeInsets(bottom: 12),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -128,11 +127,8 @@ class ProtocolFormPreview extends StatelessWidget {
                         child: Container(
                           width: 18,
                           height: 18,
-                          // width: context.w(18),
-                          // height: context.w(18),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(4),
-                            // borderRadius: context.appBorderRadius(all: 4),
                             border: Border.all(color: border, width: 1.5),
                           ),
                         ),
@@ -146,13 +142,12 @@ class ProtocolFormPreview extends StatelessWidget {
                               p.title,
                               style: const TextStyle(
                                 fontSize: 13,
-                                fontWeight: .normal,
+                                fontWeight: FontWeight.normal,
                               ),
-                              // context.fonts.black13w400
                             ),
                             _ProtocolNotesWidget(
                               protocolName: p.title,
-                              notes: state.selectedProtocolNotes,
+                              notes: sessionState.selectedProtocolNotes,
                             ),
                           ],
                         ),
@@ -172,38 +167,33 @@ class ProtocolFormPreview extends StatelessWidget {
                 style: const TextStyle(
                   color: PdfColors.grey,
                   fontSize: 10,
-                  fontWeight: .bold,
+                  fontWeight: FontWeight.bold,
                 ),
-                //  context.fonts.grey10w700ls1,
               ),
               SizedBox(height: 12),
               ...textFields.map(
                 (p) => Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  // padding: context.appEdgeInsets(bottom: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         p.title,
-                        style: const TextStyle(fontSize: 12, fontWeight: .bold),
-                        // context.fonts.black12w600,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8),
                       Container(
                         height: 40,
-                        // height: mContext.h(40),
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: const PdfColor.fromInt(0xFFF8FAFC),
                           borderRadius: BorderRadius.circular(8),
-                          // borderRadius: mContext.appBorderRadius(all: 8),
                           border: Border.all(color: border),
                         ),
                       ),
                       _ProtocolNotesWidget(
                         protocolName: p.title,
-                        notes: state.selectedProtocolNotes,
+                        notes: sessionState.selectedProtocolNotes,
                       ),
                     ],
                   ),
@@ -222,9 +212,8 @@ class ProtocolFormPreview extends StatelessWidget {
                 style: const TextStyle(
                   color: PdfColors.grey,
                   fontSize: 10,
-                  fontWeight: .bold,
+                  fontWeight: FontWeight.bold,
                 ),
-                // style: mContext.fonts.grey10w700ls1,
               ),
               SizedBox(height: 12),
               ...notesToShow.map(
@@ -247,9 +236,8 @@ class ProtocolFormPreview extends StatelessWidget {
                                 note.title!,
                                 style: const TextStyle(
                                   fontSize: 13,
-                                  fontWeight: .bold,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                // style: context.fonts.black13w600,
                               ),
                             ),
                         ],
@@ -263,7 +251,6 @@ class ProtocolFormPreview extends StatelessWidget {
                             color: PdfColors.grey,
                             fontSize: 12,
                           ),
-                          // style: context.fonts.grey12w400,
                         ),
                       ),
                     ],
@@ -280,7 +267,6 @@ class ProtocolFormPreview extends StatelessWidget {
   List<TreatmentProtocolNoteItem> _getCategoryDefaultNotes(
     CategoryDetailDto category,
   ) {
-    // Move your existing implementation here
     return [];
   }
 }
@@ -293,30 +279,25 @@ class _ProtocolNotesWidget extends StatelessWidget {
 
   @override
   Widget build(Context context) {
-    final protocolNote = notes.firstWhere(
+    final matching = notes.firstWhere(
       (n) => n.protocolName == protocolName,
-      orElse: () =>
-          TreatmentProtocolNote(protocolName: protocolName, notes: []),
+      orElse: () => TreatmentProtocolNote(protocolName: protocolName, notes: []),
     );
-
-    if (protocolNote.notes.isEmpty) {
-      return SizedBox.shrink();
-    }
+    if (matching.notes.isEmpty) return SizedBox();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 8),
-        Text(
-          'Notes:',
-          //  style:  context.fonts.black12w600,
-        ),
-        ...protocolNote.notes.map(
+        ...matching.notes.map(
           (note) => Padding(
-            padding: const EdgeInsets.only(left: 8, top: 4),
+            padding: const EdgeInsets.only(left: 8.0, top: 4.0),
             child: Text(
               "• ${note.title != null && note.title!.isNotEmpty ? '${note.title}: ' : ''}${note.description}",
-              // style: context.fonts.grey11w400,
+              style: const TextStyle(
+                color: PdfColors.grey,
+                fontSize: 11,
+              ),
             ),
           ),
         ),
