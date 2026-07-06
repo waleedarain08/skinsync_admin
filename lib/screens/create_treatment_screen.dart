@@ -422,13 +422,17 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               }
 
               if (state.treatmentStep == 4) {
-                await viewModel.submitTreatment(
+                final success = await viewModel.callBusinessLogic();
+                if (success == true) {
+                  await viewModel.submitTreatment(
                   context,
                   categories: categoryState.categories,
                 );
                 if (context.mounted) {
                   context.go('/treatment-management');
                 }
+                }
+                
               }
             },
             label: state.treatmentStep == 4
