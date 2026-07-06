@@ -2295,27 +2295,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     log(
       'NOTIFICATION: ${sessionState.preNotificationEntries.length} ${sessionState.postNotificationEntries.length}',
     );
-    if (sessionState.preNotificationEntries.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Should have at least one notification in Pre-Notifications',
-          ),
-          backgroundColor: CustomColors.red,
-        ),
-      );
-      return false;
-    } else if (sessionState.postNotificationEntries.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Should have at least one notification in Post-Notifications',
-          ),
-          backgroundColor: CustomColors.red,
-        ),
-      );
-      return false;
-    }
     for (final entry in [
       ...sessionState.postNotificationEntries,
       ...sessionState.preNotificationEntries,
