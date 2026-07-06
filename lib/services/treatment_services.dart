@@ -11,7 +11,6 @@ import 'package:skinsync_admin/models/requests/create_session_requests/step_pric
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
-import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 
 import '../models/requests/create_session_requests/down_time_level_request.dart';
 import '../models/requests/create_treatment_requests/basic_info_request.dart';
@@ -400,19 +399,19 @@ class TreatmentServices implements TreatmentRepository {
   }
 
   @override
-  Future<TreatmentDetailResponse> getTreatmentDetail({
-    required int id,
-  }) async {
-    final jsonResponse = await _api.get(
-      Endpoint.treatmentDetail,
-      pathParams: {'id': id.toString()},
-    );
-    final response = TreatmentDetailResponse.fromJson(jsonResponse);
-    if (!response.isSuccess) {
-      throw BadRequestException(response.message);
-    }
-    return response;
-  }
+  // Future<TreatmentDetailResponse> getTreatmentDetail({
+  //   required int id,
+  // }) async {
+  //   final jsonResponse = await _api.get(
+  //     Endpoint.treatmentDetail,
+  //     pathParams: {'id': id.toString()},
+  //   );
+  //   final response = TreatmentDetailResponse.fromJson(jsonResponse);
+  //   if (!response.isSuccess) {
+  //     throw BadRequestException(response.message);
+  //   }
+  //   return response;
+  // }
 
   @override
   Future<BaseApiResponseModel> updateTreatment({

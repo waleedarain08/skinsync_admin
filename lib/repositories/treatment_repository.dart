@@ -10,7 +10,6 @@ import 'package:skinsync_admin/models/requests/create_session_requests/step_pric
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/basic_info_response.dart';
-import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 
@@ -112,9 +111,9 @@ abstract class TreatmentRepository {
     required String status,
   });
 
-  Future<TreatmentDetailResponse> getTreatmentDetail({
-    required int id,
-  });
+  // Future<TreatmentDetailResponse> getTreatmentDetail({
+  //   required int id,
+  // });
 
   Future<BaseApiResponseModel> updateTreatment({
     required int treatmentId,

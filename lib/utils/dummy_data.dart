@@ -157,128 +157,128 @@ class TreatmentData {
 
   static List<ProductModel> get dummyInventoryProducts => dummyProducts;
 
-  static final List<TreatmentModel> dummyTreatments = [
-    TreatmentModel(
+  static final List<TreatmentListData> dummyTreatments = [
+    TreatmentListData(
       id: 1,
       globalSku: 'TRT-A1B2-C3D4',
-      name: 'Botox Cosmetic',
-      patientDisplayName: 'Wrinkle Relaxer',
+      patientDisplayName: 'Botox Cosmetic',
+      // patientDisplayName: 'Wrinkle Relaxer',
       description: 'Smooth fine lines and wrinkles in the upper face.',
       shortDescription: 'Anti-aging injectable treatment.',
-      basePrice: 150.0,
-      baseDurationHours: 0,
-      baseDurationMinutes: 30,
+      // basePrice: 150.0,
+      // baseDurationHours: 0,
+      // baseDurationMinutes: 30,
       image: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=1000&auto=format&fit=crop',
-      categoryName: 'Injectables',
-      categoryPath: 'Injectables > Neurotoxins',
+      // categoryName: 'Injectables',
+      // categoryPath: 'Injectables > Neurotoxins',
       status: 'active',
-      sideAreas: [
-        SideAreaModel(
-          name: 'Upper Face',
-          subAreas: [
-            SubAreaModel(name: 'Forehead', basePrice: 12.0),
-            SubAreaModel(name: "Crow's Feet", basePrice: 12.0),
-          ],
-        ),
-      ],
+      // sideAreas: [
+      //   SideAreaModel(
+      //     name: 'Upper Face',
+      //     subAreas: [
+      //       SubAreaModel(name: 'Forehead', basePrice: 12.0),
+      //       SubAreaModel(name: "Crow's Feet", basePrice: 12.0),
+      //     ],
+      //   ),
+      // ],
     ),
-    TreatmentModel(
+    TreatmentListData(
       id: 2,
       globalSku: 'TRT-9X8Y-Z7W6',
-      name: 'Juvederm Voluma',
-      patientDisplayName: 'Cheek Filler',
+      patientDisplayName: 'Juvederm Voluma',
+      // patientDisplayName: 'Cheek Filler',
       description: 'Dermal filler for cheek augmentation.',
       shortDescription: 'Volumizing dermal filler.',
-      basePrice: 800.0,
-      baseDurationHours: 1,
-      baseDurationMinutes: 0,
+      // basePrice: 800.0,
+      // baseDurationHours: 1,
+      // baseDurationMinutes: 0,
       image: 'https://images.unsplash.com/photo-1620331311520-246422ff83f9?q=80&w=1000&auto=format&fit=crop',
-      categoryName: 'Injectables',
-      categoryPath: 'Injectables > Dermal Fillers',
+      // categoryName: 'Injectables',
+      // categoryPath: 'Injectables > Dermal Fillers',
       status: 'active',
-      sideAreas: [
-        SideAreaModel(
-          name: 'Mid Face',
-          subAreas: [
-            SubAreaModel(name: 'Cheeks', basePrice: 800.0),
-          ],
-        ),
-      ],
+      // sideAreas: [
+      //   SideAreaModel(
+      //     name: 'Mid Face',
+      //     subAreas: [
+      //       SubAreaModel(name: 'Cheeks', basePrice: 800.0),
+      //     ],
+      //   ),
+      // ],
     ),
-    TreatmentModel(
+    TreatmentListData(
       id: 3,
       globalSku: 'TRT-AB12-CD34',
-      name: 'HydraFacial',
-      patientDisplayName: 'Deep Cleansing Facial',
+      patientDisplayName: 'HydraFacial',
+      // patientDisplayName: 'Deep Cleansing Facial',
       description: 'Cleanse, extract, and hydrate the skin.',
       shortDescription: 'Refreshing skin treatment.',
-      basePrice: 199.0,
-      baseDurationHours: 0,
-      baseDurationMinutes: 45,
+      // basePrice: 199.0,
+      // baseDurationHours: 0,
+      // baseDurationMinutes: 45,
       image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1000&auto=format&fit=crop',
-      categoryName: 'Skin Treatments',
-      categoryPath: 'Skin Treatments > Facials',
+      // categoryName: 'Skin Treatments',
+      // categoryPath: 'Skin Treatments > Facials',
       status: 'deactive',
     ),
-    TreatmentModel(
+    TreatmentListData(
       id: 4,
       globalSku: 'TRT-5Y6Z-W4V3',
-      name: 'Laser Hair Removal',
-      patientDisplayName: 'Permanent Hair Reduction',
+      patientDisplayName: 'Laser Hair Removal',
+      // patientDisplayName: 'Permanent Hair Reduction',
       description: 'Permanent hair reduction for smooth skin.',
       shortDescription: 'Long-term hair removal.',
-      basePrice: 250.0,
-      baseDurationHours: 1,
-      baseDurationMinutes: 30,
+      // basePrice: 250.0,
+      // baseDurationHours: 1,
+      // baseDurationMinutes: 30,
       image: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc2069?q=80&w=1000&auto=format&fit=crop',
-      categoryName: 'Laser & Energy',
-      categoryPath: 'Laser & Energy > Resurfacing',
+      // categoryName: 'Laser & Energy',
+      // categoryPath: 'Laser & Energy > Resurfacing',
       status: 'active',
-      sideAreas: [
-        SideAreaModel(
-          name: 'Body',
-          subAreas: [
-            SubAreaModel(name: 'Arms', basePrice: 150.0),
-            SubAreaModel(name: 'Thighs', basePrice: 200.0),
-          ],
-        ),
-      ],
+      // sideAreas: [
+      //   SideAreaModel(
+      //     name: 'Body',
+      //     subAreas: [
+      //       SubAreaModel(name: 'Arms', basePrice: 150.0),
+      //       SubAreaModel(name: 'Thighs', basePrice: 200.0),
+      //     ],
+      //   ),
+      // ],
     ),
-    TreatmentModel(
+    TreatmentListData(
       id: 5,
-      name: 'Chemical Peel',
-      patientDisplayName: 'Skin Resurfacing',
+      patientDisplayName: 'Chemical Peel',
+      // patientDisplayName: 'Skin Resurfacing',
       description: 'Exfoliate and improve skin texture.',
       shortDescription: 'Chemical exfoliation treatment.',
-      basePrice: 125.0,
-      baseDurationHours: 0,
-      baseDurationMinutes: 30,
+      // basePrice: 125.0,
+      // baseDurationHours: 0,
+      // baseDurationMinutes: 30,
       image: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc2069?q=80&w=1000&auto=format&fit=crop',
-      categoryName: 'Skin Treatments',
-      categoryPath: 'Skin Treatments > Chemical Peels',
+      // categoryName: 'Skin Treatments',
+      // categoryPath: 'Skin Treatments > Chemical Peels',
       status: 'active',
     ),
-    TreatmentModel(
+    TreatmentListData(
       id: 6,
-      name: 'Microneedling',
-      patientDisplayName: 'Collagen Induction Therapy',
+      patientDisplayName: 'Microneedling',
+      // patientDisplayName: 'Collagen Induction Therapy',
       description: 'Stimulate collagen production for rejuvenation.',
       shortDescription: 'Skin rejuvenation treatment.',
-      basePrice: 350.0,
-      baseDurationHours: 1,
-      baseDurationMinutes: 0,
+      // basePrice: 350.0,
+      // baseDurationHours: 1,
+      // baseDurationMinutes: 0,
       image: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=1000&auto=format&fit=crop',
-      categoryName: 'Skin Treatments',
-      categoryPath: 'Skin Treatments > Facials',
+      // categoryName: 'Skin Treatments',
+      // categoryPath: 'Skin Treatments > Facials',
       status: 'active',
-      sideAreas: [
-        SideAreaModel(
-          name: 'Face',
-          subAreas: [
-            SubAreaModel(name: 'Full Face', basePrice: 350.0),
-          ],
-        ),
-      ],
+      // sideAreas: [
+      //   SideAreaModel(
+      //     name: 'Face',
+      //     subAreas: [
+      //       SubAreaModel(name: 'Full Face', basePrice: 350.0),
+      //     ],
+      //   ),
+      // ],
     ),
   ];
 

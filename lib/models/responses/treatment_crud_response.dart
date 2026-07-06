@@ -1,7 +1,7 @@
 import '../treatment_model.dart';
 import 'base_response_model.dart';
 
-class TreatmentCrudResponse extends BaseApiResponseModel<TreatmentModel> {
+class TreatmentCrudResponse extends BaseApiResponseModel<TreatmentListData> {
   const TreatmentCrudResponse({
     required super.isSuccess,
     required super.message,
@@ -14,7 +14,7 @@ class TreatmentCrudResponse extends BaseApiResponseModel<TreatmentModel> {
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
-            : TreatmentModel.fromJson(json['data'] as Map<String, dynamic>),
+            : TreatmentListData.fromJson(json['data'] as Map<String, dynamic>),
       );
 
 

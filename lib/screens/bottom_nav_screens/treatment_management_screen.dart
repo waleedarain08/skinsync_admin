@@ -17,9 +17,7 @@ import '../../widgets/custom_outlined_button.dart';
 import '../../widgets/custom_primary_button.dart';
 import '../../widgets/gradient_scaffold.dart';
 import '../../widgets/number_paginator.dart';
-import '../edit_treatment_screen.dart';
 import '../manage_treatment_data_screen.dart';
-import '../treatment_detail_screen.dart';
 
 class TreatmentManagementScreen extends ConsumerStatefulWidget {
   const TreatmentManagementScreen({super.key});
@@ -56,7 +54,7 @@ class _TreatmentManagementScreenState
       final query = viewModel.searchController.text.toLowerCase();
       final matchesQuery =
           query.isEmpty ||
-          (t.name?.toLowerCase().contains(query) ?? false) ||
+          (t.patientDisplayName?.toLowerCase().contains(query) ?? false) ||
           (t.description?.toLowerCase().contains(query) ?? false) ||
           (t.shortDescription?.toLowerCase().contains(query) ?? false);
       return matchesQuery;
@@ -146,14 +144,14 @@ class _TreatmentManagementScreenState
     final activeTreatments = state.treatments
         .where((t) => t.status == 'active')
         .length;
-    final categoriesCovered = state.treatments
-        .map((t) => t.categoryName)
-        .where((c) => c != null && c.isNotEmpty)
-        .toSet()
-        .length;
-    final enabledByDefault = state.treatments
-        .where((t) => t.enableByDefault)
-        .length;
+    // final categoriesCovered = state.treatments
+    //     .map((t) => t.categoryName)
+    //     .where((c) => c != null && c.isNotEmpty)
+    //     .toSet()
+    //     .length;
+    // final enabledByDefault = state.treatments
+    //     .where((t) => t.enableByDefault)
+    //     .length;
     return Row(
       children: [
         _buildStatCard(
@@ -170,19 +168,19 @@ class _TreatmentManagementScreenState
           CustomColors.green,
         ),
         context.horizontalSpace(16),
-        _buildStatCard(
-          'Categories Covered',
-          '$categoriesCovered',
-          Icons.category_outlined,
-          CustomColors.amber,
-        ),
+        // _buildStatCard(
+        //   'Categories Covered',
+        //   '$categoriesCovered',
+        //   Icons.category_outlined,
+        //   CustomColors.amber,
+        // ),
         context.horizontalSpace(16),
-        _buildStatCard(
-          'Auto-Assigned',
-          '$enabledByDefault',
-          Icons.auto_awesome_outlined,
-          Colors.blue,
-        ),
+        // _buildStatCard(
+        //   'Auto-Assigned',
+        //   '$enabledByDefault',
+        //   Icons.auto_awesome_outlined,
+        //   Colors.blue,
+        // ),
       ],
     );
   }
@@ -301,7 +299,7 @@ class _TreatmentManagementScreenState
   }
 
   Widget _buildTreatmentTable(
-    List<TreatmentModel> treatments,
+    List<TreatmentListData> treatments,
     TreatmentViewModel viewModel,
   ) {
     if (treatments.isEmpty) {
@@ -369,7 +367,7 @@ class _TreatmentManagementScreenState
     );
   }
 
-  Widget _treatmentNameCell(TreatmentModel treatment) {
+  Widget _treatmentNameCell(TreatmentListData treatment) {
     final displayImage =
         (treatment.image != null && treatment.image!.isNotEmpty)
         ? treatment.image
@@ -407,7 +405,7 @@ class _TreatmentManagementScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  treatment.name ?? 'N/A',
+                  treatment.patientDisplayName ?? 'N/A',
                   style: context.fonts.black14w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -439,11 +437,11 @@ class _TreatmentManagementScreenState
     );
   }
 
-  Widget _statusBadgeCell(TreatmentModel t, WidgetRef ref) {
-    final status = t.status;
-    final String currentStatus = status.toLowerCase() == 'deactive'
-        ? 'Inactive'
-        : status;
+  Widget _statusBadgeCell(TreatmentListData t, WidgetRef ref) {
+    // final status = t.status;
+    // final String currentStatus = status.toLowerCase() == 'deactive'
+    //     ? 'Inactive'
+    //     : status;
 
     return Padding(
       padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
@@ -452,7 +450,7 @@ class _TreatmentManagementScreenState
         child: StatusToggleSwitch(
           width: context.w(100),
           height: context.h(45),
-          status: currentStatus,
+          // status: currentStatus,
           onChanged: (newStatus) {
             if (t.id != null) {
               ref
@@ -465,7 +463,7 @@ class _TreatmentManagementScreenState
     );
   }
 
-  Widget _actionsCell(TreatmentModel treatment) {
+  Widget _actionsCell(TreatmentListData treatment) {
     return Padding(
       padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
@@ -480,12 +478,12 @@ class _TreatmentManagementScreenState
             onPressed: () async {
               if (treatment.id != null) {
                 try {
-                  await ref
-                      .read(treatmentViewModelProvider.notifier)
-                      .fetchTreatmentDetail(treatment.id!);
-                  if (mounted) {
-                    await context.push(TreatmentDetailScreen.routeName);
-                  }
+                  // await ref
+                  //     .read(treatmentViewModelProvider.notifier)
+                  //     .fetchTreatmentDetail(treatment.id!);
+                  // if (mounted) {
+                  //   await context.push(TreatmentDetailScreen.routeName);
+                  // }
                 } catch (e) {
                   // Error handled gracefully by runSafely wrapper
                 }
@@ -502,12 +500,12 @@ class _TreatmentManagementScreenState
             onPressed: () async {
               if (treatment.id != null) {
                 try {
-                  await ref
-                      .read(treatmentViewModelProvider.notifier)
-                      .fetchTreatmentDetail(treatment.id!);
-                  if (mounted) {
-                    await context.push(EditTreatmentScreen.routeName);
-                  }
+                  // await ref
+                  //     .read(treatmentViewModelProvider.notifier)
+                  //     .fetchTreatmentDetail(treatment.id!);
+                  // if (mounted) {
+                  //   await context.push(EditTreatmentScreen.routeName);
+                  // }
                 } catch (e) {
                   // Error handled gracefully by runSafely wrapper
                 }

@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/responses/product_detail_response.dart';
 import 'package:skinsync_admin/models/treatment_model.dart';
-import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
@@ -28,7 +27,7 @@ class ProductDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final productState = ref.watch(productViewModelProvider);
     final product = productState.selectedProduct;
-    final treatments = ref.watch(treatmentViewModelProvider).treatments;
+    // final treatments = ref.watch(treatmentViewModelProvider).treatments;
 
     if (product == null) {
       return GradientScaffold(
@@ -41,9 +40,9 @@ class ProductDetailScreen extends ConsumerWidget {
       );
     }
 
-    final usedInTreatments = treatments.where((t) {
-      return t.productUsages?.any((u) => u.productId == product.id) ?? false;
-    }).toList();
+    // final usedInTreatments = treatments.where((t) {
+    //   return t.productUsages?.any((u) => u.productId == product.id) ?? false;
+    // }).toList();
 
     return GradientScaffold(
       appBar: AppBar(
@@ -78,11 +77,11 @@ class ProductDetailScreen extends ConsumerWidget {
                           context.verticalSpace(24),
                           _buildBillingAndPricingSection(context, product),
                           context.verticalSpace(24),
-                          _buildUsedInTreatmentsSection(
-                            context,
-                            ref,
-                            usedInTreatments,
-                          ),
+                          // _buildUsedInTreatmentsSection(
+                          //   context,
+                          //   ref,
+                          //   usedInTreatments,
+                          // ),
                         ],
                       ),
                     ),
@@ -392,7 +391,7 @@ class ProductDetailScreen extends ConsumerWidget {
   Widget _buildUsedInTreatmentsSection(
     BuildContext context,
     WidgetRef ref,
-    List<TreatmentModel> treatments,
+    List<TreatmentListData> treatments,
   ) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 28),
@@ -439,7 +438,7 @@ class ProductDetailScreen extends ConsumerWidget {
                     ref
                         .read(treatmentViewModelProvider.notifier)
                         .selectTreatment(treatment);
-                    context.push(TreatmentDetailScreen.routeName);
+                    // context.push(TreatmentDetailScreen.routeName);
                   },
                   borderRadius: context.appBorderRadius(all: 12),
                   child: Container(
@@ -462,7 +461,7 @@ class ProductDetailScreen extends ConsumerWidget {
                         context.horizontalSpace(16),
                         Expanded(
                           child: Text(
-                            treatment.name ?? 'Unnamed Treatment',
+                            treatment.patientDisplayName ?? 'Unnamed Treatment',
                             style: context.fonts.black14w600,
                           ),
                         ),

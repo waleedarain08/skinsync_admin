@@ -1,3 +1,5 @@
+import 'package:skinsync_admin/models/treatment_model.dart';
+
 import 'base_response_model.dart';
 
 class TreatmentListResponse extends BaseApiResponseModel<List<TreatmentListData>> {
@@ -30,54 +32,47 @@ class TreatmentListResponse extends BaseApiResponseModel<List<TreatmentListData>
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'is_success': isSuccess,
-        'message': message,
-        'page': page,
-        'limit': limit,
-        'total_pages': totalPages,
-        'data': data?.map((e) => e.toJson()).toList(),
-      };
+ 
 }
 
-class TreatmentListData {
-  final int? id;
-  final String? name;
-  final String? shortDescription;
-  final String? globalSku;
-  final String? icon;
-  final String? image;
-  final String? status;
+// class TreatmentListData {
+//   final int? id;
+//   final String? name;
+//   final String? shortDescription;
+//   final String? globalSku;
+//   final String? icon;
+//   final String? image;
+//   final String? status;
 
-  TreatmentListData({
-    this.id,
-    this.name,
-    this.shortDescription,
-    this.globalSku,
-    this.icon,
-    this.image,
-    this.status,
-  });
+//   TreatmentListData({
+//     this.id,
+//     this.name,
+//     this.shortDescription,
+//     this.globalSku,
+//     this.icon,
+//     this.image,
+//     this.status,
+//   });
 
-  factory TreatmentListData.fromJson(Map<String, dynamic> json) {
-    return TreatmentListData(
-      id: json['id'] as int?,
-      name: json['name'],
-      shortDescription: json['short_description'] ?? json['shortDescription'],
-      globalSku: json['global_sku'] ?? json['globalSku'],
-      icon: json['icon'],
-      image: json['image'],
-      status: json['status'],
-    );
-  }
+//   factory TreatmentListData.fromJson(Map<String, dynamic> json) {
+//     return TreatmentListData(
+//       id: json['id'] as int?,
+//       name: json['patient_display_name'],
+//       shortDescription: json['short_description'] ?? json['shortDescription'],
+//       globalSku: json['global_sku'] ?? json['globalSku'],
+//       icon: json['icon'],
+//       image: json['image'],
+//       status: json['status'],
+//     );
+//   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'short_description': shortDescription,
-        'global_sku': globalSku,
-        'icon': icon,
-        'image': image,
-        'status': status,
-      };
-}
+//   Map<String, dynamic> toJson() => {
+//         'id': id,
+//         'name': name,
+//         'short_description': shortDescription,
+//         'global_sku': globalSku,
+//         'icon': icon,
+//         'image': image,
+//         'status': status,
+//       };
+// }

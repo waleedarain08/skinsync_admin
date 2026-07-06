@@ -31,7 +31,6 @@ import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/product_detail_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
-import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/treatment_management_screen.dart';
 
 class RouteGenerator {
@@ -114,11 +113,11 @@ class RouteGenerator {
             path: CreateSessionScreen.routeName,
             builder: (_, _) => const CreateSessionScreen(),
           ),
-          GoRoute(
-            name: TreatmentDetailScreen.routeName,
-            path: TreatmentDetailScreen.routeName,
-            builder: (_, _) => const TreatmentDetailScreen(),
-          ),
+          // GoRoute(
+          //   name: TreatmentDetailScreen.routeName,
+          //   path: TreatmentDetailScreen.routeName,
+          //   builder: (_, _) => const TreatmentDetailScreen(),
+          // ),
           GoRoute(
             name: EditTreatmentScreen.routeName,
             path: EditTreatmentScreen.routeName,

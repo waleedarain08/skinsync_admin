@@ -313,7 +313,7 @@ class _TreatmentSelectionStepState
                   viewModel.globalSkuController.text.trim() == t.globalSku;
 
               return IconImageContainer(
-                title: t.patientDisplayName ?? t.name ?? 'N/A',
+                title: t.patientDisplayName ?? 'N/A',
                 imageUrl: t.image,
                 iconUrl: t.icon,
                 isSelected: isSelected,

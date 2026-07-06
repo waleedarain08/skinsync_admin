@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -67,15 +69,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: context.appEdgeInsets(
-          horizontal: 24,
-          vertical: 32,
-        ),
+        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: context.w(900),
-            ),
+            constraints: BoxConstraints(maxWidth: context.w(900)),
             child: Column(
               children: [
                 _buildUpperStepper(context, stepIndex),
@@ -162,7 +159,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                       boxShadow: isActive
                           ? [
                               BoxShadow(
-                                color: CustomColors.purple.withValues(alpha: 0.2),
+                                color: CustomColors.purple.withValues(
+                                  alpha: 0.2,
+                                ),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -171,10 +170,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     ),
                     child: Center(
                       child: isCompleted
-                          ? const Icon(Icons.check, color: Colors.white, size: 18)
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 18,
+                            )
                           : Icon(
                               step['icon'] as IconData,
-                              color: isActive ? Colors.white : CustomColors.grey,
+                              color: isActive
+                                  ? Colors.white
+                                  : CustomColors.grey,
                               size: 18,
                             ),
                     ),
@@ -187,8 +192,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                       style: isActive
                           ? context.fonts.purple14w600
                           : (isCompleted
-                              ? context.fonts.black14w600
-                              : context.fonts.grey14w500),
+                                ? context.fonts.black14w600
+                                : context.fonts.grey14w500),
                     ),
                   ],
                   // Connector line (except for the last step)
@@ -197,7 +202,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                     Container(
                       width: context.w(isCompact ? 24 : 40),
                       height: 2,
-                      color: isCompleted ? CustomColors.green : CustomColors.border,
+                      color: isCompleted
+                          ? CustomColors.green
+                          : CustomColors.border,
                     ),
                     context.horizontalSpace(isCompact ? 8 : 16),
                   ],
@@ -259,10 +266,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    titles[stepIndex],
-                    style: context.fonts.black20w600,
-                  ),
+                  Text(titles[stepIndex], style: context.fonts.black20w600),
                   Text(
                     descriptions[stepIndex],
                     style: context.fonts.grey14w400,
@@ -343,32 +347,43 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               final scaffoldMessenger = ScaffoldMessenger.of(context);
               if (state.currentStep == 1) {
                 if (state.selectedTreatment == null) {
+                  
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
-                      content: Text('Please select a treatment template before continuing.'),
+                      content: Text(
+                        'Please select a treatment template before continuing.',
+                      ),
                       backgroundColor: CustomColors.red,
                     ),
                   );
                   return;
                 }
+                log('Validating Step 2: TreatmentID - ${state.selectedTreatment!.id}');
                 viewModel.setStep(2);
                 return;
               }
 
               if (state.currentStep == 2) {
                 if (!_validateSubAreas(scaffoldMessenger, state)) return;
-                viewModel.setStep(3);
+                final result = await ref.read(treatmentViewModelProvider.notifier).createTreatmentArea();
+                if(result ==true){
+                   viewModel.setStep(3);
+                }
+               
                 return;
               }
 
               if (state.currentStep == 3) {
-                final bool allSessionsDetailed = state.sessions.isNotEmpty &&
+                final bool allSessionsDetailed =
+                    state.sessions.isNotEmpty &&
                     state.sessions.every((s) => s.isDetailedEntered);
 
                 if (!allSessionsDetailed) {
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
-                      content: Text('Please enter details for all sessions before continuing.'),
+                      content: Text(
+                        'Please enter details for all sessions before continuing.',
+                      ),
                       backgroundColor: CustomColors.red,
                     ),
                   );
@@ -381,17 +396,21 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               }
 
               if (state.currentStep == 4) {
-                viewModel.submitTreatment(
-                  context,
-                  categories: categoryState.categories,
-                ).then((_) {
-                  if (context.mounted) {
-                    context.go('/treatment-management');
-                  }
-                });
+                viewModel
+                    .submitTreatment(
+                      context,
+                      categories: categoryState.categories,
+                    )
+                    .then((_) {
+                      if (context.mounted) {
+                        context.go('/treatment-management');
+                      }
+                    });
               }
             },
-            label: state.currentStep == 4 ? 'Finish & Create Treatment' : 'Next Step',
+            label: state.currentStep == 4
+                ? 'Finish & Create Treatment'
+                : 'Next Step',
           ),
         ),
       ],
@@ -552,7 +571,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     return true;
   }
 
-  bool _validateSubAreas(ScaffoldMessengerState scaffoldMessenger, TreatmentState state) {
+  bool _validateSubAreas(
+    ScaffoldMessengerState scaffoldMessenger,
+    TreatmentState state,
+  ) {
     for (final area in state.areas) {
       if (area.subAreas.isEmpty) {
         scaffoldMessenger.showSnackBar(
