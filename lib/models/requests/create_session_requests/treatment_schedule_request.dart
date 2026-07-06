@@ -47,7 +47,7 @@ class TreatmentScheduleRequest {
     'maximum_days_in_advance': maximumDaysInAdvance,
     'calculated_total_duration': calculatedTotalDuration,
     'fixed_duration': fixedDuration,
-    'is_fixed_duration': isFixedDuration,
+    //'is_fixed_duration': isFixedDuration,
   };
 }
 
