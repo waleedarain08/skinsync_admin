@@ -1107,7 +1107,7 @@ Body                 : ${request.toJson()}
       messageController: TextEditingController(),
       timingValueController: TextEditingController(),
       timingUnit: 'days',
-      type: 'reminder',
+      type: 'care',
     );
     state = state.copyWith(
       postNotificationEntries: [...state.postNotificationEntries, newEntry],

@@ -359,7 +359,7 @@ class NotificationsStep extends ConsumerWidget {
                                     ),
                                   ),
                                   child: DropdownButton<String>(
-                                    value: entry.type,
+                                    value: types.contains(entry.type) ? entry.type : types.first,
                                     isExpanded: true,
                                     items: types
                                         .map(
