@@ -601,39 +601,46 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   }
 
   // Original callProtocol Implementation
-  Future<bool?> callProtocol({
-    required int stepNumber,
-    required Uint8List bytes,
-  }) async {
-    final mediaService = MediaService();
-    const String pdfName = 'clinicForm.pdf';
+ Future<bool?> callProtocol({
+  required int stepNumber,
+  required Uint8List bytes,
+}) async {
+  final mediaService = MediaService();
+  const String pdfName = 'clinicForm.pdf';
 
-    return await runSafely(
-      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-      () async {
+  return await runSafely(
+    onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+    () async {
+      ClinicalProtocolPdf? clinicalProtocolPdf;
+
+      if (bytes.isNotEmpty) {
         final uploadedFile = await mediaService.uploadFile(
           'treatment/pdf',
           PlatformFile(name: pdfName, size: bytes.length, bytes: bytes),
         );
-        if (uploadedFile != null) {
-          final response = await _sessionRepository.protocol(
-            request: ProtocolRequest(
-              stepNumber: stepNumber,
-              clinicalProtocolPdf: ClinicalProtocolPdf(
-                name: pdfName,
-                url: uploadedFile,
-              ),
-            ),
-            id: state.sessionId!,
-          );
 
-          return response.isSuccess;
+        if (uploadedFile == null) {
+          throw const UnknownException('Failed to upload');
         }
-        throw const UnknownException('Failed to upload');
-      },
-    );
-  }
 
+        clinicalProtocolPdf = ClinicalProtocolPdf(
+          name: pdfName,
+          url: uploadedFile,
+        );
+      }
+
+      final response = await _sessionRepository.protocol(
+        request: ProtocolRequest(
+          stepNumber: stepNumber,
+          clinicalProtocolPdf: clinicalProtocolPdf,
+        ),
+        id: state.sessionId!,
+      );
+
+      return response.isSuccess;
+    },
+  );
+}
   Future<bool?> callStepPricing({required int stepNumber}) async {
     final request = StepPricingRequest(
       stepNumber: stepNumber,

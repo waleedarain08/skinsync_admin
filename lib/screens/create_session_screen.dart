@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1983,15 +1984,23 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 success = (result == true);
               } else if (sessionState.sessionStep == 4) {
                 // Protocols
-                final bytes = await ProtocolFormPreview.getPdfBytes(
-                  state: state,
-                  sessionState: sessionState,
-                  dataState: dataState,
-                  categoryState: categoryState,
-                );
+                final bool hasProtocolContent =
+                    sessionState.selectedProtocolIds.isNotEmpty ||
+                    sessionState.standaloneNotes.isNotEmpty;
+
+                Uint8List? bytes;
+                if (hasProtocolContent) {
+                  bytes = await ProtocolFormPreview.getPdfBytes(
+                    state: state,
+                    sessionState: sessionState,
+                    dataState: dataState,
+                    categoryState: categoryState,
+                  );
+                }
+
                 final result = await viewModel.callProtocol(
                   stepNumber: 5,
-                  bytes: bytes,
+                  bytes: bytes ?? Uint8List(0),
                 );
                 success = (result == true);
               } else if (sessionState.sessionStep == 5) {
