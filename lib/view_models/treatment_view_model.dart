@@ -161,7 +161,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   }
 
 
-  Future<bool> updateTreatmentStatus(int treatmentId, String status) async {
+  Future<bool> changeTreatmentStatus(int treatmentId, String status) async {
     return await runSafely<bool>(
           onLoadingChange: (loading) =>
               state = state.copyWith(loading: loading),
@@ -582,10 +582,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     return await runSafely<void>(showLoading: true, () async {
       final draftId = state.draftTreatmentID;
       if (draftId != null) {
-        await _treatmentRepository.updateTreatmentStatus(
-          treatmentId: draftId,
-          status: 'active',
-        );
+        await changeTreatmentStatus(draftId, 'active');
       }
       await Future.delayed(const Duration(seconds: 1));
       resetForm();

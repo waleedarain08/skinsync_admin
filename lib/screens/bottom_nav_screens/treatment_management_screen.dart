@@ -457,7 +457,7 @@ class _TreatmentManagementScreenState
             if (t.id != null) {
               ref
                   .read(treatmentViewModelProvider.notifier)
-                  .updateTreatmentStatus(t.id!, newStatus);
+                  .changeTreatmentStatus(t.id!, newStatus);
             }
           },
         ),
