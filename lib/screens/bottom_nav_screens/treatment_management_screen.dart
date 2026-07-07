@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
+import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 
@@ -478,12 +479,12 @@ class _TreatmentManagementScreenState
             onPressed: () async {
               if (treatment.id != null) {
                 try {
-                  // await ref
-                  //     .read(treatmentViewModelProvider.notifier)
-                  //     .fetchTreatmentDetail(treatment.id!);
-                  // if (mounted) {
-                  //   await context.push(TreatmentDetailScreen.routeName);
-                  // }
+                  await ref
+                      .read(treatmentViewModelProvider.notifier)
+                      .fetchTreatmentDetail(treatment.id!);
+                  if (mounted) {
+                    await context.push(TreatmentDetailScreen.routeName);
+                  }
                 } catch (e) {
                   // Error handled gracefully by runSafely wrapper
                 }

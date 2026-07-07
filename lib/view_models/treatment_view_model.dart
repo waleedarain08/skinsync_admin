@@ -9,6 +9,7 @@ import 'package:skinsync_admin/models/requests/create_treatment_requests/busines
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/category_detail_response.dart';
+import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
@@ -146,6 +147,17 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           }
         }) ??
         false;
+  }
+
+  Future<bool> fetchTreatmentDetail(int id) async {
+    return await runSafely<bool>(showLoading: true, () async {
+      final response = await _treatmentRepository.getTreatmentDetail(id: id);
+      if (response.isSuccess && response.data != null) {
+        state = state.copyWith(selectedTreatmentDetail: response.data);
+        return true;
+      }
+      return false;
+    }) ?? false;
   }
 
 
@@ -743,6 +755,7 @@ class TreatmentState extends BaseStateModel {
   final int? selectedTreatmentId;
   final int? draftTreatmentID;
   final CategoryDetailDto? selectedCategoryDetail;
+  final TreatmentDetailDto? selectedTreatmentDetail;
   final int treatmentStep;
   final int sessionStep;
 
@@ -770,6 +783,7 @@ class TreatmentState extends BaseStateModel {
     this.selectedTreatment,
     this.selectedTreatmentId,
     this.selectedCategoryDetail,
+    this.selectedTreatmentDetail,
     this.treatmentStep = 0,
     this.sessionStep = 3,
     this.selectedCategoryPath = const [],
@@ -806,6 +820,7 @@ class TreatmentState extends BaseStateModel {
     bool? useInAiSimulator,
     bool? enableByDefault,
     CategoryDetailDto? selectedCategoryDetail,
+    TreatmentDetailDto? selectedTreatmentDetail,
     List<int>? selectedTreatmentAreaIds,
     bool clearTreatmentImageUrl = false,
     bool clearTreatmentIconUrl = false,
@@ -815,6 +830,8 @@ class TreatmentState extends BaseStateModel {
     return TreatmentState(
       selectedCategoryDetail:
           selectedCategoryDetail ?? this.selectedCategoryDetail,
+      selectedTreatmentDetail:
+          selectedTreatmentDetail ?? this.selectedTreatmentDetail,
       loading: loading ?? this.loading,
       draftTreatmentID: draftTreatmentID ?? this.draftTreatmentID,
       currentPage: currentPage ?? this.currentPage,

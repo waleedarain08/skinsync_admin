@@ -9,6 +9,7 @@ import '../models/requests/create_treatment_requests/sessions_setup_request.dart
 import '../models/requests/create_session_requests/treatment_schedule_request.dart';
 import '../models/responses/basic_info_response.dart';
 import '../models/responses/treatment_list_response.dart';
+import '../models/responses/treatment_detail_response.dart';
 import '../repositories/treatment_repository.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
@@ -157,19 +158,19 @@ class TreatmentServices implements TreatmentRepository {
   }
 
   @override
-  // Future<TreatmentDetailResponse> getTreatmentDetail({
-  //   required int id,
-  // }) async {
-  //   final jsonResponse = await _api.get(
-  //     Endpoint.treatmentDetail,
-  //     pathParams: {'id': id.toString()},
-  //   );
-  //   final response = TreatmentDetailResponse.fromJson(jsonResponse);
-  //   if (!response.isSuccess) {
-  //     throw BadRequestException(response.message);
-  //   }
-  //   return response;
-  // }
+  Future<TreatmentDetailResponse> getTreatmentDetail({
+    required int id,
+  }) async {
+    final jsonResponse = await _api.get(
+      Endpoint.treatmentDetail,
+      pathParams: {'id': id.toString()},
+    );
+    final response = TreatmentDetailResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
 
   @override
   Future<BaseApiResponseModel> updateTreatment({
