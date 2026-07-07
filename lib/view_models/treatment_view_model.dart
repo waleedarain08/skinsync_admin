@@ -12,12 +12,12 @@ import 'package:skinsync_admin/models/responses/category_detail_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/utils/enums.dart';
-import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/repositories/category_repository.dart';
 import 'package:skinsync_admin/repositories/treatment_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/exception.dart';
+import '../models/responses/treatment_list_response.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 import 'category_view_model.dart';
@@ -32,9 +32,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final int _formSessionId = 0;
   int get formSessionId => _formSessionId;
 
-  static final List<TreatmentListData> _localTreatments = List.from(
-    TreatmentData.dummyTreatments,
-  );
+  // static final List<TreatmentListData> _localTreatments = List.from(
+  //   TreatmentData.dummyTreatments,
+  // );
 
   final TreatmentRepository _treatmentRepository =
       locator<TreatmentRepository>();
@@ -531,23 +531,23 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     _applyFilters();
   }
 
-  void toggleTreatmentStatus(int treatmentId) {
-    final index = _localTreatments.indexWhere((t) => t.id == treatmentId);
-    if (index != -1) {}
+  // void toggleTreatmentStatus(int treatmentId) {
+  //   final index = _localTreatments.indexWhere((t) => t.id == treatmentId);
+  //   if (index != -1) {}
+  //
+  //   state = state.copyWith(
+  //     treatments: List.from(_localTreatments),
+  //     filteredTreatments: _getFilteredList(_localTreatments),
+  //   );
+  // }
 
-    state = state.copyWith(
-      treatments: List.from(_localTreatments),
-      filteredTreatments: _getFilteredList(_localTreatments),
-    );
-  }
-
-  void deleteTreatment(int treatmentId) {
-    _localTreatments.removeWhere((t) => t.id == treatmentId);
-    state = state.copyWith(
-      treatments: List.from(_localTreatments),
-      filteredTreatments: _getFilteredList(_localTreatments),
-    );
-  }
+  // void deleteTreatment(int treatmentId) {
+  //   _localTreatments.removeWhere((t) => t.id == treatmentId);
+  //   state = state.copyWith(
+  //     treatments: List.from(_localTreatments),
+  //     filteredTreatments: _getFilteredList(_localTreatments),
+  //   );
+  // }
 
 
 

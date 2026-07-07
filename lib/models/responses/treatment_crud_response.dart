@@ -1,4 +1,4 @@
-import '../treatment_model.dart';
+import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 import 'base_response_model.dart';
 
 class TreatmentCrudResponse extends BaseApiResponseModel<TreatmentListData> {

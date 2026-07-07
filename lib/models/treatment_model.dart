@@ -453,51 +453,6 @@
 //   }
 // }
 
-class TreatmentListData {
-  final int? id;
-  final String? patientDisplayName;
-  final String? shortDescription;
-  final String? description;
-  final String? globalSku;
-  final String? icon;
-  final String? image;
-  final String? status;
-
-
-  TreatmentListData({
-    this.id,
-    this.patientDisplayName,
-    this.shortDescription,
-    this.description,
-    this.globalSku,
-    this.icon,
-    this.image,
-    this.status,
-  });
-
-  factory TreatmentListData.fromJson(Map<String, dynamic> json) {
-    return TreatmentListData(
-      id: json['id'] as int?,
-      patientDisplayName: json['patient_display_name'],
-      shortDescription: json['short_description'] ?? json['shortDescription'],
-      globalSku: json['global_sku'] ?? json['globalSku'],
-      icon: json['icon'],
-      image: json['image'],
-      status: json['status'],
-      description: json['description']
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': patientDisplayName,
-        'short_description': shortDescription,
-        'global_sku': globalSku,
-        'icon': icon,
-        'image': image,
-        'status': status,
-      };
-}
 
 class SideAreaModel {
   int? id;

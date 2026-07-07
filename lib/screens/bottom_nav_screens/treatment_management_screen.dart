@@ -10,6 +10,7 @@ import 'package:skinsync_admin/view_models/category_view_model.dart';
 import '../../../widgets/app_network_image.dart';
 import '../../../widgets/custom_dropdown_widget.dart';
 import '../../../widgets/status_toggle_switch.dart';
+import '../../models/responses/treatment_list_response.dart';
 import '../../utils/theme.dart';
 import '../../view_models/treatment_view_model.dart';
 import '../../widgets/app_search_field.dart';

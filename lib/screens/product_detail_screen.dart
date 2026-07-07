@@ -1,9 +1,7 @@
-// Forced update with status switch
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/responses/product_detail_response.dart';
-import 'package:skinsync_admin/models/treatment_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
@@ -11,6 +9,8 @@ import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
+
+import '../models/responses/treatment_list_response.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   static const String routeName = '/product-detail';

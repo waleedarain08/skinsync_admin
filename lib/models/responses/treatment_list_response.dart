@@ -1,4 +1,3 @@
-import 'package:skinsync_admin/models/treatment_model.dart';
 
 import 'base_response_model.dart';
 
@@ -35,44 +34,48 @@ class TreatmentListResponse extends BaseApiResponseModel<List<TreatmentListData>
  
 }
 
-// class TreatmentListData {
-//   final int? id;
-//   final String? name;
-//   final String? shortDescription;
-//   final String? globalSku;
-//   final String? icon;
-//   final String? image;
-//   final String? status;
+class TreatmentListData {
+  final int? id;
+  final String? patientDisplayName;
+  final String? shortDescription;
+  final String? description;
+  final String? globalSku;
+  final String? icon;
+  final String? image;
+  final String? status;
 
-//   TreatmentListData({
-//     this.id,
-//     this.name,
-//     this.shortDescription,
-//     this.globalSku,
-//     this.icon,
-//     this.image,
-//     this.status,
-//   });
 
-//   factory TreatmentListData.fromJson(Map<String, dynamic> json) {
-//     return TreatmentListData(
-//       id: json['id'] as int?,
-//       name: json['patient_display_name'],
-//       shortDescription: json['short_description'] ?? json['shortDescription'],
-//       globalSku: json['global_sku'] ?? json['globalSku'],
-//       icon: json['icon'],
-//       image: json['image'],
-//       status: json['status'],
-//     );
-//   }
+  TreatmentListData({
+    this.id,
+    this.patientDisplayName,
+    this.shortDescription,
+    this.description,
+    this.globalSku,
+    this.icon,
+    this.image,
+    this.status,
+  });
 
-//   Map<String, dynamic> toJson() => {
-//         'id': id,
-//         'name': name,
-//         'short_description': shortDescription,
-//         'global_sku': globalSku,
-//         'icon': icon,
-//         'image': image,
-//         'status': status,
-//       };
-// }
+  factory TreatmentListData.fromJson(Map<String, dynamic> json) {
+    return TreatmentListData(
+        id: json['id'] as int?,
+        patientDisplayName: json['patient_display_name'],
+        shortDescription: json['short_description'] ?? json['shortDescription'],
+        globalSku: json['global_sku'] ?? json['globalSku'],
+        icon: json['icon'],
+        image: json['image'],
+        status: json['status'],
+        description: json['description']
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': patientDisplayName,
+    'short_description': shortDescription,
+    'global_sku': globalSku,
+    'icon': icon,
+    'image': image,
+    'status': status,
+  };
+}
