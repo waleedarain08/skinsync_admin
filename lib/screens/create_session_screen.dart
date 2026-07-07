@@ -18,6 +18,7 @@ import '../widgets/gradient_scaffold.dart';
 import '../widgets/nested_area_selector.dart';
 import '../widgets/session_creation_steps/treatment_creation_steps.dart';
 import '../widgets/protocol_preview_widget.dart';
+import '../widgets/live_session_preview_widget.dart';
 
 class CreateSessionScreen extends ConsumerStatefulWidget {
   const CreateSessionScreen({super.key});
@@ -84,6 +85,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
             if (isDesktop || isTablet)
               _buildLeftSidebar(context, state, sessionViewModel),
             Expanded(
+              flex: 3,
               child: Column(
                 children: [
                   if (!isDesktop && !isTablet)
@@ -142,12 +144,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               ),
             ),
             if (isDesktop)
-              _buildRightSidebar(
-                context,
-                state,
-                viewModel,
-                dataState,
-                categoryState,
+              const Expanded(
+                flex: 2,
+                child: LiveSessionPreviewWidget(),
               ),
           ],
         ),
@@ -397,75 +396,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     );
   }
 
-  Widget _buildRightSidebar(
-    BuildContext context,
-    TreatmentState state,
-    TreatmentViewModel viewModel,
-    TreatmentDataState dataState,
-    CategoryState categoryState,
-  ) {
-    final CategoryDetailDto? selectedCategory = state.selectedCategoryDetail;
 
-    return Container(
-      width: context.w(350),
-      decoration: BoxDecoration(
-        color: CustomColors.whiteGrey.withValues(alpha: 0.5),
-        border: const Border(left: BorderSide(color: CustomColors.border)),
-      ),
-      child: SingleChildScrollView(
-        padding: context.appEdgeInsets(all: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Live Preview', style: context.fonts.black16w600),
-            context.verticalSpace(20),
-            _buildPreviewCard(context, viewModel, state),
-
-            context.verticalSpace(32),
-            Text(
-              'Treatment Blueprint Summary',
-              style: context.fonts.black16w600,
-            ),
-            context.verticalSpace(16),
-            _buildCompleteTreatmentBlueprint(
-              context,
-              state,
-              viewModel,
-              dataState,
-              selectedCategory,
-            ),
-
-            context.verticalSpace(32),
-            Text(
-              'Clinical Protocol Form Preview',
-              style: context.fonts.black16w600,
-            ),
-            context.verticalSpace(16),
-            _buildProtocolFormPreview(
-              context,
-              state,
-              viewModel,
-              dataState,
-              categoryState,
-            ),
-            context.verticalSpace(32),
-            Text('Patient Journey Preview', style: context.fonts.black16w600),
-            context.verticalSpace(20),
-            _buildPatientJourneyPreview(
-              context,
-              state,
-              viewModel,
-              categoryState,
-            ),
-            context.verticalSpace(32),
-            Text('Configuration Summary', style: context.fonts.black16w600),
-            context.verticalSpace(16),
-            _buildSummaryChips(context, viewModel, state, dataState),
-          ],
-        ),
-      ),
-    );
-  }
 
   List<TreatmentProtocolNoteItem> _getCategoryDefaultNotes(
     CategoryDetailDto? category,

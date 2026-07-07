@@ -239,7 +239,20 @@ class SessionState extends BaseStateModel {
 }
 
 class SessionViewModel extends BaseViewModel<SessionState> {
-  SessionViewModel._() : super(SessionState());
+  SessionViewModel._() : super(SessionState()) {
+    basePriceController.addListener(_triggerRebuild);
+    fixedPriceController.addListener(_triggerRebuild);
+    treatmentDurationController.addListener(_triggerRebuild);
+    prepTimeController.addListener(_triggerRebuild);
+    cleanupTimeController.addListener(_triggerRebuild);
+    fixedDurationController.addListener(_triggerRebuild);
+    preTreatmentInstructionsController.addListener(_triggerRebuild);
+    postTreatmentInstructionsController.addListener(_triggerRebuild);
+  }
+
+  void _triggerRebuild() {
+    state = state.copyWith();
+  }
 
   final SessionRepository _sessionRepository = locator<SessionRepository>();
 
@@ -480,6 +493,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       boxQuantity: resolvedBoxQuantity,
       clinicCost: resolvedClinicCost,
       retailPricePerUnit: resolvedRetailPrice,
+      onChanged: _triggerRebuild,
     );
 
     state = state.copyWith(
@@ -508,6 +522,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       usageType: usageTypeVal ?? usageType,
       deductionTiming: deductionTiming,
       allowSubstitution: allowSubstitution,
+      onChanged: _triggerRebuild,
     );
     state = state.copyWith(productUsageEntries: updatedEntries);
   }
@@ -1221,10 +1236,12 @@ Body                 : ${request.toJson()}
   }
 
   TextEditingController getControllerForUnit(String unit) {
-    return unitPriceControllers.putIfAbsent(
-      unit,
-      () => TextEditingController(text: '0'),
-    );
+    if (!unitPriceControllers.containsKey(unit)) {
+      final controller = TextEditingController(text: '0');
+      controller.addListener(_triggerRebuild);
+      unitPriceControllers[unit] = controller;
+    }
+    return unitPriceControllers[unit]!;
   }
 
   void toggleRole(String role) {
@@ -1480,9 +1497,13 @@ class SubAreaConsumptionControllers {
   final minController = TextEditingController(text: '1');
   final maxController = TextEditingController(text: '1');
 
-  SubAreaConsumptionControllers({this.subAreaId, String? min, String? max}) {
+  SubAreaConsumptionControllers({this.subAreaId, String? min, String? max, VoidCallback? onChanged}) {
     if (min != null) minController.text = min;
     if (max != null) maxController.text = max;
+    if (onChanged != null) {
+      minController.addListener(onChanged);
+      maxController.addListener(onChanged);
+    }
   }
 
   void dispose() {
@@ -1525,6 +1546,7 @@ class ProductUsageEntry {
     this.boxQuantity,
     this.clinicCost,
     this.retailPricePerUnit,
+    VoidCallback? onChanged,
   }) : minQuantityController =
            minQuantityController ?? TextEditingController(text: '1'),
        maxQuantityController =
@@ -1532,12 +1554,19 @@ class ProductUsageEntry {
        notesController = notesController ?? TextEditingController(),
        perUnitDurationController =
            perUnitDurationController ?? TextEditingController(text: '0.0') {
+    if (onChanged != null) {
+      this.minQuantityController.addListener(onChanged);
+      this.maxQuantityController.addListener(onChanged);
+      this.notesController.addListener(onChanged);
+      this.perUnitDurationController.addListener(onChanged);
+    }
     if (initialSubAreaConsumptions != null) {
       for (final sac in initialSubAreaConsumptions) {
         subAreaControllers[sac.subAreaName] = SubAreaConsumptionControllers(
           subAreaId: sac.subAreaId,
           min: sac.minQuantity.toString(),
           max: sac.maxQuantity.toString(),
+          onChanged: onChanged,
         );
       }
     }
@@ -1546,6 +1575,7 @@ class ProductUsageEntry {
   SubAreaConsumptionControllers getControllersForSubArea(
     String subAreaName, {
     int? subAreaId,
+    VoidCallback? onChanged,
   }) {
     final existing = subAreaControllers[subAreaName];
     if (existing != null) {
@@ -1556,7 +1586,10 @@ class ProductUsageEntry {
       return existing;
     }
 
-    final controllers = SubAreaConsumptionControllers(subAreaId: subAreaId);
+    final controllers = SubAreaConsumptionControllers(
+      subAreaId: subAreaId,
+      onChanged: onChanged,
+    );
     subAreaControllers[subAreaName] = controllers;
     return controllers;
   }
@@ -1566,6 +1599,7 @@ class ProductUsageEntry {
     String? deductionTiming,
     bool? allowSubstitution,
     String? unit,
+    VoidCallback? onChanged,
   }) {
     final entry = ProductUsageEntry(
       productId: productId,
@@ -1582,12 +1616,14 @@ class ProductUsageEntry {
       boxQuantity: boxQuantity,
       clinicCost: clinicCost,
       retailPricePerUnit: retailPricePerUnit,
+      onChanged: onChanged,
     );
     subAreaControllers.forEach((key, val) {
       entry.subAreaControllers[key] = SubAreaConsumptionControllers(
         subAreaId: val.subAreaId,
         min: val.minController.text,
         max: val.maxController.text,
+        onChanged: onChanged,
       );
     });
     return entry;

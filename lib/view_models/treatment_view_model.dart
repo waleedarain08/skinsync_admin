@@ -62,6 +62,18 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   final ImagePicker _picker = ImagePicker();
 
   @override
+  void init() {
+    super.init();
+    displayNameController.addListener(_onTextChanged);
+    internalNameController.addListener(_onTextChanged);
+    categoryNameController.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    state = state.copyWith();
+  }
+
+  @override
   void dispose() {
     globalSkuController.dispose();
     internalNameController.dispose();
