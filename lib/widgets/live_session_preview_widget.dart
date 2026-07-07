@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
+import 'package:skinsync_admin/models/treatment_data_models.dart';
 
 class LiveSessionPreviewWidget extends ConsumerWidget {
   const LiveSessionPreviewWidget({super.key});
@@ -54,6 +56,7 @@ class LiveSessionPreviewWidget extends ConsumerWidget {
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final treatmentViewModel = ref.read(treatmentViewModelProvider.notifier);
     final categoryState = ref.watch(categoryViewModelProvider);
+    final dataState = ref.watch(treatmentDataViewModelProvider);
 
     final String treatmentName = treatmentViewModel.displayNameController.text.trim().isNotEmpty
         ? treatmentViewModel.displayNameController.text.trim()
@@ -272,14 +275,158 @@ class LiveSessionPreviewWidget extends ConsumerWidget {
                   ],
                   const Divider(),
                   context.verticalSpace(12),
-                  _previewSectionHeader(context, 'Procedural Protocols', Icons.assignment_turned_in_outlined),
-                  context.verticalSpace(8),
-                  if (sessionState.selectedProtocolIds.isEmpty)
-                    Text('No checkboxes selected (N/A)', style: context.fonts.grey12w400)
-                  else
-                    ...sessionState.selectedProtocolIds.asMap().entries.map((ent) {
-                      return _previewRow(context, 'Protocol #${ent.key + 1}', ent.value);
-                    }),
+                  _previewSectionHeader(context, 'Procedural Protocols Form', Icons.assignment_turned_in_outlined),
+                  context.verticalSpace(12),
+                  () {
+                    final selectedProtocols = sessionState.selectedProtocolIds
+                        .map((id) => dataState.protocols.any((p) => p.id == id)
+                            ? dataState.protocols.firstWhere((p) => p.id == id)
+                            : null)
+                        .whereType<ProtocolItem>()
+                        .toList();
+
+                    if (selectedProtocols.isEmpty && sessionState.standaloneNotes.isEmpty) {
+                      return Text('No checklist protocols or notes configured (N/A)', style: context.fonts.grey12w400);
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...selectedProtocols.map((protocol) {
+                          final noteEntry = sessionState.selectedProtocolNotes.firstWhere(
+                            (n) => n.protocolName == protocol.title,
+                            orElse: () => TreatmentProtocolNote(
+                              protocolName: protocol.title,
+                              notes: [],
+                            ),
+                          );
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: context.appEdgeInsets(all: 14),
+                            decoration: BoxDecoration(
+                              color: CustomColors.whiteGrey.withValues(alpha: 0.3),
+                              borderRadius: context.appBorderRadius(all: 10),
+                              border: Border.all(color: CustomColors.border.withValues(alpha: 0.5)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.check_box_outlined,
+                                      size: 18,
+                                      color: CustomColors.purple,
+                                    ),
+                                    context.horizontalSpace(8),
+                                    Expanded(
+                                      child: Text(
+                                        protocol.title,
+                                        style: context.fonts.black13w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (noteEntry.notes.isNotEmpty) ...[
+                                  context.verticalSpace(10),
+                                  const Divider(),
+                                  context.verticalSpace(8),
+                                  ...noteEntry.notes.map((noteItem) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Icon(
+                                            Icons.crop_square_rounded,
+                                            size: 16,
+                                            color: CustomColors.grey,
+                                          ),
+                                          context.horizontalSpace(8),
+                                          Expanded(
+                                            child: RichText(
+                                              text: TextSpan(
+                                                children: [
+                                                  if (noteItem.title != null && noteItem.title!.isNotEmpty)
+                                                    TextSpan(
+                                                      text: '${noteItem.title}: ',
+                                                      style: context.fonts.black13w600,
+                                                    ),
+                                                  TextSpan(
+                                                    text: noteItem.description,
+                                                    style: context.fonts.black13w500,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ] else ...[
+                                  context.verticalSpace(8),
+                                  Text(
+                                    'No specific clinical notes added for this protocol.',
+                                    style: context.fonts.grey12w400.copyWith(fontStyle: FontStyle.italic),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          );
+                        }),
+                        if (sessionState.standaloneNotes.isNotEmpty) ...[
+                          context.verticalSpace(8),
+                          Text(
+                            'General Clinical Directives:',
+                            style: context.fonts.grey12w600,
+                          ),
+                          context.verticalSpace(10),
+                          ...sessionState.standaloneNotes.asMap().entries.map((ent) {
+                            final note = ent.value;
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: context.appEdgeInsets(all: 12),
+                              decoration: BoxDecoration(
+                                color: CustomColors.whiteGrey.withValues(alpha: 0.2),
+                                borderRadius: context.appBorderRadius(all: 8),
+                                border: Border.all(color: CustomColors.border.withValues(alpha: 0.3)),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(
+                                    Icons.crop_square_rounded,
+                                    size: 16,
+                                    color: CustomColors.grey,
+                                  ),
+                                  context.horizontalSpace(8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        if (note.title != null && note.title!.isNotEmpty)
+                                          Text(
+                                            note.title!,
+                                            style: context.fonts.black13w600,
+                                          ),
+                                        context.verticalSpace(2),
+                                        Text(
+                                          note.description,
+                                          style: context.fonts.black13w500,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
+                      ],
+                    );
+                  }(),
                   const Divider(),
                   context.verticalSpace(12),
                   _previewSectionHeader(context, 'Treatment Instructions', Icons.menu_book_outlined),
