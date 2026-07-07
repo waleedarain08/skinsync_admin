@@ -582,7 +582,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     return await runSafely<void>(showLoading: true, () async {
       final draftId = state.draftTreatmentID;
       if (draftId != null) {
-        await changeTreatmentStatus(draftId, 'active');
+        await changeTreatmentStatus(draftId, 'Active');
       }
       await Future.delayed(const Duration(seconds: 1));
       resetForm();
