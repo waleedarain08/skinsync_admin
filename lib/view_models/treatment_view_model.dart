@@ -580,16 +580,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       return updateTreatment(context, categories: categories);
     }
     return await runSafely<void>(showLoading: true, () async {
-      final skuError = validateGlobalSku(globalSkuController.text.trim());
-      if (skuError != null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(skuError)));
-        }
-        return;
+      final draftId = state.draftTreatmentID;
+      if (draftId != null) {
+        await _treatmentRepository.updateTreatmentStatus(
+          treatmentId: draftId,
+          status: 'active',
+        );
       }
-
       await Future.delayed(const Duration(seconds: 1));
       resetForm();
       await getTreatments();
@@ -607,19 +604,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     }
 
     return await runSafely<void>(showLoading: true, () async {
-      final skuError = validateGlobalSku(
-        globalSkuController.text.trim(),
-        currentTreatmentId: treatmentId,
-      );
-      if (skuError != null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(skuError)));
-        }
-        return;
-      }
-
       final request = UpdateTreatmentRequest();
 
       await _treatmentRepository.updateTreatment(
@@ -677,13 +661,13 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     globalSkuController.text = generated;
   }
 
-  void updateTreatmentState({
-    List<AreaViewModelEntry>? areas,
-    String? status,
-    String? gender,
-  }) {
-    state = state.copyWith(areas: areas, status: status);
-  }
+  // void updateTreatmentState({
+  //   List<AreaViewModelEntry>? areas,
+  //   String? status,
+  //   String? gender,
+  // }) {
+  //   state = state.copyWith(areas: areas, status: status);
+  // }
 
   List<int> _getDynamicSelectedAreaIds(List<AreaViewModelEntry> areas) {
     final List<int> ids = [];
