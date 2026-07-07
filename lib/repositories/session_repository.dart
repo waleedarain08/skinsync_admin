@@ -1,4 +1,5 @@
 import 'package:skinsync_admin/models/requests/create_session_requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/constent_form_selection_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/down_time_level_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/follow_up_request.dart';
@@ -61,6 +62,7 @@ abstract class SessionRepository {
     required int id,
     required bool requirePostPhotos,
     required int count,
+    required List<PhotoMilestone> configs,
   });
 
   Future<BaseApiResponseModel> phaseNotifications({

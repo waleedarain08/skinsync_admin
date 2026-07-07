@@ -1,12 +1,29 @@
 import 'package:skinsync_admin/utils/enums.dart';
 
+class PhotoMilestone {
+  final int numberOfDays;
+  final int requiredPhotos;
+
+  const PhotoMilestone({
+    required this.numberOfDays,
+    required this.requiredPhotos,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'number_of_days': numberOfDays,
+      'required_photos': requiredPhotos,
+    };
+  }
+}
+
 class PostPhotosRequest {
   final bool requirePostTreatmentPhotos;
-  final int requiredPostTreatmentPhotoCount;
+  final List<PhotoMilestone> photoMilestone;
 
   const PostPhotosRequest({
     required this.requirePostTreatmentPhotos,
-    required this.requiredPostTreatmentPhotoCount,
+    required this.photoMilestone,
   });
 
   Map<String, dynamic> toJson() {
@@ -14,7 +31,7 @@ class PostPhotosRequest {
       'step_number': 7,
       'keys': [CreateTreatmentSteps.postTreatmentPhotos.name],
       'require_post_treatment_photos': requirePostTreatmentPhotos,
-      'required_post_treatment_photo_count': requiredPostTreatmentPhotoCount,
+      'photo_milestone': photoMilestone.map((m) => m.toJson()).toList(),
     };
   }
 }

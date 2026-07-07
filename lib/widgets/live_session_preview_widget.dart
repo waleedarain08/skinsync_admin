@@ -449,7 +449,23 @@ class LiveSessionPreviewWidget extends ConsumerWidget {
                   context.verticalSpace(12),
                   _previewSectionHeader(context, 'Safety & Notifications', Icons.notifications_active_outlined),
                   context.verticalSpace(8),
-                  _previewRow(context, 'Required Photos', sessionState.requirePostTreatmentPhotos ? '${sessionState.requiredPostTreatmentPhotoCount}' : '0'),
+                  _previewRow(
+                    context,
+                    'Required Photos',
+                    sessionState.requirePostTreatmentPhotos
+                        ? '${sessionState.postTreatmentPhotoConfigs.length} milestones'
+                        : 'No',
+                  ),
+                  if (sessionState.requirePostTreatmentPhotos)
+                    ...sessionState.postTreatmentPhotoConfigs.map((config) {
+                      final days = config.daysController.text.trim().isEmpty ? '0' : config.daysController.text.trim();
+                      final count = config.countController.text.trim().isEmpty ? '0' : config.countController.text.trim();
+                      return _previewRow(
+                        context,
+                        '  └ Milestone Day $days',
+                        '$count photos',
+                      );
+                    }),
                   _previewRow(context, 'Pre-Reminders', '${sessionState.preNotificationEntries.length} entries'),
                   _previewRow(context, 'Postcare Alerts', '${sessionState.postNotificationEntries.length} entries'),
                   _previewRow(context, 'Downtime Level', sessionState.downtimeLevel),

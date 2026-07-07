@@ -13,6 +13,7 @@ import 'package:skinsync_admin/models/requests/create_session_requests/follow_up
 import 'package:skinsync_admin/models/requests/create_session_requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/pre_treatment_instruction_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/product_usage_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
@@ -68,6 +69,7 @@ class SessionState extends BaseStateModel {
   // Attachments
   final List<Attachment> existingPreAttachments;
   final List<Attachment> existingPostAttachments;
+  final List<PostTreatmentPhotoConfig> postTreatmentPhotoConfigs;
 
   // Downtime
   final String downtimeLevel;
@@ -110,6 +112,7 @@ class SessionState extends BaseStateModel {
     this.postNotificationSource = 'Category_Default',
     this.preNotificationEntries = const [],
     this.postNotificationEntries = const [],
+    this.postTreatmentPhotoConfigs = const [],
     this.requirePostTreatmentPhotos = false,
     this.requiredPostTreatmentPhotoCount = 0,
     this.consentType = 'No_Consent',
@@ -153,6 +156,7 @@ class SessionState extends BaseStateModel {
     String? postNotificationSource,
     List<NotificationEntry>? preNotificationEntries,
     List<NotificationEntry>? postNotificationEntries,
+    List<PostTreatmentPhotoConfig>? postTreatmentPhotoConfigs,
     bool? requirePostTreatmentPhotos,
     int? requiredPostTreatmentPhotoCount,
     String? consentType,
@@ -201,6 +205,8 @@ class SessionState extends BaseStateModel {
           preNotificationEntries ?? this.preNotificationEntries,
       postNotificationEntries:
           postNotificationEntries ?? this.postNotificationEntries,
+      postTreatmentPhotoConfigs:
+          postTreatmentPhotoConfigs ?? this.postTreatmentPhotoConfigs,
       requirePostTreatmentPhotos:
           requirePostTreatmentPhotos ?? this.requirePostTreatmentPhotos,
       requiredPostTreatmentPhotoCount:
@@ -844,11 +850,27 @@ Body       : ${request.toJson()}
       if (state.sessionId == null) {
         throw const UnknownException('Session not found!');
       }
+      int totalCount = 0;
+      final List<PhotoMilestone> configs = [];
+
+      for (final config in state.postTreatmentPhotoConfigs) {
+        final days = int.tryParse(config.daysController.text) ?? 0;
+        final count = int.tryParse(config.countController.text) ?? 0;
+        totalCount += count;
+        configs.add(PhotoMilestone(
+          numberOfDays: days,
+          requiredPhotos: count,
+        ));
+      }
+
       await _sessionRepository.postTreatmentPhotos(
         id: state.sessionId!,
         requirePostPhotos: state.requirePostTreatmentPhotos,
-        count: state.requiredPostTreatmentPhotoCount,
+        count: totalCount,
+        configs: configs,
       );
+
+      state = state.copyWith(requiredPostTreatmentPhotoCount: totalCount);
       return true;
     });
   }
@@ -1146,6 +1168,22 @@ Body                 : ${request.toJson()}
     state = state.copyWith(requiredPostTreatmentPhotoCount: count);
   }
 
+  void addPostTreatmentPhotoConfig() {
+    final newConfig = PostTreatmentPhotoConfig(days: '1', count: '1');
+    newConfig.daysController.addListener(_triggerRebuild);
+    newConfig.countController.addListener(_triggerRebuild);
+    state = state.copyWith(
+      postTreatmentPhotoConfigs: [...state.postTreatmentPhotoConfigs, newConfig],
+    );
+  }
+
+  void removePostTreatmentPhotoConfig(int index) {
+    final updated = List<PostTreatmentPhotoConfig>.from(state.postTreatmentPhotoConfigs);
+    updated[index].dispose();
+    updated.removeAt(index);
+    state = state.copyWith(postTreatmentPhotoConfigs: updated);
+  }
+
   void setConsentType(String type) {
     state = state.copyWith(consentType: type);
   }
@@ -1329,7 +1367,18 @@ Body                 : ${request.toJson()}
   }
 
   void toggleRequirePostTreatmentPhotos(bool? value) {
-    state = state.copyWith(requirePostTreatmentPhotos: value ?? false);
+    final active = value ?? false;
+    final configs = List<PostTreatmentPhotoConfig>.from(state.postTreatmentPhotoConfigs);
+    if (active && configs.isEmpty) {
+      final newConfig = PostTreatmentPhotoConfig(days: '1', count: '1');
+      newConfig.daysController.addListener(_triggerRebuild);
+      newConfig.countController.addListener(_triggerRebuild);
+      configs.add(newConfig);
+    }
+    state = state.copyWith(
+      requirePostTreatmentPhotos: active,
+      postTreatmentPhotoConfigs: configs,
+    );
   }
 
   void toggleAllowClinicOverride(bool? val) {
@@ -1637,5 +1686,31 @@ class ProductUsageEntry {
     for (final controller in subAreaControllers.values) {
       controller.dispose();
     }
+  }
+}
+
+class PostTreatmentPhotoConfig {
+  final TextEditingController daysController;
+  final TextEditingController countController;
+
+  PostTreatmentPhotoConfig({
+    required String days,
+    required String count,
+  })  : daysController = TextEditingController(text: days),
+        countController = TextEditingController(text: count);
+
+  void dispose() {
+    daysController.dispose();
+    countController.dispose();
+  }
+
+  PostTreatmentPhotoConfig copyWith({
+    String? days,
+    String? count,
+  }) {
+    return PostTreatmentPhotoConfig(
+      days: days ?? daysController.text,
+      count: count ?? countController.text,
+    );
   }
 }

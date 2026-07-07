@@ -2131,15 +2131,50 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   bool _validatePostPhotos(BuildContext context, TreatmentState state) {
     final sessionState = ref.read(sessionViewModelProvider);
     if (sessionState.requirePostTreatmentPhotos) {
-      if (sessionState.requiredPostTreatmentPhotoCount <= 0) {
+      if (sessionState.postTreatmentPhotoConfigs.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please specify the required number of photos.'),
+            content: Text('Please add at least one photo requirement milestone.'),
             backgroundColor: CustomColors.red,
           ),
         );
         return false;
       }
+
+      int totalPhotos = 0;
+      for (int i = 0; i < sessionState.postTreatmentPhotoConfigs.length; i++) {
+        final config = sessionState.postTreatmentPhotoConfigs[i];
+        final daysStr = config.daysController.text.trim();
+        final countStr = config.countController.text.trim();
+
+        final days = int.tryParse(daysStr) ?? 0;
+        final count = int.tryParse(countStr) ?? 0;
+
+        if (days <= 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Please specify a valid number of days (>= 1) for milestone #${i + 1}.'),
+              backgroundColor: CustomColors.red,
+            ),
+          );
+          return false;
+        }
+
+        if (count <= 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Please specify a valid number of photos (>= 1) for milestone #${i + 1}.'),
+              backgroundColor: CustomColors.red,
+            ),
+          );
+          return false;
+        }
+
+        totalPhotos += count;
+      }
+
+      // Automatically update the state's total photo count
+      ref.read(sessionViewModelProvider.notifier).updateRequiredPostTreatmentPhotoCount(totalPhotos.toString());
     }
     return true;
   }

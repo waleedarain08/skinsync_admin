@@ -7,21 +7,6 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 class PostPhotosStep extends ConsumerWidget {
   const PostPhotosStep({super.key});
 
-  Widget _counterButton({required IconData icon, required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          border: Border.all(color: CustomColors.border),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(icon, size: 20, color: CustomColors.purple),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(sessionViewModelProvider);
@@ -52,65 +37,86 @@ class PostPhotosStep extends ConsumerWidget {
             ),
             Switch.adaptive(
               value: state.requirePostTreatmentPhotos,
-              activeColor: CustomColors.purple,
+              activeTrackColor: CustomColors.purple,
               onChanged: viewModel.toggleRequirePostTreatmentPhotos,
             ),
           ],
         ),
         if (state.requirePostTreatmentPhotos) ...[
-          context.verticalSpace(32),
+          context.verticalSpace(24),
           const Divider(),
-          context.verticalSpace(32),
-          Text('Required Number of Photos', style: context.fonts.black16w600),
+          context.verticalSpace(24),
+          Text(
+            'Photo Milestone Requirements',
+            style: context.fonts.black16w600,
+          ),
           context.verticalSpace(8),
           Text(
-            'Specify how many photos the provider is expected to upload.',
+            'Define how many photos are required at specific day milestones after treatment.',
             style: context.fonts.grey12w400,
           ),
           context.verticalSpace(20),
-          Row(
-            children: [
-              _counterButton(
-                icon: Icons.remove,
-                onTap: () {
-                  final current =
-                      int.tryParse(
-                        viewModel.postTreatmentPhotoCountController.text,
-                      ) ??
-                      0;
-                  if (current > 1) {
-                    final newVal = (current - 1).toString();
-                    viewModel.postTreatmentPhotoCountController.text = newVal;
-                    viewModel.updateRequiredPostTreatmentPhotoCount(newVal);
-                  }
-                },
-              ),
-              Container(
-                width: context.w(100),
-                margin: context.appEdgeInsets(horizontal: 16),
-                child: BuildTextField(
-                  label: '',
-                  controller: viewModel.postTreatmentPhotoCountController,
-                  hintText: '0',
-                  keyboardType: TextInputType.number,
-                  onChanged: (val) => viewModel
-                      .updateRequiredPostTreatmentPhotoCount(val ?? '0'),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: state.postTreatmentPhotoConfigs.length,
+            separatorBuilder: (_, __) => context.verticalSpace(16),
+            itemBuilder: (context, index) {
+              final config = state.postTreatmentPhotoConfigs[index];
+              return Container(
+                padding: context.appEdgeInsets(all: 16),
+                decoration: BoxDecoration(
+                  color: CustomColors.whiteGrey.withValues(alpha: 0.5),
+                  borderRadius: context.appBorderRadius(all: 10),
+                  border: Border.all(color: CustomColors.border),
                 ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: BuildTextField(
+                        label: 'Days After Treatment',
+                        controller: config.daysController,
+                        hintText: 'e.g. 3',
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    context.horizontalSpace(16),
+                    Expanded(
+                      flex: 2,
+                      child: BuildTextField(
+                        label: 'Required Photos',
+                        controller: config.countController,
+                        hintText: 'e.g. 2',
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    if (state.postTreatmentPhotoConfigs.length > 1) ...[
+                      context.horizontalSpace(16),
+                      IconButton(
+                        onPressed: () => viewModel.removePostTreatmentPhotoConfig(index),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: CustomColors.red,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          ),
+          context.verticalSpace(16),
+          Center(
+            child: TextButton.icon(
+              onPressed: viewModel.addPostTreatmentPhotoConfig,
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('Add Photo Requirement Milestone'),
+              style: TextButton.styleFrom(
+                foregroundColor: CustomColors.purple,
               ),
-              _counterButton(
-                icon: Icons.add,
-                onTap: () {
-                  final current =
-                      int.tryParse(
-                        viewModel.postTreatmentPhotoCountController.text,
-                      ) ??
-                      0;
-                  final newVal = (current + 1).toString();
-                  viewModel.postTreatmentPhotoCountController.text = newVal;
-                  viewModel.updateRequiredPostTreatmentPhotoCount(newVal);
-                },
-              ),
-            ],
+            ),
           ),
         ],
       ],
