@@ -440,10 +440,10 @@ class _TreatmentManagementScreenState
   }
 
   Widget _statusBadgeCell(TreatmentListData t, WidgetRef ref) {
-    // final status = t.status;
-    // final String currentStatus = status.toLowerCase() == 'deactive'
-    //     ? 'Inactive'
-    //     : status;
+    final status = t.status ?? 'active';
+    final String currentStatus = (status.toLowerCase() == 'deactive' || status.toLowerCase() == 'inactive')
+        ? 'Inactive'
+        : (status.toLowerCase() == 'active' ? 'Active' : 'Draft');
 
     return Padding(
       padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
@@ -452,7 +452,7 @@ class _TreatmentManagementScreenState
         child: StatusToggleSwitch(
           width: context.w(100),
           height: context.h(45),
-          // status: currentStatus,
+          status: currentStatus,
           onChanged: (newStatus) {
             if (t.id != null) {
               ref
