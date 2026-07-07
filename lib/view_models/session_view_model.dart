@@ -1034,6 +1034,10 @@ Body                 : ${request.toJson()}
     );
   }
 
+  void updateSelectedProtocolIds(List<String> ids) {
+    state = state.copyWith(selectedProtocolIds: ids);
+  }
+
   void updateProtocolNotes(
     String protocolId,
     List<TreatmentProtocolNoteItem> notes,

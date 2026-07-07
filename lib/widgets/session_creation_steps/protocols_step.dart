@@ -430,8 +430,11 @@ class ProtocolsStep extends ConsumerWidget {
     final viewModel = ref.read(sessionViewModelProvider.notifier);
     final dataState = ref.watch(treatmentDataViewModelProvider);
 
-    final selectedProtocols = dataState.protocols
-        .where((p) => state.selectedProtocolIds.contains(p.id))
+    final selectedProtocols = state.selectedProtocolIds
+        .map((id) => dataState.protocols.any((p) => p.id == id)
+            ? dataState.protocols.firstWhere((p) => p.id == id)
+            : null)
+        .whereType<ProtocolItem>()
         .toList();
 
     return Column(
@@ -460,7 +463,9 @@ class ProtocolsStep extends ConsumerWidget {
             style: context.fonts.grey14w400,
           ),
           context.verticalSpace(16),
-          ...selectedProtocols.map((protocol) {
+          ...selectedProtocols.asMap().entries.map((entry) {
+            final idx = entry.key;
+            final protocol = entry.value;
             final noteEntry = state.selectedProtocolNotes.firstWhere(
               (n) => n.protocolName == protocol.title,
               orElse: () => TreatmentProtocolNote(
@@ -475,6 +480,20 @@ class ProtocolsStep extends ConsumerWidget {
               onNotesChanged: (updatedNotes) {
                 viewModel.updateProtocolNotes(protocol.title, updatedNotes);
               },
+              onMoveUp: idx > 0 ? () {
+                final updatedIds = List<String>.from(state.selectedProtocolIds);
+                final temp = updatedIds[idx];
+                updatedIds[idx] = updatedIds[idx - 1];
+                updatedIds[idx - 1] = temp;
+                viewModel.updateSelectedProtocolIds(updatedIds);
+              } : null,
+              onMoveDown: idx < selectedProtocols.length - 1 ? () {
+                final updatedIds = List<String>.from(state.selectedProtocolIds);
+                final temp = updatedIds[idx];
+                updatedIds[idx] = updatedIds[idx + 1];
+                updatedIds[idx + 1] = temp;
+                viewModel.updateSelectedProtocolIds(updatedIds);
+              } : null,
             );
           }),
         ],
@@ -489,12 +508,16 @@ class ProtocolNotesCard extends StatefulWidget {
   final ProtocolItem protocol;
   final List<TreatmentProtocolNoteItem> initialNotes;
   final void Function(List<TreatmentProtocolNoteItem>) onNotesChanged;
+  final VoidCallback? onMoveUp;
+  final VoidCallback? onMoveDown;
 
   const ProtocolNotesCard({
     super.key,
     required this.protocol,
     required this.initialNotes,
     required this.onNotesChanged,
+    this.onMoveUp,
+    this.onMoveDown,
   });
 
   @override
@@ -570,6 +593,22 @@ class _ProtocolNotesCardState extends State<ProtocolNotesCard> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    if (widget.onMoveUp != null || widget.onMoveDown != null) ...[
+                      context.horizontalSpace(8),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_upward_rounded, size: 16, color: CustomColors.grey),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: widget.onMoveUp,
+                      ),
+                      context.horizontalSpace(4),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_downward_rounded, size: 16, color: CustomColors.grey),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: widget.onMoveDown,
+                      ),
+                    ],
                   ],
                 ),
               ),
