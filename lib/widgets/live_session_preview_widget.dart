@@ -169,29 +169,8 @@ class LiveSessionPreviewWidget extends ConsumerWidget {
                     )
                   else
                     ...sessionState.productUsageEntries.map((e) {
-                      final activeArea = state.areas.where((a) => a.areaController.text.isNotEmpty).lastOrNull;
-                      final allSubAreas = activeArea?.subAreas ?? [];
-                      
-                      // Calculate min & max qty
-                      double minQty = 0.0;
-                      double maxQty = 0.0;
-                      final List<String> subAreaBreakdowns = [];
-
-                      if (allSubAreas.isNotEmpty) {
-                        for (final subArea in allSubAreas) {
-                          final ctrls = e.getControllersForSubArea(subArea.name, subAreaId: subArea.id);
-                          final subMin = double.tryParse(ctrls.minController.text) ?? 0.0;
-                          final subMax = double.tryParse(ctrls.maxController.text) ?? 0.0;
-                          minQty += subMin;
-                          maxQty += subMax;
-                          if (subMin > 0 || subMax > 0) {
-                            subAreaBreakdowns.add('${subArea.name}: ${subMin.toStringAsFixed(1)}-${subMax.toStringAsFixed(1)} ${e.unit}');
-                          }
-                        }
-                      } else {
-                        minQty = double.tryParse(e.minQuantityController.text) ?? 0.0;
-                        maxQty = double.tryParse(e.maxQuantityController.text) ?? 0.0;
-                      }
+                      final double minQty = double.tryParse(e.minQuantityController.text) ?? 0.0;
+                      final double maxQty = double.tryParse(e.maxQuantityController.text) ?? 0.0;
 
                       final String qtyDisplay = '${minQty.toStringAsFixed(1)} - ${maxQty.toStringAsFixed(1)} ${e.unit}';
 
@@ -226,17 +205,6 @@ class LiveSessionPreviewWidget extends ConsumerWidget {
                             _previewRow(context, 'Deduction Timing', e.deductionTiming.replaceAll('_', ' ')),
                             _previewRow(context, 'Substitution Allowed', e.allowSubstitution ? 'Yes' : 'No'),
                             _previewRow(context, 'Per-Unit Duration', '${e.perUnitDurationController.text} mins'),
-                            if (subAreaBreakdowns.isNotEmpty) ...[
-                              context.verticalSpace(4),
-                              Text(
-                                'Area Breakdown:',
-                                style: context.fonts.grey12w600,
-                              ),
-                              ...subAreaBreakdowns.map((b) => Padding(
-                                padding: const EdgeInsets.only(left: 8, top: 2),
-                                child: Text(b, style: context.fonts.black13w500),
-                              )),
-                            ],
                             if (e.notesController.text.trim().isNotEmpty) ...[
                               context.verticalSpace(4),
                               Text(

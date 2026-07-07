@@ -1103,10 +1103,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: sessionState.productUsageEntries.map((entry) {
-                final allSubAreas = state.areas
-                    .expand((a) => a.subAreas)
-                    .toList();
-
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Column(
@@ -1133,29 +1129,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                               "Substitution Allowed: ${entry.allowSubstitution ? 'Yes' : 'No'}",
                               style: context.fonts.grey11w400,
                             ),
-                            if (allSubAreas.isNotEmpty) ...[
-                              context.verticalSpace(4),
-                              Text(
-                                'Sub-Area Consumption Overrides:',
-                                style: context.fonts.black12w600,
-                              ),
-                              ...allSubAreas.map((subArea) {
-                                final controllers = entry
-                                    .getControllersForSubArea(
-                                      subArea.name,
-                                      subAreaId: subArea.id,
-                                    );
-                                final minText = controllers.minController.text;
-                                final maxText = controllers.maxController.text;
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 8),
-                                  child: Text(
-                                    '- ${subArea.name}: Min $minText / Max $maxText ${entry.unit}',
-                                    style: context.fonts.grey11w400,
-                                  ),
-                                );
-                              }),
-                            ],
+                            context.verticalSpace(4),
+                            Text(
+                              'Consumption Range: Min ${entry.minQuantityController.text} / Max ${entry.maxQuantityController.text} ${entry.unit}',
+                              style: context.fonts.grey11w400,
+                            ),
                             if (entry.notesController.text.isNotEmpty)
                               Text(
                                 'Notes: ${entry.notesController.text}',
@@ -1938,19 +1916,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     ProductUsageEntry entry,
     List<SubAreaConfig> allSubAreas,
   ) {
-    if (allSubAreas.isNotEmpty) {
-      double sum = 0.0;
-      for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(
-          subArea.name,
-          subAreaId: subArea.id,
-        );
-        sum += double.tryParse(controllers.minController.text) ?? 0.0;
-      }
-      return sum;
-    } else {
-      return double.tryParse(entry.minQuantityController.text) ?? 0.0;
-    }
+    return double.tryParse(entry.minQuantityController.text) ?? 0.0;
   }
 
   double _calculateProductUsageDuration(TreatmentState state) {
@@ -2181,64 +2147,30 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
 
   bool _validateProductQuantities(BuildContext context, TreatmentState state) {
     final sessionState = ref.read(sessionViewModelProvider);
-    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
     for (final entry in sessionState.productUsageEntries) {
-      if (allSubAreas.isNotEmpty) {
-        for (final subArea in allSubAreas) {
-          final controllers = entry.getControllersForSubArea(
-            subArea.name,
-            subAreaId: subArea.id,
-          );
-          final minVal = double.tryParse(controllers.minController.text) ?? 0.0;
-          final maxVal = double.tryParse(controllers.maxController.text) ?? 0.0;
-          if (minVal < 1 || maxVal < 1) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Quantity for ${entry.productName} in ${subArea.name} must be greater than or equal to 1.',
-                ),
-                backgroundColor: CustomColors.red,
-              ),
-            );
-            return false;
-          }
-          if (maxVal < minVal) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Maximum Quantity must be greater than or equal to Minimum Quantity for ${entry.productName} in ${subArea.name}.',
-                ),
-                backgroundColor: CustomColors.red,
-              ),
-            );
-            return false;
-          }
-        }
-      } else {
-        final minVal = double.tryParse(entry.minQuantityController.text) ?? 0.0;
-        final maxVal = double.tryParse(entry.maxQuantityController.text) ?? 0.0;
-        if (minVal < 1 || maxVal < 1) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Quantity for ${entry.productName} must be greater than or equal to 1.',
-              ),
-              backgroundColor: CustomColors.red,
+      final minVal = double.tryParse(entry.minQuantityController.text) ?? 0.0;
+      final maxVal = double.tryParse(entry.maxQuantityController.text) ?? 0.0;
+      if (minVal < 1 || maxVal < 1) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Quantity for ${entry.productName} must be greater than or equal to 1.',
             ),
-          );
-          return false;
-        }
-        if (maxVal < minVal) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Maximum Quantity must be greater than or equal to Minimum Quantity for ${entry.productName}.',
-              ),
-              backgroundColor: CustomColors.red,
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
+      }
+      if (maxVal < minVal) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Maximum Quantity must be greater than or equal to Minimum Quantity for ${entry.productName}.',
             ),
-          );
-          return false;
-        }
+            backgroundColor: CustomColors.red,
+          ),
+        );
+        return false;
       }
     }
     return true;

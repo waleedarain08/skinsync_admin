@@ -6,7 +6,7 @@ class ProductUsagesRequest {
   ProductUsagesRequest({this.productUsages});
 
   Map<String, dynamic> toJson() => {
-    'step_number': 4,
+    'step_number': 1,
     'keys': [CreateTreatmentSteps.inventoryProducts.name],
     'product_usages': productUsages == null
         ? []
@@ -19,44 +19,23 @@ class ProductUsage {
   final String? deductionTiming;
   final bool? allowSubstitution;
   final String? notes;
-  final List<SubAreaConsumptionModel>? subAreaConsumptions;
+  final double? minQuantity;
+  final double? maxQuantity;
 
   ProductUsage({
     this.productId,
     this.deductionTiming,
     this.allowSubstitution,
     this.notes,
-    this.subAreaConsumptions,
-  });
-
-  Map<String, dynamic> toJson() => {
-    
-    'product_id': productId,
-    'deduction_timing': deductionTiming,
-    'allow_substitution': allowSubstitution,
-    'notes': notes,
-    'sub_area_consumptions': subAreaConsumptions == null
-        ? []
-        : List<dynamic>.from(subAreaConsumptions!.map((x) => x.toJson())),
-  };
-}
-
-class SubAreaConsumptionModel {
-  final int? subAreaId;
-  final String? subAreaName;
-  final int? minQuantity;
-  final int? maxQuantity;
-
-  SubAreaConsumptionModel({
-    this.subAreaId,
-    this.subAreaName,
     this.minQuantity,
     this.maxQuantity,
   });
 
   Map<String, dynamic> toJson() => {
-    'sub_area_id': subAreaId,
-    'sub_area_name': subAreaName,
+    'product_id': productId,
+    'deduction_timing': deductionTiming,
+    'allow_substitution': allowSubstitution,
+    'notes': notes,
     'min_quantity': minQuantity,
     'max_quantity': maxQuantity,
   };

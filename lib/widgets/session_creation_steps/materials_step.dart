@@ -112,8 +112,6 @@ class MaterialsStep extends ConsumerWidget {
     SessionViewModel viewModel,
     TreatmentState state,
   ) {
-    final allSubAreas = state.areas.expand((a) => a.subAreas).toList();
-
     final sessionState = ref.read(sessionViewModelProvider);
     final TreatmentProductData? productData =
         sessionState.products.any((p) => p.id == entry.productId)
@@ -362,167 +360,42 @@ class MaterialsStep extends ConsumerWidget {
             hintText: 'Clinical instructions or restrictions...',
             maxLines: 2,
           ),
-          if (allSubAreas.isNotEmpty) ...[
-            context.verticalSpace(24),
-            const Divider(),
-            context.verticalSpace(16),
-            Text(
-              'Sub-Area Consumption Ranges',
-              style: context.fonts.black14w600,
-            ),
-            context.verticalSpace(4),
-            Text(
-              'Define clinical product ranges for each configured sub-area.',
-              style: context.fonts.grey12w400,
-            ),
-            context.verticalSpace(16),
-            ...allSubAreas.map((subArea) {
-              final controllers = entry.getControllersForSubArea(
-                subArea.name,
-                subAreaId: subArea.id,
-              );
-              final pluralUnit = _formatUnitPlural(entry.unit);
-              return Padding(
-                padding: context.appEdgeInsets(bottom: 16),
-                child: Container(
-                  padding: context.appEdgeInsets(all: 16),
-                  decoration: BoxDecoration(
-                    color: CustomColors.whiteGrey,
-                    borderRadius: context.appBorderRadius(all: 10),
-                    border: Border.all(color: CustomColors.border),
+          context.verticalSpace(24),
+          const Divider(),
+          context.verticalSpace(16),
+          Text('Product Consumption Range', style: context.fonts.black14w600),
+          context.verticalSpace(16),
+          Row(
+            children: [
+              Expanded(
+                child: BuildTextField(
+                  label: 'Min ${_formatUnitPlural(entry.unit)}',
+                  controller: entry.minQuantityController,
+                  hintText: '1',
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.subdirectory_arrow_right,
-                            size: 16,
-                            color: CustomColors.purple,
-                          ),
-                          context.horizontalSpace(8),
-                          Text(subArea.name, style: context.fonts.black14w600),
-                        ],
-                      ),
-                      context.verticalSpace(12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: BuildTextField(
-                              label: 'Min $pluralUnit',
-                              controller: controllers.minController,
-                              hintText: '1',
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              onChanged: (val) {
-                                viewModel.updateProductPerUnitDuration(
-                                  index,
-                                  '',
-                                );
-                              },
-                            ),
-                          ),
-                          context.horizontalSpace(16),
-                          Expanded(
-                            child: BuildTextField(
-                              label: 'Max $pluralUnit',
-                              controller: controllers.maxController,
-                              hintText: '1',
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              onChanged: (val) {
-                                viewModel.updateProductPerUnitDuration(
-                                  index,
-                                  '',
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      Builder(
-                        builder: (context) {
-                          final minVal =
-                              double.tryParse(controllers.minController.text) ??
-                              0.0;
-                          final maxVal =
-                              double.tryParse(controllers.maxController.text) ??
-                              0.0;
-                          if (minVal < 1 || maxVal < 1) {
-                            return const Padding(
-                              padding: EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                'Quantity must be greater than or equal to 1.',
-                                style: TextStyle(
-                                  color: CustomColors.red,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            );
-                          }
-                          if (maxVal < minVal) {
-                            return const Padding(
-                              padding: EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                'Maximum Quantity must be greater than or equal to Minimum Quantity.',
-                                style: TextStyle(
-                                  color: CustomColors.red,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                    ],
-                  ),
+                  onChanged: (val) {
+                    viewModel.updateProductPerUnitDuration(index, '');
+                  },
                 ),
-              );
-            }),
-          ] else ...[
-            context.verticalSpace(24),
-            const Divider(),
-            context.verticalSpace(16),
-            Text('Product Consumption Range', style: context.fonts.black14w600),
-            context.verticalSpace(16),
-            Row(
-              children: [
-                Expanded(
-                  child: BuildTextField(
-                    label: 'Min ${_formatUnitPlural(entry.unit)}',
-                    controller: entry.minQuantityController,
-                    hintText: '1',
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    onChanged: (val) {
-                      viewModel.updateProductPerUnitDuration(index, '');
-                    },
+              ),
+              context.horizontalSpace(16),
+              Expanded(
+                child: BuildTextField(
+                  label: 'Max ${_formatUnitPlural(entry.unit)}',
+                  controller: entry.maxQuantityController,
+                  hintText: '1',
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
                   ),
+                  onChanged: (val) {
+                    viewModel.updateProductPerUnitDuration(index, '');
+                  },
                 ),
-                context.horizontalSpace(16),
-                Expanded(
-                  child: BuildTextField(
-                    label: 'Max ${_formatUnitPlural(entry.unit)}',
-                    controller: entry.maxQuantityController,
-                    hintText: '1',
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    onChanged: (val) {
-                      viewModel.updateProductPerUnitDuration(index, '');
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
 
         ],
       ),

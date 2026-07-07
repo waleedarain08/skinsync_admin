@@ -22,45 +22,20 @@ class SchedulingStep extends ConsumerWidget {
     ProductUsageEntry entry,
     List<dynamic> allSubAreas,
   ) {
-    if (allSubAreas.isNotEmpty) {
-      double sum = 0.0;
-      for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(
-          subArea.name,
-          subAreaId: subArea.id,
-        );
-        sum += double.tryParse(controllers.minController.text) ?? 0.0;
-      }
-      return sum;
-    } else {
-      return double.tryParse(entry.minQuantityController.text) ?? 0.0;
-    }
+    return double.tryParse(entry.minQuantityController.text) ?? 0.0;
   }
 
   double _getProductMaxQuantity(
     ProductUsageEntry entry,
     List<dynamic> allSubAreas,
   ) {
-    if (allSubAreas.isNotEmpty) {
-      double sum = 0.0;
-      for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(
-          subArea.name,
-          subAreaId: subArea.id,
-        );
-        sum += double.tryParse(controllers.maxController.text) ?? 0.0;
-      }
-      return sum;
-    } else {
-      return double.tryParse(entry.maxQuantityController.text) ?? 0.0;
-    }
+    return double.tryParse(entry.maxQuantityController.text) ?? 0.0;
   }
 
   double _calculateProductUsageDuration(TreatmentState treatmentState, SessionState sessionState) {
-    final allSubAreas = treatmentState.areas.expand((a) => a.subAreas).toList();
     double total = 0.0;
     for (final entry in sessionState.productUsageEntries) {
-      final minQty = _getProductMinQuantity(entry, allSubAreas);
+      final minQty = _getProductMinQuantity(entry, const []);
       final perUnit =
           double.tryParse(entry.perUnitDurationController.text) ?? 0.0;
       total += minQty * perUnit;

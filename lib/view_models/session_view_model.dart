@@ -553,25 +553,16 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     final treatmentState = ref.read(treatmentViewModelProvider);
     final request = ProductUsagesRequest(
       productUsages: state.productUsageEntries.map((e) {
-        final subAreaConsumptions = e.subAreaControllers.entries
-            .map(
-              (entry) => SubAreaConsumptionModel(
-                subAreaId: entry.value.subAreaId,
-                subAreaName: entry.key,
-                minQuantity: int.tryParse(entry.value.minController.text),
-                maxQuantity: int.tryParse(entry.value.maxController.text),
-              ),
-            )
-            .toList();
+        final minQty = double.tryParse(e.minQuantityController.text);
+        final maxQty = double.tryParse(e.maxQuantityController.text);
 
         return ProductUsage(
           productId: e.productId,
           deductionTiming: e.deductionTiming,
           allowSubstitution: e.allowSubstitution,
           notes: e.notesController.text,
-          subAreaConsumptions: subAreaConsumptions.isEmpty
-              ? null
-              : subAreaConsumptions,
+          minQuantity: minQty,
+          maxQuantity: maxQty,
         );
       }).toList(),
     );
@@ -589,22 +580,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   }
 
   double getProductMinQuantity(ProductUsageEntry entry) {
-    final treatmentState = ref.read(treatmentViewModelProvider);
-    final allSubAreas = treatmentState.areas.expand((a) => a.subAreas).toList();
-    if (allSubAreas.isNotEmpty) {
-      double total = 0.0;
-      for (final subArea in allSubAreas) {
-        final controllers = entry.getControllersForSubArea(
-          subArea.name,
-          subAreaId: subArea.id,
-        );
-        final val = double.tryParse(controllers.minController.text) ?? 0.0;
-        total += val;
-      }
-      return total;
-    } else {
-      return double.tryParse(entry.minQuantityController.text) ?? 0.0;
-    }
+    return double.tryParse(entry.minQuantityController.text) ?? 0.0;
   }
 
   double calculateProductUsageDuration() {
@@ -1541,26 +1517,6 @@ class FollowUpEntry {
   }
 }
 
-class SubAreaConsumptionControllers {
-  int? subAreaId;
-  final minController = TextEditingController(text: '1');
-  final maxController = TextEditingController(text: '1');
-
-  SubAreaConsumptionControllers({this.subAreaId, String? min, String? max, VoidCallback? onChanged}) {
-    if (min != null) minController.text = min;
-    if (max != null) maxController.text = max;
-    if (onChanged != null) {
-      minController.addListener(onChanged);
-      maxController.addListener(onChanged);
-    }
-  }
-
-  void dispose() {
-    minController.dispose();
-    maxController.dispose();
-  }
-}
-
 class ProductUsageEntry {
   final int productId;
   final String productName;
@@ -1572,7 +1528,6 @@ class ProductUsageEntry {
   final TextEditingController maxQuantityController;
   final TextEditingController notesController;
   final TextEditingController perUnitDurationController;
-  final Map<String, SubAreaConsumptionControllers> subAreaControllers = {};
 
   final String? packageType;
   final int? boxQuantity;
@@ -1590,7 +1545,6 @@ class ProductUsageEntry {
     TextEditingController? maxQuantityController,
     TextEditingController? notesController,
     TextEditingController? perUnitDurationController,
-    List<SubAreaConsumption>? initialSubAreaConsumptions,
     this.packageType,
     this.boxQuantity,
     this.clinicCost,
@@ -1609,38 +1563,6 @@ class ProductUsageEntry {
       this.notesController.addListener(onChanged);
       this.perUnitDurationController.addListener(onChanged);
     }
-    if (initialSubAreaConsumptions != null) {
-      for (final sac in initialSubAreaConsumptions) {
-        subAreaControllers[sac.subAreaName] = SubAreaConsumptionControllers(
-          subAreaId: sac.subAreaId,
-          min: sac.minQuantity.toString(),
-          max: sac.maxQuantity.toString(),
-          onChanged: onChanged,
-        );
-      }
-    }
-  }
-
-  SubAreaConsumptionControllers getControllersForSubArea(
-    String subAreaName, {
-    int? subAreaId,
-    VoidCallback? onChanged,
-  }) {
-    final existing = subAreaControllers[subAreaName];
-    if (existing != null) {
-      if (subAreaId != null &&
-          (existing.subAreaId == null || existing.subAreaId == 0)) {
-        existing.subAreaId = subAreaId;
-      }
-      return existing;
-    }
-
-    final controllers = SubAreaConsumptionControllers(
-      subAreaId: subAreaId,
-      onChanged: onChanged,
-    );
-    subAreaControllers[subAreaName] = controllers;
-    return controllers;
   }
 
   ProductUsageEntry copyWith({
@@ -1650,7 +1572,7 @@ class ProductUsageEntry {
     String? unit,
     VoidCallback? onChanged,
   }) {
-    final entry = ProductUsageEntry(
+    return ProductUsageEntry(
       productId: productId,
       productName: productName,
       unit: unit ?? this.unit,
@@ -1667,15 +1589,6 @@ class ProductUsageEntry {
       retailPricePerUnit: retailPricePerUnit,
       onChanged: onChanged,
     );
-    subAreaControllers.forEach((key, val) {
-      entry.subAreaControllers[key] = SubAreaConsumptionControllers(
-        subAreaId: val.subAreaId,
-        min: val.minController.text,
-        max: val.maxController.text,
-        onChanged: onChanged,
-      );
-    });
-    return entry;
   }
 
   void dispose() {
@@ -1683,9 +1596,6 @@ class ProductUsageEntry {
     maxQuantityController.dispose();
     notesController.dispose();
     perUnitDurationController.dispose();
-    for (final controller in subAreaControllers.values) {
-      controller.dispose();
-    }
   }
 }
 
