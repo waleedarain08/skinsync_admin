@@ -131,8 +131,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             }).toList();
 
             state = state.copyWith(
-              treatments: list,
+              treatments: categoryId == null ? list : null,
               filteredTreatments: list,
+              createTreatments: categoryId != null ? list :null,
               loading: false,
               currentPage: response.page ?? page,
               totalPages: response.totalPages ?? 1,
@@ -146,6 +147,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         }) ??
         false;
   }
+
 
   Future<bool> updateTreatmentStatus(int treatmentId, String status) async {
     return await runSafely<bool>(
@@ -270,7 +272,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   Future<bool?> callBusinessLogic() async {
     return await runSafely(() async {
-      final treatmentId = state.draftTreatmentID;
+      final treatmentId = state.selectedTreatment!.id;
       if (treatmentId == null) {
         throw const UnknownException('Treatment not found!');
       }
@@ -734,6 +736,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
 class TreatmentState extends BaseStateModel {
   final List<TreatmentListData> treatments;
+  final List<TreatmentListData> createTreatments;
+
   final List<TreatmentListData> filteredTreatments;
   final TreatmentListData? selectedTreatment;
   final int? selectedTreatmentId;
@@ -761,6 +765,7 @@ class TreatmentState extends BaseStateModel {
     super.totalPages,
     super.totalResults,
     this.treatments = const [],
+    this.createTreatments = const [],
     this.filteredTreatments = const [],
     this.selectedTreatment,
     this.selectedTreatmentId,
@@ -787,6 +792,7 @@ class TreatmentState extends BaseStateModel {
     bool clearTreatmentImage = false,
     bool clearTreatmentIcon = false,
     List<TreatmentListData>? treatments,
+    List<TreatmentListData>? createTreatments,
     List<TreatmentListData>? filteredTreatments,
     TreatmentListData? selectedTreatment,
     int? selectedTreatmentId,
@@ -815,6 +821,7 @@ class TreatmentState extends BaseStateModel {
       totalPages: totalPages ?? this.totalPages,
       totalResults: totalResults ?? this.totalResults,
       treatments: treatments ?? this.treatments,
+      createTreatments: createTreatments ?? this.createTreatments,
       filteredTreatments: filteredTreatments ?? this.filteredTreatments,
       selectedTreatment: selectedTreatment ?? this.selectedTreatment,
       selectedTreatmentId: selectedTreatmentId ?? this.selectedTreatmentId,

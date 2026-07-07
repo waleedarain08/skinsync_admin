@@ -1,4 +1,5 @@
 import 'package:skinsync_admin/models/requests/create_session_requests/allowed_provider_role_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/final_finish_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/constent_form_selection_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/down_time_level_request.dart';
@@ -88,4 +89,9 @@ abstract class SessionRepository {
     required ConsentFormSelectionRequest request,
     required int id,
   });
+  Future<BaseApiResponseModel> finalFinish({
+    required FinalFinishRequest request,
+    required int id,
+  });
+
 }

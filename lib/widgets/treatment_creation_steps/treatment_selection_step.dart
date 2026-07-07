@@ -276,7 +276,7 @@ class _TreatmentSelectionStepState
         ),
         context.verticalSpace(24),
 
-        if (state.treatments.isEmpty) ...[
+        if (state.createTreatments.isEmpty) ...[
           Container(
             width: double.infinity,
             padding: context.appEdgeInsets(all: 32),
@@ -307,7 +307,7 @@ class _TreatmentSelectionStepState
           Wrap(
             spacing: 16,
             runSpacing: 16,
-            children: state.treatments.map((t) {
+            children: state.createTreatments.map((t) {
               final bool isSelected =
                   viewModel.globalSkuController.text.trim().isNotEmpty &&
                   viewModel.globalSkuController.text.trim() == t.globalSku;

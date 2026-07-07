@@ -95,7 +95,8 @@ enum CreateTreatmentSteps {
   postTreatmentPhotos('post_treatment_photos'),
   downtimeLevel('downtime_level'),
   followUpSetup('follow_up_setup'),
-  businessLogic('business_logic');
+  businessLogic('business_logic'),
+  status("status");
 
   final String name;
 

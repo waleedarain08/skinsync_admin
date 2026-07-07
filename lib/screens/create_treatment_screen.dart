@@ -350,7 +350,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               final scaffoldMessenger = ScaffoldMessenger.of(context);
               if (state.treatmentStep == 1) {
                 if (state.selectedTreatment == null) {
-                  
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
                       content: Text(
@@ -361,7 +360,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   );
                   return;
                 }
-                log('Validating Step 2: TreatmentID - ${state.selectedTreatment!.id}');
+                log(
+                  'Validating Step 2: TreatmentID - ${state.selectedTreatment!.id}',
+                );
                 viewModel.setStep(2);
                 return;
               }
@@ -370,7 +371,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 if (state.selectedTreatment?.id == null) {
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
-                      content: Text('Please select a valid treatment template in Step 1.'),
+                      content: Text(
+                        'Please select a valid treatment template in Step 1.',
+                      ),
                       backgroundColor: CustomColors.red,
                     ),
                   );
@@ -379,18 +382,27 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 if (state.selectedTreatmentAreaIds.isEmpty) {
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
-                      content: Text('Please select at least one treatment area before continuing.'),
+                      content: Text(
+                        'Please select at least one treatment area before continuing.',
+                      ),
                       backgroundColor: CustomColors.red,
                     ),
                   );
                   return;
                 }
-                if (!_validateSubAreas(scaffoldMessenger, state, dataState.areas)) return;
-                final result = await ref.read(treatmentViewModelProvider.notifier).createTreatmentArea();
-                if(result ==true){
-                   viewModel.setStep(3);
+                if (!_validateSubAreas(
+                  scaffoldMessenger,
+                  state,
+                  dataState.areas,
+                ))
+                  return;
+                final result = await ref
+                    .read(treatmentViewModelProvider.notifier)
+                    .createTreatmentArea();
+                if (result == true) {
+                  viewModel.setStep(3);
                 }
-               
+
                 return;
               }
 
@@ -398,18 +410,24 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 if (sessionState.sessions.isEmpty) {
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
-                      content: Text('Please add at least one clinical session before continuing.'),
+                      content: Text(
+                        'Please add at least one clinical session before continuing.',
+                      ),
                       backgroundColor: CustomColors.red,
                     ),
                   );
                   return;
                 }
 
-                final bool hasDraftSession = sessionState.sessions.any((s) => s.status.toLowerCase() == 'draft');
+                final bool hasDraftSession = sessionState.sessions.any(
+                  (s) => s.status.toLowerCase() == 'draft',
+                );
                 if (hasDraftSession) {
                   scaffoldMessenger.showSnackBar(
                     const SnackBar(
-                      content: Text('Please configure all sessions. Some sessions are still in Draft status.'),
+                      content: Text(
+                        'Please configure all sessions. Some sessions are still in Draft status.',
+                      ),
                       backgroundColor: CustomColors.red,
                     ),
                   );
@@ -425,14 +443,13 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 final success = await viewModel.callBusinessLogic();
                 if (success == true) {
                   await viewModel.submitTreatment(
-                  context,
-                  categories: categoryState.categories,
-                );
-                if (context.mounted) {
-                  context.go('/treatment-management');
+                    context,
+                    categories: categoryState.categories,
+                  );
+                  if (context.mounted) {
+                    context.go('/treatment-management');
+                  }
                 }
-                }
-                
               }
             },
             label: state.treatmentStep == 4
@@ -583,7 +600,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       if (selectedAreaEntry.subAreas.isEmpty) {
         scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('Please select a sub-area under ${mainAreaModel.name}.'),
+            content: Text(
+              'Please select a sub-area under ${mainAreaModel.name}.',
+            ),
             backgroundColor: CustomColors.red,
           ),
         );
@@ -606,7 +625,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       if (subAreaModel.id == 0) {
         scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('Please select a valid sub-area under ${mainAreaModel.name}.'),
+            content: Text(
+              'Please select a valid sub-area under ${mainAreaModel.name}.',
+            ),
             backgroundColor: CustomColors.red,
           ),
         );
@@ -618,7 +639,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         if (selectedSubAreaEntry.children.isEmpty) {
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: Text('Please select a child area under ${subAreaModel.name}.'),
+              content: Text(
+                'Please select a child area under ${subAreaModel.name}.',
+              ),
               backgroundColor: CustomColors.red,
             ),
           );

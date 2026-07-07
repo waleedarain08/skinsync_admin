@@ -1,6 +1,7 @@
 import 'package:skinsync_admin/models/requests/create_session_requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/constent_form_selection_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/final_finish_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/post_photos_request.dart';
@@ -320,6 +321,23 @@ class SessionServices implements SessionRepository {
     return response;
   }
 
+@override
+  Future<BaseApiResponseModel<dynamic>> finalFinish({
+    required int id,
+    required FinalFinishRequest request,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.sessionUpdate,
+      body: request,
+      queryParams: {'session_id': id.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
 
 
 }

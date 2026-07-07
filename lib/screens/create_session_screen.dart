@@ -144,10 +144,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               ),
             ),
             if (isDesktop)
-              const Expanded(
-                flex: 2,
-                child: LiveSessionPreviewWidget(),
-              ),
+              const Expanded(flex: 2, child: LiveSessionPreviewWidget()),
           ],
         ),
       ),
@@ -395,8 +392,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       ],
     );
   }
-
-
 
   List<TreatmentProtocolNoteItem> _getCategoryDefaultNotes(
     CategoryDetailDto? category,
@@ -1972,115 +1967,130 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               log('CURRENT STEP: ${sessionState.sessionStep}');
               bool success = false;
 
-              if (sessionState.sessionStep == 1) { // Inventory Products
+              if (sessionState.sessionStep == 1) {
+                // Inventory Products
                 if (!_validateProductQuantities(context, state)) return;
                 final result = await viewModel.callProductUsage();
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 2) { // Scheduling
+              } else if (sessionState.sessionStep == 2) {
+                // Scheduling
                 if (!_validateScheduling(context, viewModel)) return;
                 final result = await viewModel.createSchedule(stepNumber: 3);
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 3) { // Pricing Setup
+              } else if (sessionState.sessionStep == 3) {
+                // Pricing Setup
                 final result = await viewModel.callStepPricing(stepNumber: 4);
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 4) { // Protocols
+              } else if (sessionState.sessionStep == 4) {
+                // Protocols
                 final bytes = await ProtocolFormPreview.getPdfBytes(
                   state: state,
                   sessionState: sessionState,
                   dataState: dataState,
                   categoryState: categoryState,
                 );
-                final result = await viewModel.callProtocol(stepNumber: 5, bytes: bytes);
+                final result = await viewModel.callProtocol(
+                  stepNumber: 5,
+                  bytes: bytes,
+                );
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 5) { // Pre-Treatment Instructions
+              } else if (sessionState.sessionStep == 5) {
+                // Pre-Treatment Instructions
                 final result = await viewModel.callPreTreatmentInstructions();
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 6) { // Post-Treatment Instructions
+              } else if (sessionState.sessionStep == 6) {
+                // Post-Treatment Instructions
                 final result = await viewModel.callPostTreatmentInstructions();
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 7) { // Post Treatment Photos
+              } else if (sessionState.sessionStep == 7) {
+                // Post Treatment Photos
                 if (!_validatePostPhotos(context, state)) return;
                 final result = await viewModel.callPostTreatmentPhotos();
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 8) { // Phase Notifications
+              } else if (sessionState.sessionStep == 8) {
+                // Phase Notifications
                 if (!_validatePhaseNotifications(context, state)) return;
                 final result = await viewModel.callPhaseNotifications();
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 9) { // Downtime Level
+              } else if (sessionState.sessionStep == 9) {
+                // Downtime Level
                 final result = await viewModel.callDownTimeLevels();
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 10) { // Allowed Provider Roles
+              } else if (sessionState.sessionStep == 10) {
+                // Allowed Provider Roles
                 final result = await viewModel.callAllowedProviderRoles();
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 11) { // Follow-Up Setup
+              } else if (sessionState.sessionStep == 11) {
+                // Follow-Up Setup
                 if (!_validateFollowUps(context, sessionState)) return;
                 final result = await viewModel.callFollowUpConfig();
                 success = (result == true);
-              } 
-              else if (sessionState.sessionStep == 12) { // Patient Consent (Last Step!)
-                final result = await viewModel.callConsentFormSelection();
-                if (result == true) {
-                  final durationText =
-                      '${sessionViewModel.treatmentDurationController.text} mins (Prep: ${sessionViewModel.prepTimeController.text}m, Clean: ${sessionViewModel.cleanupTimeController.text}m)';
-                  final priceText = sessionState.isFixedPrice
-                      ? '\$${sessionViewModel.fixedPriceController.text} (Fixed)'
-                      : '\$${sessionViewModel.basePriceController.text}';
+              } else if (sessionState.sessionStep == 12) {
+                // Patient Consent (Last Step!)
+                await viewModel.callConsentFormSelection().then((value) async {
+                  if (value == true) {
+                    await viewModel.callFinalFinish().then((value) {
+                      if (value == true) {
+                        final durationText =
+                            '${sessionViewModel.treatmentDurationController.text} mins (Prep: ${sessionViewModel.prepTimeController.text}m, Clean: ${sessionViewModel.cleanupTimeController.text}m)';
+                        final priceText = sessionState.isFixedPrice
+                            ? '\$${sessionViewModel.fixedPriceController.text} (Fixed)'
+                            : '\$${sessionViewModel.basePriceController.text}';
 
-                  final protocols = sessionState.selectedProtocolIds.toList();
-                  final preInstructions =
-                      sessionViewModel.preTreatmentInstructionsController.text;
-                  final postInstructions =
-                      sessionViewModel.postTreatmentInstructionsController.text;
+                        final protocols = sessionState.selectedProtocolIds
+                            .toList();
+                        final preInstructions = sessionViewModel
+                            .preTreatmentInstructionsController
+                            .text;
+                        final postInstructions = sessionViewModel
+                            .postTreatmentInstructionsController
+                            .text;
 
-                  final preNotifs = sessionState.preNotificationEntries
-                      .map(
-                        (n) =>
-                            '${n.timingValueController.text} ${n.timingUnit} before: ${n.titleController.text}',
-                      )
-                      .toList();
-                  final postNotifs = sessionState.postNotificationEntries
-                      .map(
-                        (n) =>
-                            '${n.timingValueController.text} ${n.timingUnit} after: ${n.titleController.text}',
-                      )
-                      .toList();
+                        final preNotifs = sessionState.preNotificationEntries
+                            .map(
+                              (n) =>
+                                  '${n.timingValueController.text} ${n.timingUnit} before: ${n.titleController.text}',
+                            )
+                            .toList();
+                        final postNotifs = sessionState.postNotificationEntries
+                            .map(
+                              (n) =>
+                                  '${n.timingValueController.text} ${n.timingUnit} after: ${n.titleController.text}',
+                            )
+                            .toList();
 
-                  sessionViewModel.markActiveSessionAsDetailed(
-                    durationText: durationText,
-                    priceText: priceText,
-                    protocols: protocols,
-                    preInstructions: preInstructions,
-                    postInstructions: postInstructions,
-                    requirePhotosSnapshot:
-                        sessionState.requirePostTreatmentPhotos,
-                    photosCountSnapshot:
-                        sessionState.requiredPostTreatmentPhotoCount,
-                    preNotifs: preNotifs,
-                    postNotifs: postNotifs,
-                    downtimeLevel: sessionState.downtimeLevel,
-                    selectedRoles: sessionState.selectedRoles,
-                    consentSnapshot: sessionState.consentType == 'category'
-                        ? (state.selectedCategoryDetail?.consentFormName ??
-                              'Category Consent Form')
-                        : (sessionState.preTreatmentConsentForm?.name ??
-                              sessionState.existingConsentForm?.name ??
-                              'Custom Consent'),
-                    productUsageEntries: sessionState.productUsageEntries,
-                  );
-                  if (context.mounted) {
-                    context.pop();
+                        sessionViewModel.markActiveSessionAsDetailed(
+                          durationText: durationText,
+                          priceText: priceText,
+                          protocols: protocols,
+                          preInstructions: preInstructions,
+                          postInstructions: postInstructions,
+                          requirePhotosSnapshot:
+                              sessionState.requirePostTreatmentPhotos,
+                          photosCountSnapshot:
+                              sessionState.requiredPostTreatmentPhotoCount,
+                          preNotifs: preNotifs,
+                          postNotifs: postNotifs,
+                          downtimeLevel: sessionState.downtimeLevel,
+                          selectedRoles: sessionState.selectedRoles,
+                          consentSnapshot:
+                              sessionState.consentType == 'category'
+                              ? (state
+                                        .selectedCategoryDetail
+                                        ?.consentFormName ??
+                                    'Category Consent Form')
+                              : (sessionState.preTreatmentConsentForm?.name ??
+                                    sessionState.existingConsentForm?.name ??
+                                    'Custom Consent'),
+                          productUsageEntries: sessionState.productUsageEntries,
+                        );
+                        if (context.mounted) {
+                          context.pop();
+                        }
+                      }
+                    });
                   }
-                }
+                });
               }
 
               if (success && sessionState.sessionStep < 12) {
@@ -2100,7 +2110,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       if (sessionState.postTreatmentPhotoConfigs.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please add at least one photo requirement milestone.'),
+            content: Text(
+              'Please add at least one photo requirement milestone.',
+            ),
             backgroundColor: CustomColors.red,
           ),
         );
@@ -2119,7 +2131,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         if (days <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Please specify a valid number of days (>= 1) for milestone #${i + 1}.'),
+              content: Text(
+                'Please specify a valid number of days (>= 1) for milestone #${i + 1}.',
+              ),
               backgroundColor: CustomColors.red,
             ),
           );
@@ -2129,7 +2143,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         if (count <= 0) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Please specify a valid number of photos (>= 1) for milestone #${i + 1}.'),
+              content: Text(
+                'Please specify a valid number of photos (>= 1) for milestone #${i + 1}.',
+              ),
               backgroundColor: CustomColors.red,
             ),
           );
@@ -2140,7 +2156,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       }
 
       // Automatically update the state's total photo count
-      ref.read(sessionViewModelProvider.notifier).updateRequiredPostTreatmentPhotoCount(totalPhotos.toString());
+      ref
+          .read(sessionViewModelProvider.notifier)
+          .updateRequiredPostTreatmentPhotoCount(totalPhotos.toString());
     }
     return true;
   }

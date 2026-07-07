@@ -9,6 +9,7 @@ import 'package:skinsync_admin/models/notification_entry.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/allowed_provider_role_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/constent_form_selection_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/final_finish_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/phase_notifications_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/post_treatment_instruction_request.dart';
@@ -299,7 +300,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     state = state.copyWith(sessions: [...state.sessions, newSession]);
   }
 
-  setSessionId(int? sessionId) {
+  void setSessionId(int? sessionId) {
     state = state.copyWith(sessionId: sessionId);
   }
 
@@ -319,7 +320,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
           sessionNumber: sessionNumber,
         );
         if (response.isSuccess) {
-          addCustomSession(title, sessionNumber);
+          await fetchSessions(treatmentId: treatmentId, areaId: areaId);
           return true;
         }
         return false;
@@ -550,7 +551,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   }
 
   Future<bool?> callProductUsage() async {
-    final treatmentState = ref.read(treatmentViewModelProvider);
+    // final treatmentState = ref.read(treatmentViewModelProvider);
     final request = ProductUsagesRequest(
       productUsages: state.productUsageEntries.map((e) {
         final minQty = double.tryParse(e.minQuantityController.text);
@@ -570,10 +571,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     return await runSafely<bool>(() async {
       await _sessionRepository.productUsage(
         request: request,
-        id:
-            treatmentState.selectedTreatment?.id ??
-            treatmentState.draftTreatmentID ??
-            0,
+        id: state.sessionId!,
       );
       return true;
     });
@@ -601,8 +599,6 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     final cleanupTime = int.tryParse(cleanupTimeController.text) ?? 0;
     return baseDuration + productDuration + prepTime + cleanupTime;
   }
-
-  
 
   // Original callProtocol Implementation
   Future<bool?> callProtocol({
@@ -647,19 +643,19 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       unitPriceOverrides: state.isFixedPrice
           ? []
           : state.productUsageEntries
-              .map((entry) {
-                final controller = getControllerForUnit(entry.unit);
-                final price = int.tryParse(controller.text.trim());
-                if (price == null) {
-                  return null;
-                }
-                return UnitPriceOverride(
-                  productId: entry.productId,
-                  pricePerUnit: price,
-                );
-              })
-              .whereType<UnitPriceOverride>()
-              .toList(),
+                .map((entry) {
+                  final controller = getControllerForUnit(entry.unit);
+                  final price = int.tryParse(controller.text.trim());
+                  if (price == null) {
+                    return null;
+                  }
+                  return UnitPriceOverride(
+                    productId: entry.productId,
+                    pricePerUnit: price,
+                  );
+                })
+                .whereType<UnitPriceOverride>()
+                .toList(),
       isFixedPrice: state.isFixedPrice,
       fixedPrice: state.isFixedPrice
           ? int.tryParse(fixedPriceController.text.trim())
@@ -833,10 +829,7 @@ Body       : ${request.toJson()}
         final days = int.tryParse(config.daysController.text) ?? 0;
         final count = int.tryParse(config.countController.text) ?? 0;
         totalCount += count;
-        configs.add(PhotoMilestone(
-          numberOfDays: days,
-          requiredPhotos: count,
-        ));
+        configs.add(PhotoMilestone(numberOfDays: days, requiredPhotos: count));
       }
 
       await _sessionRepository.postTreatmentPhotos(
@@ -967,39 +960,55 @@ Body                 : ${request.toJson()}
     });
   }
 
- Future<bool?> callFollowUpConfig() async {
-  return await runSafely(() async {
-    final sessionId = state.sessionId;
-    if (sessionId == null) {
-      throw const UnknownException('Session not found!');
-    }
-    await _sessionRepository.followUpConfig(
-      id: sessionId,
-      request: FollowUpRequest(
-        followUps: state.sessions
-            .expand((session) => session.followUps)
-            .map(
-              (followUp) => FollowUp(
-                type: followUp.type,
-                durationValue: num.parse(
-                  followUp.durationValueController.text,
+  Future<bool?> callFollowUpConfig() async {
+    return await runSafely(() async {
+      final sessionId = state.sessionId;
+      if (sessionId == null) {
+        throw const UnknownException('Session not found!');
+      }
+      await _sessionRepository.followUpConfig(
+        id: sessionId,
+        request: FollowUpRequest(
+          followUps: state.sessions
+              .expand((session) => session.followUps)
+              .map(
+                (followUp) => FollowUp(
+                  type: followUp.type,
+                  durationValue: num.parse(
+                    followUp.durationValueController.text,
+                  ),
+                  durationUnit: followUp.durationUnit,
+                  intervalValue: num.parse(
+                    followUp.intervalValueController.text,
+                  ),
+                  intervalUnit: followUp.intervalUnit,
+                  isImageRequired: followUp.isImageRequired,
+                  notes: followUp.notesController.text,
                 ),
-                durationUnit: followUp.durationUnit,
-                intervalValue: num.parse(
-                  followUp.intervalValueController.text,
-                ),
-                intervalUnit: followUp.intervalUnit,
-                isImageRequired: followUp.isImageRequired,
-                notes: followUp.notesController.text,
-              ),
-            )
-            .toList(),
-      ),
-    );
+              )
+              .toList(),
+        ),
+      );
 
-    return true;
-  });
-}
+      return true;
+    });
+  }
+
+  Future<bool?> callFinalFinish() async {
+    return await runSafely(() async {
+      final sessionId = state.sessionId;
+      if (sessionId == null) {
+        throw const UnknownException('Session not found!');
+      }
+      await _sessionRepository.finalFinish(
+        id: sessionId,
+        request: FinalFinishRequest(status: 'Active', isCompleted: true),
+      );
+
+      return true;
+    });
+  }
+
   void toggleProtocolSelection(
     String protocolId, {
     String? protocolName,
@@ -1149,12 +1158,17 @@ Body                 : ${request.toJson()}
     newConfig.daysController.addListener(_triggerRebuild);
     newConfig.countController.addListener(_triggerRebuild);
     state = state.copyWith(
-      postTreatmentPhotoConfigs: [...state.postTreatmentPhotoConfigs, newConfig],
+      postTreatmentPhotoConfigs: [
+        ...state.postTreatmentPhotoConfigs,
+        newConfig,
+      ],
     );
   }
 
   void removePostTreatmentPhotoConfig(int index) {
-    final updated = List<PostTreatmentPhotoConfig>.from(state.postTreatmentPhotoConfigs);
+    final updated = List<PostTreatmentPhotoConfig>.from(
+      state.postTreatmentPhotoConfigs,
+    );
     updated[index].dispose();
     updated.removeAt(index);
     state = state.copyWith(postTreatmentPhotoConfigs: updated);
@@ -1344,7 +1358,9 @@ Body                 : ${request.toJson()}
 
   void toggleRequirePostTreatmentPhotos(bool? value) {
     final active = value ?? false;
-    final configs = List<PostTreatmentPhotoConfig>.from(state.postTreatmentPhotoConfigs);
+    final configs = List<PostTreatmentPhotoConfig>.from(
+      state.postTreatmentPhotoConfigs,
+    );
     if (active && configs.isEmpty) {
       final newConfig = PostTreatmentPhotoConfig(days: '1', count: '1');
       newConfig.daysController.addListener(_triggerRebuild);
@@ -1603,21 +1619,16 @@ class PostTreatmentPhotoConfig {
   final TextEditingController daysController;
   final TextEditingController countController;
 
-  PostTreatmentPhotoConfig({
-    required String days,
-    required String count,
-  })  : daysController = TextEditingController(text: days),
-        countController = TextEditingController(text: count);
+  PostTreatmentPhotoConfig({required String days, required String count})
+    : daysController = TextEditingController(text: days),
+      countController = TextEditingController(text: count);
 
   void dispose() {
     daysController.dispose();
     countController.dispose();
   }
 
-  PostTreatmentPhotoConfig copyWith({
-    String? days,
-    String? count,
-  }) {
+  PostTreatmentPhotoConfig copyWith({String? days, String? count}) {
     return PostTreatmentPhotoConfig(
       days: days ?? daysController.text,
       count: count ?? countController.text,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,10 +31,9 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
           : null;
 
       if (treatmentId != null && areaId != null) {
-        await ref.read(sessionViewModelProvider.notifier).fetchSessions(
-              treatmentId: treatmentId,
-              areaId: areaId,
-            );
+        await ref
+            .read(sessionViewModelProvider.notifier)
+            .fetchSessions(treatmentId: treatmentId, areaId: areaId);
       }
     });
   }
@@ -105,10 +106,7 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
           shape: RoundedRectangleBorder(
             borderRadius: context.appBorderRadius(all: 16),
           ),
-          title: Text(
-            'Add Clinical Session',
-            style: context.fonts.black16w600,
-          ),
+          title: Text('Add Clinical Session', style: context.fonts.black16w600),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -136,17 +134,24 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
               child: CustomPrimaryButton(
                 onTap: () async {
                   final title = titleController.text.trim();
-                  final numVal = int.tryParse(numberController.text.trim()) ?? 1;
+                  final numVal =
+                      int.tryParse(numberController.text.trim()) ?? 1;
 
-                  final resolvedTitle = title.isEmpty ? 'Session $numVal' : title;
+                  final resolvedTitle = title.isEmpty
+                      ? 'Session $numVal'
+                      : title;
                   final treatmentId = state.selectedTreatment?.id;
                   if (treatmentId == null) {
-                    await EasyLoading.showError('Invalid treatment template. Please select one in Step 1.');
+                    await EasyLoading.showError(
+                      'Invalid treatment template. Please select one in Step 1.',
+                    );
                     return;
                   }
 
                   if (state.selectedTreatmentAreaIds.isEmpty) {
-                    await EasyLoading.showError('No body area selected. Please select one in Step 2.');
+                    await EasyLoading.showError(
+                      'No body area selected. Please select one in Step 2.',
+                    );
                     return;
                   }
 
@@ -160,7 +165,9 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                   );
 
                   if (success == true) {
-                    await EasyLoading.showSuccess('Session created successfully!');
+                    await EasyLoading.showSuccess(
+                      'Session created successfully!',
+                    );
                     if (context.mounted) {
                       Navigator.of(context).pop();
                     }
@@ -199,12 +206,10 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
               ],
             ),
             ElevatedButton.icon(
-              onPressed: () => _showAddSessionDialog(context, sessionViewModel, state),
+              onPressed: () =>
+                  _showAddSessionDialog(context, sessionViewModel, state),
               icon: const Icon(Icons.add, color: Colors.white, size: 18),
-              label: Text(
-                'Add Session',
-                style: context.fonts.white14w600,
-              ),
+              label: Text('Add Session', style: context.fonts.white14w600),
               style: ElevatedButton.styleFrom(
                 backgroundColor: CustomColors.purple,
                 padding: context.appEdgeInsets(horizontal: 16, vertical: 12),
@@ -257,7 +262,9 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
               children: List.generate(sessionState.sessions.length, (index) {
                 final sessionEntry = sessionState.sessions[index];
                 final bool isDetailed = sessionEntry.isDetailedEntered;
-                final sessionTitle = sessionEntry.title ?? 'Session ${sessionEntry.sessionNumber}';
+                final sessionTitle =
+                    sessionEntry.title ??
+                    'Session ${sessionEntry.sessionNumber}';
 
                 if (!isDetailed) {
                   return Container(
@@ -302,16 +309,20 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                                       vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: (sessionEntry.status.toLowerCase() == 'completed'
-                                              ? CustomColors.green
-                                              : CustomColors.red)
-                                          .withValues(alpha: 0.1),
+                                      color:
+                                          (sessionEntry.status.toLowerCase() ==
+                                                      'completed'
+                                                  ? CustomColors.green
+                                                  : CustomColors.red)
+                                              .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       sessionEntry.status,
                                       style: TextStyle(
-                                        color: sessionEntry.status.toLowerCase() == 'completed'
+                                        color:
+                                            sessionEntry.status.toLowerCase() ==
+                                                'completed'
                                             ? CustomColors.green
                                             : CustomColors.red,
                                         fontSize: 10,
@@ -330,7 +341,10 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                             CustomPrimaryButton(
                               width: context.w(130),
                               onTap: () {
-                                sessionViewModel.setSessionId(sessionEntry.sessionId);
+                                log('SessionID ${sessionEntry.sessionId}');
+                                sessionViewModel.setSessionId(
+                                  sessionEntry.sessionId,
+                                );
                                 sessionViewModel.setActiveSessionIndex(index);
                                 sessionViewModel.setSessionStep(1);
                                 context.push(CreateSessionScreen.routeName);
@@ -339,8 +353,12 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                             ),
                             context.horizontalSpace(12),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.red),
-                              onPressed: () => sessionViewModel.removeCustomSession(index),
+                              icon: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: CustomColors.red,
+                              ),
+                              onPressed: () =>
+                                  sessionViewModel.removeCustomSession(index),
                             ),
                           ],
                         ),
@@ -357,9 +375,9 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                     border: Border.all(color: CustomColors.green, width: 1.5),
                   ),
                   child: Theme(
-                    data: Theme.of(context).copyWith(
-                      dividerColor: Colors.transparent,
-                    ),
+                    data: Theme.of(
+                      context,
+                    ).copyWith(dividerColor: Colors.transparent),
                     child: ExpansionTile(
                       tilePadding: context.appEdgeInsets(
                         horizontal: 16,
@@ -385,10 +403,7 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                       ),
                       title: Row(
                         children: [
-                          Text(
-                            sessionTitle,
-                            style: context.fonts.black14w700,
-                          ),
+                          Text(sessionTitle, style: context.fonts.black14w700),
                           context.horizontalSpace(8),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -396,10 +411,11 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: (sessionEntry.status.toLowerCase() == 'draft'
-                                      ? CustomColors.red
-                                      : CustomColors.green)
-                                  .withValues(alpha: 0.1),
+                              color:
+                                  (sessionEntry.status.toLowerCase() == 'draft'
+                                          ? CustomColors.red
+                                          : CustomColors.green)
+                                      .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Row(
@@ -409,7 +425,9 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                                   sessionEntry.status.toLowerCase() == 'draft'
                                       ? Icons.close
                                       : Icons.check,
-                                  color: sessionEntry.status.toLowerCase() == 'draft'
+                                  color:
+                                      sessionEntry.status.toLowerCase() ==
+                                          'draft'
                                       ? CustomColors.red
                                       : CustomColors.green,
                                   size: 10,
@@ -418,7 +436,9 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                                 Text(
                                   sessionEntry.status,
                                   style: TextStyle(
-                                    color: sessionEntry.status.toLowerCase() == 'draft'
+                                    color:
+                                        sessionEntry.status.toLowerCase() ==
+                                            'draft'
                                         ? CustomColors.red
                                         : CustomColors.green,
                                     fontSize: 10,
@@ -449,8 +469,12 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                           ),
                           context.horizontalSpace(12),
                           IconButton(
-                            icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.red),
-                            onPressed: () => sessionViewModel.removeCustomSession(index),
+                            icon: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: CustomColors.red,
+                            ),
+                            onPressed: () =>
+                                sessionViewModel.removeCustomSession(index),
                           ),
                           context.horizontalSpace(12),
                           const Icon(
@@ -485,7 +509,10 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                             final minVal = p.minQuantityController.text;
                             final maxVal = p.maxQuantityController.text;
                             return Padding(
-                              padding: const EdgeInsets.only(left: 28, bottom: 4),
+                              padding: const EdgeInsets.only(
+                                left: 28,
+                                bottom: 4,
+                              ),
                               child: Text(
                                 '• ${p.productName} (Min: $minVal | Max: $maxVal ${p.unit})',
                                 style: context.fonts.grey12w400,
@@ -500,11 +527,16 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                             'Follow-Up Procedures',
                             Icons.replay_outlined,
                           ),
-                          ...sessionEntry.followUps.asMap().entries.map((entry) {
+                          ...sessionEntry.followUps.asMap().entries.map((
+                            entry,
+                          ) {
                             final idx = entry.key;
                             final fu = entry.value;
                             return Padding(
-                              padding: const EdgeInsets.only(left: 28, bottom: 4),
+                              padding: const EdgeInsets.only(
+                                left: 28,
+                                bottom: 4,
+                              ),
                               child: Text(
                                 '• Follow-Up ${idx + 1}: ${fu.type.toUpperCase()} - interval of ${fu.intervalValueController.text} ${fu.intervalUnit} (for ${fu.durationValueController.text} ${fu.durationUnit})',
                                 style: context.fonts.grey12w400,
@@ -513,7 +545,9 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                           }),
                         ],
 
-                        if (sessionEntry.preInstructionsSnapshot.isNotEmpty) ...[
+                        if (sessionEntry
+                            .preInstructionsSnapshot
+                            .isNotEmpty) ...[
                           context.verticalSpace(8),
                           _buildDetailRow(
                             context,
@@ -523,7 +557,9 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                           ),
                         ],
 
-                        if (sessionEntry.postInstructionsSnapshot.isNotEmpty) ...[
+                        if (sessionEntry
+                            .postInstructionsSnapshot
+                            .isNotEmpty) ...[
                           context.verticalSpace(8),
                           _buildDetailRow(
                             context,
@@ -533,7 +569,9 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                           ),
                         ],
 
-                        if (sessionEntry.preNotificationsSnapshot.isNotEmpty) ...[
+                        if (sessionEntry
+                            .preNotificationsSnapshot
+                            .isNotEmpty) ...[
                           _buildDetailRowHeader(
                             context,
                             'Pre-Notifications',
@@ -541,13 +579,21 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                           ),
                           ...sessionEntry.preNotificationsSnapshot.map((n) {
                             return Padding(
-                              padding: const EdgeInsets.only(left: 28, bottom: 4),
-                              child: Text('• $n', style: context.fonts.grey12w400),
+                              padding: const EdgeInsets.only(
+                                left: 28,
+                                bottom: 4,
+                              ),
+                              child: Text(
+                                '• $n',
+                                style: context.fonts.grey12w400,
+                              ),
                             );
                           }),
                         ],
 
-                        if (sessionEntry.postNotificationsSnapshot.isNotEmpty) ...[
+                        if (sessionEntry
+                            .postNotificationsSnapshot
+                            .isNotEmpty) ...[
                           _buildDetailRowHeader(
                             context,
                             'Post-Notifications',
@@ -555,8 +601,14 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                           ),
                           ...sessionEntry.postNotificationsSnapshot.map((n) {
                             return Padding(
-                              padding: const EdgeInsets.only(left: 28, bottom: 4),
-                              child: Text('• $n', style: context.fonts.grey12w400),
+                              padding: const EdgeInsets.only(
+                                left: 28,
+                                bottom: 4,
+                              ),
+                              child: Text(
+                                '• $n',
+                                style: context.fonts.grey12w400,
+                              ),
                             );
                           }),
                         ],
