@@ -115,9 +115,6 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
                 return Container(
                   margin: context.appEdgeInsets(bottom: 8),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? CustomColors.purple.withValues(alpha: 0.1)
-                        : Colors.white,
                     borderRadius: context.appBorderRadius(all: 10),
                     border: Border.all(
                       color: isSelected
@@ -126,33 +123,39 @@ class _CategorySelectionDialogState extends ConsumerState<CategorySelectionDialo
                       width: isSelected ? context.w(1.5) : context.w(1),
                     ),
                   ),
-                  child: ListTile(
-                    dense: true,
-                    contentPadding: context.appEdgeInsets(horizontal: 12, vertical: 4),
-                    title: Text(
-                      item.name,
-                      style: isSelected
-                          ? context.fonts.purple14w600
-                          : context.fonts.black14w400,
+                  child: Material(
+                    color: isSelected
+                        ? CustomColors.purple.withValues(alpha: 0.1)
+                        : Colors.white,
+                    borderRadius: context.appBorderRadius(all: 10),
+                    child: ListTile(
+                      dense: true,
+                      contentPadding: context.appEdgeInsets(horizontal: 12, vertical: 4),
+                      title: Text(
+                        item.name,
+                        style: isSelected
+                            ? context.fonts.purple14w600
+                            : context.fonts.black14w400,
+                      ),
+                      trailing: item.subCategories.isNotEmpty
+                          ? Icon(
+                              Icons.chevron_right_rounded,
+                              color: isSelected
+                                  ? CustomColors.purple
+                                  : CustomColors.lightGrey,
+                              size: context.sp(20),
+                            )
+                          : null,
+                      onTap: () {
+                        setState(() {
+                          if (columnIndex < _selectedIds.length) {
+                            _selectedIds.removeRange(
+                                columnIndex, _selectedIds.length);
+                          }
+                          _selectedIds.add(item.id);
+                        });
+                      },
                     ),
-                    trailing: item.subCategories.isNotEmpty
-                        ? Icon(
-                            Icons.chevron_right_rounded,
-                            color: isSelected
-                                ? CustomColors.purple
-                                : CustomColors.lightGrey,
-                            size: context.sp(20),
-                          )
-                        : null,
-                    onTap: () {
-                      setState(() {
-                        if (columnIndex < _selectedIds.length) {
-                          _selectedIds.removeRange(
-                              columnIndex, _selectedIds.length);
-                        }
-                        _selectedIds.add(item.id);
-                      });
-                    },
                   ),
                 );
               }).toList(),

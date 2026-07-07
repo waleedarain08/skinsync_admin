@@ -377,7 +377,6 @@ class _RecursiveCategoryTile extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(left: depth * 16.0, bottom: 8.0),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isSelected ? CustomColors.purple : CustomColors.border,
@@ -386,33 +385,36 @@ class _RecursiveCategoryTile extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: hasSubcategories
-            ? ExpansionTile(
-                initiallyExpanded: isSelected,
-                onExpansionChanged: (expanded) {
-                  onSelected(category);
-                },
-                shape: const RoundedRectangleBorder(side: BorderSide.none),
-                leading: leadingWidget,
-                title: titleWidget,
-                trailing: trailingWidget,
-                childrenPadding: const EdgeInsets.all(12),
-                children: category.subCategories.map((sub) {
-                  return _RecursiveCategoryTile(
-                    category: sub,
-                    selectedCategoryId: selectedCategoryId,
-                    onSelected: onSelected,
-                    onAddSubcategory: onAddSubcategory,
-                    depth: depth + 1,
-                  );
-                }).toList(),
-              )
-            : ListTile(
-                onTap: () => onSelected(category),
-                leading: leadingWidget,
-                title: titleWidget,
-                trailing: trailingWidget,
-              ),
+        child: Material(
+          color: Colors.white,
+          child: hasSubcategories
+              ? ExpansionTile(
+                  initiallyExpanded: isSelected,
+                  onExpansionChanged: (expanded) {
+                    onSelected(category);
+                  },
+                  shape: const RoundedRectangleBorder(side: BorderSide.none),
+                  leading: leadingWidget,
+                  title: titleWidget,
+                  trailing: trailingWidget,
+                  childrenPadding: const EdgeInsets.all(12),
+                  children: category.subCategories.map((sub) {
+                    return _RecursiveCategoryTile(
+                      category: sub,
+                      selectedCategoryId: selectedCategoryId,
+                      onSelected: onSelected,
+                      onAddSubcategory: onAddSubcategory,
+                      depth: depth + 1,
+                    );
+                  }).toList(),
+                )
+              : ListTile(
+                  onTap: () => onSelected(category),
+                  leading: leadingWidget,
+                  title: titleWidget,
+                  trailing: trailingWidget,
+                ),
+        ),
       ),
     );
   }
