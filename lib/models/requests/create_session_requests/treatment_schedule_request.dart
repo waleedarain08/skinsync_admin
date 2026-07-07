@@ -1,6 +1,7 @@
 import 'package:skinsync_admin/utils/enums.dart';
 
 class TreatmentScheduleRequest {
+  final int stepNumber;
   final int? baseDuration;
   final int? prepTime;
   final int? cleanupTime;
@@ -16,6 +17,7 @@ class TreatmentScheduleRequest {
   final bool? isFixedDuration;
 
   TreatmentScheduleRequest({
+    required this.stepNumber,
     this.baseDuration,
     this.prepTime,
     this.cleanupTime,
@@ -32,7 +34,7 @@ class TreatmentScheduleRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    'step_number': 2,
+    'step_number': stepNumber,
     'keys': [CreateTreatmentSteps.scheduling.name],
     'base_duration': baseDuration,
     'prep_time': prepTime,

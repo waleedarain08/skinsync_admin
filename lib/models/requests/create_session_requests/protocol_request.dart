@@ -1,12 +1,13 @@
 import 'package:skinsync_admin/utils/enums.dart';
 
 class ProtocolRequest {
-  final int? stepNumber;
+  final int stepNumber;
   final ClinicalProtocolPdf? clinicalProtocolPdf;
 
-  ProtocolRequest({this.stepNumber, this.clinicalProtocolPdf});
+  ProtocolRequest({required this.stepNumber, this.clinicalProtocolPdf});
 
   Map<String, dynamic> toJson() => {
+    'step_number': stepNumber,
     'keys': [CreateTreatmentSteps.protocols.name],
     'clinical_protocol_pdf': clinicalProtocolPdf?.toJson(),
   };

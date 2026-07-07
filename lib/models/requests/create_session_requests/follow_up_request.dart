@@ -1,12 +1,13 @@
 import 'package:skinsync_admin/utils/enums.dart';
 
 class FollowUpRequest {
+   final int stepNumber;
   final List<FollowUp> followUps;
 
-  FollowUpRequest({required this.followUps});
+  FollowUpRequest({ required this.stepNumber,required this.followUps});
 
   Map<String, dynamic> toJson() => {
-        'step_number': 11,
+        'step_number': stepNumber,
         'keys': [CreateTreatmentSteps.followUpSetup.name],
         'follow_ups': followUps.map((x) => x.toJson()).toList(),
       };

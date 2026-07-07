@@ -550,9 +550,10 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     );
   }
 
-  Future<bool?> callProductUsage() async {
+  Future<bool?> callProductUsage({required int stepNumber}) async {
     // final treatmentState = ref.read(treatmentViewModelProvider);
     final request = ProductUsagesRequest(
+      stepNumber: stepNumber,
       productUsages: state.productUsageEntries.map((e) {
         final minQty = double.tryParse(e.minQuantityController.text);
         final maxQty = double.tryParse(e.maxQuantityController.text);
@@ -688,7 +689,7 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callDownTimeLevels() async {
+  Future<bool?> callDownTimeLevels({required int stepNumber}) async {
     // Resolve the actual days from the selected level + category presets
     final presets = ref
         .read(treatmentViewModelProvider)
@@ -705,6 +706,7 @@ Body       : ${request.toJson()}
     };
 
     final request = DownTimeLevelRequest(
+      stepNumber: stepNumber,
       downtimeLevel: level,
       downtimeDays: downtimeDays,
     );
@@ -731,8 +733,9 @@ Body          : ${request.toJson()}
     });
   }
 
-  Future<bool?> callAllowedProviderRoles() async {
+  Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
     final request = AllowedProviderRolesRequest(
+      stepNumber: stepNumber,
       allowedRoles: state.selectedRoles, // ← matches state field from UI
     );
 
@@ -756,7 +759,7 @@ Body                 : ${request.toJson()}
     });
   }
 
-  Future<bool?> callPreTreatmentInstructions() async {
+  Future<bool?> callPreTreatmentInstructions({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       final attachments = state.existingPreAttachments
           .map(
@@ -766,6 +769,7 @@ Body                 : ${request.toJson()}
           .toList();
 
       final request = PreTreatmentInstructionsRequest(
+        stepNumber: stepNumber,
         preTreatmentInstructions:
             preTreatmentInstructionsController.text.trim().isEmpty
             ? null
@@ -790,7 +794,7 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callPostTreatmentInstructions() async {
+  Future<bool?> callPostTreatmentInstructions({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       final attachments = state.existingPostAttachments
           .map(
@@ -800,6 +804,7 @@ Body       : ${request.toJson()}
           .toList();
 
       final request = PostTreatmentInstructionsRequest(
+        stepNumber: stepNumber,
         postTreatmentInstructions:
             postTreatmentInstructionsController.text.trim().isEmpty
             ? null
@@ -824,7 +829,7 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callPostTreatmentPhotos() async {
+  Future<bool?> callPostTreatmentPhotos({required int stepNumber}) async {
     return await runSafely(() async {
       if (state.sessionId == null) {
         throw const UnknownException('Session not found!');
@@ -844,6 +849,7 @@ Body       : ${request.toJson()}
         requirePostPhotos: state.requirePostTreatmentPhotos,
         count: totalCount,
         configs: configs,
+        stepNumber: stepNumber,
       );
 
       state = state.copyWith(requiredPostTreatmentPhotoCount: totalCount);
@@ -851,7 +857,7 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callPhaseNotifications() async {
+  Future<bool?> callPhaseNotifications({required int stepNumber}) async {
     return await runSafely(() async {
       final sessionId = state.sessionId;
       if (sessionId == null) {
@@ -860,6 +866,7 @@ Body       : ${request.toJson()}
       await _sessionRepository.phaseNotifications(
         id: sessionId,
         request: PhaseNotificationsRequest(
+          stepNumber: stepNumber,
           preNotifications: state.preNotificationEntries.map((entry) {
             return NotificationRequest(
               message: entry.messageController.text,
@@ -888,6 +895,7 @@ Body       : ${request.toJson()}
     return await runSafely<bool>(() async {
       await _sessionRepository.createSchedule(
         TreatmentScheduleRequest(
+          stepNumber: stepNumber,
           baseDuration: state.isFixedDuration
               ? null
               : (int.tryParse(treatmentDurationController.text) ?? 0),
@@ -935,8 +943,9 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callConsentFormSelection() async {
+  Future<bool?> callConsentFormSelection({required int stepNumber}) async {
     final request = ConsentFormSelectionRequest(
+      stepNumber: stepNumber,
       preTreatmentConsentForm: state.preTreatmentConsentForm != null
           ? PreTreatmentConsentForm(
               name: state.preTreatmentConsentForm!.name,
@@ -967,7 +976,7 @@ Body                 : ${request.toJson()}
     });
   }
 
-  Future<bool?> callFollowUpConfig() async {
+  Future<bool?> callFollowUpConfig({required int stepNumber}) async {
     return await runSafely(() async {
       final sessionId = state.sessionId;
       if (sessionId == null) {
@@ -976,6 +985,7 @@ Body                 : ${request.toJson()}
       await _sessionRepository.followUpConfig(
         id: sessionId,
         request: FollowUpRequest(
+          stepNumber: stepNumber,
           followUps: state.sessions
               .expand((session) => session.followUps)
               .map(

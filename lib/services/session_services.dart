@@ -207,10 +207,12 @@ class SessionServices implements SessionRepository {
     required bool requirePostPhotos,
     required int count,
     required List<PhotoMilestone> configs,
+    required int stepNumber,
   }) async {
     final jsonResponse = await _api.patch(
       Endpoint.sessionUpdate,
       body: PostPhotosRequest(
+        stepNumber: stepNumber,
         requirePostTreatmentPhotos: requirePostPhotos,
         photoMilestone: configs,
       ),

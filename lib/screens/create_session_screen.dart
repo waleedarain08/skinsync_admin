@@ -1971,16 +1971,16 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               if (sessionState.sessionStep == 1) {
                 // Inventory Products
                 if (!_validateProductQuantities(context, state)) return;
-                final result = await viewModel.callProductUsage();
+                final result = await viewModel.callProductUsage(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 2) {
                 // Scheduling
                 if (!_validateScheduling(context, viewModel)) return;
-                final result = await viewModel.createSchedule(stepNumber: 3);
+                final result = await viewModel.createSchedule(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 3) {
                 // Pricing Setup
-                final result = await viewModel.callStepPricing(stepNumber: 4);
+                final result = await viewModel.callStepPricing(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 4) {
                 // Protocols
@@ -1999,44 +1999,44 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 }
 
                 final result = await viewModel.callProtocol(
-                  stepNumber: 5,
+                  stepNumber: sessionState.sessionStep,
                   bytes: bytes ?? Uint8List(0),
                 );
                 success = (result == true);
               } else if (sessionState.sessionStep == 5) {
                 // Pre-Treatment Instructions
-                final result = await viewModel.callPreTreatmentInstructions();
+                final result = await viewModel.callPreTreatmentInstructions(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 6) {
                 // Post-Treatment Instructions
-                final result = await viewModel.callPostTreatmentInstructions();
+                final result = await viewModel.callPostTreatmentInstructions(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 7) {
                 // Post Treatment Photos
                 if (!_validatePostPhotos(context, state)) return;
-                final result = await viewModel.callPostTreatmentPhotos();
+                final result = await viewModel.callPostTreatmentPhotos(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 8) {
                 // Phase Notifications
                 if (!_validatePhaseNotifications(context, state)) return;
-                final result = await viewModel.callPhaseNotifications();
+                final result = await viewModel.callPhaseNotifications(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 9) {
                 // Downtime Level
-                final result = await viewModel.callDownTimeLevels();
+                final result = await viewModel.callDownTimeLevels(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 10) {
                 // Allowed Provider Roles
-                final result = await viewModel.callAllowedProviderRoles();
+                final result = await viewModel.callAllowedProviderRoles(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 11) {
                 // Follow-Up Setup
                 if (!_validateFollowUps(context, sessionState)) return;
-                final result = await viewModel.callFollowUpConfig();
+                final result = await viewModel.callFollowUpConfig(stepNumber: sessionState.sessionStep);
                 success = (result == true);
               } else if (sessionState.sessionStep == 12) {
                 // Patient Consent (Last Step!)
-                await viewModel.callConsentFormSelection().then((value) async {
+                await viewModel.callConsentFormSelection(stepNumber: sessionState.sessionStep).then((value) async {
                   if (value == true) {
                     await viewModel.callFinalFinish().then((value) {
                       if (value == true) {

@@ -64,6 +64,7 @@ abstract class SessionRepository {
     required bool requirePostPhotos,
     required int count,
     required List<PhotoMilestone> configs,
+    required int stepNumber,
   });
 
   Future<BaseApiResponseModel> phaseNotifications({

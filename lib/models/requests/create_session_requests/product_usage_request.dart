@@ -1,12 +1,13 @@
 import 'package:skinsync_admin/utils/enums.dart';
 
 class ProductUsagesRequest {
+  final int stepNumber ;
   final List<ProductUsage>? productUsages;
 
-  ProductUsagesRequest({this.productUsages});
+  ProductUsagesRequest({required this.stepNumber, this.productUsages});
 
   Map<String, dynamic> toJson() => {
-    'step_number': 1,
+    'step_number': stepNumber,
     'keys': [CreateTreatmentSteps.inventoryProducts.name],
     'product_usages': productUsages == null
         ? []

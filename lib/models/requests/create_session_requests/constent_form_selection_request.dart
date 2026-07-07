@@ -1,12 +1,16 @@
 import 'package:skinsync_admin/utils/enums.dart';
 
 class ConsentFormSelectionRequest {
+  final int stepNumber;
   final PreTreatmentConsentForm? preTreatmentConsentForm;
 
-  ConsentFormSelectionRequest({this.preTreatmentConsentForm});
+  ConsentFormSelectionRequest({
+    required this.stepNumber,
+    this.preTreatmentConsentForm,
+  });
 
   Map<String, dynamic> toJson() => {
-    'step_number': 12,
+    'step_number': stepNumber,
     'keys': [CreateTreatmentSteps.patientConsent.name],
     'pre_treatment_consent_form': preTreatmentConsentForm?.toJson(),
   };
