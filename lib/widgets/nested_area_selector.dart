@@ -711,12 +711,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
               iconUrl: area.icon,
               isSelected: isSelected || isFocused,
               onTap: () {
-                if (!isSelected) {
-                  widget.onAreaToggle(area);
-                  ref
-                      .read(treatmentViewModelProvider.notifier)
-                      .setSelectedTreatmentAreaIds(area.id);
-                }
+                widget.onAreaToggle(area);
                 setState(() {
                   _focusedAreaName = area.name;
                   _focusedSubAreaName = null;
@@ -793,12 +788,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 iconUrl: subArea.icon,
                 isSelected: isSelected || isFocused,
                 onTap: () {
-                  if (!isSelected) {
-                    widget.onSubAreaToggle(focusedArea, subArea);
-                    ref
-                        .read(treatmentViewModelProvider.notifier)
-                        .setSelectedTreatmentAreaIds(subArea.id);
-                  }
+                  widget.onSubAreaToggle(focusedArea, subArea);
                   setState(() {
                     _focusedSubAreaName = subArea.name;
                   });
@@ -883,16 +873,11 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 iconUrl: child.icon,
                 isSelected: isSelected,
                 onTap: () {
-                  if (!isSelected) {
-                    widget.onSubAreaChildToggle(
-                      focusedArea!,
-                      focusedSubArea,
-                      child,
-                    );
-                    ref
-                        .read(treatmentViewModelProvider.notifier)
-                        .setSelectedTreatmentAreaIds(child.id);
-                  }
+                  widget.onSubAreaChildToggle(
+                    focusedArea!,
+                    focusedSubArea,
+                    child,
+                  );
                 },
                 onAddChild: () {
                   ScaffoldMessenger.of(context).showSnackBar(

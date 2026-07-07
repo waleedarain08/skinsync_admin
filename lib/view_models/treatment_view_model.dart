@@ -549,17 +549,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     );
   }
 
-  void setSelectedTreatmentAreaIds(int id) {
-    log('Selected Treatment Area ID: $id');
-    final ids = [...state.selectedTreatmentAreaIds];
-    if (ids.contains(id)) {
-      ids.remove(id);
-    } else {
-      ids.add(id);
-    }
 
-    state = state.copyWith(selectedTreatmentAreaIds: ids);
-  }
 
   List<TreatmentListData> _getFilteredList(List<TreatmentListData> source) {
     final query = searchController.text.toLowerCase();
