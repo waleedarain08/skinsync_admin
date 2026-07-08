@@ -261,9 +261,10 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   }
 
   void reset() {
-
     log('Session state reset');
-    state =  SessionState();
+    state = SessionState(
+      sessions: state.sessions,
+    );
   }
 
   void _triggerRebuild() {
