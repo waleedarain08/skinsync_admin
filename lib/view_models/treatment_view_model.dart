@@ -134,7 +134,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             state = state.copyWith(
               treatments: categoryId == null ? list : null,
               filteredTreatments: list,
-              createTreatments: categoryId != null ? list :null,
+              createTreatments: categoryId != null ? list : null,
               loading: false,
               currentPage: response.page ?? page,
               totalPages: response.totalPages ?? 1,
@@ -151,15 +151,17 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
 
   Future<bool> fetchTreatmentDetail(int id) async {
     return await runSafely<bool>(showLoading: true, () async {
-      final response = await _treatmentRepository.getTreatmentDetail(id: id);
-      if (response.isSuccess && response.data != null) {
-        state = state.copyWith(selectedTreatmentDetail: response.data);
-        return true;
-      }
-      return false;
-    }) ?? false;
+          final response = await _treatmentRepository.getTreatmentDetail(
+            id: id,
+          );
+          if (response.isSuccess && response.data != null) {
+            state = state.copyWith(selectedTreatmentDetail: response.data);
+            return true;
+          }
+          return false;
+        }) ??
+        false;
   }
-
 
   Future<bool> changeTreatmentStatus(int treatmentId, String status) async {
     return await runSafely<bool>(
@@ -270,7 +272,17 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (response.isSuccess) {
         log('Basic Info Created : ${response.data?.id}');
         state = state.copyWith(draftTreatmentID: response.data?.id);
-
+        selectTreatment(
+          TreatmentListData(
+            id: response.data?.id,
+            patientDisplayName: response.data?.patientDisplayName,
+            shortDescription: response.data?.shortDescription,
+            globalSku: response.data?.globalSku,
+            icon: response.data?.icon,
+            image: response.data?.image,
+            status: response.data?.status ?? 'active',
+          ),
+        );
         final categoryId = int.tryParse(categoryIdController.text);
         await getTreatments(categoryId: categoryId);
       }
@@ -548,8 +560,6 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   //     filteredTreatments: _getFilteredList(_localTreatments),
   //   );
   // }
-
-
 
   List<TreatmentListData> _getFilteredList(List<TreatmentListData> source) {
     final query = searchController.text.toLowerCase();

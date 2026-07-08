@@ -308,10 +308,7 @@ class _TreatmentSelectionStepState
             spacing: 16,
             runSpacing: 16,
             children: state.createTreatments.map((t) {
-              final bool isSelected =
-                  viewModel.globalSkuController.text.trim().isNotEmpty &&
-                  viewModel.globalSkuController.text.trim() == t.globalSku;
-
+              final bool isSelected = state.selectedTreatment?.id == t.id;
               return IconImageContainer(
                 title: t.patientDisplayName ?? 'N/A',
                 imageUrl: t.image,
