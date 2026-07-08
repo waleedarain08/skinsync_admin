@@ -1,4 +1,3 @@
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +5,7 @@ import 'package:skinsync_admin/models/responses/area_list_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/dailogbox/area_creation_dialog.dart';
-import 'package:skinsync_admin/widgets/icon_image_container.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 
 typedef SubAreaSetter =
     void Function({
@@ -229,24 +228,6 @@ class NestedAreaSelector extends ConsumerStatefulWidget {
 }
 
 class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
-  String? _focusedAreaName;
-  String? _focusedSubAreaName;
-
-  @override
-  void initState() {
-    super.initState();
-    final cleanSelected = widget.selectedAreas
-        .where((a) => a.areaController.text.trim().isNotEmpty)
-        .toList();
-    if (cleanSelected.isNotEmpty) {
-      final selectedEntry = cleanSelected.first;
-      _focusedAreaName = selectedEntry.areaController.text.trim();
-      if (selectedEntry.subAreas.isNotEmpty) {
-        _focusedSubAreaName = selectedEntry.subAreas.first.name.trim();
-      }
-    }
-  }
-
   Future<void> _showAddNodeDialog({
     required BuildContext context,
     required String title,
@@ -315,12 +296,6 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
               label: '${s.name} (${s.globalSku})',
               onRemove: () {
                 widget.onSubAreaToggle(area, s);
-                if (_focusedAreaName == area.name &&
-                    _focusedSubAreaName == s.name) {
-                  setState(() {
-                    _focusedSubAreaName = null;
-                  });
-                }
               },
               children: childItems,
             ),
@@ -337,12 +312,6 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
             summary: false,
             onRemove: () {
               widget.onAreaToggle(area);
-              if (_focusedAreaName == area.name) {
-                setState(() {
-                  _focusedAreaName = null;
-                  _focusedSubAreaName = null;
-                });
-              }
             },
           ),
         );
@@ -358,41 +327,14 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
 
   @override
   Widget build(BuildContext context) {
-    if (_focusedAreaName != null &&
-        !widget.areas.any((a) => a.name == _focusedAreaName)) {
-      _focusedAreaName = null;
-      _focusedSubAreaName = null;
-    }
-
-    final focusedArea = _focusedAreaName == null
-        ? null
-        : widget.areas.firstWhereOrNull((a) => a.name == _focusedAreaName);
-
-    final areaEntry = focusedArea == null
-        ? AreaViewModelEntry()
-        : widget.selectedAreas.firstWhere(
-            (a) => a.areaController.text == focusedArea.name,
-            orElse: AreaViewModelEntry.new,
-          );
-
-    if (focusedArea != null &&
-        _focusedSubAreaName != null &&
-        !focusedArea.subAreas.any((s) => s.name == _focusedSubAreaName)) {
-      _focusedSubAreaName = null;
-    }
-
-    final focusedSubArea = focusedArea?.subAreas.firstWhereOrNull(
-      (s) => s.name == _focusedSubAreaName,
-    );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Main Body Areas', style: context.fonts.black14w600),
-            IconButton(
+            Text('Anatomical Body Areas', style: context.fonts.black16w600),
+            TextButton.icon(
               onPressed: () {
                 _showAddNodeDialog(
                   context: context,
@@ -401,215 +343,40 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                       widget.onAddArea(name, sku, icon, image),
                 );
               },
-              icon: const Icon(
-                Icons.add_circle_outline_rounded,
-                size: 20,
-                color: CustomColors.purple,
+              icon: const Icon(Icons.add_circle_outline, size: 18),
+              label: const Text('Add Root Area'),
+              style: TextButton.styleFrom(
+                foregroundColor: CustomColors.purple,
               ),
-              tooltip: 'Add Root Area',
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
             ),
           ],
         ),
         context.verticalSpace(16),
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: widget.areas.map((area) {
-            final isSelected = widget.selectedAreas.any(
-              (a) => a.areaController.text == area.name,
-            );
-            final isFocused = _focusedAreaName == area.name;
-
-            return IconImageContainer(
-              title: area.name,
-              imageUrl: area.image,
-              iconUrl: area.icon,
-              isSelected: isSelected || isFocused,
-              onTap: () {
-                widget.onAreaToggle(area);
-                setState(() {
-                  _focusedAreaName = area.name;
-                  _focusedSubAreaName = null;
-                });
-              },
-              onAddChild: () {
-                _showAddNodeDialog(
-                  context: context,
-                  title: 'Create New Sub-Area in ${area.name}',
-                  onAdd: (name, sku, icon, image) => widget.onAddSubArea(
-                    parentAreaId: area.id,
-                    parentAreaName: area.name,
-                    name: name,
-                    sku: sku,
-                    icon: icon,
-                    image: image,
-                  ),
-                );
-              },
-            );
-          }).toList(),
-        ),
-
-        if (focusedArea != null && focusedArea.subAreas.isNotEmpty) ...[
-          context.verticalSpace(32),
-          const Divider(),
-          context.verticalSpace(24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Sub-Areas of ${focusedArea.name}',
-                style: context.fonts.black14w600,
+        if (widget.areas.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24.0),
+            child: Center(
+              child: Text(
+                'No anatomical areas available. Please add a root area.',
+                style: context.fonts.grey14w400,
               ),
-              IconButton(
-                onPressed: () {
-                  _showAddNodeDialog(
-                    context: context,
-                    title: 'Create New Sub-Area in ${focusedArea.name}',
-                    onAdd: (name, sku, icon, image) => widget.onAddSubArea(
-                      parentAreaId: focusedArea.id,
-                      parentAreaName: focusedArea.name,
-                      name: name,
-                      sku: sku,
-                      icon: icon,
-                      image: image,
-                    ),
-                  );
-                },
-                icon: const Icon(
-                  Icons.add_circle_outline_rounded,
-                  size: 20,
-                  color: CustomColors.purple,
-                ),
-                tooltip: 'Add Sub-Area',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
-          ),
-          context.verticalSpace(16),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: focusedArea.subAreas.map((subArea) {
-              final isSelected = areaEntry.subAreas.any(
-                (s) => s.name == subArea.name,
-              );
-              final isFocused = _focusedSubAreaName == subArea.name;
-
-              return IconImageContainer(
-                title: subArea.name,
-                imageUrl: subArea.image,
-                iconUrl: subArea.icon,
-                isSelected: isSelected || isFocused,
-                onTap: () {
-                  widget.onSubAreaToggle(focusedArea, subArea);
-                  setState(() {
-                    _focusedSubAreaName = subArea.name;
-                  });
-                },
-                onAddChild: () {
-                  _showAddNodeDialog(
-                    context: context,
-                    title: 'Create New Child Area in ${subArea.name}',
-                    onAdd: (name, sku, icon, image) => widget.onAddSubAreaChild(
-                      focusedArea.name,
-                      subArea.name,
-                      name,
-                      sku,
-                      icon,
-                      image,
-                    ),
-                  );
-                },
+            ),
+          )
+        else
+          Column(
+            children: widget.areas.map((area) {
+              return _RecursiveAreaTile(
+                area: area,
+                selectedAreas: widget.selectedAreas,
+                onAreaToggle: widget.onAreaToggle,
+                onSubAreaToggle: widget.onSubAreaToggle,
+                onSubAreaChildToggle: widget.onSubAreaChildToggle,
+                onAddSubArea: widget.onAddSubArea,
+                onAddSubAreaChild: widget.onAddSubAreaChild,
+                showAddNodeDialog: _showAddNodeDialog,
               );
             }).toList(),
           ),
-        ],
-
-        if (focusedSubArea != null &&
-            focusedSubArea.name.isNotEmpty &&
-            focusedSubArea.subAreas.isNotEmpty) ...[
-          context.verticalSpace(32),
-          const Divider(),
-          context.verticalSpace(24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Child Areas of ${focusedSubArea.name}',
-                style: context.fonts.black14w600,
-              ),
-              IconButton(
-                onPressed: () {
-                  _showAddNodeDialog(
-                    context: context,
-                    title: 'Create New Child in ${focusedSubArea.name}',
-                    onAdd: (name, sku, icon, image) => widget.onAddSubAreaChild(
-                      focusedArea!.name,
-                      focusedSubArea.name,
-                      name,
-                      sku,
-                      icon,
-                      image,
-                    ),
-                  );
-                },
-                icon: const Icon(
-                  Icons.add_circle_outline_rounded,
-                  size: 20,
-                  color: CustomColors.purple,
-                ),
-                tooltip: 'Add Child Area',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
-          ),
-          context.verticalSpace(16),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: focusedSubArea.subAreas.map((child) {
-              final subAreaConfig = areaEntry.subAreas.firstWhere(
-                (s) => s.name == focusedSubArea.name,
-                orElse: () => SubAreaConfig(
-                  name: focusedSubArea.name,
-                  id: focusedSubArea.id,
-                ),
-              );
-              final isSelected = subAreaConfig.children.any(
-                (c) => c.name == child.name,
-              );
-
-              return IconImageContainer(
-                title: child.name,
-                imageUrl: child.image,
-                iconUrl: child.icon,
-                isSelected: isSelected,
-                onTap: () {
-                  widget.onSubAreaChildToggle(
-                    focusedArea!,
-                    focusedSubArea,
-                    child,
-                  );
-                },
-                onAddChild: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Deepest level reached. Cannot add further children.',
-                      ),
-                    ),
-                  );
-                },
-              );
-            }).toList(),
-          ),
-        ],
-
         context.verticalSpace(32),
         const Divider(),
         context.verticalSpace(24),
@@ -644,6 +411,244 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _RecursiveAreaTile extends StatelessWidget {
+  final AreaModel area;
+  final AreaModel? parentArea;
+  final AreaModel? parentSubArea;
+  final int depth;
+  final List<AreaViewModelEntry> selectedAreas;
+  final void Function(AreaModel area) onAreaToggle;
+  final void Function(AreaModel area, AreaModel subArea) onSubAreaToggle;
+  final void Function(AreaModel area, AreaModel subArea, AreaModel child)
+  onSubAreaChildToggle;
+  final SubAreaSetter onAddSubArea;
+  final void Function(
+    String parentArea,
+    String parentSubArea,
+    String name,
+    String sku,
+    String? icon,
+    String? image,
+  )
+  onAddSubAreaChild;
+  final Future<void> Function({
+    required BuildContext context,
+    required String title,
+    required void Function(
+      String name,
+      String sku,
+      String iconUrl,
+      String imageUrl,
+    )
+    onAdd,
+  }) showAddNodeDialog;
+
+  const _RecursiveAreaTile({
+    required this.area,
+    this.parentArea,
+    this.parentSubArea,
+    this.depth = 0,
+    required this.selectedAreas,
+    required this.onAreaToggle,
+    required this.onSubAreaToggle,
+    required this.onSubAreaChildToggle,
+    required this.onAddSubArea,
+    required this.onAddSubAreaChild,
+    required this.showAddNodeDialog,
+  });
+
+  bool _checkSelection() {
+    if (depth == 0) {
+      return selectedAreas.any((a) => a.areaController.text == area.name);
+    } else if (depth == 1) {
+      final areaEntry = selectedAreas.firstWhereOrNull(
+        (a) => a.areaController.text == parentArea!.name,
+      );
+      return areaEntry != null &&
+          areaEntry.subAreas.any((s) => s.name == area.name);
+    } else {
+      final areaEntry = selectedAreas.firstWhereOrNull(
+        (a) => a.areaController.text == parentArea!.name,
+      );
+      final subAreaConfig = areaEntry?.subAreas.firstWhereOrNull(
+        (s) => s.name == parentSubArea!.name,
+      );
+      return subAreaConfig != null &&
+          subAreaConfig.children.any((c) => c.name == area.name);
+    }
+  }
+
+  void _handleTap() {
+    if (depth == 0) {
+      onAreaToggle(area);
+    } else if (depth == 1) {
+      onSubAreaToggle(parentArea!, area);
+    } else {
+      onSubAreaChildToggle(parentArea!, parentSubArea!, area);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = _checkSelection();
+    final hasChildren = area.subAreas.isNotEmpty;
+
+    final leadingWidget = Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: area.icon.isNotEmpty
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: AppNetworkImage(
+                imageUrl: area.icon,
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
+              ),
+            )
+          : const Icon(
+              Icons.blur_circular,
+              color: CustomColors.purple,
+              size: 18,
+            ),
+    );
+
+    final titleWidget = Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                area.name,
+                style: context.fonts.black14w600.copyWith(
+                  color: isSelected ? CustomColors.purple : CustomColors.black,
+                ),
+              ),
+              Text(
+                'SKU: ${area.globalSku}',
+                style: context.fonts.grey11w400,
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          icon: Icon(
+            isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+            color: isSelected ? CustomColors.purple : CustomColors.grey,
+            size: 20,
+          ),
+          onPressed: _handleTap,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        ),
+      ],
+    );
+
+    final trailingWidget = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (depth < 2) ...[
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline, size: 20, color: CustomColors.purple),
+            onPressed: () {
+              if (depth == 0) {
+                showAddNodeDialog(
+                  context: context,
+                  title: 'Create New Sub-Area in ${area.name}',
+                  onAdd: (name, sku, icon, image) => onAddSubArea(
+                    parentAreaId: area.id,
+                    parentAreaName: area.name,
+                    name: name,
+                    sku: sku,
+                    icon: icon,
+                    image: image,
+                  ),
+                );
+              } else if (depth == 1) {
+                showAddNodeDialog(
+                  context: context,
+                  title: 'Create New Child in ${area.name}',
+                  onAdd: (name, sku, icon, image) => onAddSubAreaChild(
+                    parentArea!.name,
+                    area.name,
+                    name,
+                    sku,
+                    icon,
+                    image,
+                  ),
+                );
+              }
+            },
+            tooltip: depth == 0 ? 'Add Sub-Area' : 'Add Child Area',
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+        ],
+        if (hasChildren) ...[
+          const SizedBox(width: 8),
+          const Icon(Icons.expand_more),
+        ],
+      ],
+    );
+
+    return Container(
+      margin: EdgeInsets.only(left: depth * 16.0, bottom: 8.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isSelected ? CustomColors.purple : CustomColors.border,
+          width: isSelected ? 1.5 : 1,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Material(
+          color: Colors.white,
+          child: hasChildren
+              ? ExpansionTile(
+                  initiallyExpanded: isSelected,
+                  onExpansionChanged: (expanded) {
+                    _handleTap();
+                  },
+                  shape: const RoundedRectangleBorder(side: BorderSide.none),
+                  leading: leadingWidget,
+                  title: titleWidget,
+                  trailing: trailingWidget,
+                  childrenPadding: const EdgeInsets.all(12),
+                  children: area.subAreas.map((sub) {
+                    return _RecursiveAreaTile(
+                      area: sub,
+                      parentArea: depth == 0 ? area : parentArea,
+                      parentSubArea: depth == 1 ? area : parentSubArea,
+                      depth: depth + 1,
+                      selectedAreas: selectedAreas,
+                      onAreaToggle: onAreaToggle,
+                      onSubAreaToggle: onSubAreaToggle,
+                      onSubAreaChildToggle: onSubAreaChildToggle,
+                      onAddSubArea: onAddSubArea,
+                      onAddSubAreaChild: onAddSubAreaChild,
+                      showAddNodeDialog: showAddNodeDialog,
+                    );
+                  }).toList(),
+                )
+              : ListTile(
+                  onTap: _handleTap,
+                  leading: leadingWidget,
+                  title: titleWidget,
+                  trailing: trailingWidget,
+                ),
+        ),
+      ),
     );
   }
 }
