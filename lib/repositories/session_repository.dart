@@ -14,6 +14,7 @@ import 'package:skinsync_admin/models/requests/create_session_requests/treatment
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/session_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
+import 'package:skinsync_admin/models/responses/session_detail_response.dart';
 
 abstract class SessionRepository {
   Future<BaseApiResponseModel> createSession({
@@ -92,6 +93,10 @@ abstract class SessionRepository {
   });
   Future<BaseApiResponseModel> finalFinish({
     required FinalFinishRequest request,
+    required int id,
+  });
+
+  Future<SessionDetailResponse> getSessionDetail({
     required int id,
   });
 

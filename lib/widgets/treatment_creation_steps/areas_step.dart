@@ -2,12 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/view_models/area_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/nested_area_selector.dart';
 
-class AreasStep extends ConsumerWidget {
+class AreasStep extends ConsumerStatefulWidget {
   const AreasStep({super.key});
+
+  @override
+  ConsumerState<AreasStep> createState() => _AreasStepState();
+}
+
+class _AreasStepState extends ConsumerState<AreasStep> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+       await ref.read(areaViewModelProvider.notifier).fetchAreas();
+      final fetchedAreas = ref.read(areaViewModelProvider).areas;
+      ref
+          .read(treatmentDataViewModelProvider.notifier)
+          .setAreasFromBackend(fetchedAreas);
+    });
+  }
 
   Widget _sectionTitle(BuildContext context, String title, {double? fontSize}) {
     return Text(
@@ -142,7 +160,7 @@ class AreasStep extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final state = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(treatmentViewModelProvider.notifier);
     final dataState = ref.watch(treatmentDataViewModelProvider);
@@ -173,12 +191,12 @@ class AreasStep extends ConsumerWidget {
                     state,
                     viewModel,
                   ),
-          onAddArea: (String name, String sku, String icon,String image) async {
+          onAddArea: (String name, String sku, String icon, String image) async {
             await ref
                 .read(treatmentDataViewModelProvider.notifier)
-                .addArea(name, sku: sku, icon: icon,image: image );
+                .addArea(name, sku: sku, icon: icon, image: image);
           },
-          onAddSubArea: ({required int parentAreaId, required String parentAreaName, required String name, String? sku, String? icon,String? image}) =>
+          onAddSubArea: ({required int parentAreaId, required String parentAreaName, required String name, String? sku, String? icon, String? image}) =>
               ref.read(treatmentDataViewModelProvider.notifier).addSubArea(
                     parentAreaId: parentAreaId,
                     parentAreaName: parentAreaName,
@@ -187,7 +205,7 @@ class AreasStep extends ConsumerWidget {
                     icon: icon,
                     image: image,
                   ),
-          onAddSubAreaChild: (parentArea, parentSubArea, name, sku, icon,image) {
+          onAddSubAreaChild: (parentArea, parentSubArea, name, sku, icon, image) {
             ref
                 .read(treatmentDataViewModelProvider.notifier)
                 .addSubAreaChild(
@@ -196,7 +214,7 @@ class AreasStep extends ConsumerWidget {
                   name,
                   sku: sku,
                   icon: icon,
-                  image: image
+                  image: image,
                 );
           },
         ),

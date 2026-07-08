@@ -7,9 +7,7 @@ import '../models/responses/area_list_response.dart';
 
 import '../models/treatment_data_models.dart';
 import '../utils/theme.dart';
-import '../view_models/area_view_model.dart';
 import '../view_models/category_view_model.dart';
-import '../view_models/product_view_model.dart';
 import '../view_models/session_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
@@ -34,12 +32,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(categoryViewModelProvider.notifier).fetchCategories();
-      await ref.read(productViewModelProvider.notifier).fetchProducts();
-      await ref.read(areaViewModelProvider.notifier).fetchAreas();
-      final fetchedAreas = ref.read(areaViewModelProvider).areas;
-      ref
-          .read(treatmentDataViewModelProvider.notifier)
-          .setAreasFromBackend(fetchedAreas);
+     // await ref.read(productViewModelProvider.notifier).fetchProducts();
+
     });
   }
 

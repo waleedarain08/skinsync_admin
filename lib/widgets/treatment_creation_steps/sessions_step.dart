@@ -340,14 +340,21 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                           children: [
                             CustomPrimaryButton(
                               width: context.w(130),
-                              onTap: () {
+                              onTap: () async {
                                 log('SessionID ${sessionEntry.sessionId}');
-                                sessionViewModel.setSessionId(
-                                  sessionEntry.sessionId,
-                                );
-                                sessionViewModel.setActiveSessionIndex(index);
-                                sessionViewModel.setSessionStep(1);
-                                context.push(CreateSessionScreen.routeName);
+                                if (sessionEntry.sessionId != null) {
+                                  final success = await sessionViewModel.fetchAndPopulateSessionDetail(
+                                    sessionEntry.sessionId!,
+                                  );
+                                  if (success && context.mounted) {
+                                    sessionViewModel.setActiveSessionIndex(index);
+                                    context.push(CreateSessionScreen.routeName);
+                                  }
+                                } else {
+                                  sessionViewModel.setActiveSessionIndex(index);
+                                  sessionViewModel.setSessionStep(1);
+                                  context.push(CreateSessionScreen.routeName);
+                                }
                               },
                               label: 'Enter Detail',
                             ),
@@ -379,6 +386,13 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                       context,
                     ).copyWith(dividerColor: Colors.transparent),
                     child: ExpansionTile(
+                      onExpansionChanged: (expanded) async {
+                        if (expanded && sessionEntry.sessionId != null) {
+                          await sessionViewModel.fetchAndPopulateSessionDetail(
+                            sessionEntry.sessionId!,
+                          );
+                        }
+                      },
                       tilePadding: context.appEdgeInsets(
                         horizontal: 16,
                         vertical: 8,
@@ -460,10 +474,19 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                           CustomOutlinedButton(
                             width: context.w(100),
                             height: context.h(32),
-                            onTap: () {
+                            onTap: () async {
                               sessionViewModel.setActiveSessionIndex(index);
-                              sessionViewModel.setSessionStep(1);
-                              context.push(CreateSessionScreen.routeName);
+                              if (sessionEntry.sessionId != null) {
+                                final success = await sessionViewModel.fetchAndPopulateSessionDetail(
+                                  sessionEntry.sessionId!,
+                                );
+                                if (success && context.mounted) {
+                                  context.push(CreateSessionScreen.routeName);
+                                }
+                              } else {
+                                sessionViewModel.setSessionStep(1);
+                                context.push(CreateSessionScreen.routeName);
+                              }
                             },
                             label: 'Edit Detail',
                           ),

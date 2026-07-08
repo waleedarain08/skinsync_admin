@@ -21,6 +21,9 @@ import 'package:skinsync_admin/models/requests/create_session_requests/step_pric
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/responses/session_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
+import 'package:skinsync_admin/models/responses/session_detail_response.dart';
+import 'package:skinsync_admin/models/common_models.dart';
+import 'package:collection/collection.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/repositories/product_repository.dart';
 import 'package:skinsync_admin/repositories/session_repository.dart';
@@ -376,6 +379,221 @@ class SessionViewModel extends BaseViewModel<SessionState> {
 
   void setActiveSessionIndex(int index) {
     state = state.copyWith(activeSessionIndex: index);
+  }
+
+  Future<bool> fetchAndPopulateSessionDetail(int sessionId) async {
+    return await runSafely<bool>(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        final response = await _sessionRepository.getSessionDetail(id: sessionId);
+        if (response.isSuccess && response.data != null) {
+          final SessionDetailDto detail = response.data!;
+
+          // Set Session ID
+          setSessionId(detail.id);
+
+          // 1. Materials Step
+          final mappedUsages = detail.productUsages.map((e) {
+            final durationMatch = detail.productDurations.firstWhereOrNull((d) => d.productId == e.productId);
+            final perUnitDuration = durationMatch?.perUnitDuration ?? 0.0;
+
+            return ProductUsageEntry(
+              productId: e.productId,
+              productName: e.productName,
+              unit: 'Unit',
+              notesController: TextEditingController(text: e.notes),
+              minQuantityController: TextEditingController(text: e.minQuantity.toString()),
+              maxQuantityController: TextEditingController(text: e.maxQuantity.toString()),
+              perUnitDurationController: TextEditingController(text: perUnitDuration.toString()),
+              allowSubstitution: e.allowSubstitution,
+              deductionTiming: e.deductionTiming,
+            );
+          }).toList();
+
+          state = state.copyWith(
+            productUsageEntries: mappedUsages,
+          );
+
+          // 2. Schedule Step
+          treatmentDurationController.text = detail.baseDuration.toString();
+          prepTimeController.text = detail.prepTime.toString();
+          cleanupTimeController.text = detail.cleanupTime.toString();
+          minimumBookingNoticeController.text = detail.minimumBookingNotice.toString();
+          maximumDaysInAdvanceController.text = detail.maximumDaysInAdvance.toString();
+          fixedDurationController.text = detail.fixedDuration.toString();
+
+          state = state.copyWith(
+            allowClinicOverride: detail.allowClinicOverride,
+            allowProviderOverride: detail.allowProviderOverride,
+            onlineBookable: detail.onlineBookable,
+            manualApprovalRequired: detail.manualApprovalRequired,
+            isFixedDuration: detail.isFixedDuration,
+          );
+
+          // 3. Pricing Step
+          basePriceController.text = detail.basePrice.toString();
+          fixedPriceController.text = detail.fixedPrice.toString();
+          state = state.copyWith(
+            isFixedPrice: detail.isFixedPrice,
+          );
+
+          unitPriceControllers.forEach((_, c) => c.dispose());
+          unitPriceControllers.clear();
+
+          for (final override in detail.unitPriceOverrides) {
+            final entry = mappedUsages.firstWhereOrNull((e) => e.productId == override.productId);
+            if (entry != null) {
+              final controller = getControllerForUnit(entry.unit);
+              controller.text = override.pricePerUnit.toString();
+            }
+          }
+
+          // 5. Pre-Treatment Instructions
+          preTreatmentInstructionsController.text = detail.preTreatmentInstructions;
+          final List<Attachment> preAttachments = detail.preTreatmentAttachments.map((a) {
+            return Attachment(url: a.url, type: a.type ?? 'pdf', name: a.name);
+          }).toList();
+
+          // 6. Post-Treatment Instructions
+          postTreatmentInstructionsController.text = detail.postTreatmentInstructions;
+          final List<Attachment> postAttachments = detail.postTreatmentAttachments.map((a) {
+            return Attachment(url: a.url, type: a.type ?? 'pdf', name: a.name);
+          }).toList();
+
+          // 7. Post-Treatment Photos
+          postTreatmentPhotoCountController.text = detail.photoMilestone.length.toString();
+          final List<PostTreatmentPhotoConfig> photoConfigs = detail.photoMilestone.map((m) {
+            return PostTreatmentPhotoConfig(
+              days: m.numberOfDays.toString(),
+              count: m.requiredPhotos.toString(),
+            );
+          }).toList();
+
+          state = state.copyWith(
+            existingPreAttachments: preAttachments,
+            existingPostAttachments: postAttachments,
+            requirePostTreatmentPhotos: detail.requirePostTreatmentPhotos,
+            postTreatmentPhotoConfigs: photoConfigs,
+          );
+
+          // 8 & 9. Phase Notifications
+          final List<NotificationEntry> preNotifs = detail.preNotifications.map((n) {
+            return NotificationEntry(
+              titleController: TextEditingController(text: n.title),
+              messageController: TextEditingController(text: n.message),
+              timingValueController: TextEditingController(text: n.timing.toString()),
+              timingUnit: n.timingUnit,
+              type: n.type,
+            );
+          }).toList();
+
+          final List<NotificationEntry> postNotifs = detail.postNotifications.map((n) {
+            return NotificationEntry(
+              titleController: TextEditingController(text: n.title),
+              messageController: TextEditingController(text: n.message),
+              timingValueController: TextEditingController(text: n.timing.toString()),
+              timingUnit: n.timingUnit,
+              type: n.type,
+            );
+          }).toList();
+
+          state = state.copyWith(
+            preNotificationEntries: preNotifs,
+            postNotificationEntries: postNotifs,
+          );
+
+          // 10. Downtime Level & Provider Roles
+          state = state.copyWith(
+            downtimeLevel: detail.downtimeLevel,
+            selectedRoles: detail.allowedRoles,
+          );
+
+          // 11. Follow ups
+          final List<FollowUpEntry> mappedFollowUps = detail.followUps.map((f) {
+            return FollowUpEntry(
+              type: f.type,
+              durationUnit: f.durationUnit,
+              durationValueController: TextEditingController(text: f.durationValue.toString()),
+              notesController: TextEditingController(text: f.notes),
+              intervalValueController: TextEditingController(text: f.intervalValue.toString()),
+              intervalUnit: f.intervalUnit,
+              isImageRequired: f.isImageRequired,
+            );
+          }).toList();
+
+          final bool hasFollowUps = mappedFollowUps.isNotEmpty;
+
+          final updatedSessions = state.sessions.map((s) {
+            if (s.sessionId == detail.id) {
+              final durationText = detail.isFixedDuration 
+                  ? "Fixed: ${detail.fixedDuration} mins"
+                  : "Total: ${detail.calculatedTotalDuration} mins (Base: ${detail.baseDuration}, Prep: ${detail.prepTime}, Cleanup: ${detail.cleanupTime})";
+                  
+              final priceText = detail.isFixedPrice 
+                  ? "\$${detail.fixedPrice} (Fixed Rate)"
+                  : "\$${detail.basePrice} (Base) + Custom Overrides";
+
+              final List<String> protocols = [];
+              if (detail.clinicalProtocolPdf != null) {
+                protocols.add("${detail.clinicalProtocolPdf!.name} (Clinical Protocol)");
+              } else {
+                protocols.add("No clinical protocols configured");
+              }
+
+              final List<String> preNotifs = detail.preNotifications
+                  .map((n) => "${n.title} - Send ${n.timing} ${n.timingUnit}(s) before")
+                  .toList();
+
+              final List<String> postNotifs = detail.postNotifications
+                  .map((n) => "${n.title} - Send ${n.timing} ${n.timingUnit}(s) after")
+                  .toList();
+
+              final newS = SessionViewModelEntry(
+                sessionId: s.sessionId,
+                sessionNumber: s.sessionNumber,
+                title: s.title,
+                status: detail.status,
+                totalFollowUpsController: s.totalFollowUpsController,
+                followUps: mappedFollowUps,
+                isDetailedEntered: true,
+                productUsageSnapshot: List<ProductUsageEntry>.from(mappedUsages),
+                durationSnapshot: durationText,
+                priceSnapshot: priceText,
+                protocolSnapshot: protocols,
+                preInstructionsSnapshot: detail.preTreatmentInstructions,
+                postInstructionsSnapshot: detail.postTreatmentInstructions,
+                requirePhotosSnapshot: detail.requirePostTreatmentPhotos,
+                photosCountSnapshot: detail.photoMilestone.length,
+                preNotificationsSnapshot: preNotifs,
+                postNotificationsSnapshot: postNotifs,
+                downtimeSnapshot: detail.downtimeLevel,
+                rolesSnapshot: List.from(detail.allowedRoles),
+                consentSnapshot: detail.preTreatmentConsentForm?.name ?? '',
+              );
+              newS.totalFollowUpsController.text = mappedFollowUps.length.toString();
+              return newS;
+            }
+            return s;
+          }).toList();
+
+          state = state.copyWith(
+            sessions: updatedSessions,
+            isFollowUpRequired: hasFollowUps,
+          );
+
+          // 12. Pre-Treatment Consent Form
+          state = state.copyWith(
+            consentFormUrl: detail.preTreatmentConsentForm?.url ?? '',
+          );
+
+          // Now let's set the Step open index
+          setSessionStep(detail.currentStep);
+
+          return true;
+        }
+        return false;
+      },
+    ) ?? false;
   }
 
   void markActiveSessionAsDetailed({
