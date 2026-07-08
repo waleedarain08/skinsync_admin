@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 
+import '../models/session_model.dart';
+
 class TreatmentSessionExpansionTile extends StatelessWidget {
-  final TreatmentSessionDto session;
+  final SessionModel session;
 
   const TreatmentSessionExpansionTile({
     super.key,
@@ -40,7 +41,7 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  session.title ?? 'Clinical Procedure Session',
+                  session.title,
                   style: context.fonts.black14w700,
                 ),
               ),
@@ -54,7 +55,7 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  session.status ?? 'Active',
+                  session.status,
                   style: context.fonts.green14w600.copyWith(
                     fontSize: 10,
                   ),
@@ -76,12 +77,12 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
                 _sessionMetaChip(
                   context,
                   Icons.layers_outlined,
-                  'Step ${session.currentStep ?? 2}',
+                  'Step ${session.currentStep}',
                 ),
                 _sessionMetaChip(
                   context,
                   Icons.location_searching,
-                  session.areaName ?? 'Target Area',
+                  session.areaName,
                 ),
               ],
             ),
@@ -90,9 +91,9 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
           children: [
             const Divider(),
             context.verticalSpace(12),
-            _buildDetailRow(context, 'Session ID', '${session.id ?? "—"}'),
-            _buildDetailRow(context, 'Treatment ID', '${session.treatmentId ?? "—"}'),
-            _buildDetailRow(context, 'Procedure Step', 'Step ${session.currentStep ?? 12}'),
+            _buildDetailRow(context, 'Session ID', '${session.id}'),
+            _buildDetailRow(context, 'Treatment ID', '${session.treatmentId }'),
+            _buildDetailRow(context, 'Procedure Step', 'Step ${session.currentStep}'),
             _buildDetailRow(context, 'Completion Status', session.isCompleted == true ? 'Completed ✓' : 'In-Progress'),
             _buildDetailRow(context, 'Created Date', _formatTimestamp(session.createdAt)),
           ],
@@ -131,9 +132,18 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
     );
   }
 
-  String _formatTimestamp(DateTime? dt) {
-    if (null == dt) return '—';
+  String _formatTimestamp(dynamic val) {
+    if (null == val) return '—';
     try {
+      DateTime dt;
+      if (val is DateTime) {
+        dt = val;
+      } else if (val is String) {
+        if (val.isEmpty) return '—';
+        dt = DateTime.parse(val);
+      } else {
+        return '—';
+      }
       final date = dt.toLocal();
       return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
     } catch (_) {

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
+import '../session_model.dart';
+
 class TreatmentDetailResponse extends BaseApiResponseModel<TreatmentDetailDto> {
   const TreatmentDetailResponse({
     required super.isSuccess,
@@ -60,9 +62,9 @@ class TreatmentDetailDto {
   });
 
   // Flattened sessions computed property for backward compatibility with older components
-  List<TreatmentSessionDto> get sessions {
+  List<SessionModel> get sessions {
     if (areas == null) return [];
-    final List<TreatmentSessionDto> allSessions = [];
+    final List<SessionModel> allSessions = [];
     for (final area in areas!) {
       if (area.sessions != null) {
         allSessions.addAll(area.sessions!);
@@ -167,7 +169,7 @@ class TreatmentCategoryDetailDto {
 class TreatmentAreaDto {
   final int? areaId;
   final String? areaName;
-  final List<TreatmentSessionDto>? sessions;
+  final List<SessionModel>? sessions;
 
   TreatmentAreaDto({
     this.areaId,
@@ -179,8 +181,8 @@ class TreatmentAreaDto {
         areaId: json['area_id'] as int?,
         areaName: json['area_name'] as String?,
         sessions: json['sessions'] != null
-            ? List<TreatmentSessionDto>.from(json['sessions']
-                .map((x) => TreatmentSessionDto.fromJson(x as Map<String, dynamic>)))
+            ? List<SessionModel>.from(json['sessions']
+                .map((x) => SessionModel.fromJson(x as Map<String, dynamic>)))
             : null,
       );
 
@@ -193,57 +195,3 @@ class TreatmentAreaDto {
       };
 }
 
-class TreatmentSessionDto {
-  final int? id;
-  final int? treatmentId;
-  final int? areaId;
-  final String? areaName;
-  final String? title;
-  final int? sessionNumber;
-  final String? status;
-  final int? currentStep;
-  final bool? isCompleted;
-  final DateTime? createdAt;
-
-  TreatmentSessionDto({
-    this.id,
-    this.treatmentId,
-    this.areaId,
-    this.areaName,
-    this.title,
-    this.sessionNumber,
-    this.status,
-    this.currentStep,
-    this.isCompleted,
-    this.createdAt,
-  });
-
-  factory TreatmentSessionDto.fromJson(Map<String, dynamic> json) =>
-      TreatmentSessionDto(
-        id: json['id'] as int?,
-        treatmentId: json['treatment_id'] as int?,
-        areaId: json['area_id'] as int?,
-        areaName: json['area_name'] as String?,
-        title: json['title'] as String?,
-        sessionNumber: json['session_number'] as int?,
-        status: json['status'] as String?,
-        currentStep: json['current_step'] as int?,
-        isCompleted: json['is_completed'] as bool?,
-        createdAt: json['created_at'] == null
-            ? null
-            : DateTime.parse(json['created_at']),
-      );
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'treatment_id': treatmentId,
-        'area_id': areaId,
-        'area_name': areaName,
-        'title': title,
-        'session_number': sessionNumber,
-        'status': status,
-        'current_step': currentStep,
-        'is_completed': isCompleted,
-        'created_at': createdAt?.toIso8601String(),
-      };
-}
