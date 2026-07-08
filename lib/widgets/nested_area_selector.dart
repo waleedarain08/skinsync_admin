@@ -3,16 +3,9 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
-import 'package:skinsync_admin/utils/sku_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/view_models/area_view_model.dart';
-import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
-import 'package:skinsync_admin/widgets/app_network_image.dart';
-import 'package:skinsync_admin/widgets/build_textfield.dart';
-import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
-import 'package:skinsync_admin/widgets/custom_primary_button.dart';
-import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
+import 'package:skinsync_admin/widgets/dailogbox/area_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/icon_image_container.dart';
 
 typedef SubAreaSetter =
@@ -254,7 +247,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
     }
   }
 
-  void _showAddNodeDialog({
+  Future<void> _showAddNodeDialog({
     required BuildContext context,
     required String title,
     required void Function(
@@ -264,295 +257,20 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
       String imageUrl,
     )
     onAdd,
-  }) {
-    final nameController = TextEditingController();
-    final skuController = TextEditingController();
-    String? iconUrl;
-    String? imageUrl;
-
-    showDialog(
+  }) async {
+    final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-//final areaState = ref.watch(areaViewModelProvider);
-            return StandardDialog(
-              title: title,
-              width: context.w(450),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BuildTextField(
-                    label: 'Name',
-                    controller: nameController,
-                    hintText: 'e.g. Left Forehead',
-                  ),
-                  context.verticalSpace(16),
-                  BuildTextField(
-                    label: 'Global SKU',
-                    controller: skuController,
-                    hintText: 'e.g. BTX-0001-UPRF',
-                    tooltip:
-                        'Must follow pattern XXX-XXXX-XXXX (like BTX-0001-UPRF) and be unique.',
-                  ),
-                  context.verticalSpace(16),
-                  context.verticalSpace(20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Area Icon', style: context.fonts.black14w600),
-                            context.verticalSpace(12),
-                            iconUrl == null || iconUrl!.isEmpty
-                                ? InkWell(
-                                    onTap: () async {
-                                      await ref.read(areaViewModelProvider.notifier).pickImage(true);
-                                      final uploaded = ref.read(areaViewModelProvider).areaIconUrl;
-                                      if (uploaded != null) {
-                                        setDialogState(() {
-                                          iconUrl = uploaded;
-                                        });
-                                      }
-                                    },
-                                    borderRadius: context.appBorderRadius(all: 12),
-                                    child: Container(
-                                      height: 110,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: CustomColors.whiteGrey,
-                                        borderRadius: context.appBorderRadius(all: 12),
-                                        border: Border.all(color: CustomColors.border),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.add_photo_alternate_outlined,
-                                            color: CustomColors.lightGrey,
-                                            size: 24,
-                                          ),
-                                          context.verticalSpace(4),
-                                          Text(
-                                            'Upload Icon',
-                                            style: context.fonts.grey11w400,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: 110,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: context.appBorderRadius(all: 12),
-                                      border: Border.all(color: CustomColors.border),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: context.appBorderRadius(all: 12),
-                                      child: Stack(
-                                        children: [
-                                          AppNetworkImage(
-                                            imageUrl: iconUrl!,
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                          ),
-                                          Positioned(
-                                            top: 4,
-                                            right: 4,
-                                            child: InkWell(
-                                              onTap: () {
-                                                setDialogState(() {
-                                                  iconUrl = '';
-                                                });
-                                              },
-                                              child: Container(
-                                                padding: const EdgeInsets.all(4),
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.white,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: const Icon(
-                                                  Icons.delete_outline_rounded,
-                                                  color: CustomColors.red,
-                                                  size: 16,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                          ],
-                        ),
-                      ),
-                      context.horizontalSpace(16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Banner Image', style: context.fonts.black14w600),
-                            context.verticalSpace(12),
-                            imageUrl == null || imageUrl!.isEmpty
-                                ? InkWell(
-                                    onTap: () async {
-                                      await ref.read(areaViewModelProvider.notifier).pickImage(false);
-                                      final uploaded = ref.read(areaViewModelProvider).areaImageUrl;
-                                      if (uploaded != null) {
-                                        setDialogState(() {
-                                          imageUrl = uploaded;
-                                        });
-                                      }
-                                    },
-                                    borderRadius: context.appBorderRadius(all: 12),
-                                    child: Container(
-                                      height: 110,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: CustomColors.whiteGrey,
-                                        borderRadius: context.appBorderRadius(all: 12),
-                                        border: Border.all(color: CustomColors.border),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.add_photo_alternate_outlined,
-                                            color: CustomColors.lightGrey,
-                                            size: 24,
-                                          ),
-                                          context.verticalSpace(4),
-                                          Text(
-                                            'Upload Image',
-                                            style: context.fonts.grey11w400,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: 110,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: context.appBorderRadius(all: 12),
-                                      border: Border.all(color: CustomColors.border),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: context.appBorderRadius(all: 12),
-                                      child: Stack(
-                                        children: [
-                                          AppNetworkImage(
-                                            imageUrl: imageUrl!,
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                          ),
-                                          Positioned(
-                                            top: 4,
-                                            right: 4,
-                                            child: InkWell(
-                                              onTap: () {
-                                                setDialogState(() {
-                                                  imageUrl = '';
-                                                });
-                                              },
-                                              child: Container(
-                                                padding: const EdgeInsets.all(4),
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.white,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: const Icon(
-                                                  Icons.delete_outline_rounded,
-                                                  color: CustomColors.red,
-                                                  size: 16,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              actions: [
-                CustomOutlinedButton(
-                  onTap: () => Navigator.pop(context),
-                  label: 'Cancel',
-                ),
-                // context.horizontalSpace(12),
-                CustomPrimaryButton(
-                  onTap: () async {
-                    final name = nameController.text.trim();
-                    final sku = skuController.text.trim().toUpperCase();
-
-                    if (name.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Name is required'),
-                          backgroundColor: CustomColors.red,
-                        ),
-                      );
-                      return;
-                    }
-
-                    final validationError = SkuUtils.validateGlobalSku(sku);
-                    if (validationError != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(validationError),
-                          backgroundColor: CustomColors.red,
-                        ),
-                      );
-                      return;
-                    }
-
-                    // uniqueness check
-                    final dataViewModel = ref.read(
-                      treatmentDataViewModelProvider.notifier,
-                    );
-                    if (!dataViewModel.isAreaSkuUnique(sku)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'SKU must be globally unique across all levels.',
-                          ),
-                          backgroundColor: CustomColors.red,
-                        ),
-                      );
-                      return;
-                    }
-
-                    if (iconUrl == null || imageUrl == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Area icon must be selected!'),
-                          backgroundColor: CustomColors.red,
-                        ),
-                      );
-                      return;
-                    }
-                    onAdd(name, sku, iconUrl!, imageUrl!);
-                    Navigator.pop(context);
-                  },
-                  label: 'Add',
-                ),
-              ],
-            );
-          },
-        );
-      },
+      builder: (context) => AreaCreationDialog(title: title),
     );
+
+    if (result != null) {
+      onAdd(
+        result['name'] as String,
+        result['sku'] as String,
+        result['icon'] as String,
+        result['image'] as String,
+      );
+    }
   }
 
   Widget _buildLiveSelectionPreview(BuildContext context) {

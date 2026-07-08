@@ -11,6 +11,7 @@ import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/dailogbox/area_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/category_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -27,6 +28,8 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
   static Future<void> _showCategoryCreationDialog({
     required BuildContext context,
     String? parentName,
+    int? parentId,
+    int? categoryId,
     String? initialName,
     String? initialIcon,
     String? initialImage,
@@ -55,6 +58,8 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
       context: context,
       builder: (context) => CategoryCreationDialog(
         parentName: parentName,
+        parentId: parentId,
+        categoryId: categoryId,
         initialName: initialName,
         initialIcon: initialIcon,
         initialImage: initialImage,
@@ -619,23 +624,13 @@ class _ManageTreatmentDataScreenState
                     String image,
                     String? consentFormName,
                     String? consentFormUrl,
-                   // List<CategorySessionModel>? sessions,
                     List<CategoryNotificationModel>? preNotif,
                     List<CategoryNotificationModel>? postNotif,
                     CategoryDowntimePresetModel? downtime,
                     List<String>? roles,
-                  ) => viewModel.addCategory(
-                    name,
-                    icon: icon,
-                    image: image,
-                    consentFormName: consentFormName,
-                    consentFormUrl: consentFormUrl,
-                 //   defaultSessions: sessions,
-                    preNotifications: preNotif,
-                    postNotifications: postNotif,
-                    downtimePresets: downtime,
-                    defaultRoles: roles,
-                  ),
+                  ) {
+                    // Done on backend directly
+                  },
             ),
           ),
           context.verticalSpace(24),
@@ -671,12 +666,20 @@ class _ManageTreatmentDataScreenState
           _buildTabHeader(
             context: context,
             title: 'Anatomical Body Areas',
-            onAdd: () => ManageTreatmentDataScreen._showItemDialog(
-              context: context,
-              title: 'Add New Area',
-              onConfirm: (String name, String icon,String image) =>
-                  viewModel.addArea(name, icon: icon,image:image),
-            ),
+            onAdd: () async {
+              final result = await showDialog<Map<String, dynamic>>(
+                context: context,
+                builder: (context) => const AreaCreationDialog(title: 'Add New Area'),
+              );
+              if (result != null) {
+                viewModel.addArea(
+                  result['name'] as String,
+                  sku: result['sku'] as String,
+                  icon: result['icon'] as String,
+                  image: result['image'] as String,
+                );
+              }
+            },
           ),
           context.verticalSpace(24),
           ListView.separated(
@@ -697,14 +700,14 @@ class _ManageTreatmentDataScreenState
                 onEdit: (name, icon,image) =>
                     viewModel.editArea(area.name, name, icon: icon,image:image),
                 onDelete: () => viewModel.deleteArea(area.name),
-                onAddChild: (name, icon,image) =>
-                    // TODO: Add area id instead of 0
+                onAddChild: (name, sku, icon, image) =>
                     viewModel.addSubArea(
-                      parentAreaId: 0,
+                      parentAreaId: area.id,
                       parentAreaName: area.name,
                       name: name,
+                      sku: sku,
                       icon: icon,
-                      image:image
+                      image: image,
                     ),
                 onEditChild: (old, name, icon,image) =>
                     viewModel.editSubArea(area.name, old, name, icon: icon,image:image),
@@ -885,7 +888,7 @@ class _ManageTreatmentDataScreenState
   required List<_ChildItemData> children,
   required void Function(String, String, String) onEdit,       
   required VoidCallback onDelete,
-  required void Function(String, String, String) onAddChild,   
+  required void Function(String, String, String, String) onAddChild,   
   required void Function(String, String, String, String) onEditChild, 
   required void Function(String) onDeleteChild,
   }) {
@@ -994,11 +997,20 @@ class _ManageTreatmentDataScreenState
                 ),
                 context.verticalSpace(8),
                 TextButton.icon(
-                  onPressed: () => ManageTreatmentDataScreen._showItemDialog(
-                    context: context,
-                    title: 'Add Sub-item',
-                    onConfirm: onAddChild,
-                  ),
+                  onPressed: () async {
+                    final result = await showDialog<Map<String, dynamic>>(
+                      context: context,
+                      builder: (context) => const AreaCreationDialog(title: 'Add Sub-item'),
+                    );
+                    if (result != null) {
+                      onAddChild(
+                        result['name'] as String,
+                        result['sku'] as String,
+                        result['icon'] as String,
+                        result['image'] as String,
+                      );
+                    }
+                  },
                   icon: const Icon(Icons.add, size: 16),
                   label: const Text('Add Sub-item'),
                   style: TextButton.styleFrom(
@@ -1082,6 +1094,7 @@ class _RecursiveCategoryTile extends StatelessWidget {
                   ManageTreatmentDataScreen._showCategoryCreationDialog(
                     context: context,
                     parentName: category.name,
+                    parentId: category.id, // Explicitly pass parentId
                     onConfirm:
                         (
                           String name,
@@ -1089,24 +1102,13 @@ class _RecursiveCategoryTile extends StatelessWidget {
                           String image,
                           String? consentFormName,
                           String? consentFormUrl,
-                          //List<CategorySessionModel>? sessions,
                           List<CategoryNotificationModel>? preNotif,
                           List<CategoryNotificationModel>? postNotif,
                           CategoryDowntimePresetModel? downtime,
                           List<String>? roles,
-                        ) => viewModel.addCategory(
-                          name,
-                          icon: icon,
-                          image: image,
-                          parentId: category.id,
-                          consentFormName: consentFormName,
-                          consentFormUrl: consentFormUrl,
-                         // defaultSessions: sessions,
-                          preNotifications: preNotif,
-                          postNotifications: postNotif,
-                          downtimePresets: downtime,
-                          defaultRoles: roles,
-                        ),
+                        ) {
+                          // Done on backend directly
+                        },
                   ),
             ),
             IconButton(
@@ -1115,6 +1117,7 @@ class _RecursiveCategoryTile extends StatelessWidget {
               onPressed: () =>
                   ManageTreatmentDataScreen._showCategoryCreationDialog(
                     context: context,
+                    categoryId: category.id, // Explicitly pass categoryId to edit
                     initialName: category.name,
                     initialIcon: category.icon,
                     initialImage: category.image,
@@ -1135,8 +1138,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
                           name,
                           icon: icon,
                           image: image,
-                          consentFormName: consentFormName,
                           consentFormUrl: consentFormUrl,
+                          consentFormName: consentFormName,
                         //  defaultSessions: sessions,
                         //  totalSessions: sessions?.length,
                           preNotifications: preNotif,

@@ -32,6 +32,7 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
     this.initialDowntimePresets,
     this.initialDefaultRoles,
     this.categoryId,
+    this.parentId, // Passed to specify parent when adding subcategories
     this.isViewMode = false,
   });
 
@@ -46,6 +47,7 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
   final CategoryDowntimePresetModel? initialDowntimePresets;
   final List<String>? initialDefaultRoles;
   final int? categoryId;
+  final int? parentId; // Added parentId field
   final bool isViewMode;
 
   @override
@@ -336,11 +338,38 @@ class _CategoryCreationDialogState
 
     try {
       if (!mounted) return;
+      final Map<String, dynamic> result = {
+        'name': _nameController.text,
+        'icon': _selectedIcon,
+        'image': _selectedImage,
+        'consentFormUrl': _consentFormUrl,
+        'consentFormName': _existingConsentName,
+        'preNotifications': _preNotificationEntries
+            .map((e) => e.toConfig())
+            .toList(),
+        'postNotifications': _postNotificationEntries
+            .map((e) => e.toConfig())
+            .toList(),
+        'downtimePresets': CategoryDowntimePresetModel(
+          none: 0,
+          low: int.tryParse(_downtimeLowController.text) ?? 2,
+          moderate: int.tryParse(_downtimeModerateController.text) ?? 5,
+          high: int.tryParse(_downtimeHighController.text) ?? 10,
+        ),
+        'defaultRoles': _selectedRoles,
+      };
+
+      if (widget.initialName != null) {
+        // If we are editing, we can pop with the result immediately so the caller updates
+        Navigator.pop(context, result);
+        return;
+      }
+
       final request = CreateCategoryRequest(
         name: _nameController.text,
         icon: _selectedIcon,
         image: _selectedImage,
-        parentId: widget.categoryId,
+        parentId: widget.parentId, // Sets the correct parent_id from parentId parameter!
         consentFormUrl: _consentFormUrl,
         consentFormName: _existingConsentName,
         preNotifications: _preNotificationEntries
@@ -363,7 +392,7 @@ class _CategoryCreationDialogState
           .createCategory(request: request)
           .then((value) {
             if (value == true && mounted) {
-              Navigator.pop(context);
+              Navigator.pop(context, result);
             }
           });
     } finally {

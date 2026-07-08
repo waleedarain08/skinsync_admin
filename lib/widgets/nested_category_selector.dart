@@ -85,7 +85,6 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
 
   @override
   Widget build(BuildContext context) {
-    final categoryViewModel = ref.read(categoryViewModelProvider.notifier);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,18 +95,7 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
             Text('Browse Categories', style: context.fonts.black16w600),
             TextButton.icon(
               onPressed: () => _showCreationDialog(context, null, (result) {
-                categoryViewModel.addCategory(
-                  result['name'],
-                  icon: result['icon'],
-                  consentFormName: result['consentFormName'],
-                  consentFormUrl: result['consentFormUrl'],
-                  defaultSessions: result['sessions'],
-                  totalSessions: result['totalSessions'],
-                  preNotifications: result['preNotifications'],
-                  postNotifications: result['postNotifications'],
-                  downtimePresets: result['downtimePresets'],
-                  defaultRoles: result['defaultRoles'],
-                );
+                // Done on backend directly via dialog
               }),
               icon: const Icon(Icons.add_circle_outline, size: 18),
               label: const Text('Add Root Category'),
@@ -139,19 +127,7 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
                   context,
                   parent,
                   (result) {
-                    categoryViewModel.addCategory(
-                      result['name'],
-                      icon: result['icon'],
-                      parentId: parent.id,
-                      consentFormName: result['consentFormName'],
-                      consentFormUrl: result['consentFormUrl'],
-                      defaultSessions: result['sessions'],
-                      totalSessions: result['totalSessions'],
-                      preNotifications: result['preNotifications'],
-                      postNotifications: result['postNotifications'],
-                      downtimePresets: result['downtimePresets'],
-                      defaultRoles: result['defaultRoles'],
-                    );
+                    // Done on backend directly via dialog
                   },
                 ),
               );
@@ -168,7 +144,10 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
   ) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => CategoryCreationDialog(parentName: parentName),
+      builder: (context) => CategoryCreationDialog(
+        parentName: parentName,
+        parentId: null, // Root category has null parentId
+      ),
     );
 
     if (result != null) {
@@ -198,6 +177,7 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
       builder: (context) => _buildCategoryDialogFromDetail(
         detail,
         parentName: parent.name,
+        parentId: parent.id, // Pass parent ID as parentId
       ),
     );
 
@@ -209,10 +189,12 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
   CategoryCreationDialog _buildCategoryDialogFromDetail(
     CategoryDetailDto detail, {
     String? parentName,
+    int? parentId,
     bool isViewMode = false,
   }) {
     return CategoryCreationDialog(
       parentName: parentName,
+      parentId: parentId, // Passed correctly here
       isViewMode: isViewMode,
       initialName: isViewMode ? detail.name : null,
       initialIcon: detail.icon,
