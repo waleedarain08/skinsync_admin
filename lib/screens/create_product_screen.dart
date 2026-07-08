@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/product_model.dart';
+import 'package:skinsync_admin/utils/sku_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
@@ -756,8 +757,19 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                                   child: BuildTextField(
                                     label: 'Global SKU (Unique key)',
                                     controller: _skuController,
-                                    hintText: 'e.g. ALL-BTX-100U-V',
-                                    validator: Validators.empty,
+                                    hintText: 'e.g. BTX-0001-UPRF',
+                                    validator: (val) {
+                                      final productState = ref.read(productViewModelProvider);
+                                      final existingSkus = productState.products
+                                          .map((p) => p.globalSku ?? p.sku ?? '')
+                                          .where((sku) => sku.isNotEmpty)
+                                          .toList();
+                                      return SkuUtils.validateGlobalSku(
+                                        val,
+                                        existingSkus: existingSkus,
+                                        currentSku: widget.productToEdit?.globalSku ?? widget.productToEdit?.sku,
+                                      );
+                                    },
                                   ),
                                 ),
                                 SizedBox(width: 16.w),

@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +16,7 @@ import 'package:skinsync_admin/repositories/treatment_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/exception.dart';
+import 'package:skinsync_admin/utils/sku_utils.dart';
 import '../models/responses/treatment_list_response.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
@@ -624,48 +624,28 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   }
 
   String? validateGlobalSku(String? sku, {int? currentTreatmentId}) {
-    if (sku == null || sku.isEmpty) {
-      return 'Global SKU is required';
-    }
-    if (sku.contains(' ')) {
-      return 'No spaces allowed';
-    }
-    final regex = RegExp(r'^TRT-[A-Z0-9]{4}-[A-Z0-9]{4}$');
-    if (!regex.hasMatch(sku)) {
-      return 'Invalid format. Must be TRT-XXXX-XXXX.';
-    }
-    final isUnique = !state.treatments.any(
-      (t) => t.globalSku == sku && t.id != currentTreatmentId,
+    final existingSkus = state.treatments
+        .map((t) => t.globalSku ?? '')
+        .where((sku) => sku.isNotEmpty)
+        .toList();
+    final currentSku = state.treatments
+        .firstWhere((t) => t.id == currentTreatmentId, orElse: () => TreatmentListData())
+        .globalSku;
+
+    return SkuUtils.validateGlobalSku(
+      sku,
+      existingSkus: existingSkus,
+      currentSku: currentSku,
     );
-    if (!isUnique) {
-      return 'SKU already exists.';
-    }
-    return null;
   }
 
   void generateSku() {
-    final rand = math.Random();
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    String generated;
-    final currentId = state.selectedTreatment?.id;
-    do {
-      final seg1 = String.fromCharCodes(
-        Iterable.generate(
-          4,
-          (_) => chars.codeUnitAt(rand.nextInt(chars.length)),
-        ),
-      );
-      final seg2 = String.fromCharCodes(
-        Iterable.generate(
-          4,
-          (_) => chars.codeUnitAt(rand.nextInt(chars.length)),
-        ),
-      );
-      generated = 'TRT-$seg1-$seg2';
-    } while (state.treatments.any(
-      (t) => t.globalSku == generated && t.id != currentId,
-    ));
-    globalSkuController.text = generated;
+    final existingSkus = state.treatments
+        .map((t) => t.globalSku ?? '')
+        .where((sku) => sku.isNotEmpty)
+        .toList();
+
+    globalSkuController.text = SkuUtils.generateSku(existingSkus: existingSkus);
   }
 
   // void updateTreatmentState({

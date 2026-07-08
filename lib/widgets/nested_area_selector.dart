@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
+import 'package:skinsync_admin/utils/sku_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/area_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
@@ -291,9 +292,9 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                   BuildTextField(
                     label: 'Global SKU',
                     controller: skuController,
-                    hintText: 'e.g. FORE-1111',
+                    hintText: 'e.g. BTX-0001-UPRF',
                     tooltip:
-                        'Must follow pattern AAAA-1234 (4 letters, hyphen, 4 digits) and be unique.',
+                        'Must follow pattern XXX-XXXX-XXXX (like BTX-0001-UPRF) and be unique.',
                   ),
                   context.verticalSpace(16),
                   context.verticalSpace(20),
@@ -505,13 +506,11 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                       return;
                     }
 
-                    final regex = RegExp(r'^[A-Z]{4}-[0-9]{4}$');
-                    if (!regex.hasMatch(sku)) {
+                    final validationError = SkuUtils.validateGlobalSku(sku);
+                    if (validationError != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Invalid SKU format. Must be AAAA-1234.',
-                          ),
+                        SnackBar(
+                          content: Text(validationError),
                           backgroundColor: CustomColors.red,
                         ),
                       );
