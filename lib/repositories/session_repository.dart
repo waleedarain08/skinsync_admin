@@ -99,5 +99,8 @@ abstract class SessionRepository {
   Future<SessionDetailResponse> getSessionDetail({
     required int id,
   });
+  Future<BaseApiResponseModel> deleteSession({
+    required int id,
+  });
 
 }

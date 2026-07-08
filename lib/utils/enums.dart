@@ -57,6 +57,8 @@ enum Endpoint {
   productsStatus('admin/products/status'),
   sessionUpdate('admin/sessions/update'),
   sessionDetail('admin/sessions/{id}'),
+  deleteSession('admin/sessions/{id}'),
+
   treatmentsStatus('admin/treatments/status');
 
   final String path;

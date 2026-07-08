@@ -357,4 +357,20 @@ class SessionServices implements SessionRepository {
     }
     return response;
   }
+
+  @override
+  Future<BaseApiResponseModel> deleteSession({
+    required int id,
+  }) async {
+    final jsonResponse = await _api.delete(
+      Endpoint.deleteSession,
+      pathParams: {'id':id.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
 }

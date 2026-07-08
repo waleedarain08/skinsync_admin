@@ -134,12 +134,31 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
               child: CustomPrimaryButton(
                 onTap: () async {
                   final title = titleController.text.trim();
-                  final numVal =
-                      int.tryParse(numberController.text.trim()) ?? 1;
+                  final sessionNumberText = numberController.text.trim();
 
-                  final resolvedTitle = title.isEmpty
-                      ? 'Session $numVal'
-                      : title;
+                  if (title.isEmpty) {
+                    await EasyLoading.showError(
+                      'Please enter a session title.',
+                    );
+                    return;
+                  }
+
+                  if (sessionNumberText.isEmpty) {
+                    await EasyLoading.showError(
+                      'Please enter a session number.',
+                    );
+                    return;
+                  }
+
+                  final numVal = int.tryParse(sessionNumberText);
+
+                  if (numVal == null) {
+                    await EasyLoading.showError(
+                      'Please enter a valid session number.',
+                    );
+                    return;
+                  }
+
                   final treatmentId = state.selectedTreatment?.id;
                   if (treatmentId == null) {
                     await EasyLoading.showError(
@@ -160,7 +179,7 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                   final success = await sessionViewModel.createSession(
                     treatmentId: treatmentId,
                     areaId: areaId,
-                    title: resolvedTitle,
+                    title: title,
                     sessionNumber: numVal,
                   );
 
@@ -341,13 +360,17 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                             CustomPrimaryButton(
                               width: context.w(130),
                               onTap: () async {
+                                sessionViewModel.reset();
                                 log('SessionID ${sessionEntry.sessionId}');
                                 if (sessionEntry.sessionId != null) {
-                                  final success = await sessionViewModel.fetchAndPopulateSessionDetail(
-                                    sessionEntry.sessionId!,
-                                  );
+                                  final success = await sessionViewModel
+                                      .fetchAndPopulateSessionDetail(
+                                        sessionEntry.sessionId!,
+                                      );
                                   if (success && context.mounted) {
-                                    sessionViewModel.setActiveSessionIndex(index);
+                                    sessionViewModel.setActiveSessionIndex(
+                                      index,
+                                    );
                                     context.push(CreateSessionScreen.routeName);
                                   }
                                 } else {
@@ -364,8 +387,12 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                                 Icons.delete_outline_rounded,
                                 color: CustomColors.red,
                               ),
-                              onPressed: () =>
-                                  sessionViewModel.removeCustomSession(index),
+                              onPressed: () async {
+                                await sessionViewModel.deleteSession(
+                                  sessionId: sessionEntry.sessionId!,
+                                );
+                                sessionViewModel.removeCustomSession(index);
+                              },
                             ),
                           ],
                         ),
@@ -475,11 +502,13 @@ class _SessionsStepState extends ConsumerState<SessionsStep> {
                             width: context.w(100),
                             height: context.h(32),
                             onTap: () async {
+                              sessionViewModel.reset();
                               sessionViewModel.setActiveSessionIndex(index);
                               if (sessionEntry.sessionId != null) {
-                                final success = await sessionViewModel.fetchAndPopulateSessionDetail(
-                                  sessionEntry.sessionId!,
-                                );
+                                final success = await sessionViewModel
+                                    .fetchAndPopulateSessionDetail(
+                                      sessionEntry.sessionId!,
+                                    );
                                 if (success && context.mounted) {
                                   context.push(CreateSessionScreen.routeName);
                                 }

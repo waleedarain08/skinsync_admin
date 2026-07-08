@@ -19,7 +19,6 @@ import 'package:skinsync_admin/models/requests/create_session_requests/product_u
 import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
-import 'package:skinsync_admin/models/responses/session_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/models/responses/session_detail_response.dart';
 import 'package:skinsync_admin/models/common_models.dart';
@@ -31,6 +30,7 @@ import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/utils/exception.dart';
+import '../models/session_model.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 
@@ -260,6 +260,12 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     postTreatmentInstructionsController.addListener(_triggerRebuild);
   }
 
+  void reset() {
+
+    log('Session state reset');
+    state =  SessionState();
+  }
+
   void _triggerRebuild() {
     state = state.copyWith();
   }
@@ -361,6 +367,23 @@ class SessionViewModel extends BaseViewModel<SessionState> {
         );
         if (response.isSuccess && response.data != null) {
           setSessions(response.data!);
+          return true;
+        }
+        return false;
+      },
+    );
+  }
+
+  Future<bool?> deleteSession({
+    required int sessionId,
+  }) async {
+    return await runSafely<bool?>(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+          () async {
+        final response = await _sessionRepository.deleteSession(
+          id: sessionId,
+        );
+        if (response.isSuccess) {
           return true;
         }
         return false;
@@ -595,6 +618,8 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       },
     ) ?? false;
   }
+
+
 
   void markActiveSessionAsDetailed({
     required String durationText,

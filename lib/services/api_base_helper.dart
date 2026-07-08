@@ -154,7 +154,7 @@ class ApiBaseHelper {
       final uri = Uri.parse(
         '${baseUrl.url}$urlPath',
       ).replace(queryParameters: queryParams);
-      // log('URL: $uri');
+      log('URL: $uri');
       final response = await _client.delete(uri, headers: await _headers());
       return _processResponse(response);
     });
