@@ -557,43 +557,26 @@ class _RecursiveAreaTile extends StatelessWidget {
     final trailingWidget = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (depth < 2) ...[
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, size: 20, color: CustomColors.purple),
-            onPressed: () {
-              if (depth == 0) {
-                showAddNodeDialog(
-                  context: context,
-                  title: 'Create New Sub-Area in ${area.name}',
-                  onAdd: (name, sku, icon, image) => onAddSubArea(
-                    parentAreaId: area.id,
-                    parentAreaName: area.name,
-                    name: name,
-                    sku: sku,
-                    icon: icon,
-                    image: image,
-                  ),
-                );
-              } else if (depth == 1) {
-                showAddNodeDialog(
-                  context: context,
-                  title: 'Create New Child in ${area.name}',
-                  onAdd: (name, sku, icon, image) => onAddSubAreaChild(
-                    parentArea!.name,
-                    area.name,
-                    name,
-                    sku,
-                    icon,
-                    image,
-                  ),
-                );
-              }
-            },
-            tooltip: depth == 0 ? 'Add Sub-Area' : 'Add Child Area',
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-        ],
+        IconButton(
+          icon: const Icon(Icons.add_circle_outline, size: 20, color: CustomColors.purple),
+          onPressed: () {
+            showAddNodeDialog(
+              context: context,
+              title: 'Create New Sub-Area in ${area.name}',
+              onAdd: (name, sku, icon, image) => onAddSubArea(
+                parentAreaId: area.id,
+                parentAreaName: area.name,
+                name: name,
+                sku: sku,
+                icon: icon,
+                image: image,
+              ),
+            );
+          },
+          tooltip: 'Add Sub-Area',
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        ),
         if (hasChildren) ...[
           const SizedBox(width: 8),
           const Icon(Icons.expand_more),
