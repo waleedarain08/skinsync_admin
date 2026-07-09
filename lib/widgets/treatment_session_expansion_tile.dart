@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/session_model.dart';
+import 'package:skinsync_admin/screens/create_session_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 
-class TreatmentSessionExpansionTile extends StatelessWidget {
+class TreatmentSessionExpansionTile extends ConsumerWidget {
   final SessionModel? session;
   final SessionViewModelEntry? sessionEntry;
   final int? index;
@@ -23,31 +26,40 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (sessionEntry != null) {
-      return _buildCreationStepMode(context, sessionEntry!, index ?? 0);
+      return _buildTileWithEntry(context, ref, sessionEntry!, index ?? 0);
+    } else if (session != null) {
+      final sessionState = ref.watch(sessionViewModelProvider);
+      SessionViewModelEntry? matchedEntry;
+      for (final s in sessionState.sessions) {
+        if (s.sessionId == session!.id) {
+          matchedEntry = s;
+          break;
+        }
+      }
+
+      final entryToUse = matchedEntry ??
+          SessionViewModelEntry(
+            sessionId: session!.id,
+            sessionNumber: session!.sessionNumber,
+            title: session!.title,
+            status: session!.status,
+            isDetailedEntered: false,
+          );
+
+      return _buildTileWithEntry(context, ref, entryToUse, index ?? 0);
     } else {
-      return _buildDetailMode(
-        context,
-        session ??
-            SessionModel(
-              id: 0,
-              treatmentId: 0,
-              areaId: 0,
-              areaName: '',
-              title: '',
-              sessionNumber: 0,
-              status: '',
-              currentStep: 0,
-              isCompleted: false,
-              createdAt: '',
-            ),
-      );
+      return const SizedBox.shrink();
     }
   }
 
-  // MODE A: Creation Step Mode (used inside SessionsStep setup wizard)
-  Widget _buildCreationStepMode(BuildContext context, SessionViewModelEntry entry, int idx) {
+  Widget _buildTileWithEntry(
+    BuildContext context,
+    WidgetRef ref,
+    SessionViewModelEntry entry,
+    int idx,
+  ) {
     final bool isDetailed = entry.isDetailedEntered;
     final sessionTitle = entry.title ?? 'Session ${entry.sessionNumber}';
 
@@ -83,9 +95,13 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        sessionTitle,
-                        style: context.fonts.black14w700,
+                      Expanded(
+                        child: Text(
+                          sessionTitle,
+                          style: context.fonts.black14w700,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                       context.horizontalSpace(8),
                       Container(
@@ -94,7 +110,7 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: (entry.status.toLowerCase() == 'draft'
+                          color: (entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
                                   ? CustomColors.red
                                   : CustomColors.green)
                               .withValues(alpha: 0.1),
@@ -104,19 +120,19 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              entry.status.toLowerCase() == 'draft'
+                              entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
                                   ? Icons.close
                                   : Icons.check,
-                              color: entry.status.toLowerCase() == 'draft'
+                              color: entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
                                   ? CustomColors.red
                                   : CustomColors.green,
                               size: 10,
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              entry.status,
+                              entry.status.isEmpty ? 'DRAFT' : entry.status,
                               style: TextStyle(
-                                color: entry.status.toLowerCase() == 'draft'
+                                color: entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
                                     ? CustomColors.red
                                     : CustomColors.green,
                                 fontSize: 10,
@@ -142,11 +158,17 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
                 CustomOutlinedButton(
                   width: context.w(110),
                   height: context.h(32),
-                  onTap: onEditDetail ?? () {},
+                  onTap: () {
+                    if (onEditDetail != null) {
+                      onEditDetail!();
+                    } else {
+                      _handleDefaultEdit(context, ref, idx, entry);
+                    }
+                  },
                   label: 'Enter Detail',
                 ),
-                context.horizontalSpace(12),
-                if (onDelete != null)
+                if (onDelete != null) ...[
+                  context.horizontalSpace(12),
                   IconButton(
                     icon: const Icon(
                       Icons.delete_outline_rounded,
@@ -154,6 +176,7 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
                     ),
                     onPressed: onDelete,
                   ),
+                ],
               ],
             ),
           ],
@@ -171,7 +194,13 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          onExpansionChanged: onExpansionChanged,
+          onExpansionChanged: (expanded) {
+            if (onExpansionChanged != null) {
+              onExpansionChanged!(expanded);
+            } else {
+              _handleDefaultExpansion(ref, expanded, entry);
+            }
+          },
           tilePadding: context.appEdgeInsets(
             horizontal: 16,
             vertical: 8,
@@ -196,7 +225,14 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
           ),
           title: Row(
             children: [
-              Text(sessionTitle, style: context.fonts.black14w700),
+              Expanded(
+                child: Text(
+                  sessionTitle,
+                  style: context.fonts.black14w700,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               context.horizontalSpace(8),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -248,11 +284,17 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
               CustomOutlinedButton(
                 width: context.w(100),
                 height: context.h(32),
-                onTap: onEditDetail ?? () {},
+                onTap: () {
+                  if (onEditDetail != null) {
+                    onEditDetail!();
+                  } else {
+                    _handleDefaultEdit(context, ref, idx, entry);
+                  }
+                },
                 label: 'Edit Detail',
               ),
-              context.horizontalSpace(12),
-              if (onDelete != null)
+              if (onDelete != null) ...[
+                context.horizontalSpace(12),
                 IconButton(
                   icon: const Icon(
                     Icons.delete_outline_rounded,
@@ -260,6 +302,7 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
                   ),
                   onPressed: onDelete,
                 ),
+              ],
               context.horizontalSpace(12),
               const Icon(
                 Icons.keyboard_arrow_down_rounded,
@@ -409,128 +452,62 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
     );
   }
 
-  // MODE B: Detailed read-only Mode (used inside TreatmentDetailScreen)
-  Widget _buildDetailMode(BuildContext context, SessionModel s) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: context.appBorderRadius(all: 12),
-        border: Border.all(
-          color: CustomColors.purple.withValues(alpha: 0.15),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: CustomColors.purple.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          )
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: context.appBorderRadius(all: 12),
-        child: ExpansionTile(
-          shape: const RoundedRectangleBorder(side: BorderSide.none),
-          collapsedShape: const RoundedRectangleBorder(side: BorderSide.none),
-          backgroundColor: Colors.white,
-          collapsedBackgroundColor: Colors.white,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  s.title,
-                  style: context.fonts.black14w700,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: CustomColors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  s.status,
-                  style: context.fonts.green14w600.copyWith(
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 6,
-              children: [
-                _sessionMetaChip(
-                  context,
-                  Icons.calendar_view_day,
-                  'Session #${s.sessionNumber}',
-                ),
-                _sessionMetaChip(
-                  context,
-                  Icons.layers_outlined,
-                  'Step ${s.currentStep}',
-                ),
-                _sessionMetaChip(
-                  context,
-                  Icons.location_searching,
-                  s.areaName,
-                ),
-              ],
-            ),
-          ),
-          childrenPadding: context.appEdgeInsets(horizontal: 16, vertical: 16),
-          children: [
-            const Divider(),
-            context.verticalSpace(12),
-            _buildDetailRow(context, 'Session ID', '${s.id}'),
-            _buildDetailRow(context, 'Treatment ID', '${s.treatmentId}'),
-            _buildDetailRow(context, 'Procedure Step', 'Step ${s.currentStep}'),
-            _buildDetailRow(context, 'Completion Status', s.isCompleted == true ? 'Completed ✓' : 'In-Progress'),
-            _buildDetailRow(context, 'Created Date', _formatTimestamp(s.createdAt)),
-          ],
-        ),
-      ),
-    );
+  // Handle Default Editing Trigger (Highly Decoupled)
+  Future<void> _handleDefaultEdit(
+    BuildContext context,
+    WidgetRef ref,
+    int idx,
+    SessionViewModelEntry entry,
+  ) async {
+    final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
+    sessionViewModel.reset();
+
+    // Ensure session list has at least this entry
+    final currentSessions = ref.read(sessionViewModelProvider).sessions;
+    final exists = currentSessions.any((s) => s.sessionId == entry.sessionId);
+    if (!exists && session != null) {
+      sessionViewModel.setSessions([session!]);
+      sessionViewModel.setActiveSessionIndex(0);
+    } else {
+      sessionViewModel.setActiveSessionIndex(idx);
+    }
+
+    if (entry.sessionId != null) {
+      final success = await sessionViewModel.fetchAndPopulateSessionDetail(
+        entry.sessionId!,
+      );
+      if (success && context.mounted) {
+        context.push(CreateSessionScreen.routeName);
+      }
+    } else {
+      sessionViewModel.setSessionStep(1);
+      if (context.mounted) {
+        context.push(CreateSessionScreen.routeName);
+      }
+    }
   }
 
-  // Shared Helper Widgets
-  Widget _buildDetailRow(BuildContext context, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: context.fonts.grey13w500),
-          Text(value, style: context.fonts.black13w600),
-        ],
-      ),
-    );
+  // Handle Default Expansion Dynamic API Call
+  Future<void> _handleDefaultExpansion(
+    WidgetRef ref,
+    bool expanded,
+    SessionViewModelEntry entry,
+  ) async {
+    if (expanded && entry.sessionId != null) {
+      final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
+
+      // Ensure sessions list has this session
+      final currentSessions = ref.read(sessionViewModelProvider).sessions;
+      final exists = currentSessions.any((s) => s.sessionId == entry.sessionId);
+      if (!exists && session != null) {
+        sessionViewModel.setSessions([session!]);
+      }
+
+      await sessionViewModel.fetchAndPopulateSessionDetail(entry.sessionId!);
+    }
   }
 
-  Widget _sessionMetaChip(BuildContext context, IconData icon, String label) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: CustomColors.grey),
-        context.horizontalSpace(4),
-        Text(
-          label,
-          style: context.fonts.grey11w400.copyWith(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
+  // Helper Widgets
   Widget _buildSnapshotDetailRow(
     BuildContext context,
     String label,
@@ -547,7 +524,7 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
           Text('$label: ', style: context.fonts.black12w600),
           Expanded(
             child: Text(
-              value,
+              value.isEmpty ? '—' : value,
               style: context.fonts.grey12w400,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -573,24 +550,5 @@ class TreatmentSessionExpansionTile extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatTimestamp(dynamic val) {
-    if (null == val) return '—';
-    try {
-      DateTime dt;
-      if (val is DateTime) {
-        dt = val;
-      } else if (val is String) {
-        if (val.isEmpty) return '—';
-        dt = DateTime.parse(val);
-      } else {
-        return '—';
-      }
-      final date = dt.toLocal();
-      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-    } catch (_) {
-      return '—';
-    }
   }
 }
