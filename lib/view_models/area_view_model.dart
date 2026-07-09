@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/create_area_request.dart';
+import 'package:skinsync_admin/models/requests/update_area_request.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 import '../models/responses/area_list_response.dart';
@@ -20,7 +21,7 @@ class AreaState extends BaseStateModel {
   final List<AreaModel> areas;
   final List<AreaModel> flattenedAreas;
   final String? errorMessage;
-    final String? areaIconUrl;
+  final String? areaIconUrl;
   final String? areaImageUrl;
 
   AreaState({
@@ -37,8 +38,8 @@ class AreaState extends BaseStateModel {
     List<AreaModel>? areas,
     List<AreaModel>? flattenedAreas,
     String? errorMessage,
-     String? areaIconUrl,
-    String? areaImageUrl
+    String? areaIconUrl,
+    String? areaImageUrl,
   }) {
     return AreaState(
       loading: loading ?? this.loading,
@@ -55,7 +56,7 @@ class AreaViewModel extends BaseViewModel<AreaState> {
   AreaViewModel() : super(AreaState());
 
   final AreaRepository _areaRepository = locator<AreaRepository>();
-   final ImagePicker _picker = ImagePicker();
+  final ImagePicker _picker = ImagePicker();
   Future<void> fetchAreas() async {
     state = state.copyWith(errorMessage: null);
     await runSafely(
@@ -65,7 +66,9 @@ class AreaViewModel extends BaseViewModel<AreaState> {
           final fetched = await _areaRepository.getAreas();
           final flattened = _flattenAreas(fetched);
           state = state.copyWith(areas: fetched, flattenedAreas: flattened);
-          ref.read(treatmentDataViewModelProvider.notifier).setAreasFromBackend(fetched);
+          ref
+              .read(treatmentDataViewModelProvider.notifier)
+              .setAreasFromBackend(fetched);
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;
@@ -93,7 +96,6 @@ class AreaViewModel extends BaseViewModel<AreaState> {
   //   });
   // }
 
-
   Future<bool?> createArea({
     required String name,
     required String globalSku,
@@ -102,15 +104,42 @@ class AreaViewModel extends BaseViewModel<AreaState> {
     required String imageUrl,
   }) async {
     return await runSafely<bool>(() async {
-     
-      
-       await _areaRepository.createArea(
-        CreateAreaRequest(parentId: parentId, name: name, globalSku: globalSku, icon: icon, image: imageUrl),
+      await _areaRepository.createArea(
+        CreateAreaRequest(
+          parentId: parentId,
+          name: name,
+          globalSku: globalSku,
+          icon: icon,
+          image: imageUrl,
+        ),
       );
-       await refreshAreas();
+      await refreshAreas();
       return true;
     });
   }
+
+  Future<bool?> callUpdateArea({
+    required String name,
+    required String globalSku,
+    required String icon,
+    required String imageUrl,
+    required int id,
+  }) async {
+    return await runSafely<bool>(() async {
+      await _areaRepository.updateArea(
+        request: UpdateAreaRequest(
+          name: name,
+          globalSku: globalSku,
+          icon: icon,
+          image: imageUrl,
+        ),
+        id: id,
+      );
+      await refreshAreas();
+      return true;
+    });
+  }
+
   Future<void> refreshAreas() async {
     await fetchAreas();
   }
@@ -160,7 +189,6 @@ class AreaViewModel extends BaseViewModel<AreaState> {
       }
     });
   }
-
 
   List<DropdownMenuItem<int>> getAreaDropdownItems({int? parentId}) {
     final list = parentId == null ? state.areas : getSubAreas(parentId);

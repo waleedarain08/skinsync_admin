@@ -1,3 +1,4 @@
+import 'package:skinsync_admin/models/requests/update_area_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
 import '../models/requests/create_area_request.dart';
@@ -15,10 +16,7 @@ class AreaServices implements AreaRepository {
   @override
   Future<List<AreaModel>> getAreas() async {
     final jsonResponse = await _api.get(Endpoint.areas);
-    final response = AreaListResponse.fromJson(
-      jsonResponse,
-  
-    );
+    final response = AreaListResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -33,7 +31,7 @@ class AreaServices implements AreaRepository {
   //     body: request.toJson(),
   //   );
   //   final response = AreaResponse.fromJson(jsonResponse,
-   
+
   // );
 
   //   if (!response.isSuccess) {
@@ -42,17 +40,31 @@ class AreaServices implements AreaRepository {
   //   return response.data!;
   // }
 
-
   @override
   Future<BaseApiResponseModel> createArea(CreateAreaRequest request) async {
     final jsonResponse = await _api.post(
       Endpoint.areas,
       body: request.toJson(),
     );
-    final response = BaseApiResponseModel.fromJson(
-      jsonResponse,
-        
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<BaseApiResponseModel> updateArea({
+    required UpdateAreaRequest request,
+    required int id,
+  }) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.areas,
+      body: request.toJson(),
+      pathParams: {'id': id.toString()},
     );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);

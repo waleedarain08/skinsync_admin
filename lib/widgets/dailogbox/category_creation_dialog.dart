@@ -178,34 +178,37 @@ class _CategoryCreationDialogState
 
     _preNotificationEntries = List.from(
       cat.preNotifications?.map(
-        (config) => NotificationEntry(
-          titleController: TextEditingController(text: config.title),
-          messageController: TextEditingController(text: config.message),
-          timingValueController: TextEditingController(
-            text: config.timing.toString(),
-          ),
-          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
-          type: typeValues.reverse[config.type] ?? 'reminder',
-        ),
-      ) ?? [],
+            (config) => NotificationEntry(
+              titleController: TextEditingController(text: config.title),
+              messageController: TextEditingController(text: config.message),
+              timingValueController: TextEditingController(
+                text: config.timing.toString(),
+              ),
+              timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+              type: typeValues.reverse[config.type] ?? 'reminder',
+            ),
+          ) ??
+          [],
     );
 
     _postNotificationEntries = List.from(
       cat.postNotifications?.map(
-        (config) => NotificationEntry(
-          titleController: TextEditingController(text: config.title),
-          messageController: TextEditingController(text: config.message),
-          timingValueController: TextEditingController(
-            text: config.timing.toString(),
-          ),
-          timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
-          type: typeValues.reverse[config.type] ?? 'care',
-        ),
-      ) ?? [],
+            (config) => NotificationEntry(
+              titleController: TextEditingController(text: config.title),
+              messageController: TextEditingController(text: config.message),
+              timingValueController: TextEditingController(
+                text: config.timing.toString(),
+              ),
+              timingUnit: unitValues.reverse[config.timingUnit] ?? 'hours',
+              type: typeValues.reverse[config.type] ?? 'care',
+            ),
+          ) ??
+          [],
     );
 
     _downtimeLowController.text = cat.downtimePresets?.low.toString() ?? '';
-    _downtimeModerateController.text = cat.downtimePresets?.moderate.toString() ?? '';
+    _downtimeModerateController.text =
+        cat.downtimePresets?.moderate.toString() ?? '';
     _downtimeHighController.text = cat.downtimePresets?.high.toString() ?? '';
 
     _selectedRoles = List.from(
@@ -329,7 +332,7 @@ class _CategoryCreationDialogState
         .read(categoryViewModelProvider)
         .selectedCategoryDetail
         ?.name;
-    if (selectedCategoryName == _nameController.text) {
+    if (selectedCategoryName == _nameController.text && !widget.isViewMode) {
       EasyLoading.showError('Parent Name Can\'t Be sub Category Name ');
       return;
     }
@@ -359,17 +362,12 @@ class _CategoryCreationDialogState
         'defaultRoles': _selectedRoles,
       };
 
-      if (widget.initialName != null) {
-        // If we are editing, we can pop with the result immediately so the caller updates
-        Navigator.pop(context, result);
-        return;
-      }
-
       final request = CreateCategoryRequest(
         name: _nameController.text,
         icon: _selectedIcon,
         image: _selectedImage,
-        parentId: widget.parentId, // Sets the correct parent_id from parentId parameter!
+        parentId: widget
+            .parentId, // Sets the correct parent_id from parentId parameter!
         consentFormUrl: _consentFormUrl,
         consentFormName: _existingConsentName,
         preNotifications: _preNotificationEntries
@@ -387,6 +385,16 @@ class _CategoryCreationDialogState
         defaultRoles: _selectedRoles,
       );
 
+      if (widget.categoryId != null) {
+        // Editing an existing category — actually call the update API.
+        // final value = await ref
+        //     .read(categoryViewModelProvider.notifier)
+        //     .updateCategory(request: request, id: widget.categoryId!);
+        //  if (value == true && mounted) {
+        Navigator.pop(context, result);
+        //  }
+        return;
+      }
       ref
           .read(categoryViewModelProvider.notifier)
           .createCategory(request: request)

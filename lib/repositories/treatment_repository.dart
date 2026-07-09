@@ -42,9 +42,7 @@ abstract class TreatmentRepository {
     required String status,
   });
 
-  Future<TreatmentDetailResponse> getTreatmentDetail({
-    required int id,
-  });
+  Future<TreatmentDetailResponse> getTreatmentDetail({required int id});
 
   Future<BaseApiResponseModel> updateTreatment({
     required int treatmentId,

@@ -1,10 +1,14 @@
+import 'package:skinsync_admin/models/requests/update_area_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import '../models/requests/create_area_request.dart';
 import '../models/responses/area_list_response.dart';
 
 abstract class AreaRepository {
   Future<List<AreaModel>> getAreas();
- // Future<AreaModel?> createArea(AreaRequest request);
+  // Future<AreaModel?> createArea(AreaRequest request);
   Future<BaseApiResponseModel> createArea(CreateAreaRequest request);
-
+  Future<BaseApiResponseModel> updateArea({
+    required UpdateAreaRequest request,
+    required int id,
+  });
 }

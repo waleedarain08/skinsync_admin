@@ -16,10 +16,7 @@ class CategoryServices implements CategoryRepository {
   @override
   Future<List<CategoryModel>> getCategories() async {
     final jsonResponse = await _api.get(Endpoint.categories);
-    final response = CategoryListResponse.fromJson(
-      jsonResponse,
-     
-    );
+    final response = CategoryListResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -33,10 +30,7 @@ class CategoryServices implements CategoryRepository {
       Endpoint.categoryDetail,
       pathParams: {'id': categoryId.toString()},
     );
-    final response =CategoryDetailResponse.fromJson(
-      jsonResponse,
-     
-    );
+    final response = CategoryDetailResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -54,6 +48,25 @@ class CategoryServices implements CategoryRepository {
     final jsonResponse = await _api.post(
       Endpoint.createCategory,
       body: request,
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+
+    return response;
+  }
+
+  @override
+  Future<BaseApiResponseModel> updateCategory({
+    required CreateCategoryRequest request,
+    required int id,
+  }) async {
+    final jsonResponse = await _api.post(
+      Endpoint.categories,
+      body: request,
+      pathParams: {'id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 

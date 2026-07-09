@@ -8,4 +8,8 @@ abstract class CategoryRepository {
   Future<List<CategoryModel>> getCategories();
   Future<CategoryDetailDto> getCategoryDetail(int categoryId);
   Future<BaseApiResponseModel> createCategory(CreateCategoryRequest request);
+  Future<BaseApiResponseModel> updateCategory({
+    required CreateCategoryRequest request,
+    required int id,
+  });
 }

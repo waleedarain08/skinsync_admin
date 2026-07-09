@@ -48,7 +48,6 @@ class CategoryState extends BaseStateModel {
 class CategoryViewModel extends BaseViewModel<CategoryState> {
   CategoryViewModel() : super(CategoryState());
 
-
   final CategoryRepository _categoryRepository = locator<CategoryRepository>();
   final MediaService _mediaService = MediaService();
 
@@ -120,6 +119,25 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
         final response = await _categoryRepository.createCategory(request);
+        if (response.isSuccess) {
+          await fetchCategories();
+        }
+        return true;
+      },
+    );
+  }
+
+  Future<bool?> updateCategory({
+    required CreateCategoryRequest request,
+    required int id,
+  }) async {
+    return await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        final response = await _categoryRepository.updateCategory(
+          request: request,
+          id: id,
+        );
         if (response.isSuccess) {
           await fetchCategories();
         }
