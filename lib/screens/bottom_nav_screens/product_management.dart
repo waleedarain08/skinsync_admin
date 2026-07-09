@@ -313,11 +313,20 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           context.horizontalSpace(16),
           CustomOutlinedButton(
             onTap: () {
-              setState(() {
+              setState(() async {
                 _isManufacturerView = !_isManufacturerView;
                 if (_isManufacturerView) {
-                  ref.read(productViewModelProvider.notifier).fetchManufacturer();
+                  await ref
+                      .read(productViewModelProvider.notifier)
+                      .fetchManufacturer();
                 } else {
+                  await ref
+                      .read(productViewModelProvider.notifier)
+                      .fetchProducts(
+                        search: state.searchKeyword,
+                        selectedPurpose: _selectedPurpose,
+                        status: _selectedStatus,
+                      );
                   _expandedManufacturerId = null;
                   _activeBrandId = null;
                 }
@@ -326,7 +335,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             icon: _isManufacturerView
                 ? Icons.table_rows_rounded
                 : Icons.business_outlined,
-            label: _isManufacturerView ? 'Products List View' : 'Browse by Manufacturer',
+            label: _isManufacturerView
+                ? 'Products List View'
+                : 'Browse by Manufacturer',
             textColor: CustomColors.purple,
             color: Colors.white,
           ),
@@ -403,8 +414,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   }
 
   Widget _buildManufacturerViewSection(ProductState state) {
-    if (state.loading && (state.manufacturers == null || state.manufacturers!.isEmpty)) {
-      return  const SizedBox();
+    if (state.loading &&
+        (state.manufacturers == null || state.manufacturers!.isEmpty)) {
+      return const SizedBox();
       // const Center(
       //   child: Padding(
       //     padding: EdgeInsets.symmetric(vertical: 48),
@@ -525,21 +537,27 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                               border: Border.all(
                                 color: isBrandExpanded
                                     ? CustomColors.purple.withValues(alpha: 0.2)
-                                    : CustomColors.border.withValues(alpha: 0.5),
+                                    : CustomColors.border.withValues(
+                                        alpha: 0.5,
+                                      ),
                               ),
                             ),
                             child: ExpansionTile(
-                              key: ValueKey('brand_tile_${brand.id}_$isBrandExpanded'),
+                              key: ValueKey(
+                                'brand_tile_${brand.id}_$isBrandExpanded',
+                              ),
                               initiallyExpanded: isBrandExpanded,
                               onExpansionChanged: (expanded) {
                                 setState(() {
                                   if (expanded) {
                                     _activeBrandId = brand.id;
-                                    ref.read(productViewModelProvider.notifier).fetchProducts(
-                                      brandId: brand.id,
-                                      page: 1,
-                                      limit: state.pageSize,
-                                    );
+                                    ref
+                                        .read(productViewModelProvider.notifier)
+                                        .fetchProducts(
+                                          brandId: brand.id,
+                                          page: 1,
+                                          limit: state.pageSize,
+                                        );
                                   } else {
                                     if (_activeBrandId == brand.id) {
                                       _activeBrandId = null;
@@ -549,16 +567,23 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                               },
                               leading: Icon(
                                 Icons.branding_watermark_outlined,
-                                color: isBrandExpanded ? CustomColors.purple : CustomColors.grey,
+                                color: isBrandExpanded
+                                    ? CustomColors.purple
+                                    : CustomColors.grey,
                                 size: context.sp(18),
                               ),
                               title: Text(
                                 brand.name,
                                 style: context.fonts.black13w600.copyWith(
-                                  color: isBrandExpanded ? CustomColors.purple : CustomColors.black,
+                                  color: isBrandExpanded
+                                      ? CustomColors.purple
+                                      : CustomColors.black,
                                 ),
                               ),
-                              childrenPadding: context.appEdgeInsets(horizontal: 12, vertical: 12),
+                              childrenPadding: context.appEdgeInsets(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
                               shape: const Border(),
                               collapsedShape: const Border(),
                               children: [
@@ -661,9 +686,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                     })(),
                     style: context.fonts.grey14w400,
                   ),
-                  _usageBadgeCell(
-                    p.usageType ?? '',
-                  ),
+                  _usageBadgeCell(p.usageType ?? ''),
                   _statusCell(p, ref),
                   _actionsCell(p),
                 ],
@@ -687,7 +710,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
 
   Widget _productNameCell(ProductModel product) {
     final displayName = product.name.trim().isEmpty ? 'N/A' : product.name;
-    final displayBrand = product.brand == null || product.brand!.trim().isEmpty ? 'N/A' : product.brand!;
+    final displayBrand = product.brand == null || product.brand!.trim().isEmpty
+        ? 'N/A'
+        : product.brand!;
     return Padding(
       padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(
@@ -717,10 +742,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 context.verticalSpace(2),
-                Text(
-                  displayBrand,
-                  style: context.fonts.purple12w700,
-                ),
+                Text(displayBrand, style: context.fonts.purple12w700),
               ],
             ),
           ),
@@ -754,7 +776,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               decoration: BoxDecoration(
                 color: CustomColors.grey.withValues(alpha: 0.1),
                 borderRadius: context.appBorderRadius(all: 20),
-                border: Border.all(color: CustomColors.grey.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: CustomColors.grey.withValues(alpha: 0.2),
+                ),
               ),
               child: Text(
                 'N/A',
@@ -815,8 +839,6 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     );
   }
 
-
-
   Widget _statusCell(ProductModel p, WidgetRef ref) {
     return Padding(
       padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
@@ -828,7 +850,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
             ref
                 .read(productViewModelProvider.notifier)
                 .updateProductStatus(p.id!, newStatus);
-          }, width: context.w(100), height: context.h(45),
+          },
+          width: context.w(100),
+          height: context.h(45),
         ),
       ),
     );

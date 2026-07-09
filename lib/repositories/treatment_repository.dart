@@ -20,6 +20,7 @@ abstract class TreatmentRepository {
   });
 
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request);
+  Future<BasicInfoResponse> updateBasicInfo(BasicInfoRequest request, int id);
 
   Future<BaseApiResponseModel> createTreatmentArea(
     TreatmentAreaRequest request,

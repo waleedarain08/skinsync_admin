@@ -4,7 +4,8 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 
 class LogicStep extends ConsumerWidget {
-  const LogicStep({super.key});
+ 
+  const LogicStep({super.key,});
 
   Widget _sectionTitle(BuildContext context, String title, {double? fontSize}) {
     return Text(

@@ -1,12 +1,12 @@
 import 'dart:developer';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/responses/usage_type_list_response.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/enums.dart';
+import 'package:skinsync_admin/utils/exception.dart';
 
 import '../models/product_model.dart';
 import '../models/requests/create_product_request.dart';
@@ -111,7 +111,6 @@ class ProductViewModel extends BaseViewModel<ProductState> {
   String get searchKeyword => state.searchKeyword;
   ProductDetailModel? get selectedProduct => state.selectedProduct;
 
-
   Future<void> initialize() async {
     await fetchProducts(page: 1, limit: 20);
   }
@@ -155,7 +154,8 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     String search = '',
     int page = 1,
     int limit = 20,
-    String? selectedPurpose = '', ProductStatus status = ProductStatus.all,
+    String? selectedPurpose = '',
+    ProductStatus status = ProductStatus.all,
     int? brandId,
   }) async {
     await runSafely(
@@ -251,35 +251,36 @@ class ProductViewModel extends BaseViewModel<ProductState> {
   }
 
   final MediaService _mediaService = MediaService();
+  final ImagePicker _picker = ImagePicker();
 
-  Future<void> pickAndUploadImage({
-    bool showLoading = true,
-    bool showError = true,
-  }) async {
-    final result = await FilePicker.pickFiles(
-      type: FileType.image,
-      withData: false,
+
+Future<void> pickAndUploadImage({
+  bool showLoading = true,
+  bool showError = true,
+}) async {
+  final XFile? image = await _picker.pickImage(
+    source: ImageSource.gallery,
+  );
+
+  if (image == null) return;
+
+  await runSafely(() async {
+    final String? url = await _mediaService.uploadImage(
+      'products/image',
+      image,
     );
 
-    if (result == null || result.files.first.path == null) {
-      return;
+    if (url == null) {
+      throw const UnknownException('Failed to upload image');
     }
 
-    final file = XFile(result.files.first.path!);
+    log('Product image uploaded: $url');
 
-    final url = await runSafely<String?>(
-      () => _mediaService.uploadImage('products/image', file),
-      showLoading: showLoading,
-      showError: showError,
+    state = state.copyWith(
+      imageUrl: url,
     );
-
-    if (url != null) {
-      log('Product image uploaded: $url');
-
-      state = state.copyWith(imageUrl: url);
-    }
-  }
-
+  }, showLoading: showLoading, showError: showError);
+}
   // List<DropdownMenuItem<int>> getProductDropdownItems() {
   //   return state.products
   //       .map(

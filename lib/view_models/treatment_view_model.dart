@@ -101,6 +101,30 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     await getTreatments();
   }
 
+  void clearBasicInfoControllers() {
+    globalSkuController.clear();
+    internalNameController.clear();
+    displayNameController.clear();
+    fullDescriptionController.clear();
+    shortDescriptionController.clear();
+    state = state.copyWith(
+      clearTreatmentImageUrl: true,
+      clearTreatmentIconUrl: true,
+    );
+  }
+
+  void setBasicInfoControllers(TreatmentDetailDto detail) {
+    globalSkuController.text = detail.globalSku ?? '';
+    internalNameController.text = detail.patientDisplayName ?? '';
+    displayNameController.text = detail.patientDisplayName ?? '';
+    fullDescriptionController.text = detail.description ?? '';
+    shortDescriptionController.text = detail.shortDescription ?? '';
+    state = state.copyWith(
+      treatmentImageUrl: detail.image,
+      treatmentIconUrl: detail.icon,
+    );
+  }
+
   Future<bool> getTreatments({
     int page = 1,
     String search = '',
@@ -132,7 +156,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             }).toList();
 
             state = state.copyWith(
-              treatments: categoryId == null ? list : null,
+              treatments: list,
               filteredTreatments: list,
               createTreatments: categoryId != null ? list : null,
               loading: false,
@@ -290,18 +314,73 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     });
   }
 
+  Future<bool?> updateBasicInfo({required int id}) async {
+    return await runSafely<bool>(() async {
+      final imageUrl = state.treatmentImageUrl;
+      final iconUrl = state.treatmentIconUrl;
+
+      if (imageUrl == null || iconUrl == null) {
+        throw const UnknownException('Please Select Image & Icon');
+      }
+
+      final response = await _treatmentRepository.updateBasicInfo(
+        BasicInfoRequest(
+          selectedCategoryIds: state.selectedCategoryPath,
+          patientDisplayName: displayNameController.text,
+          image: imageUrl,
+          shortDescription: shortDescriptionController.text,
+          description: fullDescriptionController.text,
+          globalSku: globalSkuController.text,
+          icon: iconUrl,
+        ),
+        id,
+      );
+      if (response.isSuccess) {
+        log('Basic Info Created : ${response.data?.id}');
+        state = state.copyWith(draftTreatmentID: response.data?.id);
+        selectTreatment(
+          TreatmentListData(
+            id: response.data?.id,
+            patientDisplayName: response.data?.patientDisplayName,
+            shortDescription: response.data?.shortDescription,
+            globalSku: response.data?.globalSku,
+            icon: response.data?.icon,
+            image: response.data?.image,
+            status: response.data?.status ?? 'active',
+          ),
+        );
+        final categoryId = int.tryParse(categoryIdController.text);
+        await getTreatments(categoryId: categoryId);
+      }
+      return true;
+    });
+  }
+
   void setStep(int step) {
     state = state.copyWith(currentStep: step);
   }
 
-  Future<bool?> callBusinessLogic() async {
+  void setBusinessLogic(TreatmentDetailDto detail) {
+    state = state.copyWith(
+      enableByDefault: detail.enableByDefault,
+      useInAiSimulator: detail.useInAiSimulator,
+    );
+  }
+
+  Future<bool?> callBusinessLogic({
+    bool isUpdate = false,
+    int? updatetreatmentId,
+  }) async {
     return await runSafely(() async {
       final treatmentId = state.selectedTreatment!.id;
       if (treatmentId == null) {
         throw const UnknownException('Treatment not found!');
       }
+      if (isUpdate && updatetreatmentId == null) {
+        throw const UnknownException('Treatment not found!');
+      }
       await _treatmentRepository.businessLogic(
-        draftTreatmentId: treatmentId,
+        draftTreatmentId: isUpdate ? updatetreatmentId! : treatmentId,
         request: BusinessLogicRequest(
           enableByDefault: state.enableByDefault,
           useInAiSimulator: state.useInAiSimulator,
@@ -629,7 +708,10 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         .where((sku) => sku.isNotEmpty)
         .toList();
     final currentSku = state.treatments
-        .firstWhere((t) => t.id == currentTreatmentId, orElse: () => TreatmentListData())
+        .firstWhere(
+          (t) => t.id == currentTreatmentId,
+          orElse: () => TreatmentListData(),
+        )
         .globalSku;
 
     return SkuUtils.validateGlobalSku(

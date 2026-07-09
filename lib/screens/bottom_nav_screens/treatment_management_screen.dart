@@ -260,14 +260,22 @@ class _TreatmentManagementScreenState
                   _activeCategoryId = null;
                   ref
                       .read(treatmentViewModelProvider.notifier)
-                      .getTreatments(page: 1);
+                      .getTreatments(page: 1,showLoading: true);
                 }
+                else{
+                  ref
+                      .read(categoryViewModelProvider.notifier)
+                      .fetchCategories();
+                }
+
               });
             },
             icon: _isCategoryView
                 ? Icons.table_rows_rounded
                 : Icons.category_rounded,
-            label: _isCategoryView ? 'Treatments List View' : 'Browse by Category',
+            label: _isCategoryView
+                ? 'Treatments List View'
+                : 'Browse by Category',
             textColor: CustomColors.purple,
             color: Colors.white,
           ),
@@ -441,7 +449,9 @@ class _TreatmentManagementScreenState
 
   Widget _statusBadgeCell(TreatmentListData t, WidgetRef ref) {
     final status = t.status ?? 'active';
-    final String currentStatus = (status.toLowerCase() == 'deactive' || status.toLowerCase() == 'inactive')
+    final String currentStatus =
+        (status.toLowerCase() == 'deactive' ||
+            status.toLowerCase() == 'inactive')
         ? 'Inactive'
         : (status.toLowerCase() == 'active' ? 'Active' : 'Draft');
 
@@ -492,28 +502,28 @@ class _TreatmentManagementScreenState
               }
             },
           ),
-          IconButton(
-            tooltip: 'Edit Template',
-            icon: Icon(
-              Icons.edit_road_rounded,
-              color: CustomColors.purple,
-              size: context.sp(20),
-            ),
-            onPressed: () async {
-              if (treatment.id != null) {
-                try {
-                  // await ref
-                  //     .read(treatmentViewModelProvider.notifier)
-                  //     .fetchTreatmentDetail(treatment.id!);
-                  // if (mounted) {
-                  //   await context.push(EditTreatmentScreen.routeName);
-                  // }
-                } catch (e) {
-                  // Error handled gracefully by runSafely wrapper
-                }
-              }
-            },
-          ),
+          // IconButton(
+          //   tooltip: 'Edit Template',
+          //   icon: Icon(
+          //     Icons.edit_road_rounded,
+          //     color: CustomColors.purple,
+          //     size: context.sp(20),
+          //   ),
+          //   onPressed: () async {
+          //     if (treatment.id != null) {
+          //       try {
+          //         // await ref
+          //         //     .read(treatmentViewModelProvider.notifier)
+          //         //     .fetchTreatmentDetail(treatment.id!);
+          //         // if (mounted) {
+          //         //   await context.push(EditTreatmentScreen.routeName);
+          //         // }
+          //       } catch (e) {
+          //         // Error handled gracefully by runSafely wrapper
+          //       }
+          //     }
+          //   },
+          // ),
         ],
       ),
     );

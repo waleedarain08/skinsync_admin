@@ -211,8 +211,8 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
         SizedBox(height: 12.h),
 
         InkWell(
-          onTap: () {
-            ref.read(productViewModelProvider.notifier).pickAndUploadImage();
+          onTap: () async {
+          await  ref.read(productViewModelProvider.notifier).pickAndUploadImage();
           },
 
           child: Container(

@@ -62,6 +62,21 @@ class TreatmentServices implements TreatmentRepository {
     }
     return response;
   }
+   @override
+  Future<BasicInfoResponse> updateBasicInfo(BasicInfoRequest request, int id) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.basicInfo,
+      body: request.toJson(),
+      queryParams: {'treatment_id': id.toString()},
+    );
+    final response = BasicInfoResponse.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
 
   @override
   Future<BaseApiResponseModel> createTreatmentArea(

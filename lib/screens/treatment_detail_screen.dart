@@ -5,6 +5,8 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+import 'package:skinsync_admin/widgets/dailogbox/basic_info_dialog.dart';
+import 'package:skinsync_admin/widgets/dailogbox/logic_setp_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/treatment_session_expansion_tile.dart';
 
@@ -111,6 +113,10 @@ class TreatmentDetailScreen extends ConsumerWidget {
     );
   }
 
+
+
+
+
   Widget _buildHeroBannerCard(
     BuildContext context,
     TreatmentDetailDto detail,
@@ -161,25 +167,30 @@ class TreatmentDetailScreen extends ConsumerWidget {
                                 style: context.fonts.black18w600.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: statusColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: statusColor.withValues(alpha: 0.2),
+                            Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: statusColor.withValues(alpha: 0.2),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    status,
+                                    style: context.fonts.grey10w700ls1.copyWith(
+                                      color: statusColor,
+                                      fontSize: 11,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              child: Text(
-                                status,
-                                style: context.fonts.grey10w700ls1.copyWith(
-                                  color: statusColor,
-                                  fontSize: 11,
-                                ),
-                              ),
+                                
+                              ],
                             ),
                           ],
                         ),
@@ -196,6 +207,30 @@ class TreatmentDetailScreen extends ConsumerWidget {
                               'SKU: ${detail.globalSku ?? "N/A"}',
                               style: context.fonts.grey13w500,
                             ),
+                         const   Spacer(),
+                           
+                                 Consumer(
+                                   builder: (context, ref, child) {
+                                     return GestureDetector(
+                                      onTap: (){
+                                        ref.read(treatmentViewModelProvider.notifier).setBasicInfoControllers(detail);
+                                        BasicInfoDialog.show(context, isEditMode: true,treatmentId: detail.id);
+                                      },
+                                       child: Container(
+                                        padding: context.appEdgeInsets(horizontal: 6, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20.r),
+                                          border: Border.all(color: CustomColors.purple),
+                                        ),
+                                         child: Row(children: [
+                                          Icon(Icons.update,size:16.sp,color: CustomColors.purple,),
+                                          SizedBox(width: 4.w,),
+                                          Text('Update Info',style: context.fonts.purple12w700.copyWith(fontSize: 12.sp),)
+                                         ],),
+                                       ),
+                                     );
+                                   },
+                                 )
                           ],
                         ),
                       ],
@@ -397,6 +432,22 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 'Business Logic & Rules',
                 style: context.fonts.black16w700,
               ),
+              const Spacer(),
+               Consumer(
+                 builder: (context,ref,_) {
+                   return GestureDetector(
+                    onTap: (){
+                      ref.read(treatmentViewModelProvider.notifier).setBusinessLogic(detail);
+                      LogicStepDialog.show(context, ref, treatmentId: detail.id);
+                    },
+                     child: const Icon(
+                      Icons.edit,
+                      color: CustomColors.purple,
+                      size: 20,
+                                   ),
+                   );
+                 },
+               ),
             ],
           ),
           context.verticalSpace(16),

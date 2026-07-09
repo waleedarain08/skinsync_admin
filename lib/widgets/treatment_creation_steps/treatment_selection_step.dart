@@ -258,7 +258,10 @@ class _TreatmentSelectionStepState
               ],
             ),
             ElevatedButton.icon(
-              onPressed: () => _showAddNewDialog(context, state, viewModel),
+              onPressed: () {
+                viewModel.clearBasicInfoControllers();
+                _showAddNewDialog(context, state, viewModel);
+              },
               icon: const Icon(Icons.add, color: Colors.white, size: 18),
               label: Text(
                 'Add New Basic Info',
