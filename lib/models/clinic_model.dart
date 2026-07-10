@@ -8,6 +8,7 @@ class ClinicResponse extends BaseApiResponseModel<ClinicModel> {
     super.data,
   });
 
+
   factory ClinicResponse.fromJson(Map<String, dynamic> json) =>
       ClinicResponse(
         isSuccess: (json['is_success'] as bool?) ?? (json['is_success'] as bool?) ?? false,
