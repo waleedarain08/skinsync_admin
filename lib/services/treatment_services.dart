@@ -7,6 +7,7 @@ import '../models/requests/create_treatment_requests/basic_info_request.dart';
 import '../models/requests/create_treatment_requests/business_logic_request.dart';
 import '../models/requests/create_treatment_requests/sessions_setup_request.dart';
 import '../models/requests/create_session_requests/treatment_schedule_request.dart';
+import '../models/requests/create_treatment_requests/update_basic_info_request.dart';
 import '../models/responses/basic_info_response.dart';
 import '../models/responses/treatment_list_response.dart';
 import '../models/responses/treatment_detail_response.dart';
@@ -63,9 +64,9 @@ class TreatmentServices implements TreatmentRepository {
     return response;
   }
    @override
-  Future<BasicInfoResponse> updateBasicInfo(BasicInfoRequest request, int id) async {
+  Future<BasicInfoResponse> updateBasicInfo(UpdateBasicInfoRequest request, int id) async {
     final jsonResponse = await _api.patch(
-      Endpoint.basicInfo,
+      Endpoint.updateTreatment,
       body: request.toJson(),
       queryParams: {'treatment_id': id.toString()},
     );

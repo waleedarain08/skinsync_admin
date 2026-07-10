@@ -45,7 +45,7 @@ class LogicStepDialog extends ConsumerWidget {
                   ),
                 ],
               ),
-            const  LogicStep(),
+              const LogicStep(),
               context.verticalSpace(24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -59,14 +59,18 @@ class LogicStepDialog extends ConsumerWidget {
                     width: context.w(150),
                     child: CustomPrimaryButton(
                       onTap: () async {
-                        if(treatmentId == null){
+                        if (treatmentId == null) {
                           return;
                         }
-                     final result = await  ref.read(treatmentViewModelProvider.notifier).callBusinessLogic(isUpdate: true ,updatetreatmentId: treatmentId!);
-                     if(result ==true){
-                           Navigator.of(context).pop();
-                     }
-                        
+                        final result = await ref
+                            .read(treatmentViewModelProvider.notifier)
+                            .callBusinessLogic(
+                              isUpdate: true,
+                              updatetreatmentId: treatmentId!,
+                            );
+                        if (result == true) {
+                          Navigator.of(context).pop();
+                        }
                       },
                       label: 'Save',
                     ),

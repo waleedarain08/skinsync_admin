@@ -318,10 +318,19 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     }).toList();
   }
 
-  void deleteCategory(int id) {
-    state = state.copyWith(categories: _removeFromTree(state.categories, id));
-    state = state.copyWith(
-      flattenedCategories: _flattenCategories(state.categories),
+  Future<bool?> deleteCategory(int id) async {
+    return await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        final response = await _categoryRepository.deleteCategory(id: id);
+        if (response.isSuccess) {
+          state = state.copyWith(
+            categories: _removeFromTree(state.categories, id),
+             flattenedCategories: _flattenCategories(state.categories),
+          );
+        }
+        return true;
+      },
     );
   }
 

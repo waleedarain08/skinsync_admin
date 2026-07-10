@@ -17,6 +17,7 @@ import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 import 'package:skinsync_admin/utils/sku_utils.dart';
+import '../models/requests/create_treatment_requests/update_basic_info_request.dart';
 import '../models/responses/treatment_list_response.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
@@ -156,7 +157,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             }).toList();
 
             state = state.copyWith(
-              treatments: list,
+              treatments: categoryId == null ? list : null,
               filteredTreatments: list,
               createTreatments: categoryId != null ? list : null,
               loading: false,
@@ -324,8 +325,12 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       }
 
       final response = await _treatmentRepository.updateBasicInfo(
-        BasicInfoRequest(
-          selectedCategoryIds: state.selectedCategoryPath,
+        UpdateBasicInfoRequest(
+          selectedCategoryIds:
+              state.selectedTreatmentDetail?.selectedCategories
+                  ?.map((e) => e.id!)
+                  .toList() ??
+              [],
           patientDisplayName: displayNameController.text,
           image: imageUrl,
           shortDescription: shortDescriptionController.text,
@@ -336,21 +341,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         id,
       );
       if (response.isSuccess) {
-        log('Basic Info Created : ${response.data?.id}');
-        state = state.copyWith(draftTreatmentID: response.data?.id);
-        selectTreatment(
-          TreatmentListData(
-            id: response.data?.id,
-            patientDisplayName: response.data?.patientDisplayName,
-            shortDescription: response.data?.shortDescription,
-            globalSku: response.data?.globalSku,
-            icon: response.data?.icon,
-            image: response.data?.image,
-            status: response.data?.status ?? 'active',
-          ),
-        );
-        final categoryId = int.tryParse(categoryIdController.text);
-        await getTreatments(categoryId: categoryId);
+        await fetchTreatmentDetail(id);
       }
       return true;
     });
@@ -372,20 +363,26 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     int? updatetreatmentId,
   }) async {
     return await runSafely(() async {
-      final treatmentId = state.selectedTreatment!.id;
-      if (treatmentId == null) {
-        throw const UnknownException('Treatment not found!');
+      int? treatmentId;
+      if (updatetreatmentId == null) {
+        treatmentId = state.selectedTreatment!.id;
+        if (treatmentId == null) {
+          throw const UnknownException('Treatment not found!');
+        }
       }
       if (isUpdate && updatetreatmentId == null) {
         throw const UnknownException('Treatment not found!');
       }
-      await _treatmentRepository.businessLogic(
-        draftTreatmentId: isUpdate ? updatetreatmentId! : treatmentId,
+      final response = await _treatmentRepository.businessLogic(
+        draftTreatmentId: isUpdate ? updatetreatmentId! : treatmentId!,
         request: BusinessLogicRequest(
           enableByDefault: state.enableByDefault,
           useInAiSimulator: state.useInAiSimulator,
         ),
       );
+      if (response.isSuccess && isUpdate) {
+        await fetchTreatmentDetail(updatetreatmentId!);
+      }
       return true;
     });
   }

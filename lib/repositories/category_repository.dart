@@ -12,4 +12,5 @@ abstract class CategoryRepository {
     required CreateCategoryRequest request,
     required int id,
   });
+  Future<BaseApiResponseModel> deleteCategory({required int id});
 }

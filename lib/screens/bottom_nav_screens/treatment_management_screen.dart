@@ -7,18 +7,18 @@ import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 
-import '../../../widgets/app_network_image.dart';
-import '../../../widgets/custom_dropdown_widget.dart';
-import '../../../widgets/status_toggle_switch.dart';
-import '../../models/responses/treatment_list_response.dart';
-import '../../utils/theme.dart';
-import '../../view_models/treatment_view_model.dart';
-import '../../widgets/app_search_field.dart';
-import '../../widgets/borderd_container_widget.dart';
-import '../../widgets/custom_outlined_button.dart';
-import '../../widgets/custom_primary_button.dart';
-import '../../widgets/gradient_scaffold.dart';
-import '../../widgets/number_paginator.dart';
+import '../../../../widgets/app_network_image.dart';
+import '../../../../widgets/custom_dropdown_widget.dart';
+import '../../../../widgets/status_toggle_switch.dart';
+import '../../../models/responses/treatment_list_response.dart';
+import '../../../utils/theme.dart';
+import '../../../view_models/treatment_view_model.dart';
+import '../../../widgets/app_search_field.dart';
+import '../../../widgets/borderd_container_widget.dart';
+import '../../../widgets/custom_outlined_button.dart';
+import '../../../widgets/custom_primary_button.dart';
+import '../../../widgets/gradient_scaffold.dart';
+import '../../../widgets/number_paginator.dart';
 import '../manage_treatment_data_screen.dart';
 
 class TreatmentManagementScreen extends ConsumerStatefulWidget {
@@ -260,14 +260,12 @@ class _TreatmentManagementScreenState
                   _activeCategoryId = null;
                   ref
                       .read(treatmentViewModelProvider.notifier)
-                      .getTreatments(page: 1,showLoading: true);
-                }
-                else{
+                      .getTreatments(page: 1, showLoading: true);
+                } else {
                   ref
                       .read(categoryViewModelProvider.notifier)
                       .fetchCategories();
                 }
-
               });
             },
             icon: _isCategoryView
@@ -725,7 +723,7 @@ class _TreatmentManagementScreenState
                         child: Center(child: CircularProgressIndicator()),
                       )
                     else ...[
-                      _buildTreatmentTable(state.treatments, viewModel),
+                      _buildTreatmentTable(state.createTreatments, viewModel),
                       if (state.totalPages > 1 && _activeCategoryId == cat.id)
                         Padding(
                           padding: context.appEdgeInsets(vertical: 24),

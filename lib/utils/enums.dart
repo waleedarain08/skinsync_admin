@@ -58,6 +58,7 @@ enum Endpoint {
   sessionUpdate('admin/sessions/update'),
   sessionDetail('admin/sessions/{id}'),
   deleteSession('admin/sessions/{id}'),
+  updateCategory('admin/categories/{id}'),
 
   treatmentsStatus('admin/treatments/status');
 
@@ -99,6 +100,7 @@ enum CreateTreatmentSteps {
   downtimeLevel('downtime_level'),
   followUpSetup('follow_up_setup'),
   businessLogic('business_logic'),
+  basicInfo('basic_info'),
   status("status");
 
   final String name;

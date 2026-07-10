@@ -8,6 +8,7 @@ import 'package:skinsync_admin/utils/enums.dart';
 
 import '../models/requests/create_treatment_requests/basic_info_request.dart';
 import '../models/requests/create_treatment_requests/sessions_setup_request.dart';
+import '../models/requests/create_treatment_requests/update_basic_info_request.dart';
 import '../models/responses/base_response_model.dart';
 
 abstract class TreatmentRepository {
@@ -20,7 +21,7 @@ abstract class TreatmentRepository {
   });
 
   Future<BasicInfoResponse> createBasicInfo(BasicInfoRequest request);
-  Future<BasicInfoResponse> updateBasicInfo(BasicInfoRequest request, int id);
+  Future<BasicInfoResponse> updateBasicInfo(UpdateBasicInfoRequest request, int id);
 
   Future<BaseApiResponseModel> createTreatmentArea(
     TreatmentAreaRequest request,

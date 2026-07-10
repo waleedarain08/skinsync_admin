@@ -36,6 +36,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     String? initialIcon,
     String? initialImage,
     String? initialConsentName,
+    bool isUpdate = false,
     //List<CategorySessionModel>? initialSessions,
     int? initialTotalSessions,
     List<CategoryNotificationModel>? initialPreNotifications,
@@ -66,8 +67,9 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
         initialIcon: initialIcon,
         initialImage: initialImage,
         initialConsentName: initialConsentName,
-       // initialSessions: initialSessions,
-       //  initialTotalSessions: initialTotalSessions,
+        isUpdate: isUpdate,
+        // initialSessions: initialSessions,
+        //  initialTotalSessions: initialTotalSessions,
         initialPreNotifications: initialPreNotifications,
         initialPostNotifications: initialPostNotifications,
         initialDowntimePresets: initialDowntimePresets,
@@ -86,7 +88,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
         result['preNotifications'],
         result['postNotifications'],
         result['downtimePresets'],
-     //   result['defaultRoles'],
+        //   result['defaultRoles'],
       );
     }
   }
@@ -98,7 +100,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     String? initialIcon,
     String? initialImage,
     bool showIconField = true,
-    required void Function(String, String,String) onConfirm,
+    required void Function(String, String, String) onConfirm,
   }) {
     final nameController = TextEditingController(text: initialName);
     final iconController = TextEditingController(text: initialIcon);
@@ -671,7 +673,8 @@ class _ManageTreatmentDataScreenState
             onAdd: () async {
               final result = await showDialog<Map<String, dynamic>>(
                 context: context,
-                builder: (context) => const AreaCreationDialog(title: 'Add New Area'),
+                builder: (context) =>
+                    const AreaCreationDialog(title: 'Add New Area'),
               );
               if (result != null) {
                 viewModel.addArea(
@@ -862,17 +865,17 @@ class _ManageTreatmentDataScreenState
   }
 
   Widget _buildHierarchicalItem({
-     required BuildContext context,
-  required String name,
-  String? icon,
-  String? image,
-  required int childrenCount,
-  required List<_ChildItemData> children,
-  required void Function(String, String, String) onEdit,       
-  required VoidCallback onDelete,
-  required void Function(String, String, String, String) onAddChild,   
-  required void Function(String, String, String, String) onEditChild, 
-  required void Function(String) onDeleteChild,
+    required BuildContext context,
+    required String name,
+    String? icon,
+    String? image,
+    required int childrenCount,
+    required List<_ChildItemData> children,
+    required void Function(String, String, String) onEdit,
+    required VoidCallback onDelete,
+    required void Function(String, String, String, String) onAddChild,
+    required void Function(String, String, String, String) onEditChild,
+    required void Function(String) onDeleteChild,
   }) {
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
@@ -961,8 +964,13 @@ class _ManageTreatmentDataScreenState
                                 title: 'Edit Sub-item',
                                 initialName: child.name,
                                 initialIcon: child.icon,
-                                onConfirm: (newName, newIcon,newImage) =>
-                                    onEditChild(child.name, newName, newIcon,newImage),
+                                onConfirm: (newName, newIcon, newImage) =>
+                                    onEditChild(
+                                      child.name,
+                                      newName,
+                                      newIcon,
+                                      newImage,
+                                    ),
                               ),
                         ),
                         IconButton(
@@ -982,7 +990,8 @@ class _ManageTreatmentDataScreenState
                   onPressed: () async {
                     final result = await showDialog<Map<String, dynamic>>(
                       context: context,
-                      builder: (context) => const AreaCreationDialog(title: 'Add Sub-item'),
+                      builder: (context) =>
+                          const AreaCreationDialog(title: 'Add Sub-item'),
                     );
                     if (result != null) {
                       onAddChild(
@@ -1099,10 +1108,13 @@ class _RecursiveCategoryTile extends StatelessWidget {
               onPressed: () =>
                   ManageTreatmentDataScreen._showCategoryCreationDialog(
                     context: context,
-                    categoryId: category.id, // Explicitly pass categoryId to edit
+                    categoryId:
+                        category.id, // Explicitly pass categoryId to edit
                     initialName: category.name,
                     initialIcon: category.icon,
                     initialImage: category.image,
+                    isUpdate: true,
+
                     onConfirm:
                         (
                           String name,
@@ -1110,7 +1122,7 @@ class _RecursiveCategoryTile extends StatelessWidget {
                           String image,
                           String? consentFormName,
                           String? consentFormUrl,
-                        //  List<CategorySessionModel>? sessions,
+                          //  List<CategorySessionModel>? sessions,
                           List<CategoryNotificationModel>? preNotif,
                           List<CategoryNotificationModel>? postNotif,
                           CategoryDowntimePresetModel? downtime,
@@ -1122,8 +1134,8 @@ class _RecursiveCategoryTile extends StatelessWidget {
                           image: image,
                           consentFormUrl: consentFormUrl,
                           consentFormName: consentFormName,
-                        //  defaultSessions: sessions,
-                        //  totalSessions: sessions?.length,
+                          //  defaultSessions: sessions,
+                          //  totalSessions: sessions?.length,
                           preNotifications: preNotif,
                           postNotifications: postNotif,
                           downtimePresets: downtime,
@@ -1141,7 +1153,7 @@ class _RecursiveCategoryTile extends StatelessWidget {
               onPressed: () => ManageTreatmentDataScreen._showDeleteConfirm(
                 context,
                 category.name,
-                () => viewModel.deleteCategory(category.id),
+                () async => await viewModel.deleteCategory(category.id),
               ),
             ),
             if (category.subCategories.isNotEmpty)
@@ -1288,7 +1300,7 @@ class _RecursiveAreaTile extends StatelessWidget {
 }
 
 class _ChildItemData {
-  _ChildItemData({required this.name, this.icon,this.image});
+  _ChildItemData({required this.name, this.icon, this.image});
   final String name;
   final String? icon;
   final String? image;

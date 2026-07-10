@@ -21,6 +21,7 @@ import 'standard_dialog.dart';
 class CategoryCreationDialog extends ConsumerStatefulWidget {
   const CategoryCreationDialog({
     super.key,
+
     this.parentName,
     this.initialName,
     this.initialIcon,
@@ -34,6 +35,7 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
     this.categoryId,
     this.parentId, // Passed to specify parent when adding subcategories
     this.isViewMode = false,
+    this.isUpdate = false,
   });
 
   final String? parentName;
@@ -49,6 +51,7 @@ class CategoryCreationDialog extends ConsumerStatefulWidget {
   final int? categoryId;
   final int? parentId; // Added parentId field
   final bool isViewMode;
+  final bool isUpdate;
 
   @override
   ConsumerState<CategoryCreationDialog> createState() =>
@@ -332,7 +335,7 @@ class _CategoryCreationDialogState
         .read(categoryViewModelProvider)
         .selectedCategoryDetail
         ?.name;
-    if (selectedCategoryName == _nameController.text && !widget.isViewMode) {
+    if (selectedCategoryName == _nameController.text && !widget.isUpdate) {
       EasyLoading.showError('Parent Name Can\'t Be sub Category Name ');
       return;
     }
@@ -387,12 +390,12 @@ class _CategoryCreationDialogState
 
       if (widget.categoryId != null) {
         // Editing an existing category — actually call the update API.
-        // final value = await ref
-        //     .read(categoryViewModelProvider.notifier)
-        //     .updateCategory(request: request, id: widget.categoryId!);
-        //  if (value == true && mounted) {
-        Navigator.pop(context, result);
-        //  }
+        final value = await ref
+            .read(categoryViewModelProvider.notifier)
+            .updateCategory(request: request, id: widget.categoryId!);
+        if (value == true && mounted) {
+          Navigator.pop(context, result);
+        }
         return;
       }
       ref

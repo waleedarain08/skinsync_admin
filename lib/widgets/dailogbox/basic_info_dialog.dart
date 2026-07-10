@@ -198,17 +198,17 @@ class BasicInfoDialog extends ConsumerWidget {
                     width: context.w(150),
                     child: CustomPrimaryButton(
                       onTap: () async {
-                        Navigator.of(context).pop();
-                        // if(isEditMode){
-                        //   if(treatmentId == null){
-                        //     return;
-                        //   }
-                        //   final result = await ref
-                        //     .read(treatmentViewModelProvider.notifier)
-                        //     .updateBasicInfo(id:treatmentId!);
-                        //      if (result == true) {
-                        //   Navigator.of(context).pop();
-                        // }}
+                        if (isEditMode) {
+                          if (treatmentId == null) {
+                            return;
+                          }
+                          final result = await ref
+                              .read(treatmentViewModelProvider.notifier)
+                              .updateBasicInfo(id: treatmentId!);
+                          if (result == true) {
+                            Navigator.of(context).pop();
+                          }
+                        }
 
                         //     else{
                         // final result = await ref

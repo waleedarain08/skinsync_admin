@@ -63,8 +63,8 @@ class CategoryServices implements CategoryRepository {
     required CreateCategoryRequest request,
     required int id,
   }) async {
-    final jsonResponse = await _api.post(
-      Endpoint.categories,
+    final jsonResponse = await _api.patch(
+      Endpoint.updateCategory,
       body: request,
       pathParams: {'id': id.toString()},
     );
@@ -76,4 +76,20 @@ class CategoryServices implements CategoryRepository {
 
     return response;
   }
+    @override
+ Future<BaseApiResponseModel> deleteCategory({required int id}) async {
+    final jsonResponse = await _api.delete(
+      Endpoint.updateCategory,
+      
+      pathParams: {'id': id.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+
+    return response;
+  }
+
 }
