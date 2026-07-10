@@ -16,6 +16,8 @@ import 'package:skinsync_admin/widgets/dailogbox/category_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
+import '../models/responses/area_list_response.dart';
+
 class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
   const ManageTreatmentDataScreen({super.key});
 
@@ -689,30 +691,10 @@ class _ManageTreatmentDataScreenState
             separatorBuilder: (context, index) => context.verticalSpace(16),
             itemBuilder: (context, index) {
               final area = state.areas[index];
-              return _buildHierarchicalItem(
-                context: context,
-                name: area.name,
-                icon: area.icon,
-                childrenCount: area.subAreas.length,
-                children: area.subAreas
-                    .map((s) => _ChildItemData(name: s.name, icon: s.icon,image: s.image))
-                    .toList(),
-                onEdit: (name, icon,image) =>
-                    viewModel.editArea(area.name, name, icon: icon,image:image),
-                onDelete: () => viewModel.deleteArea(area.name),
-                onAddChild: (name, sku, icon, image) =>
-                    viewModel.addSubArea(
-                      parentAreaId: area.id,
-                      parentAreaName: area.name,
-                      name: name,
-                      sku: sku,
-                      icon: icon,
-                      image: image,
-                    ),
-                onEditChild: (old, name, icon,image) =>
-                    viewModel.editSubArea(area.name, old, name, icon: icon,image:image),
-                onDeleteChild: (name) =>
-                    viewModel.deleteSubArea(area.name, name),
+              return _RecursiveAreaTile(
+                area: area,
+                viewModel: viewModel,
+                level: 0,
               );
             },
           ),
@@ -1172,6 +1154,128 @@ class _RecursiveCategoryTile extends StatelessWidget {
                 padding: EdgeInsets.only(right: 16.w, bottom: 16.h),
                 child: _RecursiveCategoryTile(
                   category: child,
+                  viewModel: viewModel,
+                  level: level + 1,
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+}
+
+class _RecursiveAreaTile extends StatelessWidget {
+  const _RecursiveAreaTile({
+    required this.area,
+    required this.viewModel,
+    required this.level,
+  });
+
+  final AreaModel area;
+  final TreatmentDataViewModel viewModel;
+  final int level;
+
+  @override
+  Widget build(BuildContext context) {
+    return BorderdContainerWidget(
+      padding: EdgeInsets.zero,
+      margin: EdgeInsets.only(left: level * 24.w, bottom: 16.h),
+      child: ExpansionTile(
+        initiallyExpanded: level == 0,
+        shape: const RoundedRectangleBorder(side: BorderSide.none),
+        leading: Container(
+          width: context.w(40),
+          height: context.w(40),
+          decoration: BoxDecoration(
+            color: CustomColors.whiteGrey,
+            borderRadius: context.borderRadius(all: 8),
+          ),
+          child: AppNetworkImage(
+            imageUrl: area.icon,
+            fit: BoxFit.cover,
+            errorIcon: Icons.location_searching,
+            errorIconColor: CustomColors.purple,
+          ),
+        ),
+        title: Text(area.name, style: context.fonts.black16w600),
+        subtitle: Text(
+          '${area.subAreasCount} sub-areas',
+          style: context.fonts.grey12w400,
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              tooltip: 'Add Sub-Area',
+              icon: const Icon(
+                Icons.add_circle_outline,
+                size: 20,
+                color: CustomColors.green,
+              ),
+              onPressed: () async {
+                final result = await showDialog<Map<String, dynamic>>(
+                  context: context,
+                  builder: (context) => const AreaCreationDialog(title: 'Add Sub-item'),
+                );
+                if (result != null) {
+                  viewModel.addSubArea(
+                    parentAreaId: area.id,
+                    parentAreaName: area.name,
+                    name: result['name'] as String,
+                    sku: result['sku'] as String,
+                    icon: result['icon'] as String,
+                    image: result['image'] as String,
+                  );
+                }
+              },
+            ),
+            IconButton(
+              tooltip: 'Edit Area',
+              icon: const Icon(Icons.edit_outlined, size: 20),
+              onPressed: () => ManageTreatmentDataScreen._showItemDialog(
+                context: context,
+                title: 'Edit Area',
+                initialName: area.name,
+                initialIcon: area.icon,
+                initialImage: area.image,
+                onConfirm: (newName, newIcon, newImage) {
+                  if (level == 0) {
+                    viewModel.editArea(area.name, newName, icon: newIcon, image: newImage);
+                  } else {
+                    viewModel.editSubArea(area.name, area.name, newName, icon: newIcon, image: newImage);
+                  }
+                },
+              ),
+            ),
+            IconButton(
+              tooltip: 'Delete Area',
+              icon: const Icon(
+                Icons.delete_outline,
+                size: 20,
+                color: CustomColors.red,
+              ),
+              onPressed: () => ManageTreatmentDataScreen._showDeleteConfirm(
+                context,
+                area.name,
+                () {
+                  if (level == 0) {
+                    viewModel.deleteArea(area.name);
+                  } else {
+                    viewModel.deleteSubArea(area.name, area.name);
+                  }
+                },
+              ),
+            ),
+            if (area.subAreas.isNotEmpty) const Icon(Icons.expand_more),
+          ],
+        ),
+        children: area.subAreas
+            .map(
+              (child) => Padding(
+                padding: EdgeInsets.only(right: 16.w, bottom: 16.h),
+                child: _RecursiveAreaTile(
+                  area: child,
                   viewModel: viewModel,
                   level: level + 1,
                 ),

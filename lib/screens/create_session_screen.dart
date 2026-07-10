@@ -2177,11 +2177,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     for (final entry in sessionState.productUsageEntries) {
       final minVal = double.tryParse(entry.minQuantityController.text) ?? 0.0;
       final maxVal = double.tryParse(entry.maxQuantityController.text) ?? 0.0;
-      if (minVal < 1 || maxVal < 1) {
+      if (minVal < 0 || maxVal < 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Quantity for ${entry.productName} must be greater than or equal to 1.',
+              'Quantity for ${entry.productName} must be greater than or equal to 0.',
             ),
             backgroundColor: CustomColors.red,
           ),
