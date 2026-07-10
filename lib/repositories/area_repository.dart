@@ -11,4 +11,7 @@ abstract class AreaRepository {
     required UpdateAreaRequest request,
     required int id,
   });
+   Future<BaseApiResponseModel> deleteArea({
+    required int id,
+  });
 }

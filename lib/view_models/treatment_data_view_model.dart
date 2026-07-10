@@ -249,43 +249,54 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     return generated;
   }
 
-  Future<void> addArea(String name, {String? sku, required String icon, required String image}) async {
+  Future<void> addArea(
+    String name, {
+    String? sku,
+    required String icon,
+    required String image,
+  }) async {
     if (name.isEmpty) return;
     final finalSku = (sku == null || sku.isEmpty)
         ? _generateUniqueAreaSku()
         : sku;
-   // final newArea = 
+    // final newArea =
     await ref
         .read(areaViewModelProvider.notifier)
         .createArea(
           parentId: null,
-          name: name, globalSku: finalSku, icon: icon, imageUrl: image);
-   // state = state.copyWith(areas: [...state.areas, newArea]);
+          name: name,
+          globalSku: finalSku,
+          icon: icon,
+          imageUrl: image,
+        );
+    // state = state.copyWith(areas: [...state.areas, newArea]);
   }
 
-  void editArea(String oldName, String newName, {String? sku, String? icon,String? image}) {
-    state = state.copyWith(
-      areas: state.areas.map((a) {
-        if (a.name == oldName) {
-          final finalSku = (sku == null || sku.isEmpty)
-              ? (a.globalSku.isEmpty ? _generateUniqueAreaSku() : a.globalSku)
-              : sku;
-          return a.copyWith(
-            name: newName,
-            globalSku: finalSku,
-            icon: icon ?? a.icon,
-            image: image ?? a.image,
-          );
-        }
-        return a;
-      }).toList(),
-    );
+  Future<void> editArea({
+    required int id,
+    required String name,
+    required String sku,
+    required String icon,
+    required String image,
+  }) async {
+    await ref
+        .read(areaViewModelProvider.notifier)
+        .callUpdateArea(
+          id: id,
+          name: name,
+          globalSku: sku,
+          icon: icon,
+          imageUrl: image,
+        );
+  
   }
 
-  void deleteArea(String name) {
-    state = state.copyWith(
-      areas: state.areas.where((a) => a.name != name).toList(),
-    );
+  Future<void> deleteArea({ required String name ,required int id} ) async {
+     await ref.read(areaViewModelProvider.notifier).callDeletArea(id: id);
+   
+    // state = state.copyWith(
+    //   areas: state.areas.where((a) => a.name != name).toList(),
+    // );
   }
 
   Future<void> addSubArea({
@@ -293,71 +304,86 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     required String parentAreaName,
     required String name,
     String? sku,
-    String? icon, String? image,
+    String? icon,
+    String? image,
   }) async {
-   final value =  await ref
+    final value = await ref
         .read(areaViewModelProvider.notifier)
         .createArea(
-      name: name,
-      globalSku: sku!,
-      icon: icon!,
-      parentId:parentAreaId,
-      imageUrl: image!,
-    );
+          name: name,
+          globalSku: sku!,
+          icon: icon!,
+          parentId: parentAreaId,
+          imageUrl: image!,
+        );
 
     if (value == true) {
-    await  ref
-          .read(areaViewModelProvider.notifier)
-          .refreshAreas();
+      await ref.read(areaViewModelProvider.notifier).refreshAreas();
     }
   }
 
-  void editSubArea(
-    String areaName,
-    String oldName,
-    String newName, {
-    String? sku,
-    String? icon,
-    String? image,
-  }) {
-    state = state.copyWith(
-      areas: state.areas.map((a) {
-        if (a.name == areaName) {
-          return a.copyWith(
-            subAreas: a.subAreas.map((s) {
-              if (s.name == oldName) {
-                final finalSku = (sku == null || sku.isEmpty)
-                    ? (s.globalSku.isEmpty
-                          ? _generateUniqueAreaSku()
-                          : s.globalSku)
-                    : sku;
-                return s.copyWith(
-                  name: newName,
-                  globalSku: finalSku,
-                  icon: icon ?? s.icon,
-                  image: image ?? s.image,
-                );
-              }
-              return s;
-            }).toList(),
-          );
-        }
-        return a;
-      }).toList(),
-    );
+  Future<void> editSubArea({
+    required String name,
+    required String sku,
+    required String icon,
+    required String image,
+    required int id,
+  }) async {
+    final result = await ref
+        .read(areaViewModelProvider.notifier)
+        .callUpdateArea(
+          id: id,
+          name: name,
+          globalSku: sku,
+          icon: icon,
+          imageUrl: image,
+        );
+    if (result == true) {
+      await ref.read(areaViewModelProvider.notifier).refreshAreas();
+    }
+
+    // state = state.copyWith(
+    //   areas: state.areas.map((a) {
+    //     if (a.name == areaName) {
+    //       return a.copyWith(
+    //         subAreas: a.subAreas.map((s) {
+    //           if (s.name == oldName) {
+    //             final finalSku = (sku == null || sku.isEmpty)
+    //                 ? (s.globalSku.isEmpty
+    //                       ? _generateUniqueAreaSku()
+    //                       : s.globalSku)
+    //                 : sku;
+    //             return s.copyWith(
+    //               name: newName,
+    //               globalSku: finalSku,
+    //               icon: icon ?? s.icon,
+    //               image: image ?? s.image,
+    //             );
+    //           }
+    //           return s;
+    //         }).toList(),
+    //       );
+    //     }
+    //     return a;
+    //   }).toList(),
+    // );
   }
 
-  void deleteSubArea(String areaName, String name) {
-    state = state.copyWith(
-      areas: state.areas.map((a) {
-        if (a.name == areaName) {
-          return a.copyWith(
-            subAreas: a.subAreas.where((s) => s.name != name).toList(),
-          );
-        }
-        return a;
-      }).toList(),
-    );
+  Future<void> deleteSubArea({required int id}) async {
+ await ref.read(areaViewModelProvider.notifier).callDeletArea(id: id);
+
+    // state = state.copyWith(
+    //   areas: state.areas.map((a) {
+    //     if (a.name == areaName) {
+    //       return a.copyWith(
+    //         subAreas: a.subAreas.where((s) => s.name != name).toList(),
+    //       );
+    //     }
+    //     return a;
+    //   }).toList(),
+    // );
+
+
   }
 
   void addSubAreaChild(

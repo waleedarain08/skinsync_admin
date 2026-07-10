@@ -126,7 +126,7 @@ class AreaViewModel extends BaseViewModel<AreaState> {
     required int id,
   }) async {
     return await runSafely<bool>(() async {
-      await _areaRepository.updateArea(
+      final response = await _areaRepository.updateArea(
         request: UpdateAreaRequest(
           name: name,
           globalSku: globalSku,
@@ -135,7 +135,21 @@ class AreaViewModel extends BaseViewModel<AreaState> {
         ),
         id: id,
       );
-      await refreshAreas();
+
+      if (response.isSuccess) {
+        await refreshAreas();
+      }
+      return true;
+    });
+  }
+
+  Future<bool?> callDeletArea({required int id}) async {
+    return await runSafely<bool>(() async {
+      final response = await _areaRepository.deleteArea(id: id);
+      if (response.isSuccess) {
+        await refreshAreas();
+      }
+
       return true;
     });
   }

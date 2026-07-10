@@ -60,8 +60,25 @@ class AreaServices implements AreaRepository {
     required int id,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.areas,
+      Endpoint.updateAreas,
       body: request.toJson(),
+      pathParams: {'id': id.toString()},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+   @override
+  Future<BaseApiResponseModel> deleteArea({
+   
+    required int id,
+  }) async {
+    final jsonResponse = await _api.delete(
+      Endpoint.updateAreas,
+    
       pathParams: {'id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);

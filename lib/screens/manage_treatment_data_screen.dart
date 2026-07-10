@@ -1228,7 +1228,8 @@ class _RecursiveAreaTile extends StatelessWidget {
               onPressed: () async {
                 final result = await showDialog<Map<String, dynamic>>(
                   context: context,
-                  builder: (context) => const AreaCreationDialog(title: 'Add Sub-item'),
+                  builder: (context) =>
+                      const AreaCreationDialog(title: 'Add Sub-item'),
                 );
                 if (result != null) {
                   viewModel.addSubArea(
@@ -1245,20 +1246,52 @@ class _RecursiveAreaTile extends StatelessWidget {
             IconButton(
               tooltip: 'Edit Area',
               icon: const Icon(Icons.edit_outlined, size: 20),
-              onPressed: () => ManageTreatmentDataScreen._showItemDialog(
-                context: context,
-                title: 'Edit Area',
-                initialName: area.name,
-                initialIcon: area.icon,
-                initialImage: area.image,
-                onConfirm: (newName, newIcon, newImage) {
+              onPressed: () async {
+                final result = await showDialog<Map<String, dynamic>>(
+                  context: context,
+                  builder: (context) => AreaCreationDialog(
+                    title: 'Edit Area',
+                    initialName: area.name,
+                    initialIconUrl: area.icon,
+                    initialImageUrl: area.image,
+                    initialSku: area.globalSku,
+                  ),
+                );
+                if (result != null) {
                   if (level == 0) {
-                    viewModel.editArea(area.name, newName, icon: newIcon, image: newImage);
+                    viewModel.editArea(
+                      id: area.id,
+                      name: result['name'] as String,
+                      sku: result['sku'] as String,
+                      icon: result['icon'] as String,
+                      image: result['image'] as String,
+                    );
                   } else {
-                    viewModel.editSubArea(area.name, area.name, newName, icon: newIcon, image: newImage);
+                    viewModel.editSubArea(
+                      id: area.id,
+                      name: result['name'] as String,
+                      sku: result['sku'] as String,
+                      icon: result['icon'] as String,
+                      image: result['image'] as String,
+                    );
                   }
-                },
-              ),
+                }
+
+                //   ManageTreatmentDataScreen._showItemDialog(
+                //   context: context,
+                //   title: ,
+                //   initialName:,
+                //   initialIcon: ,
+                //   initialImage: ,
+                //   onConfirm: (newName, newIcon, newImage) {
+                //     if (level == 0) {
+                //       viewModel.editArea(area.name, newName, icon: newIcon, image: newImage);
+                //     } else {
+                //       viewModel.editSubArea(area.name, area.name, newName, icon: newIcon, image: newImage);
+                //     }
+                //   },
+                // );
+              },
             ),
             IconButton(
               tooltip: 'Delete Area',
@@ -1272,9 +1305,9 @@ class _RecursiveAreaTile extends StatelessWidget {
                 area.name,
                 () {
                   if (level == 0) {
-                    viewModel.deleteArea(area.name);
+                    viewModel.deleteArea(name:  area.name, id:  area.id);
                   } else {
-                    viewModel.deleteSubArea(area.name, area.name);
+                    viewModel.deleteSubArea(id:area.id );
                   }
                 },
               ),
