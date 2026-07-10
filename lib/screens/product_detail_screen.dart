@@ -90,8 +90,8 @@ class ProductDetailScreen extends ConsumerWidget {
                       flex: 2,
                       child: Column(
                         children: [
-                          _buildSupplierSection(context, product),
-                          context.verticalSpace(24),
+                          // _buildSupplierSection(context, product),
+                          // context.verticalSpace(24),
                           _buildComplianceAndTrackingSection(context, product),
                         ],
                       ),
@@ -321,41 +321,41 @@ class ProductDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSupplierSection(
-    BuildContext context,
-    ProductDetailModel product,
-  ) {
-    return BorderdContainerWidget(
-      padding: context.appEdgeInsets(all: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Supplier Information', style: context.fonts.black16w700),
-          context.verticalSpace(24),
-          _statRow(
-            context,
-            Icons.store_outlined,
-            'Supplier',
-            _formatValue(product.supplier),
-          ),
-          _statRow(
-            context,
-            Icons.pin_outlined,
-            'Lot Number',
-            _formatValue(product.lotNumber),
-          ),
-          _statRow(
-            context,
-            Icons.date_range_outlined,
-            'Expiration Date',
-            product.expirationDate != null
-                ? product.expirationDate!.toIso8601String().split('T').first
-                : '—',
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildSupplierSection(
+  //   BuildContext context,
+  //   ProductDetailModel product,
+  // ) {
+  //   return BorderdContainerWidget(
+  //     padding: context.appEdgeInsets(all: 24),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text('Supplier Information', style: context.fonts.black16w700),
+  //         context.verticalSpace(24),
+  //         _statRow(
+  //           context,
+  //           Icons.store_outlined,
+  //           'Supplier',
+  //           _formatValue(product.supplier),
+  //         ),
+  //         _statRow(
+  //           context,
+  //           Icons.pin_outlined,
+  //           'Lot Number',
+  //           _formatValue(product.lotNumber),
+  //         ),
+  //         _statRow(
+  //           context,
+  //           Icons.date_range_outlined,
+  //           'Expiration Date',
+  //           product.expirationDate != null
+  //               ? product.expirationDate!.toIso8601String().split('T').first
+  //               : '—',
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildComplianceAndTrackingSection(
     BuildContext context,

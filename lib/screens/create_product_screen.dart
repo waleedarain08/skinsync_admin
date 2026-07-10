@@ -1394,140 +1394,140 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             SizedBox(height: 32.h),
 
                             // SECTION 5: SUPPLIER & INVENTORY
-                            Text(
-                              'SECTION 5: SUPPLIER & INVENTORY',
-                              style: context.fonts.purple12w700,
-                            ),
-                            SizedBox(height: 16.h),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Consumer(
-                                        builder: (context, ref, _) {
-                                          final suppliers =
-                                              ref
-                                                  .watch(
-                                                    productViewModelProvider,
-                                                  )
-                                                  .suppliers ??
-                                              [];
-                                          return SelectOrCreateDropdown<String>(
-                                            label: 'Supplier',
-                                            hint: 'Select Supplier',
-                                            value: _selectedSupplier,
-                                            items: suppliers
-                                                .map((e) => e.name)
-                                                .toList(),
-                                            itemLabel: (supplier) => supplier,
-                                            onChanged: (val) => setState(
-                                              () => _selectedSupplier = val,
-                                            ),
-                                            onOpen: () => ref
-                                                .read(
-                                                  productViewModelProvider
-                                                      .notifier,
-                                                )
-                                                .fetchSuppliers(),
-                                            onCreate: () =>
-                                                _showCreateMasterItemDialog(
-                                                  context,
-                                                  ref,
-                                                  'Supplier',
-                                                  (name) => setState(
-                                                    () => _selectedSupplier =
-                                                        name,
-                                                  ),
-                                                ),
-                                          );
-                                        },
-                                      ),
-                                      SizedBox(height: 6.h),
-                                      Text(
-                                        'The vendor or supplier of this product, e.g. McKesson.',
-                                        style: context.fonts.grey12w400,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: 16.w),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      BuildTextField(
-                                        label: 'Lot Number',
-                                        controller: _lotNumberController,
-                                        hintText: 'e.g. LOT123456',
-                                      ),
-                                      SizedBox(height: 6.h),
-                                      Text(
-                                        'The manufacturing batch/lot code of the product, e.g. L98765.',
-                                        style: context.fonts.grey12w400,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 16.h),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      InkWell(
-                                        onTap: () async {
-                                          final date = await showDatePicker(
-                                            context: context,
-                                            initialDate:
-                                                _expirationDate ??
-                                                DateTime.now(),
-                                            firstDate: DateTime(2000),
-                                            lastDate: DateTime(2100),
-                                          );
-                                          if (date != null) {
-                                            setState(() {
-                                              _expirationDate = date;
-                                              _expirationDateController.text =
-                                                  '${date.year}-${date.month}-${date.day}';
-                                            });
-                                          }
-                                        },
-                                        child: AbsorbPointer(
-                                          child: BuildTextField(
-                                            label: 'Expiration Date',
-                                            controller:
-                                                _expirationDateController,
-                                            hintText: 'YYYY-MM-DD',
-                                            suffixIcon: const Icon(
-                                              Icons.calendar_today_rounded,
-                                              size: 18,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 6.h),
-                                      Text(
-                                        'The official expiration date of the batch, e.g. 2026-12-31.',
-                                        style: context.fonts.grey12w400,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                              ],
-                            ),
-
-                            SizedBox(height: 32.h),
+                            // Text(
+                            //   'SECTION 5: SUPPLIER & INVENTORY',
+                            //   style: context.fonts.purple12w700,
+                            // ),
+                            // SizedBox(height: 16.h),
+                            // Row(
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   children: [
+                            //     Expanded(
+                            //       child: Column(
+                            //         crossAxisAlignment:
+                            //             CrossAxisAlignment.start,
+                            //         children: [
+                            //           Consumer(
+                            //             builder: (context, ref, _) {
+                            //               final suppliers =
+                            //                   ref
+                            //                       .watch(
+                            //                         productViewModelProvider,
+                            //                       )
+                            //                       .suppliers ??
+                            //                   [];
+                            //               return SelectOrCreateDropdown<String>(
+                            //                 label: 'Supplier',
+                            //                 hint: 'Select Supplier',
+                            //                 value: _selectedSupplier,
+                            //                 items: suppliers
+                            //                     .map((e) => e.name)
+                            //                     .toList(),
+                            //                 itemLabel: (supplier) => supplier,
+                            //                 onChanged: (val) => setState(
+                            //                   () => _selectedSupplier = val,
+                            //                 ),
+                            //                 onOpen: () => ref
+                            //                     .read(
+                            //                       productViewModelProvider
+                            //                           .notifier,
+                            //                     )
+                            //                     .fetchSuppliers(),
+                            //                 onCreate: () =>
+                            //                     _showCreateMasterItemDialog(
+                            //                       context,
+                            //                       ref,
+                            //                       'Supplier',
+                            //                       (name) => setState(
+                            //                         () => _selectedSupplier =
+                            //                             name,
+                            //                       ),
+                            //                     ),
+                            //               );
+                            //             },
+                            //           ),
+                            //           SizedBox(height: 6.h),
+                            //           Text(
+                            //             'The vendor or supplier of this product, e.g. McKesson.',
+                            //             style: context.fonts.grey12w400,
+                            //           ),
+                            //         ],
+                            //       ),
+                            //     ),
+                            //     SizedBox(width: 16.w),
+                            //     Expanded(
+                            //       child: Column(
+                            //         crossAxisAlignment:
+                            //             CrossAxisAlignment.start,
+                            //         children: [
+                            //           BuildTextField(
+                            //             label: 'Lot Number',
+                            //             controller: _lotNumberController,
+                            //             hintText: 'e.g. LOT123456',
+                            //           ),
+                            //           SizedBox(height: 6.h),
+                            //           Text(
+                            //             'The manufacturing batch/lot code of the product, e.g. L98765.',
+                            //             style: context.fonts.grey12w400,
+                            //           ),
+                            //         ],
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                            // SizedBox(height: 16.h),
+                            // Row(
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   children: [
+                            //     Expanded(
+                            //       child: Column(
+                            //         crossAxisAlignment:
+                            //             CrossAxisAlignment.start,
+                            //         children: [
+                            //           InkWell(
+                            //             onTap: () async {
+                            //               final date = await showDatePicker(
+                            //                 context: context,
+                            //                 initialDate:
+                            //                     _expirationDate ??
+                            //                     DateTime.now(),
+                            //                 firstDate: DateTime(2000),
+                            //                 lastDate: DateTime(2100),
+                            //               );
+                            //               if (date != null) {
+                            //                 setState(() {
+                            //                   _expirationDate = date;
+                            //                   _expirationDateController.text =
+                            //                       '${date.year}-${date.month}-${date.day}';
+                            //                 });
+                            //               }
+                            //             },
+                            //             child: AbsorbPointer(
+                            //               child: BuildTextField(
+                            //                 label: 'Expiration Date',
+                            //                 controller:
+                            //                     _expirationDateController,
+                            //                 hintText: 'YYYY-MM-DD',
+                            //                 suffixIcon: const Icon(
+                            //                   Icons.calendar_today_rounded,
+                            //                   size: 18,
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //           ),
+                            //           SizedBox(height: 6.h),
+                            //           Text(
+                            //             'The official expiration date of the batch, e.g. 2026-12-31.',
+                            //             style: context.fonts.grey12w400,
+                            //           ),
+                            //         ],
+                            //       ),
+                            //     ),
+                            //     const Spacer(),
+                            //   ],
+                            // ),
+                            //
+                            // SizedBox(height: 32.h),
 
                             // SECTION 6: GLOBAL COMPLIANCE & STATUS
                             Text(
