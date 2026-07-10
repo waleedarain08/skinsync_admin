@@ -2239,6 +2239,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
         );
         return false;
       }
+
       final duration =
           int.tryParse(sessionViewModel.fixedDurationController.text) ?? 0;
       if (duration <= 0) {
