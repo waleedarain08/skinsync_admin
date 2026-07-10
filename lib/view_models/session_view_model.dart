@@ -271,6 +271,10 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     state = state.copyWith();
   }
 
+  void syncUnitPriceControllersForState() {
+    _triggerRebuild();
+  }
+
   final SessionRepository _sessionRepository = locator<SessionRepository>();
 
   // Text Controllers for Session Creation Scratchpad
@@ -896,17 +900,24 @@ class SessionViewModel extends BaseViewModel<SessionState> {
           ? []
           : state.productUsageEntries
                 .map((entry) {
-                  final controller = getControllerForUnit(entry.unit);
-                  final price = int.tryParse(controller.text.trim());
-                  if (price == null) {
-                    return null;
+                  final maxQty = (double.tryParse(entry.maxQuantityController.text) ?? 1.0).ceil();
+                  entry.syncUnitPriceControllers(maxQty);
+
+                  final List<int> prices = [];
+                  if (entry.useDifferentPricingPerUnit) {
+                    for (final c in entry.unitPriceControllers) {
+                      prices.add(int.tryParse(c.text.trim()) ?? 0);
+                    }
+                  } else {
+                    final singlePrice = int.tryParse(entry.unitPriceControllers.isEmpty ? '0' : entry.unitPriceControllers[0].text.trim()) ?? 0;
+                    prices.addAll(List.filled(maxQty, singlePrice));
                   }
+
                   return UnitPriceOverride(
                     productId: entry.productId,
-                    pricePerUnit: price,
+                    pricePerUnit: prices,
                   );
                 })
-                .whereType<UnitPriceOverride>()
                 .toList(),
       isFixedPrice: state.isFixedPrice,
       fixedPrice: state.isFixedPrice
@@ -1811,6 +1822,9 @@ class ProductUsageEntry {
   final double? clinicCost;
   final double? retailPricePerUnit;
 
+  bool useDifferentPricingPerUnit;
+  final List<TextEditingController> unitPriceControllers;
+
   ProductUsageEntry({
     required this.productId,
     required this.productName,
@@ -1826,6 +1840,8 @@ class ProductUsageEntry {
     this.boxQuantity,
     this.clinicCost,
     this.retailPricePerUnit,
+    this.useDifferentPricingPerUnit = false,
+    List<TextEditingController>? unitPriceControllers,
     VoidCallback? onChanged,
   }) : minQuantityController =
            minQuantityController ?? TextEditingController(text: '1'),
@@ -1833,7 +1849,8 @@ class ProductUsageEntry {
            maxQuantityController ?? TextEditingController(text: '1'),
        notesController = notesController ?? TextEditingController(),
        perUnitDurationController =
-           perUnitDurationController ?? TextEditingController(text: '0.0') {
+           perUnitDurationController ?? TextEditingController(text: '0.0'),
+       unitPriceControllers = unitPriceControllers ?? [] {
     if (onChanged != null) {
       this.minQuantityController.addListener(onChanged);
       this.maxQuantityController.addListener(onChanged);
@@ -1842,11 +1859,28 @@ class ProductUsageEntry {
     }
   }
 
+  void syncUnitPriceControllers(int maxQty) {
+    if (unitPriceControllers.length < maxQty) {
+      final diff = maxQty - unitPriceControllers.length;
+      for (int i = 0; i < diff; i++) {
+        unitPriceControllers.add(TextEditingController(text: '0'));
+      }
+    } else if (unitPriceControllers.length > maxQty) {
+      final diff = unitPriceControllers.length - maxQty;
+      for (int i = 0; i < diff; i++) {
+        final last = unitPriceControllers.removeLast();
+        last.dispose();
+      }
+    }
+  }
+
   ProductUsageEntry copyWith({
     String? usageType,
     String? deductionTiming,
     bool? allowSubstitution,
     String? unit,
+    bool? useDifferentPricingPerUnit,
+    List<TextEditingController>? unitPriceControllers,
     VoidCallback? onChanged,
   }) {
     return ProductUsageEntry(
@@ -1864,6 +1898,8 @@ class ProductUsageEntry {
       boxQuantity: boxQuantity,
       clinicCost: clinicCost,
       retailPricePerUnit: retailPricePerUnit,
+      useDifferentPricingPerUnit: useDifferentPricingPerUnit ?? this.useDifferentPricingPerUnit,
+      unitPriceControllers: unitPriceControllers ?? this.unitPriceControllers,
       onChanged: onChanged,
     );
   }
@@ -1873,6 +1909,9 @@ class ProductUsageEntry {
     maxQuantityController.dispose();
     notesController.dispose();
     perUnitDurationController.dispose();
+    for (final c in unitPriceControllers) {
+      c.dispose();
+    }
   }
 }
 

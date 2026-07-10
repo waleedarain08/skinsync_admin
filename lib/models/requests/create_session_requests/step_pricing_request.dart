@@ -29,12 +29,12 @@ class StepPricingRequest {
 
 class UnitPriceOverride {
   final int? productId;
-  final int? pricePerUnit;
+  final List<int>? pricePerUnit;
 
   UnitPriceOverride({this.productId, this.pricePerUnit});
 
   Map<String, dynamic> toJson() => {
     'product_id': productId,
-    'price_per_unit': pricePerUnit,
+   // 'price_per_unit': pricePerUnit,
   };
 }

@@ -27,12 +27,6 @@ class PricingStep extends ConsumerWidget {
     final state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
 
-    final uniqueUnits = state.productUsageEntries
-        .map((e) => e.unit)
-        .where((unit) => unit.trim().isNotEmpty)
-        .toSet()
-        .toList();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -100,39 +94,102 @@ class PricingStep extends ConsumerWidget {
             keyboardType: TextInputType.number,
             validator: Validators.empty,
           ),
-          if (uniqueUnits.isNotEmpty) ...[
+          if (state.productUsageEntries.isNotEmpty) ...[
             context.verticalSpace(40),
             _sectionTitle(context, 'Unit-Based Pricing Overrides'),
             context.verticalSpace(8),
             Text(
-              'Define dynamic pricing overrides for each unit of measure from the selected inventory products.',
+              'Define dynamic pricing overrides for each configured unit up to the maximum quantity specified in materials setup.',
               style: context.fonts.grey14w400,
             ),
             context.verticalSpace(24),
-            Container(
-              padding: context.appEdgeInsets(all: 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: context.appBorderRadius(all: 12),
-                border: Border.all(color: CustomColors.border),
-              ),
-              child: Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: uniqueUnits.map((unit) {
-                  final formattedUnit = _formatUnitLabel(unit);
-                  return SizedBox(
-                    width: context.w(180),
-                    child: BuildTextField(
-                      label: 'Price Per $formattedUnit (\$)',
-                      controller: viewModel.getControllerForUnit(unit),
-                      hintText: '0',
-                      keyboardType: TextInputType.number,
+            ...state.productUsageEntries.map((entry) {
+              final maxQty = (double.tryParse(entry.maxQuantityController.text) ?? 1.0).ceil();
+              final formattedUnit = _formatUnitLabel(entry.unit);
+              entry.syncUnitPriceControllers(maxQty);
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                padding: context.appEdgeInsets(all: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: context.appBorderRadius(all: 12),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                entry.productName,
+                                style: context.fonts.black16w600,
+                              ),
+                              context.verticalSpace(4),
+                              Text(
+                                'Unit: $formattedUnit | Max Qty: $maxQty',
+                                style: context.fonts.grey12w400,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'Different price for each unit',
+                              style: context.fonts.black12w600,
+                            ),
+                            context.horizontalSpace(8),
+                            Switch(
+                              value: entry.useDifferentPricingPerUnit,
+                              onChanged: (val) {
+                                entry.useDifferentPricingPerUnit = val;
+                                // Trigger rebuild inside the provider to reflect changes
+                                ref.read(sessionViewModelProvider.notifier).syncUnitPriceControllersForState();
+                              },
+                              activeColor: CustomColors.purple,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  );
-                }).toList(),
-              ),
-            ),
+                    context.verticalSpace(20),
+                    if (entry.useDifferentPricingPerUnit) ...[
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: List.generate(maxQty, (i) {
+                          return SizedBox(
+                            width: context.w(180),
+                            child: BuildTextField(
+                              label: 'Unit ${i + 1} Price (\$)',
+                              controller: entry.unitPriceControllers[i],
+                              hintText: '0',
+                              keyboardType: TextInputType.number,
+                            ),
+                          );
+                        }),
+                      ),
+                    ] else ...[
+                      SizedBox(
+                        width: context.w(200),
+                        child: BuildTextField(
+                          label: 'Price Per $formattedUnit (\$)',
+                          controller: entry.unitPriceControllers[0],
+                          hintText: '0',
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            }),
           ],
         ],
       ],
