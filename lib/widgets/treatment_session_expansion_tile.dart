@@ -477,6 +477,7 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
         entry.sessionId!,
       );
       if (success && context.mounted) {
+        
         context.push(CreateSessionScreen.routeName);
       }
     } else {

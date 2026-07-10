@@ -36,7 +36,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ref
+     await ref
           .read(sessionViewModelProvider.notifier)
           .fetchProductsByTreatmentCategory();
     });

@@ -682,11 +682,11 @@ class SessionViewModel extends BaseViewModel<SessionState> {
 
   // Products and Inventory Original Implementations
   Future<void> fetchProductsByTreatmentCategory() async {
-    final treatmentState = ref.read(treatmentViewModelProvider);
-    if (treatmentState.selectedCategoryPath.isEmpty) {
-      state = state.copyWith(products: [], isLoadingProducts: false);
-      return;
-    }
+    // final treatmentState = ref.read(treatmentViewModelProvider);
+    // if (treatmentState.selectedCategoryPath.isEmpty) {
+    //   state = state.copyWith(products: [], isLoadingProducts: false);
+    //   return;
+    // }
 
     state = state.copyWith(isLoadingProducts: true);
 
