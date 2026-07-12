@@ -8,6 +8,7 @@ import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/basic_info_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/logic_setp_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 import 'package:skinsync_admin/widgets/treatment_session_expansion_tile.dart';
 
 class TreatmentDetailScreen extends ConsumerWidget {
@@ -39,16 +40,16 @@ class TreatmentDetailScreen extends ConsumerWidget {
           title: const Text('Treatment Details'),
           centerTitle: true,
         ),
-        body: const Center(
-          child: Text('No treatment details found (N/A)'),
-        ),
+        body: const Center(child: Text('No treatment details found (N/A)')),
       );
     }
 
     final status = detail.status ?? 'Draft';
     final statusColor = status.toLowerCase() == 'active'
         ? CustomColors.green
-        : (status.toLowerCase() == 'draft' ? CustomColors.amber : CustomColors.red);
+        : (status.toLowerCase() == 'draft'
+              ? CustomColors.amber
+              : CustomColors.red);
 
     return GradientScaffold(
       appBar: AppBar(
@@ -113,10 +114,6 @@ class TreatmentDetailScreen extends ConsumerWidget {
     );
   }
 
-
-
-
-
   Widget _buildHeroBannerCard(
     BuildContext context,
     TreatmentDetailDto detail,
@@ -164,34 +161,55 @@ class TreatmentDetailScreen extends ConsumerWidget {
                             Expanded(
                               child: Text(
                                 detail.patientDisplayName ?? 'N/A',
-                                style: context.fonts.black18w600.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                                style: context.fonts.black18w600.copyWith(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                            Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: statusColor.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: statusColor.withValues(alpha: 0.2),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    status,
-                                    style: context.fonts.grey10w700ls1.copyWith(
-                                      color: statusColor,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ),
-                                
-                              ],
+                            Consumer(
+                              builder: (context, ref, child) {
+                                return StatusToggleSwitch(
+                                  width: context.w(105),
+                                  height: context.h(35),
+                                  status: status,
+                                  onChanged: (newStatus) {
+                                    if (detail.id != null) {
+                                      ref
+                                          .read(
+                                            treatmentViewModelProvider.notifier,
+                                          )
+                                          .changeTreatmentStatus(
+                                            detail.id!,
+                                            newStatus,
+                                            callDetail: true
+                                          );
+                                    }
+                                  },
+                                );
+                              },
                             ),
+
+                            // Container(
+                            //   padding: const EdgeInsets.symmetric(
+                            //     horizontal: 12,
+                            //     vertical: 4,
+                            //   ),
+                            //   decoration: BoxDecoration(
+                            //     color: statusColor.withValues(alpha: 0.1),
+                            //     borderRadius: BorderRadius.circular(12),
+                            //     border: Border.all(
+                            //       color: statusColor.withValues(alpha: 0.2),
+                            //     ),
+                            //   ),
+                            //   child: Text(
+                            //     status,
+                            //     style: context.fonts.grey10w700ls1.copyWith(
+                            //       color: statusColor,
+                            //       fontSize: 11,
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                         context.verticalSpace(6),
@@ -207,30 +225,53 @@ class TreatmentDetailScreen extends ConsumerWidget {
                               'SKU: ${detail.globalSku ?? "N/A"}',
                               style: context.fonts.grey13w500,
                             ),
-                         const   Spacer(),
-                           
-                                 Consumer(
-                                   builder: (context, ref, child) {
-                                     return GestureDetector(
-                                      onTap: (){
-                                        ref.read(treatmentViewModelProvider.notifier).setBasicInfoControllers(detail);
-                                        BasicInfoDialog.show(context, isEditMode: true,treatmentId: detail.id);
-                                      },
-                                       child: Container(
-                                        padding: context.appEdgeInsets(horizontal: 6, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20.r),
-                                          border: Border.all(color: CustomColors.purple),
+                            const Spacer(),
+
+                            Consumer(
+                              builder: (context, ref, child) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    ref
+                                        .read(
+                                          treatmentViewModelProvider.notifier,
+                                        )
+                                        .setBasicInfoControllers(detail);
+                                    BasicInfoDialog.show(
+                                      context,
+                                      isEditMode: true,
+                                      treatmentId: detail.id,
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: context.appEdgeInsets(
+                                      horizontal: 6,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.r),
+                                      border: Border.all(
+                                        color: CustomColors.purple,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.update,
+                                          size: 16.sp,
+                                          color: CustomColors.purple,
                                         ),
-                                         child: Row(children: [
-                                          Icon(Icons.update,size:16.sp,color: CustomColors.purple,),
-                                          SizedBox(width: 4.w,),
-                                          Text('Update Info',style: context.fonts.purple12w700.copyWith(fontSize: 12.sp),)
-                                         ],),
-                                       ),
-                                     );
-                                   },
-                                 )
+                                        SizedBox(width: 4.w),
+                                        Text(
+                                          'Update Info',
+                                          style: context.fonts.purple12w700
+                                              .copyWith(fontSize: 12.sp),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           ],
                         ),
                       ],
@@ -245,7 +286,10 @@ class TreatmentDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDescriptionCard(BuildContext context, TreatmentDetailDto detail) {
+  Widget _buildDescriptionCard(
+    BuildContext context,
+    TreatmentDetailDto detail,
+  ) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 20),
       child: Column(
@@ -298,10 +342,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 size: 20,
               ),
               context.horizontalSpace(10),
-              Text(
-                'Assigned Category Path',
-                style: context.fonts.black16w700,
-              ),
+              Text('Assigned Category Path', style: context.fonts.black16w700),
             ],
           ),
           context.verticalSpace(16),
@@ -341,7 +382,10 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 size: 20,
               ),
               context.horizontalSpace(10),
-              Text('Anatomical Areas & Clinical Sessions', style: context.fonts.black16w700),
+              Text(
+                'Anatomical Areas & Clinical Sessions',
+                style: context.fonts.black16w700,
+              ),
             ],
           ),
           context.verticalSpace(16),
@@ -394,7 +438,8 @@ class TreatmentDetailScreen extends ConsumerWidget {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: areaSessions.length,
-                          separatorBuilder: (_, __) => context.verticalSpace(12),
+                          separatorBuilder: (_, __) =>
+                              context.verticalSpace(12),
                           itemBuilder: (context, idx) {
                             return TreatmentSessionExpansionTile(
                               session: areaSessions[idx],
@@ -428,26 +473,29 @@ class TreatmentDetailScreen extends ConsumerWidget {
                 size: 20,
               ),
               context.horizontalSpace(10),
-              Text(
-                'Business Logic & Rules',
-                style: context.fonts.black16w700,
-              ),
+              Text('Business Logic & Rules', style: context.fonts.black16w700),
               const Spacer(),
-               Consumer(
-                 builder: (context,ref,_) {
-                   return GestureDetector(
-                    onTap: (){
-                      ref.read(treatmentViewModelProvider.notifier).setBusinessLogic(detail);
-                      LogicStepDialog.show(context, ref, treatmentId: detail.id);
+              Consumer(
+                builder: (context, ref, _) {
+                  return GestureDetector(
+                    onTap: () {
+                      ref
+                          .read(treatmentViewModelProvider.notifier)
+                          .setBusinessLogic(detail);
+                      LogicStepDialog.show(
+                        context,
+                        ref,
+                        treatmentId: detail.id,
+                      );
                     },
-                     child: const Icon(
+                    child: const Icon(
                       Icons.edit,
                       color: CustomColors.purple,
                       size: 20,
-                                   ),
-                   );
-                 },
-               ),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
           context.verticalSpace(16),
@@ -483,9 +531,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
           size: 20,
         ),
         context.horizontalSpace(12),
-        Expanded(
-          child: Text(label, style: context.fonts.black13w600),
-        ),
+        Expanded(child: Text(label, style: context.fonts.black13w600)),
         Text(
           isEnabled ? 'Enabled' : 'Disabled',
           style: isEnabled
@@ -514,11 +560,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
             ],
           ),
           context.verticalSpace(16),
-          _detailRow(
-            context,
-            'Created At',
-            _formatTimestamp(detail.createdAt),
-          ),
+          _detailRow(context, 'Created At', _formatTimestamp(detail.createdAt)),
           context.verticalSpace(10),
           _detailRow(
             context,

@@ -174,8 +174,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         false;
   }
 
-  Future<bool> fetchTreatmentDetail(int id) async {
-    return await runSafely<bool>(showLoading: true, () async {
+  Future<bool> fetchTreatmentDetail(int id, {bool loading = true}) async {
+    return await runSafely<bool>(showLoading: loading, () async {
           final response = await _treatmentRepository.getTreatmentDetail(
             id: id,
           );
@@ -188,15 +188,23 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         false;
   }
 
-  Future<bool> changeTreatmentStatus(int treatmentId, String status) async {
-    return await runSafely<bool>(
-          onLoadingChange: (loading) =>
-              state = state.copyWith(loading: loading),
-          () async {
-            await _treatmentRepository.updateTreatmentStatus(
-              treatmentId: treatmentId,
-              status: status,
-            );
+ Future<bool> changeTreatmentStatus(
+  int treatmentId,
+  String status, {
+  bool callDetail = false,
+}) async {
+  return await runSafely<bool>(
+        onLoadingChange: (loading) {
+          if (!callDetail) {
+            state = state.copyWith(loading: loading);
+          }
+        },
+        () async {
+          await _treatmentRepository.updateTreatmentStatus(
+            treatmentId: treatmentId,
+            status: status,
+          );
+          if (callDetail == false) {
             await getTreatments(page: state.currentPage);
 
             if (state.selectedTreatment?.id == treatmentId) {
@@ -206,15 +214,19 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
               );
               state = state.copyWith(selectedTreatment: updated);
             }
+          } else {
+            await fetchTreatmentDetail(treatmentId, loading: false);
+          }
 
-            await EasyLoading.showSuccess(
-              'Treatment status updated successfully',
-            );
-            return true;
-          },
-        ) ??
-        false;
-  }
+          await EasyLoading.showSuccess(
+            'Treatment status updated successfully',
+          );
+          return true;
+        },
+      ) ??
+      false;
+}
+  
 
   void resetForm() {
     globalSkuController.clear();

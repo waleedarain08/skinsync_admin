@@ -6,6 +6,7 @@ import 'package:skinsync_admin/screens/create_session_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
+import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 
 class TreatmentSessionExpansionTile extends ConsumerWidget {
   final SessionModel? session;
@@ -14,6 +15,7 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
   final VoidCallback? onEditDetail;
   final VoidCallback? onDelete;
   final ValueChanged<bool>? onExpansionChanged;
+  final ValueChanged<String>? onStatusChanged;
 
   const TreatmentSessionExpansionTile({
     super.key,
@@ -23,6 +25,7 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
     this.onEditDetail,
     this.onDelete,
     this.onExpansionChanged,
+    this.onStatusChanged,
   });
 
   @override
@@ -39,13 +42,14 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
         }
       }
 
-      final entryToUse = matchedEntry ??
+      final entryToUse =
+          matchedEntry ??
           SessionViewModelEntry(
             sessionId: session!.id,
             sessionNumber: session!.sessionNumber,
             title: session!.title,
             status: session!.status,
-            isDetailedEntered: false,
+            isDetailedEntered: session?.status.toLowerCase() != 'draft',
           );
 
       return _buildTileWithEntry(context, ref, entryToUse, index ?? 0);
@@ -54,13 +58,54 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
     }
   }
 
+  String _mapStatusForToggle(String status) {
+    final s = status.toLowerCase();
+    if (s == 'deactive' || s == 'inactive') return 'Inactive';
+    if (s == 'active') return 'Active';
+    return 'Draft';
+  }
+
+  Widget _buildStatusToggle(
+    BuildContext context,
+    WidgetRef ref,
+    SessionViewModelEntry entry,
+  ) {
+    return StatusToggleSwitch(
+      width: context.w(80),
+      height: context.h(28),
+      status: _mapStatusForToggle(entry.status),
+      onChanged: (newStatus) {
+        if (onStatusChanged != null) {
+          onStatusChanged!(newStatus);
+        } else {
+          _handleDefaultStatusChange(ref, entry, newStatus);
+        }
+      },
+    );
+  }
+
+  // Handle Default Status Change Trigger (Highly Decoupled)
+  void _handleDefaultStatusChange(
+    WidgetRef ref,
+    SessionViewModelEntry entry,
+    String newStatus,
+  ) {
+    // if (entry.sessionId != null) {
+    //   ref
+    //       .read(sessionViewModelProvider.notifier)
+    //       .changeSessionStatus(entry.sessionId!, newStatus);
+    // }
+  }
+
   Widget _buildTileWithEntry(
     BuildContext context,
     WidgetRef ref,
     SessionViewModelEntry entry,
     int idx,
   ) {
-    final bool isDetailed = entry.isDetailedEntered;
+    final bool isDetailed =
+        entry.isDetailedEntered ||
+        (entry.status.isNotEmpty && entry.status.toLowerCase() != 'draft');
     final sessionTitle = entry.title ?? 'Session ${entry.sessionNumber}';
 
     if (!isDetailed) {
@@ -94,6 +139,7 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    mainAxisAlignment: .start,
                     children: [
                       Expanded(
                         child: Text(
@@ -104,44 +150,46 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
                         ),
                       ),
                       context.horizontalSpace(8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: (entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
-                                  ? CustomColors.red
-                                  : CustomColors.green)
-                              .withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
-                                  ? Icons.close
-                                  : Icons.check,
-                              color: entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
-                                  ? CustomColors.red
-                                  : CustomColors.green,
-                              size: 10,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              entry.status.isEmpty ? 'DRAFT' : entry.status,
-                              style: TextStyle(
-                                color: entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
-                                    ? CustomColors.red
-                                    : CustomColors.green,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                     
+
+                      // Container(
+                      //   padding: const EdgeInsets.symmetric(
+                      //     horizontal: 6,
+                      //     vertical: 2,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: (entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
+                      //             ? CustomColors.red
+                      //             : CustomColors.green)
+                      //         .withValues(alpha: 0.1),
+                      //     borderRadius: BorderRadius.circular(4),
+                      //   ),
+                      //   child: Row(
+                      //     mainAxisSize: MainAxisSize.min,
+                      //     children: [
+                      //       Icon(
+                      //         entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
+                      //             ? Icons.close
+                      //             : Icons.check,
+                      //         color: entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
+                      //             ? CustomColors.red
+                      //             : CustomColors.green,
+                      //         size: 10,
+                      //       ),
+                      //       const SizedBox(width: 4),
+                      //       Text(
+                      //         entry.status.isEmpty ? 'DRAFT' : entry.status,
+                      //         style: TextStyle(
+                      //           color: entry.status.toLowerCase() == 'draft' || entry.status.isEmpty
+                      //               ? CustomColors.red
+                      //               : CustomColors.green,
+                      //           fontSize: 10,
+                      //           fontWeight: FontWeight.bold,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                   context.verticalSpace(4),
@@ -155,6 +203,8 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                 _buildStatusToggle(context, ref, entry),
+                   context.horizontalSpace(12),
                 CustomOutlinedButton(
                   width: context.w(110),
                   height: context.h(32),
@@ -201,14 +251,8 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
               _handleDefaultExpansion(ref, expanded, entry);
             }
           },
-          tilePadding: context.appEdgeInsets(
-            horizontal: 16,
-            vertical: 8,
-          ),
-          childrenPadding: context.appEdgeInsets(
-            horizontal: 20,
-            vertical: 16,
-          ),
+          tilePadding: context.appEdgeInsets(horizontal: 16, vertical: 8),
+          childrenPadding: context.appEdgeInsets(horizontal: 20, vertical: 16),
           leading: Container(
             width: context.w(32),
             height: context.w(32),
@@ -234,44 +278,46 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
                 ),
               ),
               context.horizontalSpace(8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: (entry.status.toLowerCase() == 'draft'
-                          ? CustomColors.red
-                          : CustomColors.green)
-                      .withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      entry.status.toLowerCase() == 'draft'
-                          ? Icons.close
-                          : Icons.check,
-                      color: entry.status.toLowerCase() == 'draft'
-                          ? CustomColors.red
-                          : CustomColors.green,
-                      size: 10,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      entry.status,
-                      style: TextStyle(
-                        color: entry.status.toLowerCase() == 'draft'
-                            ? CustomColors.red
-                            : CustomColors.green,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              
+
+              // Container(
+              //   padding: const EdgeInsets.symmetric(
+              //     horizontal: 6,
+              //     vertical: 2,
+              //   ),
+              //   decoration: BoxDecoration(
+              //     color: (entry.status.toLowerCase() == 'draft'
+              //             ? CustomColors.red
+              //             : CustomColors.green)
+              //         .withValues(alpha: 0.1),
+              //     borderRadius: BorderRadius.circular(4),
+              //   ),
+              //   child: Row(
+              //     mainAxisSize: MainAxisSize.min,
+              //     children: [
+              //       Icon(
+              //         entry.status.toLowerCase() == 'draft'
+              //             ? Icons.close
+              //             : Icons.check,
+              //         color: entry.status.toLowerCase() == 'draft'
+              //             ? CustomColors.red
+              //             : CustomColors.green,
+              //         size: 10,
+              //       ),
+              //       const SizedBox(width: 4),
+              //       Text(
+              //         entry.status,
+              //         style: TextStyle(
+              //           color: entry.status.toLowerCase() == 'draft'
+              //               ? CustomColors.red
+              //               : CustomColors.green,
+              //           fontSize: 10,
+              //           fontWeight: FontWeight.bold,
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
           subtitle: Text(
@@ -281,6 +327,8 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              _buildStatusToggle(context, ref, entry),
+              context.horizontalSpace(12),
               CustomOutlinedButton(
                 width: context.w(100),
                 height: context.h(32),
@@ -335,10 +383,7 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
                 final minVal = p.minQuantityController.text;
                 final maxVal = p.maxQuantityController.text;
                 return Padding(
-                  padding: const EdgeInsets.only(
-                    left: 28,
-                    bottom: 4,
-                  ),
+                  padding: const EdgeInsets.only(left: 28, bottom: 4),
                   child: Text(
                     '• ${p.productName} (Min: $minVal | Max: $maxVal ${p.unit})',
                     style: context.fonts.grey12w400,
@@ -356,10 +401,7 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
                 final idx = followUpEntry.key;
                 final fu = followUpEntry.value;
                 return Padding(
-                  padding: const EdgeInsets.only(
-                    left: 28,
-                    bottom: 4,
-                  ),
+                  padding: const EdgeInsets.only(left: 28, bottom: 4),
                   child: Text(
                     '• Follow-Up ${idx + 1}: ${fu.type.toUpperCase()} - interval of ${fu.intervalValueController.text} ${fu.intervalUnit} (for ${fu.durationValueController.text} ${fu.durationUnit})',
                     style: context.fonts.grey12w400,
@@ -393,14 +435,8 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
               ),
               ...entry.preNotificationsSnapshot.map((n) {
                 return Padding(
-                  padding: const EdgeInsets.only(
-                    left: 28,
-                    bottom: 4,
-                  ),
-                  child: Text(
-                    '• $n',
-                    style: context.fonts.grey12w400,
-                  ),
+                  padding: const EdgeInsets.only(left: 28, bottom: 4),
+                  child: Text('• $n', style: context.fonts.grey12w400),
                 );
               }),
             ],
@@ -412,14 +448,8 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
               ),
               ...entry.postNotificationsSnapshot.map((n) {
                 return Padding(
-                  padding: const EdgeInsets.only(
-                    left: 28,
-                    bottom: 4,
-                  ),
-                  child: Text(
-                    '• $n',
-                    style: context.fonts.grey12w400,
-                  ),
+                  padding: const EdgeInsets.only(left: 28, bottom: 4),
+                  child: Text('• $n', style: context.fonts.grey12w400),
                 );
               }),
             ],
@@ -477,7 +507,6 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
         entry.sessionId!,
       );
       if (success && context.mounted) {
-        
         context.push(CreateSessionScreen.routeName);
       }
     } else {
