@@ -374,12 +374,13 @@ class SessionServices implements SessionRepository {
     }
     return response;
   }
+  @override
 Future<BaseApiResponseModel> changeSessionStatus({
     required SessionStatusRequest request,
   }) async{
     final jsonResponse = await _api.patch(
       Endpoint.sessionStatus,
-      
+      body: request
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
 

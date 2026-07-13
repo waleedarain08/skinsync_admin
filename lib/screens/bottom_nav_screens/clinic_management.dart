@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/widgets/app_loader.dart';
+import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 
 import '../../models/clinic_model.dart';
 import '../../models/invite_clinic_model.dart';
@@ -43,6 +44,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {});
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(clinicViewModelProvider.notifier).initialize();
     });
@@ -119,7 +125,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
             context.verticalSpace(32),
             _buildStatsSummary(context),
             context.verticalSpace(32),
-            _buildFilters(),
+            AnimatedBuilder(
+              animation: _tabController,
+              builder: (_, __) {
+                return _buildFilters();
+              },
+            ),
             context.verticalSpace(32),
             _buildTabs(),
             context.verticalSpace(24),
@@ -303,28 +314,32 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               },
             ),
           ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: CustomDropdown<String>(
-              label: 'Subscription Plan',
-              hintText: 'All Plans',
-              value: _selectedPlanFilter,
-              items: const [
-                'All Plans',
-                'Basic',
-                'Standard',
-                'Premium',
-                'Enterprise',
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (val) {
-                setState(() {
-                  _selectedPlanFilter = val ?? 'All Plans';
-                  _activePage = 0;
-                  _invitePage = 0;
-                });
-              },
+          if (_tabController.index != 0) SizedBox(width: 12.w),
+          if (_tabController.index != 0)
+            Expanded(
+              child: CustomDropdown<String>(
+                label: 'Subscription Plan',
+                hintText: 'All Plans',
+                value: _selectedPlanFilter,
+                items:
+                    const [
+                          'All Plans',
+                          'Basic',
+                          'Standard',
+                          'Premium',
+                          'Enterprise',
+                        ]
+                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                        .toList(),
+                onChanged: (val) {
+                  setState(() {
+                    _selectedPlanFilter = val ?? 'All Plans';
+                    _activePage = 0;
+                    _invitePage = 0;
+                  });
+                },
+              ),
             ),
-          ),
           SizedBox(width: 12.w),
           Expanded(
             child: CustomDropdown<String>(
@@ -399,10 +414,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                   0: FlexColumnWidth(4), // Clinic Name / logo
                   1: FlexColumnWidth(3), // Contact / Location
                   2: FlexColumnWidth(2), // Subscription Plan
-                  3: FlexColumnWidth(2), // Total Appointments (or Providers)
+                  3: FlexColumnWidth(2.2), // Total Appointments (or Providers)
                   4: FlexColumnWidth(2), // Total Treatments
                   5: FlexColumnWidth(2), // Status
-                  6: FlexColumnWidth(2), // Actions
+                  6: FlexColumnWidth(1.8), // Actions
                 },
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 children: [
@@ -658,33 +673,18 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   }
 
   Widget _statusBadgeCell(String status) {
-    final bool isActive = status.toLowerCase() == 'active';
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 16.h),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-          decoration: BoxDecoration(
-            color: isActive
-                ? CustomColors.green.withValues(alpha: 0.1)
-                : CustomColors.red.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(
-              color: isActive
-                  ? CustomColors.green.withValues(alpha: 0.2)
-                  : CustomColors.red.withValues(alpha: 0.2),
-            ),
-          ),
-          child: Text(
-            status,
-            style: context.fonts.grey12w600.copyWith(
-              color: isActive ? CustomColors.green : CustomColors.red,
-              fontSize: 10.sp,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+        child: StatusToggleSwitch(
+          status: status,
+          width: 90.w, // Adjust as needed
+          height: 28.h,
+          onChanged: (newStatus) {
+            // Call your API or ViewModel here
+            debugPrint('Status changed: $newStatus');
+          },
         ),
       ),
     );
