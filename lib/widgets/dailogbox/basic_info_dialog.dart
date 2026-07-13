@@ -112,7 +112,7 @@ class BasicInfoDialog extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _sectionTitle(context, 'New Basic Information'),
+                  _sectionTitle(context, isEditMode ? 'Edit Basic Information' : 'New Basic Information'),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.of(context).pop(),
@@ -186,6 +186,60 @@ class BasicInfoDialog extends ConsumerWidget {
                 maxLines: 4,
               ),
               context.verticalSpace(24),
+              const Divider(),
+              context.verticalSpace(16),
+              _sectionTitle(context, 'Business Logic', fontSize: 16),
+              context.verticalSpace(16),
+              Row(
+                children: [
+                  SizedBox(
+                    width: context.w(24),
+                    height: context.w(24),
+                    child: Checkbox(
+                      value: state.enableByDefault,
+                      onChanged: viewModel.toggleEnableByDefault,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: context.appBorderRadius(all: 4),
+                      ),
+                    ),
+                  ),
+                  context.horizontalSpace(12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Enable by Default for New Clinics',
+                          style: context.fonts.black14w600,
+                        ),
+                        Text(
+                          'Newly onboarded clinics will have this treatment assigned automatically.',
+                          style: context.fonts.grey11w400,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              context.verticalSpace(16),
+              Row(
+                children: [
+                  SizedBox(
+                    width: context.w(24),
+                    height: context.w(24),
+                    child: Checkbox(
+                      value: state.useInAiSimulator,
+                      onChanged: viewModel.toggleAiSimulator,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: context.appBorderRadius(all: 4),
+                      ),
+                    ),
+                  ),
+                  context.horizontalSpace(12),
+                  Text('Use in AI Simulator', style: context.fonts.black14w600),
+                ],
+              ),
+              context.verticalSpace(24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -208,16 +262,14 @@ class BasicInfoDialog extends ConsumerWidget {
                           if (result == true) {
                             Navigator.of(context).pop();
                           }
+                        } else {
+                          final result = await ref
+                              .read(treatmentViewModelProvider.notifier)
+                              .createBasicInfo();
+                          if (result == true) {
+                            Navigator.of(context).pop();
+                          }
                         }
-
-                        //     else{
-                        // final result = await ref
-                        //     .read(treatmentViewModelProvider.notifier)
-                        //     .createBasicInfo();
-                        //      if (result == true) {
-                        //   Navigator.of(context).pop();
-                        // }
-                        //     }
                       },
                       label: 'Apply & Close',
                     ),

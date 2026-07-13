@@ -4,7 +4,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/basic_info_request.dart';
-import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
+// import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/category_detail_response.dart';
@@ -111,6 +111,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(
       clearTreatmentImageUrl: true,
       clearTreatmentIconUrl: true,
+      enableByDefault: false,
+      useInAiSimulator: false,
     );
   }
 
@@ -123,6 +125,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     state = state.copyWith(
       treatmentImageUrl: detail.image,
       treatmentIconUrl: detail.icon,
+      enableByDefault: detail.enableByDefault ?? false,
+      useInAiSimulator: detail.useInAiSimulator ?? false,
     );
   }
 
@@ -304,6 +308,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           description: fullDescriptionController.text,
           globalSku: globalSkuController.text,
           icon: iconUrl,
+          enableByDefault: state.enableByDefault,
+          useInAiSimulator: state.useInAiSimulator,
         ),
       );
       if (response.isSuccess) {
@@ -349,6 +355,8 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
           description: fullDescriptionController.text,
           globalSku: globalSkuController.text,
           icon: iconUrl,
+          enableByDefault: state.enableByDefault,
+          useInAiSimulator: state.useInAiSimulator,
         ),
         id,
       );
@@ -370,34 +378,34 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     );
   }
 
-  Future<bool?> callBusinessLogic({
-    bool isUpdate = false,
-    int? updatetreatmentId,
-  }) async {
-    return await runSafely(() async {
-      int? treatmentId;
-      if (updatetreatmentId == null) {
-        treatmentId = state.selectedTreatment!.id;
-        if (treatmentId == null) {
-          throw const UnknownException('Treatment not found!');
-        }
-      }
-      if (isUpdate && updatetreatmentId == null) {
-        throw const UnknownException('Treatment not found!');
-      }
-      final response = await _treatmentRepository.businessLogic(
-        draftTreatmentId: isUpdate ? updatetreatmentId! : treatmentId!,
-        request: BusinessLogicRequest(
-          enableByDefault: state.enableByDefault,
-          useInAiSimulator: state.useInAiSimulator,
-        ),
-      );
-      if (response.isSuccess && isUpdate) {
-        await fetchTreatmentDetail(updatetreatmentId!);
-      }
-      return true;
-    });
-  }
+  // Future<bool?> callBusinessLogic({
+  //   bool isUpdate = false,
+  //   int? updatetreatmentId,
+  // }) async {
+  //   return await runSafely(() async {
+  //     int? treatmentId;
+  //     if (updatetreatmentId == null) {
+  //       treatmentId = state.selectedTreatment!.id;
+  //       if (treatmentId == null) {
+  //         throw const UnknownException('Treatment not found!');
+  //       }
+  //     }
+  //     if (isUpdate && updatetreatmentId == null) {
+  //       throw const UnknownException('Treatment not found!');
+  //     }
+  //     final response = await _treatmentRepository.businessLogic(
+  //       draftTreatmentId: isUpdate ? updatetreatmentId! : treatmentId!,
+  //       request: BusinessLogicRequest(
+  //         enableByDefault: state.enableByDefault,
+  //         useInAiSimulator: state.useInAiSimulator,
+  //       ),
+  //     );
+  //     if (response.isSuccess && isUpdate) {
+  //       await fetchTreatmentDetail(updatetreatmentId!);
+  //     }
+  //     return true;
+  //   });
+  // }
 
   // ignore: avoid_positional_boolean_parameters
   Future<void> pickImage(bool isIcon) async {

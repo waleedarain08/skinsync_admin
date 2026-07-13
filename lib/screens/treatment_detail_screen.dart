@@ -6,7 +6,6 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/basic_info_dialog.dart';
-import 'package:skinsync_admin/widgets/dailogbox/logic_setp_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 import 'package:skinsync_admin/widgets/treatment_session_expansion_tile.dart';
@@ -465,39 +464,13 @@ class TreatmentDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.settings_suggest_outlined,
-                color: CustomColors.purple,
-                size: 20,
-              ),
-              context.horizontalSpace(10),
-              Text('Business Logic & Rules', style: context.fonts.black16w700),
-              const Spacer(),
-              Consumer(
-                builder: (context, ref, _) {
-                  return GestureDetector(
-                    onTap: () {
-                      ref
-                          .read(treatmentViewModelProvider.notifier)
-                          .setBusinessLogic(detail);
-                      LogicStepDialog.show(
-                        context,
-                        ref,
-                        treatmentId: detail.id,
-                      );
-                    },
-                    child: const Icon(
-                      Icons.edit,
-                      color: CustomColors.purple,
-                      size: 20,
-                    ),
-                  );
-                },
-              ),
-            ],
+          const Icon(
+            Icons.settings_suggest_outlined,
+            color: CustomColors.purple,
+            size: 20,
           ),
+          context.horizontalSpace(10),
+          Text('Business Logic & Rules', style: context.fonts.black16w700),
           context.verticalSpace(16),
           _logicRow(
             context,

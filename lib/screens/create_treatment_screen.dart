@@ -114,7 +114,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       {'title': 'Basic Info', 'icon': Icons.description_outlined},
       {'title': 'Body Areas', 'icon': Icons.accessibility_new_outlined},
       {'title': 'Sessions Setup', 'icon': Icons.event_repeat_rounded},
-      {'title': 'Business Logic', 'icon': Icons.settings_suggest_outlined},
     ];
 
     final bool isCompact = context.screenWidth < 1100;
@@ -219,21 +218,18 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
       'Basic Information',
       'Body Areas',
       'Sessions Setup',
-      'Business Logic',
     ];
     final descriptions = [
       'Organize treatments to help patients and staff find them easily.',
-      'Core identification details including status.',
+      'Core identification details including status and business logic.',
       'Define mandatory sub-areas.',
       'Manage total sessions and procedural frequency.',
-      'Manage system-wide treatment behaviors and onboarding settings.',
     ];
     final icons = [
       Icons.category_outlined,
       Icons.description_outlined,
       Icons.accessibility_new_outlined,
       Icons.event_repeat_rounded,
-      Icons.settings_suggest_outlined,
     ];
 
     if (stepIndex < 0 || stepIndex >= titles.length) {
@@ -293,8 +289,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         return const AreasStep();
       case 3:
         return const SessionsStep();
-      case 4:
-        return const LogicStep();
       default:
         return const SizedBox.shrink();
     }
@@ -428,25 +422,21 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   return;
                 }
 
-                // If all sessions are configured, let's proceed to Business Logic (Step 4)
-                viewModel.setStep(4);
-                return;
-              }
-
-              if (state.treatmentStep == 4) {
-                final success = await viewModel.callBusinessLogic();
-                if (success == true) {
-                  await viewModel.submitTreatment(
-                    context,
-                    categories: categoryState.categories,
-                  );
-                  if (context.mounted) {
-                    context.go('/treatment-management');
-                  }
-                }
+                // Step 3 is the last step: call business logic and submit!
+                // final success = await viewModel.callBusinessLogic();
+                // if (success == true) {
+                //   await viewModel.submitTreatment(
+                //     context,
+                //     categories: categoryState.categories,
+                //   );
+                //   if (context.mounted) {
+                //     context.go('/treatment-management');
+                //   }
+                // }
+                // return;
               }
             },
-            label: state.treatmentStep == 4
+            label: state.treatmentStep == 3
                 ? 'Finish & Create Treatment'
                 : 'Next Step',
           ),

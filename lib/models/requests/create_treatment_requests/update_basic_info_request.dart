@@ -10,6 +10,8 @@ class UpdateBasicInfoRequest extends BasicInfoRequest {
     required super.icon,
     required super.shortDescription,
     required super.description,
+    required super.enableByDefault,
+    required super.useInAiSimulator,
   });
 
   @override
@@ -17,16 +19,5 @@ class UpdateBasicInfoRequest extends BasicInfoRequest {
     final json = super.toJson();
     json['keys'] = [CreateTreatmentSteps.basicInfo.name];
     return json;
-    //   return {
-    //   'step_number': 2,
-
-    //   'selected_category_ids': List<dynamic>.from(selectedCategoryIds.map((x) => x)),
-    //   'global_sku': globalSku,
-    //   'patient_display_name': patientDisplayName,
-    //   'image': image,
-    //   'icon': icon,
-    //   'short_description': shortDescription,
-    //   'description': description,
-    // };
   }
 }

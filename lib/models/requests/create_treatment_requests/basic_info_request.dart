@@ -1,4 +1,3 @@
-
 class BasicInfoRequest {
   final List<int> selectedCategoryIds;
   final String globalSku;
@@ -7,6 +6,8 @@ class BasicInfoRequest {
   final String icon;
   final String shortDescription;
   final String description;
+  final bool enableByDefault;
+  final bool useInAiSimulator;
 
   BasicInfoRequest({
     required this.selectedCategoryIds,
@@ -16,8 +17,9 @@ class BasicInfoRequest {
     required this.icon,
     required this.shortDescription,
     required this.description,
+    required this.enableByDefault,
+    required this.useInAiSimulator,
   });
-
 
   Map<String, dynamic> toJson() => {
     'step_number': 2,
@@ -28,5 +30,7 @@ class BasicInfoRequest {
     'icon': icon,
     'short_description': shortDescription,
     'description': description,
+    'enable_by_default': enableByDefault,
+    'use_in_ai_simulator': useInAiSimulator,
   };
 }
