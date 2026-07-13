@@ -12,7 +12,6 @@ import '../../widgets/borderd_container_widget.dart';
 import '../../widgets/custom_dropdown_widget.dart';
 import '../../widgets/custom_outlined_button.dart';
 import '../../widgets/custom_primary_button.dart';
-import '../../widgets/dailogbox/clinic_dailogbox.dart';
 import '../../widgets/gradient_scaffold.dart';
 import '../../widgets/number_paginator.dart';
 import '../add_new_clinic_screen.dart';
@@ -748,20 +747,20 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               context.push(ClinicDetailScreen.routeName);
             },
           ),
-          IconButton(
-            tooltip: 'Edit Partner',
-            icon: Icon(
-              Icons.edit_road_rounded,
-              size: 20.sp,
-              color: CustomColors.purple,
-            ),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => EditClinicDialogBox(clinic: clinic),
-              );
-            },
-          ),
+          // IconButton(
+          //   tooltip: 'Edit Partner',
+          //   icon: Icon(
+          //     Icons.edit_road_rounded,
+          //     size: 20.sp,
+          //     color: CustomColors.purple,
+          //   ),
+          //   onPressed: () {
+          //     showDialog(
+          //       context: context,
+          //       builder: (context) => EditClinicDialogBox(clinic: clinic),
+          //     );
+          //   },
+          // ),
         ],
       ),
     );

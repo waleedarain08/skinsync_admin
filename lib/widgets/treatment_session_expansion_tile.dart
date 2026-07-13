@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/session_model.dart';
 import 'package:skinsync_admin/screens/create_session_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
@@ -90,11 +91,15 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
     SessionViewModelEntry entry,
     String newStatus,
   ) {
-    // if (entry.sessionId != null) {
-    //   ref
-    //       .read(sessionViewModelProvider.notifier)
-    //       .changeSessionStatus(entry.sessionId!, newStatus);
-    // }
+    if (entry.sessionId != null) {
+      ref
+          .read(sessionViewModelProvider.notifier)
+          .changeSessionStatus(request: SessionStatusRequest(
+            sessionId:   entry.sessionId!,
+            status:  newStatus
+          )
+           );
+    }
   }
 
   Widget _buildTileWithEntry(

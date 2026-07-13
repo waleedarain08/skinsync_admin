@@ -60,6 +60,7 @@ enum Endpoint {
   deleteSession('admin/sessions/{id}'),
   updateCategory('admin/categories/{id}'),
   updateAreas('admin/areas/{id}'),
+  sessionStatus('admin/sessions/status'),
   treatmentsStatus('admin/treatments/status');
 
   final String path;

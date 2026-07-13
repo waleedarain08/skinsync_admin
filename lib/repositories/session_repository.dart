@@ -11,6 +11,7 @@ import 'package:skinsync_admin/models/requests/create_session_requests/product_u
 import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/session_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
@@ -102,5 +103,7 @@ abstract class SessionRepository {
   Future<BaseApiResponseModel> deleteSession({
     required int id,
   });
-
+Future<BaseApiResponseModel> changeSessionStatus({
+    required SessionStatusRequest request,
+  });
 }

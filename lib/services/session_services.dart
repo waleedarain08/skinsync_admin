@@ -11,6 +11,7 @@ import 'package:skinsync_admin/models/requests/create_session_requests/product_u
 import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/session_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
@@ -373,4 +374,20 @@ class SessionServices implements SessionRepository {
     }
     return response;
   }
+Future<BaseApiResponseModel> changeSessionStatus({
+    required SessionStatusRequest request,
+  }) async{
+    final jsonResponse = await _api.patch(
+      Endpoint.sessionStatus,
+      
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+
 }
