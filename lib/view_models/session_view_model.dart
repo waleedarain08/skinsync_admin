@@ -45,9 +45,14 @@ class SessionState extends BaseStateModel {
 
   // Products/materials
   final List<ProductUsageEntry> productUsageEntries;
+  final List<ProductUsageEntry> otherMaterialsUsageEntries;
   final List<TreatmentProductData> products;
   final bool isLoadingProducts;
   final String? error;
+
+  // New redesigned MaterialsStep properties
+  final int? selectedUnitTypeId;
+  final String? selectedUnitTypeName;
 
   // Protocols
   final List<String> selectedProtocolIds;
@@ -106,8 +111,11 @@ class SessionState extends BaseStateModel {
     this.sessionStep = 1,
     this.sessionId,
     this.productUsageEntries = const [],
+    this.otherMaterialsUsageEntries = const [],
     this.products = const [],
     this.isLoadingProducts = false,
+    this.selectedUnitTypeId,
+    this.selectedUnitTypeName,
     this.error,
     this.selectedProtocolIds = const [],
     this.selectedProtocolNotes = const [],
@@ -150,8 +158,11 @@ class SessionState extends BaseStateModel {
     int? activeSessionIndex,
     int? sessionStep,
     List<ProductUsageEntry>? productUsageEntries,
+    List<ProductUsageEntry>? otherMaterialsUsageEntries,
     List<TreatmentProductData>? products,
     bool? isLoadingProducts,
+    int? selectedUnitTypeId,
+    String? selectedUnitTypeName,
     String? error,
     List<String>? selectedProtocolIds,
     List<TreatmentProtocolNote>? selectedProtocolNotes,
@@ -194,8 +205,11 @@ class SessionState extends BaseStateModel {
       activeSessionIndex: activeSessionIndex ?? this.activeSessionIndex,
       sessionStep: sessionStep ?? this.sessionStep,
       productUsageEntries: productUsageEntries ?? this.productUsageEntries,
+      otherMaterialsUsageEntries: otherMaterialsUsageEntries ?? this.otherMaterialsUsageEntries,
       products: products ?? this.products,
       isLoadingProducts: isLoadingProducts ?? this.isLoadingProducts,
+      selectedUnitTypeId: selectedUnitTypeId ?? this.selectedUnitTypeId,
+      selectedUnitTypeName: selectedUnitTypeName ?? this.selectedUnitTypeName,
       error: error ?? this.error,
       selectedProtocolIds: selectedProtocolIds ?? this.selectedProtocolIds,
       selectedProtocolNotes:
@@ -258,10 +272,14 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     fixedDurationController.addListener(_triggerRebuild);
     preTreatmentInstructionsController.addListener(_triggerRebuild);
     postTreatmentInstructionsController.addListener(_triggerRebuild);
+    minUnitsController.addListener(_triggerRebuild);
+    maxUnitsController.addListener(_triggerRebuild);
   }
 
   void reset() {
     log('Session state reset');
+    minUnitsController.text = '0';
+    maxUnitsController.text = '0';
     state = SessionState(
       sessions: state.sessions,
     );
@@ -269,6 +287,50 @@ class SessionViewModel extends BaseViewModel<SessionState> {
 
   void _triggerRebuild() {
     state = state.copyWith();
+  }
+
+  void selectUnitType(int? id, String? name) {
+    state = state.copyWith(selectedUnitTypeId: id, selectedUnitTypeName: name);
+  }
+
+  void addOtherMaterial(int productId, String name) {
+    final alreadyExists = state.otherMaterialsUsageEntries.any((e) => e.productId == productId);
+    if (alreadyExists) return;
+
+    final newEntry = ProductUsageEntry(
+      productId: productId,
+      productName: name,
+      unit: 'Unit',
+      notesController: TextEditingController(),
+      minQuantityController: TextEditingController(text: '0'),
+      maxQuantityController: TextEditingController(text: '0'),
+      perUnitDurationController: TextEditingController(text: '0'),
+      onChanged: _triggerRebuild,
+    );
+    state = state.copyWith(otherMaterialsUsageEntries: [...state.otherMaterialsUsageEntries, newEntry]);
+  }
+
+  void removeOtherMaterial(int productId) {
+    final entry = state.otherMaterialsUsageEntries.firstWhere((e) => e.productId == productId);
+    entry.dispose();
+    state = state.copyWith(
+      otherMaterialsUsageEntries: state.otherMaterialsUsageEntries.where((e) => e.productId != productId).toList(),
+    );
+  }
+
+  void updateOtherMaterialEntry(
+    int index, {
+    String? deductionTiming,
+    bool? allowSubstitution,
+    String? notes,
+  }) {
+    final updatedEntries = [...state.otherMaterialsUsageEntries];
+    updatedEntries[index] = updatedEntries[index].copyWith(
+      deductionTiming: deductionTiming,
+      allowSubstitution: allowSubstitution,
+      onChanged: _triggerRebuild,
+    );
+    state = state.copyWith(otherMaterialsUsageEntries: updatedEntries);
   }
 
   void syncUnitPriceControllersForState() {
@@ -281,6 +343,9 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   final basePriceController = TextEditingController(text: '0');
   final fixedPriceController = TextEditingController(text: '0');
   final Map<String, TextEditingController> unitPriceControllers = {};
+
+  final minUnitsController = TextEditingController(text: '0');
+  final maxUnitsController = TextEditingController(text: '0');
 
   final durationHoursController = TextEditingController();
   final durationMinutesController = TextEditingController();
@@ -438,8 +503,28 @@ class SessionViewModel extends BaseViewModel<SessionState> {
             );
           }).toList();
 
+          final mappedOtherUsages = detail.otherMaterials.map((id) {
+            final product = state.products.firstWhereOrNull((p) => p.id == id);
+            return ProductUsageEntry(
+              productId: id,
+              productName: product?.name ?? 'Product #$id',
+              unit: 'Unit',
+              notesController: TextEditingController(),
+              minQuantityController: TextEditingController(text: '0'),
+              maxQuantityController: TextEditingController(text: '0'),
+              perUnitDurationController: TextEditingController(text: '0'),
+              allowSubstitution: false,
+              deductionTiming: 'On_Completion',
+            );
+          }).toList();
+
+          minUnitsController.text = (detail.minimumUnits ?? 0.0).toStringAsFixed(0);
+          maxUnitsController.text = (detail.maximumUnits ?? 0.0).toStringAsFixed(0);
+
           state = state.copyWith(
             productUsageEntries: mappedUsages,
+            otherMaterialsUsageEntries: mappedOtherUsages,
+            selectedUnitTypeId: detail.selectedUnitTypeId,
           );
 
           // 2. Schedule Step
@@ -799,22 +884,23 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   }
 
   Future<bool?> callProductUsage({required int stepNumber}) async {
-    // final treatmentState = ref.read(treatmentViewModelProvider);
+    final minUnits = double.tryParse(minUnitsController.text) ?? 0.0;
+    final maxUnits = double.tryParse(maxUnitsController.text) ?? 0.0;
+
     final request = ProductUsagesRequest(
       stepNumber: stepNumber,
-      productUsages: state.productUsageEntries.map((e) {
-        final minQty = double.tryParse(e.minQuantityController.text);
-        final maxQty = double.tryParse(e.maxQuantityController.text);
-
+      selectedUnitTypeId: state.selectedUnitTypeId,
+      minimumUnits: minUnits,
+      maximumUnits: maxUnits,
+      billableMaterials: state.productUsageEntries.map((e) {
         return ProductUsage(
           productId: e.productId,
           deductionTiming: e.deductionTiming,
           allowSubstitution: e.allowSubstitution,
           notes: e.notesController.text,
-          minQuantity: minQty,
-          maxQuantity: maxQty,
         );
       }).toList(),
+      otherMaterials: state.otherMaterialsUsageEntries.map((e) => e.productId).toList(),
     );
 
     return await runSafely<bool>(() async {

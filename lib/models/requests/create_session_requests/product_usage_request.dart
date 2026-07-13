@@ -1,17 +1,34 @@
 import 'package:skinsync_admin/utils/enums.dart';
 
 class ProductUsagesRequest {
-  final int stepNumber ;
-  final List<ProductUsage>? productUsages;
+  final int stepNumber;
+  final int? selectedUnitTypeId;
+  final double? minimumUnits;
+  final double? maximumUnits;
+  final List<ProductUsage>? billableMaterials;
+  final List<int>? otherMaterials;
 
-  ProductUsagesRequest({required this.stepNumber, this.productUsages});
+  ProductUsagesRequest({
+    required this.stepNumber,
+    this.selectedUnitTypeId,
+    this.minimumUnits,
+    this.maximumUnits,
+    this.billableMaterials,
+    this.otherMaterials,
+  });
 
   Map<String, dynamic> toJson() => {
     'step_number': stepNumber,
     'keys': [CreateTreatmentSteps.inventoryProducts.name],
-    'product_usages': productUsages == null
+    'selected_unit_type_id': selectedUnitTypeId,
+    'minimum_units': minimumUnits,
+    'maximum_units': maximumUnits,
+    'billable_materials': billableMaterials == null
         ? []
-        : List<dynamic>.from(productUsages!.map((x) => x.toJson())),
+        : List<dynamic>.from(billableMaterials!.map((x) => x.toJson())),
+    'other_materials': otherMaterials == null
+        ? []
+        : List<dynamic>.from(otherMaterials!.map((x) => x)),
   };
 }
 
@@ -20,16 +37,12 @@ class ProductUsage {
   final String? deductionTiming;
   final bool? allowSubstitution;
   final String? notes;
-  final double? minQuantity;
-  final double? maxQuantity;
 
   ProductUsage({
     this.productId,
     this.deductionTiming,
     this.allowSubstitution,
     this.notes,
-    this.minQuantity,
-    this.maxQuantity,
   });
 
   Map<String, dynamic> toJson() => {
@@ -37,7 +50,5 @@ class ProductUsage {
     'deduction_timing': deductionTiming,
     'allow_substitution': allowSubstitution,
     'notes': notes,
-    'min_quantity': minQuantity,
-    'max_quantity': maxQuantity,
   };
 }

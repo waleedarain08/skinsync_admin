@@ -59,6 +59,12 @@ class SessionDetailDto {
   final List<SessionFollowUpDto> followUps;
   final SessionAttachmentDto? preTreatmentConsentForm;
 
+  // New MaterialsStep Redesign properties
+  final int? selectedUnitTypeId;
+  final double? minimumUnits;
+  final double? maximumUnits;
+  final List<int> otherMaterials;
+
   SessionDetailDto({
     required this.id,
     required this.treatmentId,
@@ -101,6 +107,10 @@ class SessionDetailDto {
     required this.allowedRoles,
     required this.followUps,
     this.preTreatmentConsentForm,
+    this.selectedUnitTypeId,
+    this.minimumUnits,
+    this.maximumUnits,
+    required this.otherMaterials,
   });
 
   factory SessionDetailDto.fromJson(Map<String, dynamic> json) {
@@ -177,6 +187,13 @@ class SessionDetailDto {
       preTreatmentConsentForm: json['pre_treatment_consent_form'] != null
           ? SessionAttachmentDto.fromJson(json['pre_treatment_consent_form'])
           : null,
+      selectedUnitTypeId: json['selected_unit_type_id'] as int?,
+      minimumUnits: (json['minimum_units'] as num?)?.toDouble() ?? 0.0,
+      maximumUnits: (json['maximum_units'] as num?)?.toDouble() ?? 0.0,
+      otherMaterials: (json['other_materials'] as List?)
+              ?.map((e) => e as int)
+              .toList() ??
+          [],
     );
   }
 }
@@ -298,41 +315,9 @@ class SessionNotificationDto {
     return SessionNotificationDto(
       title: json['title'] as String? ?? '',
       message: json['message'] as String? ?? '',
-      timing: json['timing'] as int? ?? 1,
-      timingUnit: json['timing_unit'] as String? ?? 'day',
-      type: json['type'] as String? ?? 'push',
-    );
-  }
-}
-
-class SessionFollowUpDto {
-  final String type;
-  final int durationValue;
-  final String durationUnit;
-  final int intervalValue;
-  final String intervalUnit;
-  final bool isImageRequired;
-  final String notes;
-
-  SessionFollowUpDto({
-    required this.type,
-    required this.durationValue,
-    required this.durationUnit,
-    required this.intervalValue,
-    required this.intervalUnit,
-    required this.isImageRequired,
-    required this.notes,
-  });
-
-  factory SessionFollowUpDto.fromJson(Map<String, dynamic> json) {
-    return SessionFollowUpDto(
-      type: json['type'] as String? ?? 'virtual',
-      durationValue: json['duration_value'] as int? ?? 0,
-      durationUnit: json['duration_unit'] as String? ?? 'minutes',
-      intervalValue: json['interval_value'] as int? ?? 0,
-      intervalUnit: json['interval_unit'] as String? ?? 'weeks',
-      isImageRequired: json['is_image_required'] as bool? ?? false,
-      notes: json['notes'] as String? ?? '',
+      timing: json['timing'] as int? ?? 0,
+      timingUnit: json['timing_unit'] as String? ?? 'days',
+      type: json['type'] as String? ?? 'sms',
     );
   }
 }
@@ -350,6 +335,38 @@ class PhotoMilestoneDto {
     return PhotoMilestoneDto(
       numberOfDays: json['number_of_days'] as int? ?? 0,
       requiredPhotos: json['required_photos'] as int? ?? 0,
+    );
+  }
+}
+
+class SessionFollowUpDto {
+  final String type;
+  final String durationUnit;
+  final int durationValue;
+  final String notes;
+  final int intervalValue;
+  final String intervalUnit;
+  final bool isImageRequired;
+
+  SessionFollowUpDto({
+    required this.type,
+    required this.durationUnit,
+    required this.durationValue,
+    required this.notes,
+    required this.intervalValue,
+    required this.intervalUnit,
+    required this.isImageRequired,
+  });
+
+  factory SessionFollowUpDto.fromJson(Map<String, dynamic> json) {
+    return SessionFollowUpDto(
+      type: json['type'] as String? ?? '',
+      durationUnit: json['duration_unit'] as String? ?? '',
+      durationValue: json['duration_value'] as int? ?? 0,
+      notes: json['notes'] as String? ?? '',
+      intervalValue: json['interval_value'] as int? ?? 0,
+      intervalUnit: json['interval_unit'] as String? ?? '',
+      isImageRequired: json['is_image_required'] as bool? ?? false,
     );
   }
 }

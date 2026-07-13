@@ -2174,32 +2174,54 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
 
   bool _validateProductQuantities(BuildContext context, TreatmentState state) {
     final sessionState = ref.read(sessionViewModelProvider);
-    for (final entry in sessionState.productUsageEntries) {
-      final minVal = double.tryParse(entry.minQuantityController.text) ?? 0.0;
-      final maxVal = double.tryParse(entry.maxQuantityController.text) ?? 0.0;
-      if (minVal < 0 || maxVal < 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Quantity for ${entry.productName} must be greater than or equal to 0.',
-            ),
-            backgroundColor: CustomColors.red,
-          ),
-        );
-        return false;
-      }
-      if (maxVal < minVal) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Maximum Quantity must be greater than or equal to Minimum Quantity for ${entry.productName}.',
-            ),
-            backgroundColor: CustomColors.red,
-          ),
-        );
-        return false;
-      }
+    final viewModel = ref.read(sessionViewModelProvider.notifier);
+
+    // 1. Unit Type is required
+    if (sessionState.selectedUnitTypeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unit Type is required.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
     }
+
+    // 2. Minimum cannot be negative
+    final minVal = double.tryParse(viewModel.minUnitsController.text) ?? 0.0;
+    final maxVal = double.tryParse(viewModel.maxUnitsController.text) ?? 0.0;
+    if (minVal < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Minimum Units cannot be negative.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
+    // 3. Maximum cannot be less than Minimum
+    if (maxVal < minVal) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Maximum Units cannot be less than Minimum Units.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
+    // 4. Billable Materials are required only if Minimum Units > 0
+    if (minVal > 0 && sessionState.productUsageEntries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('At least one Billable Material is required when Minimum Units > 0.'),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
     return true;
   }
 

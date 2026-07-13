@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
+import 'package:skinsync_admin/models/responses/unit_types_list_response.dart';
 import 'package:skinsync_admin/screens/product_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
@@ -12,8 +13,28 @@ import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 
-class MaterialsStep extends ConsumerWidget {
+class MaterialsStep extends ConsumerStatefulWidget {
   const MaterialsStep({super.key});
+
+  @override
+  ConsumerState<MaterialsStep> createState() => _MaterialsStepState();
+}
+
+class _MaterialsStepState extends ConsumerState<MaterialsStep> {
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(productViewModelProvider.notifier).fetchUnitTypes();
+      await ref.read(sessionViewModelProvider.notifier).fetchProductsByTreatmentCategory();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   Widget _sectionTitle(BuildContext context, String title, {double? fontSize}) {
     return Text(
@@ -23,8 +44,6 @@ class MaterialsStep extends ConsumerWidget {
       ),
     );
   }
-
-
 
   String _formatUnitPlural(String unit) {
     if (unit.isEmpty) return 'Units';
@@ -46,12 +65,18 @@ class MaterialsStep extends ConsumerWidget {
     BuildContext context,
     List<TreatmentProductData> products,
     SessionViewModel viewModel,
-    TreatmentState state,
-  ) {
+    TreatmentState state, {
+    bool isOtherMaterial = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Select Product from Inventory', style: context.fonts.black14w600),
+        Text(
+          isOtherMaterial
+              ? 'Select other material from inventory'
+              : 'Select Product from Inventory',
+          style: context.fonts.black14w600,
+        ),
         context.verticalSpace(10),
         SearchAnchor(
           viewHintText: 'Search inventory...',
@@ -59,7 +84,9 @@ class MaterialsStep extends ConsumerWidget {
             controller: controller,
             readOnly: true,
             onTap: () => controller.openView(),
-            hintText: 'Select product from inventory',
+            hintText: isOtherMaterial
+                ? 'Select other material from inventory'
+                : 'Select product from inventory',
             suffixIcon: const Icon(
               Icons.search_rounded,
               color: CustomColors.lightGrey,
@@ -92,7 +119,11 @@ class MaterialsStep extends ConsumerWidget {
                       ],
                     ),
                     onTap: () {
-                      viewModel.addProductUsage(p.id, p.name, 'Unit');
+                      if (isOtherMaterial) {
+                        viewModel.addOtherMaterial(p.id, p.name);
+                      } else {
+                        viewModel.addProductUsage(p.id, p.name, 'Unit');
+                      }
                       controller.closeView(p.name);
                     },
                   ),
@@ -106,12 +137,12 @@ class MaterialsStep extends ConsumerWidget {
 
   Widget _buildProductUsageCard(
     BuildContext context,
-    WidgetRef ref,
     int index,
     ProductUsageEntry entry,
     SessionViewModel viewModel,
-    TreatmentState state,
-  ) {
+    TreatmentState state, {
+    bool isOtherMaterial = false,
+  }) {
     final sessionState = ref.read(sessionViewModelProvider);
     final TreatmentProductData? productData =
         sessionState.products.any((p) => p.id == entry.productId)
@@ -301,7 +332,9 @@ class MaterialsStep extends ConsumerWidget {
                 ),
               ),
               IconButton(
-                onPressed: () => viewModel.removeProductUsage(entry.productId),
+                onPressed: () => isOtherMaterial
+                    ? viewModel.removeOtherMaterial(entry.productId)
+                    : viewModel.removeProductUsage(entry.productId),
                 icon: const Icon(
                   Icons.delete_outline,
                   color: CustomColors.red,
@@ -310,170 +343,247 @@ class MaterialsStep extends ConsumerWidget {
               ),
             ],
           ),
-          context.verticalSpace(20),
-          CustomDropdown<String>(
-            label: 'Deduction Timing',
-            hintText: 'Select',
-            value: entry.deductionTiming,
-            items: const [
-              DropdownMenuItem(
-                value: 'On_Completion',
-                child: Text('On Completion'),
-              ),
-              DropdownMenuItem(value: 'Manual', child: Text('Manual')),
-              DropdownMenuItem(
-                value: 'Post_Confirmation',
-                child: Text('Post Confirmation'),
-              ),
-            ],
-            onChanged: (val) =>
-                viewModel.updateProductUsageEntry(index, deductionTiming: val),
-          ),
-          context.verticalSpace(20),
-          Row(
-            children: [
-              SizedBox(
-                width: context.w(24),
-                height: context.w(24),
-                child: Checkbox(
-                  value: entry.allowSubstitution,
-                  onChanged: (val) => viewModel.updateProductUsageEntry(
-                    index,
-                    allowSubstitution: val,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: context.appBorderRadius(all: 4),
+          if (!isOtherMaterial) ...[
+            context.verticalSpace(20),
+            CustomDropdown<String>(
+              label: 'Deduction Timing',
+              hintText: 'Select',
+              value: entry.deductionTiming,
+              items: const [
+                DropdownMenuItem(
+                  value: 'On_Completion',
+                  child: Text('On Completion'),
+                ),
+                DropdownMenuItem(value: 'Manual', child: Text('Manual')),
+                DropdownMenuItem(
+                  value: 'Post_Confirmation',
+                  child: Text('Post Confirmation'),
+                ),
+              ],
+              onChanged: (val) => viewModel.updateProductUsageEntry(index, deductionTiming: val),
+            ),
+            context.verticalSpace(20),
+            Row(
+              children: [
+                SizedBox(
+                  width: context.w(24),
+                  height: context.w(24),
+                  child: Checkbox(
+                    value: entry.allowSubstitution,
+                    onChanged: (val) => viewModel.updateProductUsageEntry(
+                      index,
+                      allowSubstitution: val,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: context.appBorderRadius(all: 4),
+                    ),
                   ),
                 ),
-              ),
-              context.horizontalSpace(12),
-              Text(
-                'Allow Product Substitution',
-                style: context.fonts.black14w600,
-              ),
-            ],
-          ),
-          context.verticalSpace(20),
-          BuildTextField(
-            label: 'Usage Notes (Optional)',
-            controller: entry.notesController,
-            hintText: 'Clinical instructions or restrictions...',
-            maxLines: 2,
-          ),
-          context.verticalSpace(24),
-          const Divider(),
-          context.verticalSpace(16),
-          Text('Product Consumption Range', style: context.fonts.black14w600),
-          context.verticalSpace(16),
-          Row(
-            children: [
-              Expanded(
-                child: BuildTextField(
-                  label: 'Min ${_formatUnitPlural(entry.unit)}',
-                  controller: entry.minQuantityController,
-                  hintText: '1',
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  onChanged: (val) {
-                    viewModel.updateProductPerUnitDuration(index, '');
-                  },
+                context.horizontalSpace(12),
+                Text(
+                  'Allow Product Substitution',
+                  style: context.fonts.black14w600,
                 ),
-              ),
-              context.horizontalSpace(16),
-              Expanded(
-                child: BuildTextField(
-                  label: 'Max ${_formatUnitPlural(entry.unit)}',
-                  controller: entry.maxQuantityController,
-                  hintText: '1',
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  onChanged: (val) {
-                    viewModel.updateProductPerUnitDuration(index, '');
-                  },
-                ),
-              ),
-            ],
-          ),
-
+              ],
+            ),
+            context.verticalSpace(20),
+            BuildTextField(
+              label: 'Usage Notes (Optional)',
+              controller: entry.notesController,
+              hintText: 'Clinical instructions or restrictions...',
+              maxLines: 2,
+            ),
+          ],
         ],
       ),
     );
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final state = ref.watch(sessionViewModelProvider);
     final treatmentState = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
 
+    // ProductViewModel holds unit types list
+    final productState = ref.watch(productViewModelProvider);
+    final unitTypes = productState.unitTypes ?? [];
+
+    // Dynamically retrieve selected Unit Type Name
+    final selectedUnitType = unitTypes.firstWhere(
+      (u) => u.id == state.selectedUnitTypeId,
+      orElse: () => const UnitTypeModel(id: 0, name: ''),
+    );
+    final unitTypeName = selectedUnitType.name.isNotEmpty
+        ? selectedUnitType.name
+        : (state.selectedUnitTypeName ?? 'Units');
+    final pluralUnitLabel = _formatUnitPlural(unitTypeName);
+
+    final minUnits = double.tryParse(viewModel.minUnitsController.text) ?? 0.0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle(context, 'Inventory Products'),
+        _sectionTitle(context, 'Unit Configuration'),
         context.verticalSpace(8),
         Text(
-          'Select specific products from inventory and define clinical usage rules.',
+          'Select the unit type and consumption boundaries for this clinical session setup.',
           style: context.fonts.grey14w400,
         ),
-        context.verticalSpace(32),
-        if (state.isLoadingProducts) ...[
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 24.0),
-              child: CircularProgressIndicator(color: CustomColors.purple),
-            ),
-          ),
-        ] else if (state.error != null) ...[
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24.0),
-              child: Column(
-                children: [
-                  Text(
-                    'Error loading products: ${state.error}',
-                    style: context.fonts.grey14w400,
-                  ),
-                  context.verticalSpace(12),
-                  TextButton(
-                    onPressed: viewModel.fetchProductsByTreatmentCategory,
-                    child: const Text('Retry'),
-                  ),
-                ],
+        context.verticalSpace(24),
+        CustomDropdown<int>(
+          label: 'Unit Type',
+          hintText: 'Select Unit Type',
+          value: state.selectedUnitTypeId,
+          items: unitTypes.map((u) {
+            return DropdownMenuItem<int>(
+              value: u.id,
+              child: Text(u.name),
+            );
+          }).toList(),
+          onChanged: (id) {
+            final selected = unitTypes.firstWhere(
+              (u) => u.id == id,
+              orElse: () => const UnitTypeModel(id: 0, name: ''),
+            );
+            viewModel.selectUnitType(id, selected.name);
+          },
+        ),
+        context.verticalSpace(20),
+        Row(
+          children: [
+            Expanded(
+              child: BuildTextField(
+                label: 'Minimum $pluralUnitLabel',
+                controller: viewModel.minUnitsController,
+                hintText: '0',
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
               ),
             ),
-          ),
-        ] else if (state.products.isEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: Text(
-              'No inventory products available for selected category hierarchy.',
-              style: context.fonts.grey14w400,
+            context.horizontalSpace(16),
+            Expanded(
+              child: BuildTextField(
+                label: 'Maximum $pluralUnitLabel',
+                controller: viewModel.maxUnitsController,
+                hintText: '0',
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
             ),
+          ],
+        ),
+        context.verticalSpace(32),
+
+        // Conditional display based on Minimum Units > 0
+        if (minUnits > 0) ...[
+          const Divider(),
+          context.verticalSpace(24),
+          _sectionTitle(context, 'Billable Materials'),
+          context.verticalSpace(8),
+          Text(
+            'Select specific inventory products to be deducted and configure Clinical Usage rules.',
+            style: context.fonts.grey14w400,
           ),
-        ] else ...[
-          _buildProductSelector(context, state.products, viewModel, treatmentState),
+          context.verticalSpace(24),
+          if (state.isLoadingProducts) ...[
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.0),
+                child: CircularProgressIndicator(color: CustomColors.purple),
+              ),
+            ),
+          ] else if (state.error != null) ...[
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Error loading products: ${state.error}',
+                      style: context.fonts.grey14w400,
+                    ),
+                    context.verticalSpace(12),
+                    TextButton(
+                      onPressed: viewModel.fetchProductsByTreatmentCategory,
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ] else if (state.products.isEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Text(
+                'No inventory products available for selected category hierarchy.',
+                style: context.fonts.grey14w400,
+              ),
+            ),
+          ] else ...[
+            _buildProductSelector(context, state.products, viewModel, treatmentState),
+          ],
+          if (state.productUsageEntries.isNotEmpty) ...[
+            context.verticalSpace(32),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: state.productUsageEntries.length,
+              separatorBuilder: (_, _) => context.verticalSpace(24),
+              itemBuilder: (context, index) {
+                return _buildProductUsageCard(
+                  context,
+                  index,
+                  state.productUsageEntries[index],
+                  viewModel,
+                  treatmentState,
+                );
+              },
+            ),
+          ],
+          context.verticalSpace(32),
         ],
-        if (state.productUsageEntries.isNotEmpty) ...[
+
+        // Section 3: Other Materials
+        const Divider(),
+        context.verticalSpace(24),
+        _sectionTitle(context, 'Other Materials'),
+        context.verticalSpace(8),
+        Text(
+          'Select products from inventory required as other physical materials for this session.',
+          style: context.fonts.grey14w400,
+        ),
+        context.verticalSpace(20),
+
+        // Select from inventory
+        if (state.products.isNotEmpty) ...[
+          _buildProductSelector(
+            context,
+            state.products,
+            viewModel,
+            treatmentState,
+            isOtherMaterial: true,
+          ),
+        ],
+
+        if (state.otherMaterialsUsageEntries.isNotEmpty) ...[
           context.verticalSpace(32),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: state.productUsageEntries.length,
+            itemCount: state.otherMaterialsUsageEntries.length,
             separatorBuilder: (_, _) => context.verticalSpace(24),
             itemBuilder: (context, index) {
               return _buildProductUsageCard(
                 context,
-                ref,
                 index,
-                state.productUsageEntries[index],
+                state.otherMaterialsUsageEntries[index],
                 viewModel,
                 treatmentState,
+                isOtherMaterial: true,
               );
             },
           ),
         ],
+        context.verticalSpace(32),
       ],
     );
   }
