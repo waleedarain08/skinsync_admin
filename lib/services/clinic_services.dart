@@ -77,7 +77,7 @@ class ClinicService implements ClinicRepository {
   }
 
   @override
-  Future<List<ClinicModel>> getInviteClinics({
+  Future<ClinicListResponse> getInviteClinics({
     required int page,
     required int limit,
     String? search,
@@ -95,21 +95,24 @@ class ClinicService implements ClinicRepository {
       Endpoint.inviteClinics,
       queryParams: queryParams,
     );
+    final response = ClinicListResponse.fromJson(jsonResponse);
 
-    final isSuccess = jsonResponse['is_success'] as bool? ?? false;
+    final isSuccess = response.isSuccess;
     if (!isSuccess) {
-      throw BadRequestException(jsonResponse['message'] ?? 'Failed to get invite clinics');
+      throw BadRequestException(response.message);
     }
-
-    final data = jsonResponse['data'];
-    if (data is List) {
-      return data.map((e) => ClinicModel.fromJson(e)).toList();
-    }
-    return [];
+    return response;
+    // final data = jsonResponse['data'];
+    // if (data is List) {
+    //   return data.map((e) => ClinicModel.fromJson(e)).toList();
+    // }
+    // return [];
   }
 
   @override
-  Future<BaseApiResponseModel> sendInvitation({required int inviteClinicId}) async {
+  Future<BaseApiResponseModel> sendInvitation({
+    required int inviteClinicId,
+  }) async {
     final jsonResponse = await _api.post(
       Endpoint.sendInvitation,
       body: {'invite_clinic_id': inviteClinicId},

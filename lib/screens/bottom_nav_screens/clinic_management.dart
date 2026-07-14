@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +11,6 @@ import '../../utils/theme.dart';
 import '../../view_models/clinic_view_model.dart';
 import '../../widgets/app_search_field.dart';
 import '../../widgets/borderd_container_widget.dart';
-import '../../widgets/custom_dropdown_widget.dart';
 import '../../widgets/custom_outlined_button.dart';
 import '../../widgets/custom_primary_button.dart';
 import '../../widgets/gradient_scaffold.dart';
@@ -30,10 +31,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
+  Timer? _timer;
 
-  String _selectedRegionFilter = 'All Regions';
-  String _selectedPlanFilter = 'All Plans';
-  String _selectedStatusFilter = 'All Statuses';
+  // String _selectedRegionFilter = 'All Regions';
+  // String _selectedPlanFilter = 'All Plans';
+  // String _selectedStatusFilter = 'All Statuses';
 
   int _activePage = 0;
   int _invitePage = 0;
@@ -43,16 +45,26 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        setState(() {});
-        if (_tabController.index == 1) {
-          ref.read(clinicViewModelProvider.notifier).getInviteClinics();
-        }
-      }
-    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(clinicViewModelProvider.notifier).initialize();
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    ref.read(clinicViewModelProvider.notifier).clearClinicsPagination();
+    _timer?.cancel();
+    _timer = Timer(const Duration(milliseconds: 500), () {
+      if (_tabController.index == 0) {
+        ref.read(clinicViewModelProvider.notifier).getClinics(search: query);
+      } else if (_tabController.index == 1) {
+        ref
+            .read(clinicViewModelProvider.notifier)
+            .getInviteClinics(search: query);
+      }
+    });
+    setState(() {
+      _activePage = 0;
+      _invitePage = 0;
     });
   }
 
@@ -60,6 +72,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   void dispose() {
     _tabController.dispose();
     _searchController.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -68,54 +81,56 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     final state = ref.watch(clinicViewModelProvider);
     final clinics = state.clinics ?? [];
     final inviteClinics = state.inviteClinics ?? [];
-
-    // Filter active clinics
-    final filteredClinics = clinics.where((c) {
-      final query = _searchController.text.toLowerCase();
-      final matchesQuery =
-          query.isEmpty ||
-          (c.name?.toLowerCase().contains(query) ?? false) ||
-          (c.email?.toLowerCase().contains(query) ?? false) ||
-          (c.address?.toLowerCase().contains(query) ?? false);
-
-      final matchesPlan =
-          _selectedPlanFilter == 'All Plans' ||
-          c.subscriptionPlan == _selectedPlanFilter;
-
-      final matchesRegion =
-          _selectedRegionFilter == 'All Regions' ||
-          (c.address?.toLowerCase().contains(
-                _selectedRegionFilter.toLowerCase(),
-              ) ??
-              false);
-
-      final matchesStatus =
-          _selectedStatusFilter == 'All Statuses' ||
-          (c.status?.toLowerCase() == _selectedStatusFilter.toLowerCase());
-
-      return matchesQuery && matchesPlan && matchesRegion && matchesStatus;
-    }).toList();
-
-    // Filter invite clinics
-    final filteredInvites = inviteClinics.where((c) {
-      final query = _searchController.text.toLowerCase();
-      final matchesQuery =
-          query.isEmpty ||
-          (c.name?.toLowerCase().contains(query) ?? false) ||
-          (c.email?.toLowerCase().contains(query) ?? false) ||
-          (c.address?.toLowerCase().contains(query) ?? false);
-
-      final matchesRegion =
-          _selectedRegionFilter == 'All Regions' ||
-          (c.address?.toLowerCase().contains(_selectedRegionFilter.toLowerCase()) ?? false);
-
-      final matchesStatus =
-          _selectedStatusFilter == 'All Statuses' ||
-          (_selectedStatusFilter == 'Pending' &&
-              c.invitationStatus.toLowerCase().contains('sent'));
-
-      return matchesQuery && matchesRegion && matchesStatus;
-    }).toList();
+    // // Filter active clinics
+    // final filteredClinics = clinics.where((c) {
+    //   final query = _searchController.text.toLowerCase();
+    //   final matchesQuery =
+    //       query.isEmpty ||
+    //       (c.name?.toLowerCase().contains(query) ?? false) ||
+    //       (c.email?.toLowerCase().contains(query) ?? false) ||
+    //       (c.address?.toLowerCase().contains(query) ?? false);
+    //
+    //   final matchesPlan =
+    //       _selectedPlanFilter == 'All Plans' ||
+    //       c.subscriptionPlan == _selectedPlanFilter;
+    //
+    //   final matchesRegion =
+    //       _selectedRegionFilter == 'All Regions' ||
+    //       (c.address?.toLowerCase().contains(
+    //             _selectedRegionFilter.toLowerCase(),
+    //           ) ??
+    //           false);
+    //
+    //   final matchesStatus =
+    //       _selectedStatusFilter == 'All Statuses' ||
+    //       (c.status?.toLowerCase() == _selectedStatusFilter.toLowerCase());
+    //
+    //   return matchesQuery && matchesPlan && matchesRegion && matchesStatus;
+    // }).toList();
+    //
+    // // Filter invite clinics
+    // final filteredInvites = inviteClinics.where((c) {
+    //   final query = _searchController.text.toLowerCase();
+    //   final matchesQuery =
+    //       query.isEmpty ||
+    //       (c.name?.toLowerCase().contains(query) ?? false) ||
+    //       (c.email?.toLowerCase().contains(query) ?? false) ||
+    //       (c.address?.toLowerCase().contains(query) ?? false);
+    //
+    //   final matchesRegion =
+    //       _selectedRegionFilter == 'All Regions' ||
+    //       (c.address?.toLowerCase().contains(
+    //             _selectedRegionFilter.toLowerCase(),
+    //           ) ??
+    //           false);
+    //
+    //   final matchesStatus =
+    //       _selectedStatusFilter == 'All Statuses' ||
+    //       (_selectedStatusFilter == 'Pending' &&
+    //           c.invitationStatus.toLowerCase().contains('sent'));
+    //
+    //   return matchesQuery && matchesRegion && matchesStatus;
+    // }).toList();
 
     return GradientScaffold(
       body: SingleChildScrollView(
@@ -126,31 +141,69 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
             _buildHeader(context),
             context.verticalSpace(32),
             _buildStatsSummary(context),
-            context.verticalSpace(32),
-            AnimatedBuilder(
-              animation: _tabController,
-              builder: (_, __) {
-                return _buildFilters();
-              },
-            ),
+            // context.verticalSpace(32),
+            // AnimatedBuilder(
+            //   animation: _tabController,
+            //   builder: (_, __) {
+            //     return _buildFilters();
+            //   },
+            // ),
             context.verticalSpace(32),
             _buildTabs(),
-            context.verticalSpace(24),
+            context.verticalSpace(12),
+            AppSearchField(
+              controller: _searchController,
+              hintText: 'Search clinics by name, email or location...',
+              onChanged: _onSearchChanged,
+              onClear: () {
+                _searchController.clear();
+                setState(() {
+                  _activePage = 0;
+                  _invitePage = 0;
+                });
+              },
+            ),
+            context.verticalSpace(12),
             SizedBox(
               height: context.h(600),
-              child: TabBarView(
-                controller: _tabController,
+              child: Column(
                 children: [
-                  _buildActiveClinicsTab(
-                    context,
-                    filteredClinics,
-                    state.loading,
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildActiveClinicsTab(context, clinics, state.loading),
+                        _buildPendingInvitationsTab(
+                          context,
+                          inviteClinics,
+                          state.loading,
+                        ),
+                      ],
+                    ),
                   ),
-                  _buildPendingInvitationsTab(
-                    context,
-                    filteredInvites,
-                    state.loading,
-                  ),
+                  if (state.totalPages > 1)
+                    Padding(
+                      padding: context.appEdgeInsets(vertical: 24),
+                      child: Center(
+                        child: NumberPaginator(
+                          totalPages: state.totalPages,
+                          currentPage: _activePage,
+                          onPageChanged: (pageIndex) {
+                            if (_tabController.index == 1) {
+                              ref
+                                  .read(clinicViewModelProvider.notifier)
+                                  .getInviteClinics(
+                                    page: pageIndex,
+                                    search: _searchController.text.trim(),
+                                  );
+                            }
+                            setState(() {
+                              _activePage = pageIndex;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -268,106 +321,106 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     );
   }
 
-  Widget _buildFilters() {
-    return BorderdContainerWidget(
-      padding: EdgeInsets.all(16.w),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            flex: 3,
-            child: AppSearchField(
-              controller: _searchController,
-              hintText: 'Search clinics by name, email or location...',
-              onChanged: (val) {
-                setState(() {
-                  _activePage = 0;
-                  _invitePage = 0;
-                });
-              },
-              onClear: () {
-                _searchController.clear();
-                setState(() {
-                  _activePage = 0;
-                  _invitePage = 0;
-                });
-              },
-            ),
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: CustomDropdown<String>(
-              label: 'Region / Network',
-              hintText: 'All Regions',
-              value: _selectedRegionFilter,
-              items: const [
-                'All Regions',
-                'East Coast',
-                'West Coast',
-                'Midwest',
-                'South',
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (val) {
-                setState(() {
-                  _selectedRegionFilter = val ?? 'All Regions';
-                  _activePage = 0;
-                  _invitePage = 0;
-                });
-              },
-            ),
-          ),
-          if (_tabController.index != 0) SizedBox(width: 12.w),
-          if (_tabController.index != 0)
-            Expanded(
-              child: CustomDropdown<String>(
-                label: 'Subscription Plan',
-                hintText: 'All Plans',
-                value: _selectedPlanFilter,
-                items:
-                    const [
-                          'All Plans',
-                          'Basic',
-                          'Standard',
-                          'Premium',
-                          'Enterprise',
-                        ]
-                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                        .toList(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedPlanFilter = val ?? 'All Plans';
-                    _activePage = 0;
-                    _invitePage = 0;
-                  });
-                },
-              ),
-            ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: CustomDropdown<String>(
-              label: 'Status',
-              hintText: 'All Statuses',
-              value: _selectedStatusFilter,
-              items: const [
-                'All Statuses',
-                'Active',
-                'Inactive',
-                'Pending',
-                'Suspended',
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (val) {
-                setState(() {
-                  _selectedStatusFilter = val ?? 'All Statuses';
-                  _activePage = 0;
-                  _invitePage = 0;
-                });
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildFilters() {
+  //   return BorderdContainerWidget(
+  //     padding: EdgeInsets.all(16.w),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.end,
+  //       children: [
+  //         Expanded(
+  //           flex: 3,
+  //           child: AppSearchField(
+  //             controller: _searchController,
+  //             hintText: 'Search clinics by name, email or location...',
+  //             onChanged: (val) {
+  //               setState(() {
+  //                 _activePage = 0;
+  //                 _invitePage = 0;
+  //               });
+  //             },
+  //             onClear: () {
+  //               _searchController.clear();
+  //               setState(() {
+  //                 _activePage = 0;
+  //                 _invitePage = 0;
+  //               });
+  //             },
+  //           ),
+  //         ),
+  //         SizedBox(width: 16.w),
+  //         Expanded(
+  //           child: CustomDropdown<String>(
+  //             label: 'Region / Network',
+  //             hintText: 'All Regions',
+  //             value: _selectedRegionFilter,
+  //             items: const [
+  //               'All Regions',
+  //               'East Coast',
+  //               'West Coast',
+  //               'Midwest',
+  //               'South',
+  //             ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+  //             onChanged: (val) {
+  //               setState(() {
+  //                 _selectedRegionFilter = val ?? 'All Regions';
+  //                 _activePage = 0;
+  //                 _invitePage = 0;
+  //               });
+  //             },
+  //           ),
+  //         ),
+  //         if (_tabController.index != 0) SizedBox(width: 12.w),
+  //         if (_tabController.index != 0)
+  //           Expanded(
+  //             child: CustomDropdown<String>(
+  //               label: 'Subscription Plan',
+  //               hintText: 'All Plans',
+  //               value: _selectedPlanFilter,
+  //               items:
+  //                   const [
+  //                         'All Plans',
+  //                         'Basic',
+  //                         'Standard',
+  //                         'Premium',
+  //                         'Enterprise',
+  //                       ]
+  //                       .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+  //                       .toList(),
+  //               onChanged: (val) {
+  //                 setState(() {
+  //                   _selectedPlanFilter = val ?? 'All Plans';
+  //                   _activePage = 0;
+  //                   _invitePage = 0;
+  //                 });
+  //               },
+  //             ),
+  //           ),
+  //         SizedBox(width: 12.w),
+  //         Expanded(
+  //           child: CustomDropdown<String>(
+  //             label: 'Status',
+  //             hintText: 'All Statuses',
+  //             value: _selectedStatusFilter,
+  //             items: const [
+  //               'All Statuses',
+  //               'Active',
+  //               'Inactive',
+  //               'Pending',
+  //               'Suspended',
+  //             ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+  //             onChanged: (val) {
+  //               setState(() {
+  //                 _selectedStatusFilter = val ?? 'All Statuses';
+  //                 _activePage = 0;
+  //                 _invitePage = 0;
+  //               });
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildTabs() {
     return DecoratedBox(
@@ -375,6 +428,18 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
         border: Border(bottom: BorderSide(color: CustomColors.border)),
       ),
       child: TabBar(
+        onTap: (index) {
+          ref.read(clinicViewModelProvider.notifier).clearClinicsPagination();
+          if (index == 0) {
+            ref
+                .read(clinicViewModelProvider.notifier)
+                .getClinics(search: _searchController.text.trim());
+          } else if (index == 1) {
+            ref
+                .read(clinicViewModelProvider.notifier)
+                .getInviteClinics(search: _searchController.text.trim());
+          }
+        },
         controller: _tabController,
         isScrollable: true,
         tabs: const [
@@ -397,103 +462,73 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     if (clinics.isEmpty) {
       return _buildEmptyState();
     }
-
-    final totalPages = (clinics.length / _itemsPerPage).ceil();
-    final paginatedClinics = clinics
-        .skip(_activePage * _itemsPerPage)
-        .take(_itemsPerPage)
-        .toList();
-
-    return Column(
-      children: [
-        Expanded(
-          child: BorderdContainerWidget(
-            padding: EdgeInsets.zero,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12.r),
-              child: Table(
-                columnWidths: const {
-                  0: FlexColumnWidth(4), // Clinic Name / logo
-                  1: FlexColumnWidth(3), // Contact / Location
-                  2: FlexColumnWidth(2), // Subscription Plan
-                  3: FlexColumnWidth(2.2), // Total Appointments (or Providers)
-                  4: FlexColumnWidth(2), // Total Treatments
-                  5: FlexColumnWidth(2), // Status
-                  6: FlexColumnWidth(1.8), // Actions
-                },
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                children: [
-                  // Header Row
-                  TableRow(
-                    decoration: const BoxDecoration(
-                      color: CustomColors.whiteGrey,
-                      border: Border(
-                        bottom: BorderSide(color: CustomColors.border),
-                      ),
-                    ),
-                    children: [
-                      _tableHeaderCell('CLINIC PARTNER'),
-                      _tableHeaderCell('CONTACT & REGION'),
-                      _tableHeaderCell('PLAN'),
-                      _tableHeaderCell('APPOINTMENTS'),
-                      _tableHeaderCell('TREATMENTS'),
-                      _tableHeaderCell('STATUS'),
-                      _tableHeaderCell('ACTIONS'),
-                    ],
+    return BorderdContainerWidget(
+      padding: EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: Table(
+          columnWidths: const {
+            0: FlexColumnWidth(4), // Clinic Name / logo
+            1: FlexColumnWidth(3), // Contact / Location
+            2: FlexColumnWidth(2), // Subscription Plan
+            3: FlexColumnWidth(2.2), // Total Appointments (or Providers)
+            4: FlexColumnWidth(2), // Total Treatments
+            5: FlexColumnWidth(2), // Status
+            6: FlexColumnWidth(1.8), // Actions
+          },
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          children: [
+            // Header Row
+            TableRow(
+              decoration: const BoxDecoration(
+                color: CustomColors.whiteGrey,
+                border: Border(bottom: BorderSide(color: CustomColors.border)),
+              ),
+              children: [
+                _tableHeaderCell('CLINIC PARTNER'),
+                _tableHeaderCell('CONTACT & REGION'),
+                _tableHeaderCell('PLAN'),
+                _tableHeaderCell('APPOINTMENTS'),
+                _tableHeaderCell('TREATMENTS'),
+                _tableHeaderCell('STATUS'),
+                _tableHeaderCell('ACTIONS'),
+              ],
+            ),
+            // Data Rows
+            ...clinics.map((clinic) {
+              return TableRow(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: CustomColors.border),
                   ),
-                  // Data Rows
-                  ...paginatedClinics.map((clinic) {
-                    return TableRow(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(color: CustomColors.border),
-                        ),
-                      ),
-                      children: [
-                        _clinicNameCell(clinic.name, clinic.logo),
-                        _clinicContactCell(
-                          clinic.email,
-                          clinic.phone,
-                          clinic.address,
-                        ),
-                        _tableTextCell(
-                          clinic.subscriptionPlan,
-                          style: context.fonts.black14w600,
-                        ),
-                        _tableTextCell(
-                          '${clinic.totalAppointments} Appts',
-                          style: context.fonts.grey14w400,
-                        ),
-                        _tableTextCell(
-                          '${clinic.totalTreatments} Proc',
-                          style: context.fonts.grey14w400,
-                        ),
-                        _statusBadgeCell(clinic.status ?? 'Active'),
-                        _activeActionsCell(clinic),
-                      ],
-                    );
-                  }),
+                ),
+                children: [
+                  _clinicNameCell(clinic.name, clinic.logo),
+                  _clinicContactCell(
+                    clinic.email,
+                    clinic.phone,
+                    clinic.address,
+                  ),
+                  _tableTextCell(
+                    clinic.subscriptionPlan,
+                    style: context.fonts.black14w600,
+                  ),
+                  _tableTextCell(
+                    '${clinic.totalAppointments} Appts',
+                    style: context.fonts.grey14w400,
+                  ),
+                  _tableTextCell(
+                    '${clinic.totalTreatments} Proc',
+                    style: context.fonts.grey14w400,
+                  ),
+                  _statusBadgeCell(clinic.status ?? 'Active'),
+                  _activeActionsCell(clinic),
                 ],
-              ),
-            ),
-          ),
+              );
+            }),
+          ],
         ),
-        if (totalPages > 1)
-          Padding(
-            padding: context.appEdgeInsets(vertical: 24),
-            child: Center(
-              child: NumberPaginator(
-                totalPages: totalPages,
-                currentPage: _activePage,
-                onPageChanged: (pageIndex) {
-                  setState(() {
-                    _activePage = pageIndex;
-                  });
-                },
-              ),
-            ),
-          ),
-      ],
+      ),
     );
   }
 
@@ -526,10 +561,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               child: Table(
                 columnWidths: const {
                   0: FlexColumnWidth(3.5), // Clinic Name / logo
-                  1: FlexColumnWidth(3),   // Contact Detail
+                  1: FlexColumnWidth(3), // Contact Detail
                   2: FlexColumnWidth(3.5), // Location / Address
-                  3: FlexColumnWidth(2),   // Invited Date
-                  4: FlexColumnWidth(2),   // Status
+                  3: FlexColumnWidth(2), // Invited Date
+                  4: FlexColumnWidth(2), // Status
                   5: FlexColumnWidth(1.8), // Actions
                 },
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -561,7 +596,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                       ),
                       children: [
                         _clinicNameCell(clinic.name ?? '', clinic.logo),
-                        _clinicContactCell(clinic.email ?? '', clinic.phone ?? '', null),
+                        _clinicContactCell(
+                          clinic.email ?? '',
+                          clinic.phone ?? '',
+                          null,
+                        ),
                         _tableTextCell(
                           clinic.address ?? '',
                           style: context.fonts.grey14w400,
@@ -588,6 +627,17 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                 totalPages: totalPages,
                 currentPage: _invitePage,
                 onPageChanged: (pageIndex) {
+                  if (_tabController.index == 0) {
+                    ref
+                        .read(clinicViewModelProvider.notifier)
+                        .getClinics(search: _searchController.text.trim());
+                  } else {
+                    ref
+                        .read(clinicViewModelProvider.notifier)
+                        .getInviteClinics(
+                          search: _searchController.text.trim(),
+                        );
+                  }
                   setState(() {
                     _invitePage = pageIndex;
                   });
@@ -835,11 +885,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                 CustomOutlinedButton(
                   onTap: () {
                     _searchController.clear();
-                    setState(() {
-                      _selectedRegionFilter = 'All Regions';
-                      _selectedPlanFilter = 'All Plans';
-                      _selectedStatusFilter = 'All Statuses';
-                    });
+                    // setState(() {
+                    //   _selectedRegionFilter = 'All Regions';
+                    //   _selectedPlanFilter = 'All Plans';
+                    //   _selectedStatusFilter = 'All Statuses';
+                    // });
                   },
                   label: 'Clear All Filters',
                   color: Colors.white,
@@ -866,7 +916,20 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   }
 
   String _getMonthName(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     if (month < 1 || month > 12) return '';
     return months[month - 1];
   }

@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
+import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
-import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 
@@ -28,43 +28,42 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     getClinics(page: state.currentPage, limit: state.pageSize);
   }
 
-  Future<bool> getClinics({int? page, int? limit}) async {
-    final int targetPage = page ?? state.currentPage;
-    final int targetLimit = limit ?? state.pageSize;
-
+  Future<bool?> getClinics({String? search, int? page, int? limit}) async {
     return await runSafely<bool?>(
-          showLoading: false,
-          onLoadingChange: (loading) {
-            state = state.copyWith(loading: loading);
-          },
-          () async {
-            try {
-              final clinics = await _clinicRepository.getClinics(
-                page: targetPage,
-                limit: targetLimit,
-              );
-              if (clinics.isNotEmpty) {
-                state = state.copyWith(
-                  clinics: clinics,
-                  currentPage: targetPage,
-                  pageSize: targetLimit,
-                );
-                return true;
-              }
-            } catch (e) {
-              // Fail-safe print
-            }
-
-            // Fallback to dummy data
+      showLoading: false,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final int targetPage = page ?? state.currentPage;
+        final int targetLimit = limit ?? state.pageSize;
+        try {
+          final clinics = await _clinicRepository.getClinics(
+            page: targetPage,
+            limit: targetLimit,
+            search: search,
+          );
+          if (clinics.isNotEmpty) {
             state = state.copyWith(
-              clinics: TreatmentData.dummyClinics,
+              clinics: clinics,
               currentPage: targetPage,
               pageSize: targetLimit,
             );
             return true;
-          },
-        ) ??
-        false;
+          }
+        } catch (e) {
+          // Fail-safe print
+        }
+
+        // Fallback to dummy data
+        state = state.copyWith(
+          clinics: TreatmentData.dummyClinics,
+          currentPage: targetPage,
+          pageSize: targetLimit,
+        );
+        return true;
+      },
+    );
   }
 
   final ImagePicker _picker = ImagePicker();
@@ -95,49 +94,54 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     state = state.copyWith(clinicImage: '');
   }
 
-  Future<bool> getInviteClinics({
+  void clearClinicsPagination() {
+    state = state.copyWith(totalPages: 1, currentPage: 1);
+  }
+
+  Future<bool?> getInviteClinics({
     int? page,
     int? limit,
     String? search,
     String? status,
   }) async {
-    final int targetPage = page ?? state.currentPage;
-    final int targetLimit = limit ?? state.pageSize;
-
     return await runSafely<bool?>(
-          showLoading: false,
-          onLoadingChange: (loading) {
-            state = state.copyWith(loading: loading);
-          },
-          () async {
-            try {
-              final invites = await _clinicRepository.getInviteClinics(
-                page: targetPage,
-                limit: targetLimit,
-                search: search,
-                status: status,
-              );
-              if (invites.isNotEmpty) {
-                state = state.copyWith(
-                  inviteClinics: invites,
-                  currentPage: targetPage,
-                  pageSize: targetLimit,
-                );
-                return true;
-              }
-            } catch (e) {
-              // Fail-safe print
-            }
-
+      showLoading: false,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final int targetPage = page ?? state.currentPage;
+        final int targetLimit = limit ?? state.pageSize;
+        try {
+          final invitesResponse = await _clinicRepository.getInviteClinics(
+            page: targetPage,
+            limit: targetLimit,
+            search: search,
+            status: status,
+          );
+          final invites = invitesResponse.data ?? [];
+          if (invites.isNotEmpty) {
             state = state.copyWith(
-              inviteClinics: [],
+              inviteClinics: invites,
               currentPage: targetPage,
               pageSize: targetLimit,
+              totalPages: invitesResponse.totalPages,
             );
             return true;
-          },
-        ) ??
-        false;
+          }
+        } catch (e) {
+          // Fail-safe print
+        }
+
+        state = state.copyWith(
+          inviteClinics: [],
+          currentPage: targetPage,
+          pageSize: targetLimit,
+          totalPages: 1,
+        );
+        return true;
+      },
+    );
   }
 
   void selectInviteClinic(ClinicModel clinic) {
@@ -149,15 +153,12 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
   }
 
   Future<bool> sendInvitation(int inviteClinicId) async {
-    return await runSafely<bool?>(
-          showLoading: true,
-          () async {
-            final response = await _clinicRepository.sendInvitation(
-              inviteClinicId: inviteClinicId,
-            );
-            return response.isSuccess;
-          },
-        ) ??
+    return await runSafely<bool?>(showLoading: true, () async {
+          final response = await _clinicRepository.sendInvitation(
+            inviteClinicId: inviteClinicId,
+          );
+          return response.isSuccess;
+        }) ??
         false;
   }
 
@@ -202,7 +203,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
         final clinic = await _clinicRepository.registerClinic(
           req: req.copyWithLogo(state.clinicImage, state.bannerImage),
         );
-        if(clinic.isSuccess){
+        if (clinic.isSuccess) {
           await getClinics();
         }
 
@@ -241,7 +242,9 @@ class ClinicState extends BaseStateModel {
 
   ClinicDetailResponse? get selectedClinic {
     if (selectedClinicId == null) return null;
-    final found = TreatmentData.dummyClinicsDetails.firstWhereOrNull((c) => c.id == selectedClinicId);
+    final found = TreatmentData.dummyClinicsDetails.firstWhereOrNull(
+      (c) => c.id == selectedClinicId,
+    );
     if (found != null) return found;
 
     final fallback = clinics?.firstWhereOrNull((c) => c.id == selectedClinicId);
@@ -267,10 +270,14 @@ class ClinicState extends BaseStateModel {
 
   ClinicDetailResponse? get selectedInviteClinic {
     if (selectedInviteClinicId == null) return null;
-    final found = TreatmentData.dummyInviteClinicsDetails.firstWhereOrNull((c) => c.id == selectedInviteClinicId);
+    final found = TreatmentData.dummyInviteClinicsDetails.firstWhereOrNull(
+      (c) => c.id == selectedInviteClinicId,
+    );
     if (found != null) return found;
 
-    final fallback = inviteClinics?.firstWhereOrNull((c) => c.id == selectedInviteClinicId);
+    final fallback = inviteClinics?.firstWhereOrNull(
+      (c) => c.id == selectedInviteClinicId,
+    );
     if (fallback != null) {
       return ClinicDetailResponse(
         id: fallback.id,
@@ -322,7 +329,8 @@ class ClinicState extends BaseStateModel {
       loading: loading ?? this.loading,
       clinics: clinics ?? this.clinics,
       inviteClinics: inviteClinics ?? this.inviteClinics,
-      selectedInviteClinicId: selectedInviteClinicId ?? this.selectedInviteClinicId,
+      selectedInviteClinicId:
+          selectedInviteClinicId ?? this.selectedInviteClinicId,
       selectedClinicId: selectedClinicId ?? this.selectedClinicId,
       searchedPlaces: searchedPlaces ?? this.searchedPlaces,
       bannerImage: bannerImage ?? this.bannerImage,
