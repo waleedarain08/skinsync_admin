@@ -1,6 +1,5 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
-import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 
@@ -301,96 +300,6 @@ class TreatmentData {
       logo: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
       status: 'Active',
       createdAt: DateTime.parse('2023-01-15'),
-    ),
-  ];
-
-  static final List<ClinicDetailResponse> dummyClinicsDetails = [
-    ClinicDetailResponse(
-      id: 1,
-      name: 'Glow MedSpa NY Detail',
-      email: 'contact@glowmedspa.com',
-      phone: '+1 212-555-0198',
-      address: '5th Ave, New York, NY',
-      logo: 'https://plus.unsplash.com/premium_photo-1661764391621-08f307405c6d?q=80&w=1000',
-      status: 'Active',
-      subscriptionPlan: 'Premium',
-      totalAppointments: 450,
-      totalTreatments: 320,
-      rating: 4.8,
-      description: 'A premium New York clinic specializing in advanced dermal treatments.',
-      createdAt: DateTime.parse('2023-01-15'),
-    ),
-    ClinicDetailResponse(
-      id: 2,
-      name: 'Serene Skin Clinic Detail',
-      email: 'info@sereneskin.com',
-      phone: '+1 310-555-0245',
-      address: 'Beverly Hills, CA',
-      logo: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
-      status: 'Active',
-      subscriptionPlan: 'Basic',
-      totalAppointments: 120,
-      totalTreatments: 85,
-      rating: 4.5,
-      description: 'An elegant clinic located in Beverly Hills providing comprehensive skincare.',
-      createdAt: DateTime.parse('2023-01-15'),
-    ),
-  ];
-
-  static final List<ClinicDetailResponse> dummyInviteClinicsDetails = [
-    ClinicDetailResponse(
-      id: 1,
-      name: 'Radiant Aesthetics Detail',
-      email: 'hello@radiantaesthetics.com',
-      phone: '+1 415-555-0312',
-      address: 'San Francisco, CA',
-      logo: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000',
-      status: 'Invitation Sent',
-      description: 'A prospect San Francisco medspa with great aesthetics potential.',
-      ownerName: 'Sarah Johnson',
-      ownerEmail: 'sarah@radiantaesthetics.com',
-      website: 'https://radiantaesthetics.com',
-      createdAt: DateTime.parse('2023-01-15'),
-    ),
-    ClinicDetailResponse(
-      id: 2,
-      name: 'Elite Wellness Center Detail',
-      email: 'admin@elitewellness.com',
-      phone: '+1 305-555-0456',
-      address: 'Miami, FL',
-      logo: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000',
-      status: 'Interested',
-      description: 'A Miami-based wellness center interested in onboarding our platform.',
-      ownerName: 'Sarah Johnson',
-      ownerEmail: 'sarah@elitewellness.com',
-      website: 'https://elitewellness.com',
-      createdAt: DateTime.parse('2023-10-05'),
-    ),
-    ClinicDetailResponse(
-      id: 3,
-      name: 'The Skin Lab Detail',
-      email: 'booking@skinlab.com',
-      phone: '+1 773-555-0789',
-      address: 'Chicago, IL',
-      status: 'Expired',
-      description: 'A prospect skin lab whose invitation has expired.',
-      createdAt: DateTime.parse('2023-09-20'),
-    ),
-    ClinicDetailResponse(
-      id: 4,
-      name: 'Aura Medical Spa Detail',
-      email: 'aura@medspa.com',
-      phone: '+1 702-555-0999',
-      address: 'Las Vegas, NV',
-      logo: 'https://images.unsplash.com/photo-1576091160550-217359f4b88c?q=80&w=1000',
-      status: 'Pending Onboarding',
-      lat: '36.1699',
-      long: '-115.1398',
-      ownerName: 'Sarah Johnson',
-      ownerEmail: 'sarah@medspa.com',
-      website: 'https://auramedspa.com',
-      description: 'A premier medical spa in the heart of Las Vegas.',
-      createdAt: DateTime.parse('2023-10-10'),
     ),
   ];
 

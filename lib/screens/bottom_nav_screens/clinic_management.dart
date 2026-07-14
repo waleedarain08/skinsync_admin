@@ -800,25 +800,14 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               size: 20.sp,
               color: CustomColors.grey,
             ),
-            onPressed: () {
-              ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
-              context.push(ClinicDetailScreen.routeName);
+            onPressed: () async {
+              final success = await ref.read(clinicViewModelProvider.notifier).getClinicDetail(clinic.id!);
+              if (success && context.mounted) {
+                ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
+                context.push(ClinicDetailScreen.routeName);
+              }
             },
           ),
-          // IconButton(
-          //   tooltip: 'Edit Partner',
-          //   icon: Icon(
-          //     Icons.edit_road_rounded,
-          //     size: 20.sp,
-          //     color: CustomColors.purple,
-          //   ),
-          //   onPressed: () {
-          //     showDialog(
-          //       context: context,
-          //       builder: (context) => EditClinicDialogBox(clinic: clinic),
-          //     );
-          //   },
-          // ),
         ],
       ),
     );
@@ -836,11 +825,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               size: 20.sp,
               color: CustomColors.grey,
             ),
-            onPressed: () {
-              ref
-                  .read(clinicViewModelProvider.notifier)
-                  .selectInviteClinic(clinic);
-              context.push(InviteClinicDetailScreen.routeName);
+            onPressed: () async {
+              final success = await ref.read(clinicViewModelProvider.notifier).getInviteClinicDetail(clinic.id!);
+              if (success && context.mounted) {
+                ref.read(clinicViewModelProvider.notifier).selectInviteClinic(clinic);
+                context.push(InviteClinicDetailScreen.routeName);
+              }
             },
           ),
         ],

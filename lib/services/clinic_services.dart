@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/clinic_list_response.dart';
+import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
+import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 
 import '../models/clinic_model.dart';
@@ -77,7 +79,7 @@ class ClinicService implements ClinicRepository {
   }
 
   @override
-  Future<ClinicListResponse> getInviteClinics({
+  Future<List<ClinicModel>> getInviteClinics({
     required int page,
     required int limit,
     String? search,
@@ -86,7 +88,7 @@ class ClinicService implements ClinicRepository {
     final Map<String, String> queryParams = {
       'page': page.toString(),
       'limit': limit.toString(),
-      'search': search ?? '',
+      'search': search ?? 'null',
     };
     if (status != null && status.isNotEmpty) {
       queryParams['status'] = status;
@@ -95,18 +97,17 @@ class ClinicService implements ClinicRepository {
       Endpoint.inviteClinics,
       queryParams: queryParams,
     );
-    final response = ClinicListResponse.fromJson(jsonResponse);
 
-    final isSuccess = response.isSuccess;
+    final isSuccess = jsonResponse['is_success'] as bool? ?? false;
     if (!isSuccess) {
-      throw BadRequestException(response.message);
+      throw BadRequestException(jsonResponse['message'] ?? 'Failed to get invite clinics');
     }
-    return response;
-    // final data = jsonResponse['data'];
-    // if (data is List) {
-    //   return data.map((e) => ClinicModel.fromJson(e)).toList();
-    // }
-    // return [];
+
+    final data = jsonResponse['data'];
+    if (data is List) {
+      return data.map((e) => ClinicModel.fromJson(e)).toList();
+    }
+    return [];
   }
 
   @override
@@ -121,6 +122,34 @@ class ClinicService implements ClinicRepository {
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<ClinicDetailResponse> getClinicDetail({required int clinicId}) async {
+    final jsonResponse = await _api.get(
+      Endpoint.clinicDetail,
+      queryParams: {'id': clinicId.toString()},
+    );
+    final response = ClinicDetailResponse.fromJson(jsonResponse);
+    final isSuccess = jsonResponse['is_success'] as bool? ?? false;
+    if (!isSuccess) {
+      throw BadRequestException(jsonResponse['message'] ?? 'Failed to get clinic detail');
+    }
+    return response;
+  }
+
+  @override
+  Future<InviteClinicDetailResponse> getInviteClinicDetail({required int inviteClinicId}) async {
+    final jsonResponse = await _api.get(
+      Endpoint.inviteClinicDetail,
+      queryParams: {'id': inviteClinicId.toString()},
+    );
+    final response = InviteClinicDetailResponse.fromJson(jsonResponse);
+    final isSuccess = jsonResponse['is_success'] as bool? ?? false;
+    if (!isSuccess) {
+      throw BadRequestException(jsonResponse['message'] ?? 'Failed to get invite clinic detail');
     }
     return response;
   }

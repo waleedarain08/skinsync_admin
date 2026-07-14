@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
+import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
@@ -22,7 +22,7 @@ import 'package:skinsync_admin/widgets/phone_widget.dart';
 
 class AddNewClinicScreen extends ConsumerStatefulWidget {
   static const String routeName = '/add-new-clinic';
-  final ClinicDetailResponse? invitedClinic;
+  final InviteClinicDetailData? invitedClinic;
   const AddNewClinicScreen({super.key, this.invitedClinic});
 
   @override
@@ -66,13 +66,13 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     }
   }
 
-  void _prefillData(ClinicDetailResponse clinic) {
+  void _prefillData(InviteClinicDetailData clinic) {
     _clinicNameController.text = clinic.name ?? '';
     _clinicEmailController.text = clinic.email ?? '';
     _clinicPhoneController.text = clinic.phone ?? '';
     _clinicAddressController.text = clinic.address ?? '';
-    _latController.text = clinic.lat ?? '';
-    _longController.text = clinic.long ?? '';
+    _latController.text = clinic.lat;
+    _longController.text = clinic.long;
     _ownerNameController.text = clinic.ownerName ?? '';
     _ownerEmailController.text = clinic.ownerEmail ?? '';
     _websiteController.text = clinic.website ?? '';

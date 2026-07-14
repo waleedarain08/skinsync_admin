@@ -1,27 +1,27 @@
 import 'dart:convert';
 
-class ClinicDetailResponse {
+class InviteClinicDetailResponse {
   final bool? isSuccess;
   final String? message;
-  final List<ClinicDetailData>? data;
+  final List<InviteClinicDetailData>? data;
 
-  ClinicDetailResponse({
+  InviteClinicDetailResponse({
     this.isSuccess,
     this.message,
     this.data,
   });
 
-  factory ClinicDetailResponse.fromRawJson(String str) =>
-      ClinicDetailResponse.fromJson(json.decode(str));
+  factory InviteClinicDetailResponse.fromRawJson(String str) =>
+      InviteClinicDetailResponse.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  factory ClinicDetailResponse.fromJson(Map<String, dynamic> json) => ClinicDetailResponse(
+  factory InviteClinicDetailResponse.fromJson(Map<String, dynamic> json) => InviteClinicDetailResponse(
     isSuccess: json['is_success'],
     message: json['message'],
     data: json['data'] == null
         ? null
-        : List<ClinicDetailData>.from(json['data'].map((x) => ClinicDetailData.fromJson(x))),
+        : List<InviteClinicDetailData>.from(json['data'].map((x) => InviteClinicDetailData.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -31,7 +31,7 @@ class ClinicDetailResponse {
   };
 }
 
-class ClinicDetailData {
+class InviteClinicDetailData {
   final int? clinicId;
   final String? name;
   final String? email;
@@ -44,10 +44,16 @@ class ClinicDetailData {
   final String? website;
   final String? banner;
   final String? status;
-  final List<ClinicAvailability>? availability;
+  final List<InviteClinicAvailability>? availability;
   final List<dynamic>? treatments;
+  final String? ownerName;
+  final String? ownerEmail;
+  final String? notes;
 
-  ClinicDetailData({
+  String get lat => latitude != null ? latitude.toString() : '';
+  String get long => longitude != null ? longitude.toString() : '';
+
+  InviteClinicDetailData({
     this.clinicId,
     this.name,
     this.email,
@@ -62,10 +68,13 @@ class ClinicDetailData {
     this.status,
     this.availability,
     this.treatments,
+    this.ownerName,
+    this.ownerEmail,
+    this.notes,
   });
 
-  factory ClinicDetailData.fromJson(Map<String, dynamic> json) => ClinicDetailData(
-    clinicId: json['clinic_id'],
+  factory InviteClinicDetailData.fromJson(Map<String, dynamic> json) => InviteClinicDetailData(
+    clinicId: json['clinic_id'] ?? json['id'],
     name: json['name'],
     email: json['email'],
     phone: json['phone']?.toString(),
@@ -79,10 +88,13 @@ class ClinicDetailData {
     status: json['status'],
     availability: json['availability'] == null
         ? null
-        : List<ClinicAvailability>.from(json['availability'].map((x) => ClinicAvailability.fromJson(x))),
+        : List<InviteClinicAvailability>.from(json['availability'].map((x) => InviteClinicAvailability.fromJson(x))),
     treatments: json['treatments'] == null
         ? null
         : List<dynamic>.from(json['treatments']),
+    ownerName: json['owner_name'],
+    ownerEmail: json['owner_email'],
+    notes: json['notes'],
   );
 
   Map<String, dynamic> toJson() => {
@@ -100,21 +112,24 @@ class ClinicDetailData {
     'status': status,
     'availability': availability == null ? null : List<dynamic>.from(availability!.map((x) => x.toJson())),
     'treatments': treatments == null ? null : List<dynamic>.from(treatments!),
+    'owner_name': ownerName,
+    'owner_email': ownerEmail,
+    'notes': notes,
   };
 }
 
-class ClinicAvailability {
+class InviteClinicAvailability {
   final String? openTime;
   final String? closeTime;
   final List<String>? days;
 
-  ClinicAvailability({
+  InviteClinicAvailability({
     this.openTime,
     this.closeTime,
     this.days,
   });
 
-  factory ClinicAvailability.fromJson(Map<String, dynamic> json) => ClinicAvailability(
+  factory InviteClinicAvailability.fromJson(Map<String, dynamic> json) => InviteClinicAvailability(
     openTime: json['open_time'],
     closeTime: json['close_time'],
     days: json['days'] == null ? null : List<String>.from(json['days'].map((x) => x)),

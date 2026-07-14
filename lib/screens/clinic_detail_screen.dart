@@ -43,7 +43,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
   @override
   void initState() {
     super.initState();
-    final clinic = ref.read(clinicViewModelProvider).selectedClinic;
+    final clinic = ref.read(clinicViewModelProvider).selectedClinicDetail;
     _clinicNameController = TextEditingController(text: clinic?.name);
     _clinicEmailController = TextEditingController(text: clinic?.email);
     _clinicPhoneController = TextEditingController(text: clinic?.phone);
@@ -71,7 +71,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
 
   Future<void> _updateClinic() async {
     if (!_formKey.currentState!.validate()) return;
-    final clinic = ref.read(clinicViewModelProvider).selectedClinic;
+    final clinic = ref.read(clinicViewModelProvider).selectedClinicDetail;
     if (clinic == null) return;
 
     final selectedCountry = ref.read(authViewModelProvider).country;
@@ -83,12 +83,12 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       clinicAddress: _clinicAddressController.text.trim(),
       cc: selectedCountry.dialCode ?? '+1',
       country: selectedCountry.code ?? 'US',
-      clinicLogo: _selectedLogo?.path ?? clinic.logo ?? 'h??ttps://example.com/logo.png',
+      clinicLogo: _selectedLogo?.path ?? clinic.logo ?? 'https://example.com/logo.png',
       website: _websiteController.text.trim(),
       description: _descriptionController.text.trim(),
     );
 
-    final success = await ref.read(clinicViewModelProvider.notifier).updateClinic(clinic.id!, req);
+    final success = await ref.read(clinicViewModelProvider.notifier).updateClinic(clinic.clinicId!, req);
     if (success && mounted) {
       setState(() => _isEditMode = false);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Clinic updated successfully')));
@@ -97,7 +97,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final clinic = ref.watch(clinicViewModelProvider).selectedClinic;
+    final clinic = ref.watch(clinicViewModelProvider).selectedClinicDetail;
 
     if (clinic == null) {
       return GradientScaffold(body: Center(child: Text('No Clinic Data Found', style: context.fonts.black16w400)));
@@ -179,74 +179,99 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     );
   }
 
-  Widget _buildHeaderSection(ClinicDetailResponse clinic) {
+  Widget _buildHeaderSection(ClinicDetailData clinic) {
     return BorderdContainerWidget(
-      padding: EdgeInsets.all(32.w),
+      padding: EdgeInsets.zero,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              GestureDetector(
-                onTap: _pickLogo,
-                child: Container(
-                  width: 100.w,
-                  height: 100.w,
-                  decoration: BoxDecoration(
-                    color: CustomColors.whiteGrey,
-                    borderRadius: BorderRadius.circular(20.r),
-                    border: _isEditMode ? Border.all(color: CustomColors.purple, width: 2) : null,
-                    image: _selectedLogo != null
-                        ? DecorationImage(
-                            image: kIsWeb ? NetworkImage(_selectedLogo!.path) : FileImage(File(_selectedLogo!.path)) as ImageProvider,
-                            fit: BoxFit.cover)
-                        : (clinic.logo != null && clinic.logo!.isNotEmpty)
-                            ? DecorationImage(image: NetworkImage(clinic.logo!), fit: BoxFit.cover)
+          // Banner Image
+          Container(
+            height: 180.h,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: CustomColors.whiteGrey,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12.r),
+                topRight: Radius.circular(12.r),
+              ),
+              image: (clinic.banner != null && clinic.banner!.isNotEmpty)
+                  ? DecorationImage(image: NetworkImage(clinic.banner!), fit: BoxFit.cover)
+                  : null,
+            ),
+            child: (clinic.banner == null || clinic.banner!.isEmpty)
+                ? Center(
+                    child: Icon(
+                      Icons.image_outlined,
+                      size: 48.sp,
+                      color: CustomColors.grey.withValues(alpha: 0.5),
+                    ),
+                  )
+                : null,
+          ),
+          Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: _pickLogo,
+                  child: Container(
+                    width: 90.w,
+                    height: 90.w,
+                    decoration: BoxDecoration(
+                      color: CustomColors.whiteGrey,
+                      borderRadius: BorderRadius.circular(20.r),
+                      border: _isEditMode ? Border.all(color: CustomColors.purple, width: 2) : null,
+                      image: _selectedLogo != null
+                          ? DecorationImage(
+                              image: kIsWeb ? NetworkImage(_selectedLogo!.path) : FileImage(File(_selectedLogo!.path)) as ImageProvider,
+                              fit: BoxFit.cover)
+                          : (clinic.logo != null && clinic.logo!.isNotEmpty)
+                              ? DecorationImage(image: NetworkImage(clinic.logo!), fit: BoxFit.cover)
+                              : null,
+                    ),
+                    child: (_selectedLogo == null && (clinic.logo == null || clinic.logo!.isEmpty))
+                        ? Icon(Icons.business_outlined, size: 36.sp, color: CustomColors.black)
+                        : _isEditMode
+                            ? DecoratedBox(
+                                decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(20.r)),
+                                child: const Icon(Icons.camera_alt_outlined, color: Colors.white),
+                              )
                             : null,
                   ),
-                  child: (_selectedLogo == null && (clinic.logo == null || clinic.logo!.isEmpty))
-                      ? Icon(Icons.business_outlined, size: 40.sp, color: CustomColors.black)
-                      : _isEditMode
-                          ? DecoratedBox(
-                              decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(20.r)),
-                              child: const Icon(Icons.camera_alt_outlined, color: Colors.white),
-                            )
-                          : null,
                 ),
-              ),
-              SizedBox(width: 32.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(child: Text(clinic.name ?? 'N/A', style: context.fonts.black26w700, overflow: TextOverflow.ellipsis)),
-                        SizedBox(width: 16.w),
-                        _statusBadge(clinic.status ?? 'Active'),
-                      ],
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(clinic.address ?? 'N/A', style: context.fonts.grey16w400),
-                    SizedBox(height: 16.h),
-                    Wrap(
-                      spacing: 12.w,
-                      runSpacing: 12.h,
-                      children: [
-                        _infoChip(Icons.calendar_today_outlined, "Joined: ${clinic.createdAt ?? 'N/A'}"),
-                        _infoChip(Icons.star_outline_rounded, "Rating: ${clinic.rating ?? '0.0'}"),
-                      ],
-                    ),
-                  ],
+                SizedBox(width: 24.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              clinic.name ?? 'N/A',
+                              style: context.fonts.black20w600,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          _statusBadge(clinic.status ?? 'Active'),
+                        ],
+                      ),
+                      SizedBox(height: 6.h),
+                      Text(clinic.address ?? 'N/A', style: context.fonts.grey14w400),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMainContent(ClinicDetailResponse clinic) {
+  Widget _buildMainContent(ClinicDetailData clinic) {
     return Column(
       children: [
         _infoSection('General Information', [
@@ -299,35 +324,99 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             readOnly: !_isEditMode,
           ),
           SizedBox(height: 24.h),
-          AdaptiveLayoutRowColumn(
-            heightBetween: 24.h,
-            widthBetween: 16.w,
-            expandedWidget: true,
-            children: [
-              BuildTextField(label: 'Website', controller: _websiteController, hintText: 'https://example.com', readOnly: !_isEditMode),
-              BuildTextField(label: 'Plan', controller: TextEditingController(text: clinic.subscriptionPlan), hintText: 'Plan', readOnly: true),
-            ],
+          BuildTextField(
+            label: 'Website',
+            controller: _websiteController,
+            hintText: 'https://example.com',
+            readOnly: !_isEditMode,
           ),
+        ]),
+        SizedBox(height: 24.h),
+        _infoSection('Treatments Available', [
+          if (clinic.treatments == null || clinic.treatments!.isEmpty)
+            _buildTreatmentsEmptyState()
+          else
+            Column(
+              children: clinic.treatments!.map((t) => _buildTreatmentRow(t)).toList(),
+            ),
         ]),
       ],
     );
   }
 
-  Widget _buildStatsSidebar(ClinicDetailResponse clinic) {
+  Widget _buildTreatmentsEmptyState() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 24.h),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(Icons.medical_services_outlined, size: 40.sp, color: CustomColors.grey),
+            SizedBox(height: 12.h),
+            Text('No treatments registered currently', style: context.fonts.grey14w500),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTreatmentRow(dynamic treatment) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle_outline_rounded, color: CustomColors.green, size: 20.sp),
+          SizedBox(width: 12.w),
+          Text(treatment.toString(), style: context.fonts.black14w500),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatsSidebar(ClinicDetailData clinic) {
     return Column(
       children: [
-        _infoSection('Performance Overview', [
-          _statRow(Icons.people_outline, 'Total Appointments', clinic.totalAppointments?.toString() ?? '0'),
-          _statRow(Icons.medical_services_outlined, 'Total Treatments', clinic.totalTreatments?.toString() ?? '0'),
-          _statRow(Icons.payments_outlined, 'Total Revenue', "\$${clinic.totalRevenue?.toStringAsFixed(0) ?? "0"}"),
+        _infoSection('Availability & Working Hours', [
+          if (clinic.availability == null || clinic.availability!.isEmpty)
+            Text('No working hours registered.', style: context.fonts.grey14w400)
+          else
+            ...clinic.availability!.map((a) => _buildAvailabilityCard(a)),
         ]),
         SizedBox(height: 24.h),
         _infoSection('Subscription Info', [
-          _statRow(Icons.card_membership_outlined, 'Current Plan', clinic.subscriptionPlan ?? 'Standard'),
-          _statRow(Icons.access_time_rounded, 'Working Hours', clinic.workingHours ?? '09:00 - 17:00'),
-          _statRow(Icons.update_rounded, 'Last Updated', clinic.updatedAt.toString()),
+          _statRow(Icons.card_membership_outlined, 'Current Status', clinic.status?.toUpperCase() ?? 'ACTIVE'),
+          _statRow(Icons.map_outlined, 'Latitude', clinic.latitude?.toStringAsFixed(4) ?? 'N/A'),
+          _statRow(Icons.explore_outlined, 'Longitude', clinic.longitude?.toStringAsFixed(4) ?? 'N/A'),
         ]),
       ],
+    );
+  }
+
+  Widget _buildAvailabilityCard(ClinicAvailability availability) {
+    final String daysStr = availability.days?.join(', ') ?? 'N/A';
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Working Hours', style: context.fonts.black13w600),
+              Text(
+                '${availability.openTime ?? "09:00"} - ${availability.closeTime ?? "17:00"}',
+                style: context.fonts.purple13w600,
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          Text(daysStr, style: context.fonts.grey12w400, maxLines: 2, overflow: TextOverflow.ellipsis),
+        ],
+      ),
     );
   }
 
@@ -375,21 +464,6 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       child: Text(
         status.toUpperCase(),
         style: isActive ? context.fonts.green10w700 : context.fonts.red10w700,
-      ),
-    );
-  }
-
-  Widget _infoChip(IconData icon, String label) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-      decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(8.r)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14.sp, color: CustomColors.grey),
-          SizedBox(width: 8.w),
-          Text(label, style: context.fonts.grey13w500),
-        ],
       ),
     );
   }

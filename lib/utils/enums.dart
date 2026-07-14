@@ -29,7 +29,7 @@ enum Endpoint {
   deleteProduct('admin/products/{id}'),
 
   //clinics
-  getClinics('admin/clinics'),
+  getClinics('admin/cliniclist'),
   registerClinic('admin/clinic/register'),
   updateClinic('admin/clinic/update/{id}'),
   updateCustomerAppVersion('admin/app-version/customer'),
@@ -60,6 +60,8 @@ enum Endpoint {
   deleteSession('admin/sessions/{id}'),
   inviteClinics('admin/invite-clinics'),
   sendInvitation('admin/invite-clinics/send-invitation'),
+  clinicDetail('admin/clinic/detail'),
+  inviteClinicDetail('admin/invite-clinics/detail'),
   updateCategory('admin/categories/{id}'),
   updateAreas('admin/areas/{id}'),
   sessionStatus('admin/sessions/status'),

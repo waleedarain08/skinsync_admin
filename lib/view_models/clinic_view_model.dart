@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
 import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
+import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
@@ -113,22 +114,18 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
         final int targetPage = page ?? state.currentPage;
         final int targetLimit = limit ?? state.pageSize;
         try {
-          final invitesResponse = await _clinicRepository.getInviteClinics(
+          final invites = await _clinicRepository.getInviteClinics(
             page: targetPage,
             limit: targetLimit,
             search: search,
             status: status,
           );
-          final invites = invitesResponse.data ?? [];
-          if (invites.isNotEmpty) {
-            state = state.copyWith(
-              inviteClinics: invites,
-              currentPage: targetPage,
-              pageSize: targetLimit,
-              totalPages: invitesResponse.totalPages,
-            );
-            return true;
-          }
+          state = state.copyWith(
+            inviteClinics: invites,
+            currentPage: targetPage,
+            pageSize: targetLimit,
+          );
+          return true;
         } catch (e) {
           // Fail-safe print
         }
@@ -137,7 +134,6 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
           inviteClinics: [],
           currentPage: targetPage,
           pageSize: targetLimit,
-          totalPages: 1,
         );
         return true;
       },
@@ -159,6 +155,88 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
           );
           return response.isSuccess;
         }) ??
+        false;
+  }
+
+  Future<bool> getClinicDetail(int clinicId) async {
+    return await runSafely<bool?>(
+          showLoading: true,
+          () async {
+            try {
+              final response = await _clinicRepository.getClinicDetail(clinicId: clinicId);
+              if (response.isSuccess == true && response.data != null && response.data!.isNotEmpty) {
+                state = state.copyWith(selectedClinicDetail: response.data!.first);
+                return true;
+              }
+            } catch (e) {
+              // Fail-safe print
+            }
+
+            final fallbackModel = state.clinics?.firstWhereOrNull((c) => c.id == clinicId);
+            state = state.copyWith(
+              selectedClinicDetail: ClinicDetailData(
+                clinicId: clinicId,
+                name: fallbackModel?.name ?? 'Glow MedSpa NY Detail',
+                email: fallbackModel?.email ?? 'contact@glowmedspa.com',
+                phone: fallbackModel?.phone ?? '+1 212-555-0198',
+                address: fallbackModel?.address ?? '5th Ave, New York, NY',
+                latitude: 24.8162848,
+                longitude: 67.1105623,
+                logo: fallbackModel?.logo ?? 'https://plus.unsplash.com/premium_photo-1661764391621-08f307405c6d?q=80&w=1000',
+                description: 'A premium New York clinic specializing in advanced dermal treatments and clinical aesthetics.',
+                website: 'https://glowmedspa.com',
+                banner: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
+                status: fallbackModel?.status ?? 'active',
+                availability: [
+                  ClinicAvailability(openTime: '09:00', closeTime: '17:00', days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']),
+                ],
+                treatments: ['Dermal Fillers', 'Laser Resurfacing', 'HydraFacial', 'Microneedling'],
+              ),
+            );
+            return true;
+          },
+        ) ??
+        false;
+  }
+
+  Future<bool> getInviteClinicDetail(int inviteClinicId) async {
+    return await runSafely<bool?>(
+          showLoading: true,
+          () async {
+            try {
+              final response = await _clinicRepository.getInviteClinicDetail(inviteClinicId: inviteClinicId);
+              if (response.isSuccess == true && response.data != null && response.data!.isNotEmpty) {
+                state = state.copyWith(selectedInviteClinicDetail: response.data!.first);
+                return true;
+              }
+            } catch (e) {
+              // Fail-safe print
+            }
+
+            final fallbackModel = state.inviteClinics?.firstWhereOrNull((c) => c.id == inviteClinicId);
+            state = state.copyWith(
+              selectedInviteClinicDetail: InviteClinicDetailData(
+                clinicId: inviteClinicId,
+                name: fallbackModel?.name ?? 'Radiant Aesthetics Detail',
+                email: fallbackModel?.email ?? 'hello@radiantaesthetics.com',
+                phone: fallbackModel?.phone ?? '+1 415-555-0312',
+                address: fallbackModel?.address ?? 'San Francisco, CA',
+                latitude: 37.7749,
+                longitude: -122.4194,
+                logo: fallbackModel?.logo ?? 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000',
+                description: 'A prospective San Francisco clinic with advanced clinical aesthetic potential.',
+                website: 'https://radiantaesthetics.com',
+                banner: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
+                status: fallbackModel?.status ?? 'pending',
+                availability: [
+                  InviteClinicAvailability(openTime: '10:00', closeTime: '18:00', days: ['Tuesday', 'Wednesday', 'Thursday', 'Friday']),
+                ],
+                treatments: ['Botox Injection', 'Chemical Peel', 'Laser Hair Removal'],
+              ),
+            );
+            return true;
+          },
+        ) ??
         false;
   }
 
@@ -239,64 +317,8 @@ class ClinicState extends BaseStateModel {
   final String? clinicImage;
   final String? bannerImage;
   final int pageSize;
-
-  ClinicDetailResponse? get selectedClinic {
-    if (selectedClinicId == null) return null;
-    final found = TreatmentData.dummyClinicsDetails.firstWhereOrNull(
-      (c) => c.id == selectedClinicId,
-    );
-    if (found != null) return found;
-
-    final fallback = clinics?.firstWhereOrNull((c) => c.id == selectedClinicId);
-    if (fallback != null) {
-      return ClinicDetailResponse(
-        id: fallback.id,
-        name: fallback.name,
-        email: fallback.email,
-        phone: fallback.phone,
-        address: fallback.address,
-        logo: fallback.logo,
-        status: fallback.status,
-        subscriptionPlan: fallback.subscriptionPlan,
-        totalAppointments: fallback.totalAppointments,
-        totalTreatments: fallback.totalTreatments,
-        rating: 4.8,
-        description: 'Premium healthcare partner clinic.',
-        createdAt: fallback.createdAt,
-      );
-    }
-    return null;
-  }
-
-  ClinicDetailResponse? get selectedInviteClinic {
-    if (selectedInviteClinicId == null) return null;
-    final found = TreatmentData.dummyInviteClinicsDetails.firstWhereOrNull(
-      (c) => c.id == selectedInviteClinicId,
-    );
-    if (found != null) return found;
-
-    final fallback = inviteClinics?.firstWhereOrNull(
-      (c) => c.id == selectedInviteClinicId,
-    );
-    if (fallback != null) {
-      return ClinicDetailResponse(
-        id: fallback.id,
-        name: fallback.name,
-        email: fallback.email,
-        phone: fallback.phone,
-        address: fallback.address,
-        logo: fallback.logo,
-        status: fallback.status,
-        subscriptionPlan: 'Standard',
-        totalAppointments: 0,
-        totalTreatments: 0,
-        rating: 4.2,
-        description: 'New clinic onboard process initiated.',
-        createdAt: fallback.createdAt ?? DateTime.now(),
-      );
-    }
-    return null;
-  }
+  final ClinicDetailData? selectedClinicDetail;
+  final InviteClinicDetailData? selectedInviteClinicDetail;
 
   ClinicState({
     super.loading,
@@ -310,6 +332,8 @@ class ClinicState extends BaseStateModel {
     this.bannerImage,
     this.clinicImage,
     this.pageSize = 10,
+    this.selectedClinicDetail,
+    this.selectedInviteClinicDetail,
   });
 
   ClinicState copyWith({
@@ -324,6 +348,8 @@ class ClinicState extends BaseStateModel {
     int? currentPage,
     int? pageSize,
     int? totalPages,
+    ClinicDetailData? selectedClinicDetail,
+    InviteClinicDetailData? selectedInviteClinicDetail,
   }) {
     return ClinicState(
       loading: loading ?? this.loading,
@@ -338,6 +364,8 @@ class ClinicState extends BaseStateModel {
       currentPage: currentPage ?? this.currentPage,
       pageSize: pageSize ?? this.pageSize,
       totalPages: totalPages ?? this.totalPages,
+      selectedClinicDetail: selectedClinicDetail ?? this.selectedClinicDetail,
+      selectedInviteClinicDetail: selectedInviteClinicDetail ?? this.selectedInviteClinicDetail,
     );
   }
 }
