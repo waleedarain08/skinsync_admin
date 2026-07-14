@@ -13,8 +13,8 @@ import '../models/responses/base_response_model.dart';
 
 abstract class TreatmentRepository {
   Future<TreatmentListResponse> getTreatments({
-    int page = 1,
-    int limit = 10,
+    required int page,
+    required int limit,
     String search = '',
     int? categoryId,
     TreatmentStatus? status,

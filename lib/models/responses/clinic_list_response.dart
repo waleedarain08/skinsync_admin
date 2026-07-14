@@ -8,16 +8,23 @@ class ClinicListResponse extends BaseApiResponseModel<List<ClinicModel>> {
     super.data,
   });
 
-  factory ClinicListResponse.fromJson(Map<String, dynamic> json) =>
-      ClinicListResponse(
-        isSuccess: (json['is_success'] as bool?)  ?? false,
-        message: json['message'] ?? '',
-        data: json['data'] == null
-            ? null
-            : (json['data'] as List)
-                .map((e) => ClinicModel.fromJson(e as Map<String, dynamic>))
-                .toList(),
-      );
+  factory ClinicListResponse.fromJson(Map<String, dynamic> json) {
+    final rawData = json['data'];
+    List<ClinicModel>? listData;
+    if (rawData is List) {
+      listData = rawData
+          .map((e) => ClinicModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } else if (rawData is Map<String, dynamic>) {
+      listData = [ClinicModel.fromJson(rawData)];
+    }
+    
+    return ClinicListResponse(
+      isSuccess: (json['is_success'] as bool?) ?? false,
+      message: json['message'] ?? '',
+      data: listData,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'is_success': isSuccess,

@@ -5,7 +5,6 @@ import 'package:skinsync_admin/widgets/app_loader.dart';
 import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 
 import '../../models/clinic_model.dart';
-import '../../models/invite_clinic_model.dart';
 import '../../utils/theme.dart';
 import '../../view_models/clinic_view_model.dart';
 import '../../widgets/app_search_field.dart';
@@ -47,6 +46,9 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         setState(() {});
+        if (_tabController.index == 1) {
+          ref.read(clinicViewModelProvider.notifier).getInviteClinics();
+        }
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -99,13 +101,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
       final query = _searchController.text.toLowerCase();
       final matchesQuery =
           query.isEmpty ||
-          c.name.toLowerCase().contains(query) ||
-          c.email.toLowerCase().contains(query) ||
-          c.address.toLowerCase().contains(query);
+          (c.name?.toLowerCase().contains(query) ?? false) ||
+          (c.email?.toLowerCase().contains(query) ?? false) ||
+          (c.address?.toLowerCase().contains(query) ?? false);
 
       final matchesRegion =
           _selectedRegionFilter == 'All Regions' ||
-          c.address.toLowerCase().contains(_selectedRegionFilter.toLowerCase());
+          (c.address?.toLowerCase().contains(_selectedRegionFilter.toLowerCase()) ?? false);
 
       final matchesStatus =
           _selectedStatusFilter == 'All Statuses' ||
@@ -455,15 +457,15 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                           clinic.address,
                         ),
                         _tableTextCell(
-                          clinic.subscriptionPlan ?? 'Standard',
+                          clinic.subscriptionPlan,
                           style: context.fonts.black14w600,
                         ),
                         _tableTextCell(
-                          '${clinic.totalAppointments ?? 0} Appts',
+                          '${clinic.totalAppointments} Appts',
                           style: context.fonts.grey14w400,
                         ),
                         _tableTextCell(
-                          '${clinic.totalTreatments ?? 0} Proc',
+                          '${clinic.totalTreatments} Proc',
                           style: context.fonts.grey14w400,
                         ),
                         _statusBadgeCell(clinic.status ?? 'Active'),
@@ -497,7 +499,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
 
   Widget _buildPendingInvitationsTab(
     BuildContext context,
-    List<InviteClinicModel> invites,
+    List<ClinicModel> invites,
     bool isLoading,
   ) {
     if (isLoading) {
@@ -556,10 +558,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                         ),
                       ),
                       children: [
-                        _clinicNameCell(clinic.name, clinic.logo),
-                        _clinicContactCell(clinic.email, clinic.phone, null),
+                        _clinicNameCell(clinic.name ?? '', clinic.logo),
+                        _clinicContactCell(clinic.email ?? '', clinic.phone ?? '', null),
                         _tableTextCell(
-                          clinic.address,
+                          clinic.address ?? '',
                           style: context.fonts.grey14w400,
                         ),
                         _invitationStatusBadgeCell(clinic.invitationStatus),
@@ -766,7 +768,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     );
   }
 
-  Widget _inviteActionsCell(InviteClinicModel clinic) {
+  Widget _inviteActionsCell(ClinicModel clinic) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(

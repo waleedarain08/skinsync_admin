@@ -24,8 +24,8 @@ class TreatmentServices implements TreatmentRepository {
 
   @override
   Future<TreatmentListResponse> getTreatments({
-    int page = 1,
-    int limit = 10,
+    required int page,
+    required int limit,
     String search = '',
     int? categoryId,
     TreatmentStatus? status,

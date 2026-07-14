@@ -67,10 +67,11 @@ class ProductServices implements ProductRepository {
 
   @override
   Future<ProductListResponse> getProducts({
+    required int page,
+    required int limit,
     String search = '',
-    String? selectedPurpose, ProductStatus? status,
-    int page = 1,
-    int limit = 10,
+    String? selectedPurpose,
+    ProductStatus? status,
     int? brandId,
   }) async {
     final jsonResponse = await _api.get(

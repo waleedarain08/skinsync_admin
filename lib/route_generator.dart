@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
+import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
-import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
@@ -91,7 +91,7 @@ class RouteGenerator {
           GoRoute(
             name: AddNewClinicScreen.routeName,
             path: AddNewClinicScreen.routeName,
-            builder: (context, state) => AddNewClinicScreen(invitedClinic: state.extra as InviteClinicModel?),
+            builder: (context, state) => AddNewClinicScreen(invitedClinic: state.extra as ClinicDetailResponse?),
           ),
           GoRoute(
             name: DisputeScreen.routeName,

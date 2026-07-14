@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
+import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
@@ -48,7 +48,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     _clinicEmailController = TextEditingController(text: clinic?.email);
     _clinicPhoneController = TextEditingController(text: clinic?.phone);
     _clinicAddressController = TextEditingController(text: clinic?.address);
-    _websiteController = TextEditingController(text: ''); // Added in ReqModel but not yet in ClinicModel
+    _websiteController = TextEditingController(text: clinic?.website ?? '');
     _descriptionController = TextEditingController(text: clinic?.description);
   }
 
@@ -179,7 +179,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     );
   }
 
-  Widget _buildHeaderSection(ClinicModel clinic) {
+  Widget _buildHeaderSection(ClinicDetailResponse clinic) {
     return BorderdContainerWidget(
       padding: EdgeInsets.all(32.w),
       child: Column(
@@ -246,7 +246,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     );
   }
 
-  Widget _buildMainContent(ClinicModel clinic) {
+  Widget _buildMainContent(ClinicDetailResponse clinic) {
     return Column(
       children: [
         _infoSection('General Information', [
@@ -313,7 +313,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     );
   }
 
-  Widget _buildStatsSidebar(ClinicModel clinic) {
+  Widget _buildStatsSidebar(ClinicDetailResponse clinic) {
     return Column(
       children: [
         _infoSection('Performance Overview', [

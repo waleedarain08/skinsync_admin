@@ -41,22 +41,68 @@ class ClinicService implements ClinicRepository {
       pathParams: {'id': id.toString()},
       body: req.toJson(),
     );
-    final response = ClinicResponse.fromJson(jsonResponse);
+    final response = ClinicListResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
-    return response.data!;
+    return response.data!.first;
   }
 
   @override
-  Future<List<ClinicModel>> getClinics() async {
-    final jsonResponse = await _api.get(Endpoint.getClinics);
+  Future<List<ClinicModel>> getClinics({
+    required int page,
+    required int limit,
+    String? search,
+    String? status,
+  }) async {
+    final Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      'search': search ?? 'null',
+    };
+    if (status != null) {
+      queryParams['status'] = status;
+    }
+    final jsonResponse = await _api.get(
+      Endpoint.getClinics,
+      queryParams: queryParams,
+    );
     final response = ClinicListResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data ?? [];
+  }
+
+  @override
+  Future<List<ClinicModel>> getInviteClinics({
+    required int page,
+    required int limit,
+    String? search,
+    required String status,
+  }) async {
+    final Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      'search': search ?? 'null',
+      'status': status,
+    };
+    final jsonResponse = await _api.get(
+      Endpoint.inviteClinics,
+      queryParams: queryParams,
+    );
+
+    final isSuccess = jsonResponse['is_success'] as bool? ?? false;
+    if (!isSuccess) {
+      throw BadRequestException(jsonResponse['message'] ?? 'Failed to get invite clinics');
+    }
+
+    final data = jsonResponse['data'];
+    if (data is List) {
+      return data.map((e) => ClinicModel.fromJson(e)).toList();
+    }
+    return [];
   }
 }

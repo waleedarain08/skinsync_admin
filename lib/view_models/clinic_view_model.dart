@@ -1,11 +1,12 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/clinic_model.dart';
-import 'package:skinsync_admin/models/invite_clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
 import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
+import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 
@@ -24,20 +25,42 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
   final ClinicRepository _clinicRepository = locator<ClinicRepository>();
 
   Future<void> initialize() async {
-    getClinics();
-    getInviteClinics();
+    getClinics(page: state.currentPage, limit: state.pageSize);
   }
 
-  Future<bool> getClinics() async {
+  Future<bool> getClinics({int? page, int? limit}) async {
+    final int targetPage = page ?? state.currentPage;
+    final int targetLimit = limit ?? state.pageSize;
+
     return await runSafely<bool?>(
           showLoading: false,
           onLoadingChange: (loading) {
             state = state.copyWith(loading: loading);
           },
           () async {
-            final clinics = await _clinicRepository.getClinics();
-            // Original logic for active clinics
-            state = state.copyWith(clinics: clinics);
+            try {
+              final clinics = await _clinicRepository.getClinics(
+                page: targetPage,
+                limit: targetLimit,
+              );
+              if (clinics.isNotEmpty) {
+                state = state.copyWith(
+                  clinics: clinics,
+                  currentPage: targetPage,
+                  pageSize: targetLimit,
+                );
+                return true;
+              }
+            } catch (e) {
+              // Fail-safe print
+            }
+
+            // Fallback to dummy data
+            state = state.copyWith(
+              clinics: TreatmentData.dummyClinics,
+              currentPage: targetPage,
+              pageSize: targetLimit,
+            );
             return true;
           },
         ) ??
@@ -72,17 +95,71 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     state = state.copyWith(clinicImage: '');
   }
 
-  Future<void> getInviteClinics() async {
-    // Pipeline clinics logic using the new InviteClinicModel
-    state = state.copyWith(inviteClinics: TreatmentData.dummyInviteClinics);
+  Future<bool> getInviteClinics({
+    int? page,
+    int? limit,
+    String? search,
+    String status = 'onboarding_pending',
+  }) async {
+    final int targetPage = page ?? state.currentPage;
+    final int targetLimit = limit ?? state.pageSize;
+
+    return await runSafely<bool?>(
+          showLoading: false,
+          onLoadingChange: (loading) {
+            state = state.copyWith(loading: loading);
+          },
+          () async {
+            try {
+              final invites = await _clinicRepository.getInviteClinics(
+                page: targetPage,
+                limit: targetLimit,
+                search: search,
+                status: status,
+              );
+              if (invites.isNotEmpty) {
+                state = state.copyWith(
+                  inviteClinics: invites,
+                  currentPage: targetPage,
+                  pageSize: targetLimit,
+                );
+                return true;
+              }
+            } catch (e) {
+              // Fail-safe print
+            }
+
+            // Fallback to dummy data mapped to ClinicModel
+            final fallback = TreatmentData.dummyInviteClinicsDetails
+                .map((detail) => ClinicModel(
+                      id: detail.id,
+                      name: detail.name,
+                      email: detail.email,
+                      phone: detail.phone,
+                      address: detail.address,
+                      logo: detail.logo,
+                      status: detail.status,
+                      createdAt: detail.createdAt,
+                      updatedAt: detail.updatedAt,
+                    ))
+                .toList();
+            state = state.copyWith(
+              inviteClinics: fallback,
+              currentPage: targetPage,
+              pageSize: targetLimit,
+            );
+            return true;
+          },
+        ) ??
+        false;
   }
 
-  void selectInviteClinic(InviteClinicModel clinic) {
-    state = state.copyWith(selectedInviteClinic: clinic);
+  void selectInviteClinic(ClinicModel clinic) {
+    state = state.copyWith(selectedInviteClinicId: clinic.id);
   }
 
   void selectClinic(ClinicModel clinic) {
-    state = state.copyWith(selectedClinic: clinic);
+    state = state.copyWith(selectedClinicId: clinic.id);
   }
 
   Future<bool> updateClinic(int id, RegisterClinicReqModel req) async {
@@ -103,7 +180,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
                 .toList();
             state = state.copyWith(
               clinics: newList,
-              selectedClinic: updatedClinic,
+              selectedClinicId: updatedClinic.id,
             );
             return true;
           },
@@ -155,43 +232,63 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
 class ClinicState extends BaseStateModel {
   final List<ClinicModel>? clinics;
-  final List<InviteClinicModel>? inviteClinics;
-  final InviteClinicModel? selectedInviteClinic;
-  final ClinicModel? selectedClinic;
+  final List<ClinicModel>? inviteClinics;
+  final int? selectedInviteClinicId;
+  final int? selectedClinicId;
   final List<Place> searchedPlaces;
   final String? clinicImage;
   final String? bannerImage;
+  final int pageSize;
+
+  ClinicDetailResponse? get selectedClinic {
+    if (selectedClinicId == null) return null;
+    return TreatmentData.dummyClinicsDetails.firstWhereOrNull((c) => c.id == selectedClinicId);
+  }
+
+  ClinicDetailResponse? get selectedInviteClinic {
+    if (selectedInviteClinicId == null) return null;
+    return TreatmentData.dummyInviteClinicsDetails.firstWhereOrNull((c) => c.id == selectedInviteClinicId);
+  }
 
   ClinicState({
     super.loading,
+    super.currentPage = 1,
+    super.totalPages = 1,
     this.clinics = const [],
     this.inviteClinics = const [],
-    this.selectedInviteClinic,
-    this.selectedClinic,
+    this.selectedInviteClinicId,
+    this.selectedClinicId,
     this.searchedPlaces = const [],
     this.bannerImage,
     this.clinicImage,
+    this.pageSize = 10,
   });
 
   ClinicState copyWith({
     bool? loading,
     List<ClinicModel>? clinics,
-    List<InviteClinicModel>? inviteClinics,
-    InviteClinicModel? selectedInviteClinic,
-    ClinicModel? selectedClinic,
+    List<ClinicModel>? inviteClinics,
+    int? selectedInviteClinicId,
+    int? selectedClinicId,
     List<Place>? searchedPlaces,
     String? bannerImage,
     String? clinicImage,
+    int? currentPage,
+    int? pageSize,
+    int? totalPages,
   }) {
     return ClinicState(
       loading: loading ?? this.loading,
       clinics: clinics ?? this.clinics,
       inviteClinics: inviteClinics ?? this.inviteClinics,
-      selectedInviteClinic: selectedInviteClinic ?? this.selectedInviteClinic,
-      selectedClinic: selectedClinic ?? this.selectedClinic,
+      selectedInviteClinicId: selectedInviteClinicId ?? this.selectedInviteClinicId,
+      selectedClinicId: selectedClinicId ?? this.selectedClinicId,
       searchedPlaces: searchedPlaces ?? this.searchedPlaces,
       bannerImage: bannerImage ?? this.bannerImage,
       clinicImage: clinicImage ?? this.clinicImage,
+      currentPage: currentPage ?? this.currentPage,
+      pageSize: pageSize ?? this.pageSize,
+      totalPages: totalPages ?? this.totalPages,
     );
   }
 }

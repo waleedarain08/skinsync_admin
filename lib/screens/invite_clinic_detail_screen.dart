@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/invite_clinic_model.dart';
+import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
@@ -59,7 +59,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeaderCard(BuildContext context, InviteClinicModel clinic) {
+  Widget _buildHeaderCard(BuildContext context, ClinicDetailResponse clinic) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 32),
       child: Row(
@@ -85,13 +85,13 @@ class InviteClinicDetailScreen extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Text(clinic.name, style: context.fonts.black26w700),
+                    Text(clinic.name ?? '', style: context.fonts.black26w700),
                     context.horizontalSpace(16),
                     _statusBadge(context, clinic.invitationStatus),
                   ],
                 ),
                 context.verticalSpace(8),
-                Text(clinic.address, style: context.fonts.grey16w400),
+                Text(clinic.address ?? '', style: context.fonts.grey16w400),
                 context.verticalSpace(16),
                 Row(
                   children: [
@@ -108,13 +108,13 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, InviteClinicModel clinic) {
+  Widget _buildMainContent(BuildContext context, ClinicDetailResponse clinic) {
     return Column(
       children: [
         _infoSection(context, 'Contact Details', [
-          _infoRow(context, Icons.email_outlined, 'Email Address', clinic.email),
-          _infoRow(context, Icons.phone_outlined, 'Phone Number', clinic.phone),
-          _infoRow(context, Icons.location_on_outlined, 'Full Address', clinic.address),
+          _infoRow(context, Icons.email_outlined, 'Email Address', clinic.email ?? ''),
+          _infoRow(context, Icons.phone_outlined, 'Phone Number', clinic.phone ?? ''),
+          _infoRow(context, Icons.location_on_outlined, 'Full Address', clinic.address ?? ''),
         ]),
         context.verticalSpace(24),
         _infoSection(context, 'Pipeline Metrics', [
@@ -131,7 +131,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionSidebar(BuildContext context, InviteClinicModel clinic) {
+  Widget _buildActionSidebar(BuildContext context, ClinicDetailResponse clinic) {
     return Column(
       children: [
         _infoSection(context, 'Invitation Control', [
