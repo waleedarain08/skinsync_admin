@@ -525,11 +525,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               borderRadius: BorderRadius.circular(12.r),
               child: Table(
                 columnWidths: const {
-                  0: FlexColumnWidth(4), // Clinic Name / logo
-                  1: FlexColumnWidth(4), // Contact / Location
-                  2: FlexColumnWidth(3), // Region / Address
-                  3: FlexColumnWidth(2), // Status
-                  4: FlexColumnWidth(2), // Actions
+                  0: FlexColumnWidth(3.5), // Clinic Name / logo
+                  1: FlexColumnWidth(3),   // Contact Detail
+                  2: FlexColumnWidth(3.5), // Location / Address
+                  3: FlexColumnWidth(2),   // Invited Date
+                  4: FlexColumnWidth(2),   // Status
+                  5: FlexColumnWidth(1.8), // Actions
                 },
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 children: [
@@ -545,6 +546,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                       _tableHeaderCell('PROSPECT CLINIC'),
                       _tableHeaderCell('CONTACT DETAIL'),
                       _tableHeaderCell('LOCATION'),
+                      _tableHeaderCell('INVITED DATE'),
                       _tableHeaderCell('STATUS'),
                       _tableHeaderCell('ACTIONS'),
                     ],
@@ -562,6 +564,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                         _clinicContactCell(clinic.email ?? '', clinic.phone ?? '', null),
                         _tableTextCell(
                           clinic.address ?? '',
+                          style: context.fonts.grey14w400,
+                        ),
+                        _tableTextCell(
+                          _formatDate(clinic.createdAt),
                           style: context.fonts.grey14w400,
                         ),
                         _invitationStatusBadgeCell(clinic.invitationStatus),
@@ -852,5 +858,16 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime? dateTime) {
+    if (dateTime == null) return 'N/A';
+    return '${dateTime.day} ${_getMonthName(dateTime.month)} ${dateTime.year}';
+  }
+
+  String _getMonthName(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    if (month < 1 || month > 12) return '';
+    return months[month - 1];
   }
 }

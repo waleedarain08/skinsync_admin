@@ -48,7 +48,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                   children: [
                     Expanded(flex: 3, child: _buildMainContent(context, clinic)),
                     context.horizontalSpace(32),
-                    Expanded(flex: 2, child: _buildActionSidebar(context, clinic)),
+                    Expanded(flex: 2, child: _buildActionSidebar(context, ref, clinic)),
                   ],
                 ),
               ],
@@ -131,7 +131,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionSidebar(BuildContext context, ClinicDetailResponse clinic) {
+  Widget _buildActionSidebar(BuildContext context, WidgetRef ref, ClinicDetailResponse clinic) {
     return Column(
       children: [
         _infoSection(context, 'Invitation Control', [
@@ -144,17 +144,15 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             Icons.mail_outline_rounded, 
             CustomColors.green, 
             CustomColors.black,
-            () {},
-          ),
-          context.verticalSpace(12),
-          _actionButton(
-            context,
-            'Resend Invitation', 
-            Icons.refresh_rounded, 
-            Colors.white, 
-            CustomColors.green,
-            () {},
-            isOutlined: true,
+            () async {
+              if (clinic.id == null) return;
+              final success = await ref.read(clinicViewModelProvider.notifier).sendInvitation(clinic.id!);
+              if (success && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Invitation sent successfully!')),
+                );
+              }
+            },
           ),
           context.verticalSpace(12),
           _actionButton(
@@ -166,19 +164,6 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             () {
               context.push(AddNewClinicScreen.routeName, extra: clinic);
             },
-          ),
-          Padding(
-            padding: context.appEdgeInsets(vertical: 32),
-            child: Divider(color: CustomColors.border.withValues(alpha: 0.6)),
-          ),
-          _actionButton(
-            context,
-            'Archive Prospect', 
-            Icons.block_flipped, 
-            Colors.white, 
-            CustomColors.red,
-            () {},
-            isOutlined: true,
           ),
         ]),
       ],

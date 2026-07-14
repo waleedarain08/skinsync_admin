@@ -81,14 +81,16 @@ class ClinicService implements ClinicRepository {
     required int page,
     required int limit,
     String? search,
-    required String status,
+    String? status,
   }) async {
     final Map<String, String> queryParams = {
       'page': page.toString(),
       'limit': limit.toString(),
-      'search': search ?? 'null',
-      'status': status,
+      'search': search ?? '',
     };
+    if (status != null && status.isNotEmpty) {
+      queryParams['status'] = status;
+    }
     final jsonResponse = await _api.get(
       Endpoint.inviteClinics,
       queryParams: queryParams,
@@ -104,5 +106,19 @@ class ClinicService implements ClinicRepository {
       return data.map((e) => ClinicModel.fromJson(e)).toList();
     }
     return [];
+  }
+
+  @override
+  Future<BaseApiResponseModel> sendInvitation({required int inviteClinicId}) async {
+    final jsonResponse = await _api.post(
+      Endpoint.sendInvitation,
+      body: {'invite_clinic_id': inviteClinicId},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 }

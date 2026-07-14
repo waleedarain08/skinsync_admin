@@ -99,7 +99,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     int? page,
     int? limit,
     String? search,
-    String status = 'onboarding_pending',
+    String? status,
   }) async {
     final int targetPage = page ?? state.currentPage;
     final int targetLimit = limit ?? state.pageSize;
@@ -129,22 +129,8 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
               // Fail-safe print
             }
 
-            // Fallback to dummy data mapped to ClinicModel
-            final fallback = TreatmentData.dummyInviteClinicsDetails
-                .map((detail) => ClinicModel(
-                      id: detail.id,
-                      name: detail.name,
-                      email: detail.email,
-                      phone: detail.phone,
-                      address: detail.address,
-                      logo: detail.logo,
-                      status: detail.status,
-                      createdAt: detail.createdAt,
-                      updatedAt: detail.updatedAt,
-                    ))
-                .toList();
             state = state.copyWith(
-              inviteClinics: fallback,
+              inviteClinics: [],
               currentPage: targetPage,
               pageSize: targetLimit,
             );
@@ -160,6 +146,19 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
   void selectClinic(ClinicModel clinic) {
     state = state.copyWith(selectedClinicId: clinic.id);
+  }
+
+  Future<bool> sendInvitation(int inviteClinicId) async {
+    return await runSafely<bool?>(
+          showLoading: true,
+          () async {
+            final response = await _clinicRepository.sendInvitation(
+              inviteClinicId: inviteClinicId,
+            );
+            return response.isSuccess;
+          },
+        ) ??
+        false;
   }
 
   Future<bool> updateClinic(int id, RegisterClinicReqModel req) async {

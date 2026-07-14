@@ -16,6 +16,7 @@ abstract class ClinicRepository {
     required int page,
     required int limit,
     String? search,
-    required String status,
+    String? status,
   });
+  Future<BaseApiResponseModel> sendInvitation({required int inviteClinicId});
 }

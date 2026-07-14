@@ -59,6 +59,7 @@ enum Endpoint {
   sessionDetail('admin/sessions/{id}'),
   deleteSession('admin/sessions/{id}'),
   inviteClinics('admin/invite-clinics'),
+  sendInvitation('admin/invite-clinics/send-invitation'),
   updateCategory('admin/categories/{id}'),
   updateAreas('admin/areas/{id}'),
   sessionStatus('admin/sessions/status'),
