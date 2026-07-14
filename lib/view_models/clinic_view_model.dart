@@ -242,12 +242,54 @@ class ClinicState extends BaseStateModel {
 
   ClinicDetailResponse? get selectedClinic {
     if (selectedClinicId == null) return null;
-    return TreatmentData.dummyClinicsDetails.firstWhereOrNull((c) => c.id == selectedClinicId);
+    final found = TreatmentData.dummyClinicsDetails.firstWhereOrNull((c) => c.id == selectedClinicId);
+    if (found != null) return found;
+
+    final fallback = clinics?.firstWhereOrNull((c) => c.id == selectedClinicId);
+    if (fallback != null) {
+      return ClinicDetailResponse(
+        id: fallback.id,
+        name: fallback.name,
+        email: fallback.email,
+        phone: fallback.phone,
+        address: fallback.address,
+        logo: fallback.logo,
+        status: fallback.status,
+        subscriptionPlan: fallback.subscriptionPlan,
+        totalAppointments: fallback.totalAppointments,
+        totalTreatments: fallback.totalTreatments,
+        rating: 4.8,
+        description: 'Premium healthcare partner clinic.',
+        createdAt: fallback.createdAt,
+      );
+    }
+    return null;
   }
 
   ClinicDetailResponse? get selectedInviteClinic {
     if (selectedInviteClinicId == null) return null;
-    return TreatmentData.dummyInviteClinicsDetails.firstWhereOrNull((c) => c.id == selectedInviteClinicId);
+    final found = TreatmentData.dummyInviteClinicsDetails.firstWhereOrNull((c) => c.id == selectedInviteClinicId);
+    if (found != null) return found;
+
+    final fallback = inviteClinics?.firstWhereOrNull((c) => c.id == selectedInviteClinicId);
+    if (fallback != null) {
+      return ClinicDetailResponse(
+        id: fallback.id,
+        name: fallback.name,
+        email: fallback.email,
+        phone: fallback.phone,
+        address: fallback.address,
+        logo: fallback.logo,
+        status: fallback.status,
+        subscriptionPlan: 'Standard',
+        totalAppointments: 0,
+        totalTreatments: 0,
+        rating: 4.2,
+        description: 'New clinic onboard process initiated.',
+        createdAt: fallback.createdAt ?? DateTime.now(),
+      );
+    }
+    return null;
   }
 
   ClinicState({
