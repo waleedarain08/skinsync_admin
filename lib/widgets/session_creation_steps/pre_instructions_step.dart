@@ -1,165 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/models/common_models.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
-import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/session_creation_steps/instruction_attachments_widget.dart';
 
 class PreInstructionsStep extends ConsumerWidget {
   const PreInstructionsStep({super.key});
-
-  Widget _buildUploadedAttachmentPreview(
-    BuildContext context,
-    Attachment file,
-  ) {
-    if (file.type == 'image') {
-      return AppNetworkImage(
-        imageUrl: file.url,
-        borderRadius: context.appBorderRadius(all: 6),
-        fit: BoxFit.cover,
-      );
-    }
-    if (file.type == 'pdf') {
-      return const Icon(
-        Icons.picture_as_pdf_rounded,
-        color: CustomColors.red,
-        size: 32,
-      );
-    }
-    if (file.type == 'video') {
-      return const Icon(
-        Icons.video_collection_rounded,
-        color: CustomColors.purple,
-        size: 32,
-      );
-    }
-    return const Icon(
-      Icons.insert_drive_file_outlined,
-      color: CustomColors.grey,
-      size: 32,
-    );
-  }
-
-  Widget _buildUploadedAttachmentsField(
-    BuildContext context,
-    List<Attachment> files,
-    VoidCallback onPick,
-    void Function(int) onRemove,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Supporting Media (Optional)',
-              style: context.fonts.black14w600,
-            ),
-            TextButton.icon(
-              onPressed: onPick,
-              icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
-              label: const Text('Add Files'),
-              style: TextButton.styleFrom(foregroundColor: CustomColors.purple),
-            ),
-          ],
-        ),
-        context.verticalSpace(12),
-        if (files.isEmpty)
-          InkWell(
-            onTap: onPick,
-            child: Container(
-              width: double.infinity,
-              padding: context.appEdgeInsets(vertical: 20),
-              decoration: BoxDecoration(
-                color: CustomColors.whiteGrey,
-                borderRadius: context.appBorderRadius(all: 12),
-                border: Border.all(
-                  color: CustomColors.border,
-                  style: BorderStyle.solid,
-                ),
-              ),
-              child: Column(
-                children: [
-                  const Icon(
-                    Icons.cloud_upload_outlined,
-                    color: CustomColors.grey,
-                    size: 24,
-                  ),
-                  context.verticalSpace(8),
-                  Text(
-                    'Upload PDFs, Images, or Videos',
-                    style: context.fonts.grey13w500,
-                  ),
-                ],
-              ),
-            ),
-          )
-        else
-          Wrap(
-            spacing: context.w(12),
-            runSpacing: context.h(12),
-            children: List.generate(files.length, (index) {
-              final file = files[index];
-              return Container(
-                width: context.w(160),
-                padding: context.appEdgeInsets(all: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: context.appBorderRadius(all: 10),
-                  border: Border.all(color: CustomColors.border),
-                ),
-                child: Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          height: context.h(80),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: CustomColors.whiteGrey,
-                            borderRadius: context.appBorderRadius(all: 6),
-                          ),
-                          child: _buildUploadedAttachmentPreview(context, file),
-                        ),
-                        Positioned(
-                          top: 2,
-                          right: 2,
-                          child: InkWell(
-                            onTap: () => onRemove(index),
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.close_rounded,
-                                size: 14,
-                                color: CustomColors.red,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    context.verticalSpace(8),
-                    Text(
-                      file.name,
-                      style: context.fonts.grey10w400,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ),
-      ],
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -176,11 +23,10 @@ class PreInstructionsStep extends ConsumerWidget {
           maxLines: 8,
         ),
         context.verticalSpace(32),
-        _buildUploadedAttachmentsField(
-          context,
-          state.existingPreAttachments,
-          () => viewModel.pickAttachments(true),
-          (idx) => viewModel.removeExistingAttachment(true, idx),
+        InstructionAttachmentsWidget(
+          files: state.existingPreAttachments,
+          onPick: () => viewModel.pickAttachments(true),
+          onRemove: (idx) => viewModel.removeExistingAttachment(true, idx),
         ),
       ],
     );
