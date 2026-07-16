@@ -197,11 +197,10 @@ class PricingStep extends ConsumerWidget {
         const Divider(),
         context.verticalSpace(24),
         AuthorizedRolesWidget(
-          providerRolesSource: state.pricingRolesSource,
+          title: 'Authorized Roles to Change Pricing',
+          description: 'Select which provider roles are authorized to override or modify session base pricing and overrides.',
           selectedRoles: state.pricingRoles,
-          onProviderRolesSourceChanged: viewModel.setPricingRolesSource,
           onRoleToggled: viewModel.togglePricingRole,
-          onSetRoles: viewModel.setPricingRoles,
         ),
       ],
     );

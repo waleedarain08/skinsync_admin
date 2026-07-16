@@ -585,11 +585,10 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
         const Divider(),
         context.verticalSpace(24),
         AuthorizedRolesWidget(
-          providerRolesSource: state.materialsRolesSource,
+          title: 'Authorized Roles to Change Materials',
+          description: 'Select which provider roles are authorized to modify products and materials for this session.',
           selectedRoles: state.materialsRoles,
-          onProviderRolesSourceChanged: viewModel.setMaterialsRolesSource,
           onRoleToggled: viewModel.toggleMaterialsRole,
-          onSetRoles: viewModel.setMaterialsRoles,
         ),
         context.verticalSpace(32),
       ],

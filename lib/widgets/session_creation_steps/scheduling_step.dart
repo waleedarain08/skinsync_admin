@@ -428,11 +428,10 @@ class SchedulingStep extends ConsumerWidget {
         const Divider(),
         context.verticalSpace(24),
         AuthorizedRolesWidget(
-          providerRolesSource: state.schedulingRolesSource,
+          title: 'Authorized Roles to Change Schedule',
+          description: 'Select which provider roles are authorized to override or modify treatment scheduling and duration controls.',
           selectedRoles: state.schedulingRoles,
-          onProviderRolesSourceChanged: viewModel.setSchedulingRolesSource,
           onRoleToggled: viewModel.toggleSchedulingRole,
-          onSetRoles: viewModel.setSchedulingRoles,
         ),
       ],
     );
