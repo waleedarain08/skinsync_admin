@@ -4,6 +4,7 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/session_creation_steps/authorized_roles_widget.dart';
 
 class PricingStep extends ConsumerWidget {
   const PricingStep({super.key});
@@ -192,6 +193,16 @@ class PricingStep extends ConsumerWidget {
             }),
           ],
         ],
+        context.verticalSpace(32),
+        const Divider(),
+        context.verticalSpace(24),
+        AuthorizedRolesWidget(
+          providerRolesSource: state.pricingRolesSource,
+          selectedRoles: state.pricingRoles,
+          onProviderRolesSourceChanged: viewModel.setPricingRolesSource,
+          onRoleToggled: viewModel.togglePricingRole,
+          onSetRoles: viewModel.setPricingRoles,
+        ),
       ],
     );
   }

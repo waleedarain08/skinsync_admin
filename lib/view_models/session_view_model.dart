@@ -87,6 +87,12 @@ class SessionState extends BaseStateModel {
   // Roles
   final List<String> selectedRoles;
   final String providerRolesSource;
+  final List<String> materialsRoles;
+  final String materialsRolesSource;
+  final List<String> schedulingRoles;
+  final String schedulingRolesSource;
+  final List<String> pricingRoles;
+  final String pricingRolesSource;
 
   // Scheduling
   final bool allowClinicOverride;
@@ -137,6 +143,12 @@ class SessionState extends BaseStateModel {
     this.downtimeLevel = 'No_Downtime',
     this.selectedRoles = const [],
     this.providerRolesSource = 'Category_Default',
+    this.materialsRoles = const [],
+    this.materialsRolesSource = 'category',
+    this.schedulingRoles = const [],
+    this.schedulingRolesSource = 'category',
+    this.pricingRoles = const [],
+    this.pricingRolesSource = 'category',
     this.allowClinicOverride = false,
     this.allowProviderOverride = false,
     this.onlineBookable = false,
@@ -184,6 +196,12 @@ class SessionState extends BaseStateModel {
     String? downtimeLevel,
     List<String>? selectedRoles,
     String? providerRolesSource,
+    List<String>? materialsRoles,
+    String? materialsRolesSource,
+    List<String>? schedulingRoles,
+    String? schedulingRolesSource,
+    List<String>? pricingRoles,
+    String? pricingRolesSource,
     bool? allowClinicOverride,
     bool? allowProviderOverride,
     bool? onlineBookable,
@@ -244,6 +262,12 @@ class SessionState extends BaseStateModel {
       downtimeLevel: downtimeLevel ?? this.downtimeLevel,
       selectedRoles: selectedRoles ?? this.selectedRoles,
       providerRolesSource: providerRolesSource ?? this.providerRolesSource,
+      materialsRoles: materialsRoles ?? this.materialsRoles,
+      materialsRolesSource: materialsRolesSource ?? this.materialsRolesSource,
+      schedulingRoles: schedulingRoles ?? this.schedulingRoles,
+      schedulingRolesSource: schedulingRolesSource ?? this.schedulingRolesSource,
+      pricingRoles: pricingRoles ?? this.pricingRoles,
+      pricingRolesSource: pricingRolesSource ?? this.pricingRolesSource,
       allowClinicOverride: allowClinicOverride ?? this.allowClinicOverride,
       allowProviderOverride:
           allowProviderOverride ?? this.allowProviderOverride,
@@ -674,6 +698,12 @@ class SessionViewModel extends BaseViewModel<SessionState> {
               state = state.copyWith(
                 downtimeLevel: detail.downtimeLevel,
                 selectedRoles: detail.allowedRoles,
+                materialsRoles: detail.allowedRoles,
+                materialsRolesSource: detail.allowedRoles.isNotEmpty ? 'custom' : 'category',
+                schedulingRoles: detail.allowedRoles,
+                schedulingRolesSource: detail.allowedRoles.isNotEmpty ? 'custom' : 'category',
+                pricingRoles: detail.allowedRoles,
+                pricingRolesSource: detail.allowedRoles.isNotEmpty ? 'custom' : 'category',
               );
 
               // 11. Follow ups
@@ -974,6 +1004,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       otherMaterials: state.otherMaterialsUsageEntries
           .map((e) => e.productId)
           .toList(),
+      allowedRoles: state.materialsRoles,
     );
 
     return await runSafely<bool>(() async {
@@ -1089,6 +1120,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       fixedPrice: state.isFixedPrice
           ? int.tryParse(fixedPriceController.text.trim())
           : null,
+      allowedRoles: state.pricingRoles,
     );
     log('''
 =========== PRODUCT USAGE REQUEST ===========
@@ -1364,6 +1396,7 @@ Body       : ${request.toJson()}
               ? (int.tryParse(fixedDurationController.text) ?? 0)
               : null,
           isFixedDuration: state.isFixedDuration,
+          allowedRoles: state.schedulingRoles,
         ),
         state.sessionId!,
       );
@@ -1731,6 +1764,60 @@ Body                 : ${request.toJson()}
 
   void setRoles(List<String> roles) {
     state = state.copyWith(selectedRoles: roles);
+  }
+
+  void toggleMaterialsRole(String role) {
+    final List<String> current = List.from(state.materialsRoles);
+    if (current.contains(role)) {
+      current.remove(role);
+    } else {
+      current.add(role);
+    }
+    state = state.copyWith(materialsRoles: current);
+  }
+
+  void setMaterialsRoles(List<String> roles) {
+    state = state.copyWith(materialsRoles: roles);
+  }
+
+  void setMaterialsRolesSource(String source) {
+    state = state.copyWith(materialsRolesSource: source);
+  }
+
+  void toggleSchedulingRole(String role) {
+    final List<String> current = List.from(state.schedulingRoles);
+    if (current.contains(role)) {
+      current.remove(role);
+    } else {
+      current.add(role);
+    }
+    state = state.copyWith(schedulingRoles: current);
+  }
+
+  void setSchedulingRoles(List<String> roles) {
+    state = state.copyWith(schedulingRoles: roles);
+  }
+
+  void setSchedulingRolesSource(String source) {
+    state = state.copyWith(schedulingRolesSource: source);
+  }
+
+  void togglePricingRole(String role) {
+    final List<String> current = List.from(state.pricingRoles);
+    if (current.contains(role)) {
+      current.remove(role);
+    } else {
+      current.add(role);
+    }
+    state = state.copyWith(pricingRoles: current);
+  }
+
+  void setPricingRoles(List<String> roles) {
+    state = state.copyWith(pricingRoles: roles);
+  }
+
+  void setPricingRolesSource(String source) {
+    state = state.copyWith(pricingRolesSource: source);
   }
 
   void updateSessionFollowUpCount(int sessionIndex, String val) {

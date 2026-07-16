@@ -5,6 +5,7 @@ import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/session_creation_steps/authorized_roles_widget.dart';
 
 class SchedulingStep extends ConsumerWidget {
   const SchedulingStep({super.key});
@@ -422,6 +423,16 @@ class SchedulingStep extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+        context.verticalSpace(32),
+        const Divider(),
+        context.verticalSpace(24),
+        AuthorizedRolesWidget(
+          providerRolesSource: state.schedulingRolesSource,
+          selectedRoles: state.schedulingRoles,
+          onProviderRolesSourceChanged: viewModel.setSchedulingRolesSource,
+          onRoleToggled: viewModel.toggleSchedulingRole,
+          onSetRoles: viewModel.setSchedulingRoles,
         ),
       ],
     );

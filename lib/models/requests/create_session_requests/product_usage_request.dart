@@ -7,6 +7,7 @@ class ProductUsagesRequest {
   final double? maximumUnits;
   final List<ProductUsage>? billableMaterials;
   final List<int>? otherMaterials;
+  final List<String>? allowedRoles;
 
   ProductUsagesRequest({
     required this.stepNumber,
@@ -15,6 +16,7 @@ class ProductUsagesRequest {
     this.maximumUnits,
     this.billableMaterials,
     this.otherMaterials,
+    this.allowedRoles,
   });
 
   Map<String, dynamic> toJson() => {
@@ -29,6 +31,9 @@ class ProductUsagesRequest {
     'other_materials': otherMaterials == null
         ? []
         : List<dynamic>.from(otherMaterials!.map((x) => x)),
+    'allowed_roles': allowedRoles == null
+        ? []
+        : List<dynamic>.from(allowedRoles!.map((x) => x)),
   };
 }
 

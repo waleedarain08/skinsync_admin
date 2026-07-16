@@ -7,11 +7,11 @@ import 'package:skinsync_admin/screens/product_detail_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
+import 'package:skinsync_admin/widgets/session_creation_steps/authorized_roles_widget.dart';
 
 class MaterialsStep extends ConsumerStatefulWidget {
   const MaterialsStep({super.key});
@@ -28,11 +28,24 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(productViewModelProvider.notifier).fetchUnitTypes();
       await ref.read(sessionViewModelProvider.notifier).fetchProductsByTreatmentCategory();
+
+      final viewModel = ref.read(sessionViewModelProvider.notifier);
+      viewModel.minUnitsController.addListener(_onUnitsChanged);
+      viewModel.maxUnitsController.addListener(_onUnitsChanged);
     });
+  }
+
+  void _onUnitsChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    try {
+      final viewModel = ref.read(sessionViewModelProvider.notifier);
+      viewModel.minUnitsController.removeListener(_onUnitsChanged);
+      viewModel.maxUnitsController.removeListener(_onUnitsChanged);
+    } catch (_) {}
     super.dispose();
   }
 
@@ -45,27 +58,10 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
     );
   }
 
-  String _formatUnitPlural(String unit) {
-    if (unit.isEmpty) return 'Units';
-    final lower = unit.toLowerCase();
-    if (lower == 'unit' || lower == 'u') return 'Units';
-    if (lower.contains('unit (u)')) return 'Units (U)';
-    if (lower == 'syringe') return 'Syringes';
-    if (lower == 'vial') return 'Vials';
-    if (lower == 'bottle') return 'Bottles';
-    if (lower == 'tube') return 'Tubes';
-    if (lower == 'kit') return 'Kits';
-    if (lower == 'pack') return 'Packs';
-    if (lower == 'piece') return 'Pieces';
-    if (lower.endsWith('s')) return unit;
-    return '${unit}s';
-  }
-
   Widget _buildProductSelector(
     BuildContext context,
     List<TreatmentProductData> products,
-    SessionViewModel viewModel,
-    TreatmentState state, {
+    SessionViewModel viewModel, {
     bool isOtherMaterial = false,
   }) {
     return Column(
@@ -139,8 +135,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
     BuildContext context,
     int index,
     ProductUsageEntry entry,
-    SessionViewModel viewModel,
-    TreatmentState state, {
+    SessionViewModel viewModel, {
     bool isOtherMaterial = false,
   }) {
     final sessionState = ref.read(sessionViewModelProvider);
@@ -402,7 +397,6 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(sessionViewModelProvider);
-    final treatmentState = ref.watch(treatmentViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
 
     // ProductViewModel holds unit types list
@@ -416,10 +410,17 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
     );
     final unitTypeName = selectedUnitType.name.isNotEmpty
         ? selectedUnitType.name
-        : (state.selectedUnitTypeName ?? 'Units');
-    final pluralUnitLabel = _formatUnitPlural(unitTypeName);
+        : (state.selectedUnitTypeName ?? 'Unit');
 
     final minUnits = double.tryParse(viewModel.minUnitsController.text) ?? 0.0;
+    final maxUnits = double.tryParse(viewModel.maxUnitsController.text) ?? 0.0;
+
+    final String minLabel = minUnits > 1 && !unitTypeName.toLowerCase().endsWith('s')
+        ? '${unitTypeName}s'
+        : unitTypeName;
+    final String maxLabel = maxUnits > 1 && !unitTypeName.toLowerCase().endsWith('s')
+        ? '${unitTypeName}s'
+        : unitTypeName;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -454,7 +455,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
           children: [
             Expanded(
               child: BuildTextField(
-                label: 'Minimum $pluralUnitLabel',
+                label: 'Minimum $minLabel',
                 controller: viewModel.minUnitsController,
                 hintText: '0',
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -463,7 +464,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
             context.horizontalSpace(16),
             Expanded(
               child: BuildTextField(
-                label: 'Maximum $pluralUnitLabel',
+                label: 'Maximum $maxLabel',
                 controller: viewModel.maxUnitsController,
                 hintText: '0',
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -519,7 +520,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
               ),
             ),
           ] else ...[
-            _buildProductSelector(context, state.products, viewModel, treatmentState),
+            _buildProductSelector(context, state.products, viewModel),
           ],
           if (state.productUsageEntries.isNotEmpty) ...[
             context.verticalSpace(32),
@@ -534,7 +535,6 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                   index,
                   state.productUsageEntries[index],
                   viewModel,
-                  treatmentState,
                 );
               },
             ),
@@ -559,7 +559,6 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
             context,
             state.products,
             viewModel,
-            treatmentState,
             isOtherMaterial: true,
           ),
         ],
@@ -577,12 +576,21 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                 index,
                 state.otherMaterialsUsageEntries[index],
                 viewModel,
-                treatmentState,
                 isOtherMaterial: true,
               );
             },
           ),
         ],
+        context.verticalSpace(32),
+        const Divider(),
+        context.verticalSpace(24),
+        AuthorizedRolesWidget(
+          providerRolesSource: state.materialsRolesSource,
+          selectedRoles: state.materialsRoles,
+          onProviderRolesSourceChanged: viewModel.setMaterialsRolesSource,
+          onRoleToggled: viewModel.toggleMaterialsRole,
+          onSetRoles: viewModel.setMaterialsRoles,
+        ),
         context.verticalSpace(32),
       ],
     );

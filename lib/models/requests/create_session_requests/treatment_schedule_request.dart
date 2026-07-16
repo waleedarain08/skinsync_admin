@@ -15,6 +15,7 @@ class TreatmentScheduleRequest {
   final int? calculatedTotalDuration;
   final int? fixedDuration;
   final bool? isFixedDuration;
+  final List<String>? allowedRoles;
 
   TreatmentScheduleRequest({
     required this.stepNumber,
@@ -31,6 +32,7 @@ class TreatmentScheduleRequest {
     this.calculatedTotalDuration,
     this.fixedDuration,
     this.isFixedDuration,
+    this.allowedRoles,
   });
 
   Map<String, dynamic> toJson() => {
@@ -50,6 +52,9 @@ class TreatmentScheduleRequest {
     'maximum_days_in_advance': maximumDaysInAdvance,
     'calculated_total_duration': calculatedTotalDuration,
     'fixed_duration': fixedDuration,
+    'allowed_roles': allowedRoles == null
+        ? []
+        : List<dynamic>.from(allowedRoles!.map((x) => x)),
     //'is_fixed_duration': isFixedDuration,
   };
 }

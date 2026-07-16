@@ -6,6 +6,7 @@ class StepPricingRequest {
   final List<UnitPriceOverride>? unitPriceOverrides;
   final bool? isFixedPrice;
   final int? fixedPrice;
+  final List<String>? allowedRoles;
 
   StepPricingRequest({
     required this.stepNumber,
@@ -13,6 +14,7 @@ class StepPricingRequest {
     this.unitPriceOverrides,
     this.isFixedPrice,
     this.fixedPrice,
+    this.allowedRoles,
   });
 
   Map<String, dynamic> toJson() => {
@@ -24,6 +26,9 @@ class StepPricingRequest {
         : List<dynamic>.from(unitPriceOverrides!.map((x) => x.toJson())),
     'is_fixed_price': isFixedPrice,
     'fixed_price': fixedPrice,
+    'allowed_roles': allowedRoles == null
+        ? []
+        : List<dynamic>.from(allowedRoles!.map((x) => x)),
   };
 }
 
