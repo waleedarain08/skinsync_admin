@@ -35,11 +35,11 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-     await ref
-          .read(sessionViewModelProvider.notifier)
-          .fetchProductsByTreatmentCategory();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //  await ref
+    //       .read(sessionViewModelProvider.notifier)
+    //       .fetchProductsByTreatmentCategory();
+    // });
   }
 
   int _getSessionOffsetStep(int sessionStep) {
@@ -1971,7 +1971,6 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               if (sessionState.sessionStep == 1) {
                 // Inventory Products
                 if (!_validateProductQuantities(context, state)) return;
-               // final result = await viewModel.callProductUsage(stepNumber: sessionState.sessionStep);
                 success =  true;
                 //(result == true);
               } else if (sessionState.sessionStep == 2) {

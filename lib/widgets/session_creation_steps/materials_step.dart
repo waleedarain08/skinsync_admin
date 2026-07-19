@@ -422,6 +422,9 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
         ? '${unitTypeName}s'
         : unitTypeName;
 
+    final hasMatchingUnitType = unitTypes.any((u) => u.id == state.selectedUnitTypeId);
+    final dropdownValue = hasMatchingUnitType ? state.selectedUnitTypeId : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -435,7 +438,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
         CustomDropdown<int>(
           label: 'Unit Type',
           hintText: 'Select Unit Type',
-          value: state.selectedUnitTypeId,
+          value: dropdownValue,
           items: unitTypes.map((u) {
             return DropdownMenuItem<int>(
               value: u.id,
