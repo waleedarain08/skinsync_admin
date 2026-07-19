@@ -13,34 +13,32 @@ class AppLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     final boxSize = size ?? 100.w;
     final imageSize = size ?? 50.w;
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(10.w),
-        child: SizedBox(
-          width: boxSize,
-          height: boxSize,
-          child: Stack(
-            children: [
-              Center(
-                child: Transform.scale(
-                  scale: 1.6,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    value: value,
-                  ),
+    return Padding(
+      padding: EdgeInsets.all(10.w),
+      child: SizedBox(
+        width: boxSize,
+        height: boxSize,
+        child: Stack(
+          children: [
+            Center(
+              child: Transform.scale(
+                scale: 1.6,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  value: value,
                 ),
               ),
-              Positioned.fill(
-                child: Center(
-                  child: Image.asset(
-                    PngAssets.splashLogo,
-                    width: imageSize,
-                    height: imageSize,
-                  ),
+            ),
+            Positioned.fill(
+              child: Center(
+                child: Image.asset(
+                  PngAssets.splashLogo,
+                  width: imageSize,
+                  height: imageSize,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
