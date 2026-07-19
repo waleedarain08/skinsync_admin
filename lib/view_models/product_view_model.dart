@@ -253,34 +253,33 @@ class ProductViewModel extends BaseViewModel<ProductState> {
   final MediaService _mediaService = MediaService();
   final ImagePicker _picker = ImagePicker();
 
+  Future<void> pickAndUploadImage({
+    bool showLoading = true,
+    bool showError = true,
+  }) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
-Future<void> pickAndUploadImage({
-  bool showLoading = true,
-  bool showError = true,
-}) async {
-  final XFile? image = await _picker.pickImage(
-    source: ImageSource.gallery,
-  );
+    if (image == null) return;
 
-  if (image == null) return;
+    await runSafely(
+      () async {
+        final String? url = await _mediaService.uploadImage(
+          'products/image',
+          image,
+        );
 
-  await runSafely(() async {
-    final String? url = await _mediaService.uploadImage(
-      'products/image',
-      image,
+        if (url == null) {
+          throw const UnknownException('Failed to upload image');
+        }
+
+        log('Product image uploaded: $url');
+
+        state = state.copyWith(imageUrl: url);
+      },
+      showLoading: showLoading,
+      showError: showError,
     );
-
-    if (url == null) {
-      throw const UnknownException('Failed to upload image');
-    }
-
-    log('Product image uploaded: $url');
-
-    state = state.copyWith(
-      imageUrl: url,
-    );
-  }, showLoading: showLoading, showError: showError);
-}
+  }
   // List<DropdownMenuItem<int>> getProductDropdownItems() {
   //   return state.products
   //       .map(
@@ -301,8 +300,8 @@ Future<void> pickAndUploadImage({
           brand: req.brand,
           manufacturer: req.manufacturer,
           globalSku: req.globalSku,
-          barcode: req.barcode,
-          usageType: req.productPurpose ?? req.usageType,
+          // barcode: req.barcode,
+          usageType:req.usageType,
           category: req.category,
           selectedCategoryIds: req.selectedCategoryIds,
           status: req.status,
@@ -315,12 +314,13 @@ Future<void> pickAndUploadImage({
           billableQuantityPerItem: req.billableQuantityPerItem,
           totalBillableQuantity: req.totalBillableQuantity,
           enforceLotTracking: req.enforceLotTracking,
-          clinicCost: req.clinicCost,
-          retailPricePerUnit: req.retailPricePerUnit,
-          supplier: req.supplier,
-          lotNumber: req.lotNumber,
-          expirationDate: req.expirationDate?.toIso8601String(),
+          // clinicCost: req.clinicCost,
+          // retailPricePerUnit: req.retailPricePerUnit,
+          // supplier: req.supplier,
+          // lotNumber: req.lotNumber,
+          // expirationDate: req.expirationDate?.toIso8601String(),
         );
+        log('This usgae type = ${createRequest.usageType}');
         await _productRepository.addProduct(req: createRequest);
         await refreshProducts();
         EasyLoading.showSuccess('Product created successfully');
@@ -340,8 +340,8 @@ Future<void> pickAndUploadImage({
               brand: req.brand,
               manufacturer: req.manufacturer,
               globalSku: req.globalSku,
-              barcode: req.barcode,
-              usageType: req.productPurpose ?? req.usageType,
+              // barcode: req.barcode,
+              usageType: req.usageType,
               category: req.category,
               selectedCategoryIds: req.selectedCategoryIds,
               status: req.status,
@@ -354,11 +354,11 @@ Future<void> pickAndUploadImage({
               billableQuantityPerItem: req.billableQuantityPerItem,
               totalBillableQuantity: req.totalBillableQuantity,
               enforceLotTracking: req.enforceLotTracking,
-              clinicCost: req.clinicCost,
-              retailPricePerUnit: req.retailPricePerUnit,
-              supplier: req.supplier,
-              lotNumber: req.lotNumber,
-              expirationDate: req.expirationDate?.toIso8601String(),
+              // clinicCost: req.clinicCost,
+              // retailPricePerUnit: req.retailPricePerUnit,
+              // supplier: req.supplier,
+              // lotNumber: req.lotNumber,
+              // expirationDate: req.expirationDate?.toIso8601String(),
             );
             await _productRepository.updateProduct(
               id: req.id!,

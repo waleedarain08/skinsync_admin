@@ -86,16 +86,16 @@ class ProductDetailScreen extends ConsumerWidget {
                       ),
                     ),
                     context.horizontalSpace(32),
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        children: [
-                          // _buildSupplierSection(context, product),
-                          // context.verticalSpace(24),
-                          _buildComplianceAndTrackingSection(context, product),
-                        ],
-                      ),
-                    ),
+                    // Expanded(
+                    //   flex: 2,
+                    //   child: Column(
+                    //     children: [
+                    //       // _buildSupplierSection(context, product),
+                    //       // context.verticalSpace(24),
+                    //    //   _buildComplianceAndTrackingSection(context, product),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               ],
@@ -190,7 +190,7 @@ class ProductDetailScreen extends ConsumerWidget {
             'Global SKU',
             _formatValue(product.globalSku),
           ),
-          _labelValueRow(context, 'Barcode', _formatValue(product.barcode)),
+       //  _labelValueRow(context, 'Barcode', _formatValue(product.barcode)),
           _labelTopicCell(
             context,
             'Manufacturer',
@@ -304,18 +304,18 @@ class ProductDetailScreen extends ConsumerWidget {
             _formatValue(product.totalBillableQuantity),
           ),
           const Divider(height: 32),
-          _labelValueRow(
-            context,
-            'Clinic Cost',
-            product.clinicCost != null ? '\$${product.clinicCost}' : '—',
-          ),
-          _labelValueRow(
-            context,
-            'Retail Price Per Unit',
-            product.retailPricePerUnit != null
-                ? '\$${product.retailPricePerUnit}'
-                : '—',
-          ),
+          // _labelValueRow(
+          //   context,
+          //   'Clinic Cost',
+          //   product.clinicCost != null ? '\$${product.clinicCost}' : '—',
+          // ),
+          // _labelValueRow(
+          //   context,
+          //   'Retail Price Per Unit',
+          //   product.retailPricePerUnit != null
+          //       ? '\$${product.retailPricePerUnit}'
+          //       : '—',
+          // ),
         ],
       ),
     );
@@ -357,36 +357,36 @@ class ProductDetailScreen extends ConsumerWidget {
   //   );
   // }
 
-  Widget _buildComplianceAndTrackingSection(
-    BuildContext context,
-    ProductDetailModel product,
-  ) {
-    final enforce = product.enforceLotTracking ?? false;
-    return BorderdContainerWidget(
-      padding: context.appEdgeInsets(all: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Compliance & Tracking', style: context.fonts.black16w700),
-          context.verticalSpace(24),
-          _statRow(
-            context,
-            Icons.security_rounded,
-            'Lot Tracking',
-            enforce ? 'Yes' : 'No',
-            color: enforce ? CustomColors.green : null,
-          ),
-          _statRow(
-            context,
-            Icons.verified_user_outlined,
-            'Verification',
-            'FDA Validated',
-          ),
-          _statRow(context, Icons.timer_outlined, 'Shelf Life', '24 Months'),
-        ],
-      ),
-    );
-  }
+  // Widget _buildComplianceAndTrackingSection(
+  //   BuildContext context,
+  //   ProductDetailModel product,
+  // ) {
+  //   final enforce = product.enforceLotTracking ?? false;
+  //   return BorderdContainerWidget(
+  //     padding: context.appEdgeInsets(all: 24),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text('Compliance & Tracking', style: context.fonts.black16w700),
+  //         context.verticalSpace(24),
+  //         _statRow(
+  //           context,
+  //           Icons.security_rounded,
+  //           'Lot Tracking',
+  //           enforce ? 'Yes' : 'No',
+  //           color: enforce ? CustomColors.green : null,
+  //         ),
+  //         _statRow(
+  //           context,
+  //           Icons.verified_user_outlined,
+  //           'Verification',
+  //           'FDA Validated',
+  //         ),
+  //         _statRow(context, Icons.timer_outlined, 'Shelf Life', '24 Months'),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildUsedInTreatmentsSection(
     BuildContext context,

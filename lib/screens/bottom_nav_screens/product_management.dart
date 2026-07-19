@@ -167,9 +167,9 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     final lotTrackingEnabled = catalogProducts
         .where((p) => p.enforceLotTracking ?? false)
         .length;
-    final devicesCount = catalogProducts
-        .where((p) => p.productPurpose == 'device')
-        .length;
+    // final devicesCount = catalogProducts
+    //     .where((p) => p.productPurpose == 'device')
+    //     .length;
 
     return Row(
       children: [
@@ -196,7 +196,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
         context.horizontalSpace(16),
         _buildCatalogStat(
           'Device Catalog',
-          '$devicesCount Devices',
+          '0 Devices',
           Icons.biotech_outlined,
           CustomColors.black,
         ),
@@ -681,7 +681,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   _productNameCell(p),
                   _tableTextCell(
                     (() {
-                      final sku = p.globalSku ?? p.sku ?? '';
+                      final sku = p.globalSku ?? '';
                       return sku.trim().isEmpty ? 'N/A' : sku;
                     })(),
                     style: context.fonts.grey14w400,
@@ -904,7 +904,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   if (context.mounted && detailedProduct != null) {
                     context.push(
                       CreateProductScreen.routeName,
-                      extra: detailedProduct.toProductModel(),
+                      extra: detailedProduct,
                     );
                   }
                 } catch (e) {

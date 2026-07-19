@@ -2,7 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
-import 'package:skinsync_admin/models/product_model.dart';
+import 'package:skinsync_admin/models/responses/product_detail_response.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/screens/appointment_detail_screen.dart';
@@ -91,7 +91,19 @@ class RouteGenerator {
           GoRoute(
             name: AddNewClinicScreen.routeName,
             path: AddNewClinicScreen.routeName,
-            builder: (context, state) => AddNewClinicScreen(invitedClinic: state.extra as InviteClinicDetailData?),
+            builder: (context, state) {
+              final extra =
+                  state.extra
+                      as ({
+                        InviteClinicDetailData? clinic,
+                        bool onBoardClinic,
+                      })?;
+
+              return AddNewClinicScreen(
+                invitedClinic: extra?.clinic,
+                onBoardClinic: extra?.onBoardClinic ?? false,
+              );
+            },
           ),
           GoRoute(
             name: DisputeScreen.routeName,
@@ -131,7 +143,9 @@ class RouteGenerator {
               if (extra is FreeSystemPlanModel) {
                 return CreateSubscriptionPlanScreen(freePlanToEdit: extra);
               }
-              return CreateSubscriptionPlanScreen(planToEdit: extra as SubscriptionPlanModel?);
+              return CreateSubscriptionPlanScreen(
+                planToEdit: extra as SubscriptionPlanModel?,
+              );
             },
           ),
           GoRoute(
@@ -167,7 +181,9 @@ class RouteGenerator {
           GoRoute(
             name: CreateProductScreen.routeName,
             path: CreateProductScreen.routeName,
-            builder: (context, state) => CreateProductScreen(productToEdit: state.extra as ProductModel?),
+            builder: (context, state) => CreateProductScreen(
+              productToEdit: state.extra as ProductDetailModel?,
+            ),
           ),
           GoRoute(
             name: ManageInventoryDataScreen.routeName,

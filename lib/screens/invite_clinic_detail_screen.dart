@@ -16,10 +16,16 @@ class InviteClinicDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clinic = ref.watch(clinicViewModelProvider).selectedInviteClinicDetail;
+    final clinic = ref
+        .watch(clinicViewModelProvider)
+        .selectedInviteClinicDetail;
 
     if (clinic == null) {
-      return GradientScaffold(body: Center(child: Text('No Clinic Data Found', style: context.fonts.black16w400)));
+      return GradientScaffold(
+        body: Center(
+          child: Text('No Clinic Data Found', style: context.fonts.black16w400),
+        ),
+      );
     }
 
     return GradientScaffold(
@@ -46,9 +52,15 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 3, child: _buildMainContent(context, clinic)),
+                    Expanded(
+                      flex: 3,
+                      child: _buildMainContent(context, clinic),
+                    ),
                     context.horizontalSpace(32),
-                    Expanded(flex: 2, child: _buildActionSidebar(context, ref, clinic)),
+                    Expanded(
+                      flex: 2,
+                      child: _buildActionSidebar(context, ref, clinic),
+                    ),
                   ],
                 ),
               ],
@@ -76,7 +88,10 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                 topRight: Radius.circular(12.r),
               ),
               image: (clinic.banner != null && clinic.banner!.isNotEmpty)
-                  ? DecorationImage(image: NetworkImage(clinic.banner!), fit: BoxFit.cover)
+                  ? DecorationImage(
+                      image: NetworkImage(clinic.banner!),
+                      fit: BoxFit.cover,
+                    )
                   : null,
             ),
             child: (clinic.banner == null || clinic.banner!.isEmpty)
@@ -100,11 +115,18 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                     color: CustomColors.whiteGrey,
                     borderRadius: context.borderRadius(all: 20),
                     image: (clinic.logo != null && clinic.logo!.isNotEmpty)
-                        ? DecorationImage(image: NetworkImage(clinic.logo!), fit: BoxFit.cover)
+                        ? DecorationImage(
+                            image: NetworkImage(clinic.logo!),
+                            fit: BoxFit.cover,
+                          )
                         : null,
                   ),
                   child: (clinic.logo == null || clinic.logo!.isEmpty)
-                      ? Icon(Icons.business_outlined, size: context.sp(36), color: CustomColors.black)
+                      ? Icon(
+                          Icons.business_outlined,
+                          size: context.sp(36),
+                          color: CustomColors.black,
+                        )
                       : null,
                 ),
                 context.horizontalSpace(24),
@@ -126,7 +148,10 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                         ],
                       ),
                       context.verticalSpace(6),
-                      Text(clinic.address ?? 'N/A', style: context.fonts.grey14w400),
+                      Text(
+                        clinic.address ?? 'N/A',
+                        style: context.fonts.grey14w400,
+                      ),
                     ],
                   ),
                 ),
@@ -138,14 +163,37 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, InviteClinicDetailData clinic) {
+  Widget _buildMainContent(
+    BuildContext context,
+    InviteClinicDetailData clinic,
+  ) {
     return Column(
       children: [
         _infoSection(context, 'Contact & General Info', [
-          _infoRow(context, Icons.email_outlined, 'Email Address', clinic.email ?? 'N/A'),
-          _infoRow(context, Icons.phone_outlined, 'Phone Number', clinic.phone ?? 'N/A'),
-          _infoRow(context, Icons.location_on_outlined, 'Full Address', clinic.address ?? 'N/A'),
-          _infoRow(context, Icons.language_outlined, 'Website', clinic.website ?? 'N/A'),
+          _infoRow(
+            context,
+            Icons.email_outlined,
+            'Email Address',
+            clinic.email ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.phone_outlined,
+            'Phone Number',
+            clinic.phone ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.location_on_outlined,
+            'Full Address',
+            clinic.address ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.language_outlined,
+            'Website',
+            clinic.website ?? 'N/A',
+          ),
           if (clinic.description != null && clinic.description!.isNotEmpty) ...[
             context.verticalSpace(12),
             Text('About Clinic', style: context.fonts.black14w600),
@@ -159,7 +207,9 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             _buildTreatmentsEmptyState(context)
           else
             Column(
-              children: clinic.treatments!.map((t) => _buildTreatmentRow(context, t)).toList(),
+              children: clinic.treatments!
+                  .map((t) => _buildTreatmentRow(context, t))
+                  .toList(),
             ),
         ]),
       ],
@@ -172,9 +222,16 @@ class InviteClinicDetailScreen extends ConsumerWidget {
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.medical_services_outlined, size: context.sp(40), color: CustomColors.grey),
+            Icon(
+              Icons.medical_services_outlined,
+              size: context.sp(40),
+              color: CustomColors.grey,
+            ),
             context.verticalSpace(12),
-            Text('No treatments registered currently', style: context.fonts.grey14w500),
+            Text(
+              'No treatments registered currently',
+              style: context.fonts.grey14w500,
+            ),
           ],
         ),
       ),
@@ -186,7 +243,11 @@ class InviteClinicDetailScreen extends ConsumerWidget {
       padding: EdgeInsets.symmetric(vertical: context.h(8)),
       child: Row(
         children: [
-          Icon(Icons.check_circle_outline_rounded, color: CustomColors.green, size: context.sp(20)),
+          Icon(
+            Icons.check_circle_outline_rounded,
+            color: CustomColors.green,
+            size: context.sp(20),
+          ),
           context.horizontalSpace(12),
           Text(treatment.toString(), style: context.fonts.black14w500),
         ],
@@ -194,25 +255,35 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionSidebar(BuildContext context, WidgetRef ref, InviteClinicDetailData clinic) {
+  Widget _buildActionSidebar(
+    BuildContext context,
+    WidgetRef ref,
+    InviteClinicDetailData clinic,
+  ) {
     return Column(
       children: [
         _infoSection(context, 'Invitation Control', [
-          Text('Manage the outreach and onboarding workflow for this prospect.', 
-            style: context.fonts.grey13w500h15),
+          Text(
+            'Manage the outreach and onboarding workflow for this prospect.',
+            style: context.fonts.grey13w500h15,
+          ),
           context.verticalSpace(24),
           _actionButton(
             context,
-            'Invite Clinic Now', 
-            Icons.mail_outline_rounded, 
-            CustomColors.green, 
+            'Invite Clinic Now',
+            Icons.mail_outline_rounded,
+            CustomColors.green,
             CustomColors.black,
             () async {
               if (clinic.clinicId == null) return;
-              final success = await ref.read(clinicViewModelProvider.notifier).sendInvitation(clinic.clinicId!);
+              final success = await ref
+                  .read(clinicViewModelProvider.notifier)
+                  .sendInvitation(clinic.clinicId!);
               if (success && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Invitation sent successfully!')),
+                  const SnackBar(
+                    content: Text('Invitation sent successfully!'),
+                  ),
                 );
               }
             },
@@ -220,27 +291,38 @@ class InviteClinicDetailScreen extends ConsumerWidget {
           context.verticalSpace(12),
           _actionButton(
             context,
-            'Start Onboarding', 
-            Icons.rocket_launch_outlined, 
-            CustomColors.green, 
+            'Start Onboarding',
+            Icons.rocket_launch_outlined,
+            CustomColors.green,
             Colors.white,
             () {
-              context.push(AddNewClinicScreen.routeName, extra: clinic);
+              context.push(
+                AddNewClinicScreen.routeName,
+                extra: (clinic: clinic, onBoardClinic: true),
+              );
             },
           ),
         ]),
         context.verticalSpace(24),
         _infoSection(context, 'Availability Hours', [
           if (clinic.availability == null || clinic.availability!.isEmpty)
-            Text('No working hours registered.', style: context.fonts.grey14w400)
+            Text(
+              'No working hours registered.',
+              style: context.fonts.grey14w400,
+            )
           else
-            ...clinic.availability!.map((a) => _buildAvailabilityCard(context, a)),
+            ...clinic.availability!.map(
+              (a) => _buildAvailabilityCard(context, a),
+            ),
         ]),
       ],
     );
   }
 
-  Widget _buildAvailabilityCard(BuildContext context, InviteClinicAvailability availability) {
+  Widget _buildAvailabilityCard(
+    BuildContext context,
+    InviteClinicAvailability availability,
+  ) {
     final String daysStr = availability.days?.join(', ') ?? 'N/A';
     return Container(
       margin: EdgeInsets.only(bottom: context.h(12)),
@@ -263,13 +345,22 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             ],
           ),
           context.verticalSpace(8),
-          Text(daysStr, style: context.fonts.grey12w400, maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(
+            daysStr,
+            style: context.fonts.grey12w400,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
   }
 
-  Widget _infoSection(BuildContext context, String title, List<Widget> children) {
+  Widget _infoSection(
+    BuildContext context,
+    String title,
+    List<Widget> children,
+  ) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
@@ -283,14 +374,22 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _infoRow(BuildContext context, IconData icon, String label, String value) {
+  Widget _infoRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Padding(
       padding: context.appEdgeInsets(bottom: 16),
       child: Row(
         children: [
           Container(
             padding: context.appEdgeInsets(all: 8),
-            decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: context.borderRadius(all: 8)),
+            decoration: BoxDecoration(
+              color: CustomColors.whiteGrey,
+              borderRadius: context.borderRadius(all: 8),
+            ),
             child: Icon(icon, size: context.sp(18), color: CustomColors.grey),
           ),
           context.horizontalSpace(16),
@@ -299,7 +398,12 @@ class InviteClinicDetailScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: context.fonts.grey13w500),
-                Text(value, style: context.fonts.grey14w600, maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  value,
+                  style: context.fonts.grey14w600,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
@@ -308,7 +412,15 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _actionButton(BuildContext context, String label, IconData icon, Color bg, Color text, VoidCallback onTap, {bool isOutlined = false}) {
+  Widget _actionButton(
+    BuildContext context,
+    String label,
+    IconData icon,
+    Color bg,
+    Color text,
+    VoidCallback onTap, {
+    bool isOutlined = false,
+  }) {
     if (isOutlined) {
       return CustomOutlinedButton(
         label: label,
@@ -333,10 +445,14 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     Color color = CustomColors.grey;
     TextStyle textStyle = context.fonts.grey10w700;
     final String cleanStatus = status.toLowerCase();
-    if (cleanStatus.contains('sent') || cleanStatus.contains('invited') || cleanStatus.contains('awaiting') || cleanStatus.contains('active')) {
+    if (cleanStatus.contains('sent') ||
+        cleanStatus.contains('invited') ||
+        cleanStatus.contains('awaiting') ||
+        cleanStatus.contains('active')) {
       color = CustomColors.green;
       textStyle = context.fonts.green10w700;
-    } else if (cleanStatus.contains('interested') || cleanStatus.contains('pending')) {
+    } else if (cleanStatus.contains('interested') ||
+        cleanStatus.contains('pending')) {
       color = CustomColors.green;
       textStyle = context.fonts.green10w700;
     } else if (cleanStatus.contains('expired')) {
@@ -351,10 +467,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
         borderRadius: context.borderRadius(all: 20),
         border: Border.all(color: color.withOpacity(0.2)),
       ),
-      child: Text(
-        status.toUpperCase(),
-        style: textStyle,
-      ),
+      child: Text(status.toUpperCase(), style: textStyle),
     );
   }
 }

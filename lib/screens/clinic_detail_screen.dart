@@ -86,6 +86,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       clinicLogo: _selectedLogo?.path ?? clinic.logo ?? 'https://example.com/logo.png',
       website: _websiteController.text.trim(),
       description: _descriptionController.text.trim(),
+       
     );
 
     final success = await ref.read(clinicViewModelProvider.notifier).updateClinic(clinic.clinicId!, req);

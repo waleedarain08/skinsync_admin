@@ -16,6 +16,7 @@ class RegisterClinicReqModel {
   final num? initialDeposit;
   final List<AvailabilityModel> availability;
   final String? bannerImage;
+  final bool? isInviteClinc;
 
   RegisterClinicReqModel({
     required this.clinicName,
@@ -25,6 +26,7 @@ class RegisterClinicReqModel {
     required this.country,
     required this.clinicAddress,
     required this.clinicLogo,
+    this.isInviteClinc,
     this.ownerName,
     this.ownerEmail,
     this.lat,
@@ -56,6 +58,7 @@ class RegisterClinicReqModel {
     data['initial_deposit'] = initialDeposit;
     data['banner'] = bannerImage;
     data['availability'] = availability.map((v) => v.toJson()).toList();
+    data['is_invite_clinic'] = isInviteClinc;
     return data;
   }
 
@@ -77,7 +80,8 @@ class RegisterClinicReqModel {
       consultationFee: consultationFee,
       initialDeposit: initialDeposit,
       availability: availability,
-      bannerImage: bannerImage
+      bannerImage: bannerImage,
+      isInviteClinc: isInviteClinc
     );
   }
 }

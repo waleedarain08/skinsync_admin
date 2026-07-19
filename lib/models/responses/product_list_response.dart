@@ -89,7 +89,7 @@ class ProductListItemModel {
       usageType: usageType,
       status: status,
       description: '',
-      unit: '',
+     // unit: '',
     );
   }
 }

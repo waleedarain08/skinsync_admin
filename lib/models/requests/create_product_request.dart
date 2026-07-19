@@ -4,7 +4,7 @@ class CreateProductRequest {
   final String? brand;
   final String? manufacturer;
   final String? globalSku;
-  final String? barcode;
+  //  final String? barcode;
   final String? usageType;
   final String? category;
   final List<int>? selectedCategoryIds;
@@ -18,11 +18,11 @@ class CreateProductRequest {
   final double? billableQuantityPerItem;
   final double? totalBillableQuantity;
   final bool? enforceLotTracking;
-  final double? clinicCost;
-  final double? retailPricePerUnit;
-  final String? supplier;
-  final String? lotNumber;
-  final String? expirationDate;
+  // final double? clinicCost;
+  // final double? retailPricePerUnit;
+  // final String? supplier;
+  // final String? lotNumber;
+  // final String? expirationDate;
 
   CreateProductRequest({
     this.image,
@@ -30,7 +30,7 @@ class CreateProductRequest {
     this.brand,
     this.manufacturer,
     this.globalSku,
-    this.barcode,
+    // this.barcode,
     this.usageType,
     this.category,
     this.selectedCategoryIds,
@@ -44,11 +44,11 @@ class CreateProductRequest {
     this.billableQuantityPerItem,
     this.totalBillableQuantity,
     this.enforceLotTracking,
-    this.clinicCost,
-    this.retailPricePerUnit,
-    this.supplier,
-    this.lotNumber,
-    this.expirationDate,
+    // this.clinicCost,
+    // this.retailPricePerUnit,
+    // this.supplier,
+    // this.lotNumber,
+    // this.expirationDate,
   });
 
   factory CreateProductRequest.fromJson(Map<String, dynamic> json) {
@@ -58,10 +58,12 @@ class CreateProductRequest {
       brand: json['brand'] as String?,
       manufacturer: json['manufacturer'] as String?,
       globalSku: json['global_sku'] as String?,
-      barcode: json['barcode'] as String?,
+      // barcode: json['barcode'] as String?,
       usageType: json['usage_type'] as String?,
       category: json['category'] as String?,
-      selectedCategoryIds: (json['selected_category_ids'] as List?)?.map((e) => e as int).toList(),
+      selectedCategoryIds: (json['selected_category_ids'] as List?)
+          ?.map((e) => e as int)
+          .toList(),
       status: json['status'] as String?,
       description: json['description'] as String?,
       unitType: json['unit_type'] as String?,
@@ -69,14 +71,16 @@ class CreateProductRequest {
       itemQuantityPerBox: json['item_quantity_per_box'] as int?,
       packageType: json['package_type'] as String?,
       billableUnit: json['billable_unit'] as String?,
-      billableQuantityPerItem: (json['billable_quantity_per_item'] as num?)?.toDouble(),
-      totalBillableQuantity: (json['total_billable_quantity'] as num?)?.toDouble(),
+      billableQuantityPerItem: (json['billable_quantity_per_item'] as num?)
+          ?.toDouble(),
+      totalBillableQuantity: (json['total_billable_quantity'] as num?)
+          ?.toDouble(),
       enforceLotTracking: json['enforce_lot_tracking'] as bool?,
-      clinicCost: (json['clinic_cost'] as num?)?.toDouble(),
-      retailPricePerUnit: (json['retail_price_per_unit'] as num?)?.toDouble(),
-      supplier: json['supplier'] as String?,
-      lotNumber: json['lot_number'] as String?,
-      expirationDate: json['expiration_date'] as String?,
+      // clinicCost: (json['clinic_cost'] as num?)?.toDouble(),
+      // retailPricePerUnit: (json['retail_price_per_unit'] as num?)?.toDouble(),
+      // supplier: json['supplier'] as String?,
+      // lotNumber: json['lot_number'] as String?,
+      // expirationDate: json['expiration_date'] as String?,
     );
   }
 
@@ -87,7 +91,7 @@ class CreateProductRequest {
       'brand': brand,
       'manufacturer': manufacturer,
       'global_sku': globalSku,
-      'barcode': barcode,
+      // 'barcode': barcode,
       'usage_type': usageType,
       'category': category,
       'selected_category_ids': selectedCategoryIds,
@@ -101,11 +105,11 @@ class CreateProductRequest {
       'billable_quantity_per_item': billableQuantityPerItem,
       'total_billable_quantity': totalBillableQuantity,
       'enforce_lot_tracking': enforceLotTracking,
-      'clinic_cost': clinicCost,
-      'retail_price_per_unit': retailPricePerUnit,
-      'supplier': supplier,
-      'lot_number': lotNumber,
-      'expiration_date': expirationDate,
+      // 'clinic_cost': clinicCost,
+      // 'retail_price_per_unit': retailPricePerUnit,
+      // 'supplier': supplier,
+      // 'lot_number': lotNumber,
+      // 'expiration_date': expirationDate,
     };
   }
 
@@ -141,7 +145,7 @@ class CreateProductRequest {
       brand: brand ?? this.brand,
       manufacturer: manufacturer ?? this.manufacturer,
       globalSku: globalSku ?? this.globalSku,
-      barcode: barcode ?? this.barcode,
+      //  barcode: barcode ?? this.barcode,
       usageType: usageType ?? this.usageType,
       category: category ?? this.category,
       selectedCategoryIds: selectedCategoryIds ?? this.selectedCategoryIds,
@@ -152,14 +156,16 @@ class CreateProductRequest {
       itemQuantityPerBox: itemQuantityPerBox ?? this.itemQuantityPerBox,
       packageType: packageType ?? this.packageType,
       billableUnit: billableUnit ?? this.billableUnit,
-      billableQuantityPerItem: billableQuantityPerItem ?? this.billableQuantityPerItem,
-      totalBillableQuantity: totalBillableQuantity ?? this.totalBillableQuantity,
+      billableQuantityPerItem:
+          billableQuantityPerItem ?? this.billableQuantityPerItem,
+      totalBillableQuantity:
+          totalBillableQuantity ?? this.totalBillableQuantity,
       enforceLotTracking: enforceLotTracking ?? this.enforceLotTracking,
-      clinicCost: clinicCost ?? this.clinicCost,
-      retailPricePerUnit: retailPricePerUnit ?? this.retailPricePerUnit,
-      supplier: supplier ?? this.supplier,
-      lotNumber: lotNumber ?? this.lotNumber,
-      expirationDate: expirationDate ?? this.expirationDate,
+      // clinicCost: clinicCost ?? this.clinicCost,
+      // retailPricePerUnit: retailPricePerUnit ?? this.retailPricePerUnit,
+      // supplier: supplier ?? this.supplier,
+      // lotNumber: lotNumber ?? this.lotNumber,
+      // expirationDate: expirationDate ?? this.expirationDate,
     );
   }
 }

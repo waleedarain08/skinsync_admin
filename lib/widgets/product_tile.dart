@@ -70,11 +70,11 @@ class ProductTile extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'units: ${product.unit}',
-                      style: context.fonts.purple14w600,
-                    ),
+                    // SizedBox(height: 8.h),
+                    // Text(
+                    //   'units: ${product.unit}',
+                    //   style: context.fonts.purple14w600,
+                    // ),
                     SizedBox(height: 8.h),
                     Expanded(
                       child: Text(

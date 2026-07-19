@@ -23,7 +23,12 @@ import 'package:skinsync_admin/widgets/phone_widget.dart';
 class AddNewClinicScreen extends ConsumerStatefulWidget {
   static const String routeName = '/add-new-clinic';
   final InviteClinicDetailData? invitedClinic;
-  const AddNewClinicScreen({super.key, this.invitedClinic});
+  final bool onBoardClinic;
+  const AddNewClinicScreen({
+    super.key,
+    this.invitedClinic,
+    this.onBoardClinic = false,
+  });
 
   @override
   ConsumerState<AddNewClinicScreen> createState() => _AddNewClinicScreenState();
@@ -219,6 +224,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       consultationFee: num.parse(_initialDepositController.text.trim()),
       initialDeposit: num.parse(_consultationFeeController.text.trim()),
       availability: availability,
+      isInviteClinc: widget.onBoardClinic
     );
 
     final success = await ref
@@ -492,7 +498,9 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                           SizedBox(
                             width: context.w(240),
                             child: CustomPrimaryButton(
-                              onTap: _submit,
+                              onTap:
+                              
+                              _submit,
                               label: 'Register Clinic',
                               height: context.h(56),
                             ),
