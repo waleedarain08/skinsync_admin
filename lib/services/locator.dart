@@ -3,12 +3,14 @@ import 'package:skinsync_admin/repositories/area_repository.dart';
 import 'package:skinsync_admin/repositories/category_repository.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/repositories/product_repository.dart';
+import 'package:skinsync_admin/repositories/provider_role_repository.dart';
 import 'package:skinsync_admin/repositories/session_repository.dart';
 import 'package:skinsync_admin/repositories/subscription_repository.dart';
 import 'package:skinsync_admin/services/area_services.dart';
 import 'package:skinsync_admin/services/category_services.dart';
 import 'package:skinsync_admin/services/clinic_services.dart';
 import 'package:skinsync_admin/services/product_services.dart';
+import 'package:skinsync_admin/services/provider_roles_service.dart';
 import 'package:skinsync_admin/services/session_services.dart';
 import 'package:skinsync_admin/services/subscription_services.dart';
 
@@ -54,6 +56,9 @@ Future<void> initializeServices() async {
   );
   locator.registerLazySingleton<SessionRepository>(
     () => SessionServices(api: apiBaseHelper),
+  );
+   locator.registerLazySingleton<ProviderRoleRepository>(
+    () => ProviderRolesService(api: apiBaseHelper),
   );
   final secureStorageService = SecureStorageService();
   await secureStorageService.init();

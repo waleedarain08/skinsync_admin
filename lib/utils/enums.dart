@@ -65,6 +65,7 @@ enum Endpoint {
   updateCategory('admin/categories/{id}'),
   updateAreas('admin/areas/{id}'),
   sessionStatus('admin/sessions/status'),
+  providerRoles('admin/provider-roles'),
   treatmentsStatus('admin/treatments/status');
 
   final String path;

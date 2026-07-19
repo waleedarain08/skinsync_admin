@@ -7,6 +7,9 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/create_category_request.dart';
+import 'package:skinsync_admin/models/responses/provider_roles_response.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
+import 'package:skinsync_admin/view_models/provider_view_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/notification_entry.dart';
@@ -77,19 +80,15 @@ class _CategoryCreationDialogState
   late final TextEditingController _downtimeHighController;
 
   List<String> _selectedRoles = [];
-  final List<String> _availableRoles = [
-    'Injector',
-    'Aesthetician',
-    'MD',
-    'Nurse',
-    'Specialist',
-  ];
+  final List<ProviderRoles> _availableRoles = [];
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(providerRoleViewModelProvider.notifier).fetchProviderRoles();
+    });
     _nameController = TextEditingController(text: widget.initialName);
-
     _selectedIcon = widget.initialIcon ?? 'category';
     _selectedImage = widget.initialImage ?? '';
     _existingConsentName = widget.initialConsentName;
@@ -916,32 +915,46 @@ class _CategoryCreationDialogState
             style: context.fonts.black16w600,
           ),
           context.verticalSpace(16),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: _availableRoles.map((role) {
-              final isSelected = _selectedRoles.contains(role);
-              return FilterChip(
-                label: Text(role),
-                selected: isSelected,
-                onSelected: widget.isViewMode
-                    ? null
-                    : (selected) {
-                        setState(() {
-                          if (selected) {
-                            _selectedRoles.add(role);
-                          } else {
-                            _selectedRoles.remove(role);
-                          }
-                        });
-                      },
-                selectedColor: CustomColors.purple.withValues(alpha: 0.2),
-                checkmarkColor: CustomColors.purple,
-                labelStyle: isSelected
-                    ? context.fonts.purple14w600
-                    : context.fonts.black14w400,
+          Consumer(
+            builder: (context, ref, _) {
+              final roles =
+                  ref.watch(providerRoleViewModelProvider).providerRoles ?? [];
+
+             if (roles.isEmpty) {
+  return Text(
+    'No provider roles available.',
+    style: context.fonts.grey13w500,
+  );
+}
+
+              return Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: roles.map((role) {
+                  final isSelected = _selectedRoles.contains(role.name);
+                  return FilterChip(
+                    label: Text(role.name?.capitalize ?? ''),
+                    selected: isSelected,
+                    onSelected: widget.isViewMode
+                        ? null
+                        : (selected) {
+                            setState(() {
+                              if (selected) {
+                                _selectedRoles.add(role.name ?? '');
+                              } else {
+                                _selectedRoles.remove(role.name ??'');
+                              }
+                            });
+                          },
+                    selectedColor: CustomColors.purple.withValues(alpha: 0.2),
+                    checkmarkColor: CustomColors.purple,
+                    labelStyle: isSelected
+                        ? context.fonts.purple14w600
+                        : context.fonts.black14w400,
+                  );
+                }).toList(),
               );
-            }).toList(),
+            },
           ),
           context.verticalSpace(32),
           const Divider(),
