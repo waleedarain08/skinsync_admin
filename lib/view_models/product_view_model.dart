@@ -13,6 +13,7 @@ import '../models/requests/create_product_request.dart';
 import '../models/responses/brands_list_response.dart';
 import '../models/responses/manufacturers_list_response.dart';
 import '../models/responses/package_type_list_response.dart';
+import '../models/responses/product_deduction_timing_list_response.dart';
 import '../models/responses/product_detail_response.dart';
 import '../models/responses/supplier_list_response.dart';
 import '../models/responses/unit_types_list_response.dart';
@@ -39,6 +40,7 @@ class ProductState extends BaseStateModel {
   final List<PackageTypeModel>? packageTypes;
   final List<UsageTypeModel>? usageType;
   final List<SupplierModel>? suppliers;
+  final List<DeductionTimingModel>? deductionTimings;
 
   ProductState({
     super.loading,
@@ -56,6 +58,7 @@ class ProductState extends BaseStateModel {
     this.imageUrl,
     this.usageType,
     this.suppliers,
+    this.deductionTimings,
   });
 
   ProductState copyWith({
@@ -75,6 +78,7 @@ class ProductState extends BaseStateModel {
     List<ManufacturersModel>? manufacturers,
     List<UsageTypeModel>? usageType,
     List<SupplierModel>? suppliers,
+    List<DeductionTimingModel>? deductionTimings,
   }) {
     return ProductState(
       loading: loading ?? this.loading,
@@ -92,6 +96,7 @@ class ProductState extends BaseStateModel {
       packageTypes: packageTypes ?? this.packageTypes,
       usageType: usageType ?? this.usageType,
       suppliers: suppliers ?? this.suppliers,
+      deductionTimings: deductionTimings ?? this.deductionTimings,
     );
   }
 }
@@ -127,6 +132,7 @@ class ProductViewModel extends BaseViewModel<ProductState> {
       packageTypes: [],
       usageType: [],
       suppliers: [],
+      deductionTimings: [],
     );
   }
 
@@ -147,6 +153,7 @@ class ProductViewModel extends BaseViewModel<ProductState> {
       packageTypes: null,
       usageType: null,
       suppliers: null,
+      deductionTimings: null,
     );
   }
 
@@ -494,6 +501,24 @@ class ProductViewModel extends BaseViewModel<ProductState> {
         try {
           final response = await _productRepository.fetchSuppliers();
           state = state.copyWith(suppliers: response.data, errorMessage: null);
+        } catch (e) {
+          state = state.copyWith(errorMessage: e.toString());
+          rethrow;
+        }
+      },
+    );
+  }
+
+  Future<void> fetchDeductionTimings() async {
+    await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        try {
+          final response = await _productRepository.fetchDeductionTimings();
+          state = state.copyWith(
+            deductionTimings: response.data,
+            errorMessage: null,
+          );
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;

@@ -72,7 +72,7 @@ class SessionState extends BaseStateModel {
 
   // Consent
   final String consentType;
-  final dynamic preTreatmentConsentForm;
+  final PlatformFile? preTreatmentConsentForm;
   final dynamic existingConsentForm;
   final String consentFormUrl;
 
@@ -188,7 +188,7 @@ class SessionState extends BaseStateModel {
     bool? requirePostTreatmentPhotos,
     int? requiredPostTreatmentPhotoCount,
     String? consentType,
-    dynamic preTreatmentConsentForm,
+    PlatformFile? preTreatmentConsentForm,
     dynamic existingConsentForm,
     String? consentFormUrl,
     List<Attachment>? existingPreAttachments,
@@ -558,7 +558,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
                   maxQuantityController: TextEditingController(text: '0'),
                   perUnitDurationController: TextEditingController(text: '0'),
                   allowSubstitution: false,
-                  deductionTiming: 'On_Completion',
+                  deductionTiming: 'On_Completion', // Default name
                 );
               }).toList();
 
@@ -2072,7 +2072,7 @@ class ProductUsageEntry {
   final String productName;
   final String unit;
   String usageType;
-  String deductionTiming;
+  String? deductionTiming;
   bool allowSubstitution;
   final TextEditingController minQuantityController;
   final TextEditingController maxQuantityController;

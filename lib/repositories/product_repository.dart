@@ -9,6 +9,7 @@ import 'package:skinsync_admin/utils/enums.dart';
 import '../models/responses/brands_list_response.dart';
 import '../models/responses/manufacturers_list_response.dart';
 import '../models/responses/package_type_list_response.dart';
+import '../models/responses/product_deduction_timing_list_response.dart';
 import '../models/responses/supplier_list_response.dart';
 import '../models/responses/unit_types_list_response.dart';
 
@@ -31,5 +32,6 @@ abstract class ProductRepository {
   Future<PackageTypeListResponse> fetchPackageTypes();
   Future<UsageTypeListResponse> fetchUsageTypes();
   Future<SupplierListResponse> fetchSuppliers();
+  Future<ProductDeductionTimingListResponse> fetchDeductionTimings();
   Future<BaseApiResponseModel> updateProductStatus({required int productId, required String status});
 }

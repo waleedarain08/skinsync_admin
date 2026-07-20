@@ -124,7 +124,7 @@ class SessionDetailDto {
       status: json['status'] as String? ?? 'Active',
       currentStep: json['current_step'] as int? ?? 1,
       isCompleted: json['is_completed'] as bool? ?? false,
-      productUsages: (json['product_usages'] as List?)
+      productUsages: (json['billable_materials'] as List? ?? json['product_usages'] as List?)
               ?.map((e) => SessionProductUsageDto.fromJson(e))
               .toList() ??
           [],
@@ -187,11 +187,13 @@ class SessionDetailDto {
       preTreatmentConsentForm: json['pre_treatment_consent_form'] != null
           ? SessionAttachmentDto.fromJson(json['pre_treatment_consent_form'])
           : null,
-      selectedUnitTypeId: json['selected_unit_type_id'] as int?,
+      selectedUnitTypeId: json['selected_unit_type_id'] is int 
+          ? json['selected_unit_type_id'] as int?
+          : (json['selected_unit_type_id'] as Map<String, dynamic>?)?['id'] as int?,
       minimumUnits: (json['minimum_units'] as num?)?.toDouble() ?? 0.0,
       maximumUnits: (json['maximum_units'] as num?)?.toDouble() ?? 0.0,
       otherMaterials: (json['other_materials'] as List?)
-              ?.map((e) => e as int)
+              ?.map((e) => e is int ? e : ((e as Map<String, dynamic>)['product_id'] ?? (e as Map<String, dynamic>)['id']) as int)
               .toList() ??
           [],
     );
@@ -223,11 +225,13 @@ class SessionProductUsageDto {
 
   factory SessionProductUsageDto.fromJson(Map<String, dynamic> json) {
     return SessionProductUsageDto(
-      productId: json['product_id'] as int? ?? 0,
+      productId: json['product_id'] is int 
+          ? json['product_id'] as int 
+          : (json['product_id'] as Map<String, dynamic>?)?['id'] as int? ?? (json['id'] as int? ?? 0),
       productName: json['product_name'] as String? ?? '',
       productImage: json['product_image'] as String? ?? '',
       productSku: json['product_sku'] as String? ?? '',
-      deductionTiming: json['deduction_timing'] as String? ?? 'before',
+      deductionTiming: json['deduction_timing']?.toString() ?? '',
       allowSubstitution: json['allow_substitution'] as bool? ?? false,
       notes: json['notes'] as String? ?? '',
       minQuantity: (json['min_quantity'] as num?)?.toDouble() ?? 0.0,

@@ -66,7 +66,8 @@ enum Endpoint {
   updateAreas('admin/areas/{id}'),
   sessionStatus('admin/sessions/status'),
   providerRoles('admin/provider-roles'),
-  treatmentsStatus('admin/treatments/status');
+  treatmentsStatus('admin/treatments/status'),
+  deductionTimings('admin/deduction-timings');
 
   final String path;
   const Endpoint(this.path);
