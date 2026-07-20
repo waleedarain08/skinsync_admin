@@ -317,7 +317,7 @@ class NotificationsStep extends ConsumerWidget {
                                               child: Text('Hours'),
                                             ),
                                             DropdownMenuItem(
-                                              value: 'days',
+                                              value: 'day',
                                               child: Text('Days'),
                                             ),
                                           ],
