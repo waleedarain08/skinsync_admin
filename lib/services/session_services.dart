@@ -70,12 +70,12 @@ class SessionServices implements SessionRepository {
 
    @override
   Future<TreatmentProductsResponse> getProductsByTreatment(
-    // List<int> categoryIds,
+    int? unitTypeId,
   ) async {
    // final String idsParam = categoryIds.join(',');
     final jsonResponse = await _api.get(
       Endpoint.productsByTreatmentId,
-      // queryParams: {'category_ids': idsParam},
+     queryParams: {'unit_type_id': unitTypeId.toString()},
     );
     final response = TreatmentProductsResponse.fromJson(jsonResponse);
     if (!response.isSuccess) {

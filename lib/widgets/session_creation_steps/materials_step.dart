@@ -21,13 +21,11 @@ class MaterialsStep extends ConsumerStatefulWidget {
 }
 
 class _MaterialsStepState extends ConsumerState<MaterialsStep> {
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(productViewModelProvider.notifier).fetchUnitTypes();
-      await ref.read(sessionViewModelProvider.notifier).fetchProductsByTreatmentCategory();
 
       final viewModel = ref.read(sessionViewModelProvider.notifier);
       viewModel.minUnitsController.addListener(_onUnitsChanged);
@@ -79,7 +77,12 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
           builder: (context, controller) => AppSearchField(
             controller: controller,
             readOnly: true,
-            onTap: () => controller.openView(),
+            onTap: () async {
+              await ref
+                  .read(sessionViewModelProvider.notifier)
+                  .fetchProductsByTreatmentCategory();
+              if (context.mounted) controller.openView();
+            },
             hintText: isOtherMaterial
                 ? 'Select other material from inventory'
                 : 'Select product from inventory',
@@ -94,7 +97,18 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
             final filtered = products
                 .where((p) => p.name.toLowerCase().contains(query))
                 .toList();
-
+            if (filtered.isEmpty) {
+              return [
+                ListTile(
+                  title: Text(
+                    products.isEmpty
+                        ? 'No inventory products available for selected category hierarchy.'
+                        : 'No matches found.',
+                    style: context.fonts.grey14w400,
+                  ),
+                ),
+              ];
+            }
             return filtered
                 .map(
                   (p) => ListTile(
@@ -114,7 +128,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                         ),
                       ],
                     ),
-                    onTap: () {
+                    onTap: () async {
                       if (isOtherMaterial) {
                         viewModel.addOtherMaterial(p.id, p.name);
                       } else {
@@ -262,15 +276,22 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                         ),
                       ],
                     ),
-                    if (entry.packageType != null || entry.boxQuantity != null || entry.clinicCost != null || entry.retailPricePerUnit != null) ...[
+                    if (entry.packageType != null ||
+                        entry.boxQuantity != null ||
+                        entry.clinicCost != null ||
+                        entry.retailPricePerUnit != null) ...[
                       context.verticalSpace(8),
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
                         children: [
-                          if (entry.packageType != null && entry.packageType!.isNotEmpty)
+                          if (entry.packageType != null &&
+                              entry.packageType!.isNotEmpty)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: CustomColors.whiteGrey,
                                 borderRadius: BorderRadius.circular(6),
@@ -283,7 +304,10 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                             ),
                           if (entry.boxQuantity != null)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: CustomColors.whiteGrey,
                                 borderRadius: BorderRadius.circular(6),
@@ -296,7 +320,10 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                             ),
                           if (entry.clinicCost != null)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: CustomColors.whiteGrey,
                                 borderRadius: BorderRadius.circular(6),
@@ -309,7 +336,10 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                             ),
                           if (entry.retailPricePerUnit != null)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: CustomColors.whiteGrey,
                                 borderRadius: BorderRadius.circular(6),
@@ -355,7 +385,10 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                   child: Text('Post Confirmation'),
                 ),
               ],
-              onChanged: (val) => viewModel.updateProductUsageEntry(index, deductionTiming: val),
+              onChanged: (val) => viewModel.updateProductUsageEntry(
+                index,
+                deductionTiming: val,
+              ),
             ),
             context.verticalSpace(20),
             Row(
@@ -415,14 +448,18 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
     final minUnits = double.tryParse(viewModel.minUnitsController.text) ?? 0.0;
     final maxUnits = double.tryParse(viewModel.maxUnitsController.text) ?? 0.0;
 
-    final String minLabel = minUnits > 1 && !unitTypeName.toLowerCase().endsWith('s')
+    final String minLabel =
+        minUnits > 1 && !unitTypeName.toLowerCase().endsWith('s')
         ? '${unitTypeName}s'
         : unitTypeName;
-    final String maxLabel = maxUnits > 1 && !unitTypeName.toLowerCase().endsWith('s')
+    final String maxLabel =
+        maxUnits > 1 && !unitTypeName.toLowerCase().endsWith('s')
         ? '${unitTypeName}s'
         : unitTypeName;
 
-    final hasMatchingUnitType = unitTypes.any((u) => u.id == state.selectedUnitTypeId);
+    final hasMatchingUnitType = unitTypes.any(
+      (u) => u.id == state.selectedUnitTypeId,
+    );
     final dropdownValue = hasMatchingUnitType ? state.selectedUnitTypeId : null;
 
     return Column(
@@ -440,10 +477,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
           hintText: 'Select Unit Type',
           value: dropdownValue,
           items: unitTypes.map((u) {
-            return DropdownMenuItem<int>(
-              value: u.id,
-              child: Text(u.name),
-            );
+            return DropdownMenuItem<int>(value: u.id, child: Text(u.name));
           }).toList(),
           onChanged: (id) {
             final selected = unitTypes.firstWhere(
@@ -461,7 +495,9 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                 label: 'Minimum $minLabel',
                 controller: viewModel.minUnitsController,
                 hintText: '0',
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
               ),
             ),
             context.horizontalSpace(16),
@@ -470,7 +506,9 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                 label: 'Maximum $maxLabel',
                 controller: viewModel.maxUnitsController,
                 hintText: '0',
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
               ),
             ),
           ],
@@ -488,14 +526,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
             style: context.fonts.grey14w400,
           ),
           context.verticalSpace(24),
-          if (state.isLoadingProducts) ...[
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 24.0),
-                child: CircularProgressIndicator(color: CustomColors.purple),
-              ),
-            ),
-          ] else if (state.error != null) ...[
+          if (state.error != null) ...[
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24.0),
@@ -512,14 +543,6 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                     ),
                   ],
                 ),
-              ),
-            ),
-          ] else if (state.products.isEmpty) ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24.0),
-              child: Text(
-                'No inventory products available for selected category hierarchy.',
-                style: context.fonts.grey14w400,
               ),
             ),
           ] else ...[
@@ -544,7 +567,6 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
           ],
           context.verticalSpace(32),
         ],
-
         // Section 3: Other Materials
         const Divider(),
         context.verticalSpace(24),
@@ -589,7 +611,8 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
         context.verticalSpace(24),
         AuthorizedRolesWidget(
           title: 'Authorized Roles to Change Materials',
-          description: 'Select which provider roles are authorized to modify products and materials for this session.',
+          description:
+              'Select which provider roles are authorized to modify products and materials for this session.',
           selectedRoles: state.materialsRoles,
           onRoleToggled: viewModel.toggleMaterialsRole,
         ),

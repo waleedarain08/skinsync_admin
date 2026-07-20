@@ -63,7 +63,7 @@ class SessionDetailDto {
   final int? selectedUnitTypeId;
   final double? minimumUnits;
   final double? maximumUnits;
-  final List<int> otherMaterials;
+  final List<OtherMaterial>? otherMaterials;
 
   SessionDetailDto({
     required this.id,
@@ -190,13 +190,41 @@ class SessionDetailDto {
       selectedUnitTypeId: json['selected_unit_type_id'] as int?,
       minimumUnits: (json['minimum_units'] as num?)?.toDouble() ?? 0.0,
       maximumUnits: (json['maximum_units'] as num?)?.toDouble() ?? 0.0,
-      otherMaterials: (json['other_materials'] as List?)
-              ?.map((e) => e as int)
-              .toList() ??
-          [],
+        otherMaterials: json["other_materials"] == null ? [] : List<OtherMaterial>.from(json["other_materials"]!.map((x) => OtherMaterial.fromJson(x))),
+   
+          
     );
   }
 }
+
+class OtherMaterial {
+    final int? productId;
+    final String? productName;
+    final String? productImage;
+    final String? productSku;
+
+    OtherMaterial({
+        this.productId,
+        this.productName,
+        this.productImage,
+        this.productSku,
+    });
+
+    factory OtherMaterial.fromJson(Map<String, dynamic> json) => OtherMaterial(
+        productId: json["product_id"],
+        productName: json["product_name"],
+        productImage: json["product_image"],
+        productSku: json["product_sku"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "product_id": productId,
+        "product_name": productName,
+        "product_image": productImage,
+        "product_sku": productSku,
+    };
+}
+
 
 class SessionProductUsageDto {
   final int productId;

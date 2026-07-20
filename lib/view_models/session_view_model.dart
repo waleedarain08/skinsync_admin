@@ -265,7 +265,8 @@ class SessionState extends BaseStateModel {
       materialsRoles: materialsRoles ?? this.materialsRoles,
       materialsRolesSource: materialsRolesSource ?? this.materialsRolesSource,
       schedulingRoles: schedulingRoles ?? this.schedulingRoles,
-      schedulingRolesSource: schedulingRolesSource ?? this.schedulingRolesSource,
+      schedulingRolesSource:
+          schedulingRolesSource ?? this.schedulingRolesSource,
       pricingRoles: pricingRoles ?? this.pricingRoles,
       pricingRolesSource: pricingRolesSource ?? this.pricingRolesSource,
       allowClinicOverride: allowClinicOverride ?? this.allowClinicOverride,
@@ -545,13 +546,13 @@ class SessionViewModel extends BaseViewModel<SessionState> {
                 );
               }).toList();
 
-              final mappedOtherUsages = detail.otherMaterials.map((id) {
+              final mappedOtherUsages = detail.otherMaterials?.map((id) {
                 final product = state.products.firstWhereOrNull(
-                  (p) => p.id == id,
+                  (p) => p.id == id.productId,
                 );
                 return ProductUsageEntry(
-                  productId: id,
-                  productName: product?.name ?? 'Product #$id',
+                  productId: id.productId ?? 0,
+                  productName: product?.name ?? 'Product #${id.productName}',
                   unit: 'Unit',
                   notesController: TextEditingController(),
                   minQuantityController: TextEditingController(text: '0'),
@@ -699,11 +700,17 @@ class SessionViewModel extends BaseViewModel<SessionState> {
                 downtimeLevel: detail.downtimeLevel,
                 selectedRoles: detail.allowedRoles,
                 materialsRoles: detail.allowedRoles,
-                materialsRolesSource: detail.allowedRoles.isNotEmpty ? 'custom' : 'category',
+                materialsRolesSource: detail.allowedRoles.isNotEmpty
+                    ? 'custom'
+                    : 'category',
                 schedulingRoles: detail.allowedRoles,
-                schedulingRolesSource: detail.allowedRoles.isNotEmpty ? 'custom' : 'category',
+                schedulingRolesSource: detail.allowedRoles.isNotEmpty
+                    ? 'custom'
+                    : 'category',
                 pricingRoles: detail.allowedRoles,
-                pricingRolesSource: detail.allowedRoles.isNotEmpty ? 'custom' : 'category',
+                pricingRolesSource: detail.allowedRoles.isNotEmpty
+                    ? 'custom'
+                    : 'category',
               );
 
               // 11. Follow ups
@@ -874,23 +881,18 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     //   return;
     // }
 
-    state = state.copyWith(isLoadingProducts: true);
-
-    try {
+    //   state = state.copyWith(isLoadingProducts: true);
+    await runSafely(showLoading: true, () async {
       final response = await _sessionRepository.getProductsByTreatment(
-        // treatmentState.selectedCategoryPath,
+        state.selectedUnitTypeId,
       );
       if (response.isSuccess) {
         state = state.copyWith(
           products: response.data ?? [],
           isLoadingProducts: false,
         );
-      } else {
-        state = state.copyWith(isLoadingProducts: false);
       }
-    } catch (e) {
-      state = state.copyWith(isLoadingProducts: false);
-    }
+    });
   }
 
   Future<void> addProductUsage(

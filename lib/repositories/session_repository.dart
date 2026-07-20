@@ -31,7 +31,7 @@ abstract class SessionRepository {
   });
 
   Future<TreatmentProductsResponse> getProductsByTreatment(
-    // List<int> categoryIds,
+    int? unitTypeId,
   );
 
   Future<BaseApiResponseModel> productUsage({
