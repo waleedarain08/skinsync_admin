@@ -26,6 +26,8 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(productViewModelProvider.notifier).fetchUnitTypes();
+      await ref.read(productViewModelProvider.notifier).fetchDeductionTimings();
+      
 
       final viewModel = ref.read(sessionViewModelProvider.notifier);
       viewModel.minUnitsController.addListener(_onUnitsChanged);
@@ -149,7 +151,8 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
     BuildContext context,
     int index,
     ProductUsageEntry entry,
-    SessionViewModel viewModel, {
+    SessionViewModel viewModel,
+    ProductState productState, {
     bool isOtherMaterial = false,
   }) {
     final sessionState = ref.read(sessionViewModelProvider);
@@ -373,22 +376,16 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
             CustomDropdown<String>(
               label: 'Deduction Timing',
               hintText: 'Select',
-              value: entry.deductionTiming,
-              items: const [
-                DropdownMenuItem(
-                  value: 'On_Completion',
-                  child: Text('On Completion'),
-                ),
-                DropdownMenuItem(value: 'Manual', child: Text('Manual')),
-                DropdownMenuItem(
-                  value: 'Post_Confirmation',
-                  child: Text('Post Confirmation'),
-                ),
-              ],
-              onChanged: (val) => viewModel.updateProductUsageEntry(
-                index,
-                deductionTiming: val,
-              ),
+              value: (productState.deductionTimings ?? []).any((dt) => dt.name == entry.deductionTiming)
+                  ? entry.deductionTiming
+                  : null,
+              items: (productState.deductionTimings ?? []).map((dt) {
+                return DropdownMenuItem<String>(
+                  value: dt.name,
+                  child: Text(dt.name.replaceAll('_', ' ')),
+                );
+              }).toList(),
+              onChanged: (val) => viewModel.updateProductUsageEntry(index, deductionTiming: val),
             ),
             context.verticalSpace(20),
             Row(
@@ -561,6 +558,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                   index,
                   state.productUsageEntries[index],
                   viewModel,
+                  productState,
                 );
               },
             ),
@@ -601,6 +599,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                 index,
                 state.otherMaterialsUsageEntries[index],
                 viewModel,
+                productState,
                 isOtherMaterial: true,
               );
             },

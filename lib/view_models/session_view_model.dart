@@ -72,7 +72,7 @@ class SessionState extends BaseStateModel {
 
   // Consent
   final String consentType;
-  final dynamic preTreatmentConsentForm;
+  final PlatformFile? preTreatmentConsentForm;
   final dynamic existingConsentForm;
   final String consentFormUrl;
 
@@ -188,7 +188,7 @@ class SessionState extends BaseStateModel {
     bool? requirePostTreatmentPhotos,
     int? requiredPostTreatmentPhotoCount,
     String? consentType,
-    dynamic preTreatmentConsentForm,
+    PlatformFile? preTreatmentConsentForm,
     dynamic existingConsentForm,
     String? consentFormUrl,
     List<Attachment>? existingPreAttachments,
@@ -548,18 +548,18 @@ class SessionViewModel extends BaseViewModel<SessionState> {
 
               final mappedOtherUsages = detail.otherMaterials?.map((id) {
                 final product = state.products.firstWhereOrNull(
-                  (p) => p.id == id.productId,
+                  (p) => p.id == id,
                 );
                 return ProductUsageEntry(
-                  productId: id.productId ?? 0,
-                  productName: product?.name ?? 'Product #${id.productName}',
+                  productId: id,
+                  productName: product?.name ?? 'Product #{id',
                   unit: 'Unit',
                   notesController: TextEditingController(),
                   minQuantityController: TextEditingController(text: '0'),
                   maxQuantityController: TextEditingController(text: '0'),
                   perUnitDurationController: TextEditingController(text: '0'),
                   allowSubstitution: false,
-                  deductionTiming: 'On_Completion',
+                  deductionTiming: 'On_Completion', // Default name
                 );
               }).toList();
 
@@ -2074,7 +2074,7 @@ class ProductUsageEntry {
   final String productName;
   final String unit;
   String usageType;
-  String deductionTiming;
+  String? deductionTiming;
   bool allowSubstitution;
   final TextEditingController minQuantityController;
   final TextEditingController maxQuantityController;

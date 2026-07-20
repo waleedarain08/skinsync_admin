@@ -6,6 +6,7 @@ import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_data_view_model.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
+import 'package:collection/collection.dart';
 
 class LiveSessionPreviewWidget extends ConsumerWidget {
   const LiveSessionPreviewWidget({super.key});
@@ -53,6 +54,12 @@ class LiveSessionPreviewWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(treatmentViewModelProvider);
     final sessionState = ref.watch(sessionViewModelProvider);
+
+    String formatDeductionTiming(String? value) {
+      if (value == null || value.isEmpty) return 'N/A';
+      return value.replaceAll('_', ' ');
+    }
+
     final sessionViewModel = ref.read(sessionViewModelProvider.notifier);
     final treatmentViewModel = ref.read(treatmentViewModelProvider.notifier);
     final categoryState = ref.watch(categoryViewModelProvider);
@@ -202,7 +209,7 @@ class LiveSessionPreviewWidget extends ConsumerWidget {
                             ),
                             context.verticalSpace(6),
                             _previewRow(context, 'Usage Type', e.usageType),
-                            _previewRow(context, 'Deduction Timing', e.deductionTiming.replaceAll('_', ' ')),
+                            _previewRow(context, 'Deduction Timing', formatDeductionTiming(e.deductionTiming)),
                             _previewRow(context, 'Substitution Allowed', e.allowSubstitution ? 'Yes' : 'No'),
                             _previewRow(context, 'Per-Unit Duration', '${e.perUnitDurationController.text} mins'),
                             if (e.notesController.text.trim().isNotEmpty) ...[
