@@ -27,7 +27,14 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(productViewModelProvider.notifier).fetchUnitTypes();
       await ref.read(productViewModelProvider.notifier).fetchDeductionTimings();
-      
+      final selectUnitType = ref
+          .read(sessionViewModelProvider)
+          .selectedUnitTypeId;
+      if (selectUnitType != null) {
+        await ref
+            .read(sessionViewModelProvider.notifier)
+            .fetchProductsByTreatmentCategory();
+      }
 
       final viewModel = ref.read(sessionViewModelProvider.notifier);
       viewModel.minUnitsController.addListener(_onUnitsChanged);
@@ -79,12 +86,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
           builder: (context, controller) => AppSearchField(
             controller: controller,
             readOnly: true,
-            onTap: () async {
-              await ref
-                  .read(sessionViewModelProvider.notifier)
-                  .fetchProductsByTreatmentCategory();
-              if (context.mounted) controller.openView();
-            },
+            onTap: () => controller.openView(),
             hintText: isOtherMaterial
                 ? 'Select other material from inventory'
                 : 'Select product from inventory',
@@ -99,18 +101,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
             final filtered = products
                 .where((p) => p.name.toLowerCase().contains(query))
                 .toList();
-            if (filtered.isEmpty) {
-              return [
-                ListTile(
-                  title: Text(
-                    products.isEmpty
-                        ? 'No inventory products available for selected category hierarchy.'
-                        : 'No matches found.',
-                    style: context.fonts.grey14w400,
-                  ),
-                ),
-              ];
-            }
+
             return filtered
                 .map(
                   (p) => ListTile(
@@ -130,7 +121,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                         ),
                       ],
                     ),
-                    onTap: () async {
+                    onTap: () {
                       if (isOtherMaterial) {
                         viewModel.addOtherMaterial(p.id, p.name);
                       } else {
@@ -376,7 +367,10 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
             CustomDropdown<String>(
               label: 'Deduction Timing',
               hintText: 'Select',
-              value: (productState.deductionTimings ?? []).any((dt) => dt.name == entry.deductionTiming)
+              value:
+                  (productState.deductionTimings ?? []).any(
+                    (dt) => dt.name == entry.deductionTiming,
+                  )
                   ? entry.deductionTiming
                   : null,
               items: (productState.deductionTimings ?? []).map((dt) {
@@ -385,7 +379,10 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                   child: Text(dt.name.replaceAll('_', ' ')),
                 );
               }).toList(),
-              onChanged: (val) => viewModel.updateProductUsageEntry(index, deductionTiming: val),
+              onChanged: (val) => viewModel.updateProductUsageEntry(
+                index,
+                deductionTiming: val,
+              ),
             ),
             context.verticalSpace(20),
             Row(
@@ -476,12 +473,15 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
           items: unitTypes.map((u) {
             return DropdownMenuItem<int>(value: u.id, child: Text(u.name));
           }).toList(),
-          onChanged: (id) {
+          onChanged: (id) async {
             final selected = unitTypes.firstWhere(
               (u) => u.id == id,
               orElse: () => const UnitTypeModel(id: 0, name: ''),
             );
             viewModel.selectUnitType(id, selected.name);
+            await ref
+                .read(sessionViewModelProvider.notifier)
+                .fetchProductsByTreatmentCategory();
           },
         ),
         context.verticalSpace(20),
@@ -523,7 +523,14 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
             style: context.fonts.grey14w400,
           ),
           context.verticalSpace(24),
-          if (state.error != null) ...[
+          if (state.isLoadingProducts) ...[
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.0),
+                child: CircularProgressIndicator(color: CustomColors.purple),
+              ),
+            ),
+          ] else if (state.error != null) ...[
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24.0),
@@ -540,6 +547,14 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
                     ),
                   ],
                 ),
+              ),
+            ),
+          ] else if (state.products.isEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Text(
+                'No inventory products available for selected category hierarchy.',
+                style: context.fonts.grey14w400,
               ),
             ),
           ] else ...[
@@ -565,6 +580,7 @@ class _MaterialsStepState extends ConsumerState<MaterialsStep> {
           ],
           context.verticalSpace(32),
         ],
+
         // Section 3: Other Materials
         const Divider(),
         context.verticalSpace(24),
