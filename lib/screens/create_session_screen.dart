@@ -1971,7 +1971,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               if (sessionState.sessionStep == 1) {
                 // Inventory Products
                 if (!_validateProductQuantities(context, state)) return;
-                success =  true;
+                final result = await viewModel.callProductUsage(stepNumber: sessionState.sessionStep);
+                success = (result == true);
                 //(result == true);
               } else if (sessionState.sessionStep == 2) {
                 // Scheduling
