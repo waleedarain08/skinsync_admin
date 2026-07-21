@@ -44,15 +44,17 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
         }
       }
 
-      final entryToUse =
-          matchedEntry ??
-          SessionViewModelEntry(
-            sessionId: session!.id,
-            sessionNumber: session!.sessionNumber,
-            title: session!.title,
-            status: session!.status,
-            isDetailedEntered: session?.status.toLowerCase() != 'draft',
-          );
+      final entryToUse = matchedEntry != null
+          ? matchedEntry.copyWithStatus(
+              session!.status,
+            ) // <-- sync status from fresh session
+          : SessionViewModelEntry(
+              sessionId: session!.id,
+              sessionNumber: session!.sessionNumber,
+              title: session!.title,
+              status: session!.status,
+              isDetailedEntered: session?.status.toLowerCase() != 'draft',
+            );
 
       return _buildTileWithEntry(context, ref, entryToUse, index ?? 0);
     } else {

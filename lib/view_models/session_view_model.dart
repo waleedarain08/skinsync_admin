@@ -848,7 +848,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
         sessionId: activeEntry.sessionId,
         sessionNumber: activeEntry.sessionNumber,
         title: activeEntry.title,
-        status: 'Completed',
+        status: 'Active',
         totalFollowUpsController: activeEntry.totalFollowUpsController,
         followUps: List.from(activeEntry.followUps),
         isDetailedEntered: true,
@@ -1992,10 +1992,35 @@ Body                 : ${request.toJson()}
 }
 
 class SessionViewModelEntry {
+   final String status;
+   SessionViewModelEntry copyWithStatus(String newStatus) {
+    return SessionViewModelEntry(
+      sessionId: sessionId,
+      sessionNumber: sessionNumber,
+      title: title,
+      status: newStatus, // <- from fresh `session`
+      totalFollowUpsController: totalFollowUpsController,
+      followUps: followUps,
+      isDetailedEntered: isDetailedEntered,
+      productUsageSnapshot: productUsageSnapshot,
+      durationSnapshot: durationSnapshot,
+      priceSnapshot: priceSnapshot,
+      protocolSnapshot: protocolSnapshot,
+      preInstructionsSnapshot: preInstructionsSnapshot,
+      postInstructionsSnapshot: postInstructionsSnapshot,
+      requirePhotosSnapshot: requirePhotosSnapshot,
+      photosCountSnapshot: photosCountSnapshot,
+      preNotificationsSnapshot: preNotificationsSnapshot,
+      postNotificationsSnapshot: postNotificationsSnapshot,
+      downtimeSnapshot: downtimeSnapshot,
+      rolesSnapshot: rolesSnapshot,
+      consentSnapshot: consentSnapshot,
+    );
+  }
   final int? sessionId;
   final int sessionNumber;
   final String? title;
-  final String status;
+  
   final TextEditingController totalFollowUpsController;
   List<FollowUpEntry> followUps;
   final bool isDetailedEntered;

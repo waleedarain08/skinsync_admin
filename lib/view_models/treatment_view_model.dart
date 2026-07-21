@@ -18,6 +18,7 @@ import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 import 'package:skinsync_admin/utils/sku_utils.dart';
+import 'package:skinsync_admin/view_models/session_view_model.dart';
 import '../models/requests/create_treatment_requests/update_basic_info_request.dart';
 import '../models/responses/treatment_list_response.dart';
 import 'base_state_model.dart';
@@ -207,7 +208,17 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         if (treatmentId != null) {
           await fetchTreatmentDetail(treatmentId,loading: false);
         }
+          // NEW: also sync SessionsStep's data source
+      final areaId = state.selectedTreatmentAreaIds.isNotEmpty
+          ? state.selectedTreatmentAreaIds.last
+          : null;
+      if (treatmentId != null && areaId != null) {
+        await ref.read(sessionViewModelProvider.notifier)
+            .fetchSessions(treatmentId: treatmentId, areaId: areaId);
       }
+    
+      }
+      
       return true;
     });
   }
