@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/models/responses/booking_configuration_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/area_view_model.dart';
+import 'package:skinsync_admin/view_models/booking_config_view_model.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
@@ -17,13 +19,6 @@ class BookingConfigScreen extends ConsumerStatefulWidget {
 }
 
 class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
-  late Map<String, TextEditingController> _durationControllers;
-  late Map<String, TextEditingController> _displayNameControllers;
-  late Map<String, TextEditingController> _descriptionControllers;
-  late Map<String, String> _appointmentTimings;
-  late Map<String, String?> _iconUrls;
-  late Map<String, String?> _imageUrls;
-
   final List<String> _timingOptions = [
     'Before Treatment',
     'Primary Session',
@@ -33,54 +28,15 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
   @override
   void initState() {
     super.initState();
-    _durationControllers = {
-      'Consultation': TextEditingController(text: '0'),
-      'Treatment': TextEditingController(text: '0'),
-      'Follow-up': TextEditingController(text: '0'),
-    };
-    _displayNameControllers = {
-      'Consultation': TextEditingController(text: 'Initial Consultation'),
-      'Treatment': TextEditingController(text: 'Clinical Treatment'),
-      'Follow-up': TextEditingController(text: 'Post-Care Follow-up'),
-    };
-    _descriptionControllers = {
-      'Consultation': TextEditingController(text: 'Discussion of clinical needs and treatment planning.'),
-      'Treatment': TextEditingController(text: 'The primary session for the selected treatment procedure.'),
-      'Follow-up': TextEditingController(text: 'Evaluation of results and post-treatment progress.'),
-    };
-    _appointmentTimings = {
-      'Consultation': 'Before Treatment',
-      'Treatment': 'Primary Session',
-      'Follow-up': 'After Treatment',
-    };
-    _iconUrls = {
-      'Consultation': null,
-      'Treatment': null,
-      'Follow-up': null,
-    };
-    _imageUrls = {
-      'Consultation': null,
-      'Treatment': null,
-      'Follow-up': null,
-    };
-  }
-
-  @override
-  void dispose() {
-    for (final controller in _durationControllers.values) {
-      controller.dispose();
-    }
-    for (final controller in _displayNameControllers.values) {
-      controller.dispose();
-    }
-    for (final controller in _descriptionControllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(bookingConfigViewModelProvider.notifier).fetchBookingConfig();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(bookingConfigViewModelProvider);
+
     return GradientScaffold(
       appBar: AppBar(
         title: Text('Booking Configuration', style: context.fonts.black18w600),
@@ -88,27 +44,31 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
         elevation: 0,
         leading: const BackButton(color: Colors.black),
       ),
-      body: SingleChildScrollView(
-        padding: context.appEdgeInsets(all: 28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionHeader(
-              'Booking Methods',
-              'Manage and configure descriptions for your available booking channels.',
-            ),
-            context.verticalSpace(16),
-            _buildBookingMethodsList(),
-            context.verticalSpace(32),
-            _buildSectionHeader(
-              'Appointment Types',
-              'Set timing rules and maximum durations for different clinical sessions.',
-            ),
-            context.verticalSpace(16),
-            _buildAppointmentTypesList(),
-          ],
-        ),
-      ),
+      body: state.loading && state.config == null
+          ? const Center(child: CircularProgressIndicator())
+          : state.errorMessage != null
+              ? Center(child: Text(state.errorMessage!))
+              : SingleChildScrollView(
+                  padding: context.appEdgeInsets(all: 28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionHeader(
+                        'Booking Methods',
+                        'Manage and configure descriptions for your available booking channels.',
+                      ),
+                      context.verticalSpace(16),
+                      _buildBookingMethodsList(state.config?.bookingMethods ?? []),
+                      context.verticalSpace(32),
+                      _buildSectionHeader(
+                        'Appointment Types',
+                        'Set timing rules and maximum durations for different clinical sessions.',
+                      ),
+                      context.verticalSpace(16),
+                      _buildAppointmentTypesList(state.config?.appointmentTypes ?? []),
+                    ],
+                  ),
+                ),
     );
   }
 
@@ -123,24 +83,13 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
     );
   }
 
-  Widget _buildBookingMethodsList() {
-    final methods = [
-      {
-        'title': 'Online',
-        'desc': 'Allows customers to browse available time slots and book their own appointments directly through the Skinsync mobile application.',
-        'icon': Icons.language_rounded,
-      },
-      {
-        'title': 'Walk-in',
-        'desc': 'Enables clinic administrators and front-desk staff to manually register and schedule appointments for customers who visit the clinic in person.',
-        'icon': Icons.person_pin_circle_rounded,
-      },
-      {
-        'title': 'Personal',
-        'desc': 'Provides a private scheduling channel for clinic staff to manage internal administrative tasks, professional blocks, or private clinical sessions.',
-        'icon': Icons.lock_outline_rounded,
-      },
-    ];
+  Widget _buildBookingMethodsList(List<BookingMethodModel> methods) {
+    if (methods.isEmpty) {
+      return const Center(child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text('No booking methods found'),
+      ));
+    }
 
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
@@ -159,12 +108,14 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                 color: CustomColors.palePurple,
                 borderRadius: context.appBorderRadius(all: 10),
               ),
-              child: Icon(method['icon'] as IconData, color: CustomColors.purple, size: 20),
+              child: method.icon != null && method.icon!.isNotEmpty
+                  ? AppNetworkImage(imageUrl: method.icon!, width: 20, height: 20)
+                  : const Icon(Icons.language_rounded, color: CustomColors.purple, size: 20),
             ),
-            title: Text(method['title'] as String, style: context.fonts.black14w600),
+            title: Text(method.title, style: context.fonts.black14w600),
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 4.0),
-              child: Text(method['desc'] as String, style: context.fonts.grey12w400),
+              child: Text(method.description, style: context.fonts.grey12w400),
             ),
           );
         },
@@ -172,90 +123,160 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
     );
   }
 
-  Widget _buildAppointmentTypesList() {
-    final types = [
-      {'title': 'Consultation', 'icon': Icons.chat_bubble_outline_rounded},
-      {'title': 'Treatment', 'icon': Icons.medical_services_outlined},
-      {'title': 'Follow-up', 'icon': Icons.event_available_outlined},
-    ];
+  Widget _buildAppointmentTypesList(List<AppointmentTypeModel> types) {
+    if (types.isEmpty) {
+      return const Center(child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text('No appointment types found'),
+      ));
+    }
 
-    return BorderdContainerWidget(
-      padding: EdgeInsets.zero,
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: types.length,
-        separatorBuilder: (context, index) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          final type = types[index];
-          final title = type['title']! as String;
-          final icon = type['icon']! as IconData;
-          final controller = _durationControllers[title];
-          final timing = _appointmentTimings[title];
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: types.length,
+      separatorBuilder: (context, index) => context.verticalSpace(16),
+      itemBuilder: (context, index) {
+        final type = types[index];
 
-          return ListTile(
-            contentPadding: context.appEdgeInsets(horizontal: 20, vertical: 12),
-            leading: Container(
-              padding: context.appEdgeInsets(all: 10),
-              decoration: BoxDecoration(
-                color: CustomColors.palePurple,
-                borderRadius: context.appBorderRadius(all: 10),
-              ),
-              child: Icon(icon, color: CustomColors.purple, size: 20),
-            ),
-            title: Row(
-              children: [
-                Text(title, style: context.fonts.black14w600),
-                context.horizontalSpace(12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: CustomColors.softGrey,
-                    borderRadius: context.appBorderRadius(all: 6),
-                    border: Border.all(color: CustomColors.border.withValues(alpha: 0.1)),
-                  ),
-                  child: Text(
-                    timing!,
-                    style: context.fonts.grey10w700.copyWith(fontSize: 10),
+        return Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            borderRadius: context.appBorderRadius(all: 16),
+            border: Border.all(color: CustomColors.border),
+          ),
+          child: Stack(
+            children: [
+              if (type.image != null && type.image!.isNotEmpty)
+                Positioned.fill(
+                  child: AppNetworkImage(
+                    imageUrl: type.image!,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              ],
-            ),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Patient Name: ${_displayNameControllers[title]!.text}',
-                    style: context.fonts.grey13w500,
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      stops: const [0.0, 0.5, 1.0],
+                      colors: [
+                        Colors.white,
+                        Colors.white.withValues(alpha: 0.9),
+                        Colors.white.withValues(alpha: 0.4),
+                      ],
+                    ),
                   ),
-                  context.verticalSpace(2),
-                  Text(
-                    'Max Duration: ${controller!.text} mins',
-                    style: context.fonts.grey13w500,
-                  ),
-                ],
+                ),
               ),
-            ),
-            trailing: IconButton(
-              onPressed: () => _showDurationEditDialog(context, title),
-              icon: const Icon(Icons.edit_outlined, color: CustomColors.purple, size: 20),
-            ),
-          );
-        },
-      ),
+              Padding(
+                padding: context.appEdgeInsets(all: 20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: context.appEdgeInsets(all: 12),
+                      decoration: BoxDecoration(
+                        color: CustomColors.palePurple,
+                        borderRadius: context.appBorderRadius(all: 12),
+                      ),
+                      child: type.icon != null && type.icon!.isNotEmpty
+                          ? AppNetworkImage(imageUrl: type.icon!, width: 24, height: 24)
+                          : const Icon(Icons.medical_services_outlined, color: CustomColors.purple, size: 24),
+                    ),
+                    context.horizontalSpace(16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(type.internalTitle, style: context.fonts.black16w700),
+                              context.horizontalSpace(12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: CustomColors.softGrey,
+                                  borderRadius: context.appBorderRadius(all: 6),
+                                  border: Border.all(color: CustomColors.border.withValues(alpha: 0.1)),
+                                ),
+                                child: Text(
+                                  type.timing,
+                                  style: context.fonts.grey10w700.copyWith(fontSize: 10),
+                                ),
+                              ),
+                            ],
+                          ),
+                          context.verticalSpace(4),
+                          Text(
+                            type.patientDisplayName,
+                            style: context.fonts.purple14w600,
+                          ),
+                          context.verticalSpace(8),
+                          Text(
+                            type.description,
+                            style: context.fonts.grey14w400,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          context.verticalSpace(12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Duration: ${type.maxDuration} mins',
+                                style: context.fonts.black13w600,
+                              ),
+                              Row(
+                                children: type.appointmentModes.map((mode) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(left: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: CustomColors.palePurple,
+                                      borderRadius: context.appBorderRadius(all: 4),
+                                      border: Border.all(color: CustomColors.purple.withValues(alpha: 0.2)),
+                                    ),
+                                    child: Text(
+                                      mode,
+                                      style: context.fonts.purple11w600.copyWith(fontSize: 9),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => _showDurationEditDialog(context, type),
+                      icon: const Icon(Icons.edit_outlined, color: CustomColors.purple, size: 22),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  void _showDurationEditDialog(BuildContext context, String title) {
-    String currentTiming = _appointmentTimings[title]!;
-    final nameController = _displayNameControllers[title]!;
-    final descController = _descriptionControllers[title]!;
-    final durationController = _durationControllers[title]!;
+  void _showDurationEditDialog(BuildContext context, AppointmentTypeModel type) {
+    String currentTiming = type.timing;
+    final nameController = TextEditingController(text: type.patientDisplayName);
+    final descController = TextEditingController(text: type.description);
+    final durationController = TextEditingController(text: type.maxDuration.toString());
+    final List<String> selectedModes = List.from(type.appointmentModes);
     
-    String? iconUrl;
-    String? imageUrl;
+    String? iconUrl = type.icon;
+    String? imageUrl = type.image;
+
+    final List<String> modeOptions = ['In-Person', 'Virtual'];
 
     showDialog(
       context: context,
@@ -269,7 +290,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Internal Title: $title', style: context.fonts.grey13w500),
+                  Text('Internal Title: ${type.internalTitle}', style: context.fonts.grey13w500),
                   context.verticalSpace(20),
                   
                   Text('Patient Display Name', style: context.fonts.black14w600),
@@ -297,10 +318,54 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                   ),
                   context.verticalSpace(20),
 
+                  Text('Appointment Modes', style: context.fonts.black14w600),
+                  context.verticalSpace(8),
+                  Row(
+                    children: modeOptions.map((mode) {
+                      final isSelected = selectedModes.contains(mode);
+                      return Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setDialogState(() {
+                              if (isSelected) {
+                                if (selectedModes.length > 1) {
+                                  selectedModes.remove(mode);
+                                }
+                              } else {
+                                selectedModes.add(mode);
+                              }
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              Checkbox(
+                                value: isSelected,
+                                activeColor: CustomColors.purple,
+                                onChanged: (val) {
+                                  setDialogState(() {
+                                    if (val == true) {
+                                      selectedModes.add(mode);
+                                    } else {
+                                      if (selectedModes.length > 1) {
+                                        selectedModes.remove(mode);
+                                      }
+                                    }
+                                  });
+                                },
+                              ),
+                              Text(mode, style: context.fonts.black14w400),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  context.verticalSpace(20),
+
                   CustomDropdown<String>(
                     label: 'Timing Selection',
                     hintText: 'Select timing',
-                    value: currentTiming,
+                    value: _timingOptions.contains(currentTiming) ? currentTiming : _timingOptions.first,
                     items: _timingOptions.map((option) {
                       return DropdownMenuItem<String>(
                         value: option,
@@ -527,11 +592,20 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                 child: Text('Cancel', style: context.fonts.grey14w600),
               ),
               CustomPrimaryButton(
-                onTap: () {
-                  setState(() {
-                    _appointmentTimings[title] = currentTiming;
-                  });
-                  Navigator.pop(context);
+                onTap: () async {
+                  final success = await ref.read(bookingConfigViewModelProvider.notifier).updateAppointmentType(
+                    id: type.id,
+                    patientDisplayName: nameController.text.trim(),
+                    description: descController.text.trim(),
+                    timing: currentTiming,
+                    maxDuration: int.tryParse(durationController.text.trim()) ?? 0,
+                    appointmentModes: selectedModes,
+                    icon: iconUrl,
+                    image: imageUrl,
+                  );
+                  if (success && context.mounted) {
+                    Navigator.pop(context);
+                  }
                 },
                 label: 'Save Changes',
                 width: context.w(140),
