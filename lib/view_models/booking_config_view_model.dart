@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/models/requests/booking_config_requests.dart';
 import 'package:skinsync_admin/models/responses/booking_configuration_response.dart';
 import 'package:skinsync_admin/repositories/booking_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
@@ -62,9 +63,84 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
     );
   }
 
+  Future<bool> createBookingMethod({
+    required String title,
+    required String key,
+    required String description,
+    String? icon,
+  }) async {
+    return await runSafely<bool>(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        await _bookingRepository.createBookingMethod(
+          req: CreateBookingMethodRequest(
+            title: title,
+            key: key,
+            description: description,
+            icon: icon,
+          ),
+        );
+        await fetchBookingConfig();
+        return true;
+      },
+    ) ?? false;
+  }
+
+  Future<bool> updateBookingMethod({
+    required int id,
+    required String title,
+    required String description,
+    String? icon,
+  }) async {
+    return await runSafely<bool>(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        await _bookingRepository.updateBookingMethod(
+          id: id,
+          title: title,
+          description: description,
+          icon: icon,
+        );
+        await fetchBookingConfig();
+        return true;
+      },
+    ) ?? false;
+  }
+
+  Future<bool> createAppointmentType({
+    required String internalTitle,
+    required String key,
+    required String description,
+    required String timing,
+    required int maxDuration,
+    required List<String> appointmentModes,
+    String? icon,
+    String? image,
+  }) async {
+    return await runSafely<bool>(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        await _bookingRepository.createAppointmentType(
+          req: CreateAppointmentTypeRequest(
+            internalTitle: internalTitle,
+            key: key,
+            description: description,
+            timing: timing,
+            maxDuration: maxDuration,
+            appointmentModes: appointmentModes,
+            icon: icon,
+            image: image,
+          ),
+        );
+        await fetchBookingConfig();
+        return true;
+      },
+    ) ?? false;
+  }
+
   Future<bool> updateAppointmentType({
     required int id,
-    required String patientDisplayName,
+    required String internalTitle,
     required String description,
     required String timing,
     required int maxDuration,
@@ -77,7 +153,7 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
       () async {
         await _bookingRepository.updateAppointmentType(
           id: id,
-          patientDisplayName: patientDisplayName,
+          internalTitle: internalTitle,
           description: description,
           timing: timing,
           maxDuration: maxDuration,

@@ -1,3 +1,4 @@
+import '../models/requests/booking_config_requests.dart';
 import '../models/responses/booking_configuration_response.dart';
 import '../repositories/booking_repository.dart';
 import '../utils/enums.dart';
@@ -20,9 +21,34 @@ class BookingServices implements BookingRepository {
   }
 
   @override
+  Future<void> createBookingMethod({required CreateBookingMethodRequest req}) async {
+    // await _api.post(Endpoint.bookingConfig, body: req.toJson());
+  }
+
+  @override
+  Future<void> updateBookingMethod({
+    required int id,
+    required String title,
+    required String description,
+    String? icon,
+  }) async {
+    // final body = {
+    //   'title': title,
+    //   'description': description,
+    //   if (icon != null) 'icon': icon,
+    // };
+    // await _api.patch(Endpoint.bookingConfig, body: body, pathParams: {'id': id.toString()});
+  }
+
+  @override
+  Future<void> createAppointmentType({required CreateAppointmentTypeRequest req}) async {
+    // await _api.post(Endpoint.bookingConfig, body: req.toJson());
+  }
+
+  @override
   Future<void> updateAppointmentType({
     required int id,
-    required String patientDisplayName,
+    required String internalTitle,
     required String description,
     required String timing,
     required int maxDuration,
@@ -30,16 +56,15 @@ class BookingServices implements BookingRepository {
     String? icon,
     String? image,
   }) async {
-    // This is a placeholder for the actual update endpoint logic
     // final body = {
-    //   'patient_display_name': patientDisplayName,
+    //   'internal_title': internalTitle,
     //   'description': description,
     //   'timing': timing,
     //   'max_duration': maxDuration,
     //   'appointment_modes': appointmentModes,
-    //   'icon': icon,
-    //   'image': image,
+    //   if (icon != null) 'icon': icon,
+    //   if (image != null) 'image': image,
     // };
-    // await _api.patch(Endpoint.updateAppointmentType, body: body, pathParams: {'id': id.toString()});
+    // await _api.patch(Endpoint.bookingConfig, body: body, pathParams: {'id': id.toString()});
   }
 }
