@@ -19,7 +19,7 @@ import 'package:skinsync_admin/models/requests/create_session_requests/product_u
 import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
-import 'package:skinsync_admin/models/requests/session_status_request.dart';
+import 'package:skinsync_admin/models/responses/down_time_level_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/models/responses/session_detail_response.dart';
 import 'package:skinsync_admin/models/common_models.dart';
@@ -48,6 +48,7 @@ class SessionState extends BaseStateModel {
   final List<ProductUsageEntry> productUsageEntries;
   final List<ProductUsageEntry> otherMaterialsUsageEntries;
   final List<TreatmentProductData> products;
+  final List<DownTimeLevel> downTimeLevelList;
   final bool isLoadingProducts;
   final String? error;
 
@@ -141,6 +142,7 @@ class SessionState extends BaseStateModel {
     this.existingPreAttachments = const [],
     this.existingPostAttachments = const [],
     this.downtimeLevel = 'No_Downtime',
+    this.downTimeLevelList = const [],
     this.selectedRoles = const [],
     this.providerRolesSource = 'Category_Default',
     this.materialsRoles = const [],
@@ -173,6 +175,7 @@ class SessionState extends BaseStateModel {
     List<ProductUsageEntry>? productUsageEntries,
     List<ProductUsageEntry>? otherMaterialsUsageEntries,
     List<TreatmentProductData>? products,
+    List<DownTimeLevel>? downTimeLevelList,
     bool? isLoadingProducts,
     int? selectedUnitTypeId,
     String? selectedUnitTypeName,
@@ -285,6 +288,7 @@ class SessionState extends BaseStateModel {
       sessionSource: sessionSource ?? this.sessionSource,
       isFollowUpRequired: isFollowUpRequired ?? this.isFollowUpRequired,
       sessionId: sessionId ?? this.sessionId,
+      downTimeLevelList: downTimeLevelList ?? this.downTimeLevelList,
     );
   }
 }
@@ -895,6 +899,17 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     });
   }
 
+  Future<void> fetchDownTimeLevelByTreatment({required int id}) async {
+    await runSafely(showLoading: true, () async {
+      final response = await _sessionRepository.getDownTimeLevelByTreatment(
+        id: id,
+      );
+      if (response.isSuccess) {
+        state = state.copyWith(downTimeLevelList: response.data ?? []);
+      }
+    });
+  }
+
   Future<void> addProductUsage(
     int productId,
     String productName,
@@ -1188,21 +1203,12 @@ Body          : ${request.toJson()}
     });
   }
 
-  Future<bool?> changeSessionStatus({
-    required SessionStatusRequest request,
-  }) async {
-    return await runSafely<bool>(() async {
-      await _sessionRepository.changeSessionStatus(request: request);
-      return true;
-    });
-  }
-
   Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
     final bool isCatDefault = state.providerRolesSource == 'category';
     final request = AllowedProviderRolesRequest(
       stepNumber: stepNumber,
       isCatDefualt: isCatDefault,
-    allowedRoles: isCatDefault ? [] : state.selectedRoles, 
+      allowedRoles: isCatDefault ? [] : state.selectedRoles,
     );
 
     log('''
@@ -1324,52 +1330,53 @@ Body       : ${request.toJson()}
   }
 
   Future<bool?> callPhaseNotifications({required int stepNumber}) async {
-  return await runSafely(() async {
-    final sessionId = state.sessionId;
-    if (sessionId == null) {
-      throw const UnknownException('Session not found!');
-    }
+    return await runSafely(() async {
+      final sessionId = state.sessionId;
+      if (sessionId == null) {
+        throw const UnknownException('Session not found!');
+      }
 
-    final bool preIsCatDefault = state.preNotificationSource == 'category';
-    final bool postIsCatDefault = state.postNotificationSource == 'category';
+      final bool preIsCatDefault = state.preNotificationSource == 'category';
+      final bool postIsCatDefault = state.postNotificationSource == 'category';
 
-    await _sessionRepository.phaseNotifications(
-      id: sessionId,
-      request: PhaseNotificationsRequest(
-        stepNumber: stepNumber,
-        preNoti: PreNoti(
-          isCatDefault: preIsCatDefault,
-          preNotifications: preIsCatDefault
-              ? []
-              : state.preNotificationEntries.map((entry) {
-                  return PhaseNotification(
-                    title: entry.titleController.text,
-                    message: entry.messageController.text,
-                    timing: int.tryParse(entry.timingValueController.text),
-                    timingUnit: entry.timingUnit,
-                    type: entry.type,
-                  );
-                }).toList(),
+      await _sessionRepository.phaseNotifications(
+        id: sessionId,
+        request: PhaseNotificationsRequest(
+          stepNumber: stepNumber,
+          preNoti: PreNoti(
+            isCatDefault: preIsCatDefault,
+            preNotifications: preIsCatDefault
+                ? []
+                : state.preNotificationEntries.map((entry) {
+                    return PhaseNotification(
+                      title: entry.titleController.text,
+                      message: entry.messageController.text,
+                      timing: int.tryParse(entry.timingValueController.text),
+                      timingUnit: entry.timingUnit,
+                      type: entry.type,
+                    );
+                  }).toList(),
+          ),
+          postNoti: PostNoti(
+            isCatDefault: postIsCatDefault,
+            postNotifications: postIsCatDefault
+                ? []
+                : state.postNotificationEntries.map((entry) {
+                    return PhaseNotification(
+                      title: entry.titleController.text,
+                      message: entry.messageController.text,
+                      timing: int.tryParse(entry.timingValueController.text),
+                      timingUnit: entry.timingUnit,
+                      type: entry.type,
+                    );
+                  }).toList(),
+          ),
         ),
-        postNoti: PostNoti(
-          isCatDefault: postIsCatDefault,
-          postNotifications: postIsCatDefault
-              ? []
-              : state.postNotificationEntries.map((entry) {
-                  return PhaseNotification(
-                    title: entry.titleController.text,
-                    message: entry.messageController.text,
-                    timing: int.tryParse(entry.timingValueController.text),
-                    timingUnit: entry.timingUnit,
-                    type: entry.type,
-                  );
-                }).toList(),
-        ),
-      ),
-    );
-    return true;
-  });
-}
+      );
+      return true;
+    });
+  }
+
   Future<bool?> createSchedule({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       await _sessionRepository.createSchedule(
@@ -1424,10 +1431,10 @@ Body       : ${request.toJson()}
   }
 
   Future<bool?> callConsentFormSelection({required int stepNumber}) async {
-      final bool isCatDefault =  state.consentType == 'category';
+    final bool isCatDefault = state.consentType == 'category';
     final request = ConsentFormSelectionRequest(
       stepNumber: stepNumber,
-      isCatDefualt: isCatDefault ,
+      isCatDefualt: isCatDefault,
       preTreatmentConsentForm: state.preTreatmentConsentForm != null
           ? PreTreatmentConsentForm(
               name: state.preTreatmentConsentForm!.name,
@@ -1503,6 +1510,7 @@ Body                 : ${request.toJson()}
         id: sessionId,
         request: FinalFinishRequest(status: 'Active', isCompleted: true),
       );
+      await fetchAndPopulateSessionDetail(sessionId);
 
       return true;
     });

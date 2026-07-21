@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/basic_info_request.dart';
 // import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/category_detail_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
@@ -184,7 +185,9 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
             id: id,
           );
           if (response.isSuccess && response.data != null) {
-            state = state.copyWith(selectedTreatmentDetail: response.data);
+            state = state.copyWith(
+              selectedTreatmentId: response.data?.id,
+              selectedTreatmentDetail: response.data);
             return true;
           }
           return false;
@@ -192,45 +195,61 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
         false;
   }
 
- Future<bool> changeTreatmentStatus(
-  int treatmentId,
-  String status, {
-  bool callDetail = false,
-}) async {
-  return await runSafely<bool>(
-        onLoadingChange: (loading) {
-          if (!callDetail) {
-            state = state.copyWith(loading: loading);
-          }
-        },
-        () async {
-          await _treatmentRepository.updateTreatmentStatus(
-            treatmentId: treatmentId,
-            status: status,
-          );
-          if (callDetail == false) {
-            await getTreatments(page: state.currentPage);
+  Future<bool?> changeSessionStatus({
+    required SessionStatusRequest request,
+  }) async {
+    return await runSafely<bool>(() async {
+      final response = await _treatmentRepository.changeSessionStatus(
+        request: request,
+      );
+      if (response.isSuccess) {
+        final treatmentId = state.selectedTreatmentDetail?.id;
+        if (treatmentId != null) {
+          await fetchTreatmentDetail(treatmentId,loading: false);
+        }
+      }
+      return true;
+    });
+  }
 
-            if (state.selectedTreatment?.id == treatmentId) {
-              final updated = state.treatments.firstWhere(
-                (t) => t.id == treatmentId,
-                orElse: () => state.selectedTreatment!,
-              );
-              state = state.copyWith(selectedTreatment: updated);
+  Future<bool> changeTreatmentStatus(
+    int treatmentId,
+    String status, {
+    bool callDetail = false,
+  }) async {
+    return await runSafely<bool>(
+          onLoadingChange: (loading) {
+            if (!callDetail) {
+              state = state.copyWith(loading: loading);
             }
-          } else {
-            await fetchTreatmentDetail(treatmentId, loading: false);
-          }
+          },
+          () async {
+            await _treatmentRepository.updateTreatmentStatus(
+              treatmentId: treatmentId,
+              status: status,
+            );
+            if (callDetail == false) {
+              await getTreatments(page: state.currentPage);
 
-          await EasyLoading.showSuccess(
-            'Treatment status updated successfully',
-          );
-          return true;
-        },
-      ) ??
-      false;
-}
-  
+              if (state.selectedTreatment?.id == treatmentId) {
+                final updated = state.treatments.firstWhere(
+                  (t) => t.id == treatmentId,
+                  orElse: () => state.selectedTreatment!,
+                );
+                state = state.copyWith(selectedTreatment: updated);
+              }
+            } else {
+              await fetchTreatmentDetail(treatmentId, loading: false);
+            }
+
+            await EasyLoading.showSuccess(
+              'Treatment status updated successfully',
+            );
+            return true;
+          },
+        ) ??
+        false;
+  }
 
   void resetForm() {
     globalSkuController.clear();
@@ -273,6 +292,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     shortDescriptionController.text = treatment.shortDescription ?? '';
 
     state = state.copyWith(
+      selectedTreatmentId: treatment.id ,
       status: treatment.status,
       treatmentImageUrl: treatment.image,
       treatmentIconUrl: treatment.icon,

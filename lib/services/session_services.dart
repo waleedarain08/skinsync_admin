@@ -11,8 +11,8 @@ import 'package:skinsync_admin/models/requests/create_session_requests/product_u
 import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
-import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
+import 'package:skinsync_admin/models/responses/down_time_level_response.dart';
 import 'package:skinsync_admin/models/responses/session_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/models/responses/session_detail_response.dart';
@@ -78,6 +78,23 @@ class SessionServices implements SessionRepository {
      queryParams: {'unit_type_id': unitTypeId.toString()},
     );
     final response = TreatmentProductsResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+
+ @override
+  Future<DownTimeLevelResponse> getDownTimeLevelByTreatment(
+  {required int id,}
+  ) async {
+   // final String idsParam = categoryIds.join(',');
+    final jsonResponse = await _api.get(
+      Endpoint.downTimeLevel,
+     pathParams: {'id': id.toString()},
+    );
+    final response = DownTimeLevelResponse.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
@@ -374,21 +391,7 @@ class SessionServices implements SessionRepository {
     }
     return response;
   }
-  @override
-Future<BaseApiResponseModel> changeSessionStatus({
-    required SessionStatusRequest request,
-  }) async{
-    final jsonResponse = await _api.patch(
-      Endpoint.sessionStatus,
-      body: request
-    );
-    final response = BaseApiResponseModel.fromJson(jsonResponse);
 
-    if (!response.isSuccess) {
-      throw BadRequestException(response.message);
-    }
-    return response;
-  }
 
 
 }

@@ -181,7 +181,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
                                           .changeTreatmentStatus(
                                             detail.id!,
                                             newStatus,
-                                            callDetail: true
+                                            callDetail: true,
                                           );
                                     }
                                   },
@@ -366,92 +366,102 @@ class TreatmentDetailScreen extends ConsumerWidget {
     BuildContext context,
     TreatmentDetailDto detail,
   ) {
-    final areas = detail.areas ?? [];
+    // final areas = detail.areas ?? [];
 
-    return BorderdContainerWidget(
-      padding: context.appEdgeInsets(all: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Consumer(
+      builder: (context, ref, _) {
+        final areas =
+            ref
+                .watch(treatmentViewModelProvider)
+                .selectedTreatmentDetail
+                ?.areas ??
+            [];
+        return BorderdContainerWidget(
+          padding: context.appEdgeInsets(all: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.location_on_outlined,
-                color: CustomColors.purple,
-                size: 20,
-              ),
-              context.horizontalSpace(10),
-              Text(
-                'Anatomical Areas & Clinical Sessions',
-                style: context.fonts.black16w700,
-              ),
-            ],
-          ),
-          context.verticalSpace(16),
-          if (areas.isEmpty)
-            Text(
-              'No anatomical areas selected (N/A)',
-              style: context.fonts.grey13w500,
-            )
-          else
-            Column(
-              children: areas.map((area) {
-                final areaSessions = area.sessions ?? [];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 24),
-                  padding: context.appEdgeInsets(all: 16),
-                  decoration: BoxDecoration(
-                    color: CustomColors.palePurple.withValues(alpha: 0.03),
-                    borderRadius: context.appBorderRadius(all: 12),
-                    border: Border.all(
-                      color: CustomColors.purple.withValues(alpha: 0.1),
-                    ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.location_on_outlined,
+                    color: CustomColors.purple,
+                    size: 20,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                  context.horizontalSpace(10),
+                  Text(
+                    'Anatomical Areas & Clinical Sessions',
+                    style: context.fonts.black16w700,
+                  ),
+                ],
+              ),
+              context.verticalSpace(16),
+              if (areas.isEmpty)
+                Text(
+                  'No anatomical areas selected (N/A)',
+                  style: context.fonts.grey13w500,
+                )
+              else
+                Column(
+                  children: areas.map((area) {
+                    final areaSessions = area.sessions ?? [];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: context.appEdgeInsets(all: 16),
+                      decoration: BoxDecoration(
+                        color: CustomColors.palePurple.withValues(alpha: 0.03),
+                        borderRadius: context.appBorderRadius(all: 12),
+                        border: Border.all(
+                          color: CustomColors.purple.withValues(alpha: 0.1),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
-                            Icons.location_searching,
-                            color: CustomColors.purple,
-                            size: 18,
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_searching,
+                                color: CustomColors.purple,
+                                size: 18,
+                              ),
+                              context.horizontalSpace(8),
+                              Text(
+                                area.areaName ?? 'Target Area',
+                                style: context.fonts.black14w700.copyWith(
+                                  color: CustomColors.purple,
+                                ),
+                              ),
+                            ],
                           ),
-                          context.horizontalSpace(8),
-                          Text(
-                            area.areaName ?? 'Target Area',
-                            style: context.fonts.black14w700.copyWith(
-                              color: CustomColors.purple,
+                          context.verticalSpace(12),
+                          if (areaSessions.isEmpty)
+                            Text(
+                              'No procedure sessions scheduled for this area.',
+                              style: context.fonts.grey12w400,
+                            )
+                          else
+                            ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: areaSessions.length,
+                              separatorBuilder: (_, __) =>
+                                  context.verticalSpace(12),
+                              itemBuilder: (context, idx) {
+                                return TreatmentSessionExpansionTile(
+                                  session: areaSessions[idx],
+                                );
+                              },
                             ),
-                          ),
                         ],
                       ),
-                      context.verticalSpace(12),
-                      if (areaSessions.isEmpty)
-                        Text(
-                          'No procedure sessions scheduled for this area.',
-                          style: context.fonts.grey12w400,
-                        )
-                      else
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: areaSessions.length,
-                          separatorBuilder: (_, __) =>
-                              context.verticalSpace(12),
-                          itemBuilder: (context, idx) {
-                            return TreatmentSessionExpansionTile(
-                              session: areaSessions[idx],
-                            );
-                          },
-                        ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-        ],
-      ),
+                    );
+                  }).toList(),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/models/responses/category_detail_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 
-class DowntimeStep extends ConsumerWidget {
+class DowntimeStep extends ConsumerStatefulWidget {
   const DowntimeStep({super.key});
 
+  @override
+  ConsumerState<DowntimeStep> createState() => _DowntimeStepState();
+}
+
+class _DowntimeStepState extends ConsumerState<DowntimeStep> {
   Widget _sectionTitle(BuildContext context, String title, {double? fontSize}) {
     return Text(
       title,
@@ -15,6 +19,21 @@ class DowntimeStep extends ConsumerWidget {
         fontSize: fontSize != null ? context.sp(fontSize) : null,
       ),
     );
+  }
+
+  String _descriptionForLevel(String? level) {
+    switch (level?.toLowerCase()) {
+      case 'none':
+        return 'No booking restrictions.';
+      case 'low':
+        return 'Short recovery window.';
+      case 'moderate':
+        return 'Standard clinical recovery.';
+      case 'high':
+        return 'Extended recovery required.';
+      default:
+        return 'Recovery window for this level.';
+    }
   }
 
   Widget _downtimeOption(
@@ -87,15 +106,22 @@ class DowntimeStep extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    final treatmentId =
+        ref.read(treatmentViewModelProvider).selectedTreatmentId;
+    if (treatmentId != null) {
+      ref
+          .read(sessionViewModelProvider.notifier)
+          .fetchDownTimeLevelByTreatment(id: treatmentId);
+    }
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
-    final CategoryDetailDto? selectedCategory = ref.watch(treatmentViewModelProvider).selectedCategoryDetail;
-    final presets = selectedCategory?.downtimePresets;
-    final lowDays = presets?.low ?? 2;
-    final moderateDays = presets?.moderate ?? 5;
-    final highDays = presets?.high ?? 10;
-    final noneDays = presets?.none ?? 0;
+    final levels = state.downTimeLevelList;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,41 +134,30 @@ class DowntimeStep extends ConsumerWidget {
         ),
         context.verticalSpace(32),
 
-        _downtimeOption(
-          context,
-          'None',
-          '$noneDays Days',
-          'No booking restrictions.',
-          state.downtimeLevel == 'None',
-          () => viewModel.setDowntimeLevel('None'),
-        ),
-        context.verticalSpace(16),
-        _downtimeOption(
-          context,
-          'Low',
-          '$lowDays Days',
-          'Short recovery window.',
-          state.downtimeLevel == 'Low',
-          () => viewModel.setDowntimeLevel('Low'),
-        ),
-        context.verticalSpace(16),
-        _downtimeOption(
-          context,
-          'Moderate',
-          '$moderateDays Days',
-          'Standard clinical recovery.',
-          state.downtimeLevel == 'Moderate',
-          () => viewModel.setDowntimeLevel('Moderate'),
-        ),
-        context.verticalSpace(16),
-        _downtimeOption(
-          context,
-          'High',
-          '$highDays Days',
-          'Extended recovery required.',
-          state.downtimeLevel == 'High',
-          () => viewModel.setDowntimeLevel('High'),
-        ),
+        if (state.loading)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: CircularProgressIndicator(color: CustomColors.purple),
+            ),
+          )
+        else if (levels.isEmpty)
+          Text(
+            'No downtime levels configured for this treatment.',
+            style: context.fonts.grey13w500,
+          )
+        else
+          for (int i = 0; i < levels.length; i++) ...[
+            _downtimeOption(
+              context,
+              levels[i].level ?? 'Level ${i + 1}',
+              '${levels[i].days ?? 0} Days',
+              _descriptionForLevel(levels[i].level),
+              state.downtimeLevel == levels[i].level,
+              () => viewModel.setDowntimeLevel(levels[i].level ?? ''),
+            ),
+            if (i != levels.length - 1) context.verticalSpace(16),
+          ],
       ],
     );
   }

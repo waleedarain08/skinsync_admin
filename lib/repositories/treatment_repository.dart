@@ -1,5 +1,6 @@
 // import 'package:skinsync_admin/models/requests/create_treatment_requests/business_logic_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/basic_info_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
@@ -48,5 +49,8 @@ abstract class TreatmentRepository {
   Future<BaseApiResponseModel> updateTreatment({
     required int treatmentId,
     required UpdateTreatmentRequest request,
+  });
+  Future<BaseApiResponseModel> changeSessionStatus({
+    required SessionStatusRequest request,
   });
 }

@@ -1,21 +1,21 @@
 import 'package:skinsync_admin/models/requests/create_session_requests/allowed_provider_role_request.dart';
-import 'package:skinsync_admin/models/requests/create_session_requests/final_finish_request.dart';
-import 'package:skinsync_admin/models/requests/create_session_requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/constent_form_selection_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/down_time_level_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/final_finish_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/phase_notifications_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/pre_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/product_usage_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
-import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
+import 'package:skinsync_admin/models/responses/down_time_level_response.dart';
+import 'package:skinsync_admin/models/responses/session_detail_response.dart';
 import 'package:skinsync_admin/models/responses/session_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
-import 'package:skinsync_admin/models/responses/session_detail_response.dart';
 
 abstract class SessionRepository {
   Future<BaseApiResponseModel> createSession({
@@ -32,6 +32,9 @@ abstract class SessionRepository {
 
   Future<TreatmentProductsResponse> getProductsByTreatment(
     int? unitTypeId,
+  );
+  Future<DownTimeLevelResponse> getDownTimeLevelByTreatment(
+   {required int id,}
   );
 
   Future<BaseApiResponseModel> productUsage({
@@ -103,7 +106,5 @@ abstract class SessionRepository {
   Future<BaseApiResponseModel> deleteSession({
     required int id,
   });
-Future<BaseApiResponseModel> changeSessionStatus({
-    required SessionStatusRequest request,
-  });
+
 }

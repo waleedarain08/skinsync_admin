@@ -6,6 +6,7 @@ import 'package:skinsync_admin/models/session_model.dart';
 import 'package:skinsync_admin/screens/create_session_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
+import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 
@@ -93,12 +94,13 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
   ) {
     if (entry.sessionId != null) {
       ref
-          .read(sessionViewModelProvider.notifier)
-          .changeSessionStatus(request: SessionStatusRequest(
-            sessionId:   entry.sessionId!,
-            status:  newStatus
-          )
-           );
+          .read(treatmentViewModelProvider.notifier)
+          .changeSessionStatus(
+            request: SessionStatusRequest(
+              sessionId: entry.sessionId!,
+              status: newStatus,
+            ),
+          );
     }
   }
 
@@ -155,7 +157,6 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
                         ),
                       ),
                       context.horizontalSpace(8),
-                     
 
                       // Container(
                       //   padding: const EdgeInsets.symmetric(
@@ -208,8 +209,8 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                 _buildStatusToggle(context, ref, entry),
-                   context.horizontalSpace(12),
+                _buildStatusToggle(context, ref, entry),
+                context.horizontalSpace(12),
                 CustomOutlinedButton(
                   width: context.w(110),
                   height: context.h(32),
@@ -283,7 +284,6 @@ class TreatmentSessionExpansionTile extends ConsumerWidget {
                 ),
               ),
               context.horizontalSpace(8),
-              
 
               // Container(
               //   padding: const EdgeInsets.symmetric(

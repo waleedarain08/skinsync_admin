@@ -488,6 +488,7 @@ class _TreatmentManagementScreenState
             onPressed: () async {
               if (treatment.id != null) {
                 try {
+                 // ref.read(treatmentViewModelProvider).
                   await ref
                       .read(treatmentViewModelProvider.notifier)
                       .fetchTreatmentDetail(treatment.id!);

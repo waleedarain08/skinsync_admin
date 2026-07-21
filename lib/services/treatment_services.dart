@@ -1,5 +1,6 @@
 
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
@@ -182,6 +183,22 @@ class TreatmentServices implements TreatmentRepository {
       pathParams: {'id': id.toString()},
     );
     final response = TreatmentDetailResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+Future<BaseApiResponseModel> changeSessionStatus({
+    required SessionStatusRequest request,
+  }) async{
+    final jsonResponse = await _api.patch(
+      Endpoint.sessionStatus,
+      body: request
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
