@@ -119,7 +119,23 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                   ? AppNetworkImage(imageUrl: method.icon!, width: 20, height: 20)
                   : const Icon(Icons.language_rounded, color: CustomColors.purple, size: 20),
             ),
-            title: Text(method.title, style: context.fonts.black14w600),
+            title: Row(
+              children: [
+                Text(method.title, style: context.fonts.black14w600),
+                context.horizontalSpace(8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: CustomColors.softGrey,
+                    borderRadius: context.appBorderRadius(all: 4),
+                  ),
+                  child: Text(
+                    method.key,
+                    style: context.fonts.grey10w700.copyWith(fontSize: 8),
+                  ),
+                ),
+              ],
+            ),
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 4.0),
               child: Text(method.description, style: context.fonts.grey12w400),
@@ -215,6 +231,18 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                                 child: Text(
                                   type.timing,
                                   style: context.fonts.grey10w700.copyWith(fontSize: 10),
+                                ),
+                              ),
+                              context.horizontalSpace(8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: CustomColors.palePurple.withValues(alpha: 0.5),
+                                  borderRadius: context.appBorderRadius(all: 5),
+                                ),
+                                child: Text(
+                                  'Key: ${type.key}',
+                                  style: context.fonts.purple11w600.copyWith(fontSize: 9),
                                 ),
                               ),
                             ],
