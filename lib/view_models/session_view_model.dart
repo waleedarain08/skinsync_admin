@@ -2,7 +2,7 @@
 import 'dart:developer';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Notification;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/notification_entry.dart';
@@ -1198,9 +1198,11 @@ Body          : ${request.toJson()}
   }
 
   Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
+    final bool isCatDefault = state.providerRolesSource == 'category';
     final request = AllowedProviderRolesRequest(
       stepNumber: stepNumber,
-      allowedRoles: state.selectedRoles, // ← matches state field from UI
+      isCatDefualt: isCatDefault,
+    allowedRoles: isCatDefault ? [] : state.selectedRoles, 
     );
 
     log('''
@@ -1322,39 +1324,52 @@ Body       : ${request.toJson()}
   }
 
   Future<bool?> callPhaseNotifications({required int stepNumber}) async {
-    return await runSafely(() async {
-      final sessionId = state.sessionId;
-      if (sessionId == null) {
-        throw const UnknownException('Session not found!');
-      }
-      await _sessionRepository.phaseNotifications(
-        id: sessionId,
-        request: PhaseNotificationsRequest(
-          stepNumber: stepNumber,
-          preNotifications: state.preNotificationEntries.map((entry) {
-            return NotificationRequest(
-              message: entry.messageController.text,
-              timing: int.tryParse(entry.timingValueController.text),
-              timingUnit: entry.timingUnit,
-              title: entry.titleController.text,
-              type: entry.type,
-            );
-          }).toList(),
-          postNotifications: state.postNotificationEntries.map((entry) {
-            return NotificationRequest(
-              message: entry.messageController.text,
-              timing: int.tryParse(entry.timingValueController.text),
-              timingUnit: entry.timingUnit,
-              title: entry.titleController.text,
-              type: entry.type,
-            );
-          }).toList(),
-        ),
-      );
-      return true;
-    });
-  }
+  return await runSafely(() async {
+    final sessionId = state.sessionId;
+    if (sessionId == null) {
+      throw const UnknownException('Session not found!');
+    }
 
+    final bool preIsCatDefault = state.preNotificationSource == 'category';
+    final bool postIsCatDefault = state.postNotificationSource == 'category';
+
+    await _sessionRepository.phaseNotifications(
+      id: sessionId,
+      request: PhaseNotificationsRequest(
+        stepNumber: stepNumber,
+        preNoti: PreNoti(
+          isCatDefault: preIsCatDefault,
+          preNotifications: preIsCatDefault
+              ? []
+              : state.preNotificationEntries.map((entry) {
+                  return PhaseNotification(
+                    title: entry.titleController.text,
+                    message: entry.messageController.text,
+                    timing: int.tryParse(entry.timingValueController.text),
+                    timingUnit: entry.timingUnit,
+                    type: entry.type,
+                  );
+                }).toList(),
+        ),
+        postNoti: PostNoti(
+          isCatDefault: postIsCatDefault,
+          postNotifications: postIsCatDefault
+              ? []
+              : state.postNotificationEntries.map((entry) {
+                  return PhaseNotification(
+                    title: entry.titleController.text,
+                    message: entry.messageController.text,
+                    timing: int.tryParse(entry.timingValueController.text),
+                    timingUnit: entry.timingUnit,
+                    type: entry.type,
+                  );
+                }).toList(),
+        ),
+      ),
+    );
+    return true;
+  });
+}
   Future<bool?> createSchedule({required int stepNumber}) async {
     return await runSafely<bool>(() async {
       await _sessionRepository.createSchedule(
@@ -1409,8 +1424,10 @@ Body       : ${request.toJson()}
   }
 
   Future<bool?> callConsentFormSelection({required int stepNumber}) async {
+      final bool isCatDefault =  state.consentType == 'category';
     final request = ConsentFormSelectionRequest(
       stepNumber: stepNumber,
+      isCatDefualt: isCatDefault ,
       preTreatmentConsentForm: state.preTreatmentConsentForm != null
           ? PreTreatmentConsentForm(
               name: state.preTreatmentConsentForm!.name,

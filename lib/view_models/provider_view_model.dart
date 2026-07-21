@@ -5,7 +5,7 @@ import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/view_models/base_view_model.dart';
 
 final providerRoleViewModelProvider =
-    NotifierProvider.autoDispose<ProviderRoleViewModel, ProviderRoleState>(
+    NotifierProvider<ProviderRoleViewModel, ProviderRoleState>(
       ProviderRoleViewModel.new,
     );
 

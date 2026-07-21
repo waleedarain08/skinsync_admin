@@ -2019,9 +2019,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 success = (result == true);
               } else if (sessionState.sessionStep == 8) {
                 // Phase Notifications
-                if (!_validatePhaseNotifications(context, state)) return;
-                final result = await viewModel.callPhaseNotifications(stepNumber: sessionState.sessionStep);
-                success = (result == true);
+                 success = true;
+                // if (!_validatePhaseNotifications(context, state)) return;
+                // final result = await viewModel.callPhaseNotifications(stepNumber: sessionState.sessionStep);
+                // success = (result == true);
               } else if (sessionState.sessionStep == 9) {
                 // Downtime Level
                 final result = await viewModel.callDownTimeLevels(stepNumber: sessionState.sessionStep);
