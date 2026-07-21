@@ -29,7 +29,7 @@ class BookingConfigData {
     AppointmentTypeModel(
       id: 1,
       key: 'consultation',
-      internalTitle: 'Consultation',
+      title: 'Consultation',
       description: 'A comprehensive evaluation to discuss clinical needs and treatment planning with the specialist.',
       timing: 'Before Treatment',
       maxDuration: 30,
@@ -38,7 +38,7 @@ class BookingConfigData {
     AppointmentTypeModel(
       id: 2,
       key: 'treatment',
-      internalTitle: 'Treatment',
+      title: 'Treatment',
       description: 'The primary session for the selected clinical procedure and therapy application.',
       timing: 'Primary Session',
       maxDuration: 60,
@@ -47,7 +47,7 @@ class BookingConfigData {
     AppointmentTypeModel(
       id: 3,
       key: 'follow_up',
-      internalTitle: 'Follow-up',
+      title: 'Follow-up',
       description: 'Reviewing results and monitoring progress following the completion of the procedure.',
       timing: 'After Treatment',
       maxDuration: 15,

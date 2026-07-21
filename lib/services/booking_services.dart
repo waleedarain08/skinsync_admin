@@ -1,4 +1,5 @@
-import '../models/requests/booking_config_requests.dart';
+import '../models/requests/appointment_type_request.dart';
+import '../models/requests/booking_method_request.dart';
 import '../models/responses/booking_configuration_response.dart';
 import '../repositories/booking_repository.dart';
 import '../utils/enums.dart';
@@ -48,7 +49,7 @@ class BookingServices implements BookingRepository {
   @override
   Future<void> updateAppointmentType({
     required int id,
-    required String internalTitle,
+    required String title,
     required String description,
     required String timing,
     required int maxDuration,
@@ -57,7 +58,7 @@ class BookingServices implements BookingRepository {
     String? image,
   }) async {
     // final body = {
-    //   'internal_title': internalTitle,
+    //   'title': title,
     //   'description': description,
     //   'timing': timing,
     //   'max_duration': maxDuration,
