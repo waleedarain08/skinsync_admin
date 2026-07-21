@@ -1,11 +1,12 @@
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
-import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
+import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/product_detail_response.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/screens/appointment_detail_screen.dart';
+import 'package:skinsync_admin/screens/booking_config_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
@@ -62,6 +63,11 @@ class RouteGenerator {
             name: AppointmentManagement.routeName,
             path: AppointmentManagement.routeName,
             builder: (_, _) => const AppointmentManagement(),
+          ),
+          GoRoute(
+            name: BookingConfigScreen.routeName,
+            path: BookingConfigScreen.routeName,
+            builder: (_, _) => const BookingConfigScreen(),
           ),
           GoRoute(
             name: UserManagement.routeName,
