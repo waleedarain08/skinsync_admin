@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/models/requests/booking_config_requests.dart';
+import 'package:skinsync_admin/models/requests/appointment_type_request.dart';
+import 'package:skinsync_admin/models/requests/booking_method_request.dart';
 import 'package:skinsync_admin/models/responses/booking_configuration_response.dart';
 import 'package:skinsync_admin/repositories/booking_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
@@ -108,7 +109,7 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
   }
 
   Future<bool> createAppointmentType({
-    required String internalTitle,
+    required String title,
     required String key,
     required String description,
     required String timing,
@@ -122,7 +123,7 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
       () async {
         await _bookingRepository.createAppointmentType(
           req: CreateAppointmentTypeRequest(
-            internalTitle: internalTitle,
+            title: title,
             key: key,
             description: description,
             timing: timing,
@@ -140,7 +141,7 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
 
   Future<bool> updateAppointmentType({
     required int id,
-    required String internalTitle,
+    required String title,
     required String description,
     required String timing,
     required int maxDuration,
@@ -153,7 +154,7 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
       () async {
         await _bookingRepository.updateAppointmentType(
           id: id,
-          internalTitle: internalTitle,
+          title: title,
           description: description,
           timing: timing,
           maxDuration: maxDuration,

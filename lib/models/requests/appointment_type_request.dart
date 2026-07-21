@@ -1,28 +1,5 @@
-class CreateBookingMethodRequest {
-  final String title;
-  final String key;
-  final String description;
-  final String? icon;
-
-  const CreateBookingMethodRequest({
-    required this.title,
-    required this.key,
-    required this.description,
-    this.icon,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'key': key,
-      'description': description,
-      if (icon != null) 'icon': icon,
-    };
-  }
-}
-
 class CreateAppointmentTypeRequest {
-  final String internalTitle;
+  final String title;
   final String key;
   final String description;
   final String timing;
@@ -32,7 +9,7 @@ class CreateAppointmentTypeRequest {
   final String? image;
 
   const CreateAppointmentTypeRequest({
-    required this.internalTitle,
+    required this.title,
     required this.key,
     required this.description,
     required this.timing,
@@ -44,7 +21,7 @@ class CreateAppointmentTypeRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'internal_title': internalTitle,
+      'title': title,
       'key': key,
       'description': description,
       'timing': timing,

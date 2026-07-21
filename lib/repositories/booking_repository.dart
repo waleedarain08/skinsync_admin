@@ -1,4 +1,5 @@
-import '../models/requests/booking_config_requests.dart';
+import '../models/requests/appointment_type_request.dart';
+import '../models/requests/booking_method_request.dart';
 import '../models/responses/booking_configuration_response.dart';
 
 abstract class BookingRepository {
@@ -17,7 +18,7 @@ abstract class BookingRepository {
 
   Future<void> updateAppointmentType({
     required int id,
-    required String internalTitle,
+    required String title,
     required String description,
     required String timing,
     required int maxDuration,
