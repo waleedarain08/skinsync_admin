@@ -67,7 +67,8 @@ enum Endpoint {
   sessionStatus('admin/sessions/status'),
   providerRoles('admin/provider-roles'),
   treatmentsStatus('admin/treatments/status'),
-  deductionTimings('admin/deduction-timings');
+  deductionTimings('admin/deduction-timings'),
+  bookingConfig('admin/booking-configuration');
 
   final String path;
   const Endpoint(this.path);
