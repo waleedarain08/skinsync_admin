@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/appointment_detail_screen.dart';
+import 'package:skinsync_admin/screens/booking_config_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -199,10 +200,22 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
             ),
           ],
         ),
-        CustomPrimaryButton(
-          onTap: () {},
-          icon: Icons.add_task_rounded,
-          label: 'Book Appointment',
+        Row(
+          children: [
+            CustomOutlinedButton(
+              onTap: () => context.push(BookingConfigScreen.routeName),
+              icon: Icons.settings_rounded,
+              label: 'Booking Settings',
+              color: Colors.white,
+              textColor: CustomColors.purple,
+            ),
+            context.horizontalSpace(12),
+            CustomPrimaryButton(
+              onTap: () {},
+              icon: Icons.add_task_rounded,
+              label: 'Book Appointment',
+            ),
+          ],
         ),
       ],
     );
