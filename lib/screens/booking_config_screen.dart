@@ -56,6 +56,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                       _buildSectionHeader(
                         'Booking Methods',
                         'Manage and configure descriptions for your available booking channels.',
+                        onAdd: () => _showBookingMethodDialog(context),
                       ),
                       context.verticalSpace(16),
                       _buildBookingMethodsList(state.config?.bookingMethods ?? []),
@@ -63,6 +64,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                       _buildSectionHeader(
                         'Appointment Types',
                         'Set timing rules and maximum durations for different clinical sessions.',
+                        onAdd: () => _showAppointmentTypeDialog(context),
                       ),
                       context.verticalSpace(16),
                       _buildAppointmentTypesList(state.config?.appointmentTypes ?? []),
@@ -72,11 +74,23 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, String description) {
+  Widget _buildSectionHeader(String title, String description, {VoidCallback? onAdd}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: context.fonts.black18w600),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: context.fonts.black18w600),
+            if (onAdd != null)
+              IconButton(
+                onPressed: onAdd,
+                icon: const Icon(Icons.add_circle_outline_rounded, color: CustomColors.purple),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+          ],
+        ),
         context.verticalSpace(4),
         Text(description, style: context.fonts.grey13w500),
       ],
@@ -116,6 +130,10 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 4.0),
               child: Text(method.description, style: context.fonts.grey12w400),
+            ),
+            trailing: IconButton(
+              onPressed: () => _showBookingMethodDialog(context, method: method),
+              icon: const Icon(Icons.edit_outlined, color: CustomColors.purple, size: 20),
             ),
           );
         },
@@ -208,11 +226,6 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                               ),
                             ],
                           ),
-                          context.verticalSpace(4),
-                          Text(
-                            type.patientDisplayName,
-                            style: context.fonts.purple14w600,
-                          ),
                           context.verticalSpace(8),
                           Text(
                             type.description,
@@ -251,7 +264,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => _showDurationEditDialog(context, type),
+                      onPressed: () => _showAppointmentTypeDialog(context, type: type),
                       icon: const Icon(Icons.edit_outlined, color: CustomColors.purple, size: 22),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -266,15 +279,114 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
     );
   }
 
-  void _showDurationEditDialog(BuildContext context, AppointmentTypeModel type) {
-    String currentTiming = type.timing;
-    final nameController = TextEditingController(text: type.patientDisplayName);
-    final descController = TextEditingController(text: type.description);
-    final durationController = TextEditingController(text: type.maxDuration.toString());
-    final List<String> selectedModes = List.from(type.appointmentModes);
+  void _showBookingMethodDialog(BuildContext context, {BookingMethodModel? method}) {
+    final bool isEdit = method != null;
+    final titleController = TextEditingController(text: method?.title);
+    final keyController = TextEditingController(text: method?.key);
+    final descController = TextEditingController(text: method?.description);
+    String? iconUrl = method?.icon;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 16)),
+            title: Text(isEdit ? 'Edit Booking Method' : 'Add Booking Method', style: context.fonts.black18w600),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Title', style: context.fonts.black14w600),
+                  context.verticalSpace(8),
+                  TextFormField(
+                    controller: titleController,
+                    style: context.fonts.black14w400,
+                    decoration: AppDecorations.input(context, hint: 'Enter method title'),
+                  ),
+                  context.verticalSpace(20),
+                  
+                  if (!isEdit) ...[
+                    Text('Key', style: context.fonts.black14w600),
+                    context.verticalSpace(8),
+                    TextFormField(
+                      controller: keyController,
+                      style: context.fonts.black14w400,
+                      decoration: AppDecorations.input(context, hint: 'e.g. online, walk_in'),
+                    ),
+                    context.verticalSpace(20),
+                  ],
+
+                  Text('Description', style: context.fonts.black14w600),
+                  context.verticalSpace(8),
+                  TextFormField(
+                    controller: descController,
+                    maxLines: 3,
+                    style: context.fonts.black14w400,
+                    decoration: AppDecorations.input(context, hint: 'Provide details...'),
+                  ),
+                  context.verticalSpace(20),
+
+                  Text('Icon', style: context.fonts.black14w600),
+                  context.verticalSpace(12),
+                  _buildAssetUploader(
+                    url: iconUrl,
+                    label: 'Icon',
+                    isIcon: true,
+                    onUpload: (url) => setDialogState(() => iconUrl = url),
+                    onDelete: () => setDialogState(() => iconUrl = null),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Cancel', style: context.fonts.grey14w600),
+              ),
+              CustomPrimaryButton(
+                onTap: () async {
+                  bool success;
+                  if (isEdit) {
+                    success = await ref.read(bookingConfigViewModelProvider.notifier).updateBookingMethod(
+                      id: method.id,
+                      title: titleController.text.trim(),
+                      description: descController.text.trim(),
+                      icon: iconUrl,
+                    );
+                  } else {
+                    success = await ref.read(bookingConfigViewModelProvider.notifier).createBookingMethod(
+                      title: titleController.text.trim(),
+                      key: keyController.text.trim(),
+                      description: descController.text.trim(),
+                      icon: iconUrl,
+                    );
+                  }
+                  if (success && context.mounted) Navigator.pop(context);
+                },
+                label: 'Save Changes',
+                width: context.w(140),
+                height: context.h(40),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _showAppointmentTypeDialog(BuildContext context, {AppointmentTypeModel? type}) {
+    final bool isEdit = type != null;
+    final titleController = TextEditingController(text: type?.internalTitle);
+    final keyController = TextEditingController(text: type?.key);
+    final descController = TextEditingController(text: type?.description);
+    final durationController = TextEditingController(text: type?.maxDuration.toString() ?? '30');
+    String currentTiming = type?.timing ?? _timingOptions.first;
+    final List<String> selectedModes = type != null ? List.from(type.appointmentModes) : ['In-Person'];
     
-    String? iconUrl = type.icon;
-    String? imageUrl = type.image;
+    String? iconUrl = type?.icon;
+    String? imageUrl = type?.image;
 
     final List<String> modeOptions = ['In-Person', 'Virtual'];
 
@@ -284,26 +396,31 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
         builder: (context, setDialogState) {
           return AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 16)),
-            title: Text('Edit Appointment Type', style: context.fonts.black18w600),
+            title: Text(isEdit ? 'Edit Appointment Type' : 'Add Appointment Type', style: context.fonts.black18w600),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Internal Title: ${type.internalTitle}', style: context.fonts.grey13w500),
-                  context.verticalSpace(20),
-                  
-                  Text('Patient Display Name', style: context.fonts.black14w600),
+                  Text('Internal Title', style: context.fonts.black14w600),
                   context.verticalSpace(8),
                   TextFormField(
-                    controller: nameController,
+                    controller: titleController,
                     style: context.fonts.black14w400,
-                    decoration: AppDecorations.input(
-                      context,
-                      hint: 'Enter public name for patients',
-                    ),
+                    decoration: AppDecorations.input(context, hint: 'Enter internal title'),
                   ),
                   context.verticalSpace(20),
+
+                  if (!isEdit) ...[
+                    Text('Key', style: context.fonts.black14w600),
+                    context.verticalSpace(8),
+                    TextFormField(
+                      controller: keyController,
+                      style: context.fonts.black14w400,
+                      decoration: AppDecorations.input(context, hint: 'e.g. consultation, treatment'),
+                    ),
+                    context.verticalSpace(20),
+                  ],
 
                   Text('Description', style: context.fonts.black14w600),
                   context.verticalSpace(8),
@@ -311,10 +428,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                     controller: descController,
                     maxLines: 3,
                     style: context.fonts.black14w400,
-                    decoration: AppDecorations.input(
-                      context,
-                      hint: 'Provide details about this appointment type...',
-                    ),
+                    decoration: AppDecorations.input(context, hint: 'Provide details...'),
                   ),
                   context.verticalSpace(20),
 
@@ -328,9 +442,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                           onTap: () {
                             setDialogState(() {
                               if (isSelected) {
-                                if (selectedModes.length > 1) {
-                                  selectedModes.remove(mode);
-                                }
+                                if (selectedModes.length > 1) selectedModes.remove(mode);
                               } else {
                                 selectedModes.add(mode);
                               }
@@ -346,9 +458,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                                     if (val == true) {
                                       selectedModes.add(mode);
                                     } else {
-                                      if (selectedModes.length > 1) {
-                                        selectedModes.remove(mode);
-                                      }
+                                      if (selectedModes.length > 1) selectedModes.remove(mode);
                                     }
                                   });
                                 },
@@ -366,18 +476,9 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                     label: 'Timing Selection',
                     hintText: 'Select timing',
                     value: _timingOptions.contains(currentTiming) ? currentTiming : _timingOptions.first,
-                    items: _timingOptions.map((option) {
-                      return DropdownMenuItem<String>(
-                        value: option,
-                        child: Text(option),
-                      );
-                    }).toList(),
+                    items: _timingOptions.map((option) => DropdownMenuItem<String>(value: option, child: Text(option))).toList(),
                     onChanged: (val) {
-                      if (val != null) {
-                        setDialogState(() {
-                          currentTiming = val;
-                        });
-                      }
+                      if (val != null) setDialogState(() => currentTiming = val);
                     },
                   ),
                   context.verticalSpace(20),
@@ -388,10 +489,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                     controller: durationController,
                     keyboardType: TextInputType.number,
                     style: context.fonts.black14w400,
-                    decoration: AppDecorations.input(
-                      context,
-                      hint: 'Enter maximum minutes',
-                    ).copyWith(
+                    decoration: AppDecorations.input(context, hint: 'Enter minutes').copyWith(
                       suffixText: 'mins',
                       suffixStyle: context.fonts.grey12w600,
                     ),
@@ -406,87 +504,13 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                           children: [
                             Text('Icon', style: context.fonts.black14w600),
                             context.verticalSpace(12),
-                            iconUrl == null || iconUrl!.isEmpty
-                                ? InkWell(
-                                    onTap: () async {
-                                      await ref.read(areaViewModelProvider.notifier).pickImage(true);
-                                      final uploaded = ref.read(areaViewModelProvider).areaIconUrl;
-                                      if (uploaded != null) {
-                                        setDialogState(() {
-                                          iconUrl = uploaded;
-                                        });
-                                      }
-                                    },
-                                    borderRadius: context.appBorderRadius(all: 12),
-                                    child: Container(
-                                      height: 100,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: CustomColors.whiteGrey,
-                                        borderRadius: context.appBorderRadius(all: 12),
-                                        border: Border.all(color: CustomColors.border),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.add_photo_alternate_outlined,
-                                            color: CustomColors.lightGrey,
-                                            size: 24,
-                                          ),
-                                          context.verticalSpace(4),
-                                          Text(
-                                            'Upload Icon',
-                                            style: context.fonts.grey11w400,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: 100,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: context.appBorderRadius(all: 12),
-                                      border: Border.all(color: CustomColors.border),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: context.appBorderRadius(all: 12),
-                                      child: Stack(
-                                        children: [
-                                          AppNetworkImage(
-                                            imageUrl: iconUrl!,
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                          ),
-                                          Positioned(
-                                            top: 4,
-                                            right: 4,
-                                            child: InkWell(
-                                              onTap: () {
-                                                setDialogState(() {
-                                                  iconUrl = null;
-                                                });
-                                              },
-                                              child: Container(
-                                                padding: const EdgeInsets.all(4),
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.white,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: const Icon(
-                                                  Icons.delete_outline_rounded,
-                                                  color: CustomColors.red,
-                                                  size: 16,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                            _buildAssetUploader(
+                              url: iconUrl,
+                              label: 'Icon',
+                              isIcon: true,
+                              onUpload: (url) => setDialogState(() => iconUrl = url),
+                              onDelete: () => setDialogState(() => iconUrl = null),
+                            ),
                           ],
                         ),
                       ),
@@ -497,87 +521,13 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                           children: [
                             Text('Banner Image', style: context.fonts.black14w600),
                             context.verticalSpace(12),
-                            imageUrl == null || imageUrl!.isEmpty
-                                ? InkWell(
-                                    onTap: () async {
-                                      await ref.read(areaViewModelProvider.notifier).pickImage(false);
-                                      final uploaded = ref.read(areaViewModelProvider).areaImageUrl;
-                                      if (uploaded != null) {
-                                        setDialogState(() {
-                                          imageUrl = uploaded;
-                                        });
-                                      }
-                                    },
-                                    borderRadius: context.appBorderRadius(all: 12),
-                                    child: Container(
-                                      height: 100,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: CustomColors.whiteGrey,
-                                        borderRadius: context.appBorderRadius(all: 12),
-                                        border: Border.all(color: CustomColors.border),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            Icons.add_photo_alternate_outlined,
-                                            color: CustomColors.lightGrey,
-                                            size: 24,
-                                          ),
-                                          context.verticalSpace(4),
-                                          Text(
-                                            'Upload Image',
-                                            style: context.fonts.grey11w400,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: 100,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: context.appBorderRadius(all: 12),
-                                      border: Border.all(color: CustomColors.border),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: context.appBorderRadius(all: 12),
-                                      child: Stack(
-                                        children: [
-                                          AppNetworkImage(
-                                            imageUrl: imageUrl!,
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                          ),
-                                          Positioned(
-                                            top: 4,
-                                            right: 4,
-                                            child: InkWell(
-                                              onTap: () {
-                                                setDialogState(() {
-                                                  imageUrl = null;
-                                                });
-                                              },
-                                              child: Container(
-                                                padding: const EdgeInsets.all(4),
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.white,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: const Icon(
-                                                  Icons.delete_outline_rounded,
-                                                  color: CustomColors.red,
-                                                  size: 16,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                            _buildAssetUploader(
+                              url: imageUrl,
+                              label: 'Image',
+                              isIcon: false,
+                              onUpload: (url) => setDialogState(() => imageUrl = url),
+                              onDelete: () => setDialogState(() => imageUrl = null),
+                            ),
                           ],
                         ),
                       ),
@@ -593,19 +543,31 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
               ),
               CustomPrimaryButton(
                 onTap: () async {
-                  final success = await ref.read(bookingConfigViewModelProvider.notifier).updateAppointmentType(
-                    id: type.id,
-                    patientDisplayName: nameController.text.trim(),
-                    description: descController.text.trim(),
-                    timing: currentTiming,
-                    maxDuration: int.tryParse(durationController.text.trim()) ?? 0,
-                    appointmentModes: selectedModes,
-                    icon: iconUrl,
-                    image: imageUrl,
-                  );
-                  if (success && context.mounted) {
-                    Navigator.pop(context);
+                  bool success;
+                  if (isEdit) {
+                    success = await ref.read(bookingConfigViewModelProvider.notifier).updateAppointmentType(
+                      id: type.id,
+                      internalTitle: titleController.text.trim(),
+                      description: descController.text.trim(),
+                      timing: currentTiming,
+                      maxDuration: int.tryParse(durationController.text.trim()) ?? 0,
+                      appointmentModes: selectedModes,
+                      icon: iconUrl,
+                      image: imageUrl,
+                    );
+                  } else {
+                    success = await ref.read(bookingConfigViewModelProvider.notifier).createAppointmentType(
+                      internalTitle: titleController.text.trim(),
+                      key: keyController.text.trim(),
+                      description: descController.text.trim(),
+                      timing: currentTiming,
+                      maxDuration: int.tryParse(durationController.text.trim()) ?? 0,
+                      appointmentModes: selectedModes,
+                      icon: iconUrl,
+                      image: imageUrl,
+                    );
                   }
+                  if (success && context.mounted) Navigator.pop(context);
                 },
                 label: 'Save Changes',
                 width: context.w(140),
@@ -613,8 +575,71 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
               ),
             ],
           );
-        }
+        },
       ),
     );
+  }
+
+  Widget _buildAssetUploader({
+    required String? url,
+    required String label,
+    required bool isIcon,
+    required void Function(String) onUpload,
+    required VoidCallback onDelete,
+  }) {
+    return url == null || url.isEmpty
+        ? InkWell(
+            onTap: () async {
+              await ref.read(areaViewModelProvider.notifier).pickImage(isIcon);
+              final uploaded = isIcon ? ref.read(areaViewModelProvider).areaIconUrl : ref.read(areaViewModelProvider).areaImageUrl;
+              if (uploaded != null) onUpload(uploaded);
+            },
+            borderRadius: context.appBorderRadius(all: 12),
+            child: Container(
+              height: 100,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 12),
+                border: Border.all(color: CustomColors.border),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.add_photo_alternate_outlined, color: CustomColors.lightGrey, size: 24),
+                  context.verticalSpace(4),
+                  Text('Upload $label', style: context.fonts.grey11w400),
+                ],
+              ),
+            ),
+          )
+        : Container(
+            height: 100,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(color: CustomColors.border),
+            ),
+            child: ClipRRect(
+              borderRadius: context.appBorderRadius(all: 12),
+              child: Stack(
+                children: [
+                  AppNetworkImage(imageUrl: url, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: InkWell(
+                      onTap: onDelete,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                        child: const Icon(Icons.delete_outline_rounded, color: CustomColors.red, size: 16),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
   }
 }

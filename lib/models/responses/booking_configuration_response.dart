@@ -68,8 +68,7 @@ class BookingMethodModel {
 class AppointmentTypeModel {
   final int id;
   final String key;
-  final String internalTitle;
-  final String patientDisplayName;
+  final String title;
   final String description;
   final String timing;
   final int maxDuration;
@@ -80,8 +79,7 @@ class AppointmentTypeModel {
   const AppointmentTypeModel({
     required this.id,
     required this.key,
-    required this.internalTitle,
-    required this.patientDisplayName,
+    required this.title,
     required this.description,
     required this.timing,
     required this.maxDuration,
@@ -94,8 +92,7 @@ class AppointmentTypeModel {
     return AppointmentTypeModel(
       id: json['id'] ?? 0,
       key: json['key'] ?? '',
-      internalTitle: json['internal_title'] ?? '',
-      patientDisplayName: json['patient_display_name'] ?? '',
+      title: json['title'] ?? json['internal_title'] ?? '',
       description: json['description'] ?? '',
       timing: json['timing'] ?? '',
       maxDuration: json['max_duration'] ?? 0,
