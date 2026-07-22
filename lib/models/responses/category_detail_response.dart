@@ -21,10 +21,10 @@ class CategoryDetailResponse extends BaseApiResponseModel<CategoryDetailDto> {
       );
 
   Map<String, dynamic> toJson() => {
-        'is_success': isSuccess,
-        'message': message,
-        'data': data?.toJson(),
-      };
+    'is_success': isSuccess,
+    'message': message,
+    'data': data?.toJson(),
+  };
 }
 
 class CategoryDetailDto {
@@ -38,7 +38,7 @@ class CategoryDetailDto {
   final List<NotificationModel>? preNotifications;
   final List<NotificationModel>? postNotifications;
   final DowntimePresets? downtimePresets;
-  final List<DefaultRole>? defaultRoles;
+  final List<String>? defaultRoles;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final List<CategoryDetailDto>? subCategories;
@@ -65,7 +65,9 @@ class CategoryDetailDto {
 
   String toRawJson() => json.encode(toJson());
 
-  factory CategoryDetailDto.fromJson(Map<String, dynamic> json) => CategoryDetailDto(
+  factory CategoryDetailDto.fromJson(
+    Map<String, dynamic> json,
+  ) => CategoryDetailDto(
     id: json['id'],
     name: json['name'],
     icon: json['icon'],
@@ -76,24 +78,32 @@ class CategoryDetailDto {
     preNotifications: json['pre_notifications'] == null
         ? null
         : List<NotificationModel>.from(
-            json['pre_notifications'].map((x) => NotificationModel.fromJson(x))),
+            json['pre_notifications'].map((x) => NotificationModel.fromJson(x)),
+          ),
     postNotifications: json['post_notifications'] == null
         ? null
         : List<NotificationModel>.from(
-            json['post_notifications'].map((x) => NotificationModel.fromJson(x))),
+            json['post_notifications'].map(
+              (x) => NotificationModel.fromJson(x),
+            ),
+          ),
     downtimePresets: json['downtime_presets'] == null
         ? null
         : DowntimePresets.fromJson(json['downtime_presets']),
     defaultRoles: json['default_roles'] == null
         ? null
-        : List<DefaultRole>.from(
-            json['default_roles'].map((x) => defaultRoleValues.map[x.toString().toLowerCase()] ?? DefaultRole.AESTHETICIAN)),
-    createdAt: json['created_at'] == null ? null : DateTime.parse(json['created_at']),
-    updatedAt: json['updated_at'] == null ? null : DateTime.parse(json['updated_at']),
+        : List<String>.from(json['default_roles']),
+    createdAt: json['created_at'] == null
+        ? null
+        : DateTime.parse(json['created_at']),
+    updatedAt: json['updated_at'] == null
+        ? null
+        : DateTime.parse(json['updated_at']),
     subCategories: json['sub_categories'] == null
         ? null
         : List<CategoryDetailDto>.from(
-            json['sub_categories'].map((x) => CategoryDetailDto.fromJson(x))),
+            json['sub_categories'].map((x) => CategoryDetailDto.fromJson(x)),
+          ),
   );
 
   Map<String, dynamic> toJson() => {
@@ -113,7 +123,7 @@ class CategoryDetailDto {
     'downtime_presets': downtimePresets?.toJson(),
     'default_roles': defaultRoles == null
         ? null
-        : List<dynamic>.from(defaultRoles!.map((x) => defaultRoleValues.reverse[x])),
+        : List<dynamic>.from(defaultRoles!),
     'created_at': createdAt?.toIso8601String(),
     'updated_at': updatedAt?.toIso8601String(),
     'sub_categories': subCategories == null
@@ -122,44 +132,15 @@ class CategoryDetailDto {
   };
 }
 
-enum DefaultRole {
-  AESTHETICIAN,
-  INJECTOR,
-  MD,
-  SPECIALIST,
-  NURSE
-}
+enum Unit { HOURS, MINUTES }
 
-final defaultRoleValues = EnumValues({
-  'aesthetician': DefaultRole.AESTHETICIAN,
-  'injector': DefaultRole.INJECTOR,
-  'md': DefaultRole.MD,
-  'specialist': DefaultRole.SPECIALIST,
-  'nurse': DefaultRole.NURSE
-});
+final unitValues = EnumValues({'hours': Unit.HOURS, 'minutes': Unit.MINUTES});
 
-
-
-enum Unit {
-  HOURS,
-  MINUTES
-}
-
-final unitValues = EnumValues({
-  'hours': Unit.HOURS,
-  'minutes': Unit.MINUTES
-});
-
-
-
-enum Type {
-  CARE,
-  INSTRUCTION
-}
+enum Type { CARE, INSTRUCTION }
 
 final typeValues = EnumValues({
   'care': Type.CARE,
-  'instruction': Type.INSTRUCTION
+  'instruction': Type.INSTRUCTION,
 });
 
 class EnumValues<T> {
