@@ -1,67 +1,6 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
-import 'package:skinsync_admin/models/responses/appointment_types_list_response.dart';
-import 'package:skinsync_admin/models/responses/booking_methods_list_response.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
-
-class BookingConfigData {
-  static const List<BookingMethodModel> dummyBookingMethods = [
-    BookingMethodModel(
-      id: 1,
-      key: 'online',
-      title: 'Online',
-      description: 'Allows customers to browse available time slots and book their own appointments directly through the Skinsync mobile application.',
-    ),
-    BookingMethodModel(
-      id: 2,
-      key: 'walk_in',
-      title: 'Walk-in',
-      description: 'Enables clinic administrators and front-desk staff to manually register and schedule appointments for customers who visit the clinic in person.',
-    ),
-    BookingMethodModel(
-      id: 3,
-      key: 'personal',
-      title: 'Personal',
-      description: 'Provides a private scheduling channel for clinic staff to manage internal administrative tasks, professional blocks, or private clinical sessions.',
-    ),
-  ];
-
-  static const List<AppointmentTypeModel> dummyAppointmentTypes = [
-    AppointmentTypeModel(
-      id: 1,
-      key: 'consultation',
-      title: 'Consultation',
-      description: 'A comprehensive evaluation to discuss clinical needs and treatment planning with the specialist.',
-      timing: 'Before Treatment',
-      maxDuration: 30,
-      appointmentModes: ['In-Person', 'Virtual'],
-    ),
-    AppointmentTypeModel(
-      id: 2,
-      key: 'treatment',
-      title: 'Treatment',
-      description: 'The primary session for the selected clinical procedure and therapy application.',
-      timing: 'Primary Session',
-      maxDuration: 60,
-      appointmentModes: ['In-Person'],
-    ),
-    AppointmentTypeModel(
-      id: 3,
-      key: 'follow_up',
-      title: 'Follow-up',
-      description: 'Reviewing results and monitoring progress following the completion of the procedure.',
-      timing: 'After Treatment',
-      maxDuration: 15,
-      appointmentModes: ['In-Person', 'Virtual'],
-    ),
-  ];
-
-  static const List<String> dummyAppointmentTimings = [
-    'Before Treatment',
-    'Primary Session',
-    'After Treatment',
-  ];
-}
 
 class TreatmentData {
   // Category Hierarchy

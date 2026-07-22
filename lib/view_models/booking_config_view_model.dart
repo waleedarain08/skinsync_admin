@@ -1,3 +1,4 @@
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/requests/appointment_type_request.dart';
 import 'package:skinsync_admin/models/requests/booking_method_request.dart';
@@ -5,7 +6,6 @@ import 'package:skinsync_admin/models/responses/appointment_types_list_response.
 import 'package:skinsync_admin/models/responses/booking_methods_list_response.dart';
 import 'package:skinsync_admin/repositories/booking_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
-import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 
@@ -49,30 +49,52 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
 
   final BookingRepository _bookingRepository = locator<BookingRepository>();
 
-  Future<void> fetchBookingConfig() async {
+  Future<void> fetchBookingMethods() async {
     await runSafely(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
         try {
-          // Use dummy data for now
-          await Future<void>.delayed(const Duration(seconds: 1));
+          final response = await _bookingRepository.getBookingMethods();
           state = state.copyWith(
-            bookingMethods: BookingConfigData.dummyBookingMethods,
-            appointmentTypes: BookingConfigData.dummyAppointmentTypes,
-            appointmentTimings: BookingConfigData.dummyAppointmentTimings,
+            bookingMethods: response.data,
             errorMessage: null,
           );
-          
-          // Re-enable this when APIs are live
-          // final methodsResponse = await _bookingRepository.getBookingMethods();
-          // final typesResponse = await _bookingRepository.getAppointmentTypes();
-          // final timingsResponse = await _bookingRepository.getAppointmentTimings();
-          // state = state.copyWith(
-          //   bookingMethods: methodsResponse.data,
-          //   appointmentTypes: typesResponse.data,
-          //   appointmentTimings: timingsResponse.data,
-          //   errorMessage: null,
-          // );
+        } catch (e) {
+          state = state.copyWith(errorMessage: e.toString());
+          rethrow;
+        }
+      },
+    );
+  }
+
+  Future<void> fetchAppointmentTypes() async {
+    await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        try {
+          final response = await _bookingRepository.getAppointmentTypes();
+          state = state.copyWith(
+            appointmentTypes: response.data,
+            errorMessage: null,
+          );
+        } catch (e) {
+          state = state.copyWith(errorMessage: e.toString());
+          rethrow;
+        }
+      },
+    );
+  }
+
+  Future<void> fetchAppointmentTimings() async {
+    await runSafely(
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        try {
+          final response = await _bookingRepository.getAppointmentTimings();
+          state = state.copyWith(
+            appointmentTimings: response.data,
+            errorMessage: null,
+          );
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;
@@ -98,7 +120,8 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
             icon: icon,
           ),
         );
-        await fetchBookingConfig();
+        EasyLoading.showSuccess('Booking method created successfully');
+        await fetchBookingMethods();
         return true;
       },
     ) ?? false;
@@ -119,7 +142,8 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
           description: description,
           icon: icon,
         );
-        await fetchBookingConfig();
+        EasyLoading.showSuccess('Booking method updated successfully');
+        await fetchBookingMethods();
         return true;
       },
     ) ?? false;
@@ -150,7 +174,8 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
             image: image,
           ),
         );
-        await fetchBookingConfig();
+        EasyLoading.showSuccess('Appointment type created successfully');
+        await fetchAppointmentTypes();
         return true;
       },
     ) ?? false;
@@ -179,7 +204,8 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
           icon: icon,
           image: image,
         );
-        await fetchBookingConfig();
+        EasyLoading.showSuccess('Appointment type updated successfully');
+        await fetchAppointmentTypes();
         return true;
       },
     ) ?? false;
