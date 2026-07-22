@@ -25,7 +25,8 @@ class NestedCategorySelector extends ConsumerStatefulWidget {
       _NestedCategorySelectorState();
 }
 
-class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector> {
+class _NestedCategorySelectorState
+    extends ConsumerState<NestedCategorySelector> {
   int? _selectedCategoryId;
 
   @override
@@ -39,7 +40,8 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
   @override
   void didUpdateWidget(NestedCategorySelector oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.initialCategoryId != oldWidget.initialCategoryId && widget.initialCategoryId != null) {
+    if (widget.initialCategoryId != oldWidget.initialCategoryId &&
+        widget.initialCategoryId != null) {
       _selectedCategoryId = int.tryParse(widget.initialCategoryId!);
     }
   }
@@ -85,7 +87,6 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -99,9 +100,7 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
               }),
               icon: const Icon(Icons.add_circle_outline, size: 18),
               label: const Text('Add Root Category'),
-              style: TextButton.styleFrom(
-                foregroundColor: CustomColors.purple,
-              ),
+              style: TextButton.styleFrom(foregroundColor: CustomColors.purple),
             ),
           ],
         ),
@@ -123,13 +122,10 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
                 category: category,
                 selectedCategoryId: _selectedCategoryId,
                 onSelected: _onCategorySelected,
-                onAddSubcategory: (parent) => _showAddChildDialog(
-                  context,
-                  parent,
-                  (result) {
-                    // Done on backend directly via dialog
-                  },
-                ),
+                onAddSubcategory: (parent) =>
+                    _showAddChildDialog(context, parent, (result) {
+                      // Done on backend directly via dialog
+                    }),
               );
             }).toList(),
           ),
@@ -201,32 +197,8 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
       initialImage: detail.image,
       initialConsentName: detail.consentFormName,
       initialConsentFormUrl: detail.consentFormUrl,
-      // initialSessions: detail.defaultSessions
-      //         ?.map(
-      //           (session) => CategorySessionModel(
-      //             sessionNumber: session.sessionNumber,
-      //             followUps: session.followUps
-      //                 .map(
-      //                   (followUp) => CategoryFollowUpModel(
-      //                     type: followUp.type ?? '',
-      //                     durationValue: followUp.durationValue ?? 0,
-      //                     durationUnit:
-      //                         unitValues.reverse[followUp.durationUnit] ??
-      //                         'minutes',
-      //                     intervalValue: followUp.intervalValue ?? 0,
-      //                     intervalUnit: followUp.intervalUnit ?? '',
-      //                     isImageRequired:
-      //                         followUp.isImageRequired ?? false,
-      //                     notes: followUp.notes ?? '',
-      //                   ),
-      //                 )
-      //                 .toList(),
-      //           ),
-      //         )
-      //         .toList() ??
-      //     [],
-      // initialTotalSessions: detail.totalSessions,
-      initialPreNotifications: detail.preNotifications
+      initialPreNotifications:
+          detail.preNotifications
               ?.map(
                 (notification) => CategoryNotificationModel(
                   title: notification.title,
@@ -238,7 +210,8 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
               )
               .toList() ??
           [],
-      initialPostNotifications: detail.postNotifications
+      initialPostNotifications:
+          detail.postNotifications
               ?.map(
                 (notification) => CategoryNotificationModel(
                   title: notification.title,
@@ -256,11 +229,7 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
         moderate: detail.downtimePresets?.moderate ?? 0,
         high: detail.downtimePresets?.high ?? 0,
       ),
-      initialDefaultRoles: detail.defaultRoles
-              ?.map((role) => defaultRoleValues.reverse[role] ?? '')
-              .where((role) => role.isNotEmpty)
-              .toList() ??
-          [],
+      initialDefaultRoles: detail.defaultRoles ?? [],
     );
   }
 
@@ -304,11 +273,7 @@ class _RecursiveCategoryTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: category.icon.isNotEmpty
-          ? IconImageContainer(
-              iconUrl: category.icon,
-              width: 36,
-              height: 36,
-            )
+          ? IconImageContainer(iconUrl: category.icon, width: 36, height: 36)
           : const Icon(
               Icons.category_outlined,
               color: CustomColors.purple,
@@ -328,7 +293,9 @@ class _RecursiveCategoryTile extends StatelessWidget {
         ),
         IconButton(
           icon: Icon(
-            isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+            isSelected
+                ? Icons.check_circle_rounded
+                : Icons.radio_button_unchecked,
             color: isSelected ? CustomColors.purple : CustomColors.grey,
             size: 20,
           ),
@@ -343,7 +310,11 @@ class _RecursiveCategoryTile extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
-          icon: const Icon(Icons.add_circle_outline, size: 20, color: CustomColors.purple),
+          icon: const Icon(
+            Icons.add_circle_outline,
+            size: 20,
+            color: CustomColors.purple,
+          ),
           onPressed: () => onAddSubcategory(category),
           tooltip: 'Add Subcategory',
           padding: EdgeInsets.zero,

@@ -8,7 +8,6 @@ import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.da
 import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
-import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 
 import '../services/location_service.dart';
@@ -42,7 +41,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
           final clinics = await _clinicRepository.getClinics(
             page: targetPage,
             limit: targetLimit,
-            search: search,
+            search: search ?? '',
           );
           if (clinics.isNotEmpty) {
             state = state.copyWith(
@@ -58,7 +57,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
         // Fallback to dummy data
         state = state.copyWith(
-          clinics: TreatmentData.dummyClinics,
+          clinics: [],
           currentPage: targetPage,
           pageSize: targetLimit,
         );
