@@ -201,31 +201,6 @@ class _NestedCategorySelectorState extends ConsumerState<NestedCategorySelector>
       initialImage: detail.image,
       initialConsentName: detail.consentFormName,
       initialConsentFormUrl: detail.consentFormUrl,
-      // initialSessions: detail.defaultSessions
-      //         ?.map(
-      //           (session) => CategorySessionModel(
-      //             sessionNumber: session.sessionNumber,
-      //             followUps: session.followUps
-      //                 .map(
-      //                   (followUp) => CategoryFollowUpModel(
-      //                     type: followUp.type ?? '',
-      //                     durationValue: followUp.durationValue ?? 0,
-      //                     durationUnit:
-      //                         unitValues.reverse[followUp.durationUnit] ??
-      //                         'minutes',
-      //                     intervalValue: followUp.intervalValue ?? 0,
-      //                     intervalUnit: followUp.intervalUnit ?? '',
-      //                     isImageRequired:
-      //                         followUp.isImageRequired ?? false,
-      //                     notes: followUp.notes ?? '',
-      //                   ),
-      //                 )
-      //                 .toList(),
-      //           ),
-      //         )
-      //         .toList() ??
-      //     [],
-      // initialTotalSessions: detail.totalSessions,
       initialPreNotifications: detail.preNotifications
               ?.map(
                 (notification) => CategoryNotificationModel(

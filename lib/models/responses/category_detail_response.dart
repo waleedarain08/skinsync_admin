@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:skinsync_admin/models/sessions_model.dart';
-
 import '../common_models.dart';
 import '../notification_model.dart';
 import 'base_response_model.dart';
@@ -35,10 +33,8 @@ class CategoryDetailDto {
   final String? icon;
   final String? image;
   final int? parentId;
-  final int? totalSessions;
   final String? consentFormUrl;
   final String? consentFormName;
-  final List<SessionsModel>? defaultSessions;
   final List<NotificationModel>? preNotifications;
   final List<NotificationModel>? postNotifications;
   final DowntimePresets? downtimePresets;
@@ -53,10 +49,8 @@ class CategoryDetailDto {
     this.icon,
     this.image,
     this.parentId,
-    this.totalSessions,
     this.consentFormUrl,
     this.consentFormName,
-    this.defaultSessions,
     this.preNotifications,
     this.postNotifications,
     this.downtimePresets,
@@ -77,13 +71,8 @@ class CategoryDetailDto {
     icon: json['icon'],
     image: json['image'],
     parentId: json['parent_id'],
-    totalSessions: json['total_sessions'],
     consentFormUrl: json['consent_form_url'],
     consentFormName: json['consent_form_name'],
-    defaultSessions: json['default_sessions'] == null
-        ? null
-        : List<SessionsModel>.from(
-            json['default_sessions'].map((x) => SessionsModel.fromJson(x))),
     preNotifications: json['pre_notifications'] == null
         ? null
         : List<NotificationModel>.from(
@@ -113,12 +102,8 @@ class CategoryDetailDto {
     'icon': icon,
     'image': image,
     'parent_id': parentId,
-    'total_sessions': totalSessions,
     'consent_form_url': consentFormUrl,
     'consent_form_name': consentFormName,
-    'default_sessions': defaultSessions == null
-        ? null
-        : List<dynamic>.from(defaultSessions!.map((x) => x.toJson())),
     'pre_notifications': preNotifications == null
         ? null
         : List<dynamic>.from(preNotifications!.map((x) => x.toJson())),
