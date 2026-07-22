@@ -1063,7 +1063,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     final isCategory = sessionState.providerRolesSource == 'category';
     final List<String> roles = isCategory
         ? (selectedCategory?.defaultRoles
-                  ?.map((r) => r.name[0] + r.name.substring(1).toLowerCase())
+                  ?.map((r) => r[0] + r.substring(1).toLowerCase())
                   .toList() ??
               [])
         : sessionState.selectedRoles;

@@ -130,11 +130,7 @@ class _AuthorizedRolesWidgetState extends ConsumerState<AuthorizedRolesWidget> {
     //   'Nurse',
     //   'Specialist',
     // ];
-    final List<String> categoryRoles =
-        selectedCategory?.defaultRoles
-            ?.map((r) => defaultRoleValues.reverse[r] ?? '')
-            .toList() ??
-        [];
+   final categoryRoles = selectedCategory?.defaultRoles ?? <String>[];
 
     final isCategoryDefault =
         widget.showCategorySwitcher &&

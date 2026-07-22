@@ -213,11 +213,8 @@ class _CategoryCreationDialogState
         cat.downtimePresets?.moderate.toString() ?? '';
     _downtimeHighController.text = cat.downtimePresets?.high.toString() ?? '';
 
-    _selectedRoles = List.from(
-      cat.defaultRoles?.map((r) => defaultRoleValues.reverse[r] ?? '') ?? [],
-    );
-  }
-
+  _selectedRoles = List<String>.from(cat.defaultRoles ?? []);
+}
   @override
   void dispose() {
     _nameController.dispose();
