@@ -32,8 +32,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await ref.read(categoryViewModelProvider.notifier).fetchCategories();
-     // await ref.read(productViewModelProvider.notifier).fetchProducts();
-
+      // await ref.read(productViewModelProvider.notifier).fetchProducts();
     });
   }
 
@@ -429,9 +428,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                 //     context,
                 //     categories: categoryState.categories,
                 //   );
-                //   if (context.mounted) {
-                //     context.go('/treatment-management');
-                //   }
+                if (context.mounted) {
+                  await viewModel.getTreatments(showLoading: true);
+                  context.go('/treatment-management');
+                }
                 // }
                 // return;
               }
