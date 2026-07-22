@@ -87,7 +87,7 @@ class CategoryDetailDto {
     defaultRoles: json['default_roles'] == null
         ? null
         : List<DefaultRole>.from(
-            json['default_roles'].map((x) => defaultRoleValues.map[x]!)),
+            json['default_roles'].map((x) => defaultRoleValues.map[x.toString().toLowerCase()] ?? DefaultRole.AESTHETICIAN)),
     createdAt: json['created_at'] == null ? null : DateTime.parse(json['created_at']),
     updatedAt: json['updated_at'] == null ? null : DateTime.parse(json['updated_at']),
     subCategories: json['sub_categories'] == null
@@ -131,11 +131,11 @@ enum DefaultRole {
 }
 
 final defaultRoleValues = EnumValues({
-  'Aesthetician': DefaultRole.AESTHETICIAN,
-  'Injector': DefaultRole.INJECTOR,
-  'MD': DefaultRole.MD,
-  'Specialist': DefaultRole.SPECIALIST,
-  'Nurse': DefaultRole.NURSE
+  'aesthetician': DefaultRole.AESTHETICIAN,
+  'injector': DefaultRole.INJECTOR,
+  'md': DefaultRole.MD,
+  'specialist': DefaultRole.SPECIALIST,
+  'nurse': DefaultRole.NURSE
 });
 
 
