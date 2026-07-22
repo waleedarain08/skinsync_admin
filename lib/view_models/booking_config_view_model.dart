@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/requests/appointment_type_request.dart';
 import 'package:skinsync_admin/models/requests/booking_method_request.dart';
-import 'package:skinsync_admin/models/responses/booking_configuration_response.dart';
+import 'package:skinsync_admin/models/responses/appointment_types_list_response.dart';
+import 'package:skinsync_admin/models/responses/booking_methods_list_response.dart';
 import 'package:skinsync_admin/repositories/booking_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
@@ -13,23 +14,27 @@ final bookingConfigViewModelProvider = NotifierProvider<BookingConfigViewModel, 
 );
 
 class BookingConfigState extends BaseStateModel {
-  final BookingConfigurationData? config;
+  final List<BookingMethodModel>? bookingMethods;
+  final List<AppointmentTypeModel>? appointmentTypes;
   final String? errorMessage;
 
   BookingConfigState({
     super.loading,
-    this.config,
+    this.bookingMethods,
+    this.appointmentTypes,
     this.errorMessage,
   });
 
   BookingConfigState copyWith({
     bool? loading,
-    BookingConfigurationData? config,
+    List<BookingMethodModel>? bookingMethods,
+    List<AppointmentTypeModel>? appointmentTypes,
     String? errorMessage,
   }) {
     return BookingConfigState(
       loading: loading ?? this.loading,
-      config: config ?? this.config,
+      bookingMethods: bookingMethods ?? this.bookingMethods,
+      appointmentTypes: appointmentTypes ?? this.appointmentTypes,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -47,15 +52,20 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
         try {
           // Use dummy data for now
           await Future<void>.delayed(const Duration(seconds: 1));
-          const dummyData = BookingConfigurationData(
+          state = state.copyWith(
             bookingMethods: BookingConfigData.dummyBookingMethods,
             appointmentTypes: BookingConfigData.dummyAppointmentTypes,
+            errorMessage: null,
           );
-          state = state.copyWith(config: dummyData, errorMessage: null);
           
-          // Re-enable this when API is live
-          // final response = await _bookingRepository.getBookingConfiguration();
-          // state = state.copyWith(config: response.data, errorMessage: null);
+          // Re-enable this when APIs are live
+          // final methodsResponse = await _bookingRepository.getBookingMethods();
+          // final typesResponse = await _bookingRepository.getAppointmentTypes();
+          // state = state.copyWith(
+          //   bookingMethods: methodsResponse.data,
+          //   appointmentTypes: typesResponse.data,
+          //   errorMessage: null,
+          // );
         } catch (e) {
           state = state.copyWith(errorMessage: e.toString());
           rethrow;

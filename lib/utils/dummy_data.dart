@@ -1,6 +1,7 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
-import 'package:skinsync_admin/models/responses/booking_configuration_response.dart';
+import 'package:skinsync_admin/models/responses/appointment_types_list_response.dart';
+import 'package:skinsync_admin/models/responses/booking_methods_list_response.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 
 class BookingConfigData {

@@ -1,9 +1,11 @@
 import '../models/requests/appointment_type_request.dart';
 import '../models/requests/booking_method_request.dart';
-import '../models/responses/booking_configuration_response.dart';
+import '../models/responses/appointment_types_list_response.dart';
+import '../models/responses/booking_methods_list_response.dart';
 
 abstract class BookingRepository {
-  Future<BookingConfigurationResponse> getBookingConfiguration();
+  Future<BookingMethodsListResponse> getBookingMethods();
+  Future<AppointmentTypesListResponse> getAppointmentTypes();
   
   Future<void> createBookingMethod({required CreateBookingMethodRequest req});
   

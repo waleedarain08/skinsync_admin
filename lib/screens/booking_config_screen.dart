@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/models/responses/booking_configuration_response.dart';
+import 'package:skinsync_admin/models/responses/appointment_types_list_response.dart';
+import 'package:skinsync_admin/models/responses/booking_methods_list_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/booking_config_view_model.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
@@ -37,7 +38,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
         elevation: 0,
         leading: const BackButton(color: Colors.black),
       ),
-      body: state.loading && state.config == null
+      body: state.loading && state.bookingMethods == null
           ? const Center(child: CircularProgressIndicator())
           : state.errorMessage != null
               ? Center(child: Text(state.errorMessage!))
@@ -52,7 +53,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                         onAdd: () => _showBookingMethodDialog(context),
                       ),
                       context.verticalSpace(16),
-                      _buildBookingMethodsList(state.config?.bookingMethods ?? []),
+                      _buildBookingMethodsList(state.bookingMethods ?? []),
                       context.verticalSpace(32),
                       _buildSectionHeader(
                         'Appointment Types',
@@ -60,7 +61,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
                         onAdd: () => _showAppointmentTypeDialog(context),
                       ),
                       context.verticalSpace(16),
-                      _buildAppointmentTypesList(state.config?.appointmentTypes ?? []),
+                      _buildAppointmentTypesList(state.appointmentTypes ?? []),
                     ],
                   ),
                 ),

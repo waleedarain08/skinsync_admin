@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/models/responses/booking_configuration_response.dart';
+import 'package:skinsync_admin/models/responses/booking_methods_list_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/area_view_model.dart';
 import 'package:skinsync_admin/view_models/booking_config_view_model.dart';
