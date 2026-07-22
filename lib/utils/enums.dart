@@ -68,7 +68,9 @@ enum Endpoint {
   providerRoles('admin/provider-roles'),
   treatmentsStatus('admin/treatments/status'),
   bookingMethods('admin/booking-methods'),
+  updateBookingMethod('admin/booking-methods/{id}'),
   appointmentTypes('admin/appointment-types'),
+  updateAppointmentType('admin/appointment-types/{id}'),
   appointmentTimings('admin/appointment-timings'),
   downTimeLevel('admin/treatments/{id}/downtime-presets'),
   deductionTimings('admin/deduction-timings');

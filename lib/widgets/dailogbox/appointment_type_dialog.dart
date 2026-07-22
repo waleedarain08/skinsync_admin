@@ -45,7 +45,7 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final timings = ref.read(bookingConfigViewModelProvider).appointmentTimings;
       if (timings == null || timings.isEmpty) {
-        ref.read(bookingConfigViewModelProvider.notifier).fetchBookingConfig();
+        ref.read(bookingConfigViewModelProvider.notifier).fetchAppointmentTimings();
       }
     });
   }
@@ -221,6 +221,7 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
           child: Text('Cancel', style: context.fonts.grey14w600),
         ),
         CustomPrimaryButton(
+          isLoading: ref.watch(bookingConfigViewModelProvider).loading,
           onTap: () async {
             bool success;
             if (isEdit) {

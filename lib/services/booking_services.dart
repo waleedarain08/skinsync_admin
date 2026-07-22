@@ -45,7 +45,7 @@ class BookingServices implements BookingRepository {
 
   @override
   Future<void> createBookingMethod({required CreateBookingMethodRequest req}) async {
-    // await _api.post(Endpoint.bookingMethods, body: req.toJson());
+    await _api.post(Endpoint.bookingMethods, body: req.toJson());
   }
 
   @override
@@ -55,17 +55,17 @@ class BookingServices implements BookingRepository {
     required String description,
     String? icon,
   }) async {
-    // final body = {
-    //   'title': title,
-    //   'description': description,
-    //   if (icon != null) 'icon': icon,
-    // };
-    // await _api.patch(Endpoint.bookingMethods, body: body, pathParams: {'id': id.toString()});
+    final body = {
+      'title': title,
+      'description': description,
+      if (icon != null) 'icon': icon,
+    };
+    await _api.patch(Endpoint.updateBookingMethod, body: body, pathParams: {'id': id.toString()});
   }
 
   @override
   Future<void> createAppointmentType({required CreateAppointmentTypeRequest req}) async {
-    // await _api.post(Endpoint.appointmentTypes, body: req.toJson());
+    await _api.post(Endpoint.appointmentTypes, body: req.toJson());
   }
 
   @override
@@ -79,15 +79,15 @@ class BookingServices implements BookingRepository {
     String? icon,
     String? image,
   }) async {
-    // final body = {
-    //   'title': title,
-    //   'description': description,
-    //   'timing': timing,
-    //   'max_duration': maxDuration,
-    //   'appointment_modes': appointmentModes,
-    //   if (icon != null) 'icon': icon,
-    //   if (image != null) 'image': image,
-    // };
-    // await _api.patch(Endpoint.appointmentTypes, body: body, pathParams: {'id': id.toString()});
+    final body = {
+      'title': title,
+      'description': description,
+      'timing': timing,
+      'max_duration': maxDuration,
+      'appointment_modes': appointmentModes,
+      if (icon != null) 'icon': icon,
+      if (image != null) 'image': image,
+    };
+    await _api.patch(Endpoint.updateAppointmentType, body: body, pathParams: {'id': id.toString()});
   }
 }

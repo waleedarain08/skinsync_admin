@@ -22,8 +22,9 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(bookingConfigViewModelProvider.notifier).fetchBookingConfig();
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      await ref.read(bookingConfigViewModelProvider.notifier).fetchBookingMethods();
+      await ref.read(bookingConfigViewModelProvider.notifier).fetchAppointmentTypes();
     });
   }
 
@@ -38,11 +39,9 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
         elevation: 0,
         leading: const BackButton(color: Colors.black),
       ),
-      body: state.loading && state.bookingMethods == null
-          ? const Center(child: CircularProgressIndicator())
-          : state.errorMessage != null
-              ? Center(child: Text(state.errorMessage!))
-              : SingleChildScrollView(
+      body: state.errorMessage != null
+          ? Center(child: Text(state.errorMessage!))
+          : SingleChildScrollView(
                   padding: context.appEdgeInsets(all: 28),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
