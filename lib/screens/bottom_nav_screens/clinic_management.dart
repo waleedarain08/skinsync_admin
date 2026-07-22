@@ -244,7 +244,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
         _buildMiniStat(
           context,
           'Total Clinics',
-          '48',
+          '3',
           Icons.business_rounded,
           CustomColors.purple,
         ),
@@ -252,7 +252,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
         _buildMiniStat(
           context,
           'Active Partners',
-          '42',
+          '4',
           Icons.bolt_rounded,
           CustomColors.green,
         ),
@@ -260,7 +260,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
         _buildMiniStat(
           context,
           'Network Revenue',
-          '\$245K',
+          '\$25K',
           Icons.payments_rounded,
           CustomColors.green,
         ),
