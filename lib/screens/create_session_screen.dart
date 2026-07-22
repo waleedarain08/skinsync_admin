@@ -1971,17 +1971,23 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               if (sessionState.sessionStep == 1) {
                 // Inventory Products
                 if (!_validateProductQuantities(context, state)) return;
-                final result = await viewModel.callProductUsage(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.callProductUsage(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
                 //(result == true);
               } else if (sessionState.sessionStep == 2) {
                 // Scheduling
                 if (!_validateScheduling(context, viewModel)) return;
-                final result = await viewModel.createSchedule(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.createSchedule(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
               } else if (sessionState.sessionStep == 3) {
                 // Pricing Setup
-                final result = await viewModel.callStepPricing(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.callStepPricing(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
               } else if (sessionState.sessionStep == 4) {
                 // Protocols
@@ -2006,101 +2012,126 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 success = (result == true);
               } else if (sessionState.sessionStep == 5) {
                 // Pre-Treatment Instructions
-                final result = await viewModel.callPreTreatmentInstructions(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.callPreTreatmentInstructions(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
               } else if (sessionState.sessionStep == 6) {
                 // Post-Treatment Instructions
-                final result = await viewModel.callPostTreatmentInstructions(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.callPostTreatmentInstructions(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
               } else if (sessionState.sessionStep == 7) {
                 // Post Treatment Photos
                 if (!_validatePostPhotos(context, state)) return;
-                final result = await viewModel.callPostTreatmentPhotos(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.callPostTreatmentPhotos(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
               } else if (sessionState.sessionStep == 8) {
                 // Phase Notifications
                 if (!_validatePhaseNotifications(context, state)) return;
-                final result = await viewModel.callPhaseNotifications(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.callPhaseNotifications(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
               } else if (sessionState.sessionStep == 9) {
                 // Downtime Level
-                final result = await viewModel.callDownTimeLevels(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.callDownTimeLevels(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
               } else if (sessionState.sessionStep == 10) {
                 // Allowed Provider Roles
-                final result = await viewModel.callAllowedProviderRoles(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.callAllowedProviderRoles(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
               } else if (sessionState.sessionStep == 11) {
                 // Follow-Up Setup
                 if (!_validateFollowUps(context, sessionState)) return;
-                final result = await viewModel.callFollowUpConfig(stepNumber: sessionState.sessionStep);
+                final result = await viewModel.callFollowUpConfig(
+                  stepNumber: sessionState.sessionStep,
+                );
                 success = (result == true);
               } else if (sessionState.sessionStep == 12) {
                 // Patient Consent (Last Step!)
-                await viewModel.callConsentFormSelection(stepNumber: sessionState.sessionStep).then((value) async {
-                  if (value == true) {
-                    await viewModel.callFinalFinish().then((value) {
+                await viewModel
+                    .callConsentFormSelection(
+                      stepNumber: sessionState.sessionStep,
+                    )
+                    .then((value) async {
                       if (value == true) {
-                        final durationText =
-                            '${sessionViewModel.treatmentDurationController.text} mins (Prep: ${sessionViewModel.prepTimeController.text}m, Clean: ${sessionViewModel.cleanupTimeController.text}m)';
-                        final priceText = sessionState.isFixedPrice
-                            ? '\$${sessionViewModel.fixedPriceController.text} (Fixed)'
-                            : '\$${sessionViewModel.basePriceController.text}';
+                        await viewModel.callFinalFinish().then((value) {
+                          if (value == true) {
+                            final durationText =
+                                '${sessionViewModel.treatmentDurationController.text} mins (Prep: ${sessionViewModel.prepTimeController.text}m, Clean: ${sessionViewModel.cleanupTimeController.text}m)';
+                            final priceText = sessionState.isFixedPrice
+                                ? '\$${sessionViewModel.fixedPriceController.text} (Fixed)'
+                                : '\$${sessionViewModel.basePriceController.text}';
 
-                        final protocols = sessionState.selectedProtocolIds
-                            .toList();
-                        final preInstructions = sessionViewModel
-                            .preTreatmentInstructionsController
-                            .text;
-                        final postInstructions = sessionViewModel
-                            .postTreatmentInstructionsController
-                            .text;
+                            final protocols = sessionState.selectedProtocolIds
+                                .toList();
+                            final preInstructions = sessionViewModel
+                                .preTreatmentInstructionsController
+                                .text;
+                            final postInstructions = sessionViewModel
+                                .postTreatmentInstructionsController
+                                .text;
 
-                        final preNotifs = sessionState.preNotificationEntries
-                            .map(
-                              (n) =>
-                                  '${n.timingValueController.text} ${n.timingUnit} before: ${n.titleController.text}',
-                            )
-                            .toList();
-                        final postNotifs = sessionState.postNotificationEntries
-                            .map(
-                              (n) =>
-                                  '${n.timingValueController.text} ${n.timingUnit} after: ${n.titleController.text}',
-                            )
-                            .toList();
+                            final preNotifs = sessionState
+                                .preNotificationEntries
+                                .map(
+                                  (n) =>
+                                      '${n.timingValueController.text} ${n.timingUnit} before: ${n.titleController.text}',
+                                )
+                                .toList();
+                            final postNotifs = sessionState
+                                .postNotificationEntries
+                                .map(
+                                  (n) =>
+                                      '${n.timingValueController.text} ${n.timingUnit} after: ${n.titleController.text}',
+                                )
+                                .toList();
 
-                        sessionViewModel.markActiveSessionAsDetailed(
-                          durationText: durationText,
-                          priceText: priceText,
-                          protocols: protocols,
-                          preInstructions: preInstructions,
-                          postInstructions: postInstructions,
-                          requirePhotosSnapshot:
-                              sessionState.requirePostTreatmentPhotos,
-                          photosCountSnapshot:
-                              sessionState.requiredPostTreatmentPhotoCount,
-                          preNotifs: preNotifs,
-                          postNotifs: postNotifs,
-                          downtimeLevel: sessionState.downtimeLevel,
-                          selectedRoles: sessionState.selectedRoles,
-                          consentSnapshot:
-                              sessionState.consentType == 'category'
-                              ? (state
-                                        .selectedCategoryDetail
-                                        ?.consentFormName ??
-                                    'Category Consent Form')
-                              : (sessionState.preTreatmentConsentForm?.name ??
-                                    sessionState.existingConsentForm?.name ??
-                                    'Custom Consent'),
-                          productUsageEntries: sessionState.productUsageEntries,
-                        );
-                        if (context.mounted) {
-                          context.pop();
-                        }
+                            sessionViewModel.markActiveSessionAsDetailed(
+                              durationText: durationText,
+                              priceText: priceText,
+                              protocols: protocols,
+                              preInstructions: preInstructions,
+                              postInstructions: postInstructions,
+                              requirePhotosSnapshot:
+                                  sessionState.requirePostTreatmentPhotos,
+                              photosCountSnapshot:
+                                  sessionState.requiredPostTreatmentPhotoCount,
+                              preNotifs: preNotifs,
+                              postNotifs: postNotifs,
+                              downtimeLevel: sessionState.downtimeLevel,
+                              selectedRoles: sessionState.selectedRoles,
+                              consentSnapshot:
+                                  sessionState.consentType == 'category'
+                                  ? (state
+                                            .selectedCategoryDetail
+                                            ?.consentFormName ??
+                                        'Category Consent Form')
+                                  : (sessionState
+                                            .preTreatmentConsentForm
+                                            ?.name ??
+                                        sessionState
+                                            .existingConsentForm
+                                            ?.name ??
+                                        'Custom Consent'),
+                              productUsageEntries:
+                                  sessionState.productUsageEntries,
+                            );
+                            if (context.mounted) {
+                              context.pop();
+                            }
+                          }
+                        });
                       }
                     });
-                  }
-                });
               }
 
               if (success && sessionState.sessionStep < 12) {
@@ -2216,7 +2247,25 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     if (minVal > 0 && sessionState.productUsageEntries.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('At least one Billable Material is required when Minimum Units > 0.'),
+          content: Text(
+            'At least one Billable Material is required when Minimum Units > 0.',
+          ),
+          backgroundColor: CustomColors.red,
+        ),
+      );
+      return false;
+    }
+
+    if (sessionState.productUsageEntries.isNotEmpty &&
+        sessionState.productUsageEntries.any(
+          (entry) =>
+              entry.deductionTiming == null || entry.deductionTiming!.isEmpty,
+        )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Please select Deduction Timing for all Billable Materials.',
+          ),
           backgroundColor: CustomColors.red,
         ),
       );

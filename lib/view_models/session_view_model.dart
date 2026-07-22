@@ -563,7 +563,6 @@ class SessionViewModel extends BaseViewModel<SessionState> {
                   maxQuantityController: TextEditingController(text: '0'),
                   perUnitDurationController: TextEditingController(text: '0'),
                   allowSubstitution: false,
-                  deductionTiming: 'On_Completion', // Default name
                 );
               }).toList();
 
@@ -2144,7 +2143,7 @@ class ProductUsageEntry {
     required this.productName,
     required this.unit,
     this.usageType = 'Required',
-    this.deductionTiming = 'On_Completion',
+    this.deductionTiming ,
     this.allowSubstitution = false,
     TextEditingController? minQuantityController,
     TextEditingController? maxQuantityController,
