@@ -55,6 +55,12 @@ class BookingConfigData {
       appointmentModes: ['In-Person', 'Virtual'],
     ),
   ];
+
+  static const List<String> dummyAppointmentTimings = [
+    'Before Treatment',
+    'Primary Session',
+    'After Treatment',
+  ];
 }
 
 class TreatmentData {

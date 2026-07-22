@@ -17,12 +17,6 @@ class AppointmentTypeDialog extends ConsumerStatefulWidget {
 }
 
 class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
-  final List<String> _timingOptions = [
-    'Before Treatment',
-    'Primary Session',
-    'After Treatment',
-  ];
-
   late TextEditingController titleController;
   late TextEditingController keyController;
   late TextEditingController descController;
@@ -42,10 +36,18 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
     keyController = TextEditingController(text: type?.key);
     descController = TextEditingController(text: type?.description);
     durationController = TextEditingController(text: type?.maxDuration.toString() ?? '30');
-    currentTiming = type?.timing ?? _timingOptions.first;
+    currentTiming = type?.timing ?? '';
     selectedModes = type != null ? List.from(type.appointmentModes) : ['In-Person'];
     iconUrl = type?.icon;
     imageUrl = type?.image;
+    
+    // Fetch timings if they are not already loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final timings = ref.read(bookingConfigViewModelProvider).appointmentTimings;
+      if (timings == null || timings.isEmpty) {
+        ref.read(bookingConfigViewModelProvider.notifier).fetchBookingConfig();
+      }
+    });
   }
 
   @override
@@ -142,14 +144,21 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
               context.verticalSpace(20),
 
               CustomDropdown<String>(
-                label: 'Timing Selection',
-                hintText: 'Select timing',
-                value: _timingOptions.contains(currentTiming) ? currentTiming : _timingOptions.first,
-                items: _timingOptions.map((option) => DropdownMenuItem<String>(value: option, child: Text(option))).toList(),
-                onChanged: (val) {
-                  if (val != null) setState(() => currentTiming = val);
-                },
-              ),
+              label: 'Timing Selection',
+              hintText: 'Select timing',
+              value: ref.watch(bookingConfigViewModelProvider).appointmentTimings?.contains(currentTiming) == true 
+                  ? currentTiming 
+                  : null,
+              items: (ref.watch(bookingConfigViewModelProvider).appointmentTimings ?? []).map((option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  child: Text(option),
+                );
+              }).toList(),
+              onChanged: (val) {
+                if (val != null) setState(() => currentTiming = val);
+              },
+            ),
               context.verticalSpace(20),
 
               Text('Maximum Duration', style: context.fonts.black14w600),

@@ -16,12 +16,14 @@ final bookingConfigViewModelProvider = NotifierProvider<BookingConfigViewModel, 
 class BookingConfigState extends BaseStateModel {
   final List<BookingMethodModel>? bookingMethods;
   final List<AppointmentTypeModel>? appointmentTypes;
+  final List<String>? appointmentTimings;
   final String? errorMessage;
 
   BookingConfigState({
     super.loading,
     this.bookingMethods,
     this.appointmentTypes,
+    this.appointmentTimings,
     this.errorMessage,
   });
 
@@ -29,12 +31,14 @@ class BookingConfigState extends BaseStateModel {
     bool? loading,
     List<BookingMethodModel>? bookingMethods,
     List<AppointmentTypeModel>? appointmentTypes,
+    List<String>? appointmentTimings,
     String? errorMessage,
   }) {
     return BookingConfigState(
       loading: loading ?? this.loading,
       bookingMethods: bookingMethods ?? this.bookingMethods,
       appointmentTypes: appointmentTypes ?? this.appointmentTypes,
+      appointmentTimings: appointmentTimings ?? this.appointmentTimings,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -55,15 +59,18 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
           state = state.copyWith(
             bookingMethods: BookingConfigData.dummyBookingMethods,
             appointmentTypes: BookingConfigData.dummyAppointmentTypes,
+            appointmentTimings: BookingConfigData.dummyAppointmentTimings,
             errorMessage: null,
           );
           
           // Re-enable this when APIs are live
           // final methodsResponse = await _bookingRepository.getBookingMethods();
           // final typesResponse = await _bookingRepository.getAppointmentTypes();
+          // final timingsResponse = await _bookingRepository.getAppointmentTimings();
           // state = state.copyWith(
           //   bookingMethods: methodsResponse.data,
           //   appointmentTypes: typesResponse.data,
+          //   appointmentTimings: timingsResponse.data,
           //   errorMessage: null,
           // );
         } catch (e) {

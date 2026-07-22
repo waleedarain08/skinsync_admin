@@ -1,5 +1,6 @@
 import '../models/requests/appointment_type_request.dart';
 import '../models/requests/booking_method_request.dart';
+import '../models/responses/appointment_timing_list_response.dart';
 import '../models/responses/appointment_types_list_response.dart';
 import '../models/responses/booking_methods_list_response.dart';
 import '../repositories/booking_repository.dart';
@@ -26,6 +27,16 @@ class BookingServices implements BookingRepository {
   Future<AppointmentTypesListResponse> getAppointmentTypes() async {
     final jsonResponse = await _api.get(Endpoint.appointmentTypes);
     final response = AppointmentTypesListResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<AppointmentTimingListResponse> getAppointmentTimings() async {
+    final jsonResponse = await _api.get(Endpoint.appointmentTimings);
+    final response = AppointmentTimingListResponse.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
