@@ -39,7 +39,7 @@ class _BookingConfigScreenState extends ConsumerState<BookingConfigScreen> {
         elevation: 0,
         leading: const BackButton(color: Colors.black),
       ),
-      body: state.errorMessage != null
+      body: state.errorMessage != null && state.bookingMethods == null
           ? Center(child: Text(state.errorMessage!))
           : SingleChildScrollView(
                   padding: context.appEdgeInsets(all: 28),

@@ -26,7 +26,7 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
   String? iconUrl;
   String? imageUrl;
 
-  final List<String> modeOptions = ['In-Person', 'Virtual'];
+  final List<String> modeOptions = ['in-person', 'virtual'];
 
   @override
   void initState() {
@@ -37,15 +37,15 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
     descController = TextEditingController(text: type?.description);
     durationController = TextEditingController(text: type?.maxDuration.toString() ?? '30');
     currentTiming = type?.timing ?? '';
-    selectedModes = type != null ? List.from(type.appointmentModes) : ['In-Person'];
+    selectedModes = type != null ? List.from(type.appointmentModes) : [];
     iconUrl = type?.icon;
     imageUrl = type?.image;
     
     // Fetch timings if they are not already loaded
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
       final timings = ref.read(bookingConfigViewModelProvider).appointmentTimings;
       if (timings == null || timings.isEmpty) {
-        ref.read(bookingConfigViewModelProvider.notifier).fetchAppointmentTimings();
+        await ref.read(bookingConfigViewModelProvider.notifier).fetchAppointmentTimings();
       }
     });
   }
@@ -113,7 +113,7 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
                       onTap: () {
                         setState(() {
                           if (isSelected) {
-                            if (selectedModes.length > 1) selectedModes.remove(mode);
+                            selectedModes.remove(mode);
                           } else {
                             selectedModes.add(mode);
                           }
@@ -129,12 +129,15 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
                                 if (val == true) {
                                   selectedModes.add(mode);
                                 } else {
-                                  if (selectedModes.length > 1) selectedModes.remove(mode);
+                                  selectedModes.remove(mode);
                                 }
                               });
                             },
                           ),
-                          Text(mode, style: context.fonts.black14w400),
+                          Text(
+                            mode.replaceAll('-', ' ').split(' ').map((str) => str[0].toUpperCase() + str.substring(1)).join(' '),
+                            style: context.fonts.black14w400,
+                          ),
                         ],
                       ),
                     ),
@@ -221,7 +224,6 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
           child: Text('Cancel', style: context.fonts.grey14w600),
         ),
         CustomPrimaryButton(
-          isLoading: ref.watch(bookingConfigViewModelProvider).loading,
           onTap: () async {
             bool success;
             if (isEdit) {
