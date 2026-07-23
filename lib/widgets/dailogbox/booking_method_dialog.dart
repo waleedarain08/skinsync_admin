@@ -102,7 +102,6 @@ class _BookingMethodDialogState extends ConsumerState<BookingMethodDialog> {
           child: Text('Cancel', style: context.fonts.grey14w600),
         ),
         CustomPrimaryButton(
-          isLoading: ref.watch(bookingConfigViewModelProvider).loading,
           onTap: () async {
             bool success;
             if (isEdit) {

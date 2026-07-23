@@ -60,7 +60,9 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
             errorMessage: null,
           );
         } catch (e) {
-          state = state.copyWith(errorMessage: e.toString());
+          if (state.bookingMethods == null) {
+            state = state.copyWith(errorMessage: e.toString());
+          }
           rethrow;
         }
       },
@@ -78,7 +80,9 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
             errorMessage: null,
           );
         } catch (e) {
-          state = state.copyWith(errorMessage: e.toString());
+          if (state.appointmentTypes == null) {
+            state = state.copyWith(errorMessage: e.toString());
+          }
           rethrow;
         }
       },
@@ -96,7 +100,6 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
             errorMessage: null,
           );
         } catch (e) {
-          state = state.copyWith(errorMessage: e.toString());
           rethrow;
         }
       },
