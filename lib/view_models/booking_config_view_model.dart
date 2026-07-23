@@ -1,17 +1,21 @@
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/appointment_type_request.dart';
 import 'package:skinsync_admin/models/requests/booking_method_request.dart';
 import 'package:skinsync_admin/models/responses/appointment_types_list_response.dart';
 import 'package:skinsync_admin/models/responses/booking_methods_list_response.dart';
 import 'package:skinsync_admin/repositories/booking_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
+import 'package:skinsync_admin/services/media_service.dart';
+import 'package:skinsync_admin/utils/exception.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 
-final bookingConfigViewModelProvider = NotifierProvider<BookingConfigViewModel, BookingConfigState>(
-  BookingConfigViewModel.new,
-);
+final bookingConfigViewModelProvider =
+    NotifierProvider<BookingConfigViewModel, BookingConfigState>(
+      BookingConfigViewModel.new,
+    );
 
 class BookingConfigState extends BaseStateModel {
   final List<BookingMethodModel>? bookingMethods;
@@ -113,21 +117,23 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
     String? icon,
   }) async {
     return await runSafely<bool>(
-      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-      () async {
-        await _bookingRepository.createBookingMethod(
-          req: CreateBookingMethodRequest(
-            title: title,
-            key: key,
-            description: description,
-            icon: icon,
-          ),
-        );
-        EasyLoading.showSuccess('Booking method created successfully');
-        await fetchBookingMethods();
-        return true;
-      },
-    ) ?? false;
+          onLoadingChange: (loading) =>
+              state = state.copyWith(loading: loading),
+          () async {
+            await _bookingRepository.createBookingMethod(
+              req: CreateBookingMethodRequest(
+                title: title,
+                key: key,
+                description: description,
+                icon: icon,
+              ),
+            );
+            EasyLoading.showSuccess('Booking method created successfully');
+            await fetchBookingMethods();
+            return true;
+          },
+        ) ??
+        false;
   }
 
   Future<bool> updateBookingMethod({
@@ -137,19 +143,21 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
     String? icon,
   }) async {
     return await runSafely<bool>(
-      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-      () async {
-        await _bookingRepository.updateBookingMethod(
-          id: id,
-          title: title,
-          description: description,
-          icon: icon,
-        );
-        EasyLoading.showSuccess('Booking method updated successfully');
-        await fetchBookingMethods();
-        return true;
-      },
-    ) ?? false;
+          onLoadingChange: (loading) =>
+              state = state.copyWith(loading: loading),
+          () async {
+            await _bookingRepository.updateBookingMethod(
+              id: id,
+              title: title,
+              description: description,
+              icon: icon,
+            );
+            EasyLoading.showSuccess('Booking method updated successfully');
+            await fetchBookingMethods();
+            return true;
+          },
+        ) ??
+        false;
   }
 
   Future<bool> createAppointmentType({
@@ -163,25 +171,27 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
     String? image,
   }) async {
     return await runSafely<bool>(
-      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-      () async {
-        await _bookingRepository.createAppointmentType(
-          req: CreateAppointmentTypeRequest(
-            title: title,
-            key: key,
-            description: description,
-            timing: timing,
-            maxDuration: maxDuration,
-            appointmentModes: appointmentModes,
-            icon: icon,
-            image: image,
-          ),
-        );
-        EasyLoading.showSuccess('Appointment type created successfully');
-        await fetchAppointmentTypes();
-        return true;
-      },
-    ) ?? false;
+          onLoadingChange: (loading) =>
+              state = state.copyWith(loading: loading),
+          () async {
+            await _bookingRepository.createAppointmentType(
+              req: CreateAppointmentTypeRequest(
+                title: title,
+                key: key,
+                description: description,
+                timing: timing,
+                maxDuration: maxDuration,
+                appointmentModes: appointmentModes,
+                icon: icon,
+                image: image,
+              ),
+            );
+            EasyLoading.showSuccess('Appointment type created successfully');
+            await fetchAppointmentTypes();
+            return true;
+          },
+        ) ??
+        false;
   }
 
   Future<bool> updateAppointmentType({
@@ -195,22 +205,43 @@ class BookingConfigViewModel extends BaseViewModel<BookingConfigState> {
     String? image,
   }) async {
     return await runSafely<bool>(
-      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
-      () async {
-        await _bookingRepository.updateAppointmentType(
-          id: id,
-          title: title,
-          description: description,
-          timing: timing,
-          maxDuration: maxDuration,
-          appointmentModes: appointmentModes,
-          icon: icon,
-          image: image,
-        );
-        EasyLoading.showSuccess('Appointment type updated successfully');
-        await fetchAppointmentTypes();
-        return true;
-      },
-    ) ?? false;
+          onLoadingChange: (loading) =>
+              state = state.copyWith(loading: loading),
+          () async {
+            await _bookingRepository.updateAppointmentType(
+              id: id,
+              title: title,
+              description: description,
+              timing: timing,
+              maxDuration: maxDuration,
+              appointmentModes: appointmentModes,
+              icon: icon,
+              image: image,
+            );
+            EasyLoading.showSuccess('Appointment type updated successfully');
+            await fetchAppointmentTypes();
+            return true;
+          },
+        ) ??
+        false;
+  }
+
+  final ImagePicker _picker = ImagePicker();
+  Future<String?> pickImage({required String path}) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) {
+      return null;
+    }
+
+    return await runSafely(() async {
+      final String? url = await MediaService().uploadImage(path, image);
+
+      if (url == null) {
+        throw const UnknownException('Failed to upload image');
+      }
+
+      return url;
+    });
   }
 }

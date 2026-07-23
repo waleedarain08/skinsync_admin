@@ -13,7 +13,8 @@ class AppointmentTypeDialog extends ConsumerStatefulWidget {
   const AppointmentTypeDialog({super.key, this.type});
 
   @override
-  ConsumerState<AppointmentTypeDialog> createState() => _AppointmentTypeDialogState();
+  ConsumerState<AppointmentTypeDialog> createState() =>
+      _AppointmentTypeDialogState();
 }
 
 class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
@@ -35,17 +36,23 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
     titleController = TextEditingController(text: type?.title);
     keyController = TextEditingController(text: type?.key);
     descController = TextEditingController(text: type?.description);
-    durationController = TextEditingController(text: type?.maxDuration.toString() ?? '30');
+    durationController = TextEditingController(
+      text: type?.maxDuration.toString() ?? '30',
+    );
     currentTiming = type?.timing ?? '';
     selectedModes = type != null ? List.from(type.appointmentModes) : [];
     iconUrl = type?.icon;
     imageUrl = type?.image;
-    
+
     // Fetch timings if they are not already loaded
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
-      final timings = ref.read(bookingConfigViewModelProvider).appointmentTimings;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final timings = ref
+          .read(bookingConfigViewModelProvider)
+          .appointmentTimings;
       if (timings == null || timings.isEmpty) {
-        await ref.read(bookingConfigViewModelProvider.notifier).fetchAppointmentTimings();
+        await ref
+            .read(bookingConfigViewModelProvider.notifier)
+            .fetchAppointmentTimings();
       }
     });
   }
@@ -64,8 +71,13 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
     final bool isEdit = widget.type != null;
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: context.appBorderRadius(all: 16)),
-      title: Text(isEdit ? 'Edit Appointment Type' : 'Add Appointment Type', style: context.fonts.black18w600),
+      shape: RoundedRectangleBorder(
+        borderRadius: context.appBorderRadius(all: 16),
+      ),
+      title: Text(
+        isEdit ? 'Edit Appointment Type' : 'Add Appointment Type',
+        style: context.fonts.black18w600,
+      ),
       content: SizedBox(
         width: context.w(500),
         child: SingleChildScrollView(
@@ -88,7 +100,10 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
                 TextFormField(
                   controller: keyController,
                   style: context.fonts.black14w400,
-                  decoration: AppDecorations.input(context, hint: 'e.g. consultation, treatment'),
+                  decoration: AppDecorations.input(
+                    context,
+                    hint: 'e.g. consultation, treatment',
+                  ),
                 ),
                 context.verticalSpace(20),
               ],
@@ -99,7 +114,10 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
                 controller: descController,
                 maxLines: 3,
                 style: context.fonts.black14w400,
-                decoration: AppDecorations.input(context, hint: 'Provide details...'),
+                decoration: AppDecorations.input(
+                  context,
+                  hint: 'Provide details...',
+                ),
               ),
               context.verticalSpace(20),
 
@@ -135,7 +153,14 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
                             },
                           ),
                           Text(
-                            mode.replaceAll('-', ' ').split(' ').map((str) => str[0].toUpperCase() + str.substring(1)).join(' '),
+                            mode
+                                .replaceAll('-', ' ')
+                                .split(' ')
+                                .map(
+                                  (str) =>
+                                      str[0].toUpperCase() + str.substring(1),
+                                )
+                                .join(' '),
                             style: context.fonts.black14w400,
                           ),
                         ],
@@ -147,21 +172,32 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
               context.verticalSpace(20),
 
               CustomDropdown<String>(
-              label: 'Timing Selection',
-              hintText: 'Select timing',
-              value: ref.watch(bookingConfigViewModelProvider).appointmentTimings?.contains(currentTiming) == true 
-                  ? currentTiming 
-                  : null,
-              items: (ref.watch(bookingConfigViewModelProvider).appointmentTimings ?? []).map((option) {
-                return DropdownMenuItem<String>(
-                  value: option,
-                  child: Text(option),
-                );
-              }).toList(),
-              onChanged: (val) {
-                if (val != null) setState(() => currentTiming = val);
-              },
-            ),
+                label: 'Timing Selection',
+                hintText: 'Select timing',
+                value:
+                    ref
+                            .watch(bookingConfigViewModelProvider)
+                            .appointmentTimings
+                            ?.contains(currentTiming) ==
+                        true
+                    ? currentTiming
+                    : null,
+                items:
+                    (ref
+                                .watch(bookingConfigViewModelProvider)
+                                .appointmentTimings ??
+                            [])
+                        .map((option) {
+                          return DropdownMenuItem<String>(
+                            value: option,
+                            child: Text(option),
+                          );
+                        })
+                        .toList(),
+                onChanged: (val) {
+                  if (val != null) setState(() => currentTiming = val);
+                },
+              ),
               context.verticalSpace(20),
 
               Text('Maximum Duration', style: context.fonts.black14w600),
@@ -170,13 +206,14 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
                 controller: durationController,
                 keyboardType: TextInputType.number,
                 style: context.fonts.black14w400,
-                decoration: AppDecorations.input(context, hint: 'Enter minutes').copyWith(
-                  suffixText: 'mins',
-                  suffixStyle: context.fonts.grey12w600,
-                ),
+                decoration: AppDecorations.input(context, hint: 'Enter minutes')
+                    .copyWith(
+                      suffixText: 'mins',
+                      suffixStyle: context.fonts.grey12w600,
+                    ),
               ),
               context.verticalSpace(24),
-              
+
               Row(
                 children: [
                   Expanded(
@@ -227,27 +264,33 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
           onTap: () async {
             bool success;
             if (isEdit) {
-              success = await ref.read(bookingConfigViewModelProvider.notifier).updateAppointmentType(
-                id: widget.type!.id,
-                title: titleController.text.trim(),
-                description: descController.text.trim(),
-                timing: currentTiming,
-                maxDuration: int.tryParse(durationController.text.trim()) ?? 0,
-                appointmentModes: selectedModes,
-                icon: iconUrl,
-                image: imageUrl,
-              );
+              success = await ref
+                  .read(bookingConfigViewModelProvider.notifier)
+                  .updateAppointmentType(
+                    id: widget.type!.id,
+                    title: titleController.text.trim(),
+                    description: descController.text.trim(),
+                    timing: currentTiming,
+                    maxDuration:
+                        int.tryParse(durationController.text.trim()) ?? 0,
+                    appointmentModes: selectedModes,
+                    icon: iconUrl,
+                    image: imageUrl,
+                  );
             } else {
-              success = await ref.read(bookingConfigViewModelProvider.notifier).createAppointmentType(
-                title: titleController.text.trim(),
-                key: keyController.text.trim(),
-                description: descController.text.trim(),
-                timing: currentTiming,
-                maxDuration: int.tryParse(durationController.text.trim()) ?? 0,
-                appointmentModes: selectedModes,
-                icon: iconUrl,
-                image: imageUrl,
-              );
+              success = await ref
+                  .read(bookingConfigViewModelProvider.notifier)
+                  .createAppointmentType(
+                    title: titleController.text.trim(),
+                    key: keyController.text.trim(),
+                    description: descController.text.trim(),
+                    timing: currentTiming,
+                    maxDuration:
+                        int.tryParse(durationController.text.trim()) ?? 0,
+                    appointmentModes: selectedModes,
+                    icon: iconUrl,
+                    image: imageUrl,
+                  );
             }
             if (success && context.mounted) Navigator.pop(context);
           },
@@ -269,9 +312,22 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
     return url == null || url.isEmpty
         ? InkWell(
             onTap: () async {
-              await ref.read(areaViewModelProvider.notifier).pickImage(isIcon);
-              final uploaded = isIcon ? ref.read(areaViewModelProvider).areaIconUrl : ref.read(areaViewModelProvider).areaImageUrl;
+              final uploadedUrl = await ref
+                  .read(bookingConfigViewModelProvider.notifier)
+                  .pickImage(
+                    path: isIcon
+                        ? 'appointment/types/icon/'
+                        : 'appointment/types/image/',
+                  );
+
+              // await ref.read(areaViewModelProvider.notifier).pickImage(isIcon);
+              final uploaded = isIcon
+                  ? ref.read(areaViewModelProvider).areaIconUrl
+                  : ref.read(areaViewModelProvider).areaImageUrl;
               if (uploaded != null) onUpload(uploaded);
+              if (uploadedUrl != null) {
+                onUpload(uploadedUrl);
+              }
             },
             borderRadius: context.appBorderRadius(all: 12),
             child: Container(
@@ -285,7 +341,11 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.add_photo_alternate_outlined, color: CustomColors.lightGrey, size: 24),
+                  const Icon(
+                    Icons.add_photo_alternate_outlined,
+                    color: CustomColors.lightGrey,
+                    size: 24,
+                  ),
                   context.verticalSpace(4),
                   Text('Upload $label', style: context.fonts.grey11w400),
                 ],
@@ -303,7 +363,12 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
               borderRadius: context.appBorderRadius(all: 12),
               child: Stack(
                 children: [
-                  AppNetworkImage(imageUrl: url, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+                  AppNetworkImage(
+                    imageUrl: url,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
                   Positioned(
                     top: 4,
                     right: 4,
@@ -311,8 +376,15 @@ class _AppointmentTypeDialogState extends ConsumerState<AppointmentTypeDialog> {
                       onTap: onDelete,
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                        child: const Icon(Icons.delete_outline_rounded, color: CustomColors.red, size: 16),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.delete_outline_rounded,
+                          color: CustomColors.red,
+                          size: 16,
+                        ),
                       ),
                     ),
                   ),
