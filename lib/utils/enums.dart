@@ -151,14 +151,4 @@ enum ProductStatus {
   const ProductStatus(this.label);
 }
 
-// enum UsageType {
-//   treatment,
-//   retailer,
-//   both;
-// }
-
-// void test() {
-//   const type = UsageType.treatment;
-//   log('API: ${type.name}');
-//   log('DISPLAY: ${type.name.capitalize}');
-// }
+enum ApplicationType { clinic, patient }
