@@ -3,6 +3,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/explore_models.dart';
+import 'package:skinsync_admin/models/responses/post_category_list_response.dart';
 import 'package:skinsync_admin/models/requests/community_post_request.dart';
 import 'package:skinsync_admin/models/requests/reel_request.dart';
 import 'package:skinsync_admin/repositories/explore_repository.dart';
@@ -25,6 +26,7 @@ class ExploreState extends BaseStateModel {
   final String? pickedImageUrl;
   final String? pickedVideoUrl;
   final String? pickedThumbnailUrl;
+  final List<PostCategoryModel> postCategories;
 
   ExploreState({
     super.loading = false,
@@ -38,6 +40,7 @@ class ExploreState extends BaseStateModel {
     this.pickedImageUrl,
     this.pickedVideoUrl,
     this.pickedThumbnailUrl,
+    this.postCategories = const [],
   });
 
   ExploreState copyWith({
@@ -52,6 +55,7 @@ class ExploreState extends BaseStateModel {
     String? pickedImageUrl,
     String? pickedVideoUrl,
     String? pickedThumbnailUrl,
+    List<PostCategoryModel>? postCategories,
   }) {
     return ExploreState(
       loading: loading ?? this.loading,
@@ -65,6 +69,7 @@ class ExploreState extends BaseStateModel {
       pickedImageUrl: pickedImageUrl ?? this.pickedImageUrl,
       pickedVideoUrl: pickedVideoUrl ?? this.pickedVideoUrl,
       pickedThumbnailUrl: pickedThumbnailUrl ?? this.pickedThumbnailUrl,
+      postCategories: postCategories ?? this.postCategories,
     );
   }
 
@@ -81,6 +86,7 @@ class ExploreState extends BaseStateModel {
       pickedImageUrl: null,
       pickedVideoUrl: null,
       pickedThumbnailUrl: null,
+      postCategories: postCategories,
     );
   }
 }
@@ -254,6 +260,28 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
         await _repository.deletePost(id);
         EasyLoading.showSuccess('Post deleted successfully');
         await fetchPosts(page: state.postsCurrentPage);
+      },
+    );
+  }
+
+  Future<void> fetchPostCategories() async {
+    await runSafely(
+      showLoading: false,
+      onLoadingChange: (l) => state = state.copyWith(loading: l),
+      () async {
+        final categories = await _repository.fetchPostCategories();
+        state = state.copyWith(postCategories: categories);
+      },
+    );
+  }
+
+  Future<void> createPostCategory(String name) async {
+    await runSafely(
+      onLoadingChange: (l) => state = state.copyWith(loading: l),
+      () async {
+        await _repository.createPostCategory(name);
+        EasyLoading.showSuccess('Category created successfully');
+        await fetchPostCategories();
       },
     );
   }

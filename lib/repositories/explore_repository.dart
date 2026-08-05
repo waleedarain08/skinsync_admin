@@ -1,6 +1,7 @@
 import '../models/requests/community_post_request.dart';
 import '../models/requests/reel_request.dart';
 import '../models/responses/community_posts_list_response.dart';
+import '../models/responses/post_category_list_response.dart';
 import '../models/responses/reels_list_response.dart';
 
 abstract class ExploreRepository {
@@ -12,4 +13,6 @@ abstract class ExploreRepository {
   Future<void> createPost(CreateCommunityPostRequest post);
   Future<void> updatePostStatus(int id, String status);
   Future<void> deletePost(int id);
+  Future<List<PostCategoryModel>> fetchPostCategories();
+  Future<void> createPostCategory(String name);
 }

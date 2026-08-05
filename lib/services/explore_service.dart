@@ -1,6 +1,7 @@
 import '../models/requests/community_post_request.dart';
 import '../models/requests/reel_request.dart';
 import '../models/responses/community_posts_list_response.dart';
+import '../models/responses/post_category_list_response.dart';
 import '../models/responses/reels_list_response.dart';
 import '../repositories/explore_repository.dart';
 import '../utils/enums.dart';
@@ -69,5 +70,16 @@ class ExploreService implements ExploreRepository {
       Endpoint.deletePost,
       pathParams: {'id': id.toString()},
     );
+  }
+
+  @override
+  Future<List<PostCategoryModel>> fetchPostCategories() async {
+    final response = await _api.get(Endpoint.postCategories);
+    return PostCategoryListResponse.fromJson(response).data ?? [];
+  }
+
+  @override
+  Future<void> createPostCategory(String name) async {
+    await _api.post(Endpoint.postCategories, body: {'name': name});
   }
 }

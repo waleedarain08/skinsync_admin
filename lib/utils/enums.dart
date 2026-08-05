@@ -79,6 +79,7 @@ enum Endpoint {
   explorerCommunity('admin/posts'),
   updatePost('admin/posts/{id}'),
   deletePost('admin/posts/{id}'),
+  postCategories('admin/posts/categories'),
   webRequests('admin/web-requests'),
   webRequestDetail('admin/web-requests/{id}'),
   deductionTimings('admin/deduction-timings');

@@ -13,6 +13,7 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/number_paginator.dart';
+import 'package:skinsync_admin/widgets/select_or_create_dropdown_widget.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -200,7 +201,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> with SingleTicker
   void _showAddPostDialog(BuildContext context) {
     final titleController = TextEditingController();
     final contentController = TextEditingController();
-    final categoryController = TextEditingController();
+    String? selectedCategory;
     final tagsController = TextEditingController();
 
     showDialog(
@@ -230,7 +231,16 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> with SingleTicker
                       isUploading: state.loading && state.pickedImageUrl == null,
                     ),
                     context.verticalSpace(16),
-                    BuildTextField(label: 'Category', controller: categoryController, hintText: 'Enter category'),
+                    SelectOrCreateDropdown<String>(
+                      label: 'Category',
+                      hint: 'Select Category',
+                      value: selectedCategory,
+                      items: state.postCategories.map((e) => e.name).toList(),
+                      itemLabel: (cat) => cat,
+                      onChanged: (val) => selectedCategory = val,
+                      onOpen: () => ref.read(exploreViewModelProvider.notifier).fetchPostCategories(),
+                      onCreate: () => _showCreateCategoryDialog(context, ref),
+                    ),
                     context.verticalSpace(16),
                     BuildTextField(label: 'Tags (comma separated)', controller: tagsController, hintText: 'e.g. advice, community, help'),
                   ],
@@ -258,7 +268,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> with SingleTicker
                     title: titleController.text,
                     content: contentController.text,
                     imageUrl: state.pickedImageUrl!,
-                    category: categoryController.text,
+                    category: selectedCategory,
                     tags: tagsController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
                   );
                   ref.read(exploreViewModelProvider.notifier).createPost(post).then((success) {
@@ -270,6 +280,44 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> with SingleTicker
           );
         },
       ),
+    );
+  }
+
+  void _showCreateCategoryDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Create New Category', style: context.fonts.black18w600),
+          content: BuildTextField(
+            label: 'Name',
+            controller: controller,
+            hintText: 'Enter category name...',
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: CustomPrimaryButton(
+                onTap: () {
+                  final name = controller.text.trim();
+                  if (name.isNotEmpty) {
+                    ref.read(exploreViewModelProvider.notifier).createPostCategory(name);
+                    Navigator.pop(context);
+                  }
+                },
+                label: 'Add',
+                width: 100.w,
+              ),
+            ),
+            SizedBox(height: 10.h),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel', style: context.fonts.grey14w600),
+            ),
+          ],
+        );
+      },
     );
   }
 
