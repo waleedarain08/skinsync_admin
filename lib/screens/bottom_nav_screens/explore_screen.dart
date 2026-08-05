@@ -11,6 +11,7 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/number_paginator.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -105,48 +106,88 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> with SingleTicker
   void _showAddReelDialog(BuildContext context) {
     final titleController = TextEditingController();
     final descController = TextEditingController();
-    final videoUrlController = TextEditingController();
     final tagsController = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Add New Reel', style: context.fonts.black20w600),
-        content: SizedBox(
-          width: context.w(500),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                BuildTextField(label: 'Title', controller: titleController, hintText: 'Enter reel title'),
-                context.verticalSpace(16),
-                BuildTextField(label: 'Description', controller: descController, hintText: 'Enter reel description', maxLines: 3),
-                context.verticalSpace(16),
-                BuildTextField(label: 'Video URL', controller: videoUrlController, hintText: 'Enter video URL'),
-                context.verticalSpace(16),
-                BuildTextField(label: 'Tags (comma separated)', controller: tagsController, hintText: 'e.g. skin, care, routine'),
-              ],
+      barrierDismissible: false,
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final state = ref.watch(exploreViewModelProvider);
+          return AlertDialog(
+            title: Text('Add New Reel', style: context.fonts.black20w600),
+            content: SizedBox(
+              width: context.w(600),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    BuildTextField(label: 'Title', controller: titleController, hintText: 'Enter reel title'),
+                    context.verticalSpace(16),
+                    BuildTextField(label: 'Description', controller: descController, hintText: 'Enter reel description', maxLines: 3),
+                    context.verticalSpace(16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildFilePicker(
+                            label: 'Thumbnail',
+                            url: state.pickedThumbnailUrl,
+                            icon: Icons.image_outlined,
+                            onTap: () => ref.read(exploreViewModelProvider.notifier).pickAndUploadThumbnail(),
+                            isImage: true,
+                            isUploading: state.loading && state.pickedThumbnailUrl == null && state.pickedVideoUrl == null && state.pickedImageUrl == null,
+                          ),
+                        ),
+                        context.horizontalSpace(16),
+                        Expanded(
+                          child: _buildFilePicker(
+                            label: 'Video File',
+                            url: state.pickedVideoUrl,
+                            icon: Icons.movie_outlined,
+                            onTap: () => ref.read(exploreViewModelProvider.notifier).pickAndUploadVideo(),
+                            isUploading: state.loading && state.pickedVideoUrl == null && state.pickedThumbnailUrl == null,
+                          ),
+                        ),
+                      ],
+                    ),
+                    context.verticalSpace(16),
+                    BuildTextField(label: 'Tags (comma separated)', controller: tagsController, hintText: 'e.g. skin, care, routine'),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: context.fonts.grey14w600)),
-          CustomPrimaryButton(
-            label: 'Create Reel',
-            width: context.w(120),
-            onTap: () {
-              final reel = CreateReelRequest(
-                title: titleController.text,
-                description: descController.text,
-                videoUrl: videoUrlController.text,
-                tags: tagsController.text.split(',').map((e) => e.trim()).toList(),
-              );
-              ref.read(exploreViewModelProvider.notifier).createReel(reel).then((success) {
-                if (success) Navigator.pop(context);
-              });
-            },
-          ),
-        ],
+            actions: [
+              TextButton(
+                onPressed: () {
+                  ref.read(exploreViewModelProvider.notifier).clearPickedFiles();
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel', style: context.fonts.grey14w600),
+              ),
+              CustomPrimaryButton(
+                label: 'Create Reel',
+                width: context.w(120),
+                isLoading: state.loading && (state.pickedVideoUrl != null || state.pickedThumbnailUrl != null),
+                onTap: () {
+                  if (state.pickedVideoUrl == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please upload a video')));
+                    return;
+                  }
+                  final reel = CreateReelRequest(
+                    title: titleController.text,
+                    description: descController.text,
+                    videoUrl: state.pickedVideoUrl!,
+                    thumbnail: state.pickedThumbnailUrl,
+                    tags: tagsController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+                  );
+                  ref.read(exploreViewModelProvider.notifier).createReel(reel).then((success) {
+                    if (success) Navigator.pop(context);
+                  });
+                },
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -154,53 +195,155 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> with SingleTicker
   void _showAddPostDialog(BuildContext context) {
     final titleController = TextEditingController();
     final contentController = TextEditingController();
-    final imageUrlController = TextEditingController();
     final categoryController = TextEditingController();
     final tagsController = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Add New Community Post', style: context.fonts.black20w600),
-        content: SizedBox(
-          width: context.w(500),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                BuildTextField(label: 'Title', controller: titleController, hintText: 'Enter post title'),
-                context.verticalSpace(16),
-                BuildTextField(label: 'Content', controller: contentController, hintText: 'Enter post content', maxLines: 5),
-                context.verticalSpace(16),
-                BuildTextField(label: 'Image URL', controller: imageUrlController, hintText: 'Enter image URL'),
-                context.verticalSpace(16),
-                BuildTextField(label: 'Category', controller: categoryController, hintText: 'Enter category'),
-                context.verticalSpace(16),
-                BuildTextField(label: 'Tags (comma separated)', controller: tagsController, hintText: 'e.g. advice, community, help'),
-              ],
+      barrierDismissible: false,
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final state = ref.watch(exploreViewModelProvider);
+          return AlertDialog(
+            title: Text('Add New Community Post', style: context.fonts.black20w600),
+            content: SizedBox(
+              width: context.w(500),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    BuildTextField(label: 'Title', controller: titleController, hintText: 'Enter post title'),
+                    context.verticalSpace(16),
+                    BuildTextField(label: 'Content', controller: contentController, hintText: 'Enter post content', maxLines: 5),
+                    context.verticalSpace(16),
+                    _buildFilePicker(
+                      label: 'Post Image',
+                      url: state.pickedImageUrl,
+                      icon: Icons.image_outlined,
+                      onTap: () => ref.read(exploreViewModelProvider.notifier).pickAndUploadImage(),
+                      isImage: true,
+                      isUploading: state.loading && state.pickedImageUrl == null,
+                    ),
+                    context.verticalSpace(16),
+                    BuildTextField(label: 'Category', controller: categoryController, hintText: 'Enter category'),
+                    context.verticalSpace(16),
+                    BuildTextField(label: 'Tags (comma separated)', controller: tagsController, hintText: 'e.g. advice, community, help'),
+                  ],
+                ),
+              ),
             ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  ref.read(exploreViewModelProvider.notifier).clearPickedFiles();
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel', style: context.fonts.grey14w600),
+              ),
+              CustomPrimaryButton(
+                label: 'Create Post',
+                width: context.w(120),
+                isLoading: state.loading && state.pickedImageUrl != null,
+                onTap: () {
+                  if (state.pickedImageUrl == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please upload an image')));
+                    return;
+                  }
+                  final post = CreateCommunityPostRequest(
+                    title: titleController.text,
+                    content: contentController.text,
+                    imageUrl: state.pickedImageUrl!,
+                    category: categoryController.text,
+                    tags: tagsController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+                  );
+                  ref.read(exploreViewModelProvider.notifier).createPost(post).then((success) {
+                    if (success) Navigator.pop(context);
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildFilePicker({
+    required String label,
+    required String? url,
+    required IconData icon,
+    required VoidCallback onTap,
+    bool isImage = false,
+    bool isUploading = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: context.fonts.black14w600),
+        context.verticalSpace(12),
+        InkWell(
+          onTap: isUploading ? null : onTap,
+          borderRadius: context.appBorderRadius(all: 12),
+          child: Container(
+            height: 120,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: CustomColors.whiteGrey,
+              borderRadius: context.appBorderRadius(all: 12),
+              border: Border.all(color: CustomColors.border),
+            ),
+            child: url != null && url.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: context.appBorderRadius(all: 12),
+                    child: Stack(
+                      children: [
+                        isImage
+                            ? AppNetworkImage(imageUrl: url, fit: BoxFit.cover, width: double.infinity, height: double.infinity)
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.check_circle_outline, color: CustomColors.green, size: 32),
+                                  context.verticalSpace(4),
+                                  Text('File Uploaded', style: context.fonts.black12w600),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: Text(url, style: context.fonts.grey11w400, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                  ),
+                                ],
+                              ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: GestureDetector(
+                            onTap: () {
+                               // Specific clear logic could be added here, but for now we clear all
+                               ref.read(exploreViewModelProvider.notifier).clearPickedFiles();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                              child: const Icon(Icons.close, color: CustomColors.red, size: 16),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isUploading)
+                        const CircularProgressIndicator(color: CustomColors.purple)
+                      else ...[
+                        Icon(icon, color: CustomColors.lightGrey, size: 32),
+                        context.verticalSpace(4),
+                        Text('Click to Upload', style: context.fonts.grey12w400),
+                      ],
+                    ],
+                  ),
           ),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: context.fonts.grey14w600)),
-          CustomPrimaryButton(
-            label: 'Create Post',
-            width: context.w(120),
-            onTap: () {
-              final post = CreateCommunityPostRequest(
-                title: titleController.text,
-                content: contentController.text,
-                imageUrl: imageUrlController.text,
-                category: categoryController.text,
-                tags: tagsController.text.split(',').map((e) => e.trim()).toList(),
-              );
-              ref.read(exploreViewModelProvider.notifier).createPost(post).then((success) {
-                if (success) Navigator.pop(context);
-              });
-            },
-          ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -285,7 +428,9 @@ class _ReelCard extends StatelessWidget {
                 color: CustomColors.lightPurple.withValues(alpha: 0.3),
                 borderRadius: context.appBorderRadius(topLeft: 12, topRight: 12),
               ),
-              child: const Center(child: Icon(Icons.play_circle_outline, size: 48, color: CustomColors.purple)),
+              child: reel.thumbnail != null && reel.thumbnail!.isNotEmpty 
+                ? AppNetworkImage(imageUrl: reel.thumbnail!, fit: BoxFit.cover, width: double.infinity, height: double.infinity)
+                : const Center(child: Icon(Icons.play_circle_outline, size: 48, color: CustomColors.purple)),
             ),
           ),
           Padding(
@@ -385,7 +530,9 @@ class _PostListItem extends StatelessWidget {
               color: CustomColors.whiteGrey,
               borderRadius: context.appBorderRadius(all: 8),
             ),
-            child: const Icon(Icons.image_outlined, color: CustomColors.grey),
+            child: post.imageUrl != null && post.imageUrl!.isNotEmpty
+                ? AppNetworkImage(imageUrl: post.imageUrl!, fit: BoxFit.cover)
+                : const Icon(Icons.image_outlined, color: CustomColors.grey),
           ),
           context.horizontalSpace(16),
           Expanded(
