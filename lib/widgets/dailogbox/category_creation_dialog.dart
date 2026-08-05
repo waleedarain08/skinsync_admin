@@ -7,7 +7,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/create_category_request.dart';
-import 'package:skinsync_admin/models/responses/provider_roles_response.dart';
 import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/view_models/provider_view_model.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -80,7 +79,6 @@ class _CategoryCreationDialogState
   late final TextEditingController _downtimeHighController;
 
   List<String> _selectedRoles = [];
-  final List<ProviderRoles> _availableRoles = [];
 
   @override
   void initState() {

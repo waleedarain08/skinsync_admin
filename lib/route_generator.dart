@@ -10,6 +10,7 @@ import 'package:skinsync_admin/screens/booking_config_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/explore_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/home_page.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
@@ -58,6 +59,11 @@ class RouteGenerator {
             name: DashboardScreen.routeName,
             path: DashboardScreen.routeName,
             builder: (_, _) => const DashboardScreen(),
+          ),
+          GoRoute(
+            name: ExploreScreen.routeName,
+            path: ExploreScreen.routeName,
+            builder: (_, _) => const ExploreScreen(),
           ),
           GoRoute(
             name: AppointmentManagement.routeName,

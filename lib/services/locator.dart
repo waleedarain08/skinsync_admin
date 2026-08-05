@@ -3,6 +3,7 @@ import 'package:skinsync_admin/repositories/area_repository.dart';
 import 'package:skinsync_admin/repositories/booking_repository.dart';
 import 'package:skinsync_admin/repositories/category_repository.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
+import 'package:skinsync_admin/repositories/explore_repository.dart';
 import 'package:skinsync_admin/repositories/product_repository.dart';
 import 'package:skinsync_admin/repositories/provider_role_repository.dart';
 import 'package:skinsync_admin/repositories/session_repository.dart';
@@ -11,6 +12,7 @@ import 'package:skinsync_admin/services/area_services.dart';
 import 'package:skinsync_admin/services/booking_services.dart';
 import 'package:skinsync_admin/services/category_services.dart';
 import 'package:skinsync_admin/services/clinic_services.dart';
+import 'package:skinsync_admin/services/explore_service.dart';
 import 'package:skinsync_admin/services/product_services.dart';
 import 'package:skinsync_admin/services/provider_roles_service.dart';
 import 'package:skinsync_admin/services/session_services.dart';
@@ -64,6 +66,9 @@ Future<void> initializeServices() async {
   );
   locator.registerLazySingleton<BookingRepository>(
     () => BookingServices(api: apiBaseHelper),
+  );
+  locator.registerLazySingleton<ExploreRepository>(
+    () => ExploreService(),
   );
   final secureStorageService = SecureStorageService();
   await secureStorageService.init();

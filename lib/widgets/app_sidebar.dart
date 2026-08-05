@@ -3,6 +3,7 @@ import 'package:sidebarx/sidebarx.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/explore_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
@@ -18,6 +19,7 @@ import 'package:skinsync_admin/utils/theme.dart';
 abstract final class AppSidebarRoutes {
   static const routes = <String>[
     DashboardScreen.routeName,
+    ExploreScreen.routeName,
     ClinicManagement.routeName,
     AppointmentManagement.routeName,
     PatientManagement.routeName,
@@ -109,25 +111,26 @@ class AppSidebar extends StatelessWidget {
   List<SidebarXItem> _buildItems() {
     return [
       SidebarXItem(icon: Icons.grid_view_rounded, label: 'Dashboard', onTap: () => onItemTap(0)),
-      SidebarXItem(icon: Icons.business_rounded, label: 'Clinics', onTap: () => onItemTap(1)),
-      SidebarXItem(icon: Icons.calendar_today_rounded, label: 'Appointments', onTap: () => onItemTap(2)),
-      SidebarXItem(icon: Icons.people_alt_rounded, label: 'Patients', onTap: () => onItemTap(3)),
-      SidebarXItem(icon: Icons.medical_services_rounded, label: 'Treatments', onTap: () => onItemTap(4)),
-      SidebarXItem(icon: Icons.inventory_2_rounded, label: 'Inventory', onTap: () => onItemTap(5)),
-      SidebarXItem(icon: Icons.card_membership_rounded, label: 'Subscriptions', onTap: () => onItemTap(6)),
-      SidebarXItem(icon: Icons.admin_panel_settings_rounded, label: 'Users', onTap: () => onItemTap(7)),
-      SidebarXItem(icon: Icons.account_balance_wallet_rounded, label: 'Payments', onTap: () => onItemTap(8)),
-      SidebarXItem(icon: Icons.gavel_rounded, label: 'Disputes', onTap: () => onItemTap(9)),
-      SidebarXItem(icon: Icons.notifications_active_rounded, label: 'Notifications', onTap: () => onItemTap(10)),
-      SidebarXItem(icon: Icons.settings_rounded, label: 'Settings', onTap: () => onItemTap(11)),
+      SidebarXItem(icon: Icons.explore_outlined, label: 'Explore', onTap: () => onItemTap(1)),
+      SidebarXItem(icon: Icons.business_rounded, label: 'Clinics', onTap: () => onItemTap(2)),
+      SidebarXItem(icon: Icons.calendar_today_rounded, label: 'Appointments', onTap: () => onItemTap(3)),
+      SidebarXItem(icon: Icons.people_alt_rounded, label: 'Patients', onTap: () => onItemTap(4)),
+      SidebarXItem(icon: Icons.medical_services_rounded, label: 'Treatments', onTap: () => onItemTap(5)),
+      SidebarXItem(icon: Icons.inventory_2_rounded, label: 'Inventory', onTap: () => onItemTap(6)),
+      SidebarXItem(icon: Icons.card_membership_rounded, label: 'Subscriptions', onTap: () => onItemTap(7)),
+      SidebarXItem(icon: Icons.admin_panel_settings_rounded, label: 'Users', onTap: () => onItemTap(8)),
+      SidebarXItem(icon: Icons.account_balance_wallet_rounded, label: 'Payments', onTap: () => onItemTap(9)),
+      SidebarXItem(icon: Icons.gavel_rounded, label: 'Disputes', onTap: () => onItemTap(10)),
+      SidebarXItem(icon: Icons.notifications_active_rounded, label: 'Notifications', onTap: () => onItemTap(11)),
+      SidebarXItem(icon: Icons.settings_rounded, label: 'Settings', onTap: () => onItemTap(12)),
     ];
   }
 
   Widget _separatorBuilder(BuildContext context, int index, SidebarXController controller) {
     if (index == 0) return _SectionLabel(title: 'NETWORK', controller: controller);
-    if (index == 3) return _SectionLabel(title: 'OPERATIONS', controller: controller);
-    if (index == 6) return _SectionLabel(title: 'FINANCIALS', controller: controller);
-    if (index == 8) return _SectionLabel(title: 'SYSTEM', controller: controller);
+    if (index == 4) return _SectionLabel(title: 'OPERATIONS', controller: controller);
+    if (index == 7) return _SectionLabel(title: 'FINANCIALS', controller: controller);
+    if (index == 9) return _SectionLabel(title: 'SYSTEM', controller: controller);
     return context.verticalSpace(2);
   }
 

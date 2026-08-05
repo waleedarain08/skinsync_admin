@@ -849,8 +849,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                       'Session ${session.sessionNumber} (Total Follow-Ups: ${session.followUps.length})',
                       style: context.fonts.black12w600,
                     ),
-                    if (session.followUps != null &&
-                        session.followUps.isNotEmpty)
+                    if (session.followUps.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(left: 12, top: 4),
                         child: Column(
