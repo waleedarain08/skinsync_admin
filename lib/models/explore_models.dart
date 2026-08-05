@@ -6,6 +6,7 @@ class ReelModel {
   final String? thumbnail;
   final List<String> tags;
   final DateTime? createdAt;
+  final String status;
 
   ReelModel({
     this.id,
@@ -15,6 +16,7 @@ class ReelModel {
     this.thumbnail,
     this.tags = const [],
     this.createdAt,
+    this.status = 'Active',
   });
 
   factory ReelModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class ReelModel {
       thumbnail: json['thumbnail'],
       tags: json['tags'] != null ? List<String>.from(json['tags']) : [],
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      status: json['status'] ?? 'Active',
     );
   }
 
@@ -36,6 +39,7 @@ class ReelModel {
       'video_url': videoUrl,
       'thumbnail': thumbnail,
       'tags': tags,
+      'status': status,
     };
   }
 }
@@ -48,6 +52,7 @@ class CommunityPostModel {
   final String? category;
   final List<String> tags;
   final DateTime? createdAt;
+  final String status;
 
   CommunityPostModel({
     this.id,
@@ -57,6 +62,7 @@ class CommunityPostModel {
     this.category,
     this.tags = const [],
     this.createdAt,
+    this.status = 'Active',
   });
 
   factory CommunityPostModel.fromJson(Map<String, dynamic> json) {
@@ -68,6 +74,7 @@ class CommunityPostModel {
       category: json['category'],
       tags: json['tags'] != null ? List<String>.from(json['tags']) : [],
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      status: json['status'] ?? 'Active',
     );
   }
 
@@ -78,6 +85,7 @@ class CommunityPostModel {
       'image_url': imageUrl,
       'category': category,
       'tags': tags,
+      'status': status,
     };
   }
 }

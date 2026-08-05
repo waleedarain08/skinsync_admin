@@ -74,7 +74,11 @@ enum Endpoint {
   appointmentTimings('admin/appointment-timings'),
   downTimeLevel('admin/treatments/{id}/downtime-presets'),
   explorerReels('admin/reels'),
+  updateReel('admin/reels/{id}'),
+  deleteReel('admin/reels/{id}'),
   explorerCommunity('admin/posts'),
+  updatePost('admin/posts/{id}'),
+  deletePost('admin/posts/{id}'),
   deductionTimings('admin/deduction-timings');
 
   final String path;

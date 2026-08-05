@@ -6,6 +6,10 @@ import '../models/responses/reels_list_response.dart';
 abstract class ExploreRepository {
   Future<ReelsListResponse> fetchReels({int page = 1, int limit = 20});
   Future<void> createReel(CreateReelRequest reel);
+  Future<void> updateReelStatus(int id, String status);
+  Future<void> deleteReel(int id);
   Future<CommunityPostsListResponse> fetchPosts({int page = 1, int limit = 20});
   Future<void> createPost(CreateCommunityPostRequest post);
+  Future<void> updatePostStatus(int id, String status);
+  Future<void> deletePost(int id);
 }

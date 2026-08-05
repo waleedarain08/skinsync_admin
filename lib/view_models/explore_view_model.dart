@@ -94,6 +94,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
 
   Future<void> fetchReels({int page = 1}) async {
     await runSafely(
+      showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
         final response = await _repository.fetchReels(page: page, limit: state.pageSize);
@@ -108,6 +109,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
 
   Future<void> fetchPosts({int page = 1}) async {
     await runSafely(
+      showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
         final response = await _repository.fetchPosts(page: page, limit: state.pageSize);
@@ -125,6 +127,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
     if (image == null) return;
 
     await runSafely(
+      showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
         final String? url = await _mediaService.uploadImage('explore/posts/', image);
@@ -141,6 +144,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
     if (image == null) return;
 
     await runSafely(
+      showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
         final String? url = await _mediaService.uploadImage('explore/reels/thumbnails/', image);
@@ -162,6 +166,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
     final file = result.files.first;
 
     await runSafely(
+      showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
         final String? url = await _mediaService.uploadFile('explore/reels/', file);
@@ -201,5 +206,55 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
         return true;
       },
     ) ?? false;
+  }
+
+  Future<void> toggleReelVisibility(int id, String currentStatus) async {
+    final newStatus = currentStatus == 'Active' ? 'In Active' : 'Active';
+    await runSafely(
+      showLoading: false,
+      onLoadingChange: (l) => state = state.copyWith(loading: l),
+      () async {
+        await _repository.updateReelStatus(id, newStatus);
+        EasyLoading.showSuccess('Reel status updated to $newStatus');
+        await fetchReels(page: state.reelsCurrentPage);
+      },
+    );
+  }
+
+  Future<void> deleteReel(int id) async {
+    await runSafely(
+      showLoading: false,
+      onLoadingChange: (l) => state = state.copyWith(loading: l),
+      () async {
+        await _repository.deleteReel(id);
+        EasyLoading.showSuccess('Reel deleted successfully');
+        await fetchReels(page: state.reelsCurrentPage);
+      },
+    );
+  }
+
+  Future<void> togglePostVisibility(int id, String currentStatus) async {
+    final newStatus = currentStatus == 'Active' ? 'In Active' : 'Active';
+    await runSafely(
+      showLoading: false,
+      onLoadingChange: (l) => state = state.copyWith(loading: l),
+      () async {
+        await _repository.updatePostStatus(id, newStatus);
+        EasyLoading.showSuccess('Post status updated to $newStatus');
+        await fetchPosts(page: state.postsCurrentPage);
+      },
+    );
+  }
+
+  Future<void> deletePost(int id) async {
+    await runSafely(
+      showLoading: false,
+      onLoadingChange: (l) => state = state.copyWith(loading: l),
+      () async {
+        await _repository.deletePost(id);
+        EasyLoading.showSuccess('Post deleted successfully');
+        await fetchPosts(page: state.postsCurrentPage);
+      },
+    );
   }
 }

@@ -5,13 +5,14 @@ import 'package:skinsync_admin/models/requests/community_post_request.dart';
 import 'package:skinsync_admin/models/requests/reel_request.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/explore_view_model.dart';
+import 'package:skinsync_admin/widgets/app_loader.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/app_page_header.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/number_paginator.dart';
-import 'package:skinsync_admin/widgets/app_network_image.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -31,11 +32,15 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> with SingleTicker
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         setState(() {});
+        if (_tabController.index == 0) {
+          ref.read(exploreViewModelProvider.notifier).fetchReels();
+        } else {
+          ref.read(exploreViewModelProvider.notifier).fetchPosts();
+        }
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(exploreViewModelProvider.notifier).fetchReels();
-      ref.read(exploreViewModelProvider.notifier).fetchPosts();
     });
   }
 
@@ -333,7 +338,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> with SingleTicker
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (isUploading)
-                        const CircularProgressIndicator(color: CustomColors.purple)
+                        const AppLoader()
                       else ...[
                         Icon(icon, color: CustomColors.lightGrey, size: 32),
                         context.verticalSpace(4),
@@ -353,8 +358,8 @@ class _ReelsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(exploreViewModelProvider);
     
-    if (state.loading && state.reels.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: CustomColors.purple));
+    if (state.loading) {
+      return const Center(child: AppLoader());
     }
 
     if (state.reels.isEmpty) {
@@ -411,26 +416,70 @@ class _ReelsTab extends ConsumerWidget {
   }
 }
 
-class _ReelCard extends StatelessWidget {
+class _ReelCard extends ConsumerWidget {
   final ReelModel reel;
   const _ReelCard({required this.reel});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return BorderdContainerWidget(
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: CustomColors.lightPurple.withValues(alpha: 0.3),
-                borderRadius: context.appBorderRadius(topLeft: 12, topRight: 12),
-              ),
-              child: reel.thumbnail != null && reel.thumbnail!.isNotEmpty 
-                ? AppNetworkImage(imageUrl: reel.thumbnail!, fit: BoxFit.cover, width: double.infinity, height: double.infinity)
-                : const Center(child: Icon(Icons.play_circle_outline, size: 48, color: CustomColors.purple)),
+            child: Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: CustomColors.lightPurple.withValues(alpha: 0.3),
+                    borderRadius: context.appBorderRadius(topLeft: 12, topRight: 12),
+                  ),
+                  child: reel.thumbnail != null && reel.thumbnail!.isNotEmpty
+                    ? AppNetworkImage(imageUrl: reel.thumbnail!, fit: BoxFit.cover, width: double.infinity, height: double.infinity)
+                    : const Center(child: Icon(Icons.play_circle_outline, size: 48, color: CustomColors.purple)),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Row(
+                    children: [
+                      _CircleActionBtn(
+                        icon: reel.status == 'Active' ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                        color: reel.status == 'Active' ? CustomColors.purple : CustomColors.grey,
+                        onTap: () {
+                          if (reel.id != null) {
+                            ref.read(exploreViewModelProvider.notifier).toggleReelVisibility(reel.id!, reel.status);
+                          }
+                        },
+                      ),
+                      context.horizontalSpace(8),
+                      _CircleActionBtn(
+                        icon: Icons.delete_outline,
+                        color: CustomColors.red,
+                        onTap: () {
+                          if (reel.id != null) {
+                            _showDeleteConfirm(context, () {
+                              ref.read(exploreViewModelProvider.notifier).deleteReel(reel.id!);
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                if (reel.status != 'Active')
+                   Container(
+                     decoration: BoxDecoration(
+                       color: Colors.black.withValues(alpha: 0.4),
+                       borderRadius: context.appBorderRadius(topLeft: 12, topRight: 12),
+                     ),
+                     child: const Center(
+                       child: Text('HIDDEN', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                     ),
+                   ),
+              ],
             ),
           ),
           Padding(
@@ -444,11 +493,14 @@ class _ReelCard extends StatelessWidget {
                 context.verticalSpace(8),
                 Wrap(
                   spacing: 4,
-                  children: reel.tags.map((tag) => Chip(
-                    label: Text(tag, style: context.fonts.purple9w800ls1),
-                    backgroundColor: CustomColors.lightPurple.withValues(alpha: 0.2),
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
+                  runSpacing: 4,
+                  children: reel.tags.map((tag) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: CustomColors.lightPurple.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(tag, style: context.fonts.purple9w800ls1),
                   )).toList(),
                 ),
               ],
@@ -460,13 +512,52 @@ class _ReelCard extends StatelessWidget {
   }
 }
 
+class _CircleActionBtn extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  const _CircleActionBtn({required this.icon, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
+        child: Icon(icon, color: color, size: 18),
+      ),
+    );
+  }
+}
+
+void _showDeleteConfirm(BuildContext context, VoidCallback onConfirm) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Confirm Delete'),
+      content: const Text('Are you sure you want to delete this item? This action cannot be undone.'),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            onConfirm();
+          },
+          child: const Text('Delete', style: TextStyle(color: CustomColors.red)),
+        ),
+      ],
+    ),
+  );
+}
+
 class _CommunityTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(exploreViewModelProvider);
     
-    if (state.loading && state.posts.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: CustomColors.purple));
+    if (state.loading) {
+      return const Center(child: AppLoader());
     }
 
     if (state.posts.isEmpty) {
@@ -512,66 +603,98 @@ class _CommunityTab extends ConsumerWidget {
   }
 }
 
-class _PostListItem extends StatelessWidget {
+class _PostListItem extends ConsumerWidget {
   final CommunityPostModel post;
   const _PostListItem({required this.post});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isHidden = post.status != 'Active';
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: context.w(120),
-            height: context.h(80),
-            decoration: BoxDecoration(
-              color: CustomColors.whiteGrey,
-              borderRadius: context.appBorderRadius(all: 8),
+      child: Opacity(
+        opacity: isHidden ? 0.6 : 1.0,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: context.w(120),
+              height: context.h(80),
+              decoration: BoxDecoration(
+                color: CustomColors.whiteGrey,
+                borderRadius: context.appBorderRadius(all: 8),
+              ),
+              child: post.imageUrl != null && post.imageUrl!.isNotEmpty
+                  ? AppNetworkImage(imageUrl: post.imageUrl!, fit: BoxFit.cover)
+                  : const Icon(Icons.image_outlined, color: CustomColors.grey),
             ),
-            child: post.imageUrl != null && post.imageUrl!.isNotEmpty
-                ? AppNetworkImage(imageUrl: post.imageUrl!, fit: BoxFit.cover)
-                : const Icon(Icons.image_outlined, color: CustomColors.grey),
-          ),
-          context.horizontalSpace(16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(post.title, style: context.fonts.black16w600),
-                    if (post.category != null)
-                      Container(
-                        padding: context.appEdgeInsets(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: CustomColors.purple.withValues(alpha: 0.1),
-                          borderRadius: context.appBorderRadius(all: 4),
-                        ),
-                        child: Text(post.category!, style: context.fonts.purple11w600),
+            context.horizontalSpace(16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(post.title, style: context.fonts.black16w600),
+                          if (isHidden) ...[
+                            context.horizontalSpace(8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(color: CustomColors.grey, borderRadius: BorderRadius.circular(4)),
+                              child: Text('HIDDEN', style: context.fonts.white10w700),
+                            ),
+                          ],
+                        ],
                       ),
-                  ],
+                      if (post.category != null)
+                        Container(
+                          padding: context.appEdgeInsets(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: CustomColors.purple.withValues(alpha: 0.1),
+                            borderRadius: context.appBorderRadius(all: 4),
+                          ),
+                          child: Text(post.category!, style: context.fonts.purple11w600),
+                        ),
+                    ],
+                  ),
+                  context.verticalSpace(8),
+                  Text(post.content, style: context.fonts.grey14w400, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  context.verticalSpace(8),
+                  Wrap(
+                    spacing: 8,
+                    children: post.tags.map((tag) => Text('#$tag', style: context.fonts.purple11w600)).toList(),
+                  ),
+                ],
+              ),
+            ),
+            context.horizontalSpace(16),
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(isHidden ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: CustomColors.purple),
+                  onPressed: () {
+                    if (post.id != null) {
+                      ref.read(exploreViewModelProvider.notifier).togglePostVisibility(post.id!, post.status);
+                    }
+                  },
                 ),
-                context.verticalSpace(8),
-                Text(post.content, style: context.fonts.grey14w400, maxLines: 2, overflow: TextOverflow.ellipsis),
-                context.verticalSpace(8),
-                Wrap(
-                  spacing: 8,
-                  children: post.tags.map((tag) => Text('#$tag', style: context.fonts.purple11w600)).toList(),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: CustomColors.red),
+                  onPressed: () {
+                    if (post.id != null) {
+                      _showDeleteConfirm(context, () {
+                        ref.read(exploreViewModelProvider.notifier).deletePost(post.id!);
+                      });
+                    }
+                  },
                 ),
               ],
             ),
-          ),
-          context.horizontalSpace(16),
-          Column(
-            children: [
-              IconButton(icon: const Icon(Icons.edit_outlined, color: CustomColors.purple), onPressed: () {}),
-              IconButton(icon: const Icon(Icons.delete_outline, color: CustomColors.red), onPressed: () {}),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

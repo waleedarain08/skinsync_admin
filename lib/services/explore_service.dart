@@ -24,6 +24,23 @@ class ExploreService implements ExploreRepository {
   }
 
   @override
+  Future<void> updateReelStatus(int id, String status) async {
+    await _api.put(
+      Endpoint.updateReel,
+      pathParams: {'id': id.toString()},
+      body: {'status': status},
+    );
+  }
+
+  @override
+  Future<void> deleteReel(int id) async {
+    await _api.delete(
+      Endpoint.deleteReel,
+      pathParams: {'id': id.toString()},
+    );
+  }
+
+  @override
   Future<CommunityPostsListResponse> fetchPosts({int page = 1, int limit = 20}) async {
     final response = await _api.get(
       Endpoint.explorerCommunity,
@@ -35,5 +52,22 @@ class ExploreService implements ExploreRepository {
   @override
   Future<void> createPost(CreateCommunityPostRequest post) async {
     await _api.post(Endpoint.explorerCommunity, body: post.toJson());
+  }
+
+  @override
+  Future<void> updatePostStatus(int id, String status) async {
+    await _api.put(
+      Endpoint.updatePost,
+      pathParams: {'id': id.toString()},
+      body: {'status': status},
+    );
+  }
+
+  @override
+  Future<void> deletePost(int id) async {
+    await _api.delete(
+      Endpoint.deletePost,
+      pathParams: {'id': id.toString()},
+    );
   }
 }
