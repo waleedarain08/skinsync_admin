@@ -1,4 +1,5 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
+import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 
@@ -59,6 +60,57 @@ class TreatmentData {
       logo: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
       status: 'Active',
       createdAt: DateTime.parse('2023-01-15'),
+    ),
+  ];
+
+  static final List<ClinicWebRequestModel> dummyWebRequests = [
+    ClinicWebRequestModel(
+      id: 101,
+      clinicName: 'Aura Aesthetics',
+      ownerName: 'Dr. Sarah Mitchell',
+      email: 'contact@auraaesthetics.com',
+      phone: '+1 617-555-0842',
+      address: 'Boston, MA',
+      website: 'https://auraaesthetics.com',
+      specialty: 'Dermatology & Laser',
+      yearsInBusiness: '5',
+      instagramHandle: '@aura_skin',
+      facebookPage: 'Aura Aesthetics Boston',
+      message: 'We are looking to integrate AI-driven skin analysis into our daily workflow to improve patient consultation accuracy.',
+      status: 'Pending',
+      createdAt: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    ClinicWebRequestModel(
+      id: 102,
+      clinicName: 'Vivid Glow Center',
+      ownerName: 'Marcus Thorne',
+      email: 'admin@vividglow.com',
+      phone: '+1 305-555-0915',
+      address: 'Miami, FL',
+      website: 'https://vividglowcenter.com',
+      specialty: 'Cosmetic Injectables',
+      yearsInBusiness: '12',
+      instagramHandle: '@vivid_glow_miami',
+      facebookPage: 'Vivid Glow Miami',
+      message: 'Interested in the Premium plan for our multiple locations across Florida. We need a robust system for tracking treatment progress.',
+      status: 'Approved',
+      createdAt: DateTime.now().subtract(const Duration(days: 5)),
+    ),
+    ClinicWebRequestModel(
+      id: 103,
+      clinicName: 'Luxe Dermal Care',
+      ownerName: 'Elena Rossi',
+      email: 'hello@luxedermal.com',
+      phone: '+1 702-555-0428',
+      address: 'Las Vegas, NV',
+      website: 'https://luxedermal.com',
+      specialty: 'Clinical Facials',
+      yearsInBusiness: '3',
+      instagramHandle: '@luxe_dermal_care',
+      facebookPage: 'Luxe Dermal Care Official',
+      message: 'Exploring options for digital patient consent forms and automated follow-up reminders.',
+      status: 'Rejected',
+      createdAt: DateTime.now().subtract(const Duration(days: 10)),
     ),
   ];
 

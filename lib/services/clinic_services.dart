@@ -5,6 +5,8 @@ import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/clinic_list_response.dart';
 import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
+import 'package:skinsync_admin/models/responses/clinic_web_request_detail_response.dart';
+import 'package:skinsync_admin/models/responses/clinic_web_request_list_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 
 import '../models/clinic_model.dart';
@@ -111,6 +113,33 @@ class ClinicService implements ClinicRepository {
   }
 
   @override
+  Future<ClinicWebRequestListResponse> getWebRequests({
+    required int page,
+    required int limit,
+    String? search,
+    String? status,
+  }) async {
+    final Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      'search': search ?? 'null',
+    };
+    if (status != null && status.isNotEmpty) {
+      queryParams['status'] = status;
+    }
+    final jsonResponse = await _api.get(
+      Endpoint.webRequests,
+      queryParams: queryParams,
+    );
+    final response = ClinicWebRequestListResponse.fromJson(jsonResponse);
+
+    if (!(response.isSuccess ?? false)) {
+      throw BadRequestException(response.message ?? 'Failed to get web requests');
+    }
+    return response;
+  }
+
+  @override
   Future<BaseApiResponseModel> sendInvitation({
     required int inviteClinicId,
   }) async {
@@ -150,6 +179,19 @@ class ClinicService implements ClinicRepository {
     final isSuccess = jsonResponse['is_success'] as bool? ?? false;
     if (!isSuccess) {
       throw BadRequestException(jsonResponse['message'] ?? 'Failed to get invite clinic detail');
+    }
+    return response;
+  }
+
+  @override
+  Future<ClinicWebRequestDetailResponse> getWebRequestDetail({required int id}) async {
+    final jsonResponse = await _api.get(
+      Endpoint.webRequestDetail,
+      pathParams: {'id': id.toString()},
+    );
+    final response = ClinicWebRequestDetailResponse.fromJson(jsonResponse);
+    if (!(response.isSuccess ?? false)) {
+      throw BadRequestException(response.message ?? 'Failed to get web request detail');
     }
     return response;
   }

@@ -6,8 +6,10 @@ import 'package:skinsync_admin/models/requests/register_clinic_request_model.dar
 import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/places_response.dart';
+import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
+import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 
 import '../services/location_service.dart';
@@ -26,6 +28,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
   Future<void> initialize() async {
     getClinics(page: state.currentPage, limit: state.pageSize);
+    getWebRequests(page: state.webRequestsCurrentPage, limit: state.pageSize);
   }
 
   Future<bool?> getClinics({String? search, int? page, int? limit}) async {
@@ -139,12 +142,60 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     );
   }
 
+  Future<bool?> getWebRequests({
+    int? page,
+    int? limit,
+    String? search,
+    String? status,
+  }) async {
+    return await runSafely<bool?>(
+      showLoading: false,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final int targetPage = page ?? state.webRequestsCurrentPage;
+        final int targetLimit = limit ?? state.pageSize;
+        try {
+          final response = await _clinicRepository.getWebRequests(
+            page: targetPage,
+            limit: targetLimit,
+            search: search,
+            status: status,
+          );
+          if (response.data != null && response.data!.isNotEmpty) {
+            state = state.copyWith(
+              webRequests: response.data ?? [],
+              webRequestsCurrentPage: targetPage,
+              webRequestsTotalPages: response.totalPages ?? 1,
+              pageSize: targetLimit,
+            );
+            return true;
+          }
+        } catch (e) {
+          // Fail-safe
+        }
+
+        state = state.copyWith(
+          webRequests: TreatmentData.dummyWebRequests,
+          webRequestsCurrentPage: targetPage,
+          webRequestsTotalPages: 1,
+        );
+        return true;
+      },
+    );
+  }
+
   void selectInviteClinic(ClinicModel clinic) {
     state = state.copyWith(selectedInviteClinicId: clinic.id);
   }
 
   void selectClinic(ClinicModel clinic) {
     state = state.copyWith(selectedClinicId: clinic.id);
+  }
+
+  void selectWebRequest(ClinicWebRequestModel request) {
+    state = state.copyWith(selectedWebRequestId: request.id);
   }
 
   Future<bool> sendInvitation(int inviteClinicId) async {
@@ -239,6 +290,30 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
         false;
   }
 
+  Future<bool> getWebRequestDetail(int requestId) async {
+    return await runSafely<bool?>(
+          showLoading: true,
+          () async {
+            try {
+              final response = await _clinicRepository.getWebRequestDetail(id: requestId);
+              if (response.isSuccess == true && response.data != null) {
+                state = state.copyWith(selectedWebRequestDetail: response.data);
+                return true;
+              }
+            } catch (e) {
+              // Fail-safe
+            }
+
+            final fallbackModel = state.webRequests.firstWhereOrNull((r) => r.id == requestId);
+            state = state.copyWith(
+              selectedWebRequestDetail: fallbackModel ?? TreatmentData.dummyWebRequests.firstWhereOrNull((r) => r.id == requestId),
+            );
+            return true;
+          },
+        ) ??
+        false;
+  }
+
   Future<bool> updateClinic(int id, RegisterClinicReqModel req) async {
     final success =
         await runSafely<bool?>(
@@ -310,14 +385,19 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 class ClinicState extends BaseStateModel {
   final List<ClinicModel>? clinics;
   final List<ClinicModel>? inviteClinics;
+  final List<ClinicWebRequestModel> webRequests;
   final int? selectedInviteClinicId;
   final int? selectedClinicId;
+  final int? selectedWebRequestId;
   final List<Place> searchedPlaces;
   final String? clinicImage;
   final String? bannerImage;
   final int pageSize;
+  final int webRequestsTotalPages;
+  final int webRequestsCurrentPage;
   final ClinicDetailData? selectedClinicDetail;
   final InviteClinicDetailData? selectedInviteClinicDetail;
+  final ClinicWebRequestModel? selectedWebRequestDetail;
 
   ClinicState({
     super.loading,
@@ -325,46 +405,61 @@ class ClinicState extends BaseStateModel {
     super.totalPages = 1,
     this.clinics = const [],
     this.inviteClinics = const [],
+    this.webRequests = const [],
     this.selectedInviteClinicId,
     this.selectedClinicId,
+    this.selectedWebRequestId,
     this.searchedPlaces = const [],
     this.bannerImage,
     this.clinicImage,
     this.pageSize = 10,
+    this.webRequestsTotalPages = 1,
+    this.webRequestsCurrentPage = 1,
     this.selectedClinicDetail,
     this.selectedInviteClinicDetail,
+    this.selectedWebRequestDetail,
   });
 
   ClinicState copyWith({
     bool? loading,
     List<ClinicModel>? clinics,
     List<ClinicModel>? inviteClinics,
+    List<ClinicWebRequestModel>? webRequests,
     int? selectedInviteClinicId,
     int? selectedClinicId,
+    int? selectedWebRequestId,
     List<Place>? searchedPlaces,
     String? bannerImage,
     String? clinicImage,
     int? currentPage,
     int? pageSize,
     int? totalPages,
+    int? webRequestsTotalPages,
+    int? webRequestsCurrentPage,
     ClinicDetailData? selectedClinicDetail,
     InviteClinicDetailData? selectedInviteClinicDetail,
+    ClinicWebRequestModel? selectedWebRequestDetail,
   }) {
     return ClinicState(
       loading: loading ?? this.loading,
       clinics: clinics ?? this.clinics,
       inviteClinics: inviteClinics ?? this.inviteClinics,
+      webRequests: webRequests ?? this.webRequests,
       selectedInviteClinicId:
           selectedInviteClinicId ?? this.selectedInviteClinicId,
       selectedClinicId: selectedClinicId ?? this.selectedClinicId,
+      selectedWebRequestId: selectedWebRequestId ?? this.selectedWebRequestId,
       searchedPlaces: searchedPlaces ?? this.searchedPlaces,
       bannerImage: bannerImage ?? this.bannerImage,
       clinicImage: clinicImage ?? this.clinicImage,
       currentPage: currentPage ?? this.currentPage,
       pageSize: pageSize ?? this.pageSize,
       totalPages: totalPages ?? this.totalPages,
+      webRequestsTotalPages: webRequestsTotalPages ?? this.webRequestsTotalPages,
+      webRequestsCurrentPage: webRequestsCurrentPage ?? this.webRequestsCurrentPage,
       selectedClinicDetail: selectedClinicDetail ?? this.selectedClinicDetail,
       selectedInviteClinicDetail: selectedInviteClinicDetail ?? this.selectedInviteClinicDetail,
+      selectedWebRequestDetail: selectedWebRequestDetail ?? this.selectedWebRequestDetail,
     );
   }
 }

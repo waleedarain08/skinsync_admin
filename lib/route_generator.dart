@@ -33,6 +33,7 @@ import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/product_detail_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
+import 'package:skinsync_admin/screens/clinic_web_request_detail_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/treatment_management_screen.dart';
 
 class RouteGenerator {
@@ -99,6 +100,11 @@ class RouteGenerator {
             name: ClinicDetailScreen.routeName,
             path: ClinicDetailScreen.routeName,
             builder: (context, state) => const ClinicDetailScreen(),
+          ),
+          GoRoute(
+            name: ClinicWebRequestDetailScreen.routeName,
+            path: ClinicWebRequestDetailScreen.routeName,
+            builder: (context, state) => const ClinicWebRequestDetailScreen(),
           ),
           GoRoute(
             name: AddNewClinicScreen.routeName,
