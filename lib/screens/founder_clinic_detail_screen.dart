@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
+import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -180,6 +181,20 @@ class FounderClinicDetailScreen extends ConsumerWidget {
             Colors.white,
             () {
               // Logic to approve
+            },
+          ),
+          context.verticalSpace(12),
+          _actionButton(
+            context,
+            'Start Onboarding',
+            Icons.rocket_launch_outlined,
+            CustomColors.green,
+            Colors.white,
+            () {
+              context.push(
+                AddNewClinicScreen.routeName,
+                extra: (clinic: clinic.toInviteClinicDetail(), onBoardClinic: true),
+              );
             },
           ),
           context.verticalSpace(12),

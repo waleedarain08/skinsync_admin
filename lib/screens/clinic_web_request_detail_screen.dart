@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/requests/send_notes_request.dart';
+import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -180,6 +181,20 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
             CustomColors.purple,
             Colors.white,
             () => _showSendNotesDialog(context, ref, request),
+          ),
+          context.verticalSpace(12),
+          _actionButton(
+            context,
+            'Start Onboarding',
+            Icons.rocket_launch_outlined,
+            CustomColors.green,
+            Colors.white,
+            () {
+              context.push(
+                AddNewClinicScreen.routeName,
+                extra: (clinic: request.toInviteClinicDetail(), onBoardClinic: true),
+              );
+            },
           ),
           context.verticalSpace(12),
           _actionButton(

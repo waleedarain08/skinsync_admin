@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'responses/invite_clinic_detail_response.dart';
+
 class FounderClinicModel {
   final int? id;
   final String? clinicName;
@@ -89,4 +91,18 @@ class FounderClinicModel {
     'status': status,
     'created_at': createdAt?.toIso8601String(),
   };
+
+  InviteClinicDetailData toInviteClinicDetail() {
+    return InviteClinicDetailData(
+      clinicId: id,
+      name: clinicName,
+      email: email,
+      phone: phone,
+      address: address,
+      ownerName: contactName,
+      website: website,
+      notes: founderReason,
+      status: status,
+    );
+  }
 }
