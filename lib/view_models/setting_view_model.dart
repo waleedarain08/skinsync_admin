@@ -1,23 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/models/requests/app_version_request_model.dart';
 import 'package:skinsync_admin/repositories/setting_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/view_models/base_state_model.dart';
 import 'package:skinsync_admin/view_models/base_view_model.dart';
 
+import '../models/requests/app_version_request.dart';
+
 final settingViewModelProvider =
-    NotifierProvider<SettingViewModel, SettingState>(
-      SettingViewModel._,
-    );
+    NotifierProvider<SettingViewModel, SettingState>(SettingViewModel._);
 
 class SettingViewModel extends BaseViewModel<SettingState> {
   SettingViewModel._() : super(SettingState());
 
   final SettingRepository _settingRepository = locator<SettingRepository>();
 
-  Future<bool> updateCustomerAppVersion(AppVersionRequestModel req) async {
+  Future<bool> updateCustomerAppVersion(AppVersionRequest req) async {
     final success =
         await runSafely<bool?>(
           showLoading: true,
@@ -49,7 +48,7 @@ class SettingViewModel extends BaseViewModel<SettingState> {
     return success;
   }
 
-  Future<bool> updateClinicAppVersion(AppVersionRequestModel req) async {
+  Future<bool> updateClinicAppVersion(AppVersionRequest req) async {
     final success =
         await runSafely<bool?>(
           showLoading: true,
