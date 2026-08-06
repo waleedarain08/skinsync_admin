@@ -906,12 +906,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                 children: [
                   _tableTextCell(request.clinicName ?? 'N/A', style: context.fonts.black14w600),
                   _clinicContactCell(
-                    request.email,
-                    request.phone,
-                    request.ownerName,
+                    request.ownerEmail,
+                    request.contactNumber,
+                    request.contactName,
                   ),
                   _tableTextCell(
-                    request.address ?? 'N/A',
+                    request.clinicLocation ?? 'N/A',
                     style: context.fonts.grey14w400,
                   ),
                   _tableTextCell(

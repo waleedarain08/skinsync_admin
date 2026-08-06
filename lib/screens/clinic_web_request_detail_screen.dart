@@ -33,7 +33,7 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
         flexibleSpace: AppDecorations.appBarGradient,
         elevation: 0,
         centerTitle: true,
-        title: Text('Web Registration Request', style: context.fonts.black18w600),
+        title: Text('Registration Request Detail', style: context.fonts.black18w600),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
@@ -85,7 +85,7 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
             ),
             child: Center(
               child: Text(
-                request.clinicName?[0].toUpperCase() ?? 'W',
+                (request.clinicOrPracticeName ?? request.clinicName ?? 'W')[0].toUpperCase(),
                 style: context.fonts.purple14w700.copyWith(fontSize: 32),
               ),
             ),
@@ -99,7 +99,7 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        request.clinicName ?? 'N/A',
+                        request.clinicOrPracticeName ?? request.clinicName ?? 'N/A',
                         style: context.fonts.black20w600,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -110,7 +110,7 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
                 ),
                 context.verticalSpace(6),
                 Text(
-                  request.address ?? 'No Address Provided',
+                  request.primaryClinicAddress ?? request.clinicLocation ?? 'No Address Provided',
                   style: context.fonts.grey14w400,
                 ),
                 context.verticalSpace(4),
@@ -130,38 +130,73 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
     return Column(
       children: [
         _infoSection(context, 'Clinic Information', [
-          _infoRow(context, Icons.business_outlined, 'Clinic Name', request.clinicName ?? 'N/A'),
-          _infoRow(context, Icons.person_outline, 'Owner Name', request.ownerName ?? 'N/A'),
-          _infoRow(context, Icons.medical_services_outlined, 'Specialty', request.specialty ?? 'N/A'),
-          _infoRow(context, Icons.history_outlined, 'Years in Business', request.yearsInBusiness ?? 'N/A'),
+          _infoRow(context, Icons.business_outlined, 'Clinic/Practice Name', request.clinicOrPracticeName ?? 'N/A'),
+          _infoRow(context, Icons.category_outlined, 'Clinic Type', request.clinicType ?? 'N/A'),
+          _infoRow(context, Icons.language_outlined, 'Clinic Website', request.clinicWebsite ?? 'N/A'),
+          _infoRow(context, Icons.location_on_outlined, 'Primary Address', request.primaryClinicAddress ?? 'N/A'),
+          _infoRow(context, Icons.pin_drop_outlined, 'Number of Locations', request.numberOfLocations ?? 'N/A'),
         ]),
         context.verticalSpace(24),
-        _infoSection(context, 'Contact Details', [
-          _infoRow(context, Icons.email_outlined, 'Email Address', request.email ?? 'N/A'),
-          _infoRow(context, Icons.phone_outlined, 'Phone Number', request.phone ?? 'N/A'),
-          _infoRow(context, Icons.language_outlined, 'Website', request.website ?? 'N/A'),
-          _infoRow(context, Icons.location_on_outlined, 'Full Address', request.address ?? 'N/A'),
+        _infoSection(context, 'Contact Person', [
+          _infoRow(context, Icons.person_outline, 'First & Last Name', request.firstAndLastName ?? 'N/A'),
+          _infoRow(context, Icons.badge_outlined, 'Professional Title', request.professionalTitle ?? 'N/A'),
+          _infoRow(context, Icons.email_outlined, 'Business Email', request.businessEmailAddress ?? 'N/A'),
+          _infoRow(context, Icons.phone_outlined, 'Phone Number', request.phoneNumber ?? 'N/A'),
         ]),
         context.verticalSpace(24),
-        _infoSection(context, 'Social Media & Message', [
-          _infoRow(context, Icons.camera_alt_outlined, 'Instagram', request.instagramHandle ?? 'N/A'),
-          _infoRow(context, Icons.facebook_outlined, 'Facebook', request.facebookPage ?? 'N/A'),
-          if (request.message != null && request.message!.isNotEmpty) ...[
-            context.verticalSpace(12),
-            Text('Message from Clinic', style: context.fonts.black14w600),
-            context.verticalSpace(8),
-            Container(
-              width: double.infinity,
-              padding: context.appEdgeInsets(all: 16),
-              decoration: BoxDecoration(
-                color: CustomColors.whiteGrey,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Text(request.message!, style: context.fonts.grey14w400h16),
-            ),
-          ],
+        _infoSection(context, 'Business Volume & Tools', [
+          _infoRow(context, Icons.groups_outlined, 'Approx. Providers', request.approximateNumberOfProviders ?? 'N/A'),
+          _infoRow(context, Icons.person_add_alt_1_outlined, 'Monthly Patient Volume', request.approximateMonthlyPatientVolume ?? 'N/A'),
+          _infoRow(context, Icons.computer_outlined, 'Current Software', request.currentSchedulingEhrCrmOrPracticeManagementSoftware ?? 'N/A'),
+        ]),
+        context.verticalSpace(24),
+        _infoSection(context, 'Additional Details', [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('SkinSync AI Capabilities Interested In:', style: context.fonts.black14w600),
+              context.verticalSpace(12),
+              if (request.skinsyncAiCapabilities != null && request.skinsyncAiCapabilities!.isNotEmpty)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: request.skinsyncAiCapabilities!.map((cap) => Container(
+                    padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: CustomColors.palePurple,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(cap, style: context.fonts.purple13w600),
+                  )).toList(),
+                )
+              else
+                Text('None selected', style: context.fonts.grey14w400),
+            ],
+          ),
+          context.verticalSpace(20),
+          _infoRow(context, Icons.campaign_outlined, 'How did you hear about us?', request.howDidYouHearAboutSkinsyncAi ?? 'N/A'),
+          context.verticalSpace(12),
+          _buildCheckRow(context, 'Authorized to create account', request.authorizedToCreateAccount ?? false),
+          _buildCheckRow(context, 'Agreed to Terms & Privacy Policy', request.agreeToTermsOfServiceAndPrivacyPolicy ?? false),
         ]),
       ],
+    );
+  }
+
+  Widget _buildCheckRow(BuildContext context, String label, bool checked) {
+    return Padding(
+      padding: context.appEdgeInsets(bottom: 8),
+      child: Row(
+        children: [
+          Icon(
+            checked ? Icons.check_circle_rounded : Icons.cancel_rounded,
+            color: checked ? CustomColors.green : CustomColors.red,
+            size: 20,
+          ),
+          context.horizontalSpace(12),
+          Text(label, style: context.fonts.black14w500),
+        ],
+      ),
     );
   }
 
@@ -222,9 +257,9 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Send Notes to ${request.clinicName}', style: context.fonts.black18w600),
+              Text('Send Notes to ${request.clinicOrPracticeName ?? request.clinicName}', style: context.fonts.black18w600),
               context.verticalSpace(4),
-              Text('Recipient: ${request.email}', style: context.fonts.grey12w400),
+              Text('Recipient: ${request.businessEmailAddress ?? request.ownerEmail}', style: context.fonts.grey12w400),
             ],
           ),
           content: SizedBox(
