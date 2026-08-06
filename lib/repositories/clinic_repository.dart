@@ -4,6 +4,8 @@ import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/clinic_web_request_detail_response.dart';
 import 'package:skinsync_admin/models/responses/clinic_web_request_list_response.dart';
+import 'package:skinsync_admin/models/responses/founder_clinic_detail_response.dart';
+import 'package:skinsync_admin/models/responses/founder_clinic_list_response.dart';
 
 import '../models/requests/register_clinic_request_model.dart';
 
@@ -28,8 +30,15 @@ abstract class ClinicRepository {
     String? search,
     String? status,
   });
+  Future<FounderClinicListResponse> getFounderClinics({
+    required int page,
+    required int limit,
+    String? search,
+    String? status,
+  });
   Future<BaseApiResponseModel> sendInvitation({required int inviteClinicId});
   Future<ClinicDetailResponse> getClinicDetail({required int clinicId});
   Future<InviteClinicDetailResponse> getInviteClinicDetail({required int inviteClinicId});
   Future<ClinicWebRequestDetailResponse> getWebRequestDetail({required int id});
+  Future<FounderClinicDetailResponse> getFounderClinicDetail({required int id});
 }

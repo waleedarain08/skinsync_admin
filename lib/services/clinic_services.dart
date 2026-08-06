@@ -7,6 +7,8 @@ import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/clinic_web_request_detail_response.dart';
 import 'package:skinsync_admin/models/responses/clinic_web_request_list_response.dart';
+import 'package:skinsync_admin/models/responses/founder_clinic_detail_response.dart';
+import 'package:skinsync_admin/models/responses/founder_clinic_list_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 
 import '../models/clinic_model.dart';
@@ -140,6 +142,33 @@ class ClinicService implements ClinicRepository {
   }
 
   @override
+  Future<FounderClinicListResponse> getFounderClinics({
+    required int page,
+    required int limit,
+    String? search,
+    String? status,
+  }) async {
+    final Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      'search': search ?? 'null',
+    };
+    if (status != null && status.isNotEmpty) {
+      queryParams['status'] = status;
+    }
+    final jsonResponse = await _api.get(
+      Endpoint.founderClinics,
+      queryParams: queryParams,
+    );
+    final response = FounderClinicListResponse.fromJson(jsonResponse);
+
+    if (!(response.isSuccess ?? false)) {
+      throw BadRequestException(response.message ?? 'Failed to get founder clinics');
+    }
+    return response;
+  }
+
+  @override
   Future<BaseApiResponseModel> sendInvitation({
     required int inviteClinicId,
   }) async {
@@ -192,6 +221,19 @@ class ClinicService implements ClinicRepository {
     final response = ClinicWebRequestDetailResponse.fromJson(jsonResponse);
     if (!(response.isSuccess ?? false)) {
       throw BadRequestException(response.message ?? 'Failed to get web request detail');
+    }
+    return response;
+  }
+
+  @override
+  Future<FounderClinicDetailResponse> getFounderClinicDetail({required int id}) async {
+    final jsonResponse = await _api.get(
+      Endpoint.founderClinicDetail,
+      pathParams: {'id': id.toString()},
+    );
+    final response = FounderClinicDetailResponse.fromJson(jsonResponse);
+    if (!(response.isSuccess ?? false)) {
+      throw BadRequestException(response.message ?? 'Failed to get founder clinic detail');
     }
     return response;
   }

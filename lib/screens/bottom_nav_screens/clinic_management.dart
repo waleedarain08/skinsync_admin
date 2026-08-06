@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
+import 'package:skinsync_admin/models/founder_clinic_model.dart';
 import 'package:skinsync_admin/screens/clinic_web_request_detail_screen.dart';
+import 'package:skinsync_admin/screens/founder_clinic_detail_screen.dart';
 import 'package:skinsync_admin/widgets/app_loader.dart';
 import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 
@@ -46,7 +48,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(clinicViewModelProvider.notifier).initialize();
     });
@@ -66,6 +68,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
         ref
             .read(clinicViewModelProvider.notifier)
             .getWebRequests(search: query);
+      } else if (_tabController.index == 3) {
+        ref
+            .read(clinicViewModelProvider.notifier)
+            .getFounderClinics(search: query);
       }
     });
     setState(() {
@@ -88,6 +94,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     final clinics = state.clinics ?? [];
     final inviteClinics = state.inviteClinics ?? [];
     final webRequests = state.webRequests;
+    final founderClinics = state.founderClinics;
     // // Filter active clinics
     // final filteredClinics = clinics.where((c) {
     //   final query = _searchController.text.toLowerCase();
@@ -190,12 +197,18 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                           webRequests,
                           state.loading,
                         ),
+                        _buildFounderClinicsTab(
+                          context,
+                          founderClinics,
+                          state.loading,
+                        ),
                       ],
                     ),
                   ),
                   if ((_tabController.index == 0 && state.totalPages > 1) ||
                       (_tabController.index == 1 && (inviteClinics.length / _itemsPerPage).ceil() > 1) ||
-                      (_tabController.index == 2 && state.webRequestsTotalPages > 1))
+                      (_tabController.index == 2 && state.webRequestsTotalPages > 1) ||
+                      (_tabController.index == 3 && state.founderClinicsTotalPages > 1))
                     Padding(
                       padding: context.appEdgeInsets(vertical: 24),
                       child: Center(
@@ -204,12 +217,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                               ? state.totalPages
                               : (_tabController.index == 1
                                   ? (inviteClinics.length / _itemsPerPage).ceil()
-                                  : state.webRequestsTotalPages),
+                                  : (_tabController.index == 2 ? state.webRequestsTotalPages : state.founderClinicsTotalPages)),
                           currentPage: _tabController.index == 0
                               ? _activePage
                               : (_tabController.index == 1
                                   ? _invitePage
-                                  : state.webRequestsCurrentPage - 1),
+                                  : (_tabController.index == 2 ? state.webRequestsCurrentPage - 1 : state.founderClinicsCurrentPage - 1)),
                           onPageChanged: (pageIndex) {
                             if (_tabController.index == 0) {
                               ref
@@ -229,6 +242,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                               ref
                                   .read(clinicViewModelProvider.notifier)
                                   .getWebRequests(
+                                    page: pageIndex + 1,
+                                    search: _searchController.text.trim(),
+                                  );
+                            } else if (_tabController.index == 3) {
+                              ref
+                                  .read(clinicViewModelProvider.notifier)
+                                  .getFounderClinics(
                                     page: pageIndex + 1,
                                     search: _searchController.text.trim(),
                                   );
@@ -475,6 +495,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
             ref
                 .read(clinicViewModelProvider.notifier)
                 .getWebRequests(search: _searchController.text.trim());
+          } else if (index == 3) {
+            ref
+                .read(clinicViewModelProvider.notifier)
+                .getFounderClinics(search: _searchController.text.trim());
           }
           setState(() {});
         },
@@ -484,6 +508,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
           Tab(text: 'Active Partners'),
           Tab(text: 'Prospect Invitations'),
           Tab(text: 'Web Requests'),
+          Tab(text: 'Founder Clinics'),
         ],
       ),
     );
@@ -921,6 +946,114 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               if (success && context.mounted) {
                 ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
                 context.push(ClinicDetailScreen.routeName);
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFounderClinicsTab(
+    BuildContext context,
+    List<FounderClinicModel> clinics,
+    bool isLoading,
+  ) {
+    if (isLoading) {
+      return const Center(child: AppLoader());
+    }
+
+    if (clinics.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return BorderdContainerWidget(
+      padding: EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: Table(
+          columnWidths: const {
+            0: FlexColumnWidth(3.5), // Clinic Name
+            1: FlexColumnWidth(3), // Contact
+            2: FlexColumnWidth(3), // Providers/EMR
+            3: FlexColumnWidth(2), // Date
+            4: FlexColumnWidth(2), // Status
+            5: FlexColumnWidth(1.8), // Actions
+          },
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          children: [
+            // Header Row
+            TableRow(
+              decoration: const BoxDecoration(
+                color: CustomColors.whiteGrey,
+                border: Border(bottom: BorderSide(color: CustomColors.border)),
+              ),
+              children: [
+                _tableHeaderCell('CLINIC NAME'),
+                _tableHeaderCell('OWNER / CONTACT'),
+                _tableHeaderCell('EMR / PROVIDERS'),
+                _tableHeaderCell('REQUESTED DATE'),
+                _tableHeaderCell('STATUS'),
+                _tableHeaderCell('ACTIONS'),
+              ],
+            ),
+            // Data Rows
+            ...clinics.map((clinic) {
+              return TableRow(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: CustomColors.border),
+                  ),
+                ),
+                children: [
+                  _tableTextCell(clinic.clinicName ?? 'N/A', style: context.fonts.black14w600),
+                  _clinicContactCell(
+                    clinic.email,
+                    clinic.phone,
+                    clinic.contactName,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('EMR: ${clinic.currentEmr ?? "N/A"}', style: context.fonts.grey12w400),
+                        Text('Staff: ${clinic.numberOfProviders ?? "0"}', style: context.fonts.grey12w400),
+                      ],
+                    ),
+                  ),
+                  _tableTextCell(
+                    _formatDate(clinic.createdAt),
+                    style: context.fonts.grey14w400,
+                  ),
+                  _statusBadgeCell(clinic.status ?? 'Pending'),
+                  _founderClinicActionsCell(clinic),
+                ],
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _founderClinicActionsCell(FounderClinicModel clinic) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
+        children: [
+          IconButton(
+            tooltip: 'View Detail',
+            icon: Icon(
+              Icons.visibility_outlined,
+              size: 20.sp,
+              color: CustomColors.grey,
+            ),
+            onPressed: () async {
+              final success = await ref.read(clinicViewModelProvider.notifier).getFounderClinicDetail(clinic.id!);
+              if (success && context.mounted) {
+                ref.read(clinicViewModelProvider.notifier).selectFounderClinic(clinic);
+                context.push(FounderClinicDetailScreen.routeName);
               }
             },
           ),

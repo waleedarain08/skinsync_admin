@@ -1,5 +1,6 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
+import 'package:skinsync_admin/models/founder_clinic_model.dart';
 import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 
@@ -96,21 +97,48 @@ class TreatmentData {
       status: 'Approved',
       createdAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
-    ClinicWebRequestModel(
-      id: 103,
-      clinicName: 'Luxe Dermal Care',
-      ownerName: 'Elena Rossi',
-      email: 'hello@luxedermal.com',
-      phone: '+1 702-555-0428',
-      address: 'Las Vegas, NV',
-      website: 'https://luxedermal.com',
-      specialty: 'Clinical Facials',
-      yearsInBusiness: '3',
-      instagramHandle: '@luxe_dermal_care',
-      facebookPage: 'Luxe Dermal Care Official',
-      message: 'Exploring options for digital patient consent forms and automated follow-up reminders.',
-      status: 'Rejected',
-      createdAt: DateTime.now().subtract(const Duration(days: 10)),
+  ];
+
+  static final List<FounderClinicModel> dummyFounderClinics = [
+    FounderClinicModel(
+      id: 201,
+      clinicName: 'Elite Aesthetics Group',
+      contactName: 'Dr. Julian Thorne',
+      email: 'founder@elitegroup.com',
+      phone: '+1 212-555-0777',
+      address: 'Park Ave, New York, NY',
+      city: 'New York',
+      state: 'NY',
+      zipCode: '10022',
+      website: 'https://eliteaesthetics.com',
+      currentEmr: 'Zenoti',
+      numberOfProviders: '15',
+      specialty: 'Full Service Medical Aesthetics',
+      instagramHandle: '@elite_aesthetics',
+      facebookPage: 'Elite Aesthetics NY',
+      founderReason: 'We want to be at the forefront of AI integration in the beauty industry and help shape the future of clinical software.',
+      status: 'Pending',
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    FounderClinicModel(
+      id: 202,
+      clinicName: 'Radiance Wellness Hub',
+      contactName: 'Sophia Chen',
+      email: 'sophia@radiancehub.com',
+      phone: '+1 650-555-0333',
+      address: 'Palo Alto, CA',
+      city: 'Palo Alto',
+      state: 'CA',
+      zipCode: '94301',
+      website: 'https://radiancehub.io',
+      currentEmr: 'Mindbody',
+      numberOfProviders: '8',
+      specialty: 'Holistic Skin Health',
+      instagramHandle: '@radiance_paloalto',
+      facebookPage: 'Radiance Wellness Hub',
+      founderReason: 'As an early adopter of technology, we are eager to provide feedback and contribute to the growth of SkinSync.',
+      status: 'Approved',
+      createdAt: DateTime.now().subtract(const Duration(days: 4)),
     ),
   ];
 

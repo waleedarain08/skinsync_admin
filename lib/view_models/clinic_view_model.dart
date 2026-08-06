@@ -7,6 +7,7 @@ import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
+import 'package:skinsync_admin/models/founder_clinic_model.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
@@ -29,6 +30,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
   Future<void> initialize() async {
     getClinics(page: state.currentPage, limit: state.pageSize);
     getWebRequests(page: state.webRequestsCurrentPage, limit: state.pageSize);
+    getFounderClinics(page: state.founderClinicsCurrentPage, limit: state.pageSize);
   }
 
   Future<bool?> getClinics({String? search, int? page, int? limit}) async {
@@ -186,6 +188,50 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     );
   }
 
+  Future<bool?> getFounderClinics({
+    int? page,
+    int? limit,
+    String? search,
+    String? status,
+  }) async {
+    return await runSafely<bool?>(
+      showLoading: false,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final int targetPage = page ?? state.founderClinicsCurrentPage;
+        final int targetLimit = limit ?? state.pageSize;
+        try {
+          final response = await _clinicRepository.getFounderClinics(
+            page: targetPage,
+            limit: targetLimit,
+            search: search,
+            status: status,
+          );
+          if (response.data != null && response.data!.isNotEmpty) {
+            state = state.copyWith(
+              founderClinics: response.data ?? [],
+              founderClinicsCurrentPage: targetPage,
+              founderClinicsTotalPages: response.totalPages ?? 1,
+              pageSize: targetLimit,
+            );
+            return true;
+          }
+        } catch (e) {
+          // Fail-safe
+        }
+
+        state = state.copyWith(
+          founderClinics: TreatmentData.dummyFounderClinics,
+          founderClinicsCurrentPage: targetPage,
+          founderClinicsTotalPages: 1,
+        );
+        return true;
+      },
+    );
+  }
+
   void selectInviteClinic(ClinicModel clinic) {
     state = state.copyWith(selectedInviteClinicId: clinic.id);
   }
@@ -196,6 +242,10 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
   void selectWebRequest(ClinicWebRequestModel request) {
     state = state.copyWith(selectedWebRequestId: request.id);
+  }
+
+  void selectFounderClinic(FounderClinicModel clinic) {
+    state = state.copyWith(selectedFounderClinicId: clinic.id);
   }
 
   Future<bool> sendInvitation(int inviteClinicId) async {
@@ -314,6 +364,30 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
         false;
   }
 
+  Future<bool> getFounderClinicDetail(int id) async {
+    return await runSafely<bool?>(
+          showLoading: true,
+          () async {
+            try {
+              final response = await _clinicRepository.getFounderClinicDetail(id: id);
+              if (response.isSuccess == true && response.data != null) {
+                state = state.copyWith(selectedFounderClinicDetail: response.data);
+                return true;
+              }
+            } catch (e) {
+              // Fail-safe
+            }
+
+            final fallbackModel = state.founderClinics.firstWhereOrNull((r) => r.id == id);
+            state = state.copyWith(
+              selectedFounderClinicDetail: fallbackModel ?? TreatmentData.dummyFounderClinics.firstWhereOrNull((r) => r.id == id),
+            );
+            return true;
+          },
+        ) ??
+        false;
+  }
+
   Future<bool> updateClinic(int id, RegisterClinicReqModel req) async {
     final success =
         await runSafely<bool?>(
@@ -386,18 +460,23 @@ class ClinicState extends BaseStateModel {
   final List<ClinicModel>? clinics;
   final List<ClinicModel>? inviteClinics;
   final List<ClinicWebRequestModel> webRequests;
+  final List<FounderClinicModel> founderClinics;
   final int? selectedInviteClinicId;
   final int? selectedClinicId;
   final int? selectedWebRequestId;
+  final int? selectedFounderClinicId;
   final List<Place> searchedPlaces;
   final String? clinicImage;
   final String? bannerImage;
   final int pageSize;
   final int webRequestsTotalPages;
   final int webRequestsCurrentPage;
+  final int founderClinicsTotalPages;
+  final int founderClinicsCurrentPage;
   final ClinicDetailData? selectedClinicDetail;
   final InviteClinicDetailData? selectedInviteClinicDetail;
   final ClinicWebRequestModel? selectedWebRequestDetail;
+  final FounderClinicModel? selectedFounderClinicDetail;
 
   ClinicState({
     super.loading,
@@ -406,18 +485,23 @@ class ClinicState extends BaseStateModel {
     this.clinics = const [],
     this.inviteClinics = const [],
     this.webRequests = const [],
+    this.founderClinics = const [],
     this.selectedInviteClinicId,
     this.selectedClinicId,
     this.selectedWebRequestId,
+    this.selectedFounderClinicId,
     this.searchedPlaces = const [],
     this.bannerImage,
     this.clinicImage,
     this.pageSize = 10,
     this.webRequestsTotalPages = 1,
     this.webRequestsCurrentPage = 1,
+    this.founderClinicsTotalPages = 1,
+    this.founderClinicsCurrentPage = 1,
     this.selectedClinicDetail,
     this.selectedInviteClinicDetail,
     this.selectedWebRequestDetail,
+    this.selectedFounderClinicDetail,
   });
 
   ClinicState copyWith({
@@ -425,9 +509,11 @@ class ClinicState extends BaseStateModel {
     List<ClinicModel>? clinics,
     List<ClinicModel>? inviteClinics,
     List<ClinicWebRequestModel>? webRequests,
+    List<FounderClinicModel>? founderClinics,
     int? selectedInviteClinicId,
     int? selectedClinicId,
     int? selectedWebRequestId,
+    int? selectedFounderClinicId,
     List<Place>? searchedPlaces,
     String? bannerImage,
     String? clinicImage,
@@ -436,19 +522,24 @@ class ClinicState extends BaseStateModel {
     int? totalPages,
     int? webRequestsTotalPages,
     int? webRequestsCurrentPage,
+    int? founderClinicsTotalPages,
+    int? founderClinicsCurrentPage,
     ClinicDetailData? selectedClinicDetail,
     InviteClinicDetailData? selectedInviteClinicDetail,
     ClinicWebRequestModel? selectedWebRequestDetail,
+    FounderClinicModel? selectedFounderClinicDetail,
   }) {
     return ClinicState(
       loading: loading ?? this.loading,
       clinics: clinics ?? this.clinics,
       inviteClinics: inviteClinics ?? this.inviteClinics,
       webRequests: webRequests ?? this.webRequests,
+      founderClinics: founderClinics ?? this.founderClinics,
       selectedInviteClinicId:
           selectedInviteClinicId ?? this.selectedInviteClinicId,
       selectedClinicId: selectedClinicId ?? this.selectedClinicId,
       selectedWebRequestId: selectedWebRequestId ?? this.selectedWebRequestId,
+      selectedFounderClinicId: selectedFounderClinicId ?? this.selectedFounderClinicId,
       searchedPlaces: searchedPlaces ?? this.searchedPlaces,
       bannerImage: bannerImage ?? this.bannerImage,
       clinicImage: clinicImage ?? this.clinicImage,
@@ -457,9 +548,12 @@ class ClinicState extends BaseStateModel {
       totalPages: totalPages ?? this.totalPages,
       webRequestsTotalPages: webRequestsTotalPages ?? this.webRequestsTotalPages,
       webRequestsCurrentPage: webRequestsCurrentPage ?? this.webRequestsCurrentPage,
+      founderClinicsTotalPages: founderClinicsTotalPages ?? this.founderClinicsTotalPages,
+      founderClinicsCurrentPage: founderClinicsCurrentPage ?? this.founderClinicsCurrentPage,
       selectedClinicDetail: selectedClinicDetail ?? this.selectedClinicDetail,
       selectedInviteClinicDetail: selectedInviteClinicDetail ?? this.selectedInviteClinicDetail,
       selectedWebRequestDetail: selectedWebRequestDetail ?? this.selectedWebRequestDetail,
+      selectedFounderClinicDetail: selectedFounderClinicDetail ?? this.selectedFounderClinicDetail,
     );
   }
 }
