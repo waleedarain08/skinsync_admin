@@ -6,6 +6,7 @@ import 'package:skinsync_admin/models/responses/clinic_web_request_detail_respon
 import 'package:skinsync_admin/models/responses/clinic_web_request_list_response.dart';
 import 'package:skinsync_admin/models/responses/founder_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/founder_clinic_list_response.dart';
+import 'package:skinsync_admin/models/requests/send_notes_request.dart';
 
 import '../models/requests/register_clinic_request_model.dart';
 
@@ -40,5 +41,6 @@ abstract class ClinicRepository {
   Future<ClinicDetailResponse> getClinicDetail({required int clinicId});
   Future<InviteClinicDetailResponse> getInviteClinicDetail({required int inviteClinicId});
   Future<ClinicWebRequestDetailResponse> getWebRequestDetail({required int id});
+  Future<BaseApiResponseModel> sendWebRequestNotes({required int id, required SendNotesRequest req});
   Future<FounderClinicDetailResponse> getFounderClinicDetail({required int id});
 }

@@ -8,6 +8,7 @@ import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.da
 import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
+import 'package:skinsync_admin/models/requests/send_notes_request.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
@@ -383,6 +384,17 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
               selectedFounderClinicDetail: fallbackModel ?? TreatmentData.dummyFounderClinics.firstWhereOrNull((r) => r.id == id),
             );
             return true;
+          },
+        ) ??
+        false;
+  }
+
+  Future<bool> sendWebRequestNotes(int id, SendNotesRequest req) async {
+    return await runSafely<bool?>(
+          showLoading: true,
+          () async {
+            final response = await _clinicRepository.sendWebRequestNotes(id: id, req: req);
+            return response.isSuccess;
           },
         ) ??
         false;

@@ -9,6 +9,7 @@ import 'package:skinsync_admin/models/responses/clinic_web_request_detail_respon
 import 'package:skinsync_admin/models/responses/clinic_web_request_list_response.dart';
 import 'package:skinsync_admin/models/responses/founder_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/founder_clinic_list_response.dart';
+import 'package:skinsync_admin/models/requests/send_notes_request.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 
 import '../models/clinic_model.dart';
@@ -223,6 +224,16 @@ class ClinicService implements ClinicRepository {
       throw BadRequestException(response.message ?? 'Failed to get web request detail');
     }
     return response;
+  }
+
+  @override
+  Future<BaseApiResponseModel> sendWebRequestNotes({required int id, required SendNotesRequest req}) async {
+    final jsonResponse = await _api.post(
+      Endpoint.sendWebRequestNotes,
+      pathParams: {'id': id.toString()},
+      body: req.toJson(),
+    );
+    return BaseApiResponseModel.fromJson(jsonResponse);
   }
 
   @override

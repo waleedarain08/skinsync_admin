@@ -82,6 +82,7 @@ enum Endpoint {
   postCategories('admin/posts/categories'),
   webRequests('admin/web-requests'),
   webRequestDetail('admin/web-requests/{id}'),
+  sendWebRequestNotes('admin/web-requests/{id}/notes'),
   founderClinics('admin/founder-clinics'),
   founderClinicDetail('admin/founder-clinics/{id}'),
   deductionTimings('admin/deduction-timings');

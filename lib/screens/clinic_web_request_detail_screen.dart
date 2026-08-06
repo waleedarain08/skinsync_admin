@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
+import 'package:skinsync_admin/models/requests/send_notes_request.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -165,21 +167,19 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
   Widget _buildActionSidebar(BuildContext context, WidgetRef ref, ClinicWebRequestModel request) {
     return Column(
       children: [
-        _infoSection(context, 'Request Actions', [
+        _infoSection(context, 'Feedback & Notes', [
           Text(
-            'Review this web registration request and decide whether to approve it for onboarding.',
+            'Send follow-up notes or internal feedback regarding this registration request directly to the clinic\'s provided email address.',
             style: context.fonts.grey13w500h15,
           ),
           context.verticalSpace(24),
           _actionButton(
             context,
-            'Approve & Send Invitation',
-            Icons.check_circle_outline,
-            CustomColors.green,
+            'Send Notes',
+            Icons.email_outlined,
+            CustomColors.purple,
             Colors.white,
-            () {
-              // Logic to approve and invite
-            },
+            () => _showSendNotesDialog(context, ref, request),
           ),
           context.verticalSpace(12),
           _actionButton(
@@ -195,6 +195,57 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
           ),
         ]),
       ],
+    );
+  }
+
+  void _showSendNotesDialog(BuildContext context, WidgetRef ref, ClinicWebRequestModel request) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Send Notes to ${request.clinicName}', style: context.fonts.black18w600),
+              context.verticalSpace(4),
+              Text('Recipient: ${request.email}', style: context.fonts.grey12w400),
+            ],
+          ),
+          content: SizedBox(
+            width: context.w(400),
+            child: BuildTextField(
+              label: 'Notes',
+              controller: controller,
+              hintText: 'Type your feedback or notes here...',
+              maxLines: 5,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel', style: context.fonts.grey14w600),
+            ),
+            CustomPrimaryButton(
+              onTap: () async {
+                final notes = controller.text.trim();
+                if (notes.isEmpty) return;
+                
+                final req = SendNotesRequest(notes: notes);
+                final success = await ref.read(clinicViewModelProvider.notifier).sendWebRequestNotes(request.id!, req);
+                if (success && context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Notes sent successfully!')),
+                  );
+                }
+              },
+              label: 'Send Email',
+              width: 120.w,
+            ),
+          ],
+        );
+      },
     );
   }
 
