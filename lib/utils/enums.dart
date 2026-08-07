@@ -153,5 +153,3 @@ enum ProductStatus {
 
   const ProductStatus(this.label);
 }
-
-enum ApplicationType { clinic, patient }

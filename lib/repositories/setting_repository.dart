@@ -1,7 +1,11 @@
-import '../models/requests/app_version_request_model.dart';
+import '../models/requests/app_version_request.dart';
 import '../models/responses/base_response_model.dart';
 
 abstract class SettingRepository {
-  Future<BaseApiResponseModel> updateCustomerAppVersion({required AppVersionRequestModel req});
-  Future<BaseApiResponseModel> updateClinicAppVersion({required AppVersionRequestModel req});
+  Future<BaseApiResponseModel> updateCustomerAppVersion({
+    required AppVersionRequest req,
+  });
+  Future<BaseApiResponseModel> updateClinicAppVersion({
+    required AppVersionRequest req,
+  });
 }

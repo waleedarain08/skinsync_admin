@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/models/requests/app_version_request_model.dart';
 import 'package:skinsync_admin/view_models/setting_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
+import '../../models/requests/app_version_request.dart';
 import '../../utils/theme.dart';
 
 class SettingScreen extends ConsumerStatefulWidget {
@@ -65,7 +65,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             ),
             SizedBox(height: 30.h),
             Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              data: Theme.of(
+                context,
+              ).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
                 title: Text('Customer App', style: context.fonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
@@ -102,7 +104,9 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             ),
             SizedBox(height: 20.h),
             Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              data: Theme.of(
+                context,
+              ).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
                 title: Text('Clinic App', style: context.fonts.black20w500),
                 childrenPadding: EdgeInsets.all(15.w),
@@ -232,7 +236,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
       return;
     }
 
-    final req = AppVersionRequestModel(
+    final req = AppVersionRequest(
       type: type,
       version: versionController.text.trim(),
       buildNumber: buildController.text.trim(),

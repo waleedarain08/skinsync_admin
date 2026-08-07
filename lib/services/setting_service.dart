@@ -1,4 +1,4 @@
-import '../models/requests/app_version_request_model.dart';
+import '../models/requests/app_version_request.dart';
 import '../models/responses/base_response_model.dart';
 import '../repositories/setting_repository.dart';
 import '../utils/enums.dart';
@@ -11,32 +11,26 @@ class SettingService implements SettingRepository {
 
   @override
   Future<BaseApiResponseModel> updateCustomerAppVersion({
-    required AppVersionRequestModel req,
+    required AppVersionRequest req,
   }) async {
     final jsonResponse = await _api.patch(
       Endpoint.updateCustomerAppVersion,
       body: req.toJson(),
     );
-    final response = BaseApiResponseModel<dynamic>.fromJson(
-      jsonResponse,
-    
-    );
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
 
     return response;
   }
 
   @override
   Future<BaseApiResponseModel> updateClinicAppVersion({
-    required AppVersionRequestModel req,
+    required AppVersionRequest req,
   }) async {
     final jsonResponse = await _api.patch(
       Endpoint.updateClinicAppVersion,
       body: req.toJson(),
     );
-    final response = BaseApiResponseModel<dynamic>.fromJson(
-      jsonResponse,
-     
-    );
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
 
     return response;
   }
