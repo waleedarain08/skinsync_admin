@@ -276,23 +276,33 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
               onPressed: () => Navigator.pop(context),
               child: Text('Cancel', style: context.fonts.grey14w600),
             ),
-            CustomPrimaryButton(
-              onTap: () async {
-                final notes = controller.text.trim();
-                if (notes.isEmpty) return;
-                
-                final req = SendNotesRequest(notes: notes);
-                final success = await ref.read(clinicViewModelProvider.notifier).sendWebRequestNotes(request.id!, req);
-                if (success && context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Notes sent successfully!')),
-                  );
-                }
-              },
-              label: 'Send Email',
-              width: 120.w,
-            ),
+              CustomPrimaryButton(
+                onTap: () async {
+                  final notes = controller.text.trim();
+                  if (notes.isEmpty) return;
+
+                  final email = request.businessEmailAddress ?? request.ownerEmail;
+                  if (email == null || email.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Recipient email not found!')),
+                    );
+                    return;
+                  }
+
+                  final req = SendNotesRequest(email: email, notes: notes);
+                  final success = await ref
+                      .read(clinicViewModelProvider.notifier)
+                      .sendWebRequestNotes(request.id!, req);
+                  if (success && context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Notes sent successfully!')),
+                    );
+                  }
+                },
+                label: 'Send Email',
+                width: 120.w,
+              ),
           ],
         );
       },
