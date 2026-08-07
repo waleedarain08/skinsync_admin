@@ -28,6 +28,15 @@ class PricingStep extends ConsumerWidget {
     final state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
 
+    // Locked to Fixed Price for now — force underlying state to stay in
+    // sync so submitted payloads correctly send fixed_price / is_fixed_price
+    // instead of null/false. Remove this block when re-enabling the toggle.
+    if (!state.isFixedPrice) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        viewModel.toggleIsFixedPrice(true);
+      });
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -65,9 +74,9 @@ class PricingStep extends ConsumerWidget {
                     ],
                   ),
                 ),
-                Switch(
-                  value: state.isFixedPrice,
-                  onChanged: viewModel.toggleIsFixedPrice,
+                 Switch(
+                  value: true,
+                  onChanged:(_){}, // Locked to Fixed Price for now
                   activeColor: CustomColors.purple,
                 ),
               ],
@@ -75,7 +84,7 @@ class PricingStep extends ConsumerWidget {
           ),
         ),
         context.verticalSpace(32),
-        if (state.isFixedPrice) ...[
+        if (true) ...[ // Locked to Fixed Price for now (state.isFixedPrice ignored)
           _sectionTitle(context, 'Fixed Pricing'),
           context.verticalSpace(24),
           BuildTextField(
@@ -85,7 +94,7 @@ class PricingStep extends ConsumerWidget {
             keyboardType: TextInputType.number,
             validator: Validators.empty,
           ),
-        ] else ...[
+        ] /* else ...[
           _sectionTitle(context, 'Base Pricing'),
           context.verticalSpace(24),
           BuildTextField(
@@ -192,7 +201,7 @@ class PricingStep extends ConsumerWidget {
               );
             }),
           ],
-        ],
+        ] */,
         context.verticalSpace(32),
         const Divider(),
         context.verticalSpace(24),

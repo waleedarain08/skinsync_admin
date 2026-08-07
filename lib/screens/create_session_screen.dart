@@ -2311,17 +2311,17 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       );
       return false;
     }
-    final duration =
-        int.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0;
-    if (duration <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Treatment duration must be greater than 0'),
-          backgroundColor: CustomColors.red,
-        ),
-      );
-      return false;
-    }
+    // final duration =
+    //     int.tryParse(sessionViewModel.treatmentDurationController.text) ?? 0;
+    // if (duration <= 0) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text('Treatment duration must be greater than 0'),
+    //       backgroundColor: CustomColors.red,
+    //     ),
+    //   );
+    //   return false;
+    // }
     return true;
   }
 

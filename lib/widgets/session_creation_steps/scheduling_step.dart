@@ -33,7 +33,10 @@ class SchedulingStep extends ConsumerWidget {
     return double.tryParse(entry.maxQuantityController.text) ?? 0.0;
   }
 
-  double _calculateProductUsageDuration(TreatmentState treatmentState, SessionState sessionState) {
+  double _calculateProductUsageDuration(
+    TreatmentState treatmentState,
+    SessionState sessionState,
+  ) {
     double total = 0.0;
     for (final entry in sessionState.productUsageEntries) {
       final minQty = _getProductMinQuantity(entry, const []);
@@ -53,7 +56,16 @@ class SchedulingStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final SessionState state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
-    final treatmentState = ref.watch(treatmentViewModelProvider);
+    //  final treatmentState = ref.watch(treatmentViewModelProvider);
+
+    // Locked to Fixed Duration for now — force underlying state to stay in
+    // sync so submitted payloads correctly send fixed_duration: true instead
+    // of null/false. Remove this block when re-enabling the toggle.
+    if (!state.isFixedDuration) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        viewModel.toggleIsFixedDuration(true);
+      });
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,8 +98,8 @@ class SchedulingStep extends ConsumerWidget {
                   ),
                 ),
                 Switch(
-                  value: state.isFixedDuration,
-                  onChanged: viewModel.toggleIsFixedDuration,
+                  value: true,
+                  onChanged: (_) {}, // Locked to Fixed Duration for now
                   activeThumbColor: CustomColors.purple,
                 ),
               ],
@@ -95,7 +107,8 @@ class SchedulingStep extends ConsumerWidget {
           ),
         ),
         context.verticalSpace(32),
-        if (state.isFixedDuration) ...[
+        if (true) ...[
+          // Locked to Fixed Duration for now (state.isFixedDuration ignored)
           _sectionTitle(context, 'Fixed Duration'),
           context.verticalSpace(24),
           Row(
@@ -114,7 +127,7 @@ class SchedulingStep extends ConsumerWidget {
               ),
             ],
           ),
-        ] else ...[
+        ] /* else ...[
           _sectionTitle(context, 'Base Duration'),
           context.verticalSpace(24),
           Row(
@@ -325,7 +338,7 @@ class SchedulingStep extends ConsumerWidget {
               );
             },
           ),
-        ],
+        ] */,
         context.verticalSpace(32),
         _sectionTitle(context, 'Override & Booking Controls'),
         context.verticalSpace(24),
@@ -409,7 +422,8 @@ class SchedulingStep extends ConsumerWidget {
                 controller: viewModel.minimumBookingNoticeController,
                 hintText: 'e.g. 24',
                 keyboardType: TextInputType.number,
-                tooltip: 'The minimum number of hours before an appointment that a patient can book this treatment.',
+                tooltip:
+                    'The minimum number of hours before an appointment that a patient can book this treatment.',
               ),
             ),
             context.horizontalSpace(24),
@@ -419,7 +433,8 @@ class SchedulingStep extends ConsumerWidget {
                 controller: viewModel.maximumDaysInAdvanceController,
                 hintText: 'e.g. 90',
                 keyboardType: TextInputType.number,
-                tooltip: 'The maximum number of days in advance that a patient can book this treatment.',
+                tooltip:
+                    'The maximum number of days in advance that a patient can book this treatment.',
               ),
             ),
           ],
@@ -429,7 +444,8 @@ class SchedulingStep extends ConsumerWidget {
         context.verticalSpace(24),
         AuthorizedRolesWidget(
           title: 'Authorized Roles to Change Schedule',
-          description: 'Select which provider roles are authorized to override or modify treatment scheduling and duration controls.',
+          description:
+              'Select which provider roles are authorized to override or modify treatment scheduling and duration controls.',
           selectedRoles: state.schedulingRoles,
           onRoleToggled: viewModel.toggleSchedulingRole,
         ),
