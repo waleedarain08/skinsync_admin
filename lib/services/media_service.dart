@@ -108,8 +108,10 @@ class MediaService {
 
         'jpg' || 'jpeg' || 'png' => '$path/image/$fileName',
         'mp4' || 'mov' || 'avi' || 'mkv' || 'webm' => '$path/video/$fileName',
+      
         'pdf' => '$path/pdf/$fileName',
         _ => '$path/file/$fileName',
+        
       };
 
       log('UPLOAD STARTED');

@@ -79,7 +79,7 @@ class ExploreService implements ExploreRepository {
 
   @override
   Future<void> updatePostStatus(int id, String status) async {
-    await _api.put(
+    await _api.patch(
       Endpoint.updatePost,
       pathParams: {'id': id.toString()},
       body: {'status': status},

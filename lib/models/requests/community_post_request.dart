@@ -18,7 +18,7 @@ class CreateCommunityPostRequest {
       'title': title,
       'content': content,
       'image_url': imageUrl,
-      'category': category,
+      'category_name': category,
       'tags': tags,
     };
   }

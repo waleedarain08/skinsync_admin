@@ -6,6 +6,8 @@ class ReelModel {
   final String? thumbnail;
   final List<String> tags;
   final DateTime? createdAt;
+  final String? profileLogo;
+  final String? profileName;
   final String status;
 
   ReelModel({
@@ -16,6 +18,8 @@ class ReelModel {
     this.thumbnail,
     this.tags = const [],
     this.createdAt,
+    this.profileLogo,
+    this.profileName,
     this.status = 'Active',
   });
 
@@ -27,7 +31,11 @@ class ReelModel {
       videoUrl: json['video_url'] ?? '',
       thumbnail: json['thumbnail'],
       tags: json['tags'] != null ? List<String>.from(json['tags']) : [],
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
+      profileLogo: json['profile_logo'] ?? '',
+      profileName: json['profile_name'] ?? '',
       status: json['status'] ?? 'Active',
     );
   }
@@ -52,6 +60,8 @@ class CommunityPostModel {
   final String? category;
   final List<String> tags;
   final DateTime? createdAt;
+  final String? profileLogo;
+  final String? profileName;
   final String status;
 
   CommunityPostModel({
@@ -62,6 +72,8 @@ class CommunityPostModel {
     this.category,
     this.tags = const [],
     this.createdAt,
+    this.profileLogo,
+    this.profileName,
     this.status = 'Active',
   });
 
@@ -70,21 +82,30 @@ class CommunityPostModel {
       id: json['id'],
       title: json['title'] ?? '',
       content: json['content'] ?? '',
-      imageUrl: json['image_url'],
-      category: json['category'],
-      tags: json['tags'] != null ? List<String>.from(json['tags']) : [],
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      imageUrl: json['image_url'] ?? '',
+      category: json['category'] ?? '',
+      tags: json['tags'] is List ? List<String>.from(json['tags']) : [],
+      createdAt:
+          json['created_at'] != null && json['created_at'].toString().isNotEmpty
+          ? DateTime.parse(json['created_at'])
+          : null,
+      profileLogo: json['profile_logo'] ?? '',
+      profileName: json['profile_name'] ?? '',
       status: json['status'] ?? 'Active',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'title': title,
       'content': content,
       'image_url': imageUrl,
       'category': category,
       'tags': tags,
+      'created_at': createdAt?.toIso8601String(),
+      'profile_logo': profileLogo,
+      'profile_name': profileName,
       'status': status,
     };
   }

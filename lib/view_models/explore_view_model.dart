@@ -13,7 +13,8 @@ import 'package:skinsync_admin/utils/exception.dart';
 import 'package:skinsync_admin/view_models/base_state_model.dart';
 import 'package:skinsync_admin/view_models/base_view_model.dart';
 
-final exploreViewModelProvider = NotifierProvider<ExploreViewModel, ExploreState>(ExploreViewModel.new);
+final exploreViewModelProvider =
+    NotifierProvider<ExploreViewModel, ExploreState>(ExploreViewModel.new);
 
 class ExploreState extends BaseStateModel {
   final List<ReelModel> reels;
@@ -36,19 +37,12 @@ class ExploreState extends BaseStateModel {
     this.postsTotalPages = 1,
     this.reelsCurrentPage = 1,
     this.postsCurrentPage = 1,
-    this.pageSize = 10,
+    this.pageSize = 20,
     this.pickedImageUrl,
     this.pickedVideoUrl,
     this.pickedThumbnailUrl,
     this.postCategories = const [],
-    this.postSearchKeyword = '',
-    this.reelSearchKeyword = '',
-    this.selectedPostCategory,
   });
-
-  final String postSearchKeyword;
-  final String reelSearchKeyword;
-  final String? selectedPostCategory;
 
   ExploreState copyWith({
     bool? loading,
@@ -63,9 +57,6 @@ class ExploreState extends BaseStateModel {
     String? pickedVideoUrl,
     String? pickedThumbnailUrl,
     List<PostCategoryModel>? postCategories,
-    String? postSearchKeyword,
-    String? reelSearchKeyword,
-    String? selectedPostCategory,
   }) {
     return ExploreState(
       loading: loading ?? this.loading,
@@ -80,9 +71,6 @@ class ExploreState extends BaseStateModel {
       pickedVideoUrl: pickedVideoUrl ?? this.pickedVideoUrl,
       pickedThumbnailUrl: pickedThumbnailUrl ?? this.pickedThumbnailUrl,
       postCategories: postCategories ?? this.postCategories,
-      postSearchKeyword: postSearchKeyword ?? this.postSearchKeyword,
-      reelSearchKeyword: reelSearchKeyword ?? this.reelSearchKeyword,
-      selectedPostCategory: selectedPostCategory ?? this.selectedPostCategory,
     );
   }
 
@@ -111,9 +99,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
   final ImagePicker _picker = ImagePicker();
   final MediaService _mediaService = MediaService();
 
-  Future<void> fetchReels({int page = 1, String? search}) async {
-    final targetSearch = search ?? state.reelSearchKeyword;
-
+  Future<void> fetchReels({int page = 1}) async {
     await runSafely(
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
@@ -121,22 +107,17 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
         final response = await _repository.fetchReels(
           page: page,
           limit: state.pageSize,
-          search: targetSearch,
         );
         state = state.copyWith(
           reels: response.data ?? [],
           reelsTotalPages: response.totalPages,
           reelsCurrentPage: response.page,
-          reelSearchKeyword: targetSearch,
         );
       },
     );
   }
 
-  Future<void> fetchPosts({int page = 1, String? search, String? category}) async {
-    final targetSearch = search ?? state.postSearchKeyword;
-    final targetCategory = category ?? state.selectedPostCategory;
-
+  Future<void> fetchPosts({int page = 1}) async {
     await runSafely(
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
@@ -144,15 +125,11 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
         final response = await _repository.fetchPosts(
           page: page,
           limit: state.pageSize,
-          search: targetSearch,
-          category: targetCategory,
         );
         state = state.copyWith(
           posts: response.data ?? [],
           postsTotalPages: response.totalPages,
           postsCurrentPage: response.page,
-          postSearchKeyword: targetSearch,
-          selectedPostCategory: targetCategory,
         );
       },
     );
@@ -162,56 +139,54 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
-    await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        final String? url = await _mediaService.uploadImage('explore/posts/', image);
-        if (url == null) {
-          throw const UnknownException('Failed to upload image');
-        }
-        state = state.copyWith(pickedImageUrl: url);
-      },
-    );
+    await runSafely(showLoading: true, () async {
+      final String? url = await _mediaService.uploadImage(
+        'explore/posts/',
+        image,
+      );
+      if (url == null) {
+        throw const UnknownException('Failed to upload image');
+      }
+      state = state.copyWith(pickedImageUrl: url);
+    });
   }
 
   Future<void> pickAndUploadThumbnail() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
-    await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        final String? url = await _mediaService.uploadImage('explore/reels/thumbnails/', image);
-        if (url == null) {
-          throw const UnknownException('Failed to upload thumbnail');
-        }
-        state = state.copyWith(pickedThumbnailUrl: url);
-      },
-    );
+    await runSafely(showLoading: true, () async {
+      final String? url = await _mediaService.uploadImage(
+        'explore/reels/thumbnails/',
+        image,
+      );
+      if (url == null) {
+        throw const UnknownException('Failed to upload thumbnail');
+      }
+      state = state.copyWith(pickedThumbnailUrl: url);
+    });
   }
 
   Future<void> pickAndUploadVideo() async {
     final FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.video,
       allowMultiple: false,
+      withData: true,
     );
-    
+
     if (result == null || result.files.isEmpty) return;
     final file = result.files.first;
 
-    await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        final String? url = await _mediaService.uploadFile('explore/reels/', file);
-        if (url == null) {
-          throw const UnknownException('Failed to upload video');
-        }
-        state = state.copyWith(pickedVideoUrl: url);
-      },
-    );
+    await runSafely(showLoading: true, () async {
+      final String? url = await _mediaService.uploadMedia(
+        path: 'explore/reels/',
+        file: file,
+      );
+      if (url == null) {
+        throw const UnknownException('Failed to upload video');
+      }
+      state = state.copyWith(pickedVideoUrl: url);
+    });
   }
 
   void clearPickedFiles() {
@@ -220,28 +195,30 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
 
   Future<bool> createReel(CreateReelRequest reel) async {
     return await runSafely(
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        await _repository.createReel(reel);
-        EasyLoading.showSuccess('Reel created successfully');
-        clearPickedFiles();
-        await fetchReels();
-        return true;
-      },
-    ) ?? false;
+          onLoadingChange: (l) => state = state.copyWith(loading: l),
+          () async {
+            await _repository.createReel(reel);
+            EasyLoading.showSuccess('Reel created successfully');
+            clearPickedFiles();
+            await fetchReels();
+            return true;
+          },
+        ) ??
+        false;
   }
 
   Future<bool> createPost(CreateCommunityPostRequest post) async {
     return await runSafely(
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        await _repository.createPost(post);
-        EasyLoading.showSuccess('Post created successfully');
-        clearPickedFiles();
-        await fetchPosts();
-        return true;
-      },
-    ) ?? false;
+          onLoadingChange: (l) => state = state.copyWith(loading: l),
+          () async {
+            await _repository.createPost(post);
+            EasyLoading.showSuccess('Post created successfully');
+            clearPickedFiles();
+            await fetchPosts();
+            return true;
+          },
+        ) ??
+        false;
   }
 
   Future<void> toggleReelVisibility(int id, String currentStatus) async {
