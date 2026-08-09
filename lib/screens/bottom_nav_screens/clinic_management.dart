@@ -41,9 +41,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   // String _selectedPlanFilter = 'All Plans';
   // String _selectedStatusFilter = 'All Statuses';
 
-  int _activePage = 0;
-  int _invitePage = 0;
-  static const int _itemsPerPage = 5;
+  static const int _itemsPerPage = 10;
 
   @override
   void initState() {
@@ -73,10 +71,6 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
             .read(clinicViewModelProvider.notifier)
             .getFounderClinics(search: query);
       }
-    });
-    setState(() {
-      _activePage = 0;
-      _invitePage = 0;
     });
   }
 
@@ -171,15 +165,12 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               onChanged: _onSearchChanged,
               onClear: () {
                 _searchController.clear();
-                setState(() {
-                  _activePage = 0;
-                  _invitePage = 0;
-                });
+                _onSearchChanged('');
               },
             ),
             context.verticalSpace(12),
             SizedBox(
-              height: context.h(600),
+              height: context.h(850),
               child: Column(
                 children: [
                   Expanded(
@@ -206,9 +197,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                     ),
                   ),
                   if ((_tabController.index == 0 && state.totalPages > 1) ||
-                      (_tabController.index == 1 && (inviteClinics.length / _itemsPerPage).ceil() > 1) ||
-                      (_tabController.index == 2 && state.webRequestsTotalPages > 1) ||
-                      (_tabController.index == 3 && state.founderClinicsTotalPages > 1))
+                      (_tabController.index == 1 && state.inviteClinicsTotalPages > 1) ||
+                      (_tabController.index == 2 &&
+                          state.webRequestsTotalPages > 1) ||
+                      (_tabController.index == 3 &&
+                          state.founderClinicsTotalPages > 1))
                     Padding(
                       padding: context.appEdgeInsets(vertical: 24),
                       child: Center(
@@ -216,41 +209,48 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                           totalPages: _tabController.index == 0
                               ? state.totalPages
                               : (_tabController.index == 1
-                                  ? (inviteClinics.length / _itemsPerPage).ceil()
-                                  : (_tabController.index == 2 ? state.webRequestsTotalPages : state.founderClinicsTotalPages)),
+                                  ? state.inviteClinicsTotalPages
+                                  : (_tabController.index == 2
+                                      ? state.webRequestsTotalPages
+                                      : state.founderClinicsTotalPages)),
                           currentPage: _tabController.index == 0
-                              ? _activePage
+                              ? state.currentPage - 1
                               : (_tabController.index == 1
-                                  ? _invitePage
-                                  : (_tabController.index == 2 ? state.webRequestsCurrentPage - 1 : state.founderClinicsCurrentPage - 1)),
+                                  ? state.inviteClinicsCurrentPage - 1
+                                  : (_tabController.index == 2
+                                      ? state.webRequestsCurrentPage - 1
+                                      : state.founderClinicsCurrentPage - 1)),
                           onPageChanged: (pageIndex) {
+                            final targetPage = pageIndex + 1;
+                            final search = _searchController.text.trim();
+                            
                             if (_tabController.index == 0) {
                               ref
                                   .read(clinicViewModelProvider.notifier)
                                   .getClinics(
-                                    page: pageIndex + 1,
-                                    search: _searchController.text.trim(),
+                                    page: targetPage,
+                                    search: search,
                                   );
-                              setState(() {
-                                _activePage = pageIndex;
-                              });
                             } else if (_tabController.index == 1) {
-                              setState(() {
-                                _invitePage = pageIndex;
-                              });
+                              ref
+                                  .read(clinicViewModelProvider.notifier)
+                                  .getInviteClinics(
+                                    page: targetPage,
+                                    search: search,
+                                  );
                             } else if (_tabController.index == 2) {
                               ref
                                   .read(clinicViewModelProvider.notifier)
                                   .getWebRequests(
-                                    page: pageIndex + 1,
-                                    search: _searchController.text.trim(),
+                                    page: targetPage,
+                                    search: search,
                                   );
                             } else if (_tabController.index == 3) {
                               ref
                                   .read(clinicViewModelProvider.notifier)
                                   .getFounderClinics(
-                                    page: pageIndex + 1,
-                                    search: _searchController.text.trim(),
+                                    page: targetPage,
+                                    search: search,
                                   );
                             }
                           },
@@ -609,12 +609,6 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
       return _buildEmptyState();
     }
 
-    final totalPages = (invites.length / _itemsPerPage).ceil();
-    final paginatedInvites = invites
-        .skip(_invitePage * _itemsPerPage)
-        .take(_itemsPerPage)
-        .toList();
-
     return Column(
       children: [
         Expanded(
@@ -651,7 +645,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                     ],
                   ),
                   // Data Rows
-                  ...paginatedInvites.map((clinic) {
+                  ...invites.map((clinic) {
                     return TableRow(
                       decoration: const BoxDecoration(
                         border: Border(
@@ -683,32 +677,6 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
             ),
           ),
         ),
-        if (totalPages > 1)
-          Padding(
-            padding: context.appEdgeInsets(vertical: 24),
-            child: Center(
-              child: NumberPaginator(
-                totalPages: totalPages,
-                currentPage: _invitePage,
-                onPageChanged: (pageIndex) {
-                  if (_tabController.index == 0) {
-                    ref
-                        .read(clinicViewModelProvider.notifier)
-                        .getClinics(search: _searchController.text.trim());
-                  } else {
-                    ref
-                        .read(clinicViewModelProvider.notifier)
-                        .getInviteClinics(
-                          search: _searchController.text.trim(),
-                        );
-                  }
-                  setState(() {
-                    _invitePage = pageIndex;
-                  });
-                },
-              ),
-            ),
-          ),
       ],
     );
   }

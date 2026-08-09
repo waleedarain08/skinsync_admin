@@ -11,6 +11,8 @@ import 'package:skinsync_admin/widgets/app_page_header.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/app_search_field.dart';
+import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/number_paginator.dart';
 import 'package:skinsync_admin/widgets/select_or_create_dropdown_widget.dart';
@@ -42,6 +44,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> with SingleTicker
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(exploreViewModelProvider.notifier).fetchReels();
+      ref.read(exploreViewModelProvider.notifier).fetchPostCategories();
     });
   }
 
@@ -406,28 +409,31 @@ class _ReelsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(exploreViewModelProvider);
     
-    if (state.loading) {
+    if (state.loading && state.reels.isEmpty) {
       return const Center(child: AppLoader());
-    }
-
-    if (state.reels.isEmpty) {
-       return _buildDummyReels(context);
     }
 
     return Column(
       children: [
-        Expanded(
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              crossAxisSpacing: context.w(20),
-              mainAxisSpacing: context.h(20),
-              childAspectRatio: 0.75,
+        _buildFilters(context, ref, state),
+        context.verticalSpace(24),
+        if (state.loading)
+          const Expanded(child: Center(child: AppLoader()))
+        else if (state.reels.isEmpty)
+          Expanded(child: _buildDummyReels(context))
+        else
+          Expanded(
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                crossAxisSpacing: context.w(20),
+                mainAxisSpacing: context.h(20),
+                childAspectRatio: 0.75,
+              ),
+              itemCount: state.reels.length,
+              itemBuilder: (context, index) => _ReelCard(reel: state.reels[index]),
             ),
-            itemCount: state.reels.length,
-            itemBuilder: (context, index) => _ReelCard(reel: state.reels[index]),
           ),
-        ),
         if (state.reelsTotalPages > 1)
           Padding(
             padding: context.appEdgeInsets(vertical: 24),
@@ -440,6 +446,27 @@ class _ReelsTab extends ConsumerWidget {
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildFilters(BuildContext context, WidgetRef ref, ExploreState state) {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            flex: 3,
+            child: AppSearchField(
+              hintText: 'Search reels by title or description...',
+              onChanged: (val) {
+                ref.read(exploreViewModelProvider.notifier).fetchReels(search: val, page: 1);
+              },
+            ),
+          ),
+          const Spacer(),
+        ],
+      ),
     );
   }
 
@@ -604,23 +631,26 @@ class _CommunityTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(exploreViewModelProvider);
     
-    if (state.loading) {
+    if (state.loading && state.posts.isEmpty) {
       return const Center(child: AppLoader());
-    }
-
-    if (state.posts.isEmpty) {
-      return _buildDummyPosts(context);
     }
 
     return Column(
       children: [
-        Expanded(
-          child: ListView.separated(
-            itemCount: state.posts.length,
-            separatorBuilder: (context, index) => context.verticalSpace(16),
-            itemBuilder: (context, index) => _PostListItem(post: state.posts[index]),
+        _buildFilters(context, ref, state),
+        context.verticalSpace(24),
+        if (state.loading)
+          const Expanded(child: Center(child: AppLoader()))
+        else if (state.posts.isEmpty)
+          Expanded(child: _buildDummyPosts(context))
+        else
+          Expanded(
+            child: ListView.separated(
+              itemCount: state.posts.length,
+              separatorBuilder: (context, index) => context.verticalSpace(16),
+              itemBuilder: (context, index) => _PostListItem(post: state.posts[index]),
+            ),
           ),
-        ),
         if (state.postsTotalPages > 1)
           Padding(
             padding: context.appEdgeInsets(vertical: 24),
@@ -633,6 +663,41 @@ class _CommunityTab extends ConsumerWidget {
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildFilters(BuildContext context, WidgetRef ref, ExploreState state) {
+    return BorderdContainerWidget(
+      padding: context.appEdgeInsets(all: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            flex: 3,
+            child: AppSearchField(
+              hintText: 'Search posts by title or content...',
+              onChanged: (val) {
+                ref.read(exploreViewModelProvider.notifier).fetchPosts(search: val, page: 1);
+              },
+            ),
+          ),
+          context.horizontalSpace(16),
+          Expanded(
+            child: CustomDropdown<String>(
+              label: 'Category',
+              hintText: 'All Categories',
+              value: (state.selectedPostCategory == null || state.selectedPostCategory!.isEmpty) ? '' : state.selectedPostCategory,
+              items: [
+                const DropdownMenuItem(value: '', child: Text('All Categories')),
+                ...state.postCategories.map((e) => DropdownMenuItem(value: e.name, child: Text(e.name))),
+              ],
+              onChanged: (val) {
+                ref.read(exploreViewModelProvider.notifier).fetchPosts(category: val ?? '', page: 1);
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 

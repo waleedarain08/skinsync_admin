@@ -25,7 +25,7 @@ class ClinicListResponse extends BaseApiResponseModel<List<ClinicModel>> {
       isSuccess: (json['is_success'] as bool?) ?? false,
       message: json['message'] ?? '',
       data: listData,
-      totalPages: json['total_pages'],
+      totalPages: json['total_pages'] ?? 1,
     );
   }
 

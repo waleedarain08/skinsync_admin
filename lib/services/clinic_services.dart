@@ -57,7 +57,7 @@ class ClinicService implements ClinicRepository {
   }
 
   @override
-  Future<List<ClinicModel>> getClinics({
+  Future<ClinicListResponse> getClinics({
     required int page,
     required int limit,
     String? search,
@@ -80,11 +80,11 @@ class ClinicService implements ClinicRepository {
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
-    return response.data ?? [];
+    return response;
   }
 
   @override
-  Future<List<ClinicModel>> getInviteClinics({
+  Future<ClinicListResponse> getInviteClinics({
     required int page,
     required int limit,
     String? search,
@@ -103,16 +103,11 @@ class ClinicService implements ClinicRepository {
       queryParams: queryParams,
     );
 
-    final isSuccess = jsonResponse['is_success'] as bool? ?? false;
-    if (!isSuccess) {
-      throw BadRequestException(jsonResponse['message'] ?? 'Failed to get invite clinics');
+    final response = ClinicListResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
     }
-
-    final data = jsonResponse['data'];
-    if (data is List) {
-      return data.map((e) => ClinicModel.fromJson(e)).toList();
-    }
-    return [];
+    return response;
   }
 
   @override

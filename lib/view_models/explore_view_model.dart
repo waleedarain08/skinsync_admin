@@ -36,12 +36,19 @@ class ExploreState extends BaseStateModel {
     this.postsTotalPages = 1,
     this.reelsCurrentPage = 1,
     this.postsCurrentPage = 1,
-    this.pageSize = 20,
+    this.pageSize = 10,
     this.pickedImageUrl,
     this.pickedVideoUrl,
     this.pickedThumbnailUrl,
     this.postCategories = const [],
+    this.postSearchKeyword = '',
+    this.reelSearchKeyword = '',
+    this.selectedPostCategory,
   });
+
+  final String postSearchKeyword;
+  final String reelSearchKeyword;
+  final String? selectedPostCategory;
 
   ExploreState copyWith({
     bool? loading,
@@ -56,6 +63,9 @@ class ExploreState extends BaseStateModel {
     String? pickedVideoUrl,
     String? pickedThumbnailUrl,
     List<PostCategoryModel>? postCategories,
+    String? postSearchKeyword,
+    String? reelSearchKeyword,
+    String? selectedPostCategory,
   }) {
     return ExploreState(
       loading: loading ?? this.loading,
@@ -70,6 +80,9 @@ class ExploreState extends BaseStateModel {
       pickedVideoUrl: pickedVideoUrl ?? this.pickedVideoUrl,
       pickedThumbnailUrl: pickedThumbnailUrl ?? this.pickedThumbnailUrl,
       postCategories: postCategories ?? this.postCategories,
+      postSearchKeyword: postSearchKeyword ?? this.postSearchKeyword,
+      reelSearchKeyword: reelSearchKeyword ?? this.reelSearchKeyword,
+      selectedPostCategory: selectedPostCategory ?? this.selectedPostCategory,
     );
   }
 
@@ -98,31 +111,48 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
   final ImagePicker _picker = ImagePicker();
   final MediaService _mediaService = MediaService();
 
-  Future<void> fetchReels({int page = 1}) async {
+  Future<void> fetchReels({int page = 1, String? search}) async {
+    final targetSearch = search ?? state.reelSearchKeyword;
+
     await runSafely(
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
-        final response = await _repository.fetchReels(page: page, limit: state.pageSize);
+        final response = await _repository.fetchReels(
+          page: page,
+          limit: state.pageSize,
+          search: targetSearch,
+        );
         state = state.copyWith(
           reels: response.data ?? [],
           reelsTotalPages: response.totalPages,
           reelsCurrentPage: response.page,
+          reelSearchKeyword: targetSearch,
         );
       },
     );
   }
 
-  Future<void> fetchPosts({int page = 1}) async {
+  Future<void> fetchPosts({int page = 1, String? search, String? category}) async {
+    final targetSearch = search ?? state.postSearchKeyword;
+    final targetCategory = category ?? state.selectedPostCategory;
+
     await runSafely(
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
-        final response = await _repository.fetchPosts(page: page, limit: state.pageSize);
+        final response = await _repository.fetchPosts(
+          page: page,
+          limit: state.pageSize,
+          search: targetSearch,
+          category: targetCategory,
+        );
         state = state.copyWith(
           posts: response.data ?? [],
           postsTotalPages: response.totalPages,
           postsCurrentPage: response.page,
+          postSearchKeyword: targetSearch,
+          selectedPostCategory: targetCategory,
         );
       },
     );

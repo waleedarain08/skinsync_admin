@@ -30,6 +30,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
   Future<void> initialize() async {
     getClinics(page: state.currentPage, limit: state.pageSize);
+    getInviteClinics(page: state.inviteClinicsCurrentPage, limit: state.pageSize);
     getWebRequests(page: state.webRequestsCurrentPage, limit: state.pageSize);
     getFounderClinics(page: state.founderClinicsCurrentPage, limit: state.pageSize);
   }
@@ -44,15 +45,16 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
         final int targetPage = page ?? state.currentPage;
         final int targetLimit = limit ?? state.pageSize;
         try {
-          final clinics = await _clinicRepository.getClinics(
+          final response = await _clinicRepository.getClinics(
             page: targetPage,
             limit: targetLimit,
             search: search ?? '',
           );
-          if (clinics.isNotEmpty) {
+          if (response.data != null && response.data!.isNotEmpty) {
             state = state.copyWith(
-              clinics: clinics,
+              clinics: response.data,
               currentPage: targetPage,
+              totalPages: response.totalPages,
               pageSize: targetLimit,
             );
             return true;
@@ -66,6 +68,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
           clinics: [],
           currentPage: targetPage,
           pageSize: targetLimit,
+          totalPages: 1,
         );
         return true;
       },
@@ -101,7 +104,16 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
   }
 
   void clearClinicsPagination() {
-    state = state.copyWith(totalPages: 1, currentPage: 1);
+    state = state.copyWith(
+      totalPages: 1, 
+      currentPage: 1, 
+      inviteClinicsTotalPages: 1, 
+      inviteClinicsCurrentPage: 1,
+      webRequestsTotalPages: 1,
+      webRequestsCurrentPage: 1,
+      founderClinicsTotalPages: 1,
+      founderClinicsCurrentPage: 1,
+    );
   }
 
   Future<bool?> getInviteClinics({
@@ -116,18 +128,19 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
         state = state.copyWith(loading: loading);
       },
       () async {
-        final int targetPage = page ?? state.currentPage;
+        final int targetPage = page ?? state.inviteClinicsCurrentPage;
         final int targetLimit = limit ?? state.pageSize;
         try {
-          final invites = await _clinicRepository.getInviteClinics(
+          final response = await _clinicRepository.getInviteClinics(
             page: targetPage,
             limit: targetLimit,
             search: search,
             status: status,
           );
           state = state.copyWith(
-            inviteClinics: invites,
-            currentPage: targetPage,
+            inviteClinics: response.data ?? [],
+            inviteClinicsCurrentPage: targetPage,
+            inviteClinicsTotalPages: response.totalPages,
             pageSize: targetLimit,
           );
           return true;
@@ -137,7 +150,8 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
         state = state.copyWith(
           inviteClinics: [],
-          currentPage: targetPage,
+          inviteClinicsCurrentPage: targetPage,
+          inviteClinicsTotalPages: 1,
           pageSize: targetLimit,
         );
         return true;
@@ -481,6 +495,8 @@ class ClinicState extends BaseStateModel {
   final String? clinicImage;
   final String? bannerImage;
   final int pageSize;
+  final int inviteClinicsTotalPages;
+  final int inviteClinicsCurrentPage;
   final int webRequestsTotalPages;
   final int webRequestsCurrentPage;
   final int founderClinicsTotalPages;
@@ -506,6 +522,8 @@ class ClinicState extends BaseStateModel {
     this.bannerImage,
     this.clinicImage,
     this.pageSize = 10,
+    this.inviteClinicsTotalPages = 1,
+    this.inviteClinicsCurrentPage = 1,
     this.webRequestsTotalPages = 1,
     this.webRequestsCurrentPage = 1,
     this.founderClinicsTotalPages = 1,
@@ -532,6 +550,8 @@ class ClinicState extends BaseStateModel {
     int? currentPage,
     int? pageSize,
     int? totalPages,
+    int? inviteClinicsTotalPages,
+    int? inviteClinicsCurrentPage,
     int? webRequestsTotalPages,
     int? webRequestsCurrentPage,
     int? founderClinicsTotalPages,
@@ -558,6 +578,8 @@ class ClinicState extends BaseStateModel {
       currentPage: currentPage ?? this.currentPage,
       pageSize: pageSize ?? this.pageSize,
       totalPages: totalPages ?? this.totalPages,
+      inviteClinicsTotalPages: inviteClinicsTotalPages ?? this.inviteClinicsTotalPages,
+      inviteClinicsCurrentPage: inviteClinicsCurrentPage ?? this.inviteClinicsCurrentPage,
       webRequestsTotalPages: webRequestsTotalPages ?? this.webRequestsTotalPages,
       webRequestsCurrentPage: webRequestsCurrentPage ?? this.webRequestsCurrentPage,
       founderClinicsTotalPages: founderClinicsTotalPages ?? this.founderClinicsTotalPages,

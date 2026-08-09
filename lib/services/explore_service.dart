@@ -11,10 +11,20 @@ class ExploreService implements ExploreRepository {
   final ApiBaseHelper _api = ApiBaseHelper();
 
   @override
-  Future<ReelsListResponse> fetchReels({int page = 1, int limit = 20}) async {
+  Future<ReelsListResponse> fetchReels({
+    int page = 1,
+    int limit = 20,
+    String? search,
+  }) async {
+    final Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+    if (search != null && search.isNotEmpty) queryParams['search'] = search;
+
     final response = await _api.get(
       Endpoint.explorerReels,
-      queryParams: {'page': page.toString(), 'limit': limit.toString()},
+      queryParams: queryParams,
     );
     return ReelsListResponse.fromJson(response);
   }
@@ -42,10 +52,22 @@ class ExploreService implements ExploreRepository {
   }
 
   @override
-  Future<CommunityPostsListResponse> fetchPosts({int page = 1, int limit = 20}) async {
+  Future<CommunityPostsListResponse> fetchPosts({
+    int page = 1,
+    int limit = 20,
+    String? search,
+    String? category,
+  }) async {
+    final Map<String, String> queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+    if (search != null && search.isNotEmpty) queryParams['search'] = search;
+    if (category != null && category.isNotEmpty) queryParams['category'] = category;
+
     final response = await _api.get(
       Endpoint.explorerCommunity,
-      queryParams: {'page': page.toString(), 'limit': limit.toString()},
+      queryParams: queryParams,
     );
     return CommunityPostsListResponse.fromJson(response);
   }

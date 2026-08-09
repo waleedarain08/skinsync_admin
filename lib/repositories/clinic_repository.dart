@@ -6,6 +6,7 @@ import 'package:skinsync_admin/models/responses/clinic_web_request_detail_respon
 import 'package:skinsync_admin/models/responses/clinic_web_request_list_response.dart';
 import 'package:skinsync_admin/models/responses/founder_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/founder_clinic_list_response.dart';
+import 'package:skinsync_admin/models/responses/clinic_list_response.dart';
 import 'package:skinsync_admin/models/requests/send_notes_request.dart';
 
 import '../models/requests/register_clinic_request_model.dart';
@@ -13,13 +14,13 @@ import '../models/requests/register_clinic_request_model.dart';
 abstract class ClinicRepository {
   Future<BaseApiResponseModel> registerClinic({required RegisterClinicReqModel req});
   Future<ClinicModel> updateClinic({required int id, required RegisterClinicReqModel req});
-  Future<List<ClinicModel>> getClinics({
+  Future<ClinicListResponse> getClinics({
     required int page,
     required int limit,
     String? search,
     String? status,
   });
-  Future<List<ClinicModel>> getInviteClinics({
+  Future<ClinicListResponse> getInviteClinics({
     required int page,
     required int limit,
     String? search,
