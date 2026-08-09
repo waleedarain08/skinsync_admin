@@ -44,35 +44,44 @@ class ExploreState extends BaseStateModel {
     this.postCategories = const [],
   });
 
-  ExploreState copyWith({
-    bool? loading,
-    List<ReelModel>? reels,
-    List<CommunityPostModel>? posts,
-    int? reelsTotalPages,
-    int? postsTotalPages,
-    int? reelsCurrentPage,
-    int? postsCurrentPage,
-    int? pageSize,
-    String? pickedImageUrl,
-    String? pickedVideoUrl,
-    String? pickedThumbnailUrl,
-    List<PostCategoryModel>? postCategories,
-  }) {
-    return ExploreState(
-      loading: loading ?? this.loading,
-      reels: reels ?? this.reels,
-      posts: posts ?? this.posts,
-      reelsTotalPages: reelsTotalPages ?? this.reelsTotalPages,
-      postsTotalPages: postsTotalPages ?? this.postsTotalPages,
-      reelsCurrentPage: reelsCurrentPage ?? this.reelsCurrentPage,
-      postsCurrentPage: postsCurrentPage ?? this.postsCurrentPage,
-      pageSize: pageSize ?? this.pageSize,
-      pickedImageUrl: pickedImageUrl ?? this.pickedImageUrl,
-      pickedVideoUrl: pickedVideoUrl ?? this.pickedVideoUrl,
-      pickedThumbnailUrl: pickedThumbnailUrl ?? this.pickedThumbnailUrl,
-      postCategories: postCategories ?? this.postCategories,
-    );
-  }
+ ExploreState copyWith({
+  bool? loading,
+  List<ReelModel>? reels,
+  List<CommunityPostModel>? posts,
+  int? reelsTotalPages,
+  int? postsTotalPages,
+  int? reelsCurrentPage,
+  int? postsCurrentPage,
+  int? pageSize,
+  String? pickedImageUrl,
+  String? pickedVideoUrl,
+  String? pickedThumbnailUrl,
+  bool clearPickedImage = false,
+  bool clearPickedVideo = false,
+  bool clearPickedThumbnail = false,
+  List<PostCategoryModel>? postCategories,
+}) {
+  return ExploreState(
+    loading: loading ?? this.loading,
+    reels: reels ?? this.reels,
+    posts: posts ?? this.posts,
+    reelsTotalPages: reelsTotalPages ?? this.reelsTotalPages,
+    postsTotalPages: postsTotalPages ?? this.postsTotalPages,
+    reelsCurrentPage: reelsCurrentPage ?? this.reelsCurrentPage,
+    postsCurrentPage: postsCurrentPage ?? this.postsCurrentPage,
+    pageSize: pageSize ?? this.pageSize,
+    pickedImageUrl: clearPickedImage
+        ? null
+        : (pickedImageUrl ?? this.pickedImageUrl),
+    pickedVideoUrl: clearPickedVideo
+        ? null
+        : (pickedVideoUrl ?? this.pickedVideoUrl),
+    pickedThumbnailUrl: clearPickedThumbnail
+        ? null
+        : (pickedThumbnailUrl ?? this.pickedThumbnailUrl),
+    postCategories: postCategories ?? this.postCategories,
+  );
+}
 
   ExploreState clearFiles() {
     return ExploreState(
@@ -116,6 +125,22 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
       },
     );
   }
+
+
+
+
+
+void clearPickedImageOnly() {
+  state = state.copyWith(clearPickedImage: true);
+}
+
+void clearPickedVideoOnly() {
+  state = state.copyWith(clearPickedVideo: true);
+}
+
+void clearPickedThumbnailOnly() {
+  state = state.copyWith(clearPickedThumbnail: true);
+}
 
   Future<void> fetchPosts({int page = 1}) async {
     await runSafely(

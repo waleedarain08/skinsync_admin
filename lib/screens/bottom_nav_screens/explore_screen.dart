@@ -153,6 +153,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
                             onTap: () => ref
                                 .read(exploreViewModelProvider.notifier)
                                 .pickAndUploadThumbnail(),
+                            onClear: () => ref
+                                .read(exploreViewModelProvider.notifier)
+                                .clearPickedThumbnailOnly(),
                             isImage: true,
                           ),
                         ),
@@ -165,6 +168,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
                             onTap: () => ref
                                 .read(exploreViewModelProvider.notifier)
                                 .pickAndUploadVideo(),
+                            onClear: () => ref
+                                .read(exploreViewModelProvider.notifier)
+                                .clearPickedVideoOnly(),
                           ),
                         ),
                       ],
@@ -272,6 +278,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
                       onTap: () => ref
                           .read(exploreViewModelProvider.notifier)
                           .pickAndUploadImage(),
+                      onClear: () => ref
+                          .read(exploreViewModelProvider.notifier)
+                          .clearPickedImageOnly(),
                       isImage: true,
                     ),
                     context.verticalSpace(16),
@@ -412,6 +421,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
     required String? url,
     required IconData icon,
     required VoidCallback onTap,
+    required VoidCallback onClear,
     bool isImage = false,
   }) {
     return Column(
@@ -472,12 +482,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
                           top: 8,
                           right: 8,
                           child: GestureDetector(
-                            onTap: () {
-                              // Specific clear logic could be added here, but for now we clear all
-                              ref
-                                  .read(exploreViewModelProvider.notifier)
-                                  .clearPickedFiles();
-                            },
+                            onTap: onClear,
                             child: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: const BoxDecoration(

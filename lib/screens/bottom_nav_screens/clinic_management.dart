@@ -169,101 +169,106 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               },
             ),
             context.verticalSpace(12),
-            SizedBox(
-              height: context.h(850),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        _buildActiveClinicsTab(context, clinics, state.loading),
-                        _buildPendingInvitationsTab(
-                          context,
-                          inviteClinics,
-                          state.loading,
-                        ),
-                        _buildWebRequestsTab(
-                          context,
-                          webRequests,
-                          state.loading,
-                        ),
-                        _buildFounderClinicsTab(
-                          context,
-                          founderClinics,
-                          state.loading,
-                        ),
-                      ],
-                    ),
-                  ),
-                  if ((_tabController.index == 0 && state.totalPages > 1) ||
-                      (_tabController.index == 1 && state.inviteClinicsTotalPages > 1) ||
-                      (_tabController.index == 2 &&
-                          state.webRequestsTotalPages > 1) ||
-                      (_tabController.index == 3 &&
-                          state.founderClinicsTotalPages > 1))
-                    Padding(
-                      padding: context.appEdgeInsets(vertical: 24),
-                      child: Center(
-                        child: NumberPaginator(
-                          totalPages: _tabController.index == 0
-                              ? state.totalPages
-                              : (_tabController.index == 1
-                                  ? state.inviteClinicsTotalPages
-                                  : (_tabController.index == 2
-                                      ? state.webRequestsTotalPages
-                                      : state.founderClinicsTotalPages)),
-                          currentPage: _tabController.index == 0
-                              ? state.currentPage - 1
-                              : (_tabController.index == 1
-                                  ? state.inviteClinicsCurrentPage - 1
-                                  : (_tabController.index == 2
-                                      ? state.webRequestsCurrentPage - 1
-                                      : state.founderClinicsCurrentPage - 1)),
-                          onPageChanged: (pageIndex) {
-                            final targetPage = pageIndex + 1;
-                            final search = _searchController.text.trim();
-                            
-                            if (_tabController.index == 0) {
-                              ref
-                                  .read(clinicViewModelProvider.notifier)
-                                  .getClinics(
-                                    page: targetPage,
-                                    search: search,
-                                  );
-                            } else if (_tabController.index == 1) {
-                              ref
-                                  .read(clinicViewModelProvider.notifier)
-                                  .getInviteClinics(
-                                    page: targetPage,
-                                    search: search,
-                                  );
-                            } else if (_tabController.index == 2) {
-                              ref
-                                  .read(clinicViewModelProvider.notifier)
-                                  .getWebRequests(
-                                    page: targetPage,
-                                    search: search,
-                                  );
-                            } else if (_tabController.index == 3) {
-                              ref
-                                  .read(clinicViewModelProvider.notifier)
-                                  .getFounderClinics(
-                                    page: targetPage,
-                                    search: search,
-                                  );
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                ],
-              ),
+            context.verticalSpace(12),
+            _buildTabContent(
+              context,
+              clinics,
+              inviteClinics,
+              webRequests,
+              founderClinics,
+              state,
             ),
+            if ((_tabController.index == 0 && state.totalPages > 1) ||
+                (_tabController.index == 1 &&
+                    (inviteClinics.length / _itemsPerPage).ceil() > 1) ||
+                (_tabController.index == 2 &&
+                    state.webRequestsTotalPages > 1) ||
+                (_tabController.index == 3 &&
+                    state.founderClinicsTotalPages > 1))
+              Padding(
+                padding: context.appEdgeInsets(vertical: 24),
+                child: Center(
+                  child: NumberPaginator(
+                    totalPages: _tabController.index == 0
+                        ? state.totalPages
+                        : (_tabController.index == 1
+                              ? (inviteClinics.length / _itemsPerPage).ceil()
+                              : (_tabController.index == 2
+                                    ? state.webRequestsTotalPages
+                                    : state.founderClinicsTotalPages)),
+                    currentPage: _tabController.index == 0
+                        ? _activePage
+                        : (_tabController.index == 1
+                              ? _invitePage
+                              : (_tabController.index == 2
+                                    ? state.webRequestsCurrentPage - 1
+                                    : state.founderClinicsCurrentPage - 1)),
+                    onPageChanged: (pageIndex) {
+                      if (_tabController.index == 0) {
+                        ref
+                            .read(clinicViewModelProvider.notifier)
+                            .getClinics(
+                              page: pageIndex + 1,
+                              search: _searchController.text.trim(),
+                            );
+                        setState(() {
+                          _activePage = pageIndex;
+                        });
+                      } else if (_tabController.index == 1) {
+                        ref
+                            .read(clinicViewModelProvider.notifier)
+                            .getInviteClinics(
+                              page: pageIndex + 1,
+                              search: _searchController.text.trim(),
+                            );
+                      } else if (_tabController.index == 2) {
+                        ref
+                            .read(clinicViewModelProvider.notifier)
+                            .getWebRequests(
+                              page: pageIndex + 1,
+                              search: _searchController.text.trim(),
+                            );
+                      } else if (_tabController.index == 3) {
+                        ref
+                            .read(clinicViewModelProvider.notifier)
+                            .getFounderClinics(
+                              page: pageIndex + 1,
+                              search: _searchController.text.trim(),
+                            );
+                      }
+                    },
+                  ),
+                ),
+              ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildTabContent(
+    BuildContext context,
+    List<ClinicModel> clinics,
+    List<ClinicModel> inviteClinics,
+    List<ClinicWebRequestModel> webRequests,
+    List<FounderClinicModel> founderClinics,
+    dynamic state,
+  ) {
+    switch (_tabController.index) {
+      case 1:
+        return _buildPendingInvitationsTab(
+          context,
+          inviteClinics,
+          state.loading,
+        );
+      case 2:
+        return _buildWebRequestsTab(context, webRequests, state.loading);
+      case 3:
+        return _buildFounderClinicsTab(context, founderClinics, state.loading);
+      case 0:
+      default:
+        return _buildActiveClinicsTab(context, clinics, state.loading);
+    }
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -609,75 +614,65 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
       return _buildEmptyState();
     }
 
-    return Column(
-      children: [
-        Expanded(
-          child: BorderdContainerWidget(
-            padding: EdgeInsets.zero,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12.r),
-              child: Table(
-                columnWidths: const {
-                  0: FlexColumnWidth(3.5), // Clinic Name / logo
-                  1: FlexColumnWidth(3), // Contact Detail
-                  2: FlexColumnWidth(3.5), // Location / Address
-                  3: FlexColumnWidth(2), // Invited Date
-                  4: FlexColumnWidth(2), // Status
-                  5: FlexColumnWidth(1.8), // Actions
-                },
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                children: [
-                  // Header Row
-                  TableRow(
-                    decoration: const BoxDecoration(
-                      color: CustomColors.whiteGrey,
-                      border: Border(
-                        bottom: BorderSide(color: CustomColors.border),
-                      ),
-                    ),
-                    children: [
-                      _tableHeaderCell('PROSPECT CLINIC'),
-                      _tableHeaderCell('CONTACT DETAIL'),
-                      _tableHeaderCell('LOCATION'),
-                      _tableHeaderCell('INVITED DATE'),
-                      _tableHeaderCell('STATUS'),
-                      _tableHeaderCell('ACTIONS'),
-                    ],
-                  ),
-                  // Data Rows
-                  ...invites.map((clinic) {
-                    return TableRow(
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(color: CustomColors.border),
-                        ),
-                      ),
-                      children: [
-                        _clinicNameCell(clinic.name ?? '', clinic.logo),
-                        _clinicContactCell(
-                          clinic.email ?? '',
-                          clinic.phone ?? '',
-                          null,
-                        ),
-                        _tableTextCell(
-                          clinic.address ?? '',
-                          style: context.fonts.grey14w400,
-                        ),
-                        _tableTextCell(
-                          _formatDate(clinic.createdAt),
-                          style: context.fonts.grey14w400,
-                        ),
-                        _invitationStatusBadgeCell(clinic.invitationStatus),
-                        _inviteActionsCell(clinic),
-                      ],
-                    );
-                  }),
-                ],
+    return BorderdContainerWidget(
+      padding: EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: Table(
+          columnWidths: const {
+            0: FlexColumnWidth(3.5),
+            1: FlexColumnWidth(3),
+            2: FlexColumnWidth(3.5),
+            3: FlexColumnWidth(2),
+            4: FlexColumnWidth(2),
+            5: FlexColumnWidth(1.8),
+          },
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          children: [
+            TableRow(
+              decoration: const BoxDecoration(
+                color: CustomColors.whiteGrey,
+                border: Border(bottom: BorderSide(color: CustomColors.border)),
               ),
+              children: [
+                _tableHeaderCell('PROSPECT CLINIC'),
+                _tableHeaderCell('CONTACT DETAIL'),
+                _tableHeaderCell('LOCATION'),
+                _tableHeaderCell('INVITED DATE'),
+                _tableHeaderCell('STATUS'),
+                _tableHeaderCell('ACTIONS'),
+              ],
             ),
-          ),
+            ...invites.map((clinic) {
+              return TableRow(
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: CustomColors.border),
+                  ),
+                ),
+                children: [
+                  _clinicNameCell(clinic.name ?? '', clinic.logo),
+                  _clinicContactCell(
+                    clinic.email ?? '',
+                    clinic.phone ?? '',
+                    null,
+                  ),
+                  _tableTextCell(
+                    clinic.address ?? '',
+                    style: context.fonts.grey14w400,
+                  ),
+                  _tableTextCell(
+                    _formatDate(clinic.createdAt),
+                    style: context.fonts.grey14w400,
+                  ),
+                  _invitationStatusBadgeCell(clinic.invitationStatus),
+                  _inviteActionsCell(clinic),
+                ],
+              );
+            }),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -872,7 +867,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                   ),
                 ),
                 children: [
-                  _tableTextCell(request.clinicName ?? 'N/A', style: context.fonts.black14w600),
+                  _tableTextCell(
+                    request.clinicName ?? 'N/A',
+                    style: context.fonts.black14w600,
+                  ),
                   _clinicContactCell(
                     request.ownerEmail,
                     request.contactNumber,
@@ -910,7 +908,9 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               color: CustomColors.grey,
             ),
             onPressed: () async {
-              final success = await ref.read(clinicViewModelProvider.notifier).getClinicDetail(clinic.id!);
+              final success = await ref
+                  .read(clinicViewModelProvider.notifier)
+                  .getClinicDetail(clinic.id!);
               if (success && context.mounted) {
                 ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
                 context.push(ClinicDetailScreen.routeName);
@@ -974,19 +974,31 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                   ),
                 ),
                 children: [
-                  _tableTextCell(clinic.clinicName ?? 'N/A', style: context.fonts.black14w600),
+                  _tableTextCell(
+                    clinic.clinicName ?? 'N/A',
+                    style: context.fonts.black14w600,
+                  ),
                   _clinicContactCell(
                     clinic.email,
                     clinic.phone,
                     clinic.contactName,
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 16.h,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('EMR: ${clinic.currentEmr ?? "N/A"}', style: context.fonts.grey12w400),
-                        Text('Staff: ${clinic.numberOfProviders ?? "0"}', style: context.fonts.grey12w400),
+                        Text(
+                          'EMR: ${clinic.currentEmr ?? "N/A"}',
+                          style: context.fonts.grey12w400,
+                        ),
+                        Text(
+                          'Staff: ${clinic.numberOfProviders ?? "0"}',
+                          style: context.fonts.grey12w400,
+                        ),
                       ],
                     ),
                   ),
@@ -1018,9 +1030,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               color: CustomColors.grey,
             ),
             onPressed: () async {
-              final success = await ref.read(clinicViewModelProvider.notifier).getFounderClinicDetail(clinic.id!);
+              final success = await ref
+                  .read(clinicViewModelProvider.notifier)
+                  .getFounderClinicDetail(clinic.id!);
               if (success && context.mounted) {
-                ref.read(clinicViewModelProvider.notifier).selectFounderClinic(clinic);
+                ref
+                    .read(clinicViewModelProvider.notifier)
+                    .selectFounderClinic(clinic);
                 context.push(FounderClinicDetailScreen.routeName);
               }
             },
@@ -1043,9 +1059,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               color: CustomColors.grey,
             ),
             onPressed: () async {
-              final success = await ref.read(clinicViewModelProvider.notifier).getWebRequestDetail(request.id!);
+              final success = await ref
+                  .read(clinicViewModelProvider.notifier)
+                  .getWebRequestDetail(request.id!);
               if (success && context.mounted) {
-                ref.read(clinicViewModelProvider.notifier).selectWebRequest(request);
+                ref
+                    .read(clinicViewModelProvider.notifier)
+                    .selectWebRequest(request);
                 context.push(ClinicWebRequestDetailScreen.routeName);
               }
             },
@@ -1068,9 +1088,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               color: CustomColors.grey,
             ),
             onPressed: () async {
-              final success = await ref.read(clinicViewModelProvider.notifier).getInviteClinicDetail(clinic.id!);
+              final success = await ref
+                  .read(clinicViewModelProvider.notifier)
+                  .getInviteClinicDetail(clinic.id!);
               if (success && context.mounted) {
-                ref.read(clinicViewModelProvider.notifier).selectInviteClinic(clinic);
+                ref
+                    .read(clinicViewModelProvider.notifier)
+                    .selectInviteClinic(clinic);
                 context.push(InviteClinicDetailScreen.routeName);
               }
             },

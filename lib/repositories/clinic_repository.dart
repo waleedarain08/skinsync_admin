@@ -1,6 +1,7 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
+import 'package:skinsync_admin/models/responses/clinic_list_response.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/clinic_web_request_detail_response.dart';
 import 'package:skinsync_admin/models/responses/clinic_web_request_list_response.dart';

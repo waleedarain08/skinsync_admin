@@ -83,33 +83,32 @@ class ClinicService implements ClinicRepository {
     return response;
   }
 
-  @override
-  Future<ClinicListResponse> getInviteClinics({
-    required int page,
-    required int limit,
-    String? search,
-    String? status,
-  }) async {
-    final Map<String, String> queryParams = {
-      'page': page.toString(),
-      'limit': limit.toString(),
-      'search': search ?? 'null',
-    };
-    if (status != null && status.isNotEmpty) {
-      queryParams['status'] = status;
-    }
-    final jsonResponse = await _api.get(
-      Endpoint.inviteClinics,
-      queryParams: queryParams,
-    );
-
-    final response = ClinicListResponse.fromJson(jsonResponse);
-    if (!response.isSuccess) {
-      throw BadRequestException(response.message);
-    }
-    return response;
+ @override
+Future<ClinicListResponse> getInviteClinics({
+  required int page,
+  required int limit,
+  String? search,
+  String? status,
+}) async {
+  final Map<String, String> queryParams = {
+    'page': page.toString(),
+    'limit': limit.toString(),
+    'search': search ?? 'null',
+  };
+  if (status != null && status.isNotEmpty) {
+    queryParams['status'] = status;
   }
+  final jsonResponse = await _api.get(
+    Endpoint.inviteClinics,
+    queryParams: queryParams,
+  );
+  final response = ClinicListResponse.fromJson(jsonResponse);
 
+  if (!response.isSuccess) {
+    throw BadRequestException(response.message);
+  }
+  return response;
+}
   @override
   Future<ClinicWebRequestListResponse> getWebRequests({
     required int page,
