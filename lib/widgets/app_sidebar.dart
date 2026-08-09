@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sidebarx/sidebarx.dart';
+import 'package:skinsync_admin/main.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
@@ -17,7 +18,7 @@ import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 
 abstract final class AppSidebarRoutes {
-  static const routes = <String>[
+  static List<String> get routes => [
     DashboardScreen.routeName,
     ExploreScreen.routeName,
     ClinicManagement.routeName,
@@ -25,24 +26,24 @@ abstract final class AppSidebarRoutes {
     PatientManagement.routeName,
     TreatmentManagementScreen.routeName,
     ProductManagement.routeName,
-    SubscriptionPlansTab.routeName,
-    UserManagement.routeName,
+    if (!isDeploymentMode) SubscriptionPlansTab.routeName,
+    if (!isDeploymentMode) UserManagement.routeName,
     PaymentScreen.routeName,
-    DisputeScreen.routeName,
+    if (!isDeploymentMode) DisputeScreen.routeName,
     PushNotificationScreen.routeName,
     SettingScreen.routeName,
   ];
 
   static int indexOf(String location) {
-    final exact = routes.indexOf(location);
+    final list = routes;
+    final exact = list.indexOf(location);
     if (exact >= 0) return exact;
-    for (var i = 0; i < routes.length; i++) {
-      if (location.startsWith(routes[i])) return i;
+    for (var i = 0; i < list.length; i++) {
+      if (location.startsWith(list[i])) return i;
     }
     return -1;
   }
 }
-
 class AppSidebar extends StatelessWidget {
   const AppSidebar({
     super.key,
@@ -108,31 +109,36 @@ class AppSidebar extends StatelessWidget {
     );
   }
 
-  List<SidebarXItem> _buildItems() {
-    return [
-      SidebarXItem(icon: Icons.grid_view_rounded, label: 'Dashboard', onTap: () => onItemTap(0)),
-      SidebarXItem(icon: Icons.explore_outlined, label: 'Explore', onTap: () => onItemTap(1)),
-      SidebarXItem(icon: Icons.business_rounded, label: 'Clinics', onTap: () => onItemTap(2)),
-      SidebarXItem(icon: Icons.calendar_today_rounded, label: 'Appointments', onTap: () => onItemTap(3)),
-      SidebarXItem(icon: Icons.people_alt_rounded, label: 'Patients', onTap: () => onItemTap(4)),
-      SidebarXItem(icon: Icons.medical_services_rounded, label: 'Treatments', onTap: () => onItemTap(5)),
-      SidebarXItem(icon: Icons.inventory_2_rounded, label: 'Inventory', onTap: () => onItemTap(6)),
-      SidebarXItem(icon: Icons.card_membership_rounded, label: 'Subscriptions', onTap: () => onItemTap(7)),
-      SidebarXItem(icon: Icons.admin_panel_settings_rounded, label: 'Users', onTap: () => onItemTap(8)),
-      SidebarXItem(icon: Icons.account_balance_wallet_rounded, label: 'Payments', onTap: () => onItemTap(9)),
-      SidebarXItem(icon: Icons.gavel_rounded, label: 'Disputes', onTap: () => onItemTap(10)),
-      SidebarXItem(icon: Icons.notifications_active_rounded, label: 'Notifications', onTap: () => onItemTap(11)),
-      SidebarXItem(icon: Icons.settings_rounded, label: 'Settings', onTap: () => onItemTap(12)),
-    ];
-  }
+ List<SidebarXItem> _buildItems() {
+  int i = 0;
+  SidebarXItem item(IconData icon, String label) =>
+      SidebarXItem(icon: icon, label: label, onTap: () => onItemTap(i++));
 
-  Widget _separatorBuilder(BuildContext context, int index, SidebarXController controller) {
-    if (index == 0) return _SectionLabel(title: 'NETWORK', controller: controller);
-    if (index == 4) return _SectionLabel(title: 'OPERATIONS', controller: controller);
-    if (index == 7) return _SectionLabel(title: 'FINANCIALS', controller: controller);
-    if (index == 9) return _SectionLabel(title: 'SYSTEM', controller: controller);
-    return context.verticalSpace(2);
-  }
+  return [
+    item(Icons.grid_view_rounded, 'Dashboard'),
+    item(Icons.explore_outlined, 'Explore'),
+    item(Icons.business_rounded, 'Clinics'),
+    item(Icons.calendar_today_rounded, 'Appointments'),
+    item(Icons.people_alt_rounded, 'Patients'),
+    item(Icons.medical_services_rounded, 'Treatments'),
+    item(Icons.inventory_2_rounded, 'Inventory'),
+    if (!isDeploymentMode) item(Icons.card_membership_rounded, 'Subscriptions'),
+    if (!isDeploymentMode) item(Icons.admin_panel_settings_rounded, 'Users'),
+    item(Icons.account_balance_wallet_rounded, 'Payments'),
+    if (!isDeploymentMode) item(Icons.gavel_rounded, 'Disputes'),
+    item(Icons.notifications_active_rounded, 'Notifications'),
+    item(Icons.settings_rounded, 'Settings'),
+  ];
+}
+ Widget _separatorBuilder(BuildContext context, int index, SidebarXController controller) {
+  final financialsIndex = !isDeploymentMode ? 7 : -1;
+  final systemIndex = !isDeploymentMode ? 9 : 7;
+  if (index == 0) return _SectionLabel(title: 'NETWORK', controller: controller);
+  if (index == 4) return _SectionLabel(title: 'OPERATIONS', controller: controller);
+  if (index == financialsIndex) return _SectionLabel(title: 'FINANCIALS', controller: controller);
+  if (index == systemIndex) return _SectionLabel(title: 'SYSTEM', controller: controller);
+  return context.verticalSpace(2);
+}
 
   Widget _headerBuilder(BuildContext context, bool extended) {
     return AnimatedContainer(
