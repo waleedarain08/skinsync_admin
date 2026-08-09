@@ -10,11 +10,11 @@ class SettingService implements SettingRepository {
   SettingService({required ApiBaseHelper api}) : _api = api;
 
   @override
-  Future<BaseApiResponseModel> updateCustomerAppVersion({
+  Future<BaseApiResponseModel> updateAppVersion({
     required AppVersionRequest req,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateCustomerAppVersion,
+      Endpoint.updateAppVersion,
       body: req.toJson(),
     );
     final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
@@ -23,15 +23,12 @@ class SettingService implements SettingRepository {
   }
 
   @override
-  Future<BaseApiResponseModel> updateClinicAppVersion({
-    required AppVersionRequest req,
-  }) async {
-    final jsonResponse = await _api.patch(
-      Endpoint.updateClinicAppVersion,
-      body: req.toJson(),
+  Future<BaseApiResponseModel<AppVersionRequest>> getAppVersion() async {
+    final jsonResponse = await _api.get(Endpoint.updateAppVersion);
+    return BaseApiResponseModel<AppVersionRequest>.raw(
+      statusCode: 69,
+      data: AppVersionRequest.fromJson(jsonResponse['data']),
+      message: jsonResponse['message'],
     );
-    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
-
-    return response;
   }
 }

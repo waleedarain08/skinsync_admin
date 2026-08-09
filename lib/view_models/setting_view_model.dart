@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/repositories/setting_repository.dart';
@@ -16,67 +15,36 @@ class SettingViewModel extends BaseViewModel<SettingState> {
 
   final SettingRepository _settingRepository = locator<SettingRepository>();
 
-  Future<bool> updateCustomerAppVersion(AppVersionRequest req) async {
-    final success =
-        await runSafely<bool?>(
-          showLoading: true,
-          onLoadingChange: (loading) {
-            state = state.copyWith(loading: loading);
-          },
-          () async {
-            final response = await _settingRepository.updateCustomerAppVersion(
-              req: req,
-            );
-            if (response.isSuccess) {
-              EasyLoading.showSuccess(
-                response.message.isNotEmpty ? response.message : 'Success',
-              );
-              debugPrint(response.message.toString());
-              return true;
-            } else {
-              EasyLoading.showError(
-                response.message.isNotEmpty
-                    ? response.message
-                    : 'Failed to update version',
-              );
-              return false;
-            }
-          },
-        ) ??
-        false;
-
-    return success;
+  Future<AppVersionRequest?> getAppVersion() async {
+    return await runSafely(() async {
+      final response = await _settingRepository.getAppVersion();
+      return response.data;
+    });
   }
 
-  Future<bool> updateClinicAppVersion(AppVersionRequest req) async {
-    final success =
-        await runSafely<bool?>(
-          showLoading: true,
-          onLoadingChange: (loading) {
-            state = state.copyWith(loading: loading);
-          },
-          () async {
-            final response = await _settingRepository.updateClinicAppVersion(
-              req: req,
-            );
-            if (response.isSuccess) {
-              EasyLoading.showSuccess(
-                response.message.isNotEmpty ? response.message : 'Success',
-              );
-              return true;
-            } else {
-              EasyLoading.showError(
-                response.message.isNotEmpty
-                    ? response.message
-                    : 'Failed to update version',
-              );
-              return false;
-            }
-          },
-        ) ??
-        false;
-
-    return success;
+  Future<bool?> updateAppVersion(AppVersionRequest req) async {
+    return await runSafely<bool?>(
+      showLoading: true,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final response = await _settingRepository.updateAppVersion(req: req);
+        if (response.isSuccess) {
+          EasyLoading.showSuccess(
+            response.message.isNotEmpty ? response.message : 'Success',
+          );
+          return true;
+        } else {
+          EasyLoading.showError(
+            response.message.isNotEmpty
+                ? response.message
+                : 'Failed to update version',
+          );
+          return false;
+        }
+      },
+    );
   }
 }
 

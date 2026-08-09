@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/view_models/setting_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
@@ -34,6 +35,20 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
   final GlobalKey<FormState> _customerIosFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _clinicAndroidFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _clinicIosFormKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final data = await ref
+          .read(settingViewModelProvider.notifier)
+          .getAppVersion();
+      if (data == null) {
+        return;
+      }
+      // _customerAndroidVersionCtrl.text = data.
+    });
+  }
 
   @override
   void dispose() {
@@ -211,7 +226,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
                     formKey: formKey,
                     versionController: versionController,
                     buildController: buildController,
-                    type: type,
+                    deviceType: type,
                     isCustomer: isCustomer,
                   );
                 },
@@ -229,32 +244,29 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     required GlobalKey<FormState> formKey,
     required TextEditingController versionController,
     required TextEditingController buildController,
-    required String type,
+    required String deviceType,
     required bool isCustomer,
   }) async {
     if (!formKey.currentState!.validate()) {
       return;
     }
 
+    final build = int.tryParse(buildController.text.trim());
+    if (build == null) {
+      await EasyLoading.showError('Invalid build number');
+      return;
+    }
     final req = AppVersionRequest(
-      type: type,
+      applicationType: isCustomer ? 'clinic' : 'patient',
+      deviceType: deviceType,
       version: versionController.text.trim(),
-      buildNumber: buildController.text.trim(),
+      build: build,
     );
 
-    bool success = false;
-    if (isCustomer) {
-      success = await ref
-          .read(settingViewModelProvider.notifier)
-          .updateCustomerAppVersion(req);
-    } else {
-      success = await ref
-          .read(settingViewModelProvider.notifier)
-          .updateClinicAppVersion(req);
-    }
-    if (success) {
-      versionController.clear();
-      buildController.clear();
-    }
+    await ref.read(settingViewModelProvider.notifier).updateAppVersion(req);
+    // if (success ?? false) {
+    //   versionController.clear();
+    //   buildController.clear();
+    // }
   }
 }

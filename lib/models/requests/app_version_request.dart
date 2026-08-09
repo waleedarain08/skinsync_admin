@@ -1,23 +1,31 @@
 class AppVersionRequest {
-  final String type;
+  final String applicationType;
+  final String deviceType;
   final String version;
-  final String buildNumber;
+  final int build;
 
-  AppVersionRequest({
-    required this.type,
+  const AppVersionRequest({
+    required this.applicationType,
+    required this.deviceType,
     required this.version,
-    required this.buildNumber,
+    required this.build,
   });
 
   factory AppVersionRequest.fromJson(Map<String, dynamic> json) {
     return AppVersionRequest(
-      type: json['type'],
+      applicationType: json['application_type'],
+      deviceType: json['device_type'],
       version: json['version'],
-      buildNumber: json['build_number'],
+      build: json['build'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'type': type, 'version': version, 'build_number': buildNumber};
+    return {
+      'application_type': applicationType,
+      'device_type': deviceType,
+      'version': version,
+      'build': build,
+    };
   }
 }
