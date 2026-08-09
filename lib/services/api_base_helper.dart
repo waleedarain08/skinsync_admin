@@ -106,6 +106,7 @@ class ApiBaseHelper {
     final uri = Uri.parse(
       '${baseUrl.url}$urlPath',
     ).replace(queryParameters: queryParams);
+     log('URL: ${baseUrl.url}${endpoint.path}');
     return _safeRequest(() async {
       final response = await _client.put(
         uri,

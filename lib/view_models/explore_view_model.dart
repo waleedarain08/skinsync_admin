@@ -13,7 +13,8 @@ import 'package:skinsync_admin/utils/exception.dart';
 import 'package:skinsync_admin/view_models/base_state_model.dart';
 import 'package:skinsync_admin/view_models/base_view_model.dart';
 
-final exploreViewModelProvider = NotifierProvider<ExploreViewModel, ExploreState>(ExploreViewModel.new);
+final exploreViewModelProvider =
+    NotifierProvider<ExploreViewModel, ExploreState>(ExploreViewModel.new);
 
 class ExploreState extends BaseStateModel {
   final List<ReelModel> reels;
@@ -103,7 +104,10 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
-        final response = await _repository.fetchReels(page: page, limit: state.pageSize);
+        final response = await _repository.fetchReels(
+          page: page,
+          limit: state.pageSize,
+        );
         state = state.copyWith(
           reels: response.data ?? [],
           reelsTotalPages: response.totalPages,
@@ -118,7 +122,10 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
-        final response = await _repository.fetchPosts(page: page, limit: state.pageSize);
+        final response = await _repository.fetchPosts(
+          page: page,
+          limit: state.pageSize,
+        );
         state = state.copyWith(
           posts: response.data ?? [],
           postsTotalPages: response.totalPages,
@@ -132,56 +139,54 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
-    await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        final String? url = await _mediaService.uploadImage('explore/posts/', image);
-        if (url == null) {
-          throw const UnknownException('Failed to upload image');
-        }
-        state = state.copyWith(pickedImageUrl: url);
-      },
-    );
+    await runSafely(showLoading: true, () async {
+      final String? url = await _mediaService.uploadImage(
+        'explore/posts/',
+        image,
+      );
+      if (url == null) {
+        throw const UnknownException('Failed to upload image');
+      }
+      state = state.copyWith(pickedImageUrl: url);
+    });
   }
 
   Future<void> pickAndUploadThumbnail() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
-    await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        final String? url = await _mediaService.uploadImage('explore/reels/thumbnails/', image);
-        if (url == null) {
-          throw const UnknownException('Failed to upload thumbnail');
-        }
-        state = state.copyWith(pickedThumbnailUrl: url);
-      },
-    );
+    await runSafely(showLoading: true, () async {
+      final String? url = await _mediaService.uploadImage(
+        'explore/reels/thumbnails/',
+        image,
+      );
+      if (url == null) {
+        throw const UnknownException('Failed to upload thumbnail');
+      }
+      state = state.copyWith(pickedThumbnailUrl: url);
+    });
   }
 
   Future<void> pickAndUploadVideo() async {
     final FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.video,
       allowMultiple: false,
+      withData: true,
     );
-    
+
     if (result == null || result.files.isEmpty) return;
     final file = result.files.first;
 
-    await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        final String? url = await _mediaService.uploadFile('explore/reels/', file);
-        if (url == null) {
-          throw const UnknownException('Failed to upload video');
-        }
-        state = state.copyWith(pickedVideoUrl: url);
-      },
-    );
+    await runSafely(showLoading: true, () async {
+      final String? url = await _mediaService.uploadMedia(
+        path: 'explore/reels/',
+        file: file,
+      );
+      if (url == null) {
+        throw const UnknownException('Failed to upload video');
+      }
+      state = state.copyWith(pickedVideoUrl: url);
+    });
   }
 
   void clearPickedFiles() {
@@ -190,28 +195,30 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
 
   Future<bool> createReel(CreateReelRequest reel) async {
     return await runSafely(
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        await _repository.createReel(reel);
-        EasyLoading.showSuccess('Reel created successfully');
-        clearPickedFiles();
-        await fetchReels();
-        return true;
-      },
-    ) ?? false;
+          onLoadingChange: (l) => state = state.copyWith(loading: l),
+          () async {
+            await _repository.createReel(reel);
+            EasyLoading.showSuccess('Reel created successfully');
+            clearPickedFiles();
+            await fetchReels();
+            return true;
+          },
+        ) ??
+        false;
   }
 
   Future<bool> createPost(CreateCommunityPostRequest post) async {
     return await runSafely(
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        await _repository.createPost(post);
-        EasyLoading.showSuccess('Post created successfully');
-        clearPickedFiles();
-        await fetchPosts();
-        return true;
-      },
-    ) ?? false;
+          onLoadingChange: (l) => state = state.copyWith(loading: l),
+          () async {
+            await _repository.createPost(post);
+            EasyLoading.showSuccess('Post created successfully');
+            clearPickedFiles();
+            await fetchPosts();
+            return true;
+          },
+        ) ??
+        false;
   }
 
   Future<void> toggleReelVisibility(int id, String currentStatus) async {
