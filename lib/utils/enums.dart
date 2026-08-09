@@ -82,8 +82,8 @@ enum Endpoint {
   webRequests('admin/clinic-web-regiteration'),
   webRequestDetail('admin/clinic-web-registration/detail/{id}'),
   sendWebRequestNotes('admin/web-requests/{id}/notes'),
-  founderClinics('admin/founder-clinics'),
-  founderClinicDetail('admin/founder-clinics/{id}'),
+  founderClinics('admin/founder-clinic'),
+  founderClinicDetail('admin/founder-clinic/detail/{id}'),
   deductionTimings('admin/deduction-timings');
 
   final String path;

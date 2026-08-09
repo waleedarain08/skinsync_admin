@@ -157,8 +157,8 @@ Future<ClinicListResponse> getInviteClinics({
     );
     final response = FounderClinicListResponse.fromJson(jsonResponse);
 
-    if (!(response.isSuccess ?? false)) {
-      throw BadRequestException(response.message ?? 'Failed to get founder clinics');
+    if (!(response.isSuccess)) {
+      throw BadRequestException(response.message );
     }
     return response;
   }
