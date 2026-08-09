@@ -146,7 +146,7 @@ Future<ClinicListResponse> getInviteClinics({
     final Map<String, String> queryParams = {
       'page': page.toString(),
       'limit': limit.toString(),
-      'search': search ?? 'null',
+      'search': search ?? '',
     };
     if (status != null && status.isNotEmpty) {
       queryParams['status'] = status;
