@@ -30,7 +30,6 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
   Future<void> initialize() async {
     getClinics(page: state.currentPage, limit: state.pageSize);
-    getInviteClinics(page: state.inviteClinicsCurrentPage, limit: state.pageSize);
     getWebRequests(page: state.webRequestsCurrentPage, limit: state.pageSize);
     getFounderClinics(page: state.founderClinicsCurrentPage, limit: state.pageSize);
   }
@@ -103,16 +102,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
   }
 
   void clearClinicsPagination() {
-    state = state.copyWith(
-      totalPages: 1, 
-      currentPage: 1, 
-      inviteClinicsTotalPages: 1, 
-      inviteClinicsCurrentPage: 1,
-      webRequestsTotalPages: 1,
-      webRequestsCurrentPage: 1,
-      founderClinicsTotalPages: 1,
-      founderClinicsCurrentPage: 1,
-    );
+    state = state.copyWith(totalPages: 1, currentPage: 1);
   }
 
 Future<bool?> getInviteClinics({
@@ -493,8 +483,6 @@ class ClinicState extends BaseStateModel {
   final String? clinicImage;
   final String? bannerImage;
   final int pageSize;
-  final int inviteClinicsTotalPages;
-  final int inviteClinicsCurrentPage;
   final int webRequestsTotalPages;
   final int webRequestsCurrentPage;
   final int founderClinicsTotalPages;
@@ -522,8 +510,6 @@ class ClinicState extends BaseStateModel {
     this.bannerImage,
     this.clinicImage,
     this.pageSize = 10,
-    this.inviteClinicsTotalPages = 1,
-    this.inviteClinicsCurrentPage = 1,
     this.webRequestsTotalPages = 1,
     this.webRequestsCurrentPage = 1,
     this.founderClinicsTotalPages = 1,
@@ -552,8 +538,6 @@ class ClinicState extends BaseStateModel {
     int? currentPage,
     int? pageSize,
     int? totalPages,
-    int? inviteClinicsTotalPages,
-    int? inviteClinicsCurrentPage,
     int? webRequestsTotalPages,
     int? webRequestsCurrentPage,
     int? founderClinicsTotalPages,
@@ -582,8 +566,6 @@ class ClinicState extends BaseStateModel {
       currentPage: currentPage ?? this.currentPage,
       pageSize: pageSize ?? this.pageSize,
       totalPages: totalPages ?? this.totalPages,
-      inviteClinicsTotalPages: inviteClinicsTotalPages ?? this.inviteClinicsTotalPages,
-      inviteClinicsCurrentPage: inviteClinicsCurrentPage ?? this.inviteClinicsCurrentPage,
       webRequestsTotalPages: webRequestsTotalPages ?? this.webRequestsTotalPages,
       webRequestsCurrentPage: webRequestsCurrentPage ?? this.webRequestsCurrentPage,
       founderClinicsTotalPages: founderClinicsTotalPages ?? this.founderClinicsTotalPages,

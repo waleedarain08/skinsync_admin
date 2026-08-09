@@ -41,7 +41,9 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   // String _selectedPlanFilter = 'All Plans';
   // String _selectedStatusFilter = 'All Statuses';
 
-  static const int _itemsPerPage = 10;
+  int _activePage = 0;
+  int _invitePage = 0;
+  static const int _itemsPerPage = 5;
 
   @override
   void initState() {
@@ -71,6 +73,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
             .read(clinicViewModelProvider.notifier)
             .getFounderClinics(search: query);
       }
+    });
+    setState(() {
+      _activePage = 0;
+      _invitePage = 0;
     });
   }
 
@@ -165,7 +171,10 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               onChanged: _onSearchChanged,
               onClear: () {
                 _searchController.clear();
-                _onSearchChanged('');
+                setState(() {
+                  _activePage = 0;
+                  _invitePage = 0;
+                });
               },
             ),
             context.verticalSpace(12),
