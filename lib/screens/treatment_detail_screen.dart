@@ -183,6 +183,8 @@ class TreatmentDetailScreen extends ConsumerWidget {
                                             newStatus,
                                             callDetail: true,
                                           );
+                                      ref.read(treatmentViewModelProvider.notifier).initialize();
+
                                     }
                                   },
                                 );

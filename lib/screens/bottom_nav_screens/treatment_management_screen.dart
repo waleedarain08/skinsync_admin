@@ -143,8 +143,8 @@ class _TreatmentManagementScreenState
 
   Widget _buildQuickInsights(TreatmentState state) {
     final totalTreatments = state.treatments.length;
-    final activeTreatments = state.treatments
-        .where((t) => t.status == 'active')
+    final activeTreatments  = state.treatments
+        .where((t) => t.status == 'Active')
         .length;
     // final categoriesCovered = state.treatments
     //     .map((t) => t.categoryName)
@@ -639,7 +639,6 @@ class _TreatmentManagementScreenState
         final bool isLeaf = cat.subCategories.isEmpty;
         final bool isExpanded =
             _expandedChildIdByParentId[cat.parentId] == cat.id;
-
         return Padding(
           padding: context.appEdgeInsets(vertical: 4),
           child: DecoratedBox(
