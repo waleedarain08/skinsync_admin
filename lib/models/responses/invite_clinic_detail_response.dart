@@ -49,6 +49,7 @@ class InviteClinicDetailData {
   final String? ownerName;
   final String? ownerEmail;
   final String? notes;
+  final DateTime? createdAt;
 
   String get lat => latitude != null ? latitude.toString() : '';
   String get long => longitude != null ? longitude.toString() : '';
@@ -70,7 +71,7 @@ class InviteClinicDetailData {
     this.treatments,
     this.ownerName,
     this.ownerEmail,
-    this.notes,
+    this.notes, this.createdAt,
   });
 
   factory InviteClinicDetailData.fromJson(Map<String, dynamic> json) => InviteClinicDetailData(
@@ -95,6 +96,7 @@ class InviteClinicDetailData {
     ownerName: json['owner_name'],
     ownerEmail: json['owner_email'],
     notes: json['notes'],
+    createdAt: json['created_at'] == null ? null : DateTime.parse(json['created_at']),
   );
 
   Map<String, dynamic> toJson() => {

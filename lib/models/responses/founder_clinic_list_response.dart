@@ -7,6 +7,7 @@ class FounderClinicListResponse
     extends BaseApiResponseModel<List<FounderClinicModel>> {
   final int? totalPages;
   final int? currentPage;
+  final int? totalItems;
 
   FounderClinicListResponse({
     required super.isSuccess,
@@ -14,6 +15,7 @@ class FounderClinicListResponse
     super.data,
     this.totalPages,
     this.currentPage,
+    this.totalItems,
   });
 
   factory FounderClinicListResponse.fromRawJson(String str) =>
@@ -25,24 +27,31 @@ class FounderClinicListResponse
       FounderClinicListResponse(
         isSuccess: json['is_success'],
         message: json['message'],
-        data: json['data'] == null
-            ? null
-            : List<FounderClinicModel>.from(
-                (json['data'] as List).map(
-                  (x) => FounderClinicModel.fromJson(x as Map<String, dynamic>),
+        data:
+            json['data'] == null || json['data']['items'] == null
+                ? null
+                : List<FounderClinicModel>.from(
+                  (json['data']['items'] as List).map(
+                    (x) =>
+                        FounderClinicModel.fromJson(x as Map<String, dynamic>),
+                  ),
                 ),
-              ),
-        totalPages: json['total_pages'],
-        currentPage: json['current_page'],
+        totalPages: json['data']?['total_pages'],
+        currentPage: json['data']?['page'],
+        totalItems: json['data']?['total'],
       );
 
   Map<String, dynamic> toJson() => {
     'is_success': isSuccess,
     'message': message,
-    'data': data == null
-        ? null
-        : List<dynamic>.from(data!.map((x) => x.toJson())),
-    'total_pages': totalPages,
-    'current_page': currentPage,
+    'data': {
+      'items':
+          data == null
+              ? null
+              : List<dynamic>.from(data!.map((x) => x.toJson())),
+      'total_pages': totalPages,
+      'page': currentPage,
+      'total': totalItems,
+    },
   };
 }

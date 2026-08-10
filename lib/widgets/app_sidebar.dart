@@ -110,24 +110,23 @@ class AppSidebar extends StatelessWidget {
   }
 
  List<SidebarXItem> _buildItems() {
-  int i = 0;
-  SidebarXItem item(IconData icon, String label) =>
-      SidebarXItem(icon: icon, label: label, onTap: () => onItemTap(i++));
+  SidebarXItem item(int index, IconData icon, String label) =>
+      SidebarXItem(icon: icon, label: label, onTap: () => onItemTap(index));
 
   return [
-    item(Icons.grid_view_rounded, 'Dashboard'),
-    item(Icons.explore_outlined, 'Explore'),
-    item(Icons.business_rounded, 'Clinics'),
-    item(Icons.calendar_today_rounded, 'Appointments'),
-    item(Icons.people_alt_rounded, 'Patients'),
-    item(Icons.medical_services_rounded, 'Treatments'),
-    item(Icons.inventory_2_rounded, 'Inventory'),
-    if (!isDeploymentMode) item(Icons.card_membership_rounded, 'Subscriptions'),
-    if (!isDeploymentMode) item(Icons.admin_panel_settings_rounded, 'Users'),
-    item(Icons.account_balance_wallet_rounded, 'Payments'),
-    if (!isDeploymentMode) item(Icons.gavel_rounded, 'Disputes'),
-    item(Icons.notifications_active_rounded, 'Notifications'),
-    item(Icons.settings_rounded, 'Settings'),
+    item(0, Icons.grid_view_rounded, 'Dashboard'),
+    item(1, Icons.explore_outlined, 'Explore'),
+    item(2, Icons.business_rounded, 'Clinics'),
+    item(3, Icons.calendar_today_rounded, 'Appointments'),
+    item(4, Icons.people_alt_rounded, 'Patients'),
+    item(5, Icons.medical_services_rounded, 'Treatments'),
+    item(6, Icons.inventory_2_rounded, 'Inventory'),
+    if (!isDeploymentMode) item(7, Icons.card_membership_rounded, 'Subscriptions'),
+    if (!isDeploymentMode) item(8, Icons.admin_panel_settings_rounded, 'Users'),
+    item(!isDeploymentMode ? 9 : 7, Icons.account_balance_wallet_rounded, 'Payments'),
+    if (!isDeploymentMode) item(10, Icons.gavel_rounded, 'Disputes'),
+    item(!isDeploymentMode ? 11 : 8, Icons.notifications_active_rounded, 'Notifications'),
+    item(!isDeploymentMode ? 12 : 9, Icons.settings_rounded, 'Settings'),
   ];
 }
  Widget _separatorBuilder(BuildContext context, int index, SidebarXController controller) {

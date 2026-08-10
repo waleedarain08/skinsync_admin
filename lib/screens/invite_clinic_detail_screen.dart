@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
+import 'package:skinsync_admin/utils/date_time_utills.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -99,7 +100,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                     child: Icon(
                       Icons.image_outlined,
                       size: context.sp(48),
-                      color: CustomColors.grey.withOpacity(0.5),
+                      color: CustomColors.grey.withValues(alpha: 0.5),
                     ),
                   )
                 : null,
@@ -199,6 +200,15 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             Text('About Clinic', style: context.fonts.black14w600),
             context.verticalSpace(8),
             Text(clinic.description!, style: context.fonts.grey14w400h16),
+          ],
+          if (clinic.createdAt != null) ...[
+            context.verticalSpace(16),
+            _infoRow(
+              context,
+              Icons.calendar_today_outlined,
+              'Invitation Date',
+              formatDateTime(clinic.createdAt, includeTime: true, timeSeparator: ' | '),
+            ),
           ],
         ]),
         context.verticalSpace(24),
@@ -463,9 +473,9 @@ class InviteClinicDetailScreen extends ConsumerWidget {
     return Container(
       padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: context.borderRadius(all: 20),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(status.toUpperCase(), style: textStyle),
     );

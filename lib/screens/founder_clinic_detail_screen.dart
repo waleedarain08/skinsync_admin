@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
+import 'package:skinsync_admin/utils/date_time_utills.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -83,7 +84,7 @@ class FounderClinicDetailScreen extends ConsumerWidget {
             ),
             child: Center(
               child: Text(
-                clinic.clinicName?[0].toUpperCase() ?? 'F',
+                (clinic.publicFacingClinicName ?? clinic.clinicName ?? 'F')[0].toUpperCase(),
                 style: context.fonts.purple14w700.copyWith(fontSize: 32),
               ),
             ),
@@ -97,7 +98,7 @@ class FounderClinicDetailScreen extends ConsumerWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        clinic.clinicName ?? 'N/A',
+                        clinic.publicFacingClinicName ?? clinic.clinicName ?? 'N/A',
                         style: context.fonts.black20w600,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -108,12 +109,12 @@ class FounderClinicDetailScreen extends ConsumerWidget {
                 ),
                 context.verticalSpace(6),
                 Text(
-                  '${clinic.city ?? ""}, ${clinic.state ?? ""}',
+                  clinic.primaryLocation ?? clinic.address ?? 'No Address Provided',
                   style: context.fonts.grey14w400,
                 ),
                 context.verticalSpace(4),
                 Text(
-                  'Member since: ${_formatDate(clinic.createdAt)}',
+                  'Requested on: ${formatDateTime(clinic.createdAt, includeTime: true, timeSeparator: ' | ')}',
                   style: context.fonts.grey12w400,
                 ),
               ],
@@ -127,40 +128,46 @@ class FounderClinicDetailScreen extends ConsumerWidget {
   Widget _buildMainContent(BuildContext context, FounderClinicModel clinic) {
     return Column(
       children: [
-        _infoSection(context, 'General & Business Info', [
-          _infoRow(context, Icons.business_outlined, 'Clinic Name', clinic.clinicName ?? 'N/A'),
-          _infoRow(context, Icons.person_outline, 'Contact Person', clinic.contactName ?? 'N/A'),
-          _infoRow(context, Icons.computer_outlined, 'Current EMR', clinic.currentEmr ?? 'N/A'),
-          _infoRow(context, Icons.groups_outlined, 'No. of Providers', clinic.numberOfProviders ?? '0'),
-          _infoRow(context, Icons.medical_services_outlined, 'Specialty', clinic.specialty ?? 'N/A'),
-        ]),
-        context.verticalSpace(24),
-        _infoSection(context, 'Contact & Location', [
-          _infoRow(context, Icons.email_outlined, 'Email Address', clinic.email ?? 'N/A'),
-          _infoRow(context, Icons.phone_outlined, 'Phone Number', clinic.phone ?? 'N/A'),
+        _infoSection(context, 'Clinic Information', [
+          _infoRow(context, Icons.business_outlined, 'Clinic Legal Name', clinic.clinicLegalName ?? 'N/A'),
+          _infoRow(context, Icons.storefront_outlined, 'Public Facing Name', clinic.publicFacingClinicName ?? 'N/A'),
           _infoRow(context, Icons.language_outlined, 'Website', clinic.website ?? 'N/A'),
-          _infoRow(context, Icons.location_on_outlined, 'Address', '${clinic.address ?? "N/A"}, ${clinic.city ?? ""}, ${clinic.state ?? ""} ${clinic.zipCode ?? ""}'),
+          _infoRow(context, Icons.location_on_outlined, 'Primary Location', clinic.primaryLocation ?? 'N/A'),
+          _infoRow(context, Icons.add_location_alt_outlined, 'Additional Locations', clinic.additionalLocations ?? 'N/A'),
+          _infoRow(context, Icons.map_outlined, 'Primary Service Area', clinic.primaryServiceArea ?? 'N/A'),
         ]),
         context.verticalSpace(24),
-        _infoSection(context, 'Founder Statement', [
-          _infoRow(context, Icons.camera_alt_outlined, 'Instagram', clinic.instagramHandle ?? 'N/A'),
-          _infoRow(context, Icons.facebook_outlined, 'Facebook', clinic.facebookPage ?? 'N/A'),
-          if (clinic.founderReason != null && clinic.founderReason!.isNotEmpty) ...[
-            context.verticalSpace(12),
-            Text('Why they want to join as Founder?', style: context.fonts.black14w600),
-            context.verticalSpace(8),
-            Container(
-              width: double.infinity,
-              padding: context.appEdgeInsets(all: 16),
-              decoration: BoxDecoration(
-                color: CustomColors.whiteGrey,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Text(clinic.founderReason!, style: context.fonts.grey14w400h16),
-            ),
-          ],
+        _infoSection(context, 'Contact Person', [
+          _infoRow(context, Icons.person_outline, 'Primary Contact Name', clinic.primaryContactName ?? 'N/A'),
+          _infoRow(context, Icons.email_outlined, 'Email Address', clinic.emailAddress ?? 'N/A'),
+          _infoRow(context, Icons.phone_outlined, 'Phone Number', clinic.phoneNumber ?? 'N/A'),
+        ]),
+        context.verticalSpace(24),
+        _infoSection(context, 'Representative & Authorization', [
+          _infoRow(context, Icons.badge_outlined, 'Representative Name', clinic.representativeName ?? 'N/A'),
+          _infoRow(context, Icons.title_outlined, 'Title', clinic.title ?? 'N/A'),
+          _infoRow(context, Icons.draw_outlined, 'Electronic Signature', clinic.electronicSignature ?? 'N/A'),
+          _infoRow(context, Icons.calendar_today_outlined, 'Signature Date', clinic.signatureDate ?? 'N/A'),
+          _buildCheckRow(context, 'Authorized to submit request', clinic.authorizedToSubmit ?? false),
         ]),
       ],
+    );
+  }
+
+  Widget _buildCheckRow(BuildContext context, String label, bool checked) {
+    return Padding(
+      padding: context.appEdgeInsets(bottom: 8),
+      child: Row(
+        children: [
+          Icon(
+            checked ? Icons.check_circle_rounded : Icons.cancel_rounded,
+            color: checked ? CustomColors.green : CustomColors.red,
+            size: 20,
+          ),
+          context.horizontalSpace(12),
+          Text(label, style: context.fonts.black14w500),
+        ],
+      ),
     );
   }
 
@@ -282,21 +289,16 @@ class FounderClinicDetailScreen extends ConsumerWidget {
     final String cleanStatus = status.toLowerCase();
     if (cleanStatus == 'approved') color = CustomColors.green;
     if (cleanStatus == 'rejected') color = CustomColors.red;
-    if (cleanStatus == 'pending') color = Colors.orange;
+    if (cleanStatus == 'pending' || cleanStatus == 'inactive') color = Colors.orange;
 
     return Container(
       padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: context.borderRadius(all: 20),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(status.toUpperCase(), style: context.fonts.grey10w700.copyWith(color: color)),
     );
-  }
-
-  String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return 'N/A';
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 }

@@ -11,6 +11,7 @@ import 'package:skinsync_admin/widgets/app_loader.dart';
 import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 
 import '../../models/clinic_model.dart';
+import '../../utils/date_time_utills.dart';
 import '../../utils/theme.dart';
 import '../../view_models/clinic_view_model.dart';
 import '../../widgets/app_search_field.dart';
@@ -261,7 +262,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     List<ClinicModel> inviteClinics,
     List<ClinicWebRequestModel> webRequests,
     List<FounderClinicModel> founderClinics,
-    dynamic state,
+    ClinicState state,
   ) {
     switch (_tabController.index) {
       case 1:
@@ -296,7 +297,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
           ],
         ),
         CustomPrimaryButton(
-          onTap: () => context.push(AddNewClinicScreen.routeName),
+          onTap: () => unawaited(context.push(AddNewClinicScreen.routeName)),
           icon: Icons.add_rounded,
           label: 'Add New Clinic',
           width: context.w(200),
@@ -754,13 +755,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     );
   }
 
-  Widget _tableTextCell(String text, {required TextStyle style}) {
+  Widget _tableTextCell(String text, {required TextStyle style, int maxLines = 2}) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Text(
         text,
         style: style,
-        maxLines: 1,
+        maxLines: maxLines,
         overflow: TextOverflow.ellipsis,
       ),
     );
@@ -920,9 +921,9 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               final success = await ref
                   .read(clinicViewModelProvider.notifier)
                   .getClinicDetail(clinic.id!);
-              if (success && context.mounted) {
+              if (success && mounted) {
                 ref.read(clinicViewModelProvider.notifier).selectClinic(clinic);
-                context.push(ClinicDetailScreen.routeName);
+                unawaited(context.push(ClinicDetailScreen.routeName));
               }
             },
           ),
@@ -951,11 +952,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
         child: Table(
           columnWidths: const {
             0: FlexColumnWidth(3.5), // Clinic Name
-            1: FlexColumnWidth(3), // Contact
-            2: FlexColumnWidth(3), // Providers/EMR
-            3: FlexColumnWidth(2), // Date
+            1: FlexColumnWidth(3.5), // Contact Detail
+            2: FlexColumnWidth(3.5), // Location
+            3: FlexColumnWidth(2.5), // Date
             4: FlexColumnWidth(2), // Status
-            5: FlexColumnWidth(1.8), // Actions
+            5: FlexColumnWidth(1.5), // Actions
           },
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
@@ -967,8 +968,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               ),
               children: [
                 _tableHeaderCell('CLINIC NAME'),
-                _tableHeaderCell('OWNER / CONTACT'),
-                _tableHeaderCell('EMR / PROVIDERS'),
+                _tableHeaderCell('CONTACT DETAIL'),
+                _tableHeaderCell('LOCATION'),
                 _tableHeaderCell('REQUESTED DATE'),
                 _tableHeaderCell('STATUS'),
                 _tableHeaderCell('ACTIONS'),
@@ -992,24 +993,9 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                     clinic.phone,
                     clinic.contactName,
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 16.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'EMR: ${clinic.currentEmr ?? "N/A"}',
-                          style: context.fonts.grey12w400,
-                        ),
-                        Text(
-                          'Staff: ${clinic.numberOfProviders ?? "0"}',
-                          style: context.fonts.grey12w400,
-                        ),
-                      ],
-                    ),
+                  _tableTextCell(
+                    clinic.address ?? 'N/A',
+                    style: context.fonts.grey14w400,
                   ),
                   _tableTextCell(
                     _formatDate(clinic.createdAt),
@@ -1042,11 +1028,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               final success = await ref
                   .read(clinicViewModelProvider.notifier)
                   .getFounderClinicDetail(clinic.id!);
-              if (success && context.mounted) {
+              if (success && mounted) {
                 ref
                     .read(clinicViewModelProvider.notifier)
                     .selectFounderClinic(clinic);
-                context.push(FounderClinicDetailScreen.routeName);
+                unawaited(context.push(FounderClinicDetailScreen.routeName));
               }
             },
           ),
@@ -1071,11 +1057,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               final success = await ref
                   .read(clinicViewModelProvider.notifier)
                   .getWebRequestDetail(request.id!);
-              if (success && context.mounted) {
+              if (success && mounted) {
                 ref
                     .read(clinicViewModelProvider.notifier)
                     .selectWebRequest(request);
-                context.push(ClinicWebRequestDetailScreen.routeName);
+                unawaited(context.push(ClinicWebRequestDetailScreen.routeName));
               }
             },
           ),
@@ -1100,11 +1086,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               final success = await ref
                   .read(clinicViewModelProvider.notifier)
                   .getInviteClinicDetail(clinic.id!);
-              if (success && context.mounted) {
+              if (success && mounted) {
                 ref
                     .read(clinicViewModelProvider.notifier)
                     .selectInviteClinic(clinic);
-                context.push(InviteClinicDetailScreen.routeName);
+                unawaited(context.push(InviteClinicDetailScreen.routeName));
               }
             },
           ),
@@ -1148,9 +1134,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
               mainAxisSize: MainAxisSize.min,
               children: [
                 CustomOutlinedButton(
-                  onTap: () {
-                    _searchController.clear();
-                  },
+                  onTap: _searchController.clear,
                   label: 'Clear All Filters',
                   color: Colors.white,
                   textColor: CustomColors.purple,
@@ -1158,7 +1142,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                 if (_tabController.index == 0) ...[
                   context.horizontalSpace(16),
                   CustomPrimaryButton(
-                    onTap: () => context.push(AddNewClinicScreen.routeName),
+                    onTap: () => unawaited(context.push(AddNewClinicScreen.routeName)),
                     icon: Icons.add_rounded,
                     label: 'Add Clinic',
                     width: context.w(180),
@@ -1173,26 +1157,6 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   }
 
   String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return 'N/A';
-    return '${dateTime.day} ${_getMonthName(dateTime.month)} ${dateTime.year}';
-  }
-
-  String _getMonthName(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    if (month < 1 || month > 12) return '';
-    return months[month - 1];
+    return formatDateTime(dateTime, includeTime: true, timeSeparator: '\n');
   }
 }

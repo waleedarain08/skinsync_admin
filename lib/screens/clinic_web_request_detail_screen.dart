@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/requests/send_notes_request.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
+import 'package:skinsync_admin/utils/date_time_utills.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -115,7 +116,7 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
                 ),
                 context.verticalSpace(4),
                 Text(
-                  'Requested on: ${_formatDate(request.createdAt)}',
+                  'Requested on: ${formatDateTime(request.createdAt, includeTime: true, timeSeparator: ' | ')}',
                   style: context.fonts.grey12w400,
                 ),
               ],
@@ -382,16 +383,11 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
     return Container(
       padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: context.borderRadius(all: 20),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(status.toUpperCase(), style: context.fonts.grey10w700.copyWith(color: color)),
     );
-  }
-
-  String _formatDate(DateTime? dateTime) {
-    if (dateTime == null) return 'N/A';
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 }
