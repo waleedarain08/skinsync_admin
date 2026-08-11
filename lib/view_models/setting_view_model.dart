@@ -1,5 +1,6 @@
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/models/responses/app_version_response.dart';
 import 'package:skinsync_admin/repositories/setting_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/view_models/base_state_model.dart';
@@ -15,7 +16,7 @@ class SettingViewModel extends BaseViewModel<SettingState> {
 
   final SettingRepository _settingRepository = locator<SettingRepository>();
 
-  Future<AppVersionRequest?> getAppVersion() async {
+  Future<List<VersionData>?> getAppVersion() async {
     return await runSafely(() async {
       final response = await _settingRepository.getAppVersion();
       return response.data;

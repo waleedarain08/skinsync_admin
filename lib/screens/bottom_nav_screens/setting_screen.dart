@@ -40,13 +40,31 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final data = await ref
+      final versions = await ref
           .read(settingViewModelProvider.notifier)
           .getAppVersion();
-      if (data == null) {
+      if (versions == null) {
         return;
       }
-      // _customerAndroidVersionCtrl.text = data.
+      for (final version in versions) {
+        if (version.app == 'clinic') {
+          if (version.type == 'ios') {
+            _clinicIosVersionCtrl.text = version.version ?? '';
+            _clinicIosBuildCtrl.text = '${version.buildNumber ?? ''}';
+          } else {
+            _clinicAndroidVersionCtrl.text = version.version ?? '';
+            _clinicAndroidBuildCtrl.text = '${version.buildNumber ?? ''}';
+          }
+        } else {
+          if (version.type == 'ios') {
+            _customerIosVersionCtrl.text = version.version ?? '';
+            _customerIosBuildCtrl.text = '${version.buildNumber ?? ''}';
+          } else {
+            _customerAndroidVersionCtrl.text = version.version ?? '';
+            _customerAndroidBuildCtrl.text = '${version.buildNumber ?? ''}';
+          }
+        }
+      }
     });
   }
 
@@ -257,16 +275,12 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
       return;
     }
     final req = AppVersionRequest(
-      applicationType: isCustomer ? 'clinic' : 'patient',
+      applicationType: isCustomer ? 'patient' : 'clinic',
       deviceType: deviceType,
       version: versionController.text.trim(),
       build: build,
     );
 
     await ref.read(settingViewModelProvider.notifier).updateAppVersion(req);
-    // if (success ?? false) {
-    //   versionController.clear();
-    //   buildController.clear();
-    // }
   }
 }

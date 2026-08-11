@@ -1,3 +1,5 @@
+import 'package:skinsync_admin/models/responses/app_version_response.dart';
+
 import '../models/requests/app_version_request.dart';
 import '../models/responses/base_response_model.dart';
 import '../repositories/setting_repository.dart';
@@ -23,12 +25,8 @@ class SettingService implements SettingRepository {
   }
 
   @override
-  Future<BaseApiResponseModel<AppVersionRequest>> getAppVersion() async {
+  Future<AppVersionResponse> getAppVersion() async {
     final jsonResponse = await _api.get(Endpoint.updateAppVersion);
-    return BaseApiResponseModel<AppVersionRequest>.raw(
-      statusCode: 69,
-      data: AppVersionRequest.fromJson(jsonResponse['data']),
-      message: jsonResponse['message'],
-    );
+    return AppVersionResponse.fromJson(jsonResponse);
   }
 }
