@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/explore_models.dart';
 import 'package:skinsync_admin/models/requests/community_post_request.dart';
 import 'package:skinsync_admin/models/requests/reel_request.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/explore_view_model.dart';
 import 'package:skinsync_admin/widgets/app_loader.dart';
@@ -675,14 +676,14 @@ class _ReelCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  reel.title,
+                  reel.title.capitalize,
                   style: context.fonts.black14w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 context.verticalSpace(4),
                 Text(
-                  reel.description ?? '',
+                  reel.description?.capitalize ?? '',
                   style: context.fonts.grey12w400,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -862,7 +863,7 @@ class _PostListItem extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          Text(post.title, style: context.fonts.black16w600),
+                          Text(post.title.capitalize, style: context.fonts.black16w600),
                           if (isHidden) ...[
                             context.horizontalSpace(8),
                             Container(
@@ -888,7 +889,7 @@ class _PostListItem extends ConsumerWidget {
                   context.verticalSpace(8),
 
                   Text(
-                    post.content,
+                    post.content.capitalize,
                     style: context.fonts.grey14w400,
                     // maxLines: 2,
                     // overflow: TextOverflow.ellipsis,
@@ -898,10 +899,10 @@ class _PostListItem extends ConsumerWidget {
 
                   Wrap(
                     spacing: 8,
-                    children: post.tags
+                    children:   post.tags
                         .map(
                           (tag) =>
-                              Text('#$tag', style: context.fonts.purple11w600),
+                              Text('#${tag.capitalize}', style: context.fonts.purple11w600),
                         )
                         .toList(),
                   ),
