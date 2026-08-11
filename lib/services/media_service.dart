@@ -6,7 +6,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart';
+import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../main.dart';
 
 class MediaService {
   final _storage = FirebaseStorage.instance;
@@ -21,11 +24,17 @@ class MediaService {
 
   MediaService._();
 
-  Future<String?> uploadImage(String path, XFile image) async {
+  Future<String?> uploadImage(
+    String path,
+    XFile image, {
+    bool acceptAnyFormat = false,
+  }) async {
     final storagePath = '$path/${image.name}';
-    final ref = _storage.ref().child(storagePath);
+    final ref = _storage
+        .ref(isDeploymentMode ? 'production/' : 'staging/')
+        .child(storagePath);
     final metadata = SettableMetadata(
-      contentType: _imageContentType(image.name),
+      contentType: _imageContentType(image.path, acceptAnyFormat),
     );
     final bytes = await image.readAsBytes();
     final compressedBytes = await _compressImage(bytes);
@@ -37,28 +46,35 @@ class MediaService {
     return url;
   }
 
-  String _imageContentType(String fileName) {
-    final ext = fileName.split('.').last.toLowerCase();
+  String? _imageContentType(String path, bool acceptAnyFormat) {
+    log('ACCEPT ANY: $acceptAnyFormat');
+    if (acceptAnyFormat) {
+      return lookupMimeType(path);
+    }
+    final ext = path.split('.').last.toLowerCase();
     return switch (ext) {
-      'png' => 'image/png',
+      // 'png' => 'image/png',
       'jpg' || 'jpeg' => 'image/jpeg',
       // 'gif' => 'image/gif',
       // 'webp' => 'image/webp',
-      _ => throw Exception('Any format other than jpeg and png is not supported!'),
+      _ => throw Exception('Any format other than jpeg is not supported!'),
     };
   }
 
   Future<String?> uploadFile(String path, PlatformFile file) async {
     final storagePath = '$path/${file.name}';
-    final ref = _storage.ref().child(storagePath);
+    final ref = _storage
+        .ref(isDeploymentMode ? 'production/' : 'staging/')
+        .child(storagePath);
     final metadata = SettableMetadata(
       contentType: file.extension == 'pdf'
           ? 'application/pdf'
           : 'application/octet-stream',
     );
+    final bytes = await file.readAsBytes();
 
-    if (file.bytes != null) {
-      final task = ref.putData(file.bytes!, metadata);
+    if (bytes.isNotEmpty) {
+      final task = ref.putData(bytes, metadata);
       await task.whenComplete(() {});
     } else if (file.path != null) {
       final task = ref.putFile(File(file.path!), metadata);
@@ -89,12 +105,11 @@ class MediaService {
       // PlatformFile
       else if (file is PlatformFile) {
         fileName = file.name;
+        bytes = await file.readAsBytes();
 
-        if (file.bytes == null) {
+        if (bytes.isNotEmpty) {
           throw Exception('PlatformFile.bytes is null. Use withData:true');
         }
-
-        bytes = file.bytes!;
       } else {
         throw Exception('Unsupported file type');
       }
@@ -102,22 +117,21 @@ class MediaService {
       final ext = fileName.split('.').last.toLowerCase();
 
       final storagePath = switch (ext) {
-        /*'png' || */'gif' || 'webp' => throw Exception(
+        'png' || 'gif' || 'webp' => throw Exception(
           'Any format other than jpeg is not supported!',
         ),
-
-        'jpg' || 'jpeg' || 'png' => '$path/image/$fileName',
+        'jpg' || 'jpeg' => '$path/image/$fileName',
         'mp4' || 'mov' || 'avi' || 'mkv' || 'webm' => '$path/video/$fileName',
-      
         'pdf' => '$path/pdf/$fileName',
         _ => '$path/file/$fileName',
-        
       };
 
       log('UPLOAD STARTED');
       log('PATH: $storagePath');
 
-      final ref = _storage.ref().child(storagePath);
+      final ref = _storage
+          .ref(isDeploymentMode ? 'production/' : 'staging/')
+          .child(storagePath);
       if (storagePath.contains('/image/')) {
         bytes = await _compressImage(bytes);
       }
@@ -162,8 +176,8 @@ class MediaService {
 
   Future<XFile?> downloadSimulationImage({
     int? simId,
-    required bool isBefore,
     String? imageUrl,
+    required String pose,
   }) async {
     if (imageUrl == null) {
       return null;
@@ -171,8 +185,7 @@ class MediaService {
     final uri = Uri.parse(imageUrl);
     final ext = uri.path.split('.').last;
     final dir = await getApplicationCacheDirectory();
-    final path =
-        '${dir.path}/simulation_${isBefore ? 'before' : 'after'}_${simId ?? 0}.$ext';
+    final path = '${dir.path}/simulation_${pose}_${simId ?? 0}.$ext';
     final file = File(path);
     if (await file.exists()) {
       return XFile(file.path);
