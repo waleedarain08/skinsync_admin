@@ -97,7 +97,10 @@ enum Endpoint {
     return updatedPath;
   }
 }
-
+enum Status {
+  active,
+  inactive,
+}
 enum BaseUrls {
   api('https://api.skinsyncai.com/api/'),
   apiQa('https://api-qa.skinsyncai.com/api/');

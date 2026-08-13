@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/explore_models.dart';
 import 'package:skinsync_admin/models/requests/community_post_request.dart';
 import 'package:skinsync_admin/models/requests/reel_request.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/explore_view_model.dart';
@@ -616,10 +617,10 @@ class _ReelCard extends ConsumerWidget {
                   child: Column(
                     children: [
                       _CircleActionBtn(
-                        icon: reel.status == 'Active'
+                        icon: reel.status.toLowerCase() == Status.active.name
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
-                        color: reel.status == 'Active'
+                        color: reel.status.toLowerCase() == Status.active.name
                             ? CustomColors.purple
                             : CustomColors.grey,
                         onTap: () {
@@ -647,7 +648,7 @@ class _ReelCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                if (reel.status != 'Active')
+                if (reel.status.toLowerCase() != Status.active.name)
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.4),
@@ -826,7 +827,7 @@ class _PostListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isHidden = post.status != 'Active';
+    final isHidden = post.status.toLowerCase() != Status.active.name;
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 16),
       child: Opacity(
@@ -863,7 +864,10 @@ class _PostListItem extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          Text(post.title.capitalize, style: context.fonts.black16w600),
+                          Text(
+                            post.title.capitalize,
+                            style: context.fonts.black16w600,
+                          ),
                           if (isHidden) ...[
                             context.horizontalSpace(8),
                             Container(
@@ -899,10 +903,12 @@ class _PostListItem extends ConsumerWidget {
 
                   Wrap(
                     spacing: 8,
-                    children:   post.tags
+                    children: post.tags
                         .map(
-                          (tag) =>
-                              Text('#${tag.capitalize}', style: context.fonts.purple11w600),
+                          (tag) => Text(
+                            '#${tag.capitalize}',
+                            style: context.fonts.purple11w600,
+                          ),
                         )
                         .toList(),
                   ),

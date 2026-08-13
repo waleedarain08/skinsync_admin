@@ -1,3 +1,6 @@
+import 'package:skinsync_admin/models/responses/base_response_model.dart';
+import 'package:skinsync_admin/utils/exception.dart';
+
 import '../models/requests/community_post_request.dart';
 import '../models/requests/reel_request.dart';
 import '../models/responses/community_posts_list_response.dart';
@@ -30,25 +33,46 @@ class ExploreService implements ExploreRepository {
   }
 
   @override
-  Future<void> createReel(CreateReelRequest reel) async {
-    await _api.post(Endpoint.explorerReels, body: reel.toJson());
+  Future<BaseApiResponseModel> createReel(CreateReelRequest reel) async {
+    final jsonResponse = await _api.post(
+      Endpoint.explorerReels,
+      body: reel.toJson(),
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!(response.isSuccess)) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 
   @override
-  Future<void> updateReelStatus(int id, String status) async {
-    await _api.put(
+  Future<BaseApiResponseModel> updateReelStatus(int id, String status) async {
+    final jsonResponse = await _api.put(
       Endpoint.updateReel,
       pathParams: {'id': id.toString()},
       body: {'status': status},
     );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!(response.isSuccess)) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 
   @override
-  Future<void> deleteReel(int id) async {
-    await _api.delete(
+  Future<BaseApiResponseModel> deleteReel(int id) async {
+    final jsonResponse = await _api.delete(
       Endpoint.deleteReel,
       pathParams: {'id': id.toString()},
     );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!(response.isSuccess)) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 
   @override
@@ -63,7 +87,8 @@ class ExploreService implements ExploreRepository {
       'limit': limit.toString(),
     };
     if (search != null && search.isNotEmpty) queryParams['search'] = search;
-    if (category != null && category.isNotEmpty) queryParams['category'] = category;
+    if (category != null && category.isNotEmpty)
+      queryParams['category'] = category;
 
     final response = await _api.get(
       Endpoint.explorerCommunity,
@@ -73,25 +98,48 @@ class ExploreService implements ExploreRepository {
   }
 
   @override
-  Future<void> createPost(CreateCommunityPostRequest post) async {
-    await _api.post(Endpoint.explorerCommunity, body: post.toJson());
+  Future<BaseApiResponseModel> createPost(
+    CreateCommunityPostRequest post,
+  ) async {
+    final jsonResponse = await _api.post(
+      Endpoint.explorerCommunity,
+      body: post.toJson(),
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!(response.isSuccess)) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 
   @override
-  Future<void> updatePostStatus(int id, String status) async {
-    await _api.patch(
+  Future<BaseApiResponseModel> updatePostStatus(int id, String status) async {
+    final jsonResponse = await _api.patch(
       Endpoint.updatePost,
       pathParams: {'id': id.toString()},
       body: {'status': status},
     );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!(response.isSuccess)) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 
   @override
-  Future<void> deletePost(int id) async {
-    await _api.delete(
+  Future<BaseApiResponseModel> deletePost(int id) async {
+    final jsonResponse = await _api.delete(
       Endpoint.deletePost,
       pathParams: {'id': id.toString()},
     );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!(response.isSuccess)) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 
   @override
@@ -101,7 +149,16 @@ class ExploreService implements ExploreRepository {
   }
 
   @override
-  Future<void> createPostCategory(String name) async {
-    await _api.post(Endpoint.postCategories, body: {'name': name});
+  Future<BaseApiResponseModel> createPostCategory(String name) async {
+    final jsonResponse = await _api.post(
+      Endpoint.postCategories,
+      body: {'name': name},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!(response.isSuccess)) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 }

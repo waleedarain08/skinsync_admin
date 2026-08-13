@@ -9,6 +9,7 @@ import 'package:skinsync_admin/models/requests/reel_request.dart';
 import 'package:skinsync_admin/repositories/explore_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 import 'package:skinsync_admin/view_models/base_state_model.dart';
 import 'package:skinsync_admin/view_models/base_view_model.dart';
@@ -44,44 +45,44 @@ class ExploreState extends BaseStateModel {
     this.postCategories = const [],
   });
 
- ExploreState copyWith({
-  bool? loading,
-  List<ReelModel>? reels,
-  List<CommunityPostModel>? posts,
-  int? reelsTotalPages,
-  int? postsTotalPages,
-  int? reelsCurrentPage,
-  int? postsCurrentPage,
-  int? pageSize,
-  String? pickedImageUrl,
-  String? pickedVideoUrl,
-  String? pickedThumbnailUrl,
-  bool clearPickedImage = false,
-  bool clearPickedVideo = false,
-  bool clearPickedThumbnail = false,
-  List<PostCategoryModel>? postCategories,
-}) {
-  return ExploreState(
-    loading: loading ?? this.loading,
-    reels: reels ?? this.reels,
-    posts: posts ?? this.posts,
-    reelsTotalPages: reelsTotalPages ?? this.reelsTotalPages,
-    postsTotalPages: postsTotalPages ?? this.postsTotalPages,
-    reelsCurrentPage: reelsCurrentPage ?? this.reelsCurrentPage,
-    postsCurrentPage: postsCurrentPage ?? this.postsCurrentPage,
-    pageSize: pageSize ?? this.pageSize,
-    pickedImageUrl: clearPickedImage
-        ? null
-        : (pickedImageUrl ?? this.pickedImageUrl),
-    pickedVideoUrl: clearPickedVideo
-        ? null
-        : (pickedVideoUrl ?? this.pickedVideoUrl),
-    pickedThumbnailUrl: clearPickedThumbnail
-        ? null
-        : (pickedThumbnailUrl ?? this.pickedThumbnailUrl),
-    postCategories: postCategories ?? this.postCategories,
-  );
-}
+  ExploreState copyWith({
+    bool? loading,
+    List<ReelModel>? reels,
+    List<CommunityPostModel>? posts,
+    int? reelsTotalPages,
+    int? postsTotalPages,
+    int? reelsCurrentPage,
+    int? postsCurrentPage,
+    int? pageSize,
+    String? pickedImageUrl,
+    String? pickedVideoUrl,
+    String? pickedThumbnailUrl,
+    bool clearPickedImage = false,
+    bool clearPickedVideo = false,
+    bool clearPickedThumbnail = false,
+    List<PostCategoryModel>? postCategories,
+  }) {
+    return ExploreState(
+      loading: loading ?? this.loading,
+      reels: reels ?? this.reels,
+      posts: posts ?? this.posts,
+      reelsTotalPages: reelsTotalPages ?? this.reelsTotalPages,
+      postsTotalPages: postsTotalPages ?? this.postsTotalPages,
+      reelsCurrentPage: reelsCurrentPage ?? this.reelsCurrentPage,
+      postsCurrentPage: postsCurrentPage ?? this.postsCurrentPage,
+      pageSize: pageSize ?? this.pageSize,
+      pickedImageUrl: clearPickedImage
+          ? null
+          : (pickedImageUrl ?? this.pickedImageUrl),
+      pickedVideoUrl: clearPickedVideo
+          ? null
+          : (pickedVideoUrl ?? this.pickedVideoUrl),
+      pickedThumbnailUrl: clearPickedThumbnail
+          ? null
+          : (pickedThumbnailUrl ?? this.pickedThumbnailUrl),
+      postCategories: postCategories ?? this.postCategories,
+    );
+  }
 
   ExploreState clearFiles() {
     return ExploreState(
@@ -109,7 +110,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
   final MediaService _mediaService = MediaService();
 
   Future<void> fetchReels({int page = 1}) async {
-    await runSafely(
+    return await runSafely(
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
@@ -126,24 +127,20 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
     );
   }
 
+  void clearPickedImageOnly() {
+    state = state.copyWith(clearPickedImage: true);
+  }
 
+  void clearPickedVideoOnly() {
+    state = state.copyWith(clearPickedVideo: true);
+  }
 
-
-
-void clearPickedImageOnly() {
-  state = state.copyWith(clearPickedImage: true);
-}
-
-void clearPickedVideoOnly() {
-  state = state.copyWith(clearPickedVideo: true);
-}
-
-void clearPickedThumbnailOnly() {
-  state = state.copyWith(clearPickedThumbnail: true);
-}
+  void clearPickedThumbnailOnly() {
+    state = state.copyWith(clearPickedThumbnail: true);
+  }
 
   Future<void> fetchPosts({int page = 1}) async {
-    await runSafely(
+    return await runSafely(
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
@@ -164,7 +161,7 @@ void clearPickedThumbnailOnly() {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
-    await runSafely(showLoading: true, () async {
+    return await runSafely(showLoading: true, () async {
       final String? url = await _mediaService.uploadImage(
         'explore/posts/',
         image,
@@ -180,7 +177,7 @@ void clearPickedThumbnailOnly() {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
-    await runSafely(showLoading: true, () async {
+    return await runSafely(showLoading: true, () async {
       final String? url = await _mediaService.uploadImage(
         'explore/reels/thumbnails/',
         image,
@@ -202,7 +199,7 @@ void clearPickedThumbnailOnly() {
     if (result == null || result.files.isEmpty) return;
     final file = result.files.first;
 
-    await runSafely(showLoading: true, () async {
+    return await runSafely(showLoading: true, () async {
       final String? url = await _mediaService.uploadMedia(
         path: 'explore/reels/',
         file: file,
@@ -247,20 +244,39 @@ void clearPickedThumbnailOnly() {
   }
 
   Future<void> toggleReelVisibility(int id, String currentStatus) async {
-    final newStatus = currentStatus == 'Active' ? 'In Active' : 'Active';
-    await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        await _repository.updateReelStatus(id, newStatus);
-        EasyLoading.showSuccess('Reel status updated to $newStatus');
+    final current = currentStatus.toLowerCase();
+
+    final newStatus = current == Status.active.name
+        ? Status.inactive.name
+        : Status.active.name;
+
+    return await runSafely(() async {
+      final response = await _repository.updateReelStatus(id, newStatus);
+      if (response.isSuccess) {
+        await EasyLoading.showSuccess('Reel status updated to $newStatus');
         await fetchReels(page: state.reelsCurrentPage);
-      },
-    );
+      }
+    });
+  }
+
+  Future<void> togglePostVisibility(int id, String currentStatus) async {
+    final current = currentStatus.toLowerCase();
+
+    final newStatus = current == Status.active.name
+        ? Status.inactive.name
+        : Status.active.name;
+
+    return await runSafely(() async {
+      final response = await _repository.updatePostStatus(id, newStatus);
+      if (response.isSuccess) {
+        EasyLoading.showSuccess('Post status updated to $newStatus');
+        await fetchPosts(page: state.postsCurrentPage);
+      }
+    });
   }
 
   Future<void> deleteReel(int id) async {
-    await runSafely(
+    return await runSafely(
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
@@ -271,21 +287,8 @@ void clearPickedThumbnailOnly() {
     );
   }
 
-  Future<void> togglePostVisibility(int id, String currentStatus) async {
-    final newStatus = currentStatus == 'Active' ? 'In Active' : 'Active';
-    await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        await _repository.updatePostStatus(id, newStatus);
-        EasyLoading.showSuccess('Post status updated to $newStatus');
-        await fetchPosts(page: state.postsCurrentPage);
-      },
-    );
-  }
-
   Future<void> deletePost(int id) async {
-    await runSafely(
+    return await runSafely(
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
@@ -297,7 +300,7 @@ void clearPickedThumbnailOnly() {
   }
 
   Future<void> fetchPostCategories() async {
-    await runSafely(
+    return await runSafely(
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
@@ -308,7 +311,7 @@ void clearPickedThumbnailOnly() {
   }
 
   Future<void> createPostCategory(String name) async {
-    await runSafely(
+    return await runSafely(
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
         await _repository.createPostCategory(name);
@@ -316,5 +319,12 @@ void clearPickedThumbnailOnly() {
         await fetchPostCategories();
       },
     );
+  }
+
+  @override
+  void onError(String message) {
+    super.onError(message);
+    state.copyWith(loading: false);
+    EasyLoading.dismiss();
   }
 }
