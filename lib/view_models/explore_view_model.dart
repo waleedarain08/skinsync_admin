@@ -109,10 +109,12 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
   final ImagePicker _picker = ImagePicker();
   final MediaService _mediaService = MediaService();
 
-  Future<void> fetchReels({int page = 1}) async {
+  Future<void> fetchReels({int page = 1, bool showLoading = true}) async {
     return await runSafely(
       showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
+      onLoadingChange: showLoading
+          ? (l) => state = state.copyWith(loading: l)
+          : null,
       () async {
         final response = await _repository.fetchReels(
           page: page,
@@ -139,10 +141,12 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
     state = state.copyWith(clearPickedThumbnail: true);
   }
 
-  Future<void> fetchPosts({int page = 1}) async {
+  Future<void> fetchPosts({int page = 1, bool showLoading = true}) async {
     return await runSafely(
       showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
+      onLoadingChange: showLoading
+          ? (l) => state = state.copyWith(loading: l)
+          : null,
       () async {
         final response = await _repository.fetchPosts(
           page: page,
@@ -234,7 +238,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
           onLoadingChange: (l) => state = state.copyWith(loading: l),
           () async {
             await _repository.createPost(post);
-            EasyLoading.showSuccess('Post created successfully');
+            await EasyLoading.showSuccess('Post created successfully');
             clearPickedFiles();
             await fetchPosts();
             return true;
@@ -254,7 +258,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
       final response = await _repository.updateReelStatus(id, newStatus);
       if (response.isSuccess) {
         await EasyLoading.showSuccess('Reel status updated to $newStatus');
-        await fetchReels(page: state.reelsCurrentPage);
+        await fetchReels(page: state.reelsCurrentPage, showLoading: false);
       }
     });
   }
@@ -269,8 +273,8 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
     return await runSafely(() async {
       final response = await _repository.updatePostStatus(id, newStatus);
       if (response.isSuccess) {
-        EasyLoading.showSuccess('Post status updated to $newStatus');
-        await fetchPosts(page: state.postsCurrentPage);
+       await  EasyLoading.showSuccess('Post status updated to $newStatus');
+        await fetchPosts(page: state.postsCurrentPage, showLoading: false);
       }
     });
   }
@@ -280,34 +284,30 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
       showLoading: false,
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
-        await _repository.deleteReel(id);
-        EasyLoading.showSuccess('Reel deleted successfully');
-        await fetchReels(page: state.reelsCurrentPage);
+        final response = await _repository.deleteReel(id);
+        if (response.isSuccess) {
+          await EasyLoading.showSuccess('Reel deleted successfully');
+          await fetchReels(page: state.reelsCurrentPage, showLoading: false);
+        }
       },
     );
   }
 
   Future<void> deletePost(int id) async {
-    return await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        await _repository.deletePost(id);
-        EasyLoading.showSuccess('Post deleted successfully');
-        await fetchPosts(page: state.postsCurrentPage);
-      },
-    );
+    return await runSafely(() async {
+      final response = await _repository.deletePost(id);
+      if (response.isSuccess) {
+        await EasyLoading.showSuccess('Post deleted successfully');
+        await fetchPosts(page: state.postsCurrentPage, showLoading: false);
+      }
+    });
   }
 
   Future<void> fetchPostCategories() async {
-    return await runSafely(
-      showLoading: false,
-      onLoadingChange: (l) => state = state.copyWith(loading: l),
-      () async {
-        final categories = await _repository.fetchPostCategories();
-        state = state.copyWith(postCategories: categories);
-      },
-    );
+    return await runSafely(() async {
+      final categories = await _repository.fetchPostCategories();
+      state = state.copyWith(postCategories: categories);
+    });
   }
 
   Future<void> createPostCategory(String name) async {

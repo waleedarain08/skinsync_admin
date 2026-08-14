@@ -48,7 +48,7 @@ class ExploreService implements ExploreRepository {
 
   @override
   Future<BaseApiResponseModel> updateReelStatus(int id, String status) async {
-    final jsonResponse = await _api.put(
+    final jsonResponse = await _api.patch(
       Endpoint.updateReel,
       pathParams: {'id': id.toString()},
       body: {'status': status},
@@ -64,7 +64,7 @@ class ExploreService implements ExploreRepository {
   @override
   Future<BaseApiResponseModel> deleteReel(int id) async {
     final jsonResponse = await _api.delete(
-      Endpoint.deleteReel,
+      Endpoint.updateReel,
       pathParams: {'id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
@@ -131,7 +131,7 @@ class ExploreService implements ExploreRepository {
   @override
   Future<BaseApiResponseModel> deletePost(int id) async {
     final jsonResponse = await _api.delete(
-      Endpoint.deletePost,
+      Endpoint.updatePost,
       pathParams: {'id': id.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
