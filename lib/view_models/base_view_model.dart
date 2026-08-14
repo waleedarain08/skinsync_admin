@@ -24,7 +24,7 @@ abstract class BaseViewModel<S> extends Notifier<S> {
   }) async {
     try {
       if (showLoading) {
-        EasyLoading.show();
+        await EasyLoading.show();
       }
 
       onLoadingChange?.call(true);
@@ -40,7 +40,7 @@ abstract class BaseViewModel<S> extends Notifier<S> {
       onLoadingChange?.call(false);
 
       if (showLoading) {
-        EasyLoading.dismiss();
+        await EasyLoading.dismiss();
       }
     }
   }
