@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
 import '../app_init.dart';
+import '../main.dart';
 import '../models/responses/refresh_token_response.dart';
 import '../screens/sign_in_screen.dart';
 import '../utils/enums.dart';
@@ -15,7 +16,7 @@ import 'locator.dart';
 import 'storage_service.dart';
 
 class ApiBaseHelper {
-  static BaseUrls baseUrl = BaseUrls.apiQa;
+  static BaseUrls baseUrl = isDeploymentMode ? BaseUrls.api : BaseUrls.apiQa;
 
   final http.Client _client = http.Client();
   final Connectivity _connectivity = Connectivity();
@@ -106,7 +107,7 @@ class ApiBaseHelper {
     final uri = Uri.parse(
       '${baseUrl.url}$urlPath',
     ).replace(queryParameters: queryParams);
-     log('URL: ${baseUrl.url}${endpoint.path}');
+    log('URL: ${baseUrl.url}${endpoint.path}');
     return _safeRequest(() async {
       final response = await _client.put(
         uri,
