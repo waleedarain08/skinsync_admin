@@ -19,6 +19,7 @@ import '../../widgets/borderd_container_widget.dart';
 import '../../widgets/custom_outlined_button.dart';
 import '../../widgets/custom_primary_button.dart';
 import '../../widgets/gradient_scaffold.dart';
+import '../../widgets/mini_stat_card.dart';
 import '../../widgets/number_paginator.dart';
 import '../add_new_clinic_screen.dart';
 import '../clinic_detail_screen.dart';
@@ -309,83 +310,35 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
   Widget _buildStatsSummary(BuildContext context) {
     return Row(
       children: [
-        _buildMiniStat(
-          context,
-          'Total Clinics',
-          '3',
-          Icons.business_rounded,
-          CustomColors.purple,
+        const MiniStatCard(
+          title: 'Total Clinics',
+          value: 3,
+          icon: Icons.business_rounded,
+          color: CustomColors.purple,
         ),
         context.horizontalSpace(16),
-        _buildMiniStat(
-          context,
-          'Active Partners',
-          '4',
-          Icons.bolt_rounded,
-          CustomColors.green,
+        const MiniStatCard(
+          title: 'Active Partners',
+          value: 4,
+          icon: Icons.bolt_rounded,
+          color: CustomColors.green,
         ),
         context.horizontalSpace(16),
-        _buildMiniStat(
-          context,
-          'Network Revenue',
-          '\$25K',
-          Icons.payments_rounded,
-          CustomColors.green,
+        const MiniStatCard(
+          title: 'Network Revenue',
+          value: 25000,
+          prefix: '\$',
+          icon: Icons.payments_rounded,
+          color: CustomColors.green,
         ),
         context.horizontalSpace(16),
-        _buildMiniStat(
-          context,
-          'Avg Patient Rating',
-          '4.8',
-          Icons.star_rounded,
-          Colors.amber,
+        const MiniStatCard(
+          title: 'Avg Patient Rating',
+          value: 4.8,
+          icon: Icons.star_rounded,
+          color: Colors.amber,
         ),
       ],
-    );
-  }
-
-  Widget _buildMiniStat(
-    BuildContext context,
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        padding: context.appEdgeInsets(all: 16),
-        child: Row(
-          children: [
-            Container(
-              padding: context.appEdgeInsets(all: 10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: context.borderRadius(all: 8),
-              ),
-              child: Icon(icon, color: color, size: context.sp(20)),
-            ),
-            context.horizontalSpace(14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: context.fonts.black18w600,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  context.verticalSpace(2),
-                  Text(
-                    title,
-                    style: context.fonts.grey11w400,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -755,7 +708,11 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     );
   }
 
-  Widget _tableTextCell(String text, {required TextStyle style, int maxLines = 2}) {
+  Widget _tableTextCell(
+    String text, {
+    required TextStyle style,
+    int maxLines = 2,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Text(
@@ -1142,7 +1099,8 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                 if (_tabController.index == 0) ...[
                   context.horizontalSpace(16),
                   CustomPrimaryButton(
-                    onTap: () => unawaited(context.push(AddNewClinicScreen.routeName)),
+                    onTap: () =>
+                        unawaited(context.push(AddNewClinicScreen.routeName)),
                     icon: Icons.add_rounded,
                     label: 'Add Clinic',
                     width: context.w(180),

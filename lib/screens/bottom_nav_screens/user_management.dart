@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
-import 'package:skinsync_admin/utils/color_constant.dart';
-import 'package:skinsync_admin/utils/custom_fonts.dart';
+import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/user_management_dailog_box.dart';
-
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/mini_stat_card.dart';
 
 class UserManagement extends StatefulWidget {
   static const String routeName = '/user-management';
@@ -30,16 +28,16 @@ class _UserManagementState extends State<UserManagement> {
   Widget build(BuildContext context) {
     return GradientScaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(),
-            SizedBox(height: 32.h),
+            context.verticalSpace(32),
             _buildQuickMetrics(),
-            SizedBox(height: 32.h),
+            context.verticalSpace(32),
             _buildTabSwitcher(),
-            SizedBox(height: 24.h),
+            context.verticalSpace(24),
             _buildUsersTable(),
           ],
         ),
@@ -52,7 +50,7 @@ class _UserManagementState extends State<UserManagement> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('User Management', style: context.fonts.black32w700),
-        SizedBox(height: 4.h),
+        context.verticalSpace(4),
         Text(
           'Manage system access, roles, and status for all participants.',
           style: context.fonts.grey14w400,
@@ -64,48 +62,44 @@ class _UserManagementState extends State<UserManagement> {
   Widget _buildQuickMetrics() {
     return Row(
       children: [
-        _buildMetricCard('Total Users', '15,240', Icons.group_rounded, CustomColors.purple),
-        SizedBox(width: 16.w),
-        _buildMetricCard('Active Staff', '84', Icons.admin_panel_settings_rounded, CustomColors.green),
-        SizedBox(width: 16.w),
-        _buildMetricCard('New Signups', '+120', Icons.person_add_rounded, CustomColors.purple),
-        SizedBox(width: 16.w),
-        _buildMetricCard('Reported', '3', Icons.report_problem_rounded, CustomColors.red),
-      ],
-    );
-  }
-
-  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        padding: EdgeInsets.all(24.w),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10.r)),
-              child: Icon(icon, color: color, size: 24.sp),
-            ),
-            SizedBox(width: 16.w),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: context.fonts.black20w600),
-                Text(title, style: context.fonts.grey12w400),
-              ],
-            ),
-          ],
+        const MiniStatCard(
+          title: 'Total Users',
+          value: 15240,
+          icon: Icons.group_rounded,
+          color: CustomColors.purple,
         ),
-      ),
+        context.horizontalSpace(16),
+        const MiniStatCard(
+          title: 'Active Staff',
+          value: 84,
+          icon: Icons.admin_panel_settings_rounded,
+          color: CustomColors.green,
+        ),
+        context.horizontalSpace(16),
+        const MiniStatCard(
+          title: 'New Signups',
+          value: 120,
+          prefix: '+',
+          icon: Icons.person_add_rounded,
+          color: CustomColors.purple,
+        ),
+        context.horizontalSpace(16),
+        const MiniStatCard(
+          title: 'Reported',
+          value: 3,
+          icon: Icons.report_problem_rounded,
+          color: CustomColors.red,
+        ),
+      ],
     );
   }
 
   Widget _buildTabSwitcher() {
     return Container(
-      padding: EdgeInsets.all(4.w),
+      padding: context.appEdgeInsets(all: 4),
       decoration: BoxDecoration(
         color: CustomColors.whiteGrey,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -122,10 +116,10 @@ class _UserManagementState extends State<UserManagement> {
     return GestureDetector(
       onTap: () => setState(() => _selectedTab = index),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 12.h),
+        padding: context.appEdgeInsets(horizontal: 40, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(10),
           boxShadow: isSelected ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))] : null,
         ),
         child: Text(
@@ -143,7 +137,7 @@ class _UserManagementState extends State<UserManagement> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.all(20.w),
+            padding: context.appEdgeInsets(all: 20),
             child: Row(
               children: [
                 Text(_selectedTab == 0 ? 'Patient Users' : 'Clinic Admins', style: context.fonts.black20w600),
@@ -152,7 +146,7 @@ class _UserManagementState extends State<UserManagement> {
                   controller: _searchController,
                   hintText: 'Search by name or email...',
                   onChanged: (val) => setState(() {}),
-                  maxWidth: 300.w,
+                  maxWidth: context.w(300),
                 ),
               ],
             ),
@@ -172,7 +166,7 @@ class UserDataTable extends StatelessWidget {
     return DataTable(
       headingRowColor: WidgetStateProperty.all(CustomColors.whiteGrey),
       headingTextStyle: context.fonts.grey12w700,
-      columnSpacing: 40.w,
+      columnSpacing: context.w(40),
       columns: const [
         DataColumn(label: Text('User')),
         DataColumn(label: Text('Email')),
@@ -190,8 +184,8 @@ class UserDataTable extends StatelessWidget {
         DataCell(
           Row(
             children: [
-              CircleAvatar(radius: 16.r, backgroundColor: CustomColors.green.withValues(alpha: 0.2), child: const Icon(Icons.person_rounded, size: 18, color: CustomColors.purple)),
-              SizedBox(width: 12.w),
+              CircleAvatar(radius: context.r(16), backgroundColor: CustomColors.green.withValues(alpha: 0.2), child: Icon(Icons.person_rounded, size: context.sp(18), color: CustomColors.purple)),
+              context.horizontalSpace(12),
               Text('Courtney Henry', style: context.fonts.black14w600),
             ],
           ),
@@ -200,8 +194,8 @@ class UserDataTable extends StatelessWidget {
         DataCell(Text('Oct 24, 2023', style: context.fonts.black14w400)),
         DataCell(
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(color: CustomColors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20.r)),
+            padding: context.appEdgeInsets(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(color: CustomColors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
             child: Text('Active', style: context.fonts.green10w700),
           ),
         ),

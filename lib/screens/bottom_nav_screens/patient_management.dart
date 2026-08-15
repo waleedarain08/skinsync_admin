@@ -9,6 +9,7 @@ import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/mini_stat_card.dart';
 import 'package:skinsync_admin/widgets/number_paginator.dart';
 
 class PatientDummyModel {
@@ -192,83 +193,34 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
   Widget _buildQuickMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard(
-          context,
-          'Total Patients',
-          '12,840',
-          Icons.people_rounded,
-          CustomColors.purple,
+        const MiniStatCard(
+          title: 'Total Patients',
+          value: 12840,
+          icon: Icons.people_rounded,
+          color: CustomColors.purple,
         ),
         context.horizontalSpace(16),
-        _buildMetricCard(
-          context,
-          'Verified Profiles',
-          '8,200',
-          Icons.verified_user_rounded,
-          CustomColors.green,
+        const MiniStatCard(
+          title: 'Verified Profiles',
+          value: 8200,
+          icon: Icons.verified_user_rounded,
+          color: CustomColors.green,
         ),
         context.horizontalSpace(16),
-        _buildMetricCard(
-          context,
-          'App Users',
-          '9,450',
-          Icons.smartphone_rounded,
-          CustomColors.green,
+        const MiniStatCard(
+          title: 'App Users',
+          value: 9450,
+          icon: Icons.smartphone_rounded,
+          color: CustomColors.green,
         ),
         context.horizontalSpace(16),
-        _buildMetricCard(
-          context,
-          'Active Network',
-          '3,390',
-          Icons.hub_rounded,
-          CustomColors.purple,
+        const MiniStatCard(
+          title: 'Active Network',
+          value: 3390,
+          icon: Icons.hub_rounded,
+          color: CustomColors.purple,
         ),
       ],
-    );
-  }
-
-  Widget _buildMetricCard(
-    BuildContext context,
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        padding: context.appEdgeInsets(all: 16),
-        child: Row(
-          children: [
-            Container(
-              padding: context.appEdgeInsets(all: 10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: context.borderRadius(all: 8),
-              ),
-              child: Icon(icon, color: color, size: context.sp(20)),
-            ),
-            context.horizontalSpace(14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: context.fonts.black18w600,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  context.verticalSpace(2),
-                  Text(
-                    title,
-                    style: context.fonts.grey11w400,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

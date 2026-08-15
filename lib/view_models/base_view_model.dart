@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
@@ -26,22 +27,20 @@ abstract class BaseViewModel<S> extends Notifier<S> {
       if (showLoading) {
         await EasyLoading.show();
       }
-
       onLoadingChange?.call(true);
-
-      return await action.call();
+      final T? data = await action.call();
+      unawaited(EasyLoading.dismiss());
+      onLoadingChange?.call(false);
+      return data;
     } catch (e, s) {
       log('BASE: $e', stackTrace: s);
+      onLoadingChange?.call(false);
       if (showError) {
         onError(e.toString().replaceAll('Exception:', ''));
-      }
-      return null;
-    } finally {
-      onLoadingChange?.call(false);
-
-      if (showLoading) {
+      } else if (showLoading) {
         await EasyLoading.dismiss();
       }
+      return null;
     }
   }
 

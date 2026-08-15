@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/mini_stat_card.dart';
 
 import '../widgets/dailogbox/payment_dailog_box.dart';
 
@@ -48,35 +49,37 @@ class PaymentScreen extends StatelessWidget {
   Widget _buildPaymentMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard(context, 'Total Network GMV', '\$124,500', Icons.account_balance_wallet_outlined, CustomColors.purple),
-        context.horizontalSpace(16),
-        _buildMetricCard(context, 'Net Platform Revenue', '\$18,675', Icons.trending_up_rounded, CustomColors.green),
-        context.horizontalSpace(16),
-        _buildMetricCard(context, 'Pending Payouts', '\$4,200', Icons.hourglass_empty_rounded, CustomColors.amber),
-        context.horizontalSpace(16),
-        _buildMetricCard(context, 'Active Subscriptions', '142', Icons.sync_rounded, CustomColors.black),
-      ],
-    );
-  }
-
-  Widget _buildMetricCard(BuildContext context, String title, String value, IconData icon, Color color) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        padding: context.appEdgeInsets(all: 24),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: context.sp(28)),
-            context.horizontalSpace(16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: context.fonts.black20w600),
-                Text(title, style: context.fonts.grey12w400),
-              ],
-            ),
-          ],
+        const MiniStatCard(
+          title: 'Total Network GMV',
+          value: 124500,
+          prefix: '\$',
+          icon: Icons.account_balance_wallet_outlined,
+          color: CustomColors.purple,
         ),
-      ),
+        context.horizontalSpace(16),
+        const MiniStatCard(
+          title: 'Net Platform Revenue',
+          value: 18675,
+          prefix: '\$',
+          icon: Icons.trending_up_rounded,
+          color: CustomColors.green,
+        ),
+        context.horizontalSpace(16),
+        const MiniStatCard(
+          title: 'Pending Payouts',
+          value: 4200,
+          prefix: '\$',
+          icon: Icons.hourglass_empty_rounded,
+          color: CustomColors.amber,
+        ),
+        context.horizontalSpace(16),
+        const MiniStatCard(
+          title: 'Active Subscriptions',
+          value: 142,
+          icon: Icons.sync_rounded,
+          color: CustomColors.black,
+        ),
+      ],
     );
   }
 
@@ -88,7 +91,10 @@ class PaymentScreen extends StatelessWidget {
         children: [
           Padding(
             padding: context.appEdgeInsets(all: 20),
-            child: Text('Global Transactions', style: context.fonts.black20w600),
+            child: Text(
+              'Global Transactions',
+              style: context.fonts.black20w600,
+            ),
           ),
           SizedBox(
             height: context.h(300),
@@ -119,13 +125,23 @@ class PaymentScreen extends StatelessWidget {
         DataCell(Text('Oct 24, 14:20', style: context.fonts.black14w400)),
         DataCell(Text('Radiant Skin Care', style: context.fonts.black14w400)),
         DataCell(Text('\$250.00', style: context.fonts.black14w400)),
-        DataCell(Text('\$37.50', style: context.fonts.black14w400.copyWith(color: CustomColors.green))),
+        DataCell(
+          Text(
+            '\$37.50',
+            style: context.fonts.black14w400.copyWith(
+              color: CustomColors.green,
+            ),
+          ),
+        ),
         DataCell(_statusBadge('Completed')),
         DataCell(
           IconButton(
             icon: const Icon(Icons.receipt_long_outlined, size: 20),
             onPressed: () {
-              showDialog(context: context, builder: (_) => const TransactionDetailsDialog());
+              showDialog(
+                context: context,
+                builder: (_) => const TransactionDetailsDialog(),
+              );
             },
           ),
         ),
@@ -152,7 +168,10 @@ class PaymentScreen extends StatelessWidget {
               headingRowColor: WidgetStateProperty.all(CustomColors.softGrey),
               columns: const [
                 DataColumn2(label: Text('CLINIC'), size: ColumnSize.L),
-                DataColumn2(label: Text('REQUESTED AMOUNT'), size: ColumnSize.M),
+                DataColumn2(
+                  label: Text('REQUESTED AMOUNT'),
+                  size: ColumnSize.M,
+                ),
                 DataColumn2(label: Text('BANK ACCOUNT'), size: ColumnSize.L),
                 DataColumn2(label: Text('ACTIONS'), size: ColumnSize.M),
               ],

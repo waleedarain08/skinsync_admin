@@ -18,6 +18,7 @@ import '../../../widgets/borderd_container_widget.dart';
 import '../../../widgets/custom_outlined_button.dart';
 import '../../../widgets/custom_primary_button.dart';
 import '../../../widgets/gradient_scaffold.dart';
+import '../../../widgets/mini_stat_card.dart';
 import '../../../widgets/number_paginator.dart';
 import '../manage_treatment_data_screen.dart';
 
@@ -143,91 +144,27 @@ class _TreatmentManagementScreenState
 
   Widget _buildQuickInsights(TreatmentState state) {
     final totalTreatments = state.treatments.length;
-    final activeTreatments  = state.treatments
+    final activeTreatments = state.treatments
         .where((t) => t.status == 'Active')
         .length;
-    // final categoriesCovered = state.treatments
-    //     .map((t) => t.categoryName)
-    //     .where((c) => c != null && c.isNotEmpty)
-    //     .toSet()
-    //     .length;
-    // final enabledByDefault = state.treatments
-    //     .where((t) => t.enableByDefault)
-    //     .length;
+
     return Row(
       children: [
-        _buildStatCard(
-          'Total Treatments',
-          '$totalTreatments',
-          Icons.layers_outlined,
-          CustomColors.purple,
+        MiniStatCard(
+          title: 'Total Treatments',
+          value: totalTreatments,
+          icon: Icons.layers_outlined,
+          color: CustomColors.purple,
         ),
         context.horizontalSpace(16),
-        _buildStatCard(
-          'Active Treatments',
-          '$activeTreatments',
-          Icons.check_circle_outline_rounded,
-          CustomColors.green,
+        MiniStatCard(
+          title: 'Active Treatments',
+          value: activeTreatments,
+          icon: Icons.check_circle_outline_rounded,
+          color: CustomColors.green,
         ),
         context.horizontalSpace(16),
-        // _buildStatCard(
-        //   'Categories Covered',
-        //   '$categoriesCovered',
-        //   Icons.category_outlined,
-        //   CustomColors.amber,
-        // ),
-        context.horizontalSpace(16),
-        // _buildStatCard(
-        //   'Auto-Assigned',
-        //   '$enabledByDefault',
-        //   Icons.auto_awesome_outlined,
-        //   Colors.blue,
-        // ),
       ],
-    );
-  }
-
-  Widget _buildStatCard(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        padding: context.appEdgeInsets(all: 16),
-        child: Row(
-          children: [
-            Container(
-              padding: context.appEdgeInsets(all: 10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: context.borderRadius(all: 8),
-              ),
-              child: Icon(icon, color: color, size: context.sp(20)),
-            ),
-            context.horizontalSpace(14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: context.fonts.black18w600,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  context.verticalSpace(2),
-                  Text(
-                    title,
-                    style: context.fonts.grey11w400,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -488,7 +425,7 @@ class _TreatmentManagementScreenState
             onPressed: () async {
               if (treatment.id != null) {
                 try {
-                 // ref.read(treatmentViewModelProvider).
+                  // ref.read(treatmentViewModelProvider).
                   await ref
                       .read(treatmentViewModelProvider.notifier)
                       .fetchTreatmentDetail(treatment.id!);

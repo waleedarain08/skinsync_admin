@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/mini_stat_card.dart';
 
 import '../widgets/dailogbox/on_view_dailog_box.dart';
 
@@ -48,35 +49,35 @@ class DisputeScreen extends StatelessWidget {
   Widget _buildDisputeMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard(context, 'Active Disputes', '12', Icons.gavel_outlined, CustomColors.red),
-        context.horizontalSpace(16),
-        _buildMetricCard(context, 'Pending Review', '8', Icons.hourglass_top, CustomColors.amber),
-        context.horizontalSpace(16),
-        _buildMetricCard(context, 'Resolved (30d)', '45', Icons.check_circle_outline, CustomColors.green),
-        context.horizontalSpace(16),
-        _buildMetricCard(context, 'Avg Resolution Time', '2.4 Days', Icons.timer_outlined, CustomColors.black),
-      ],
-    );
-  }
-
-  Widget _buildMetricCard(BuildContext context, String title, String value, IconData icon, Color color) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        padding: context.appEdgeInsets(all: 24),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: context.sp(28)),
-            context.horizontalSpace(16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: context.fonts.black20w600),
-                Text(title, style: context.fonts.grey12w400),
-              ],
-            ),
-          ],
+        const MiniStatCard(
+          title: 'Active Disputes',
+          value: 12,
+          icon: Icons.gavel_outlined,
+          color: CustomColors.red,
         ),
-      ),
+        context.horizontalSpace(16),
+        const MiniStatCard(
+          title: 'Pending Review',
+          value: 8,
+          icon: Icons.hourglass_top,
+          color: CustomColors.amber,
+        ),
+        context.horizontalSpace(16),
+        const MiniStatCard(
+          title: 'Resolved (30d)',
+          value: 45,
+          icon: Icons.check_circle_outline,
+          color: CustomColors.green,
+        ),
+        context.horizontalSpace(16),
+        const MiniStatCard(
+          title: 'Avg Resolution Time',
+          value: 2.4,
+          suffix: ' Days',
+          icon: Icons.timer_outlined,
+          color: CustomColors.black,
+        ),
+      ],
     );
   }
 
@@ -123,7 +124,10 @@ class DisputeScreen extends StatelessWidget {
         DataCell(
           Container(
             padding: context.appEdgeInsets(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: CustomColors.red.withValues(alpha: 0.1), borderRadius: context.appBorderRadius(all: 4)),
+            decoration: BoxDecoration(
+              color: CustomColors.red.withValues(alpha: 0.1),
+              borderRadius: context.appBorderRadius(all: 4),
+            ),
             child: Text('High', style: context.fonts.red10w700),
           ),
         ),
@@ -133,10 +137,20 @@ class DisputeScreen extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.visibility_outlined, size: 20),
                 onPressed: () {
-                  showDialog(context: context, builder: (_) => const DisputeDetailsDialog());
+                  showDialog(
+                    context: context,
+                    builder: (_) => const DisputeDetailsDialog(),
+                  );
                 },
               ),
-              IconButton(icon: const Icon(Icons.check_circle_outline, size: 20, color: CustomColors.green), onPressed: () {}),
+              IconButton(
+                icon: const Icon(
+                  Icons.check_circle_outline,
+                  size: 20,
+                  color: CustomColors.green,
+                ),
+                onPressed: () {},
+              ),
             ],
           ),
         ),
@@ -182,7 +196,9 @@ class DisputeScreen extends StatelessWidget {
         DataCell(Text('#DSP-390', style: context.fonts.black14w400)),
         DataCell(Text('Aura Med Spa', style: context.fonts.black14w400)),
         DataCell(Text('Admin Alex', style: context.fonts.black14w400)),
-        DataCell(Text('Partial Refund Release', style: context.fonts.black14w400)),
+        DataCell(
+          Text('Partial Refund Release', style: context.fonts.black14w400),
+        ),
         DataCell(Text('Oct 20, 2023', style: context.fonts.black14w400)),
       ],
     );

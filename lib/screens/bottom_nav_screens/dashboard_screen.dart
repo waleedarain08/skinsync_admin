@@ -4,6 +4,7 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_badge.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/mini_stat_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -103,81 +104,39 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildQuickStats(BuildContext context) {
     return Row(
       children: [
-        _buildStatCard(
-          context,
-          'Total Clinics',
-          '54',
-          '+12%',
-          Icons.domain_rounded,
-          CustomColors.purple,
+        const MiniStatCard(
+          title: 'Total Clinics',
+          value: 54,
+          growth: '+12%',
+          icon: Icons.domain_rounded,
+          color: CustomColors.purple,
         ),
         context.horizontalSpace(16),
-        _buildStatCard(
-          context,
-          'Active Patients',
-          '12,450',
-          '+5.2%',
-          Icons.people_rounded,
-          CustomColors.green,
+        const MiniStatCard(
+          title: 'Active Patients',
+          value: 12450,
+          growth: '+5.2%',
+          icon: Icons.people_rounded,
+          color: CustomColors.green,
         ),
         context.horizontalSpace(16),
-        _buildStatCard(
-          context,
-          'New Appointments',
-          '3,820',
-          '+18%',
-          Icons.event_available_rounded,
-          CustomColors.lightPurple,
+        const MiniStatCard(
+          title: 'New Appointments',
+          value: 3820,
+          growth: '+18%',
+          icon: Icons.event_available_rounded,
+          color: CustomColors.lightPurple,
         ),
         context.horizontalSpace(16),
-        _buildStatCard(
-          context,
-          'Total Revenue',
-          '\$1.2M',
-          '+24%',
-          Icons.payments_rounded,
-          CustomColors.green,
+        const MiniStatCard(
+          title: 'Total Revenue',
+          value: 1200000,
+          prefix: '\$',
+          growth: '+24%',
+          icon: Icons.payments_rounded,
+          color: CustomColors.green,
         ),
       ],
-    );
-  }
-
-  Widget _buildStatCard(
-    BuildContext context,
-    String title,
-    String value,
-    String growth,
-    IconData icon,
-    Color color,
-  ) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        enableHover: true,
-        padding: context.appEdgeInsets(all: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: context.appEdgeInsets(all: 10),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    borderRadius: context.appBorderRadius(all: 8),
-                  ),
-                  child: Icon(icon, color: color, size: context.sp(20)),
-                ),
-                AppBadge(label: growth, variant: AppBadgeVariant.success),
-              ],
-            ),
-            context.verticalSpace(16),
-            Text(value, style: context.fonts.black20w600),
-            context.verticalSpace(2),
-            Text(title, style: context.fonts.grey13w500),
-          ],
-        ),
-      ),
     );
   }
 

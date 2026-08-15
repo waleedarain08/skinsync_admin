@@ -10,6 +10,7 @@ import 'package:skinsync_admin/widgets/custom_dropdown_widget.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/mini_stat_card.dart';
 import 'package:skinsync_admin/widgets/number_paginator.dart';
 
 class AppointmentDummyModel {
@@ -224,83 +225,34 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
   Widget _buildAppointmentMetrics(BuildContext context) {
     return Row(
       children: [
-        _buildMetricCard(
-          context,
-          'Upcoming',
-          '1,240',
-          Icons.event_available_rounded,
-          CustomColors.green,
+        const MiniStatCard(
+          title: 'Upcoming',
+          value: 1240,
+          icon: Icons.event_available_rounded,
+          color: CustomColors.green,
         ),
         context.horizontalSpace(16),
-        _buildMetricCard(
-          context,
-          'Completed',
-          '8,450',
-          Icons.check_circle_outline_rounded,
-          CustomColors.green,
+        const MiniStatCard(
+          title: 'Completed',
+          value: 8450,
+          icon: Icons.check_circle_outline_rounded,
+          color: CustomColors.green,
         ),
         context.horizontalSpace(16),
-        _buildMetricCard(
-          context,
-          'Cancelled',
-          '120',
-          Icons.cancel_outlined,
-          CustomColors.red,
+        const MiniStatCard(
+          title: 'Cancelled',
+          value: 120,
+          icon: Icons.cancel_outlined,
+          color: CustomColors.red,
         ),
         context.horizontalSpace(16),
-        _buildMetricCard(
-          context,
-          'No Shows',
-          '45',
-          Icons.person_off_outlined,
-          CustomColors.amber,
+        const MiniStatCard(
+          title: 'No Shows',
+          value: 45,
+          icon: Icons.person_off_outlined,
+          color: CustomColors.amber,
         ),
       ],
-    );
-  }
-
-  Widget _buildMetricCard(
-    BuildContext context,
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        padding: context.appEdgeInsets(all: 16),
-        child: Row(
-          children: [
-            Container(
-              padding: context.appEdgeInsets(all: 10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: context.borderRadius(all: 8),
-              ),
-              child: Icon(icon, color: color, size: context.sp(20)),
-            ),
-            context.horizontalSpace(14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: context.fonts.black18w600,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  context.verticalSpace(2),
-                  Text(
-                    title,
-                    style: context.fonts.grey11w400,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

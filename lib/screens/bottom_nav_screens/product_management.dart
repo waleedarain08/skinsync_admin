@@ -16,6 +16,7 @@ import '../../widgets/borderd_container_widget.dart';
 import '../../widgets/custom_dropdown_widget.dart';
 import '../../widgets/custom_primary_button.dart';
 import '../../widgets/gradient_scaffold.dart';
+import '../../widgets/mini_stat_card.dart';
 import '../../widgets/number_paginator.dart';
 import '../../widgets/status_toggle_switch.dart';
 import '../create_product_screen.dart';
@@ -167,38 +168,36 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     final lotTrackingEnabled = catalogProducts
         .where((p) => p.enforceLotTracking ?? false)
         .length;
-    // final devicesCount = catalogProducts
-    //     .where((p) => p.productPurpose == 'device')
-    //     .length;
 
     return Row(
       children: [
-        _buildCatalogStat(
-          'Total Master SKUs',
-          '$totalSkus',
-          Icons.inventory_2_outlined,
-          CustomColors.purple,
+        MiniStatCard(
+          title: 'Total Master SKUs',
+          value: totalSkus,
+          icon: Icons.inventory_2_outlined,
+          color: CustomColors.purple,
         ),
         context.horizontalSpace(16),
-        _buildCatalogStat(
-          'Published Brands',
-          '$totalBrands',
-          Icons.workspace_premium_outlined,
-          CustomColors.amber,
+        MiniStatCard(
+          title: 'Published Brands',
+          value: totalBrands,
+          icon: Icons.workspace_premium_outlined,
+          color: CustomColors.amber,
         ),
         context.horizontalSpace(16),
-        _buildCatalogStat(
-          'Lot Tracking Enabled',
-          '$lotTrackingEnabled',
-          Icons.pin_outlined,
-          CustomColors.green,
+        MiniStatCard(
+          title: 'Lot Tracking Enabled',
+          value: lotTrackingEnabled,
+          icon: Icons.pin_outlined,
+          color: CustomColors.green,
         ),
         context.horizontalSpace(16),
-        _buildCatalogStat(
-          'Device Catalog',
-          '0 Devices',
-          Icons.biotech_outlined,
-          CustomColors.black,
+        const MiniStatCard(
+          title: 'Device Catalog',
+          value: 0,
+          suffix: ' Devices',
+          icon: Icons.biotech_outlined,
+          color: CustomColors.black,
         ),
       ],
     );
@@ -244,49 +243,6 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
           ],
         );
       },
-    );
-  }
-
-  Widget _buildCatalogStat(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Expanded(
-      child: BorderdContainerWidget(
-        padding: context.appEdgeInsets(all: 20),
-        child: Row(
-          children: [
-            Container(
-              padding: context.appEdgeInsets(all: 12),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: context.appBorderRadius(all: 10),
-              ),
-              child: Icon(icon, color: color, size: context.sp(24)),
-            ),
-            context.horizontalSpace(16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: context.fonts.black20w600,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    title,
-                    style: context.fonts.grey12w400,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
