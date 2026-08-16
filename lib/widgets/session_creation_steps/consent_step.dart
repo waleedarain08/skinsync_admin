@@ -121,9 +121,18 @@ class ConsentStep extends ConsumerWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      Text(
-                        '${(file.size / 1024).toStringAsFixed(1)} KB',
-                        style: context.fonts.grey12w400,
+                      FutureBuilder(
+                        future: file.length(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final size = snapshot.data! / 1024;
+                            return Text(
+                              '${size.toStringAsFixed(1)} KB',
+                              style: context.fonts.grey12w400,
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
                       ),
                     ],
                   ),
@@ -147,7 +156,9 @@ class ConsentStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final SessionState state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
-    final CategoryDetailDto? selectedCategory = ref.watch(treatmentViewModelProvider).selectedCategoryDetail;
+    final CategoryDetailDto? selectedCategory = ref
+        .watch(treatmentViewModelProvider)
+        .selectedCategoryDetail;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

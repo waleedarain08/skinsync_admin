@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -233,14 +232,11 @@ class _CategoryCreationDialogState
       _viewConsentPdf();
       return;
     }
-    final result = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
-      withData: kIsWeb,
     );
-    if (result == null || result.files.isEmpty || !mounted) return;
-
-    final file = result.files.first;
+    if (file == null || !mounted) return;
     final url = await _uploadWithLoading(
       loadingMessage: 'Uploading consent form...',
       errorMessage: 'Failed to upload consent form',

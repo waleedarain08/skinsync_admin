@@ -1,6 +1,8 @@
-// ignore_for_file: avoid_positional_boolean_parameters
 import 'dart:developer';
 import 'dart:typed_data';
+
+import 'package:camera/camera.dart';
+import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' hide Notification;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -12,25 +14,24 @@ import 'package:skinsync_admin/models/requests/create_session_requests/down_time
 import 'package:skinsync_admin/models/requests/create_session_requests/final_finish_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/follow_up_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/phase_notifications_request.dart';
+import 'package:skinsync_admin/models/requests/create_session_requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/post_treatment_instruction_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/pre_treatment_instruction_request.dart';
-import 'package:skinsync_admin/models/requests/create_session_requests/post_photos_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/product_usage_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/step_pricing_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/responses/down_time_level_response.dart';
-import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/models/responses/session_detail_response.dart';
-import 'package:skinsync_admin/models/common_models.dart';
-import 'package:collection/collection.dart';
+import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/repositories/product_repository.dart';
 import 'package:skinsync_admin/repositories/session_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/utils/exception.dart';
+import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+
 import '../models/session_model.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
@@ -550,7 +551,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
                 );
               }).toList();
 
-              final mappedOtherUsages = detail.otherMaterials?.map((id) {
+              final mappedOtherUsages = detail.otherMaterials.map((id) {
                 final product = state.products.firstWhereOrNull(
                   (p) => p.id == id,
                 );
@@ -1071,7 +1072,7 @@ class SessionViewModel extends BaseViewModel<SessionState> {
         if (bytes.isNotEmpty) {
           final uploadedFile = await mediaService.uploadFile(
             'treatment/pdf',
-            PlatformFile(name: pdfName, size: bytes.length, bytes: bytes),
+            XFile.fromData(bytes, name: pdfName, length: bytes.length),
           );
 
           if (uploadedFile == null) {
@@ -1697,8 +1698,7 @@ Body                 : ${request.toJson()}
   }
 
   Future<void> pickAttachments(bool isPreTreatment) async {
-    final FilePickerResult? result = await FilePicker.pickFiles(
-      allowMultiple: true,
+    final files = await FilePicker.pickFiles(
       withData: true,
       type: FileType.custom,
       allowedExtensions: [
@@ -1715,12 +1715,12 @@ Body                 : ${request.toJson()}
       ],
     );
 
-    if (result == null) return;
+    if (files.isEmpty) return;
 
     await runSafely(() async {
       final uploaded = <Attachment>[];
 
-      for (final file in result.files) {
+      for (final file in files) {
         log('Uploading: ${file.name}');
 
         final url = await MediaService().uploadMedia(
@@ -1762,7 +1762,7 @@ Body                 : ${request.toJson()}
   }
 
   String _getFileType(PlatformFile file) {
-    final ext = file.extension?.toLowerCase();
+    final ext = file.name.split('.').lastOrNull?.toLowerCase();
     if (ext == 'pdf') return 'pdf';
     if (['jpg', 'jpeg', 'png', 'webp'].contains(ext)) return 'image';
     if (['mp4', 'mov', 'avi', 'mkv'].contains(ext)) return 'video';
@@ -1886,15 +1886,12 @@ Body                 : ${request.toJson()}
   }
 
   Future<void> pickConsentForm() async {
-    final FilePickerResult? result = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
-      withData: true,
     );
 
-    if (result != null && result.files.isNotEmpty) {
-      final file = result.files.first;
-
+    if (file != null) {
       final String? url = await MediaService().uploadMedia(
         path: 'treatment',
         file: file,
@@ -1991,8 +1988,8 @@ Body                 : ${request.toJson()}
 }
 
 class SessionViewModelEntry {
-   final String status;
-   SessionViewModelEntry copyWithStatus(String newStatus) {
+  final String status;
+  SessionViewModelEntry copyWithStatus(String newStatus) {
     return SessionViewModelEntry(
       sessionId: sessionId,
       sessionNumber: sessionNumber,
@@ -2016,10 +2013,11 @@ class SessionViewModelEntry {
       consentSnapshot: consentSnapshot,
     );
   }
+
   final int? sessionId;
   final int sessionNumber;
   final String? title;
-  
+
   final TextEditingController totalFollowUpsController;
   List<FollowUpEntry> followUps;
   final bool isDetailedEntered;
@@ -2143,7 +2141,7 @@ class ProductUsageEntry {
     required this.productName,
     required this.unit,
     this.usageType = 'Required',
-    this.deductionTiming ,
+    this.deductionTiming,
     this.allowSubstitution = false,
     TextEditingController? minQuantityController,
     TextEditingController? maxQuantityController,
