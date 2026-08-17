@@ -109,6 +109,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
         state = state.copyWith(
           categories: categories,
           flattenedCategories: flattened,
+          loading: false,
         );
       },
     );

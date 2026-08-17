@@ -20,6 +20,7 @@ import '../../../widgets/custom_primary_button.dart';
 import '../../../widgets/gradient_scaffold.dart';
 import '../../../widgets/mini_stat_card.dart';
 import '../../../widgets/number_paginator.dart';
+import '../../widgets/app_loader.dart';
 import '../manage_treatment_data_screen.dart';
 
 class TreatmentManagementScreen extends ConsumerStatefulWidget {
@@ -43,15 +44,39 @@ class _TreatmentManagementScreenState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(treatmentViewModelProvider.notifier).initialize();
-      ref.read(categoryViewModelProvider.notifier).fetchCategories();
+      ref
+          .read(categoryViewModelProvider.notifier)
+          .fetchCategories(showLoading: false);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(treatmentViewModelProvider);
-    final viewModel = ref.read(treatmentViewModelProvider.notifier);
+    final categoryLoading = ref.watch(
+      categoryViewModelProvider.select((s) => s.loading),
+    );
+    return GradientScaffold(
+      body: Padding(
+        padding: context.appEdgeInsets(horizontal: 28, vertical: 28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            context.verticalSpace(32),
+            Expanded(
+              child: state.loading || categoryLoading
+                  ? const Center(child: AppLoader())
+                  : _buildBody(context, state),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
+  SingleChildScrollView _buildBody(BuildContext context, TreatmentState state) {
+    final viewModel = ref.read(treatmentViewModelProvider.notifier);
     // Filter treatments dynamically based on inline filters
     final filteredTreatments = state.treatments.where((t) {
       final query = viewModel.searchController.text.toLowerCase();
@@ -62,42 +87,35 @@ class _TreatmentManagementScreenState
           (t.shortDescription?.toLowerCase().contains(query) ?? false);
       return matchesQuery;
     }).toList();
-
-    return GradientScaffold(
-      body: SingleChildScrollView(
-        padding: context.appEdgeInsets(horizontal: 28, vertical: 28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(context),
-            context.verticalSpace(32),
-            _buildQuickInsights(state),
-            context.verticalSpace(32),
-            _buildFilters(viewModel),
-            context.verticalSpace(24),
-            _isCategoryView
-                ? _buildCategoryViewSection(viewModel, state)
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTreatmentTable(filteredTreatments, viewModel),
-                      if (state.totalPages > 1)
-                        Padding(
-                          padding: context.appEdgeInsets(vertical: 24),
-                          child: Center(
-                            child: NumberPaginator(
-                              totalPages: state.totalPages,
-                              currentPage: state.currentPage - 1,
-                              onPageChanged: (pageIndex) {
-                                viewModel.getTreatments(page: pageIndex + 1);
-                              },
-                            ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildQuickInsights(state),
+          context.verticalSpace(32),
+          _buildFilters(viewModel),
+          context.verticalSpace(24),
+          _isCategoryView
+              ? _buildCategoryViewSection(viewModel, state)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTreatmentTable(filteredTreatments, viewModel),
+                    if (state.totalPages > 1)
+                      Padding(
+                        padding: context.appEdgeInsets(vertical: 24),
+                        child: Center(
+                          child: NumberPaginator(
+                            totalPages: state.totalPages,
+                            currentPage: state.currentPage - 1,
+                            onPageChanged: (pageIndex) {
+                              viewModel.getTreatments(page: pageIndex + 1);
+                            },
                           ),
                         ),
-                    ],
-                  ),
-          ],
-        ),
+                      ),
+                  ],
+                ),
+        ],
       ),
     );
   }
@@ -197,11 +215,11 @@ class _TreatmentManagementScreenState
                   _activeCategoryId = null;
                   ref
                       .read(treatmentViewModelProvider.notifier)
-                      .getTreatments(page: 1, showLoading: true);
+                      .getTreatments(page: 1);
                 } else {
                   ref
                       .read(categoryViewModelProvider.notifier)
-                      .fetchCategories();
+                      .fetchCategories(showLoading: false);
                 }
               });
             },
@@ -533,15 +551,6 @@ class _TreatmentManagementScreenState
     TreatmentState state,
   ) {
     final categoryState = ref.watch(categoryViewModelProvider);
-
-    if (categoryState.loading && categoryState.categories.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 48),
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
 
     if (categoryState.categories.isEmpty) {
       return BorderdContainerWidget(

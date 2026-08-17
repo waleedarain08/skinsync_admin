@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,14 +12,15 @@ import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/category_detail_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
 import 'package:skinsync_admin/models/treatment_data_models.dart';
-import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/repositories/category_repository.dart';
 import 'package:skinsync_admin/repositories/treatment_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 import 'package:skinsync_admin/utils/sku_utils.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
+
 import '../models/requests/create_treatment_requests/update_basic_info_request.dart';
 import '../models/responses/treatment_list_response.dart';
 import 'base_state_model.dart';
@@ -132,7 +134,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     );
   }
 
-  Future<bool> getTreatments({
+  Future<bool?> getTreatments({
     int page = 1,
     String search = '',
     int limit = 10,
@@ -141,59 +143,51 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     bool showLoading = false,
   }) async {
     return await runSafely<bool?>(showLoading: showLoading, () async {
-          state = state.copyWith(loading: true, currentPage: page);
-          try {
-            final response = await _treatmentRepository.getTreatments(
-              page: page,
-              limit: limit,
-              search: search,
-              categoryId: categoryId,
-              status: status,
-            );
-            final list = (response.data ?? []).map((dto) {
-              return TreatmentListData(
-                id: dto.id,
-                patientDisplayName: dto.patientDisplayName,
-                shortDescription: dto.shortDescription,
-                globalSku: dto.globalSku,
-                icon: dto.icon,
-                image: dto.image,
-                status: dto.status ?? 'active',
-              );
-            }).toList();
+      state = state.copyWith(loading: true, currentPage: page);
+      final response = await _treatmentRepository.getTreatments(
+        page: page,
+        limit: limit,
+        search: search,
+        categoryId: categoryId,
+        status: status,
+      );
+      final list = (response.data ?? []).map((dto) {
+        return TreatmentListData(
+          id: dto.id,
+          patientDisplayName: dto.patientDisplayName,
+          shortDescription: dto.shortDescription,
+          globalSku: dto.globalSku,
+          icon: dto.icon,
+          image: dto.image,
+          status: dto.status ?? 'active',
+        );
+      }).toList();
 
-            state = state.copyWith(
-              treatments: categoryId == null ? list : null,
-              filteredTreatments: list,
-              createTreatments: categoryId != null ? list : null,
-              loading: false,
-              currentPage: response.page ?? page,
-              totalPages: response.totalPages ?? 1,
-              totalResults: list.length,
-            );
-            return true;
-          } catch (e) {
-            state = state.copyWith(loading: false);
-            rethrow;
-          }
-        }) ??
-        false;
+      state = state.copyWith(
+        treatments: categoryId == null ? list : null,
+        filteredTreatments: list,
+        createTreatments: categoryId != null ? list : null,
+        loading: false,
+        currentPage: response.page ?? page,
+        totalPages: response.totalPages ?? 1,
+        totalResults: list.length,
+      );
+      return true;
+    });
   }
 
-  Future<bool> fetchTreatmentDetail(int id, {bool loading = true}) async {
+  Future<bool?> fetchTreatmentDetail(int id, {bool loading = true}) async {
     return await runSafely<bool>(showLoading: loading, () async {
-          final response = await _treatmentRepository.getTreatmentDetail(
-            id: id,
-          );
-          if (response.isSuccess && response.data != null) {
-            state = state.copyWith(
-              selectedTreatmentId: response.data?.id,
-              selectedTreatmentDetail: response.data);
-            return true;
-          }
-          return false;
-        }) ??
-        false;
+      final response = await _treatmentRepository.getTreatmentDetail(id: id);
+      if (response.isSuccess && response.data != null) {
+        state = state.copyWith(
+          selectedTreatmentId: response.data?.id,
+          selectedTreatmentDetail: response.data,
+        );
+        return true;
+      }
+      return false;
+    });
   }
 
   Future<bool?> changeSessionStatus({
@@ -206,60 +200,58 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
       if (response.isSuccess) {
         final treatmentId = state.selectedTreatmentDetail?.id;
         if (treatmentId != null) {
-          await fetchTreatmentDetail(treatmentId,loading: false);
+          await fetchTreatmentDetail(treatmentId, loading: false);
         }
-          // NEW: also sync SessionsStep's data source
-      final areaId = state.selectedTreatmentAreaIds.isNotEmpty
-          ? state.selectedTreatmentAreaIds.last
-          : null;
-      if (treatmentId != null && areaId != null) {
-        await ref.read(sessionViewModelProvider.notifier)
-            .fetchSessions(treatmentId: treatmentId, areaId: areaId);
+        // NEW: also sync SessionsStep's data source
+        final areaId = state.selectedTreatmentAreaIds.isNotEmpty
+            ? state.selectedTreatmentAreaIds.last
+            : null;
+        if (treatmentId != null && areaId != null) {
+          await ref
+              .read(sessionViewModelProvider.notifier)
+              .fetchSessions(treatmentId: treatmentId, areaId: areaId);
+        }
       }
-    
-      }
-      
+
       return true;
     });
   }
 
-  Future<bool> changeTreatmentStatus(
+  Future<bool?> changeTreatmentStatus(
     int treatmentId,
     String status, {
     bool callDetail = false,
   }) async {
     return await runSafely<bool>(
-          onLoadingChange: (loading) {
-            if (!callDetail) {
-              state = state.copyWith(loading: loading);
-            }
-          },
-          () async {
-            await _treatmentRepository.updateTreatmentStatus(
-              treatmentId: treatmentId,
-              status: status,
-            );
-            if (callDetail == false) {
-              await getTreatments(page: state.currentPage);
+      showLoading: false,
+      onLoadingChange: (loading) {
+        if (!callDetail) {
+          state = state.copyWith(loading: loading);
+        }
+      },
+      () async {
+        await _treatmentRepository.updateTreatmentStatus(
+          treatmentId: treatmentId,
+          status: status,
+        );
+        if (callDetail == false) {
+          await getTreatments(page: state.currentPage);
 
-              if (state.selectedTreatment?.id == treatmentId) {
-                final updated = state.treatments.firstWhere(
-                  (t) => t.id == treatmentId,
-                  orElse: () => state.selectedTreatment!,
-                );
-                state = state.copyWith(selectedTreatment: updated);
-              }
-            } else {
-              await fetchTreatmentDetail(treatmentId, loading: false);
-            }
-
-            await EasyLoading.showSuccess(
-              'Treatment status updated successfully',
+          if (state.selectedTreatment?.id == treatmentId) {
+            final updated = state.treatments.firstWhere(
+              (t) => t.id == treatmentId,
+              orElse: () => state.selectedTreatment!,
             );
-            return true;
-          },
-        ) ??
-        false;
+            state = state.copyWith(selectedTreatment: updated);
+          }
+        } else {
+          await fetchTreatmentDetail(treatmentId, loading: false);
+        }
+
+        await EasyLoading.showSuccess('Treatment status updated successfully');
+        return true;
+      },
+    );
   }
 
   void resetForm() {
@@ -303,7 +295,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     shortDescriptionController.text = treatment.shortDescription ?? '';
 
     state = state.copyWith(
-      selectedTreatmentId: treatment.id ,
+      selectedTreatmentId: treatment.id,
       status: treatment.status,
       treatmentImageUrl: treatment.image,
       treatmentIconUrl: treatment.icon,
@@ -834,6 +826,12 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
   void updateAreas(List<AreaViewModelEntry> areas) {
     final dynamicIds = _getDynamicSelectedAreaIds(areas);
     state = state.copyWith(areas: areas, selectedTreatmentAreaIds: dynamicIds);
+  }
+
+  @override
+  void onError(String message) {
+    state = state.copyWith(loading: false);
+    super.onError(message);
   }
 }
 
