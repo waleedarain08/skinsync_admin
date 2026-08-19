@@ -3,9 +3,9 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/explore_models.dart';
-import 'package:skinsync_admin/models/responses/post_category_list_response.dart';
 import 'package:skinsync_admin/models/requests/community_post_request.dart';
 import 'package:skinsync_admin/models/requests/reel_request.dart';
+import 'package:skinsync_admin/models/responses/post_category_list_response.dart';
 import 'package:skinsync_admin/repositories/explore_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
@@ -194,14 +194,9 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
   }
 
   Future<void> pickAndUploadVideo() async {
-    final FilePickerResult? result = await FilePicker.pickFiles(
-      type: FileType.video,
-      allowMultiple: false,
-      withData: true,
-    );
+    final file = await FilePicker.pickFile(type: FileType.video);
 
-    if (result == null || result.files.isEmpty) return;
-    final file = result.files.first;
+    if (file == null) return;
 
     return await runSafely(showLoading: true, () async {
       final String? url = await _mediaService.uploadMedia(
@@ -273,7 +268,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
     return await runSafely(() async {
       final response = await _repository.updatePostStatus(id, newStatus);
       if (response.isSuccess) {
-       await  EasyLoading.showSuccess('Post status updated to $newStatus');
+        await EasyLoading.showSuccess('Post status updated to $newStatus');
         await fetchPosts(page: state.postsCurrentPage, showLoading: false);
       }
     });

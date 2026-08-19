@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/utils/enums.dart';
+import 'package:skinsync_admin/widgets/app_loader.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/select_or_create_dropdown_widget.dart';
@@ -46,7 +47,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(productViewModelProvider.notifier)
-          .fetchProducts(page: 1, limit: 20);
+          .fetchProducts(page: 1, limit: 20, showLoading: false);
     });
   }
 
@@ -59,6 +60,26 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(productViewModelProvider);
+    return GradientScaffold(
+      body: Padding(
+        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            context.verticalSpace(32),
+            Expanded(
+              child: state.loading
+                  ? const Center(child: AppLoader())
+                  : _buildBody(context, state),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SingleChildScrollView _buildBody(BuildContext context, ProductState state) {
     final catalogProducts = state.products;
 
     // Filter products dynamically
@@ -74,48 +95,42 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
     }).toList();
 
     final paginatedProducts = filteredProducts;
-
-    return GradientScaffold(
-      body: SingleChildScrollView(
-        padding: context.appEdgeInsets(horizontal: 24, vertical: 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            context.verticalSpace(32),
-            _buildCatalogOverview(),
-            context.verticalSpace(32),
-            _buildFilters(),
-            context.verticalSpace(24),
-            _isManufacturerView
-                ? _buildManufacturerViewSection(state)
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildCatalogTable(paginatedProducts),
-                      if (state.totalPages >= 1)
-                        Padding(
-                          padding: context.appEdgeInsets(vertical: 24),
-                          child: Center(
-                            child: NumberPaginator(
-                              totalPages: state.totalPages,
-                              currentPage: state.currentPage - 1,
-                              onPageChanged: (pageIndex) {
-                                ref
-                                    .read(productViewModelProvider.notifier)
-                                    .fetchProducts(
-                                      search: state.searchKeyword,
-                                      page: pageIndex + 1,
-                                      limit: state.pageSize,
-                                    );
-                              },
-                            ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildCatalogOverview(),
+          context.verticalSpace(32),
+          _buildFilters(),
+          context.verticalSpace(24),
+          _isManufacturerView
+              ? _buildManufacturerViewSection(state)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildCatalogTable(paginatedProducts),
+                    if (state.totalPages >= 1)
+                      Padding(
+                        padding: context.appEdgeInsets(vertical: 24),
+                        child: Center(
+                          child: NumberPaginator(
+                            totalPages: state.totalPages,
+                            currentPage: state.currentPage - 1,
+                            onPageChanged: (pageIndex) {
+                              ref
+                                  .read(productViewModelProvider.notifier)
+                                  .fetchProducts(
+                                    search: state.searchKeyword,
+                                    page: pageIndex + 1,
+                                    limit: state.pageSize,
+                                    showLoading: false,
+                                  );
+                            },
                           ),
                         ),
-                    ],
-                  ),
-          ],
-        ),
+                      ),
+                  ],
+                ),
+        ],
       ),
     );
   }
@@ -262,7 +277,12 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
               onChanged: (val) {
                 ref
                     .read(productViewModelProvider.notifier)
-                    .fetchProducts(search: val, page: 1, limit: state.pageSize);
+                    .fetchProducts(
+                      search: val,
+                      page: 1,
+                      limit: state.pageSize,
+                      showLoading: false,
+                    );
               },
             ),
           ),
@@ -274,7 +294,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                 if (_isManufacturerView) {
                   await ref
                       .read(productViewModelProvider.notifier)
-                      .fetchManufacturer();
+                      .fetchManufacturer(showLoading: false);
                 } else {
                   await ref
                       .read(productViewModelProvider.notifier)
@@ -282,6 +302,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                         search: state.searchKeyword,
                         selectedPurpose: _selectedPurpose,
                         status: _selectedStatus,
+                        showLoading: false,
                       );
                   _expandedManufacturerId = null;
                   _activeBrandId = null;
@@ -322,6 +343,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                         .fetchProducts(
                           search: state.searchKeyword,
                           selectedPurpose: _selectedPurpose,
+                          showLoading: false,
                         );
                   },
                   onOpen: () => ref
@@ -359,6 +381,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                       .fetchProducts(
                         search: state.searchKeyword,
                         status: _selectedStatus,
+                        showLoading: false,
                       );
                 });
               },
@@ -513,6 +536,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                                           brandId: brand.id,
                                           page: 1,
                                           limit: state.pageSize,
+                                          showLoading: false,
                                         );
                                   } else {
                                     if (_activeBrandId == brand.id) {

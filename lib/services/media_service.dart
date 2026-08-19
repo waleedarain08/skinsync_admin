@@ -1,13 +1,10 @@
 import 'dart:developer';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:http/http.dart';
 import 'package:mime/mime.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../main.dart';
 
@@ -61,13 +58,13 @@ class MediaService {
     };
   }
 
-  Future<String?> uploadFile(String path, PlatformFile file) async {
+  Future<String?> uploadFile(String path, XFile file) async {
     final storagePath = '$path/${file.name}';
     final ref = _storage
         .ref(isDeploymentMode ? 'production/' : 'staging/')
         .child(storagePath);
     final metadata = SettableMetadata(
-      contentType: file.extension == 'pdf'
+      contentType: file.name.toLowerCase().endsWith('.pdf')
           ? 'application/pdf'
           : 'application/octet-stream',
     );
@@ -75,9 +72,6 @@ class MediaService {
 
     if (bytes.isNotEmpty) {
       final task = ref.putData(bytes, metadata);
-      await task.whenComplete(() {});
-    } else if (file.path != null) {
-      final task = ref.putFile(File(file.path!), metadata);
       await task.whenComplete(() {});
     } else {
       throw Exception('File data not available');
@@ -174,42 +168,19 @@ class MediaService {
     };
   }
 
-  Future<XFile?> downloadSimulationImage({
-    int? simId,
-    String? imageUrl,
-    required String pose,
-  }) async {
-    if (imageUrl == null) {
-      return null;
-    }
-    final uri = Uri.parse(imageUrl);
-    final ext = uri.path.split('.').last;
-    final dir = await getApplicationCacheDirectory();
-    final path = '${dir.path}/simulation_${pose}_${simId ?? 0}.$ext';
-    final file = File(path);
-    if (await file.exists()) {
-      return XFile(file.path);
-    }
-    final response = await get(uri);
-    if (response.statusCode != 200) {
-      return null;
-    }
-    await file.writeAsBytes(response.bodyBytes);
-    log('PATH: ${uri.path}');
-    return XFile(path);
-  }
-
   Future<Uint8List> _compressImage(Uint8List data) async {
-    Uint8List result = Uint8List.fromList(data);
-    int count = 0;
-    while (result.length > maxSizeBytes) {
+    Uint8List result = data;
+    int quality = 90;
+    log('ORIGINAL SIZE: ${data.length}');
+
+    while (result.length > maxSizeBytes && quality >= 10) {
       result = await FlutterImageCompress.compressWithList(
         data,
-        format: .jpeg,
-        quality: 90,
+        format: CompressFormat.jpeg,
+        quality: quality,
       );
-      count++;
-      log('ITERATION # $count, SIZE: ${result.length}');
+      log('COMPRESSION ITERATION - QUALITY: $quality, SIZE: ${result.length}');
+      quality -= 10;
     }
     return result;
   }

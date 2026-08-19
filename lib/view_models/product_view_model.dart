@@ -164,53 +164,46 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     String? selectedPurpose = '',
     ProductStatus status = ProductStatus.all,
     int? brandId,
+    bool showLoading = false,
   }) async {
     await runSafely(
+      showLoading: showLoading,
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
-        try {
-          final response = await _productRepository.getProducts(
-            search: search,
-            page: page,
-            limit: limit,
-            selectedPurpose: selectedPurpose,
-            status: status,
-            brandId: brandId,
-          );
-          state = state.copyWith(
-            products: (response.data ?? [])
-                .map((e) => e.toProductModel())
-                .toList(),
-            currentPage: response.page,
-            pageSize: response.limit,
-            totalPages: response.totalPages,
-            searchKeyword: search,
-            errorMessage: null,
-          );
-        } catch (e) {
-          state = state.copyWith(errorMessage: e.toString());
-          rethrow;
-        }
+        final response = await _productRepository.getProducts(
+          search: search,
+          page: page,
+          limit: limit,
+          selectedPurpose: selectedPurpose,
+          status: status,
+          brandId: brandId,
+        );
+        state = state.copyWith(
+          products: (response.data ?? [])
+              .map((e) => e.toProductModel())
+              .toList(),
+          currentPage: response.page,
+          pageSize: response.limit,
+          totalPages: response.totalPages,
+          searchKeyword: search,
+          errorMessage: null,
+        );
       },
     );
   }
 
   Future<void> fetchProductDetail(int productId) async {
     await runSafely(
+      showLoading: false,
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
-        try {
-          final response = await _productRepository.getProductDetail(
-            id: productId,
-          );
-          state = state.copyWith(
-            selectedProduct: response.data,
-            errorMessage: null,
-          );
-        } catch (e) {
-          state = state.copyWith(errorMessage: e.toString());
-          rethrow;
-        }
+        final response = await _productRepository.getProductDetail(
+          id: productId,
+        );
+        state = state.copyWith(
+          selectedProduct: response.data,
+          errorMessage: null,
+        );
       },
     );
   }
@@ -308,7 +301,7 @@ class ProductViewModel extends BaseViewModel<ProductState> {
           manufacturer: req.manufacturer,
           globalSku: req.globalSku,
           // barcode: req.barcode,
-          usageType:req.usageType,
+          usageType: req.usageType,
           category: req.category,
           selectedCategoryIds: req.selectedCategoryIds,
           status: req.status,
@@ -393,24 +386,23 @@ class ProductViewModel extends BaseViewModel<ProductState> {
         false;
   }
 
-  Future<bool> updateProductStatus(int productId, String status) async {
+  Future<bool?> updateProductStatus(int productId, String status) async {
     return await runSafely<bool>(
-          onLoadingChange: (loading) =>
-              state = state.copyWith(loading: loading),
-          () async {
-            await _productRepository.updateProductStatus(
-              productId: productId,
-              status: status,
-            );
-            await refreshProducts();
-            if (state.selectedProduct?.id == productId) {
-              await fetchProductDetail(productId);
-            }
-            EasyLoading.showSuccess('Product status updated successfully');
-            return true;
-          },
-        ) ??
-        false;
+      showLoading: false,
+      onLoadingChange: (loading) => state = state.copyWith(loading: loading),
+      () async {
+        await _productRepository.updateProductStatus(
+          productId: productId,
+          status: status,
+        );
+        await refreshProducts();
+        if (state.selectedProduct?.id == productId) {
+          await fetchProductDetail(productId);
+        }
+        EasyLoading.showSuccess('Product status updated successfully');
+        return true;
+      },
+    );
   }
 
   Future<void> fetchBrand() async {
@@ -428,8 +420,9 @@ class ProductViewModel extends BaseViewModel<ProductState> {
     );
   }
 
-  Future<void> fetchManufacturer() async {
+  Future<void> fetchManufacturer({bool showLoading = false}) async {
     await runSafely(
+      showLoading: showLoading,
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
         try {
@@ -525,5 +518,11 @@ class ProductViewModel extends BaseViewModel<ProductState> {
         }
       },
     );
+  }
+
+  @override
+  void onError(String message) {
+    state = state.copyWith(loading: false, errorMessage: message);
+    super.onError(message);
   }
 }

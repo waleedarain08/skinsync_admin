@@ -73,7 +73,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
     bool showError = true,
   }) async {
     final url = await runSafely<String?>(
-      () => _mediaService.uploadFile('category/pdf', file),
+      () => _mediaService.uploadFile('category/pdf', file.xFile),
       showLoading: showLoading,
       showError: showError,
     );
@@ -109,6 +109,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
         state = state.copyWith(
           categories: categories,
           flattenedCategories: flattened,
+          loading: false,
         );
       },
     );
@@ -322,7 +323,7 @@ class CategoryViewModel extends BaseViewModel<CategoryState> {
         if (response.isSuccess) {
           state = state.copyWith(
             categories: _removeFromTree(state.categories, id),
-             flattenedCategories: _flattenCategories(state.categories),
+            flattenedCategories: _flattenCategories(state.categories),
           );
         }
         return true;

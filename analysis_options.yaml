@@ -39,6 +39,14 @@ analyzer:
     cast_nullable_to_non_nullable: error
     null_check_on_nullable_type_parameter: error
     avoid_print: warning
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   rules:
