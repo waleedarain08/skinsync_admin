@@ -142,7 +142,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Global Product Catalog', style: context.fonts.black32w700),
+            Text('Global Product Catalog', style: context.fonts.level1Heading),
             context.verticalSpace(8),
             Text(
               'Manage platform-wide product definitions and template specifications for clinics.',

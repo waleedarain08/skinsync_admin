@@ -87,7 +87,7 @@ class AppointmentDetailScreen extends ConsumerWidget {
                     Flexible(
                       child: Text(
                         a.patientName,
-                        style: context.fonts.black26w700,
+                        style: context.fonts.level2Heading,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

@@ -429,7 +429,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
                 protocol.type == ProtocolType.checkbox
                     ? 'CHECKBOX PROTOCOL'
                     : 'TEXT PROTOCOL',
-                style: context.fonts.purple12w700,
+                style: context.fonts.sectionHeading,
               ),
             ),
             context.verticalSpace(20),
@@ -571,7 +571,7 @@ class _ManageTreatmentDataScreenState
           elevation: 0,
           title: Text(
             'Manage Network Taxonomy',
-            style: context.fonts.black20w600,
+            style: context.fonts.level2Heading,
           ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: CustomColors.black),

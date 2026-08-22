@@ -257,7 +257,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titles[stepIndex], style: context.fonts.black20w600),
+                  Text(titles[stepIndex], style: context.fonts.level2Heading),
                   Text(
                     descriptions[stepIndex],
                     style: context.fonts.grey14w400,

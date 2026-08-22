@@ -289,7 +289,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Clinic Partners', style: context.fonts.black26w700),
+            Text('Clinic Partners', style: context.fonts.level1Heading),
             context.verticalSpace(6),
             Text(
               'Manage and monitor your MedSpa network performance.',

@@ -90,7 +90,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 20.h),
-            Text('Settings', style: context.fonts.black30w600),
+            Text('Settings', style: context.fonts.level1Heading),
             SizedBox(height: 10.h),
             Text(
               'Manage application versions for Customer and Clinic apps.',

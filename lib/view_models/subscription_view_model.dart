@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/free_system_plan_model.dart';
 import '../models/subscription_plan_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
@@ -18,7 +17,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
   final SubscriptionRepository _subscriptionRepository = locator<SubscriptionRepository>();
 
   Future<void> initialize() async {
-    getSubscriptionPlans();
+    await getSubscriptionPlans();
   }
 
   Future<bool> getSubscriptionPlans() async {
@@ -30,8 +29,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
           () async {
             // Using dummy data for initial design
             final plans = TreatmentData.dummySubscriptionPlans;
-            final freeSystemPlan = TreatmentData.dummyFreeSystemPlan;
-            state = state.copyWith(plans: plans, freeSystemPlan: freeSystemPlan);
+            state = state.copyWith(plans: plans);
             return true;
           },
         ) ??
@@ -78,23 +76,19 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
 
 class SubscriptionState extends BaseStateModel {
   final List<SubscriptionPlanModel>? plans;
-  final FreeSystemPlanModel? freeSystemPlan;
 
   SubscriptionState({
     super.loading,
     this.plans = const [],
-    this.freeSystemPlan,
   });
 
   SubscriptionState copyWith({
     bool? loading,
     List<SubscriptionPlanModel>? plans,
-    FreeSystemPlanModel? freeSystemPlan,
   }) {
     return SubscriptionState(
       loading: loading ?? this.loading,
       plans: plans ?? this.plans,
-      freeSystemPlan: freeSystemPlan ?? this.freeSystemPlan,
     );
   }
 }

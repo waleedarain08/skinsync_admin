@@ -138,7 +138,7 @@ class ProductDetailScreen extends ConsumerWidget {
                     Flexible(
                       child: Text(
                         _formatValue(product.name),
-                        style: context.fonts.black26w700,
+                        style: context.fonts.level2Heading,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

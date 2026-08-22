@@ -101,7 +101,7 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
                     Flexible(
                       child: Text(
                         request.clinicOrPracticeName ?? request.clinicName ?? 'N/A',
-                        style: context.fonts.black20w600,
+                        style: context.fonts.level2Heading,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

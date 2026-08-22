@@ -251,7 +251,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                           Flexible(
                             child: Text(
                               clinic.name ?? 'N/A',
-                              style: context.fonts.black20w600,
+                              style: context.fonts.level2Heading,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),

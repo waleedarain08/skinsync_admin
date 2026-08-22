@@ -215,7 +215,7 @@ class _CreateStaffScreenState extends ConsumerState<CreateStaffScreen> {
         context.horizontalSpace(12),
         Text(
           'Create Staff',
-          style: context.fonts.black18w600,
+          style: context.fonts.level2Heading,
         ),
       ],
     );

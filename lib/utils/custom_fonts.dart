@@ -96,6 +96,16 @@ class CustomFontsGetter {
   TextStyle get red13w500 => TextStyle(fontSize: context.sp(13), fontWeight: FontWeight.w500, color: CustomColors.red, fontFamily: _fontFamily);
   TextStyle get red14w600 => TextStyle(fontSize: context.sp(14), fontWeight: FontWeight.w600, color: CustomColors.red, fontFamily: _fontFamily);
   TextStyle get red10w600 => TextStyle(fontSize: context.sp(10), fontWeight: FontWeight.w600, color: CustomColors.red, fontFamily: _fontFamily);
+
+  // --- STANDARDIZED HEADING SYSTEM ---
+  /// Level 1: Page Title (Sidebar/Main Screens)
+  TextStyle get level1Heading => black32w700;
+  /// Level 2: Child Page Title (Inner/Detail/Create Screens)
+  TextStyle get level2Heading => black26w700;
+  /// Sub Heading (Cards/Dialogs)
+  TextStyle get subHeading => black20w600;
+  /// Section Heading
+  TextStyle get sectionHeading => purple12w700;
 }
 
 class CustomFonts {
@@ -186,4 +196,14 @@ class CustomFonts {
   static TextStyle get red13w500 => TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500, color: CustomColors.red, fontFamily: _fontFamily);
   static TextStyle get red14w600 => TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: CustomColors.red, fontFamily: _fontFamily);
   static TextStyle get red10w600 => TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600, color: CustomColors.red, fontFamily: _fontFamily);
+
+  // --- STANDARDIZED HEADING SYSTEM ---
+  /// Level 1: Page Title (Sidebar/Main Screens)
+  static TextStyle get level1Heading => black32w700;
+  /// Level 2: Child Page Title (Inner/Detail/Create Screens)
+  static TextStyle get level2Heading => black26w700;
+  /// Sub Heading (Cards/Dialogs)
+  static TextStyle get subHeading => black20w600;
+  /// Section Heading
+  static TextStyle get sectionHeading => purple12w700;
 }

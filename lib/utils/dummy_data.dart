@@ -1,7 +1,6 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
-import 'package:skinsync_admin/models/free_system_plan_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 
 class TreatmentData {
@@ -162,22 +161,22 @@ class TreatmentData {
     ),
   ];
 
-  static final FreeSystemPlanModel dummyFreeSystemPlan = FreeSystemPlanModel(
-    id: 0,
-    name: 'Free System Plan',
-    durationMonths: 2,
-    doctorSeats: 2,
-    staffSeats: 5,
-    standardBookingCommissionPercent: 12,
-    dynamicBookingCommissionPercent: 18,
-    technologyFeePerTreatment: 8,
-    benefits: [
-      PlanBenefit(title: 'Initial free access', enabled: true),
-      PlanBenefit(title: 'Basic patient records', enabled: true),
-    ],
-  );
-
   static final List<SubscriptionPlanModel> dummySubscriptionPlans = [
+    SubscriptionPlanModel(
+      id: 0,
+      name: 'Free Plan',
+      basePrice: 0.00,
+      doctorSeats: 2,
+      staffSeats: 5,
+      standardBookingCommissionPercent: 12,
+      dynamicBookingCommissionPercent: 18,
+      technologyFeePerTreatment: 8,
+      isActive: true,
+      benefits: [
+        PlanBenefit(title: 'Initial free access', enabled: true),
+        PlanBenefit(title: 'Basic patient records', enabled: true),
+      ],
+    ),
     SubscriptionPlanModel(
       id: 1,
       name: 'Basic Plan',
