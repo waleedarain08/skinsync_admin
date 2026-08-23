@@ -296,11 +296,14 @@ class _CreateClinicsSubscriptionPlanScreenState
                                   'Plan Status: ',
                                   style: context.fonts.black14w600,
                                 ),
-                                Switch.adaptive(
-                                  value: _isActive,
-                                  onChanged: (val) =>
-                                      setState(() => _isActive = val),
-                                  activeTrackColor: CustomColors.green,
+                                Transform.scale(
+                                  scale: 0.7,
+                                  child: Switch.adaptive(
+                                    value: _isActive,
+                                    onChanged: (val) =>
+                                        setState(() => _isActive = val),
+                                    activeTrackColor: CustomColors.purple,
+                                  ),
                                 ),
                                 Text(
                                   _isActive ? 'Active' : 'Inactive',
@@ -670,12 +673,15 @@ class _CreateClinicsSubscriptionPlanScreenState
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Switch.adaptive(
-          value: value,
-          onChanged: onChanged,
-          activeTrackColor: CustomColors.green,
+        Transform.scale(
+          scale: 0.7,
+          child: Switch.adaptive(
+            value: value,
+            onChanged: onChanged,
+            activeTrackColor: CustomColors.purple,
+          ),
         ),
-        context.horizontalSpace(8),
+        context.horizontalSpace(4),
         Text(label, style: context.fonts.grey13w600),
       ],
     );
