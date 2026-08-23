@@ -87,7 +87,7 @@ class PatientDetailScreen extends ConsumerWidget {
                     Flexible(
                       child: Text(
                         p.name,
-                        style: context.fonts.black26w700,
+                        style: context.fonts.level2Heading,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

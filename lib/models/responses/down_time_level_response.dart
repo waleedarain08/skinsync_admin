@@ -10,13 +10,13 @@ class DownTimeLevelResponse extends BaseApiResponseModel<List<DownTimeLevel>> {
 
   factory DownTimeLevelResponse.fromJson(Map<String, dynamic> json) =>
       DownTimeLevelResponse(
-        data: json["data"] == null
+        data: json['data'] == null
             ? []
             : List<DownTimeLevel>.from(
-                json["data"]!.map((x) => DownTimeLevel.fromJson(x)),
+                json['data']!.map((x) => DownTimeLevel.fromJson(x)),
               ),
-        isSuccess: json["is_success"],
-        message: json["message"],
+        isSuccess: json['is_success'],
+        message: json['message'],
       );
 }
 
@@ -27,5 +27,5 @@ class DownTimeLevel {
   DownTimeLevel({this.level, this.days});
 
   factory DownTimeLevel.fromJson(Map<String, dynamic> json) =>
-      DownTimeLevel(level: json["level"], days: json["days"]);
+      DownTimeLevel(level: json['level'], days: json['days']);
 }

@@ -36,7 +36,7 @@ class PaymentScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Financial Console', style: context.fonts.black26w700),
+        Text('Financial Console', style: context.fonts.level1Heading),
         context.verticalSpace(8),
         Text(
           'Monitor network-wide transactions, commissions, and clinic payouts.',
@@ -93,7 +93,7 @@ class PaymentScreen extends StatelessWidget {
             padding: context.appEdgeInsets(all: 20),
             child: Text(
               'Global Transactions',
-              style: context.fonts.black20w600,
+              style: context.fonts.subHeading,
             ),
           ),
           SizedBox(

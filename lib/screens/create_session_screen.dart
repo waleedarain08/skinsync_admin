@@ -10,16 +10,16 @@ import '../models/treatment_data_models.dart';
 import '../utils/list_utils.dart';
 import '../utils/theme.dart';
 import '../view_models/category_view_model.dart';
+import '../view_models/session_view_model.dart';
 import '../view_models/treatment_data_view_model.dart';
 import '../view_models/treatment_view_model.dart';
-import '../view_models/session_view_model.dart';
 import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/gradient_scaffold.dart';
-import '../widgets/nested_area_selector.dart';
-import '../widgets/session_creation_steps/treatment_creation_steps.dart';
-import '../widgets/protocol_preview_widget.dart';
 import '../widgets/live_session_preview_widget.dart';
+import '../widgets/nested_area_selector.dart';
+import '../widgets/protocol_preview_widget.dart';
+import '../widgets/session_creation_steps/treatment_creation_steps.dart';
 
 class CreateSessionScreen extends ConsumerStatefulWidget {
   const CreateSessionScreen({super.key});
@@ -380,7 +380,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titles[stepIndex], style: context.fonts.black20w600),
+                  Text(titles[stepIndex], style: context.fonts.level2Heading),
                   Text(
                     descriptions[stepIndex],
                     style: context.fonts.grey14w400,

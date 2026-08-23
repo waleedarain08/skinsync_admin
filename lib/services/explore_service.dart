@@ -87,8 +87,9 @@ class ExploreService implements ExploreRepository {
       'limit': limit.toString(),
     };
     if (search != null && search.isNotEmpty) queryParams['search'] = search;
-    if (category != null && category.isNotEmpty)
+    if (category != null && category.isNotEmpty) {
       queryParams['category'] = category;
+    }
 
     final response = await _api.get(
       Endpoint.explorerCommunity,

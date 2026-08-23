@@ -193,7 +193,7 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Booking Schedule', style: context.fonts.black26w700),
+            Text('Booking Schedule', style: context.fonts.level1Heading),
             context.verticalSpace(6),
             Text(
               'Centralized booking management and real-time clinic capacity tracking.',

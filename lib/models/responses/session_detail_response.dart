@@ -193,7 +193,7 @@ class SessionDetailDto {
       minimumUnits: (json['minimum_units'] as num?)?.toDouble() ?? 0.0,
       maximumUnits: (json['maximum_units'] as num?)?.toDouble() ?? 0.0,
       otherMaterials: (json['other_materials'] as List?)
-              ?.map((e) => e is int ? e : ((e as Map<String, dynamic>)['product_id'] ?? (e as Map<String, dynamic>)['id']) as int)
+              ?.map((e) => e is int ? e : ((e as Map<String, dynamic>)['product_id'] ?? (e)['id']) as int)
               .toList() ??
           [],
     );

@@ -293,11 +293,11 @@ class _AreaCreationDialogState extends ConsumerState<AreaCreationDialog> {
               return;
             }
 
-            // uniqueness check
+            // uniqueness check - Only check if SKU has changed
             final dataViewModel = ref.read(
               treatmentDataViewModelProvider.notifier,
             );
-            if (!dataViewModel.isAreaSkuUnique(sku)) {
+            if (sku != widget.initialSku && !dataViewModel.isAreaSkuUnique(sku)) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('SKU must be globally unique across all levels.'),
@@ -324,7 +324,7 @@ class _AreaCreationDialogState extends ConsumerState<AreaCreationDialog> {
               'image': _imageUrl,
             });
           },
-          label: 'Add',
+          label: widget.initialSku == null ? 'Add' : 'Update',
         ),
       ],
     );

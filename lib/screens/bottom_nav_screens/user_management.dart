@@ -49,7 +49,7 @@ class _UserManagementState extends State<UserManagement> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('User Management', style: context.fonts.black32w700),
+        Text('User Management', style: context.fonts.level1Heading),
         context.verticalSpace(4),
         Text(
           'Manage system access, roles, and status for all participants.',
@@ -140,7 +140,7 @@ class _UserManagementState extends State<UserManagement> {
             padding: context.appEdgeInsets(all: 20),
             child: Row(
               children: [
-                Text(_selectedTab == 0 ? 'Patient Users' : 'Clinic Admins', style: context.fonts.black20w600),
+                Text(_selectedTab == 0 ? 'Patient Users' : 'Clinic Admins', style: context.fonts.subHeading),
                 const Spacer(),
                 AppSearchField(
                   controller: _searchController,

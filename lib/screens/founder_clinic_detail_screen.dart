@@ -99,7 +99,7 @@ class FounderClinicDetailScreen extends ConsumerWidget {
                     Flexible(
                       child: Text(
                         clinic.publicFacingClinicName ?? clinic.clinicName ?? 'N/A',
-                        style: context.fonts.black20w600,
+                        style: context.fonts.level2Heading,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

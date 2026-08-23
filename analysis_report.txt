@@ -1,0 +1,464 @@
+Resolving dependencies...
+Downloading packages...
+  _fe_analyzer_shared 91.0.0 (105.0.0 available)
+  analyzer 8.4.1 (14.1.0 available)
+  archive 4.0.9 (4.2.0 available)
+  async 2.13.0 (2.13.1 available)
+  camera_android_camerax 0.7.2 (0.7.4+6 available)
+  camera_avfoundation 0.10.1 (0.10.2 available)
+  camera_platform_interface 2.12.0 (2.13.1 available)
+  camera_web 0.3.5+3 (0.3.5+5 available)
+  code_assets 1.0.0 (2.0.0 available)
+  coverage 1.15.0 (1.15.1 available)
+  data_table_2 2.7.2 (3.0.0 available)
+  dbus 0.7.13 (0.7.15 available)
+  equatable 2.0.8 (2.1.0 available)
+  flutter_cache_manager 3.4.1 (3.4.2 available)
+  flutter_secure_storage_linux 3.0.1 (3.0.2 available)
+  flutter_secure_storage_platform_interface 2.0.1 (2.0.3 available)
+  google_mlkit_commons 0.12.0 (0.13.0 available)
+  google_mlkit_face_detection 0.14.0 (0.15.1 available)
+  hooks 1.0.0 (2.2.0 available)
+  image 4.9.1 (4.9.2 available)
+  image_picker_android 0.8.13+14 (0.8.13+19 available)
+  lints 6.0.0 (6.1.0 available)
+  local_auth_android 2.0.4 (2.0.9 available)
+  local_auth_darwin 2.0.1 (2.0.3 available)
+  markdown 7.3.0 (7.3.1 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  native_toolchain_c 0.17.4 (0.19.4 available)
+  objective_c 9.2.3 (9.6.0 available)
+  package_config 2.2.0 (3.0.0 available)
+  path_provider 2.1.5 (2.1.6 available)
+  path_provider_android 2.2.22 (2.3.1 available)
+  path_provider_linux 2.2.1 (2.2.2 available)
+  path_provider_platform_interface 2.1.2 (2.1.3 available)
+  posix 6.5.0 (6.5.2 available)
+  qr 3.0.2 (4.0.0 available)
+  quill_native_bridge_ios 0.0.1 (0.0.3 available)
+  shared_preferences_android 2.4.18 (2.4.27 available)
+  shared_preferences_platform_interface 2.4.1 (2.4.2 available)
+  shimmer 3.0.0 (4.0.0 available)
+  source_maps 0.10.13 (0.10.14 available)
+  source_span 1.10.1 (1.10.2 available)
+  sqflite 2.4.2+1 (2.4.3 available)
+  sqflite_android 2.4.2+3 (2.4.3 available)
+  sqflite_common 2.5.6+1 (2.5.11 available)
+  sqflite_darwin 2.4.2 (2.4.3+1 available)
+  sqflite_platform_interface 2.4.0 (2.4.1 available)
+  syncfusion_flutter_charts 34.2.3 (34.2.4 available)
+  syncfusion_flutter_core 34.2.3 (34.2.4 available)
+  synchronized 3.4.0 (3.4.1+2 available)
+  test 1.31.1 (1.31.2 available)
+  test_api 0.7.12 (0.7.13 available)
+  test_core 0.6.18 (0.6.19 available)
+  url_launcher_android 6.3.28 (6.3.32 available)
+  url_launcher_web 2.4.2 (2.4.3 available)
+  uuid 4.5.3 (4.6.0 available)
+  vector_graphics 1.2.0 (1.2.3 available)
+  vector_graphics_compiler 1.2.6 (1.3.0 available)
+  vm_service 15.0.2 (15.3.0 available)
+Got dependencies!
+58 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing skinsync_admin...                                     
+
+warning • 'dead_code' isn't a recognized lint rule. Try using the name of a recognized lint rule • analysis_options.yaml:155:5 • undefined_lint
+   info • 'color' is deprecated and shouldn't be used. Use colorFilter instead. Try replacing the use of the deprecated member with the replacement • lib/generated/assets.dart:260:7 • deprecated_member_use
+   info • 'colorBlendMode' is deprecated and shouldn't be used. Use colorFilter instead. Try replacing the use of the deprecated member with the replacement • lib/generated/assets.dart:261:7 • deprecated_member_use
+   info • 'cacheColorFilter' is deprecated and shouldn't be used. This no longer does anything. Try replacing the use of the deprecated member with the replacement • lib/generated/assets.dart:263:7 • deprecated_member_use
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/common_models.dart:173:18 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/common_models.dart:174:18 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/common_models.dart:179:22 • avoid_dynamic_calls
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_category_request.dart:36:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_category_request.dart:39:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_category_request.dart:43:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/allowed_provider_role_request.dart:15:11 • inference_failure_on_collection_literal
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/requests/create_session_requests/phase_notifications_request.dart:43:99 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/requests/create_session_requests/phase_notifications_request.dart:43:132 • inference_failure_on_untyped_parameter
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/phase_notifications_request.dart:48:59 • inference_failure_on_collection_literal
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/requests/create_session_requests/phase_notifications_request.dart:103:97 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/requests/create_session_requests/phase_notifications_request.dart:103:129 • inference_failure_on_untyped_parameter
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/phase_notifications_request.dart:108:57 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/post_treatment_instruction_request.dart:19:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/pre_treatment_instruction_request.dart:19:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/product_usage_request.dart:29:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/product_usage_request.dart:32:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/product_usage_request.dart:35:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/step_pricing_request.dart:25:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/step_pricing_request.dart:30:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/treatment_schedule_request.dart:45:11 • inference_failure_on_collection_literal
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/requests/create_session_requests/treatment_schedule_request.dart:56:11 • inference_failure_on_collection_literal
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/app_version_response.dart:17:17 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/app_version_response.dart:17:36 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:123:86 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:123:122 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:130:82 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:130:114 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:131:77 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:131:106 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:135:83 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:135:115 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:143:88 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:143:123 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:146:98 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:146:138 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:148:100 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:148:141 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:151:83 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:151:115 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:152:85 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:152:118 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:155:75 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:155:103 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/basic_info_response.dart:157:66 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/basic_info_response.dart:157:89 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/category_detail_response.dart:81:13 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/category_detail_response.dart:81:44 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/category_detail_response.dart:86:13 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/category_detail_response.dart:87:16 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/category_detail_response.dart:105:13 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/category_detail_response.dart:105:41 • inference_failure_on_untyped_parameter
+   info • The constant name 'HOURS' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/models/responses/category_detail_response.dart:135:13 • constant_identifier_names
+   info • The constant name 'MINUTES' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/models/responses/category_detail_response.dart:135:20 • constant_identifier_names
+   info • The constant name 'CARE' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/models/responses/category_detail_response.dart:139:13 • constant_identifier_names
+   info • The constant name 'INSTRUCTION' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/models/responses/category_detail_response.dart:139:19 • constant_identifier_names
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/clinic_detail_response.dart:24:39 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/clinic_detail_response.dart:24:57 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/clinic_detail_response.dart:82:41 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/clinic_detail_response.dart:82:67 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/clinic_detail_response.dart:120:59 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/clinic_detail_response.dart:120:77 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/community_posts_list_response.dart:25:37 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/community_posts_list_response.dart:27:14 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/down_time_level_response.dart:16:17 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/down_time_level_response.dart:16:36 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/founder_clinic_list_response.dart:31:37 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/founder_clinic_list_response.dart:34:20 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/founder_clinic_list_response.dart:39:21 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/founder_clinic_list_response.dart:40:22 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/founder_clinic_list_response.dart:41:21 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/invite_clinic_detail_response.dart:24:45 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/invite_clinic_detail_response.dart:24:63 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/invite_clinic_detail_response.dart:92:47 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/invite_clinic_detail_response.dart:92:73 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/invite_clinic_detail_response.dart:137:59 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/invite_clinic_detail_response.dart:137:77 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:11:28 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:11:48 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:126:29 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:126:48 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:138:13 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:162:29 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:162:50 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:165:28 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:165:48 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:193:13 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:193:43 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:198:13 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:199:16 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:205:13 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:206:16 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:223:17 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:223:40 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:227:31 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:227:50 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:286:29 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:286:48 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:287:33 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:288:27 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:321:13 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:321:34 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:325:29 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:325:62 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:423:17 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:424:20 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:429:33 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:429:66 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:466:15 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:467:16 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:555:29 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:555:55 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:579:17 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:580:20 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/places_response.dart:585:33 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/places_response.dart:585:66 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/provider_roles_response.dart:17:17 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/provider_roles_response.dart:17:36 • inference_failure_on_untyped_parameter
+warning • The type argument(s) of 'List' can't be inferred. Use explicit type argument(s) for 'List' • lib/models/responses/provider_roles_response.dart:25:11 • inference_failure_on_collection_literal
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/reels_list_response.dart:25:37 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/reels_list_response.dart:27:14 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/treatment_detail_response.dart:86:53 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/treatment_detail_response.dart:87:23 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/treatment_detail_response.dart:98:43 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/treatment_detail_response.dart:99:23 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/responses/treatment_detail_response.dart:184:39 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/responses/treatment_detail_response.dart:185:23 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/sessions_model.dart:20:41 • avoid_dynamic_calls
+warning • The type of 'x' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/models/sessions_model.dart:20:65 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/models/treatment_model.dart:522:18 • avoid_dynamic_calls
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/area_repository.dart:9:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/area_repository.dart:10:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/area_repository.dart:14:11 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/auth_repository.dart:8:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/auth_repository.dart:10:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/auth_repository.dart:11:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/category_repository.dart:10:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/category_repository.dart:11:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/category_repository.dart:15:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/clinic_repository.dart:15:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/clinic_repository.dart:41:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/clinic_repository.dart:45:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/explore_repository.dart:14:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/explore_repository.dart:15:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/explore_repository.dart:16:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/explore_repository.dart:23:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/explore_repository.dart:24:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/explore_repository.dart:25:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/explore_repository.dart:27:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/product_repository.dart:19:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/product_repository.dart:36:10 • strict_raw_type
+   info • Unnecessary use of an abstract class. Try making 'providerRoles' a top-level function and removing the class • lib/repositories/provider_role_repository.dart:3:16 • one_member_abstracts
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:21:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:40:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:45:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:49:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:53:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:58:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:62:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:67:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:75:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:80:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:84:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:89:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:94:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:98:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/session_repository.dart:106:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/setting_repository.dart:6:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/treatment_repository.dart:27:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/treatment_repository.dart:32:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/treatment_repository.dart:42:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/treatment_repository.dart:49:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/repositories/treatment_repository.dart:53:10 • strict_raw_type
+warning • The value of the field '_imagePicker' isn't used. Try removing the field, or using it • lib/screens/add_new_clinic_screen.dart:53:21 • unused_field
+warning • The return type of ' Function(TimeOfDay)' can't be inferred. Declare the return type of ' Function(TimeOfDay)' • lib/screens/add_new_clinic_screen.dart:740:14 • inference_failure_on_function_return_type
+   info • Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check • lib/screens/add_new_clinic_screen.dart:756:47 • use_build_context_synchronously
+warning • The member 'state' can only be used within 'package:riverpod/src/framework.dart' or a test • lib/screens/bottom_nav_screens/appointment_management.dart:544:62 • invalid_use_of_visible_for_testing_member
+warning • The member 'state' can only be used within instance members of subclasses of 'AnyNotifier' • lib/screens/bottom_nav_screens/appointment_management.dart:544:62 • invalid_use_of_protected_member
+   info • Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check • lib/screens/bottom_nav_screens/explore_screen.dart:230:52 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check • lib/screens/bottom_nav_screens/explore_screen.dart:366:52 • use_build_context_synchronously
+warning • The return type of ' Function(String)' can't be inferred. Declare the return type of ' Function(String)' • lib/screens/bottom_nav_screens/explore_screen.dart:379:14 • inference_failure_on_function_return_type
+warning • The member 'state' can only be used within 'package:riverpod/src/framework.dart' or a test • lib/screens/bottom_nav_screens/patient_management.dart:473:58 • invalid_use_of_visible_for_testing_member
+warning • The member 'state' can only be used within instance members of subclasses of 'AnyNotifier' • lib/screens/bottom_nav_screens/patient_management.dart:473:58 • invalid_use_of_protected_member
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext • lib/screens/bottom_nav_screens/product_management.dart:860:21 • use_build_context_synchronously
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/screens/bottom_nav_screens/product_management.dart:860:29 • unawaited_futures
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext • lib/screens/bottom_nav_screens/product_management.dart:885:21 • use_build_context_synchronously
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/screens/bottom_nav_screens/product_management.dart:885:29 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/screens/business_info_screen.dart:54:5 • unawaited_futures
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/screens/create_clinics_subscription_plan_screen.dart:639:28 • avoid_positional_boolean_parameters
+warning • The declaration '_buildSelectOrCreateDropdown' isn't referenced. Try removing the declaration of '_buildSelectOrCreateDropdown' • lib/screens/create_product_screen.dart:247:10 • unused_element
+warning • The declaration '_buildCompleteTreatmentBlueprint' isn't referenced. Try removing the declaration of '_buildCompleteTreatmentBlueprint' • lib/screens/create_session_screen.dart:428:10 • unused_element
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/screens/create_session_screen.dart:910:12 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/screens/create_session_screen.dart:911:12 • avoid_dynamic_calls
+warning • The declaration '_buildPatientJourneyPreview' isn't referenced. Try removing the declaration of '_buildPatientJourneyPreview' • lib/screens/create_session_screen.dart:1304:10 • unused_element
+warning • The declaration '_buildProtocolFormPreview' isn't referenced. Try removing the declaration of '_buildProtocolFormPreview' • lib/screens/create_session_screen.dart:1356:10 • unused_element
+warning • The declaration '_buildPreviewCard' isn't referenced. Try removing the declaration of '_buildPreviewCard' • lib/screens/create_session_screen.dart:1600:10 • unused_element
+warning • The declaration '_buildSummaryChips' isn't referenced. Try removing the declaration of '_buildSummaryChips' • lib/screens/create_session_screen.dart:1711:10 • unused_element
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/screens/create_session_screen.dart:2120:41 • avoid_dynamic_calls
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/screens/create_staff_screen.dart:54:5 • unawaited_futures
+   info • Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check • lib/screens/create_treatment_screen.dart:434:19 • use_build_context_synchronously
+warning • The return type of ' Function(bool)' can't be inferred. Declare the return type of ' Function(bool)' • lib/screens/notification_setting_screen.dart:141:14 • inference_failure_on_function_return_type
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/screens/notification_setting_screen.dart:141:23 • avoid_positional_boolean_parameters
+warning • The declaration '_buildUsedInTreatmentsSection' isn't referenced. Try removing the declaration of '_buildUsedInTreatmentsSection' • lib/screens/product_detail_screen.dart:391:10 • unused_element
+warning • The declaration '_statRow' isn't referenced. Try removing the declaration of '_statRow' • lib/screens/product_detail_screen.dart:500:10 • unused_element
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/screens/sign_in_screen.dart:460:19 • unawaited_futures
+warning • The type argument(s) of the constructor 'Future.delayed' can't be inferred. Use explicit type argument(s) for 'Future.delayed' • lib/screens/splash_screen.dart:27:13 • inference_failure_on_instance_creation
+warning • The type argument(s) of the constructor 'Future.delayed' can't be inferred. Use explicit type argument(s) for 'Future.delayed' • lib/screens/splash_screen.dart:30:13 • inference_failure_on_instance_creation
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/services/api_base_helper.dart:263:15 • avoid_dynamic_calls
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/area_services.dart:44:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/area_services.dart:49:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/area_services.dart:58:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/area_services.dart:67:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/area_services.dart:75:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/area_services.dart:84:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/auth_service.dart:50:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/auth_service.dart:82:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/auth_service.dart:98:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/category_services.dart:45:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/category_services.dart:52:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/category_services.dart:62:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/category_services.dart:71:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/category_services.dart:80:9 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/category_services.dart:86:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/clinic_services.dart:26:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/clinic_services.dart:33:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/clinic_services.dart:167:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/clinic_services.dart:174:22 • inference_failure_on_instance_creation
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/services/clinic_services.dart:189:23 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/services/clinic_services.dart:191:33 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/services/clinic_services.dart:203:23 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/services/clinic_services.dart:205:33 • avoid_dynamic_calls
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/clinic_services.dart:224:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/explore_service.dart:36:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/explore_service.dart:41:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/explore_service.dart:50:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/explore_service.dart:56:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/explore_service.dart:65:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/explore_service.dart:70:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/explore_service.dart:102:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/explore_service.dart:109:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/explore_service.dart:118:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/explore_service.dart:124:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/explore_service.dart:133:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/explore_service.dart:138:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/explore_service.dart:153:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/explore_service.dart:158:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/product_services.dart:56:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/product_services.dart:180:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:31:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:46:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:106:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:116:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:126:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:136:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:144:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:154:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:164:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:174:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:185:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:195:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:205:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:215:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:225:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:241:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:250:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:260:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:270:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:280:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:290:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:300:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:311:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:320:22 • inference_failure_on_instance_creation
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:338:22 • inference_failure_on_instance_creation
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:356:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/session_services.dart:381:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/session_services.dart:388:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/setting_service.dart:15:10 • strict_raw_type
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/treatment_services.dart:84:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/treatment_services.dart:94:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/treatment_services.dart:103:10 • strict_raw_type
+warning • The method doesn't override an inherited method. Try updating this class to match the superclass, or removing the override annotation • lib/services/treatment_services.dart:103:32 • override_on_non_overriding_member
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/treatment_services.dart:113:22 • inference_failure_on_instance_creation
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/treatment_services.dart:133:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/treatment_services.dart:161:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/treatment_services.dart:170:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/treatment_services.dart:193:8 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/treatment_services.dart:200:22 • inference_failure_on_instance_creation
+warning • The generic type 'BaseApiResponseModel<dynamic>' should have explicit type arguments but doesn't. Use explicit type arguments for 'BaseApiResponseModel<dynamic>' • lib/services/treatment_services.dart:209:10 • strict_raw_type
+warning • The type argument(s) of the constructor 'BaseApiResponseModel.fromJson' can't be inferred. Use explicit type argument(s) for 'BaseApiResponseModel.fromJson' • lib/services/treatment_services.dart:218:22 • inference_failure_on_instance_creation
+warning • Don't invoke 'print' in production code. Try using a logging framework • lib/utils/colored_print.dart:14:5 • avoid_print
+warning • Don't invoke 'print' in production code. Try using a logging framework • lib/utils/colored_print.dart:19:5 • avoid_print
+warning • Don't invoke 'print' in production code. Try using a logging framework • lib/utils/colored_print.dart:24:5 • avoid_print
+warning • Don't invoke 'print' in production code. Try using a logging framework • lib/utils/colored_print.dart:29:5 • avoid_print
+warning • Don't invoke 'print' in production code. Try using a logging framework • lib/utils/colored_print.dart:34:5 • avoid_print
+warning • Don't invoke 'print' in production code. Try using a logging framework • lib/utils/colored_print.dart:39:5 • avoid_print
+warning • Don't invoke 'print' in production code. Try using a logging framework • lib/utils/colored_print.dart:44:5 • avoid_print
+   info • The variable name 'when_static' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/utils/responsive.dart:28:12 • non_constant_identifier_names
+   info • The variable name 'pagePaddingH_static' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/utils/theme.dart:290:21 • non_constant_identifier_names
+   info • The variable name 'pagePaddingV_static' isn't a lowerCamelCase identifier. Try changing the name to follow the lowerCamelCase style • lib/utils/theme.dart:291:21 • non_constant_identifier_names
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/area_view_model.dart:188:26 • avoid_positional_boolean_parameters
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/auth_view_model.dart:54:23 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/auth_view_model.dart:63:23 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/auth_view_model.dart:72:23 • unawaited_futures
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/base_view_model.dart:24:19 • avoid_positional_boolean_parameters
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/booking_config_view_model.dart:131:25 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/booking_config_view_model.dart:155:25 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/booking_config_view_model.dart:189:25 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/booking_config_view_model.dart:221:25 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/clinic_view_model.dart:32:5 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/clinic_view_model.dart:33:5 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/clinic_view_model.dart:34:5 • unawaited_futures
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/clinic_view_model.dart:78:26 • avoid_positional_boolean_parameters
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/explore_view_model.dart:222:25 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/explore_view_model.dart:313:21 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/product_view_model.dart:326:21 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/product_view_model.dart:368:25 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/product_view_model.dart:382:25 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/product_view_model.dart:402:21 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/session_view_model.dart:920:17 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/session_view_model.dart:943:19 • unawaited_futures
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/session_view_model.dart:1688:33 • avoid_positional_boolean_parameters
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/session_view_model.dart:1700:32 • avoid_positional_boolean_parameters
+   info • 'withData' is deprecated and shouldn't be used. Use PlatformFile.readAsBytes(); this parameter will be removed in a future release. Try replacing the use of the deprecated member with the replacement • lib/view_models/session_view_model.dart:1702:7 • deprecated_member_use
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/session_view_model.dart:1916:41 • avoid_positional_boolean_parameters
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/session_view_model.dart:1933:34 • avoid_positional_boolean_parameters
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/session_view_model.dart:1937:36 • avoid_positional_boolean_parameters
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/session_view_model.dart:1941:29 • avoid_positional_boolean_parameters
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/session_view_model.dart:1945:37 • avoid_positional_boolean_parameters
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/session_view_model.dart:1949:30 • avoid_positional_boolean_parameters
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/session_view_model.dart:1953:27 • avoid_positional_boolean_parameters
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/setting_view_model.dart:35:23 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/setting_view_model.dart:40:23 • unawaited_futures
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/treatment_view_model.dart:606:26 • avoid_positional_boolean_parameters
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/view_models/treatment_view_model.dart:610:30 • avoid_positional_boolean_parameters
+warning • The declaration '_getFilteredList' isn't referenced. Try removing the declaration of '_getFilteredList' • lib/view_models/treatment_view_model.dart:683:27 • unused_element
+warning • The type argument(s) of the constructor 'Future.delayed' can't be inferred. Use explicit type argument(s) for 'Future.delayed' • lib/view_models/treatment_view_model.dart:716:13 • inference_failure_on_instance_creation
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/treatment_view_model.dart:728:19 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/view_models/treatment_view_model.dart:741:19 • unawaited_futures
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:789:16 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:793:17 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:796:40 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:796:40 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:796:40 • avoid_dynamic_calls
+warning • The type of 'sa' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/view_models/treatment_view_model.dart:799:18 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:801:22 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:802:25 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:806:21 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:809:42 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:809:42 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:809:42 • avoid_dynamic_calls
+warning • The type of 'ca' can't be inferred; a type must be explicitly provided. Try specifying the type of the parameter • lib/view_models/treatment_view_model.dart:812:22 • inference_failure_on_untyped_parameter
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:812:29 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/view_models/treatment_view_model.dart:816:25 • avoid_dynamic_calls
+warning • The return type of ' Function(String?)?' can't be inferred. Declare the return type of ' Function(String?)?' • lib/widgets/build_textfield.dart:12:9 • inference_failure_on_function_return_type
+   info • Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check • lib/widgets/dailogbox/basic_info_dialog.dart:263:42 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check • lib/widgets/dailogbox/basic_info_dialog.dart:270:42 • use_build_context_synchronously
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/dailogbox/category_creation_dialog.dart:232:7 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/dailogbox/category_creation_dialog.dart:308:17 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/dailogbox/category_creation_dialog.dart:311:19 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/dailogbox/category_creation_dialog.dart:314:17 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/dailogbox/category_creation_dialog.dart:321:19 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/dailogbox/category_creation_dialog.dart:329:19 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/dailogbox/category_creation_dialog.dart:394:12 • unawaited_futures
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/widgets/dailogbox/clinic_dailogbox.dart:32:57 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/widgets/dailogbox/clinic_dailogbox.dart:33:58 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/widgets/dailogbox/clinic_dailogbox.dart:34:58 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/widgets/dailogbox/clinic_dailogbox.dart:36:13 • avoid_dynamic_calls
+warning • Method invocation or property access on a 'dynamic' target. Try giving the target a type • lib/widgets/live_session_preview_widget.dart:458:27 • avoid_dynamic_calls
+warning • The return type of ' Function(int)' can't be inferred. Declare the return type of ' Function(int)' • lib/widgets/pagination_footer.dart:7:9 • inference_failure_on_function_return_type
+warning • The return type of ' Function(String)' can't be inferred. Declare the return type of ' Function(String)' • lib/widgets/session_creation_steps/authorized_roles_widget.dart:12:9 • inference_failure_on_function_return_type
+warning • The return type of ' Function(String)?' can't be inferred. Declare the return type of ' Function(String)?' • lib/widgets/session_creation_steps/authorized_roles_widget.dart:15:9 • inference_failure_on_function_return_type
+warning • The return type of ' Function(List<String>)?' can't be inferred. Declare the return type of ' Function(List<String>)?' • lib/widgets/session_creation_steps/authorized_roles_widget.dart:16:9 • inference_failure_on_function_return_type
+   info • 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/widgets/session_creation_steps/authorized_roles_widget.dart:59:13 • deprecated_member_use
+   info • 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/widgets/session_creation_steps/authorized_roles_widget.dart:60:13 • deprecated_member_use
+   info • 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/widgets/session_creation_steps/consent_step.dart:26:13 • deprecated_member_use
+   info • 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/widgets/session_creation_steps/consent_step.dart:27:13 • deprecated_member_use
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/session_creation_steps/materials_step.dart:222:41 • unawaited_futures
+   info • 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/widgets/session_creation_steps/notifications_step.dart:62:13 • deprecated_member_use
+   info • 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre. Try replacing the use of the deprecated member with the replacement • lib/widgets/session_creation_steps/notifications_step.dart:63:13 • deprecated_member_use
+   info • 'bool' parameters should be named parameters. Try converting the parameter to a named parameter • lib/widgets/session_creation_steps/notifications_step.dart:161:11 • avoid_positional_boolean_parameters
+warning • The declaration '_formatUnitLabel' isn't referenced. Try removing the declaration of '_formatUnitLabel' • lib/widgets/session_creation_steps/pricing_step.dart:21:10 • unused_element
+warning • The declaration '_getProductMaxQuantity' isn't referenced. Try removing the declaration of '_getProductMaxQuantity' • lib/widgets/session_creation_steps/scheduling_step.dart:29:10 • unused_element
+warning • The declaration '_calculateProductUsageDuration' isn't referenced. Try removing the declaration of '_calculateProductUsageDuration' • lib/widgets/session_creation_steps/scheduling_step.dart:36:10 • unused_element
+warning • The declaration '_formatUnitLabel' isn't referenced. Try removing the declaration of '_formatUnitLabel' • lib/widgets/session_creation_steps/scheduling_step.dart:50:10 • unused_element
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/treatment_creation_steps/sessions_step.dart:92:31 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/treatment_creation_steps/sessions_step.dart:102:31 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/treatment_creation_steps/sessions_step.dart:107:29 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/treatment_creation_steps/sessions_step.dart:117:31 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/treatment_creation_steps/sessions_step.dart:123:31 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/treatment_creation_steps/sessions_step.dart:241:33 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/treatment_creation_steps/sessions_step.dart:245:31 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/treatment_session_expansion_tile.dart:517:17 • unawaited_futures
+   info • Missing an 'await' for the 'Future' computed by this expression. Try adding an 'await' or wrapping the expression with 'unawaited' • lib/widgets/treatment_session_expansion_tile.dart:522:17 • unawaited_futures
+
+397 issues found. (ran in 4.7s)

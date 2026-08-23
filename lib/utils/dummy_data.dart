@@ -1,8 +1,8 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
+import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
-import 'package:skinsync_admin/models/free_system_plan_model.dart';
-import 'package:skinsync_admin/models/subscription_plan_model.dart';
+import 'package:skinsync_admin/models/patient_subscription_plan_model.dart';
 
 class TreatmentData {
   // Category Hierarchy
@@ -162,23 +162,23 @@ class TreatmentData {
     ),
   ];
 
-  static final FreeSystemPlanModel dummyFreeSystemPlan = FreeSystemPlanModel(
-    id: 0,
-    name: 'Free System Plan',
-    durationMonths: 2,
-    doctorSeats: 2,
-    staffSeats: 5,
-    standardBookingCommissionPercent: 12,
-    dynamicBookingCommissionPercent: 18,
-    technologyFeePerTreatment: 8,
-    benefits: [
-      PlanBenefit(title: 'Initial free access', enabled: true),
-      PlanBenefit(title: 'Basic patient records', enabled: true),
-    ],
-  );
-
-  static final List<SubscriptionPlanModel> dummySubscriptionPlans = [
-    SubscriptionPlanModel(
+  static final List<ClinicSubscriptionPlanModel> dummySubscriptionPlans = [
+    ClinicSubscriptionPlanModel(
+      id: 0,
+      name: 'Free Plan',
+      basePrice: 0.00,
+      doctorSeats: 2,
+      staffSeats: 5,
+      standardBookingCommissionPercent: 12,
+      dynamicBookingCommissionPercent: 18,
+      technologyFeePerTreatment: 8,
+      isActive: true,
+      benefits: [
+        PlanBenefit(title: 'Initial free access', enabled: true),
+        PlanBenefit(title: 'Basic patient records', enabled: true),
+      ],
+    ),
+    ClinicSubscriptionPlanModel(
       id: 1,
       name: 'Basic Plan',
       basePrice: 49.99,
@@ -195,7 +195,7 @@ class TreatmentData {
         PlanBenefit(title: 'Automated invoices', enabled: true),
       ],
     ),
-    SubscriptionPlanModel(
+    ClinicSubscriptionPlanModel(
       id: 2,
       name: 'Premium Plan',
       basePrice: 149.99,
@@ -213,7 +213,7 @@ class TreatmentData {
         PlanBenefit(title: 'Dynamic pricing system', enabled: true),
       ],
     ),
-    SubscriptionPlanModel(
+    ClinicSubscriptionPlanModel(
       id: 3,
       name: 'Gold Plan',
       basePrice: 299.99,
@@ -230,6 +230,33 @@ class TreatmentData {
         PlanBenefit(title: 'Priority onboarding and support', enabled: true),
         PlanBenefit(title: 'Custom branding', enabled: true),
       ],
+    ),
+  ];
+
+  static final List<PatientSubscriptionPlanModel> dummyPatientSubscriptionPlans = [
+    PatientSubscriptionPlanModel(
+      id: 1,
+      name: 'Basic Care',
+      basePrice: 19.99,
+      simulationCount: 5,
+      postsViewCount: 20,
+      isActive: true,
+    ),
+    PatientSubscriptionPlanModel(
+      id: 2,
+      name: 'Premium Glow',
+      basePrice: 49.99,
+      simulationCount: 15,
+      unlimitedPostsView: true,
+      isActive: true,
+    ),
+    PatientSubscriptionPlanModel(
+      id: 3,
+      name: 'Unlimited Elite',
+      basePrice: 99.99,
+      unlimitedSimulations: true,
+      unlimitedPostsView: true,
+      isActive: true,
     ),
   ];
 }

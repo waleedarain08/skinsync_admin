@@ -750,7 +750,7 @@ class TreatmentViewModel extends BaseViewModel<TreatmentState> {
     final currentSku = state.treatments
         .firstWhere(
           (t) => t.id == currentTreatmentId,
-          orElse: () => TreatmentListData(),
+          orElse: TreatmentListData.new,
         )
         .globalSku;
 
@@ -931,7 +931,7 @@ class TreatmentState extends BaseStateModel {
       filteredTreatments: filteredTreatments ?? this.filteredTreatments,
       selectedTreatment: selectedTreatment ?? this.selectedTreatment,
       selectedTreatmentId: selectedTreatmentId ?? this.selectedTreatmentId,
-      treatmentStep: currentStep ?? this.treatmentStep,
+      treatmentStep: currentStep ?? treatmentStep,
       sessionStep: sessionStep ?? this.sessionStep,
       areas: areas ?? this.areas,
       selectedCategoryPath: selectedCategoryPath ?? this.selectedCategoryPath,

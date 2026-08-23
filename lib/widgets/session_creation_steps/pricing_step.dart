@@ -77,7 +77,7 @@ class PricingStep extends ConsumerWidget {
                  Switch(
                   value: true,
                   onChanged:(_){}, // Locked to Fixed Price for now
-                  activeColor: CustomColors.purple,
+                  activeThumbColor: CustomColors.purple,
                 ),
               ],
             ),

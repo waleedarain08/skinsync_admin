@@ -26,7 +26,7 @@ class DashboardScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Good Morning, Alex',
-                        style: context.fonts.black32w700,
+                        style: context.fonts.level1Heading,
                       ),
                       context.verticalSpace(6),
                       Text(

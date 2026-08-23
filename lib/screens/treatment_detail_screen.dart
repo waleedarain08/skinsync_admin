@@ -160,10 +160,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
                             Expanded(
                               child: Text(
                                 detail.patientDisplayName ?? 'N/A',
-                                style: context.fonts.black18w600.copyWith(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: context.fonts.level2Heading,
                               ),
                             ),
                             Consumer(
@@ -264,7 +261,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
                                         SizedBox(width: 4.w),
                                         Text(
                                           'Update Info',
-                                          style: context.fonts.purple12w700
+                                          style: context.fonts.sectionHeading
                                               .copyWith(fontSize: 12.sp),
                                         ),
                                       ],
@@ -447,7 +444,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: areaSessions.length,
-                              separatorBuilder: (_, __) =>
+                              separatorBuilder: (_, _) =>
                                   context.verticalSpace(12),
                               itemBuilder: (context, idx) {
                                 return TreatmentSessionExpansionTile(

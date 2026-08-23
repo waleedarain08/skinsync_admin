@@ -653,7 +653,7 @@ class _ReelCard extends ConsumerWidget {
                
                 if (reel.status.toLowerCase() != Status.active.name)
                   IgnorePointer(
-                    child: Container(
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.4),
                         borderRadius: context.appBorderRadius(

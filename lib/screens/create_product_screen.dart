@@ -388,7 +388,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                         isEdit
                             ? 'Edit Catalog Product'
                             : 'Create New Catalog Product',
-                        style: context.fonts.black32w700,
+                        style: context.fonts.level2Heading,
                       ),
                     ],
                   ),
@@ -506,7 +506,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             // SECTION 1: BASIC INFORMATION
                             Text(
                               'SECTION 1: BASIC INFORMATION',
-                              style: context.fonts.purple12w700,
+                              style: context.fonts.sectionHeading,
                             ),
                             SizedBox(height: 16.h),
                             Row(
@@ -893,7 +893,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             // SECTION 2: PACKAGING
                             Text(
                               'SECTION 2: PACKAGING',
-                              style: context.fonts.purple12w700,
+                              style: context.fonts.sectionHeading,
                             ),
                             SizedBox(height: 16.h),
                             Row(
@@ -1224,7 +1224,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             // SECTION 3: BILLING / CONSUMPTION
                             Text(
                               'SECTION 3: BILLING / CONSUMPTION',
-                              style: context.fonts.purple12w700,
+                              style: context.fonts.sectionHeading,
                             ),
                             SizedBox(height: 16.h),
                             Row(
@@ -1341,7 +1341,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             // SECTION 4: PRICING
                             // Text(
                             //   'SECTION 4: PRICING',
-                            //   style: context.fonts.purple12w700,
+                            //   style: context.fonts.sectionHeading,
                             // ),
                             // SizedBox(height: 16.h),
                             // Row(
@@ -1403,7 +1403,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             // SECTION 5: SUPPLIER & INVENTORY
                             // Text(
                             //   'SECTION 5: SUPPLIER & INVENTORY',
-                            //   style: context.fonts.purple12w700,
+                            //   style: context.fonts.sectionHeading,
                             // ),
                             // SizedBox(height: 16.h),
                             // Row(
@@ -1539,7 +1539,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
                             // SECTION 6: GLOBAL COMPLIANCE & STATUS
                             Text(
                               'SECTION 6: GLOBAL COMPLIANCE & STATUS',
-                              style: context.fonts.purple12w700,
+                              style: context.fonts.sectionHeading,
                             ),
                             SizedBox(height: 16.h),
                             _buildSwitchRow(

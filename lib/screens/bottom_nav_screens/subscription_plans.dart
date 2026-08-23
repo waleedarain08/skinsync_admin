@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../models/free_system_plan_model.dart';
-import '../../models/subscription_plan_model.dart';
+import '../../models/clinic_subscription_plan_model.dart';
+import '../../models/patient_subscription_plan_model.dart';
 import '../../utils/theme.dart';
 import '../../view_models/subscription_view_model.dart';
 import '../../widgets/app_badge.dart';
@@ -13,7 +13,8 @@ import '../../widgets/custom_outlined_button.dart';
 import '../../widgets/custom_primary_button.dart';
 import '../../widgets/dailogbox/standard_dialog.dart';
 import '../../widgets/gradient_scaffold.dart';
-import '../create_subscription_plan_screen.dart';
+import '../create_clinics_subscription_plan_screen.dart';
+import '../create_patient_subscription_plan_screen.dart';
 
 class SubscriptionPlansTab extends ConsumerStatefulWidget {
   static const String routeName = '/subscription-plans';
@@ -24,13 +25,28 @@ class SubscriptionPlansTab extends ConsumerStatefulWidget {
       _SubscriptionPlansTabState();
 }
 
-class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
+class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {});
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(subscriptionViewModelProvider.notifier).initialize();
     });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,10 +61,33 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           children: [
             _buildHeader(context),
             context.verticalSpace(32),
+            TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              labelColor: CustomColors.purple,
+              unselectedLabelColor: CustomColors.grey,
+              indicatorColor: CustomColors.purple,
+              indicatorWeight: 3,
+              labelStyle: context.fonts.black16w600,
+              tabs: const [
+                Tab(text: 'Clinic Subscription Plans'),
+                Tab(text: 'Patient Subscription Plans'),
+              ],
+            ),
+            context.verticalSpace(24),
             Expanded(
-              child: state.loading
-                  ? const Center(child: AppLoader())
-                  : _buildContent(context, state),
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  state.loading
+                      ? const Center(child: AppLoader())
+                      : _buildClinicPlansContent(context, state),
+                  state.loading
+                      ? const Center(child: AppLoader())
+                      : _buildPatientPlansContent(context, state),
+                ],
+              ),
             ),
           ],
         ),
@@ -63,16 +102,24 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Subscription Models', style: context.fonts.black26w700),
+            Text('Subscription Models', style: context.fonts.level1Heading),
             context.verticalSpace(6),
             Text(
-              'Define tiers, commissions, and capacity limits for your clinic network.',
+              _tabController.index == 0
+                  ? 'Define tiers, commissions, and capacity limits for your clinic network.'
+                  : 'Manage subscription plans and benefits for individual patients.',
               style: context.fonts.grey13w500,
             ),
           ],
         ),
         CustomPrimaryButton(
-          onTap: () => context.push(CreateSubscriptionPlanScreen.routeName),
+          onTap: () {
+            if (_tabController.index == 0) {
+              context.push(CreateClinicsSubscriptionPlanScreen.routeName);
+            } else {
+              context.push(CreatePatientSubscriptionPlanScreen.routeName);
+            }
+          },
           icon: Icons.add_rounded,
           label: 'Create New Tier',
           width: context.w(200),
@@ -81,26 +128,19 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     );
   }
 
-  Widget _buildContent(BuildContext context, SubscriptionState state) {
-    final freePlan = state.freeSystemPlan;
-    final paidPlans = state.plans ?? [];
+  Widget _buildClinicPlansContent(BuildContext context, SubscriptionState state) {
+    final plans = state.plans ?? [];
 
     return ListView(
       children: [
-        if (freePlan != null) ...[
-          Text('System Default Tier', style: context.fonts.purple14w600),
-          context.verticalSpace(16),
-          _buildFreePlanCard(context, freePlan),
-          context.verticalSpace(40),
-        ],
-        Text('Custom Subscription Tiers', style: context.fonts.black14w600),
+        Text('Available Clinic Tiers', style: context.fonts.black14w600),
         context.verticalSpace(16),
-        if (paidPlans.isEmpty)
+        if (plans.isEmpty)
           BorderdContainerWidget(
             padding: context.appEdgeInsets(all: 40),
             child: Center(
               child: Text(
-                'No custom tiers configured.',
+                'No clinic tiers configured.',
                 style: context.fonts.grey13w500,
               ),
             ),
@@ -115,153 +155,53 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
               mainAxisSpacing: context.w(24),
               childAspectRatio: 0.65,
             ),
-            itemCount: paidPlans.length,
+            itemCount: plans.length,
             itemBuilder: (context, index) =>
-                _buildPaidPlanCard(context, paidPlans[index]),
+                _buildClinicPlanCard(context, plans[index]),
           ),
       ],
     );
   }
 
-  Widget _buildFreePlanCard(BuildContext context, FreeSystemPlanModel plan) {
-    final activeBenefits =
-        plan.benefits?.where((b) => b.enabled).toList() ?? [];
+  Widget _buildPatientPlansContent(BuildContext context, SubscriptionState state) {
+    final plans = state.patientPlans ?? [];
 
-    return BorderdContainerWidget(
-      enableHover: true,
-      padding: context.appEdgeInsets(all: 24),
-      // backgroundColor: CustomColors.purple.withValues(alpha: 0.02),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(plan.name, style: context.fonts.black18w600),
-              const AppBadge(
-                label: 'SYSTEM DEFAULT',
-                variant: AppBadgeVariant.info,
+    return ListView(
+      children: [
+        Text('Available Patient Tiers', style: context.fonts.black14w600),
+        context.verticalSpace(16),
+        if (plans.isEmpty)
+          BorderdContainerWidget(
+            padding: context.appEdgeInsets(all: 40),
+            child: Center(
+              child: Text(
+                'No patient tiers configured.',
+                style: context.fonts.grey13w500,
               ),
-            ],
+            ),
+          )
+        else
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: MediaQuery.sizeOf(context).width > 1200 ? 3 : 2,
+              crossAxisSpacing: context.w(24),
+              mainAxisSpacing: context.w(24),
+              childAspectRatio: 0.8,
+            ),
+            itemCount: plans.length,
+            itemBuilder: (context, index) =>
+                _buildPatientPlanCard(context, plans[index]),
           ),
-          context.verticalSpace(16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                '\$0.00',
-                style: context.fonts.black32w700.copyWith(
-                  color: CustomColors.purple,
-                  fontSize: context.sp(32),
-                ),
-              ),
-              context.horizontalSpace(4),
-              Text(
-                ' / ${plan.durationMonths} months introductory',
-                style: context.fonts.grey12w400,
-              ),
-            ],
-          ),
-          context.verticalSpace(24),
-          const Divider(),
-          context.verticalSpace(24),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('CAPACITY LIMITS', style: context.fonts.green9w600),
-                    context.verticalSpace(12),
-                    _limitRow(
-                      context,
-                      Icons.person_pin_rounded,
-                      'Doctor Seats:',
-                      plan.unlimitedDoctors
-                          ? 'Unlimited'
-                          : '${plan.doctorSeats}',
-                    ),
-                    context.verticalSpace(8),
-                    _limitRow(
-                      context,
-                      Icons.people_alt_rounded,
-                      'Staff Seats:',
-                      plan.unlimitedStaff ? 'Unlimited' : '${plan.staffSeats}',
-                    ),
-                  ],
-                ),
-              ),
-              context.horizontalSpace(48),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('COMMISSION & FEES', style: context.fonts.green9w600),
-                    context.verticalSpace(12),
-                    _limitRow(
-                      context,
-                      Icons.percent_rounded,
-                      'Standard Comm:',
-                      '${plan.standardBookingCommissionPercent}%',
-                    ),
-                    context.verticalSpace(8),
-                    _limitRow(
-                      context,
-                      Icons.terminal_rounded,
-                      'Technology Fee:',
-                      '\$${plan.technologyFeePerTreatment}',
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          context.verticalSpace(24),
-          Text('INCLUDED FEATURES', style: context.fonts.green9w600),
-          context.verticalSpace(16),
-          Wrap(
-            spacing: context.w(24),
-            runSpacing: context.h(10),
-            children: activeBenefits
-                .map(
-                  (benefit) => SizedBox(
-                    width: context.w(280),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.check_rounded,
-                          color: CustomColors.green,
-                          size: 16,
-                        ),
-                        context.horizontalSpace(8),
-                        Expanded(
-                          child: Text(
-                            benefit.title ?? '',
-                            style: context.fonts.grey13w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-          context.verticalSpace(24),
-          CustomOutlinedButton(
-            onTap: () {
-              context.push(CreateSubscriptionPlanScreen.routeName, extra: plan);
-            },
-            icon: Icons.tune_rounded,
-            label: 'Configure Default Model',
-          ),
-        ],
-      ),
+      ],
     );
   }
 
-  Widget _buildPaidPlanCard(BuildContext context, SubscriptionPlanModel plan) {
+  Widget _buildClinicPlanCard(
+    BuildContext context,
+    ClinicSubscriptionPlanModel plan,
+  ) {
     final activeBenefits =
         plan.benefits?.where((b) => b.enabled).toList() ?? [];
 
@@ -297,7 +237,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           context.verticalSpace(24),
           const Divider(),
           context.verticalSpace(24),
-          Text('CAPACITY & FEES', style: context.fonts.green9w600),
+          Text('CAPACITY & FEES', style: context.fonts.sectionHeading),
           context.verticalSpace(12),
           _limitRow(
             context,
@@ -327,7 +267,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             '\$${plan.technologyFeePerTreatment}',
           ),
           context.verticalSpace(24),
-          Text('INCLUDED FEATURES', style: context.fonts.green9w600),
+          Text('INCLUDED FEATURES', style: context.fonts.sectionHeading),
           context.verticalSpace(16),
           Expanded(
             child: ListView.separated(
@@ -361,7 +301,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
                 child: CustomOutlinedButton(
                   onTap: () {
                     context.push(
-                      CreateSubscriptionPlanScreen.routeName,
+                      CreateClinicsSubscriptionPlanScreen.routeName,
                       extra: plan,
                     );
                   },
@@ -370,7 +310,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
               ),
               context.horizontalSpace(12),
               IconButton(
-                onPressed: () => _confirmDelete(context, plan),
+                onPressed: () => _confirmDeleteClinicPlan(context, plan),
                 icon: const Icon(
                   Icons.delete_outline_rounded,
                   color: CustomColors.red,
@@ -386,17 +326,122 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     );
   }
 
-  Future<void> _confirmDelete(
+  Widget _buildPatientPlanCard(
     BuildContext context,
-    SubscriptionPlanModel plan,
+    PatientSubscriptionPlanModel plan,
+  ) {
+    return BorderdContainerWidget(
+      enableHover: true,
+      padding: context.appEdgeInsets(all: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(plan.name ?? 'N/A', style: context.fonts.black18w600),
+              _statusBadge(plan.isActive),
+            ],
+          ),
+          context.verticalSpace(16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                style: context.fonts.black32w700.copyWith(
+                  color: CustomColors.purple,
+                  fontSize: context.sp(32),
+                ),
+              ),
+              context.horizontalSpace(4),
+              Text('/ month', style: context.fonts.grey12w400),
+            ],
+          ),
+          context.verticalSpace(24),
+          const Divider(),
+          context.verticalSpace(24),
+          Text('USAGE LIMITS', style: context.fonts.sectionHeading),
+          context.verticalSpace(12),
+          _limitRow(
+            context,
+            Icons.auto_awesome_rounded,
+            'Simulations:',
+            plan.unlimitedSimulations ? 'Unlimited' : '${plan.simulationCount}',
+          ),
+          context.verticalSpace(8),
+          _limitRow(
+            context,
+            Icons.visibility_outlined,
+            'Posts View:',
+            plan.unlimitedPostsView ? 'Unlimited' : '${plan.postsViewCount}',
+          ),
+          const Spacer(),
+          context.verticalSpace(24),
+          Row(
+            children: [
+              Expanded(
+                child: CustomOutlinedButton(
+                  onTap: () {
+                    context.push(
+                      CreatePatientSubscriptionPlanScreen.routeName,
+                      extra: plan,
+                    );
+                  },
+                  label: 'Edit Tier',
+                ),
+              ),
+              context.horizontalSpace(12),
+              IconButton(
+                onPressed: () => _confirmDeletePatientPlan(context, plan),
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: CustomColors.red,
+                ),
+                style: IconButton.styleFrom(
+                  backgroundColor: CustomColors.red.withValues(alpha: 0.05),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteClinicPlan(
+    BuildContext context,
+    ClinicSubscriptionPlanModel plan,
   ) async {
-    final confirm = await showDialog<bool>(
+    final confirm = await _showDeleteDialog(context, plan.name ?? '');
+    if (confirm == true && plan.id != null) {
+      await ref
+          .read(subscriptionViewModelProvider.notifier)
+          .deleteSubscriptionPlan(plan.id!);
+    }
+  }
+
+  Future<void> _confirmDeletePatientPlan(
+    BuildContext context,
+    PatientSubscriptionPlanModel plan,
+  ) async {
+    final confirm = await _showDeleteDialog(context, plan.name ?? '');
+    if (confirm == true && plan.id != null) {
+      await ref
+          .read(subscriptionViewModelProvider.notifier)
+          .deletePatientSubscriptionPlan(plan.id!);
+    }
+  }
+
+  Future<bool?> _showDeleteDialog(BuildContext context, String name) {
+    return showDialog<bool>(
       context: context,
       builder: (context) => StandardDialog(
         title: 'Remove Tier',
         width: context.w(400),
         content: Text(
-          "Are you sure you want to remove the '${plan.name}' tier from your catalog?",
+          "Are you sure you want to remove the '$name' tier from your catalog?",
           style: context.fonts.grey14w400,
         ),
         actions: [
@@ -412,11 +457,6 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
         ],
       ),
     );
-    if (confirm == true && plan.id != null) {
-      ref
-          .read(subscriptionViewModelProvider.notifier)
-          .deleteSubscriptionPlan(plan.id!);
-    }
   }
 
   Widget _limitRow(
@@ -443,3 +483,5 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     );
   }
 }
+
+

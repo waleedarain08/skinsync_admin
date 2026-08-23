@@ -127,7 +127,7 @@ class _TreatmentManagementScreenState
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Treatment Library', style: context.fonts.black26w700),
+            Text('Treatment Library', style: context.fonts.level1Heading),
             context.verticalSpace(6),
             Text(
               'Manage medical aesthetic procedures, dynamic pricing, and product consumption.',

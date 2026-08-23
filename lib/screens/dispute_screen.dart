@@ -36,7 +36,7 @@ class DisputeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Dispute Management', style: context.fonts.black26w700),
+        Text('Dispute Management', style: context.fonts.level1Heading),
         context.verticalSpace(8),
         Text(
           'Review, mediate, and resolve patient-clinic disputes.',
@@ -89,7 +89,7 @@ class DisputeScreen extends StatelessWidget {
         children: [
           Padding(
             padding: context.appEdgeInsets(all: 20),
-            child: Text('Pending Action', style: context.fonts.black20w600),
+            child: Text('Pending Action', style: context.fonts.subHeading),
           ),
           SizedBox(
             height: context.h(300),
@@ -166,7 +166,7 @@ class DisputeScreen extends StatelessWidget {
         children: [
           Padding(
             padding: context.appEdgeInsets(all: 20),
-            child: Text('Resolution History', style: context.fonts.black20w600),
+            child: Text('Resolution History', style: context.fonts.subHeading),
           ),
           SizedBox(
             height: context.h(300),

@@ -34,6 +34,11 @@ enum Endpoint {
   updateClinic('admin/clinic/update/{id}'),
   updateAppVersion('admin/app-version'),
   subscriptionPlans('admin/subscription-plans'),
+  updateSubscriptionPlan('admin/subscription-plans/{id}'),
+  deleteSubscriptionPlan('admin/subscription-plans/{id}'),
+  patientSubscriptionPlans('admin/patient-subscription-plans'),
+  updatePatientSubscriptionPlan('admin/patient-subscription-plans/{id}'),
+  deletePatientSubscriptionPlan('admin/patient-subscription-plans/{id}'),
   categories('admin/categories'),
   categoryDetail('admin/categories/{id}'),
   createCategory('admin/categories'),
@@ -126,7 +131,7 @@ enum CreateTreatmentSteps {
   followUpSetup('follow_up_setup'),
   businessLogic('business_logic'),
   basicInfo('basic_info'),
-  status("status");
+  status('status');
 
   final String name;
 

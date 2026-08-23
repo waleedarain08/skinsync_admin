@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/free_system_plan_model.dart';
-import '../models/subscription_plan_model.dart';
+import '../models/clinic_subscription_plan_model.dart';
+import '../models/patient_subscription_plan_model.dart';
+import '../models/requests/create_clinic_subscription_plan_request.dart';
+import '../models/requests/create_patient_subscription_plan_request.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
-import '../utils/dummy_data.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 
@@ -18,8 +19,13 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
   final SubscriptionRepository _subscriptionRepository = locator<SubscriptionRepository>();
 
   Future<void> initialize() async {
-    getSubscriptionPlans();
+    await Future.wait([
+      getSubscriptionPlans(),
+      getPatientSubscriptionPlans(),
+    ]);
   }
+
+  // ---------------- CLINICS ----------------
 
   Future<bool> getSubscriptionPlans() async {
     return await runSafely<bool?>(
@@ -28,26 +34,30 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
             state = state.copyWith(loading: loading);
           },
           () async {
-            // Using dummy data for initial design
-            final plans = TreatmentData.dummySubscriptionPlans;
-            final freeSystemPlan = TreatmentData.dummyFreeSystemPlan;
-            state = state.copyWith(plans: plans, freeSystemPlan: freeSystemPlan);
+            final plans = await _subscriptionRepository.getSubscriptionPlans();
+            state = state.copyWith(plans: plans);
             return true;
           },
         ) ??
         false;
   }
 
-  Future<bool> createSubscriptionPlan(SubscriptionPlanModel plan) async {
+  Future<bool> createClinicSubscriptionPlan(CreateClinicSubscriptionPlanRequest request) async {
     final success = await runSafely<bool?>(
           showLoading: true,
           () async {
-            final newPlan = await _subscriptionRepository.createSubscriptionPlan(plan);
+            final ClinicSubscriptionPlanModel newPlan;
+            if (request.id != null) {
+              newPlan = await _subscriptionRepository.updateSubscriptionPlan(request.id!, request);
+            } else {
+              newPlan = await _subscriptionRepository.createClinicSubscriptionPlan(request);
+            }
+            
             final currentList = state.plans ?? [];
             
-            if (plan.id != null) {
+            if (request.id != null) {
                state = state.copyWith(
-                 plans: currentList.map((p) => p.id == plan.id ? newPlan : p).toList()
+                 plans: currentList.map((p) => p.id == request.id ? newPlan : p).toList()
                );
             } else {
               state = state.copyWith(plans: [...currentList, newPlan]);
@@ -64,9 +74,69 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
     final success = await runSafely<bool?>(
           showLoading: true,
           () async {
-            // final success = await _subscriptionRepository.deleteSubscriptionPlan(id);
+            await _subscriptionRepository.deleteSubscriptionPlan(id);
             final currentList = state.plans ?? [];
             state = state.copyWith(plans: currentList.where((p) => p.id != id).toList());
+            return true;
+          },
+        ) ??
+        false;
+
+    return success;
+  }
+
+  // ---------------- PATIENTS ----------------
+
+  Future<bool> getPatientSubscriptionPlans() async {
+    return await runSafely<bool?>(
+          showLoading: false,
+          onLoadingChange: (loading) {
+            state = state.copyWith(loading: loading);
+          },
+          () async {
+            final plans = await _subscriptionRepository.getPatientSubscriptionPlans();
+            state = state.copyWith(patientPlans: plans);
+            return true;
+          },
+        ) ??
+        false;
+  }
+
+  Future<bool> createPatientSubscriptionPlan(CreatePatientSubscriptionPlanRequest request) async {
+    final success = await runSafely<bool?>(
+          showLoading: true,
+          () async {
+            final PatientSubscriptionPlanModel newPlan;
+            if (request.id != null) {
+              newPlan = await _subscriptionRepository.updatePatientSubscriptionPlan(request.id!, request);
+            } else {
+              newPlan = await _subscriptionRepository.createPatientSubscriptionPlan(request);
+            }
+            
+            final currentList = state.patientPlans ?? [];
+            
+            if (request.id != null) {
+               state = state.copyWith(
+                 patientPlans: currentList.map((p) => p.id == request.id ? newPlan : p).toList()
+               );
+            } else {
+              state = state.copyWith(patientPlans: [...currentList, newPlan]);
+            }
+            return true;
+          },
+        ) ??
+        false;
+
+    return success;
+  }
+
+  Future<bool> deletePatientSubscriptionPlan(int id) async {
+    final success = await runSafely<bool?>(
+          showLoading: true,
+          () async {
+            await _subscriptionRepository.deletePatientSubscriptionPlan(id);
+            final currentList = state.patientPlans ?? [];
+            state = state.copyWith(patientPlans: currentList.where((p) => p.id != id).toList());
             return true;
           },
         ) ??
@@ -77,24 +147,24 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
 }
 
 class SubscriptionState extends BaseStateModel {
-  final List<SubscriptionPlanModel>? plans;
-  final FreeSystemPlanModel? freeSystemPlan;
+  final List<ClinicSubscriptionPlanModel>? plans;
+  final List<PatientSubscriptionPlanModel>? patientPlans;
 
   SubscriptionState({
     super.loading,
     this.plans = const [],
-    this.freeSystemPlan,
+    this.patientPlans = const [],
   });
 
   SubscriptionState copyWith({
     bool? loading,
-    List<SubscriptionPlanModel>? plans,
-    FreeSystemPlanModel? freeSystemPlan,
+    List<ClinicSubscriptionPlanModel>? plans,
+    List<PatientSubscriptionPlanModel>? patientPlans,
   }) {
     return SubscriptionState(
       loading: loading ?? this.loading,
       plans: plans ?? this.plans,
-      freeSystemPlan: freeSystemPlan ?? this.freeSystemPlan,
+      patientPlans: patientPlans ?? this.patientPlans,
     );
   }
 }

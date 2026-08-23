@@ -3,8 +3,8 @@ import 'package:skinsync_admin/models/requests/create_treatment_requests/treatme
 import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/basic_info_response.dart';
-import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
+import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 
 import '../models/requests/create_treatment_requests/basic_info_request.dart';

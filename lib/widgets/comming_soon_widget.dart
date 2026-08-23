@@ -60,7 +60,7 @@ class _ComingSoonWidgetState extends State<ComingSoonWidget> with SingleTickerPr
                   child: Icon(Icons.auto_awesome_rounded, size: context.sp(48), color: CustomColors.white),
                 ),
                 context.verticalSpace(32),
-                Text('Coming Soon', style: context.fonts.black26w700),
+                Text('Coming Soon', style: context.fonts.level2Heading),
                 context.verticalSpace(12),
                 Text(
                   "We're crafting an elegant experience for this module.\nStay tuned for the unveiling.",

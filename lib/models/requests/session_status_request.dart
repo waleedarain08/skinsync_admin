@@ -4,5 +4,5 @@ class SessionStatusRequest {
 
   SessionStatusRequest({this.sessionId, this.status});
 
-  Map<String, dynamic> toJson() => {"session_id": sessionId, "status": status};
+  Map<String, dynamic> toJson() => {'session_id': sessionId, 'status': status};
 }

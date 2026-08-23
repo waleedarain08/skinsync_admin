@@ -172,7 +172,7 @@ class _PatientManagementState extends ConsumerState<PatientManagement> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Client Database', style: context.fonts.black26w700),
+            Text('Client Database', style: context.fonts.level1Heading),
             context.verticalSpace(6),
             Text(
               'Unified view of all patients across your clinic network.',

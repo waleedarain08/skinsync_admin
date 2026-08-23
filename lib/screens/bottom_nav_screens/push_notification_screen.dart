@@ -19,7 +19,7 @@ class PushNotificationScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               context.verticalSpace(40),
-              Text('Push Notifications', style: context.fonts.black32w700),
+              Text('Push Notifications', style: context.fonts.level1Heading),
               context.verticalSpace(10),
               Text(
                 'Send push notifications to app users about updates, offers, and alerts',
@@ -47,7 +47,7 @@ class PushNotificationScreen extends StatelessWidget {
                         context.horizontalSpace(20),
                         Text(
                           'Send New Notification',
-                          style: context.fonts.black20w600,
+                          style: context.fonts.subHeading,
                         ),
                       ],
                     ),
@@ -159,7 +159,7 @@ class PushNotificationScreen extends StatelessWidget {
                             children: [
                               Text(
                                 'Notification Preview',
-                                style: context.fonts.black20w600,
+                                style: context.fonts.subHeading,
                               ),
                               context.horizontalSpace(12),
                               Text(
@@ -201,7 +201,7 @@ class PushNotificationScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Notification History',
-                      style: context.fonts.black20w600,
+                      style: context.fonts.subHeading,
                     ),
                     context.verticalSpace(20),
                     const PushNotificationTable(),
@@ -223,7 +223,7 @@ class PushNotificationScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Best Practices for Push Notifications:',
-                      style: context.fonts.black20w600,
+                      style: context.fonts.subHeading,
                     ),
                     context.verticalSpace(5),
                     Text(

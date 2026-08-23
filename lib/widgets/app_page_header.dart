@@ -22,7 +22,7 @@ class AppPageHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: context.fonts.black26w700),
+              Text(title, style: context.fonts.level1Heading),
               if (subtitle != null) ...[
                 SizedBox(height: 6.h),
                 Text(subtitle!, style: context.fonts.grey13w500),
