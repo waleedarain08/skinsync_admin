@@ -34,6 +34,8 @@ enum Endpoint {
   updateClinic('admin/clinic/update/{id}'),
   updateAppVersion('admin/app-version'),
   subscriptionPlans('admin/subscription-plans'),
+  updateSubscriptionPlan('admin/subscription-plans/{id}'),
+  deleteSubscriptionPlan('admin/subscription-plans/{id}'),
   categories('admin/categories'),
   categoryDetail('admin/categories/{id}'),
   createCategory('admin/categories'),

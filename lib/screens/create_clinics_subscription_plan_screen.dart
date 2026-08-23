@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/models/requests/create_subscription_plan_request.dart';
 import 'package:skinsync_admin/models/subscription_plan_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
@@ -130,7 +131,7 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
-      final plan = SubscriptionPlanModel(
+      final request = CreateSubscriptionPlanRequest(
         id: widget.planToEdit?.id,
         name: _nameController.text,
         basePrice: double.tryParse(_priceController.text),
@@ -146,7 +147,7 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
         isActive: _isActive,
       );
 
-      final success = await ref.read(subscriptionViewModelProvider.notifier).createSubscriptionPlan(plan);
+      final success = await ref.read(subscriptionViewModelProvider.notifier).createClinicSubscriptionPlan(request);
       if (success && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(

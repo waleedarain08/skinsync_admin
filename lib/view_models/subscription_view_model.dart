@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/requests/create_subscription_plan_request.dart';
 import '../models/subscription_plan_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
-import '../utils/dummy_data.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 
@@ -27,8 +27,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
             state = state.copyWith(loading: loading);
           },
           () async {
-            // Using dummy data for initial design
-            final plans = TreatmentData.dummySubscriptionPlans;
+            final plans = await _subscriptionRepository.getSubscriptionPlans();
             state = state.copyWith(plans: plans);
             return true;
           },
@@ -36,16 +35,22 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
         false;
   }
 
-  Future<bool> createSubscriptionPlan(SubscriptionPlanModel plan) async {
+  Future<bool> createClinicSubscriptionPlan(CreateSubscriptionPlanRequest request) async {
     final success = await runSafely<bool?>(
           showLoading: true,
           () async {
-            final newPlan = await _subscriptionRepository.createSubscriptionPlan(plan);
+            final SubscriptionPlanModel newPlan;
+            if (request.id != null) {
+              newPlan = await _subscriptionRepository.updateSubscriptionPlan(request.id!, request);
+            } else {
+              newPlan = await _subscriptionRepository.createClinicSubscriptionPlan(request);
+            }
+            
             final currentList = state.plans ?? [];
             
-            if (plan.id != null) {
+            if (request.id != null) {
                state = state.copyWith(
-                 plans: currentList.map((p) => p.id == plan.id ? newPlan : p).toList()
+                 plans: currentList.map((p) => p.id == request.id ? newPlan : p).toList()
                );
             } else {
               state = state.copyWith(plans: [...currentList, newPlan]);
@@ -62,7 +67,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
     final success = await runSafely<bool?>(
           showLoading: true,
           () async {
-            // final success = await _subscriptionRepository.deleteSubscriptionPlan(id);
+            await _subscriptionRepository.deleteSubscriptionPlan(id);
             final currentList = state.plans ?? [];
             state = state.copyWith(plans: currentList.where((p) => p.id != id).toList());
             return true;
