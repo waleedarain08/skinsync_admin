@@ -2,6 +2,7 @@ import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
+import 'package:skinsync_admin/models/patient_subscription_plan_model.dart';
 
 class TreatmentData {
   // Category Hierarchy
@@ -229,6 +230,33 @@ class TreatmentData {
         PlanBenefit(title: 'Priority onboarding and support', enabled: true),
         PlanBenefit(title: 'Custom branding', enabled: true),
       ],
+    ),
+  ];
+
+  static final List<PatientSubscriptionPlanModel> dummyPatientSubscriptionPlans = [
+    PatientSubscriptionPlanModel(
+      id: 1,
+      name: 'Basic Care',
+      basePrice: 19.99,
+      simulationCount: 5,
+      postsViewCount: 20,
+      isActive: true,
+    ),
+    PatientSubscriptionPlanModel(
+      id: 2,
+      name: 'Premium Glow',
+      basePrice: 49.99,
+      simulationCount: 15,
+      unlimitedPostsView: true,
+      isActive: true,
+    ),
+    PatientSubscriptionPlanModel(
+      id: 3,
+      name: 'Unlimited Elite',
+      basePrice: 99.99,
+      unlimitedSimulations: true,
+      unlimitedPostsView: true,
+      isActive: true,
     ),
   ];
 }
