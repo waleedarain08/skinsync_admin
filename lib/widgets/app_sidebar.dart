@@ -121,7 +121,7 @@ class AppSidebar extends StatelessWidget {
     item(4, Icons.people_alt_rounded, 'Patients'),
     item(5, Icons.medical_services_rounded, 'Treatments'),
     item(6, Icons.inventory_2_rounded, 'Inventory'),
-    if (!isDeploymentMode) item(7, Icons.card_membership_rounded, 'Subscriptions'),
+    item(7, Icons.card_membership_rounded, 'Subscriptions'),
     if (!isDeploymentMode) item(8, Icons.admin_panel_settings_rounded, 'Users'),
     item(!isDeploymentMode ? 9 : 7, Icons.account_balance_wallet_rounded, 'Payments'),
     if (!isDeploymentMode) item(10, Icons.gavel_rounded, 'Disputes'),
