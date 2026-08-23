@@ -20,12 +20,14 @@ class CreateClinicsSubscriptionPlanScreen extends ConsumerStatefulWidget {
   const CreateClinicsSubscriptionPlanScreen({super.key, this.planToEdit});
 
   @override
-  ConsumerState<CreateClinicsSubscriptionPlanScreen> createState() => _CreateClinicsSubscriptionPlanScreenState();
+  ConsumerState<CreateClinicsSubscriptionPlanScreen> createState() =>
+      _CreateClinicsSubscriptionPlanScreenState();
 }
 
-class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClinicsSubscriptionPlanScreen> {
+class _CreateClinicsSubscriptionPlanScreenState
+    extends ConsumerState<CreateClinicsSubscriptionPlanScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   late final TextEditingController _nameController;
   late final TextEditingController _priceController;
   late final TextEditingController _doctorSeatsController;
@@ -33,7 +35,8 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
   late final TextEditingController _standardCommissionController;
   late final TextEditingController _dynamicCommissionController;
   late final TextEditingController _techFeeController;
-  final TextEditingController _customBenefitController = TextEditingController();
+  final TextEditingController _customBenefitController =
+      TextEditingController();
   final TextEditingController _clinicSearchController = TextEditingController();
 
   bool _unlimitedDoctors = false;
@@ -61,10 +64,10 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
   @override
   void initState() {
     super.initState();
-    
+
     _initFromNormalPlan(widget.planToEdit);
     _initializeBenefits();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(clinicViewModelProvider.notifier).initialize();
     });
@@ -73,23 +76,34 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
   void _initFromNormalPlan(ClinicSubscriptionPlanModel? plan) {
     _nameController = TextEditingController(text: plan?.name);
     _priceController = TextEditingController(text: plan?.basePrice?.toString());
-    _doctorSeatsController = TextEditingController(text: plan?.doctorSeats.toString() ?? '0');
-    _staffSeatsController = TextEditingController(text: plan?.staffSeats.toString() ?? '0');
-    _standardCommissionController = TextEditingController(text: plan?.standardBookingCommissionPercent.toString() ?? '0');
-    _dynamicCommissionController = TextEditingController(text: plan?.dynamicBookingCommissionPercent.toString() ?? '0');
-    _techFeeController = TextEditingController(text: plan?.technologyFeePerTreatment.toString() ?? '0');
-    
+    _doctorSeatsController = TextEditingController(
+      text: plan?.doctorSeats.toString() ?? '0',
+    );
+    _staffSeatsController = TextEditingController(
+      text: plan?.staffSeats.toString() ?? '0',
+    );
+    _standardCommissionController = TextEditingController(
+      text: plan?.standardBookingCommissionPercent.toString() ?? '0',
+    );
+    _dynamicCommissionController = TextEditingController(
+      text: plan?.dynamicBookingCommissionPercent.toString() ?? '0',
+    );
+    _techFeeController = TextEditingController(
+      text: plan?.technologyFeePerTreatment.toString() ?? '0',
+    );
+
     _unlimitedDoctors = plan?.unlimitedDoctors ?? false;
     _unlimitedStaff = plan?.unlimitedStaff ?? false;
     _isActive = plan?.isActive ?? true;
 
     _selectedClinics = plan?.assignedClinics ?? [];
-    _visibilityType = _selectedClinics.isEmpty ? 'All Clinics' : 'Specific Clinics';
+    _visibilityType =
+        _selectedClinics.isEmpty ? 'All Clinics' : 'Specific Clinics';
   }
 
   void _initializeBenefits() {
     final existingBenefits = widget.planToEdit?.benefits ?? [];
-    
+
     _planBenefits = _predefinedFeatures.map((title) {
       final existing = existingBenefits.firstWhere(
         (b) => b.title == title,
@@ -100,7 +114,9 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
 
     for (final benefit in existingBenefits) {
       if (!_predefinedFeatures.contains(benefit.title)) {
-        _planBenefits.add(PlanBenefit(title: benefit.title, enabled: benefit.enabled));
+        _planBenefits.add(
+          PlanBenefit(title: benefit.title, enabled: benefit.enabled),
+        );
       }
     }
   }
@@ -134,24 +150,40 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
       final request = CreateClinicSubscriptionPlanRequest(
         id: widget.planToEdit?.id,
         name: _nameController.text,
-        basePrice: double.tryParse(_priceController.text),
-        doctorSeats: _unlimitedDoctors ? 0 : (int.tryParse(_doctorSeatsController.text) ?? 0),
+        basePrice: double.tryParse(_priceController.text) ?? 0.0,
+        doctorSeats:
+            _unlimitedDoctors
+                ? 0
+                : (int.tryParse(_doctorSeatsController.text) ?? 0),
         unlimitedDoctors: _unlimitedDoctors,
-        staffSeats: _unlimitedStaff ? 0 : (int.tryParse(_staffSeatsController.text) ?? 0),
+        staffSeats:
+            _unlimitedStaff ? 0 : (int.tryParse(_staffSeatsController.text) ?? 0),
         unlimitedStaff: _unlimitedStaff,
-        standardBookingCommissionPercent: double.tryParse(_standardCommissionController.text) ?? 0.0,
-        dynamicBookingCommissionPercent: double.tryParse(_dynamicCommissionController.text) ?? 0.0,
-        technologyFeePerTreatment: double.tryParse(_techFeeController.text) ?? 0.0,
+        standardBookingCommissionPercent:
+            double.tryParse(_standardCommissionController.text) ?? 0.0,
+        dynamicBookingCommissionPercent:
+            double.tryParse(_dynamicCommissionController.text) ?? 0.0,
+        technologyFeePerTreatment:
+            double.tryParse(_techFeeController.text) ?? 0.0,
         benefits: _planBenefits,
-        assignedClinics: _visibilityType == 'All Clinics' ? [] : _selectedClinics,
+        assignedClinics:
+            _visibilityType == 'All Clinics' ? [] : _selectedClinics,
         isActive: _isActive,
       );
 
-      final success = await ref.read(subscriptionViewModelProvider.notifier).createClinicSubscriptionPlan(request);
+      final success = await ref
+          .read(subscriptionViewModelProvider.notifier)
+          .createClinicSubscriptionPlan(request);
       if (success && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isEditMode ? 'Plan updated successfully' : 'Plan created successfully')),
+          SnackBar(
+            content: Text(
+              isEditMode
+                  ? 'Plan updated successfully'
+                  : 'Plan created successfully',
+            ),
+          ),
         );
       }
     }
@@ -199,9 +231,7 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
                       SizedBox(width: 16.w),
                       CustomPrimaryButton(
                         onTap: _submit,
-                        label: state.loading
-                            ? 'Saving...'
-                            : (isEditMode ? 'Update Plan' : 'Create Plan'),
+                        label: state.loading ? 'Saving...' : 'Save Plan',
                         width: 180.w,
                       ),
                     ],
@@ -215,8 +245,6 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 32.h),
-
                       // Form Content in a clean styled container
                       Container(
                         padding: context.appEdgeInsets(all: 24),
@@ -229,24 +257,16 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // SECTION 1: VISIBILITY
+                            // SECTION 1: BASIC INFORMATION
                             Text(
-                              'SECTION 1: PLAN VISIBILITY',
-                              style: context.fonts.sectionHeading,
-                            ),
-                            SizedBox(height: 16.h),
-                            _buildVisibilitySectionContent(),
-                            SizedBox(height: 32.h),
-
-                            // SECTION 2: BASIC INFORMATION
-                            Text(
-                              'SECTION 2: BASIC INFORMATION',
+                              'SECTION 1: BASIC INFORMATION',
                               style: context.fonts.sectionHeading,
                             ),
                             SizedBox(height: 16.h),
                             Row(
                               children: [
                                 Expanded(
+                                  flex: 2,
                                   child: BuildTextField(
                                     label: 'Plan Name',
                                     controller: _nameController,
@@ -292,40 +312,32 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
                             ),
                             SizedBox(height: 32.h),
 
-                            // SECTION 3: PLAN LIMITS
+                            // SECTION 2: PLAN LIMITS
                             Text(
-                              'SECTION 3: PLAN LIMITS',
+                              'SECTION 2: PLAN LIMITS',
                               style: context.fonts.sectionHeading,
                             ),
                             SizedBox(height: 16.h),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: BuildTextField(
-                                    label: 'Doctor/Injector Seats',
-                                    controller: _doctorSeatsController,
-                                    hintText: '0',
-                                    keyboardType: TextInputType.number,
-                                    readOnly: _unlimitedDoctors,
-                                    onChanged: (val) {
-                                      if (val != null &&
-                                          val.isNotEmpty &&
-                                          val != '0') {
-                                        setState(
-                                          () => _unlimitedDoctors = false,
-                                        );
-                                      }
-                                    },
+                                if (!_unlimitedDoctors)
+                                  Expanded(
+                                    flex: 2,
+                                    child: BuildTextField(
+                                      label: 'Doctor/Injector Seats',
+                                      controller: _doctorSeatsController,
+                                      hintText: '0',
+                                      keyboardType: TextInputType.number,
+                                    ),
                                   ),
-                                ),
-                                context.horizontalSpace(24),
+                                if (!_unlimitedDoctors)
+                                  context.horizontalSpace(24),
                                 Expanded(
                                   child: Padding(
                                     padding: context.appEdgeInsets(bottom: 8),
                                     child: _unlimitedToggle(
-                                      label: 'Unlimited',
+                                      label: 'Unlimited Doctors',
                                       value: _unlimitedDoctors,
                                       onChanged: (val) {
                                         setState(() {
@@ -344,29 +356,23 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: BuildTextField(
-                                    label: 'Staff Seats',
-                                    controller: _staffSeatsController,
-                                    hintText: '0',
-                                    keyboardType: TextInputType.number,
-                                    readOnly: _unlimitedStaff,
-                                    onChanged: (val) {
-                                      if (val != null &&
-                                          val.isNotEmpty &&
-                                          val != '0') {
-                                        setState(() => _unlimitedStaff = false);
-                                      }
-                                    },
+                                if (!_unlimitedStaff)
+                                  Expanded(
+                                    flex: 2,
+                                    child: BuildTextField(
+                                      label: 'Staff Seats',
+                                      controller: _staffSeatsController,
+                                      hintText: '0',
+                                      keyboardType: TextInputType.number,
+                                    ),
                                   ),
-                                ),
-                                context.horizontalSpace(24),
+                                if (!_unlimitedStaff)
+                                  context.horizontalSpace(24),
                                 Expanded(
                                   child: Padding(
                                     padding: context.appEdgeInsets(bottom: 8),
                                     child: _unlimitedToggle(
-                                      label: 'Unlimited',
+                                      label: 'Unlimited Staff',
                                       value: _unlimitedStaff,
                                       onChanged: (val) {
                                         setState(() {
@@ -383,9 +389,9 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
                             ),
                             SizedBox(height: 32.h),
 
-                            // SECTION 4: COMMISSION & FEES
+                            // SECTION 3: COMMISSION & FEES
                             Text(
-                              'SECTION 4: COMMISSION & FEES',
+                              'SECTION 3: COMMISSION & FEES',
                               style: context.fonts.sectionHeading,
                             ),
                             SizedBox(height: 16.h),
@@ -425,9 +431,9 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
                             ),
                             SizedBox(height: 32.h),
 
-                            // SECTION 5: FEATURES & BENEFITS
+                            // SECTION 4: PLAN FEATURES & BENEFITS
                             Text(
-                              'SECTION 5: PLAN FEATURES & BENEFITS',
+                              'SECTION 4: PLAN FEATURES & BENEFITS',
                               style: context.fonts.sectionHeading,
                             ),
                             SizedBox(height: 16.h),
@@ -472,6 +478,29 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
                                 ),
                               ],
                             ),
+                          ],
+                        ),
+                      ),
+                      context.verticalSpace(24),
+
+                      // SECTION 5: PLAN VISIBILITY
+                      Container(
+                        padding: context.appEdgeInsets(all: 24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: context.appBorderRadius(all: 16),
+                          boxShadow: AppShadows.xs(context),
+                          border: Border.all(color: CustomColors.border),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'SECTION 5: PLAN VISIBILITY',
+                              style: context.fonts.sectionHeading,
+                            ),
+                            SizedBox(height: 16.h),
+                            _buildVisibilitySectionContent(),
                           ],
                         ),
                       ),

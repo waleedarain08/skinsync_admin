@@ -32,7 +32,10 @@ class BuildTextField extends StatelessWidget {
     this.obscureText = false,
     this.width,
     this.tooltip,
+    this.inputFormatters,
   });
+
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +68,12 @@ class BuildTextField extends StatelessWidget {
             keyboardType: keyboardType,
             validator: validator,
             readOnly: readOnly,
-            inputFormatters: [
-              if (keyboardType == TextInputType.phone || keyboardType == TextInputType.number)
+            inputFormatters: inputFormatters ?? [
+              if (keyboardType == TextInputType.phone ||
+                  keyboardType == TextInputType.number)
                 FilteringTextInputFormatter.digitsOnly,
+              if (keyboardType?.toString().contains('decimal: true') ?? false)
+                FilteringTextInputFormatter.allow(RegExp(r'[\d.]')),
             ],
             onChanged: onChanged,
             decoration: AppDecorations.input(

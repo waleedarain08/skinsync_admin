@@ -37,6 +37,7 @@ class _CreatePatientSubscriptionPlanScreenState
   bool _unlimitedPostsView = false;
   String _visibilityType = 'All Patients';
   List<String> _selectedPatients = [];
+  String _patientSearchQuery = '';
   bool _isActive = true;
 
   // Dummy patient data for selection
@@ -93,7 +94,7 @@ class _CreatePatientSubscriptionPlanScreenState
       final request = CreatePatientSubscriptionPlanRequest(
         id: widget.planToEdit?.id,
         name: _nameController.text,
-        basePrice: double.tryParse(_priceController.text),
+        basePrice: double.tryParse(_priceController.text) ?? 0.0,
         simulationCount:
             _unlimitedSimulations
                 ? 0
@@ -181,10 +182,178 @@ class _CreatePatientSubscriptionPlanScreenState
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildMainForm(),
+                      // Form Content in a clean styled container
+                      Container(
+                        padding: context.appEdgeInsets(all: 24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: context.appBorderRadius(all: 16),
+                          boxShadow: AppShadows.xs(context),
+                          border: Border.all(color: CustomColors.border),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // SECTION 1: BASIC INFORMATION
+                            Text(
+                              'SECTION 1: BASIC INFORMATION',
+                              style: context.fonts.sectionHeading,
+                            ),
+                            SizedBox(height: 16.h),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: BuildTextField(
+                                    label: 'Plan Name',
+                                    controller: _nameController,
+                                    hintText: 'e.g. Standard Patient Tier',
+                                    validator: Validators.empty,
+                                  ),
+                                ),
+                                context.horizontalSpace(24),
+                                Expanded(
+                                  child: BuildTextField(
+                                    label: 'Monthly Price (\$)',
+                                    controller: _priceController,
+                                    hintText: '0.00',
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                    validator: Validators.empty,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            context.verticalSpace(24),
+                            Row(
+                              children: [
+                                Text(
+                                  'Plan Status: ',
+                                  style: context.fonts.black14w600,
+                                ),
+                                Switch.adaptive(
+                                  value: _isActive,
+                                  onChanged: (val) =>
+                                      setState(() => _isActive = val),
+                                  activeTrackColor: CustomColors.green,
+                                ),
+                                Text(
+                                  _isActive ? 'Active' : 'Inactive',
+                                  style: _isActive
+                                      ? context.fonts.green13w500
+                                      : context.fonts.red13w500,
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 32.h),
+
+                            // SECTION 2: PLAN LIMITS
+                            Text(
+                              'SECTION 2: PLAN LIMITS',
+                              style: context.fonts.sectionHeading,
+                            ),
+                            SizedBox(height: 16.h),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                if (!_unlimitedSimulations)
+                                  Expanded(
+                                    flex: 2,
+                                    child: BuildTextField(
+                                      label: 'Simulation Count',
+                                      controller: _simulationCountController,
+                                      hintText: 'Quantity',
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ),
+                                if (!_unlimitedSimulations)
+                                  context.horizontalSpace(24),
+                                Expanded(
+                                  child: Padding(
+                                    padding: context.appEdgeInsets(bottom: 8),
+                                    child: _unlimitedToggle(
+                                      label: 'Unlimited Simulations',
+                                      value: _unlimitedSimulations,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _unlimitedSimulations = val;
+                                          if (val) {
+                                            _simulationCountController.text =
+                                                '0';
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            context.verticalSpace(24),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                if (!_unlimitedPostsView)
+                                  Expanded(
+                                    flex: 2,
+                                    child: BuildTextField(
+                                      label: 'Posts View Count',
+                                      controller: _postsViewCountController,
+                                      hintText: 'Quantity',
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ),
+                                if (!_unlimitedPostsView)
+                                  context.horizontalSpace(24),
+                                Expanded(
+                                  child: Padding(
+                                    padding: context.appEdgeInsets(bottom: 8),
+                                    child: _unlimitedToggle(
+                                      label: 'Unlimited Posts View',
+                                      value: _unlimitedPostsView,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _unlimitedPostsView = val;
+                                          if (val) {
+                                            _postsViewCountController.text =
+                                                '0';
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                       context.verticalSpace(24),
-                      _buildVisibilitySection(),
+
+                      // SECTION 3: PLAN VISIBILITY
+                      Container(
+                        padding: context.appEdgeInsets(all: 24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: context.appBorderRadius(all: 16),
+                          boxShadow: AppShadows.xs(context),
+                          border: Border.all(color: CustomColors.border),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'SECTION 3: PLAN VISIBILITY',
+                              style: context.fonts.sectionHeading,
+                            ),
+                            SizedBox(height: 16.h),
+                            _buildVisibilitySectionContent(),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -196,200 +365,131 @@ class _CreatePatientSubscriptionPlanScreenState
     );
   }
 
-  Widget _buildMainForm() {
-    return Container(
-      padding: context.appEdgeInsets(all: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: context.appBorderRadius(all: 16),
-        boxShadow: AppShadows.xs(context),
-        border: Border.all(color: CustomColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('SECTION 1: PLAN DETAILS', style: context.fonts.sectionHeading),
+  Widget _buildVisibilitySectionContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Target Availability', style: context.fonts.black14w600),
+        context.verticalSpace(12),
+        Container(
+          padding: context.appEdgeInsets(horizontal: 16),
+          decoration: BoxDecoration(
+            border: Border.all(color: CustomColors.border),
+            borderRadius: context.borderRadius(all: 12),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _visibilityType,
+              isExpanded: true,
+              items: ['All Patients', 'Specific Patients'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value, style: context.fonts.grey14w400),
+                );
+              }).toList(),
+              onChanged: (val) {
+                setState(() {
+                  _visibilityType = val!;
+                  if (_visibilityType == 'All Patients') _selectedPatients = [];
+                });
+              },
+            ),
+          ),
+        ),
+        if (_visibilityType == 'Specific Patients') ...[
           context.verticalSpace(24),
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: BuildTextField(
-                  label: 'Plan Name',
-                  controller: _nameController,
-                  hintText: 'e.g. Standard Patient Tier',
-                  validator: Validators.empty,
-                ),
-              ),
-              context.horizontalSpace(16),
-              Expanded(
-                child: BuildTextField(
-                  label: 'Monthly Price (\$)',
-                  controller: _priceController,
-                  hintText: '0.00',
-                  validator: Validators.empty,
-                ),
-              ),
-            ],
-          ),
-          context.verticalSpace(32),
-          Text('SECTION 2: PLAN LIMITS', style: context.fonts.sectionHeading),
-          context.verticalSpace(24),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    BuildTextField(
-                      label: 'Simulation Count',
-                      controller: _simulationCountController,
-                      hintText: 'Quantity',
-                      readOnly: _unlimitedSimulations,
-                    ),
-                    context.verticalSpace(12),
-                    _unlimitedToggle(
-                      label: 'Unlimited Simulations',
-                      value: _unlimitedSimulations,
-                      onChanged: (val) {
-                        setState(() => _unlimitedSimulations = val);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              context.horizontalSpace(24),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    BuildTextField(
-                      label: 'Posts View Count',
-                      controller: _postsViewCountController,
-                      hintText: 'Quantity',
-                      readOnly: _unlimitedPostsView,
-                    ),
-                    context.verticalSpace(12),
-                    _unlimitedToggle(
-                      label: 'Unlimited Posts View',
-                      value: _unlimitedPostsView,
-                      onChanged: (val) {
-                        setState(() => _unlimitedPostsView = val);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          context.verticalSpace(32),
-          Row(
-            children: [
-              Text('Plan Status', style: context.fonts.black14w600),
-              const Spacer(),
-              Switch.adaptive(
-                value: _isActive,
-                onChanged: (val) => setState(() => _isActive = val),
-                activeTrackColor: CustomColors.green,
-              ),
-              context.horizontalSpace(8),
-              Text(
-                _isActive ? 'Active' : 'Inactive',
-                style: context.fonts.grey13w600,
-              ),
-            ],
-          ),
+          Text('Assign to Patients', style: context.fonts.black14w600),
+          context.verticalSpace(12),
+          _buildPatientSelector(),
         ],
-      ),
+      ],
     );
   }
 
-  Widget _buildVisibilitySection() {
-    return Container(
-      padding: context.appEdgeInsets(all: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: context.appBorderRadius(all: 16),
-        boxShadow: AppShadows.xs(context),
-        border: Border.all(color: CustomColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('PLAN VISIBILITY', style: context.fonts.sectionHeading),
+  Widget _buildPatientSelector() {
+    final filteredPatients =
+        _dummyPatients.where((p) {
+          final query = _patientSearchQuery.toLowerCase();
+          return p.toLowerCase().contains(query);
+        }).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppSearchField(
+          controller: _patientSearchController,
+          onChanged: (val) => setState(() => _patientSearchQuery = val),
+          hintText: 'Search patients by name...',
+        ),
+        context.verticalSpace(16),
+        if (_selectedPatients.isNotEmpty) ...[
+          Wrap(
+            spacing: context.w(8),
+            runSpacing: context.h(8),
+            children:
+                _selectedPatients.map((name) {
+                  return Chip(
+                    label: Text(name, style: context.fonts.black13w500),
+                    backgroundColor: CustomColors.green.withValues(alpha: 0.1),
+                    deleteIcon: const Icon(Icons.close, size: 14),
+                    onDeleted:
+                        () => setState(() => _selectedPatients.remove(name)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: context.borderRadius(all: 8),
+                      side: BorderSide.none,
+                    ),
+                  );
+                }).toList(),
+          ),
           context.verticalSpace(16),
-          Row(
-            children: [
-              _visibilityOption('All Patients'),
-              context.horizontalSpace(24),
-              _visibilityOption('Specific Patients'),
-            ],
-          ),
-          if (_visibilityType == 'Specific Patients') ...[
-            context.verticalSpace(24),
-            AppSearchField(
-              controller: _patientSearchController,
-              hintText: 'Search patients by name...',
-              onChanged: (v) => setState(() {}),
-            ),
-            context.verticalSpace(16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children:
-                  _dummyPatients
-                      .where(
-                        (p) => p.toLowerCase().contains(
-                          _patientSearchController.text.toLowerCase(),
-                        ),
-                      )
-                      .map((p) => _patientChip(p))
-                      .toList(),
-            ),
-          ],
         ],
-      ),
-    );
-  }
-
-  Widget _visibilityOption(String title) {
-    return InkWell(
-      onTap: () => setState(() => _visibilityType = title),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Radio<String>(
-            value: title,
-            groupValue: _visibilityType,
-            onChanged: (v) => setState(() => _visibilityType = v!),
-            activeColor: CustomColors.purple,
+        Container(
+          constraints: BoxConstraints(maxHeight: context.h(250)),
+          decoration: BoxDecoration(
+            border: Border.all(color: CustomColors.border),
+            borderRadius: context.borderRadius(all: 12),
           ),
-          Text(title, style: context.fonts.black14w600),
-        ],
-      ),
-    );
-  }
-
-  Widget _patientChip(String patient) {
-    final isSelected = _selectedPatients.contains(patient);
-    return FilterChip(
-      label: Text(patient),
-      selected: isSelected,
-      onSelected: (selected) {
-        setState(() {
-          if (selected) {
-            _selectedPatients.add(patient);
-          } else {
-            _selectedPatients.remove(patient);
-          }
-        });
-      },
-      selectedColor: CustomColors.purple.withValues(alpha: 0.1),
-      checkmarkColor: CustomColors.purple,
-      labelStyle: TextStyle(
-        color: isSelected ? CustomColors.purple : CustomColors.black,
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-      ),
+          child:
+              filteredPatients.isEmpty
+                  ? Center(
+                    child: Padding(
+                      padding: context.appEdgeInsets(all: 16),
+                      child: Text(
+                        'No patients found',
+                        style: context.fonts.grey14w400,
+                      ),
+                    ),
+                  )
+                  : Scrollbar(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: filteredPatients.length,
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        final patient = filteredPatients[index];
+                        final isSelected = _selectedPatients.contains(patient);
+                        return CheckboxListTile(
+                          title: Text(patient, style: context.fonts.grey14w600),
+                          value: isSelected,
+                          onChanged: (val) {
+                            setState(() {
+                              if (val == true) {
+                                _selectedPatients.add(patient);
+                              } else {
+                                _selectedPatients.remove(patient);
+                              }
+                            });
+                          },
+                          activeColor: CustomColors.green,
+                          checkColor: CustomColors.black,
+                          controlAffinity: ListTileControlAffinity.leading,
+                          contentPadding: context.appEdgeInsets(horizontal: 16),
+                        );
+                      },
+                    ),
+                  ),
+        ),
+      ],
     );
   }
 
