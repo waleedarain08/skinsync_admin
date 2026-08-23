@@ -68,7 +68,7 @@ Future<void> initializeServices() async {
     () => BookingServices(api: apiBaseHelper),
   );
   locator.registerLazySingleton<ExploreRepository>(
-    () => ExploreService(),
+    ExploreService.new,
   );
   final secureStorageService = SecureStorageService();
   await secureStorageService.init();

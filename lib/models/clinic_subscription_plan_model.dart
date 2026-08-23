@@ -1,62 +1,4 @@
-
-import 'package:skinsync_admin/models/responses/base_response_model.dart';
-
-class SubscriptionPlanResponse
-    extends BaseApiResponseModel<SubscriptionPlanModel> {
-  const SubscriptionPlanResponse({
-    required super.isSuccess,
-    required super.message,
-    super.data,
-  });
-
-  factory SubscriptionPlanResponse.fromJson(
-    Map<String, dynamic> json,
-  ) =>
-      SubscriptionPlanResponse(
-        isSuccess:
-            (json['is_success'] as bool?) ??
-            
-            false,
-        message: json['message'] ?? '',
-        data: json['data'] == null
-            ? null
-            : SubscriptionPlanModel.fromJson(
-                json['data'] as Map<String, dynamic>,
-              ),
-      );
-
-  
-}
-
-class SubscriptionPlanListResponse
-    extends BaseApiResponseModel<List<SubscriptionPlanModel>> {
-  const SubscriptionPlanListResponse({
-    required super.isSuccess,
-    required super.message,
-    super.data,
-  });
-
-  factory SubscriptionPlanListResponse.fromJson(
-    Map<String, dynamic> json,
-  ) =>
-      SubscriptionPlanListResponse(
-        isSuccess:
-            (json['is_success'] as bool?) ??
-            (json['status'] as bool?) ??
-            false,
-        message: json['message'] ?? '',
-        data: json['data'] == null
-            ? []
-            : List<SubscriptionPlanModel>.from(
-                (json['data'] as List).map(
-                  (e) => SubscriptionPlanModel.fromJson(e),
-                ),
-              ),
-      );
-
- 
-}
-class SubscriptionPlanModel {
+class ClinicSubscriptionPlanModel {
   int? id;
   String? name;
   double? basePrice;
@@ -71,7 +13,7 @@ class SubscriptionPlanModel {
   List<String>? assignedClinics;
   bool isActive;
 
-  SubscriptionPlanModel({
+  ClinicSubscriptionPlanModel({
     this.id,
     this.name,
     this.basePrice,
@@ -87,24 +29,31 @@ class SubscriptionPlanModel {
     this.isActive = true,
   });
 
-  factory SubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
-    return SubscriptionPlanModel(
+  factory ClinicSubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
+    return ClinicSubscriptionPlanModel(
       id: json['id'],
       name: json['name'],
-      basePrice: json['base_price']?.toDouble(),
+      basePrice: (json['base_price'] as num?)?.toDouble(),
       doctorSeats: json['doctor_seats'] ?? 0,
       unlimitedDoctors: json['unlimited_doctors'] ?? false,
       staffSeats: json['staff_seats'] ?? 0,
       unlimitedStaff: json['unlimited_staff'] ?? false,
-      standardBookingCommissionPercent: json['standard_booking_commission_percent']?.toDouble() ?? 0.0,
-      dynamicBookingCommissionPercent: json['dynamic_booking_commission_percent']?.toDouble() ?? 0.0,
-      technologyFeePerTreatment: json['technology_fee_per_treatment']?.toDouble() ?? 0.0,
-      isActive: json['is_active'] ?? true,
+      standardBookingCommissionPercent:
+          (json['standard_booking_commission_percent'] as num?)?.toDouble() ??
+              0.0,
+      dynamicBookingCommissionPercent:
+          (json['dynamic_booking_commission_percent'] as num?)?.toDouble() ??
+              0.0,
+      technologyFeePerTreatment:
+          (json['technology_fee_per_treatment'] as num?)?.toDouble() ?? 0.0,
+      isActive: (json['is_active'] as bool?) ?? true,
       benefits: json['benefits'] != null
-          ? (json['benefits'] as List).map((e) => PlanBenefit.fromJson(e)).toList()
+          ? (json['benefits'] as List)
+              .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
       assignedClinics: json['assigned_clinics'] != null
-          ? List<String>.from(json['assigned_clinics'])
+          ? List<String>.from(json['assigned_clinics'] as Iterable)
           : null,
     );
   }

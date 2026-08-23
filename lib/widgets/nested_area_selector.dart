@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/responses/area_list_response.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/treatment_view_model.dart';
-import 'package:skinsync_admin/widgets/dailogbox/area_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/app_network_image.dart';
+import 'package:skinsync_admin/widgets/dailogbox/area_creation_dialog.dart';
 
 typedef SubAreaSetter =
     void Function({

@@ -60,7 +60,7 @@ class PostPhotosStep extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.postTreatmentPhotoConfigs.length,
-            separatorBuilder: (_, __) => context.verticalSpace(16),
+            separatorBuilder: (_, _) => context.verticalSpace(16),
             itemBuilder: (context, index) {
               final config = state.postTreatmentPhotoConfigs[index];
               return Container(

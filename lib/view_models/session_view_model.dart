@@ -741,33 +741,33 @@ class SessionViewModel extends BaseViewModel<SessionState> {
               final updatedSessions = state.sessions.map((s) {
                 if (s.sessionId == detail.id) {
                   final durationText = detail.isFixedDuration
-                      ? "Fixed: ${detail.fixedDuration} mins"
-                      : "Total: ${detail.calculatedTotalDuration} mins (Base: ${detail.baseDuration}, Prep: ${detail.prepTime}, Cleanup: ${detail.cleanupTime})";
+                      ? 'Fixed: ${detail.fixedDuration} mins'
+                      : 'Total: ${detail.calculatedTotalDuration} mins (Base: ${detail.baseDuration}, Prep: ${detail.prepTime}, Cleanup: ${detail.cleanupTime})';
 
                   final priceText = detail.isFixedPrice
-                      ? "\$${detail.fixedPrice} (Fixed Rate)"
-                      : "\$${detail.basePrice} (Base) + Custom Overrides";
+                      ? '\$${detail.fixedPrice} (Fixed Rate)'
+                      : '\$${detail.basePrice} (Base) + Custom Overrides';
 
                   final List<String> protocols = [];
                   if (detail.clinicalProtocolPdf != null) {
                     protocols.add(
-                      "${detail.clinicalProtocolPdf!.name} (Clinical Protocol)",
+                      '${detail.clinicalProtocolPdf!.name} (Clinical Protocol)',
                     );
                   } else {
-                    protocols.add("No clinical protocols configured");
+                    protocols.add('No clinical protocols configured');
                   }
 
                   final List<String> preNotifs = detail.preNotifications
                       .map(
                         (n) =>
-                            "${n.title} - Send ${n.timing} ${n.timingUnit}(s) before",
+                            '${n.title} - Send ${n.timing} ${n.timingUnit}(s) before',
                       )
                       .toList();
 
                   final List<String> postNotifs = detail.postNotifications
                       .map(
                         (n) =>
-                            "${n.title} - Send ${n.timing} ${n.timingUnit}(s) after",
+                            '${n.title} - Send ${n.timing} ${n.timingUnit}(s) after',
                       )
                       .toList();
 

@@ -40,7 +40,7 @@ class PostNoti {
 
     factory PostNoti.fromJson(Map<String, dynamic> json) => PostNoti(
         isCatDefault: json['is_cat_default'],
-        postNotifications: json['post_notifications'] == null ? [] : List<PhaseNotification>.from(json["post_notifications"]!.map((x) => PhaseNotification.fromJson(x))),
+        postNotifications: json['post_notifications'] == null ? [] : List<PhaseNotification>.from(json['post_notifications']!.map((x) => PhaseNotification.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
@@ -70,7 +70,7 @@ class PhaseNotification {
 
     factory PhaseNotification.fromJson(Map<String, dynamic> json) => PhaseNotification(
         title: json['title'],
-        message: json["message"],
+        message: json['message'],
         timing: json['timing'],
         timingUnit: json['timing_unit'],
         type: json['type'],
@@ -100,7 +100,7 @@ class PreNoti {
 
     factory PreNoti.fromJson(Map<String, dynamic> json) => PreNoti(
         isCatDefault: json['is_cat_default'],
-        preNotifications: json['pre_notifications'] == null ? [] : List<PhaseNotification>.from(json["pre_notifications"]!.map((x) => PhaseNotification.fromJson(x))),
+        preNotifications: json['pre_notifications'] == null ? [] : List<PhaseNotification>.from(json['pre_notifications']!.map((x) => PhaseNotification.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {

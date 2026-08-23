@@ -338,7 +338,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             _buildTreatmentsEmptyState()
           else
             Column(
-              children: clinic.treatments!.map((t) => _buildTreatmentRow(t)).toList(),
+              children: clinic.treatments!.map(_buildTreatmentRow).toList(),
             ),
         ]),
       ],
@@ -380,7 +380,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
           if (clinic.availability == null || clinic.availability!.isEmpty)
             Text('No working hours registered.', style: context.fonts.grey14w400)
           else
-            ...clinic.availability!.map((a) => _buildAvailabilityCard(a)),
+            ...clinic.availability!.map(_buildAvailabilityCard),
         ]),
         SizedBox(height: 24.h),
         _infoSection('Subscription Info', [

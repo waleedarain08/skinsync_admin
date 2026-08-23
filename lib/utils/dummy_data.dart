@@ -1,7 +1,7 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
+import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
-import 'package:skinsync_admin/models/subscription_plan_model.dart';
 
 class TreatmentData {
   // Category Hierarchy
@@ -161,8 +161,8 @@ class TreatmentData {
     ),
   ];
 
-  static final List<SubscriptionPlanModel> dummySubscriptionPlans = [
-    SubscriptionPlanModel(
+  static final List<ClinicSubscriptionPlanModel> dummySubscriptionPlans = [
+    ClinicSubscriptionPlanModel(
       id: 0,
       name: 'Free Plan',
       basePrice: 0.00,
@@ -177,7 +177,7 @@ class TreatmentData {
         PlanBenefit(title: 'Basic patient records', enabled: true),
       ],
     ),
-    SubscriptionPlanModel(
+    ClinicSubscriptionPlanModel(
       id: 1,
       name: 'Basic Plan',
       basePrice: 49.99,
@@ -194,7 +194,7 @@ class TreatmentData {
         PlanBenefit(title: 'Automated invoices', enabled: true),
       ],
     ),
-    SubscriptionPlanModel(
+    ClinicSubscriptionPlanModel(
       id: 2,
       name: 'Premium Plan',
       basePrice: 149.99,
@@ -212,7 +212,7 @@ class TreatmentData {
         PlanBenefit(title: 'Dynamic pricing system', enabled: true),
       ],
     ),
-    SubscriptionPlanModel(
+    ClinicSubscriptionPlanModel(
       id: 3,
       name: 'Gold Plan',
       basePrice: 299.99,

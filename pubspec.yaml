@@ -71,6 +71,9 @@ dependencies:
   flutter_image_compress: ^2.5.1
   animated_toggle_switch: ^0.8.7
 
+  collection: any
+  intl: any
+  mime: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

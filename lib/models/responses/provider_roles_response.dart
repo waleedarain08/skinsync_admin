@@ -11,21 +11,21 @@ class ProviderRolesResponse extends BaseApiResponseModel<List<ProviderRoles>> {
 
   factory ProviderRolesResponse.fromJson(Map<String, dynamic> json) =>
       ProviderRolesResponse(
-        data: json["data"] == null
+        data: json['data'] == null
             ? []
             : List<ProviderRoles>.from(
-                json["data"]!.map((x) => ProviderRoles.fromJson(x)),
+                json['data']!.map((x) => ProviderRoles.fromJson(x)),
               ),
-        isSuccess: json["is_success"],
-        message: json["message"],
+        isSuccess: json['is_success'],
+        message: json['message'],
       );
 
   Map<String, dynamic> toJson() => {
-    "data": data == null
+    'data': data == null
         ? []
         : List<dynamic>.from(data!.map((x) => x.toJson())),
-    "is_success": isSuccess,
-    "message": message,
+    'is_success': isSuccess,
+    'message': message,
   };
 }
 
@@ -41,7 +41,7 @@ class ProviderRoles {
   String toRawJson() => json.encode(toJson());
 
   factory ProviderRoles.fromJson(Map<String, dynamic> json) =>
-      ProviderRoles(id: json["id"], name: json["name"]);
+      ProviderRoles(id: json['id'], name: json['name']);
 
-  Map<String, dynamic> toJson() => {"id": id, "name": name};
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
 }

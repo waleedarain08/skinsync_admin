@@ -1,6 +1,8 @@
-import '../models/requests/create_subscription_plan_request.dart';
-import '../models/subscription_plan_model.dart';
+import '../models/clinic_subscription_plan_model.dart';
+import '../models/requests/create_clinic_subscription_plan_request.dart';
+import '../models/responses/clinic_subscription_plan_response.dart';
 import '../repositories/subscription_repository.dart';
+import '../utils/dummy_data.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
 import 'api_base_helper.dart';
@@ -11,25 +13,29 @@ class SubscriptionServices implements SubscriptionRepository {
   SubscriptionServices({required ApiBaseHelper api}) : _api = api;
 
   @override
-  Future<List<SubscriptionPlanModel>> getSubscriptionPlans() async {
+  Future<List<ClinicSubscriptionPlanModel>> getSubscriptionPlans() async {
+    // TODO: Uncomment when backend is ready
+    /*
     final jsonResponse = await _api.get(Endpoint.subscriptionPlans);
-    final response = SubscriptionPlanListResponse.fromJson(
-      jsonResponse,
-      
-    );
+    final response = ClinicSubscriptionPlanListResponse.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
     return response.data!;
+    */
+
+    // Returning dummy data for now as requested
+    await Future<void>.delayed(const Duration(milliseconds: 500)); // Simulate network lag
+    return TreatmentData.dummySubscriptionPlans;
   }
 
   @override
-  Future<SubscriptionPlanModel> createClinicSubscriptionPlan(CreateSubscriptionPlanRequest request) async {
+  Future<ClinicSubscriptionPlanModel> createClinicSubscriptionPlan(CreateClinicSubscriptionPlanRequest request) async {
     final jsonResponse = await _api.post(
       Endpoint.subscriptionPlans,
       body: request.toJson(),
     );
-    final response = SubscriptionPlanResponse.fromJson(
+    final response = ClinicSubscriptionPlanResponse.fromJson(
       jsonResponse,
     );
 
@@ -40,12 +46,13 @@ class SubscriptionServices implements SubscriptionRepository {
   }
 
   @override
-  Future<SubscriptionPlanModel> updateSubscriptionPlan(int id, CreateSubscriptionPlanRequest request) async {
+  Future<ClinicSubscriptionPlanModel> updateSubscriptionPlan(int id, CreateClinicSubscriptionPlanRequest request) async {
     final jsonResponse = await _api.put(
-      Endpoint.updateSubscriptionPlan.withParams({'id': id.toString()}),
+      Endpoint.updateSubscriptionPlan,
+      pathParams: {'id': id.toString()},
       body: request.toJson(),
     );
-    final response = SubscriptionPlanResponse.fromJson(jsonResponse);
+    final response = ClinicSubscriptionPlanResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -56,7 +63,8 @@ class SubscriptionServices implements SubscriptionRepository {
   @override
   Future<bool> deleteSubscriptionPlan(int id) async {
     final jsonResponse = await _api.delete(
-      Endpoint.deleteSubscriptionPlan.withParams({'id': id.toString()}),
+      Endpoint.deleteSubscriptionPlan,
+      pathParams: {'id': id.toString()},
     ) as Map<String, dynamic>;
     final isSuccess = (jsonResponse['is_success'] as bool?) ?? false;
     if (!isSuccess) {

@@ -381,8 +381,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
                   scaffoldMessenger,
                   state,
                   dataState.areas,
-                ))
+                )) {
                   return;
+                }
                 final result = await ref
                     .read(treatmentViewModelProvider.notifier)
                     .createTreatmentArea();

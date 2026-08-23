@@ -13,12 +13,13 @@ import 'package:skinsync_admin/models/requests/create_session_requests/step_pric
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/down_time_level_response.dart';
+import 'package:skinsync_admin/models/responses/session_detail_response.dart';
 import 'package:skinsync_admin/models/responses/session_list_response.dart';
 import 'package:skinsync_admin/models/responses/treatment_products_response.dart';
-import 'package:skinsync_admin/models/responses/session_detail_response.dart';
 import 'package:skinsync_admin/repositories/session_repository.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/utils/exception.dart';
+
 import 'api_base_helper.dart';
 
 class SessionServices implements SessionRepository {

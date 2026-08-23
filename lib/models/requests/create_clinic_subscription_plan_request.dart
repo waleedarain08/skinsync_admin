@@ -1,6 +1,6 @@
-import '../subscription_plan_model.dart';
+import '../clinic_subscription_plan_model.dart';
 
-class CreateSubscriptionPlanRequest {
+class CreateClinicSubscriptionPlanRequest {
   final int? id;
   final String? name;
   final double? basePrice;
@@ -15,7 +15,7 @@ class CreateSubscriptionPlanRequest {
   final List<String>? assignedClinics;
   final bool isActive;
 
-  CreateSubscriptionPlanRequest({
+  CreateClinicSubscriptionPlanRequest({
     this.id,
     this.name,
     this.basePrice,
@@ -49,8 +49,8 @@ class CreateSubscriptionPlanRequest {
     };
   }
 
-  factory CreateSubscriptionPlanRequest.fromModel(SubscriptionPlanModel model) {
-    return CreateSubscriptionPlanRequest(
+  factory CreateClinicSubscriptionPlanRequest.fromModel(ClinicSubscriptionPlanModel model) {
+    return CreateClinicSubscriptionPlanRequest(
       id: model.id,
       name: model.name,
       basePrice: model.basePrice,

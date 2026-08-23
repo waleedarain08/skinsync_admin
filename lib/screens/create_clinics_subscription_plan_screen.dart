@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/requests/create_subscription_plan_request.dart';
-import 'package:skinsync_admin/models/subscription_plan_model.dart';
+import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
+import 'package:skinsync_admin/models/requests/create_clinic_subscription_plan_request.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
@@ -15,7 +15,7 @@ import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 class CreateClinicsSubscriptionPlanScreen extends ConsumerStatefulWidget {
   static const String routeName = '/create-clinics-subscription-plan';
-  final SubscriptionPlanModel? planToEdit;
+  final ClinicSubscriptionPlanModel? planToEdit;
 
   const CreateClinicsSubscriptionPlanScreen({super.key, this.planToEdit});
 
@@ -70,7 +70,7 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
     });
   }
 
-  void _initFromNormalPlan(SubscriptionPlanModel? plan) {
+  void _initFromNormalPlan(ClinicSubscriptionPlanModel? plan) {
     _nameController = TextEditingController(text: plan?.name);
     _priceController = TextEditingController(text: plan?.basePrice?.toString());
     _doctorSeatsController = TextEditingController(text: plan?.doctorSeats.toString() ?? '0');
@@ -131,7 +131,7 @@ class _CreateClinicsSubscriptionPlanScreenState extends ConsumerState<CreateClin
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
-      final request = CreateSubscriptionPlanRequest(
+      final request = CreateClinicSubscriptionPlanRequest(
         id: widget.planToEdit?.id,
         name: _nameController.text,
         basePrice: double.tryParse(_priceController.text),

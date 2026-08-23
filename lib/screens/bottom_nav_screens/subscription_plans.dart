@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../models/subscription_plan_model.dart';
+import '../../models/clinic_subscription_plan_model.dart';
 import '../../utils/theme.dart';
 import '../../view_models/subscription_view_model.dart';
 import '../../widgets/app_badge.dart';
@@ -115,7 +115,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
     );
   }
 
-  Widget _buildPlanCard(BuildContext context, SubscriptionPlanModel plan) {
+  Widget _buildPlanCard(BuildContext context, ClinicSubscriptionPlanModel plan) {
     final activeBenefits =
         plan.benefits?.where((b) => b.enabled).toList() ?? [];
 
@@ -151,7 +151,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           context.verticalSpace(24),
           const Divider(),
           context.verticalSpace(24),
-          Text('CAPACITY & FEES', style: context.fonts.green9w600),
+          Text('CAPACITY & FEES', style: context.fonts.sectionHeading),
           context.verticalSpace(12),
           _limitRow(
             context,
@@ -181,7 +181,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             '\$${plan.technologyFeePerTreatment}',
           ),
           context.verticalSpace(24),
-          Text('INCLUDED FEATURES', style: context.fonts.green9w600),
+          Text('INCLUDED FEATURES', style: context.fonts.sectionHeading),
           context.verticalSpace(16),
           Expanded(
             child: ListView.separated(
@@ -242,7 +242,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
 
   Future<void> _confirmDelete(
     BuildContext context,
-    SubscriptionPlanModel plan,
+    ClinicSubscriptionPlanModel plan,
   ) async {
     final confirm = await showDialog<bool>(
       context: context,

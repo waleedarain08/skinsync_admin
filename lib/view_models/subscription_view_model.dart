@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/requests/create_subscription_plan_request.dart';
-import '../models/subscription_plan_model.dart';
+import '../models/clinic_subscription_plan_model.dart';
+import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
 import 'base_state_model.dart';
@@ -35,11 +35,11 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
         false;
   }
 
-  Future<bool> createClinicSubscriptionPlan(CreateSubscriptionPlanRequest request) async {
+  Future<bool> createClinicSubscriptionPlan(CreateClinicSubscriptionPlanRequest request) async {
     final success = await runSafely<bool?>(
           showLoading: true,
           () async {
-            final SubscriptionPlanModel newPlan;
+            final ClinicSubscriptionPlanModel newPlan;
             if (request.id != null) {
               newPlan = await _subscriptionRepository.updateSubscriptionPlan(request.id!, request);
             } else {
@@ -80,7 +80,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
 }
 
 class SubscriptionState extends BaseStateModel {
-  final List<SubscriptionPlanModel>? plans;
+  final List<ClinicSubscriptionPlanModel>? plans;
 
   SubscriptionState({
     super.loading,
@@ -89,7 +89,7 @@ class SubscriptionState extends BaseStateModel {
 
   SubscriptionState copyWith({
     bool? loading,
-    List<SubscriptionPlanModel>? plans,
+    List<ClinicSubscriptionPlanModel>? plans,
   }) {
     return SubscriptionState(
       loading: loading ?? this.loading,

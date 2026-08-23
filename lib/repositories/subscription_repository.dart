@@ -1,9 +1,9 @@
-import '../models/requests/create_subscription_plan_request.dart';
-import '../models/subscription_plan_model.dart';
+import '../models/clinic_subscription_plan_model.dart';
+import '../models/requests/create_clinic_subscription_plan_request.dart';
 
 abstract class SubscriptionRepository {
-  Future<List<SubscriptionPlanModel>> getSubscriptionPlans();
-  Future<SubscriptionPlanModel> createClinicSubscriptionPlan(CreateSubscriptionPlanRequest request);
-  Future<SubscriptionPlanModel> updateSubscriptionPlan(int id, CreateSubscriptionPlanRequest request);
+  Future<List<ClinicSubscriptionPlanModel>> getSubscriptionPlans();
+  Future<ClinicSubscriptionPlanModel> createClinicSubscriptionPlan(CreateClinicSubscriptionPlanRequest request);
+  Future<ClinicSubscriptionPlanModel> updateSubscriptionPlan(int id, CreateClinicSubscriptionPlanRequest request);
   Future<bool> deleteSubscriptionPlan(int id);
 }

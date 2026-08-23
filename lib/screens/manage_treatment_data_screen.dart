@@ -87,65 +87,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
     }
   }
 
-  static void _showItemDialog({
-    required BuildContext context,
-    required String title,
-    String? initialName,
-    String? initialIcon,
-    String? initialImage,
-    bool showIconField = true,
-    required void Function(String, String, String) onConfirm,
-  }) {
-    final nameController = TextEditingController(text: initialName);
-    final iconController = TextEditingController(text: initialIcon);
-    final imageController = TextEditingController(text: initialImage);
 
-    showDialog(
-      context: context,
-      builder: (context) => StandardDialog(
-        title: title,
-        width: context.w(450),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            BuildTextField(
-              label: 'Name',
-              controller: nameController,
-              hintText: 'Enter name...',
-            ),
-            if (showIconField) ...[
-              context.verticalSpace(20),
-              BuildTextField(
-                label: 'Icon URL (Optional)',
-                controller: iconController,
-                hintText: 'https://...',
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          CustomPrimaryButton(
-            onTap: () {
-              if (nameController.text.trim().isNotEmpty) {
-                onConfirm(
-                  nameController.text.trim(),
-                  iconController.text.trim(),
-                  imageController.text.trim(),
-                );
-                Navigator.pop(context);
-              }
-            },
-            label: 'Confirm',
-            width: context.w(120),
-          ),
-        ],
-      ),
-    );
-  }
 
   static void _showProtocolDialog({
     required BuildContext context,
@@ -547,7 +489,7 @@ class _ManageTreatmentDataScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ref.read(categoryViewModelProvider.notifier).fetchCategories();
+      await ref.read(categoryViewModelProvider.notifier).fetchCategories();
       await ref.read(areaViewModelProvider.notifier).fetchAreas();
       final fetchedAreas = ref.read(areaViewModelProvider).areas;
       ref
@@ -671,7 +613,7 @@ class _ManageTreatmentDataScreenState
                     const AreaCreationDialog(title: 'Add New Area'),
               );
               if (result != null) {
-                viewModel.addArea(
+                await viewModel.addArea(
                   result['name'] as String,
                   sku: result['sku'] as String,
                   icon: result['icon'] as String,
@@ -858,157 +800,7 @@ class _ManageTreatmentDataScreenState
     );
   }
 
-  Widget _buildHierarchicalItem({
-    required BuildContext context,
-    required String name,
-    String? icon,
-    String? image,
-    required int childrenCount,
-    required List<_ChildItemData> children,
-    required void Function(String, String, String) onEdit,
-    required VoidCallback onDelete,
-    required void Function(String, String, String, String) onAddChild,
-    required void Function(String, String, String, String) onEditChild,
-    required void Function(String) onDeleteChild,
-  }) {
-    return BorderdContainerWidget(
-      padding: EdgeInsets.zero,
-      child: ExpansionTile(
-        shape: const RoundedRectangleBorder(side: BorderSide.none),
-        leading: Container(
-          width: context.w(40),
-          height: context.w(100),
-          decoration: BoxDecoration(
-            color: CustomColors.whiteGrey,
-            borderRadius: context.borderRadius(all: 8),
-          ),
-          child: AppNetworkImage(
-            imageUrl: icon ?? '',
-            fit: BoxFit.cover,
-            errorIcon: Icons.category_outlined,
-            errorIconColor: CustomColors.purple,
-          ),
-        ),
-        title: Text(name, style: context.fonts.black16w600),
-        subtitle: Text(
-          '$childrenCount sub-items',
-          style: context.fonts.grey12w400,
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit_outlined, size: 20),
-              onPressed: () => ManageTreatmentDataScreen._showItemDialog(
-                context: context,
-                title: 'Edit Item',
-                initialName: name,
-                initialIcon: icon,
-                initialImage: image,
-                onConfirm: onEdit,
-              ),
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.delete_outline,
-                size: 20,
-                color: CustomColors.red,
-              ),
-              onPressed: () => ManageTreatmentDataScreen._showDeleteConfirm(
-                context,
-                name,
-                onDelete,
-              ),
-            ),
-            const Icon(Icons.expand_more),
-          ],
-        ),
-        children: [
-          Padding(
-            padding: context.appEdgeInsets(all: 16),
-            child: Column(
-              children: [
-                ...children.map(
-                  (child) => ListTile(
-                    dense: true,
-                    leading: Container(
-                      width: context.w(32),
-                      height: context.w(32),
-                      decoration: BoxDecoration(
-                        color: CustomColors.whiteGrey,
-                        borderRadius: context.borderRadius(all: 6),
-                      ),
-                      child: AppNetworkImage(
-                        imageUrl: child.icon ?? '',
-                        fit: BoxFit.cover,
-                        errorIcon: Icons.subdirectory_arrow_right,
-                        errorIconSize: 16,
-                        errorIconColor: CustomColors.grey,
-                      ),
-                    ),
-                    title: Text(child.name, style: context.fonts.black14w400),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined, size: 18),
-                          onPressed: () =>
-                              ManageTreatmentDataScreen._showItemDialog(
-                                context: context,
-                                title: 'Edit Sub-item',
-                                initialName: child.name,
-                                initialIcon: child.icon,
-                                onConfirm: (newName, newIcon, newImage) =>
-                                    onEditChild(
-                                      child.name,
-                                      newName,
-                                      newIcon,
-                                      newImage,
-                                    ),
-                              ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.close,
-                            size: 18,
-                            color: CustomColors.red,
-                          ),
-                          onPressed: () => onDeleteChild(child.name),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                context.verticalSpace(8),
-                TextButton.icon(
-                  onPressed: () async {
-                    final result = await showDialog<Map<String, dynamic>>(
-                      context: context,
-                      builder: (context) =>
-                          const AreaCreationDialog(title: 'Add Sub-item'),
-                    );
-                    if (result != null) {
-                      onAddChild(
-                        result['name'] as String,
-                        result['sku'] as String,
-                        result['icon'] as String,
-                        result['image'] as String,
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('Add Sub-item'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: CustomColors.purple,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 }
 
 class _RecursiveCategoryTile extends StatelessWidget {
@@ -1223,7 +1015,7 @@ class _RecursiveAreaTile extends StatelessWidget {
                       const AreaCreationDialog(title: 'Add Sub-item'),
                 );
                 if (result != null) {
-                  viewModel.addSubArea(
+                  await viewModel.addSubArea(
                     parentAreaId: area.id,
                     parentAreaName: area.name,
                     name: result['name'] as String,
@@ -1250,7 +1042,7 @@ class _RecursiveAreaTile extends StatelessWidget {
                 );
                 if (result != null) {
                   if (level == 0) {
-                    viewModel.editArea(
+                    await viewModel.editArea(
                       id: area.id,
                       name: result['name'] as String,
                       sku: result['sku'] as String,
@@ -1258,7 +1050,7 @@ class _RecursiveAreaTile extends StatelessWidget {
                       image: result['image'] as String,
                     );
                   } else {
-                    viewModel.editSubArea(
+                    await viewModel.editSubArea(
                       id: area.id,
                       name: result['name'] as String,
                       sku: result['sku'] as String,
@@ -1323,9 +1115,4 @@ class _RecursiveAreaTile extends StatelessWidget {
   }
 }
 
-class _ChildItemData {
-  _ChildItemData({required this.name, this.icon, this.image});
-  final String name;
-  final String? icon;
-  final String? image;
-}
+

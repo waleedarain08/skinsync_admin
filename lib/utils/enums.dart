@@ -128,7 +128,7 @@ enum CreateTreatmentSteps {
   followUpSetup('follow_up_setup'),
   businessLogic('business_logic'),
   basicInfo('basic_info'),
-  status("status");
+  status('status');
 
   final String name;
 
