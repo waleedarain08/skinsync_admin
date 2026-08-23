@@ -23,13 +23,28 @@ class SubscriptionPlansTab extends ConsumerStatefulWidget {
       _SubscriptionPlansTabState();
 }
 
-class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
+class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {});
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(subscriptionViewModelProvider.notifier).initialize();
     });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -44,10 +59,31 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
           children: [
             _buildHeader(context),
             context.verticalSpace(32),
+            TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              labelColor: CustomColors.purple,
+              unselectedLabelColor: CustomColors.grey,
+              indicatorColor: CustomColors.purple,
+              indicatorWeight: 3,
+              labelStyle: context.fonts.black16w600,
+              tabs: const [
+                Tab(text: 'Clinic Subscription Plans'),
+                Tab(text: 'Patient Subscription Plans'),
+              ],
+            ),
+            context.verticalSpace(24),
             Expanded(
-              child: state.loading
-                  ? const Center(child: AppLoader())
-                  : _buildContent(context, state),
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  state.loading
+                      ? const Center(child: AppLoader())
+                      : _buildContent(context, state),
+                  _buildPatientPlansTab(context),
+                ],
+              ),
             ),
           ],
         ),
@@ -65,16 +101,51 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab> {
             Text('Subscription Models', style: context.fonts.level1Heading),
             context.verticalSpace(6),
             Text(
-              'Define tiers, commissions, and capacity limits for your clinic network.',
+              _tabController.index == 0
+                  ? 'Define tiers, commissions, and capacity limits for your clinic network.'
+                  : 'Manage subscription plans and benefits for individual patients.',
               style: context.fonts.grey13w500,
             ),
           ],
         ),
-        CustomPrimaryButton(
-          onTap: () => context.push(CreateClinicsSubscriptionPlanScreen.routeName),
-          icon: Icons.add_rounded,
-          label: 'Create New Tier',
-          width: context.w(200),
+        if (_tabController.index == 0)
+          CustomPrimaryButton(
+            onTap: () =>
+                context.push(CreateClinicsSubscriptionPlanScreen.routeName),
+            icon: Icons.add_rounded,
+            label: 'Create New Tier',
+            width: context.w(200),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildPatientPlansTab(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: context.appEdgeInsets(all: 40),
+          decoration: const BoxDecoration(
+            color: CustomColors.whiteGrey,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.person_outline_rounded,
+            size: 80,
+            color: CustomColors.grey,
+          ),
+        ),
+        context.verticalSpace(24),
+        Text(
+          'Patient Subscription Management',
+          style: context.fonts.black18w600,
+        ),
+        context.verticalSpace(8),
+        Text(
+          'Individual patient subscription plans are coming soon.\nThis module will allow you to define consumer-facing tiers.',
+          textAlign: TextAlign.center,
+          style: context.fonts.grey14w400,
         ),
       ],
     );
