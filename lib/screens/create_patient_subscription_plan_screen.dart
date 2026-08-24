@@ -39,6 +39,7 @@ class _CreatePatientSubscriptionPlanScreenState
   List<String> _selectedPatients = [];
   String _patientSearchQuery = '';
   bool _isActive = true;
+  bool _isDefault = false;
 
   // Dummy patient data for selection
   final List<String> _dummyPatients = [
@@ -73,6 +74,7 @@ class _CreatePatientSubscriptionPlanScreenState
     _unlimitedSimulations = plan?.unlimitedSimulations ?? false;
     _unlimitedPostsView = plan?.unlimitedPostsView ?? false;
     _isActive = plan?.isActive ?? true;
+    _isDefault = plan?.isDefault ?? false;
 
     _selectedPatients = plan?.assignedPatients ?? [];
     _visibilityType =
@@ -108,6 +110,7 @@ class _CreatePatientSubscriptionPlanScreenState
         assignedPatients:
             _visibilityType == 'All Patients' ? [] : _selectedPatients,
         isActive: _isActive,
+        isDefault: _isDefault,
       );
 
       final success = await ref
@@ -249,6 +252,26 @@ class _CreatePatientSubscriptionPlanScreenState
                                   style: _isActive
                                       ? context.fonts.green13w500
                                       : context.fonts.red13w500,
+                                ),
+                                context.horizontalSpace(32),
+                                Text(
+                                  'Set as Default: ',
+                                  style: context.fonts.black14w600,
+                                ),
+                                Transform.scale(
+                                  scale: 0.7,
+                                  child: Switch.adaptive(
+                                    value: _isDefault,
+                                    onChanged: (val) =>
+                                        setState(() => _isDefault = val),
+                                    activeTrackColor: CustomColors.purple,
+                                  ),
+                                ),
+                                Text(
+                                  _isDefault ? 'Default' : 'Not Default',
+                                  style: _isDefault
+                                      ? context.fonts.green13w500
+                                      : context.fonts.grey13w500,
                                 ),
                               ],
                             ),

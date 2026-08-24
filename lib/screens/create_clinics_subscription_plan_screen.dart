@@ -45,6 +45,7 @@ class _CreateClinicsSubscriptionPlanScreenState
   List<String> _selectedClinics = [];
   String _clinicSearchQuery = '';
   bool _isActive = true;
+  bool _isDefault = false;
 
   final List<String> _predefinedFeatures = [
     'AI consultation and treatment recommendation tools',
@@ -95,6 +96,7 @@ class _CreateClinicsSubscriptionPlanScreenState
     _unlimitedDoctors = plan?.unlimitedDoctors ?? false;
     _unlimitedStaff = plan?.unlimitedStaff ?? false;
     _isActive = plan?.isActive ?? true;
+    _isDefault = plan?.isDefault ?? false;
 
     _selectedClinics = plan?.assignedClinics ?? [];
     _visibilityType =
@@ -169,6 +171,7 @@ class _CreateClinicsSubscriptionPlanScreenState
         assignedClinics:
             _visibilityType == 'All Clinics' ? [] : _selectedClinics,
         isActive: _isActive,
+        isDefault: _isDefault,
       );
 
       final success = await ref
@@ -310,6 +313,26 @@ class _CreateClinicsSubscriptionPlanScreenState
                                   style: _isActive
                                       ? context.fonts.green13w500
                                       : context.fonts.red13w500,
+                                ),
+                                context.horizontalSpace(32),
+                                Text(
+                                  'Set as Default: ',
+                                  style: context.fonts.black14w600,
+                                ),
+                                Transform.scale(
+                                  scale: 0.7,
+                                  child: Switch.adaptive(
+                                    value: _isDefault,
+                                    onChanged: (val) =>
+                                        setState(() => _isDefault = val),
+                                    activeTrackColor: CustomColors.purple,
+                                  ),
+                                ),
+                                Text(
+                                  _isDefault ? 'Default' : 'Not Default',
+                                  style: _isDefault
+                                      ? context.fonts.green13w500
+                                      : context.fonts.grey13w500,
                                 ),
                               ],
                             ),
