@@ -373,7 +373,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../models/responses/patient_detail_response.dart';
 import '../../utils/theme.dart';
 import '../../view_models/patient_view_model.dart';
@@ -382,6 +381,7 @@ import '../../widgets/app_loader.dart';
 import '../../widgets/borderd_container_widget.dart';
 import '../../widgets/gradient_scaffold.dart';
 import '../widgets/patient_treatment_request.widget.dart';
+import '../widgets/status_toggle_switch.dart';
 import 'bottom_nav_screens/patient_management.dart';
 import 'treatment_detail_screen.dart';
 
@@ -455,30 +455,63 @@ class _PatientManagementDetailScreenState
       padding: context.appEdgeInsets(all: 24),
       backgroundColor: CustomColors.white,
       child: Row(
+        mainAxisAlignment: .spaceBetween,
+        crossAxisAlignment: .end,
         children: [
-          _buildAvatar(context, p.image, 40),
-          context.horizontalSpace(24),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(p.patientName, style: context.fonts.level2Heading),
-                context.verticalSpace(4),
-                Container(
-                  padding: context.appEdgeInsets(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: CustomColors.purple.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(context.r(20)),
+          Row(
+            children: [
+              _buildAvatar(context, p.image, 40),
+              context.horizontalSpace(24),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(p.patientName, style: context.fonts.level2Heading),
+                  context.verticalSpace(4),
+                  Container(
+                    padding: context.appEdgeInsets(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: CustomColors.purple.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(context.r(20)),
+                    ),
+                    child: Text(
+                      'Active Patient',
+                      style: context.fonts.purple12w700,
+                    ),
                   ),
-                  child: Text(
-                    'Active Patient',
-                    style: context.fonts.purple12w700,
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
+          _statusCell(context, p, ref),
         ],
+      ),
+    );
+  }
+
+  Widget _statusCell(
+    BuildContext context,
+    PatientDetailData patient,
+    WidgetRef ref,
+  ) {
+    return Padding(
+      padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: StatusToggleSwitch(
+          status: patient.status,
+          onChanged: (newStatus) {
+            if (patient.id != null) {
+              ref
+                  .read(patientProvider.notifier)
+                  .updatePatientStatus(
+                    patientId: patient.id!,
+                    status: newStatus.toLowerCase(),
+                  );
+            }
+          },
+          width: context.w(100),
+          height: context.h(45),
+        ),
       ),
     );
   }
