@@ -111,6 +111,8 @@ enum BaseUrls {
   api('https://api.skinsyncai.com/api/'),
   apiQa('https://api-dev.skinsyncai.com/api/');
 
+  // apiQa('https://gecko-pure-gator.ngrok-free.app/api/');
+
   final String url;
 
   const BaseUrls(this.url);

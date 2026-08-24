@@ -340,7 +340,15 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(plan.name ?? 'N/A', style: context.fonts.black18w600),
-              _statusBadge(plan.isActive),
+              Row(
+                children: [
+                  _statusBadge(plan.isActive),
+                  if (plan.isDefault == true) ...[
+                    context.horizontalSpace(8),
+                    const AppBadge(label: 'Default', variant: AppBadgeVariant.info),
+                  ],
+                ],
+              ),
             ],
           ),
           context.verticalSpace(16),

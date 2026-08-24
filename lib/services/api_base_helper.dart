@@ -171,6 +171,7 @@ class ApiBaseHelper {
       'Accept': 'application/json',
       // if (_storage.token != null)
       'Authorization': 'Bearer $token',
+      'ngrok-skip-browser-warning': 'true',
     };
   }
 

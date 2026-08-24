@@ -14,6 +14,7 @@ class CreateClinicSubscriptionPlanRequest {
   final List<PlanBenefit>? benefits;
   final List<String>? assignedClinics;
   final bool isActive;
+  final bool isDefault;
 
   CreateClinicSubscriptionPlanRequest({
     this.id,
@@ -29,6 +30,7 @@ class CreateClinicSubscriptionPlanRequest {
     this.benefits,
     this.assignedClinics,
     this.isActive = true,
+    this.isDefault = false,
   });
 
   Map<String, dynamic> toJson() {
@@ -44,6 +46,7 @@ class CreateClinicSubscriptionPlanRequest {
       'dynamic_booking_commission_percent': dynamicBookingCommissionPercent,
       'technology_fee_per_treatment': technologyFeePerTreatment,
       'is_active': isActive,
+      'is_default': isDefault,
       'benefits': benefits?.map((e) => e.toJson()).toList(),
       'assigned_clinics': assignedClinics,
     };
@@ -64,6 +67,7 @@ class CreateClinicSubscriptionPlanRequest {
       benefits: model.benefits,
       assignedClinics: model.assignedClinics,
       isActive: model.isActive,
+      isDefault: model.isDefault,
     );
   }
 }
