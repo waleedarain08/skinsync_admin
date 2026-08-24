@@ -76,4 +76,22 @@ class PatientService implements PatientRepository {
 
     return response;
   }
+
+  @override
+  Future<void> updatePatientStatus({
+    required int patientId,
+    required String status,
+  }) async {
+    final response = await _api.patch(
+      Endpoint.updatePatientStatus,
+      body: {'status': status},
+      pathParams: {'id': patientId.toString()},
+    );
+
+    if (response is Map && response['success'] == false) {
+      throw BadRequestException(
+        response['message'] ?? 'Failed to update status',
+      );
+    }
+  }
 }

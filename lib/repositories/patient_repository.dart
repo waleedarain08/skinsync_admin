@@ -9,13 +9,16 @@ abstract class PatientRepository {
     String? search,
   });
 
-  Future<PatientDetailResponse> getPatientDetail({
-    required int patientId,
-  });
+  Future<PatientDetailResponse> getPatientDetail({required int patientId});
 
   Future<PatientTreatmentRequestResponse> getPatientTreatmentRequests({
     required int page,
     required int limit,
     int? patientId,
+  });
+
+  Future<void> updatePatientStatus({
+    required int patientId,
+    required String status,
   });
 }

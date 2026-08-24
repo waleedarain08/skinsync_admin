@@ -89,6 +89,7 @@ enum Endpoint {
   patients('admin/patients'),
   patientDetail('admin/patients/{id}'),
   patientTreatmentRequest('admin/patient-treatment-request'),
+  updatePatientStatus('admin/patient/status/{id}'),
   founderClinicDetail('admin/founder-clinic/detail/{id}'),
   deductionTimings('admin/deduction-timings');
 

@@ -16,7 +16,7 @@ final patientProvider =
     );
 
 class PatientViewModel extends BaseViewModel<PatientState> {
-  PatientViewModel() : super(PatientState());
+  PatientViewModel() : super(const PatientState());
 
   final TextEditingController searchController = TextEditingController();
   final PatientRepository _repository = locator<PatientRepository>();
@@ -124,6 +124,26 @@ class PatientViewModel extends BaseViewModel<PatientState> {
     );
   }
 
+  Future<bool> updatePatientStatus({
+    required int patientId,
+    required String status,
+  }) async {
+    return await runSafely<bool>(
+          onLoadingChange: (loading) =>
+              state = state.copyWith(loading: loading),
+          () async {
+            await _repository.updatePatientStatus(
+              patientId: patientId,
+              status: status,
+            );
+            EasyLoading.showSuccess('Patient status updated successfully');
+            await getPatients(initialCall: false, showEasyLoading: false);
+            return true;
+          },
+        ) ??
+        false;
+  }
+
   @override
   @mustCallSuper
   void onError(String message) {
@@ -149,7 +169,7 @@ class PatientState extends BaseStateModel {
   final int? treatmentTotalResults;
   final List<PatientTreatmentRequestData> treatmentRequests;
 
-  PatientState({
+  const PatientState({
     super.loading = false,
     this.page = 1,
     this.pageSize = 10,
