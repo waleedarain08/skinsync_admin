@@ -29,7 +29,8 @@ class PatientSubscriptionPlanModel {
       name: json['name'] as String?,
       basePrice: (json['base_price'] as num?)?.toDouble(),
       simulationCount: json['simulation_count'] as int? ?? 0,
-      unlimitedSimulations: json['unlimited_simulations'] as bool? ?? false,
+      // backend sometimes uses 'unlimited_simulation' (singular) or 'unlimited_simulations' (plural)
+      unlimitedSimulations: (json['unlimited_simulations'] as bool?) ?? (json['unlimited_simulation'] as bool?) ?? false,
       postsViewCount: json['posts_view_count'] as int? ?? 0,
       unlimitedPostsView: json['unlimited_posts_view'] as bool? ?? false,
       isActive: (json['is_active'] as bool?) ?? true,
@@ -46,7 +47,8 @@ class PatientSubscriptionPlanModel {
       'name': name,
       'base_price': basePrice,
       'simulation_count': simulationCount,
-      'unlimited_simulations': unlimitedSimulations,
+      // use singular key to match backend expectation
+      'unlimited_simulation': unlimitedSimulations,
       'posts_view_count': postsViewCount,
       'unlimited_posts_view': unlimitedPostsView,
       'is_active': isActive,

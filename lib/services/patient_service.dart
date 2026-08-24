@@ -16,12 +16,16 @@ class PatientService implements PatientRepository {
     required int page,
     required int limit,
     String? search,
+    PatientStatus? status,
   }) async {
     final jsonResponse = await _api.get(
       Endpoint.patients,
       queryParams: {
         'page': page.toString(),
         'limit': limit.toString(),
+        'status': status == null || status == PatientStatus.all
+            ? ''
+            : status.name,
         if (search != null && search.isNotEmpty) 'search': search,
       },
     );
@@ -75,5 +79,23 @@ class PatientService implements PatientRepository {
     }
 
     return response;
+  }
+
+  @override
+  Future<void> updatePatientStatus({
+    required int patientId,
+    required String status,
+  }) async {
+    final response = await _api.patch(
+      Endpoint.updatePatientStatus,
+      body: {'status': status},
+      pathParams: {'id': patientId.toString()},
+    );
+
+    if (response is Map && response['success'] == false) {
+      throw BadRequestException(
+        response['message'] ?? 'Failed to update status',
+      );
+    }
   }
 }

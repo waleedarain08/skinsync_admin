@@ -89,6 +89,7 @@ enum Endpoint {
   patients('admin/patients'),
   patientDetail('admin/patients/{id}'),
   patientTreatmentRequest('admin/patient-treatment-request'),
+  updatePatientStatus('admin/patient/status/{id}'),
   founderClinicDetail('admin/founder-clinic/detail/{id}'),
   deductionTimings('admin/deduction-timings');
 
@@ -109,6 +110,8 @@ enum Status { active, inactive }
 enum BaseUrls {
   api('https://api.skinsyncai.com/api/'),
   apiQa('https://api-dev.skinsyncai.com/api/');
+
+  // apiQa('https://gecko-pure-gator.ngrok-free.app/api/');
 
   final String url;
 
@@ -159,4 +162,16 @@ enum ProductStatus {
   final String label;
 
   const ProductStatus(this.label);
+}
+
+enum PatientStatus {
+  all('All'),
+  active('Active'),
+  inactive('In Active'),
+  New('New'),
+  archived('Archived');
+
+  final String label;
+
+  const PatientStatus(this.label);
 }

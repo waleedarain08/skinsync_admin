@@ -31,7 +31,8 @@ class _CreatePatientSubscriptionPlanScreenState
   late final TextEditingController _priceController;
   late final TextEditingController _simulationCountController;
   late final TextEditingController _postsViewCountController;
-  final TextEditingController _patientSearchController = TextEditingController();
+  final TextEditingController _patientSearchController =
+      TextEditingController();
 
   bool _unlimitedSimulations = false;
   bool _unlimitedPostsView = false;
@@ -77,8 +78,9 @@ class _CreatePatientSubscriptionPlanScreenState
     _isDefault = plan?.isDefault ?? false;
 
     _selectedPatients = plan?.assignedPatients ?? [];
-    _visibilityType =
-        _selectedPatients.isEmpty ? 'All Patients' : 'Specific Patients';
+    _visibilityType = _selectedPatients.isEmpty
+        ? 'All Patients'
+        : 'Specific Patients';
   }
 
   @override
@@ -97,18 +99,17 @@ class _CreatePatientSubscriptionPlanScreenState
         id: widget.planToEdit?.id,
         name: _nameController.text,
         basePrice: double.tryParse(_priceController.text) ?? 0.0,
-        simulationCount:
-            _unlimitedSimulations
-                ? 0
-                : (int.tryParse(_simulationCountController.text) ?? 0),
+        simulationCount: _unlimitedSimulations
+            ? 0
+            : (int.tryParse(_simulationCountController.text) ?? 0),
         unlimitedSimulations: _unlimitedSimulations,
-        postsViewCount:
-            _unlimitedPostsView
-                ? 0
-                : (int.tryParse(_postsViewCountController.text) ?? 0),
+        postsViewCount: _unlimitedPostsView
+            ? 0
+            : (int.tryParse(_postsViewCountController.text) ?? 0),
         unlimitedPostsView: _unlimitedPostsView,
-        assignedPatients:
-            _visibilityType == 'All Patients' ? [] : _selectedPatients,
+        assignedPatients: _visibilityType == 'All Patients'
+            ? []
+            : _selectedPatients,
         isActive: _isActive,
         isDefault: _isDefault,
       );
@@ -116,7 +117,7 @@ class _CreatePatientSubscriptionPlanScreenState
       final success = await ref
           .read(subscriptionViewModelProvider.notifier)
           .createPatientSubscriptionPlan(request);
-      if (success && mounted) {
+      if ((success ?? false) && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -253,9 +254,10 @@ class _CreatePatientSubscriptionPlanScreenState
                                       ? context.fonts.green13w500
                                       : context.fonts.red13w500,
                                 ),
-                                context.horizontalSpace(32),
+                                context.horizontalSpace(24),
+                                // Default toggle
                                 Text(
-                                  'Set as Default: ',
+                                  'Default Plan: ',
                                   style: context.fonts.black14w600,
                                 ),
                                 Transform.scale(
@@ -268,9 +270,9 @@ class _CreatePatientSubscriptionPlanScreenState
                                   ),
                                 ),
                                 Text(
-                                  _isDefault ? 'Default' : 'Not Default',
+                                  _isDefault ? 'Yes' : 'No',
                                   style: _isDefault
-                                      ? context.fonts.green13w500
+                                      ? context.fonts.purple13w600
                                       : context.fonts.grey13w500,
                                 ),
                               ],
@@ -433,11 +435,10 @@ class _CreatePatientSubscriptionPlanScreenState
   }
 
   Widget _buildPatientSelector() {
-    final filteredPatients =
-        _dummyPatients.where((p) {
-          final query = _patientSearchQuery.toLowerCase();
-          return p.toLowerCase().contains(query);
-        }).toList();
+    final filteredPatients = _dummyPatients.where((p) {
+      final query = _patientSearchQuery.toLowerCase();
+      return p.toLowerCase().contains(query);
+    }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,20 +453,18 @@ class _CreatePatientSubscriptionPlanScreenState
           Wrap(
             spacing: context.w(8),
             runSpacing: context.h(8),
-            children:
-                _selectedPatients.map((name) {
-                  return Chip(
-                    label: Text(name, style: context.fonts.black13w500),
-                    backgroundColor: CustomColors.green.withValues(alpha: 0.1),
-                    deleteIcon: const Icon(Icons.close, size: 14),
-                    onDeleted:
-                        () => setState(() => _selectedPatients.remove(name)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: context.borderRadius(all: 8),
-                      side: BorderSide.none,
-                    ),
-                  );
-                }).toList(),
+            children: _selectedPatients.map((name) {
+              return Chip(
+                label: Text(name, style: context.fonts.black13w500),
+                backgroundColor: CustomColors.green.withValues(alpha: 0.1),
+                deleteIcon: const Icon(Icons.close, size: 14),
+                onDeleted: () => setState(() => _selectedPatients.remove(name)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: context.borderRadius(all: 8),
+                  side: BorderSide.none,
+                ),
+              );
+            }).toList(),
           ),
           context.verticalSpace(16),
         ],
@@ -475,45 +474,44 @@ class _CreatePatientSubscriptionPlanScreenState
             border: Border.all(color: CustomColors.border),
             borderRadius: context.borderRadius(all: 12),
           ),
-          child:
-              filteredPatients.isEmpty
-                  ? Center(
-                    child: Padding(
-                      padding: context.appEdgeInsets(all: 16),
-                      child: Text(
-                        'No patients found',
-                        style: context.fonts.grey14w400,
-                      ),
-                    ),
-                  )
-                  : Scrollbar(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: filteredPatients.length,
-                      separatorBuilder: (_, _) => const Divider(height: 1),
-                      itemBuilder: (context, index) {
-                        final patient = filteredPatients[index];
-                        final isSelected = _selectedPatients.contains(patient);
-                        return CheckboxListTile(
-                          title: Text(patient, style: context.fonts.grey14w600),
-                          value: isSelected,
-                          onChanged: (val) {
-                            setState(() {
-                              if (val == true) {
-                                _selectedPatients.add(patient);
-                              } else {
-                                _selectedPatients.remove(patient);
-                              }
-                            });
-                          },
-                          activeColor: CustomColors.green,
-                          checkColor: CustomColors.black,
-                          controlAffinity: ListTileControlAffinity.leading,
-                          contentPadding: context.appEdgeInsets(horizontal: 16),
-                        );
-                      },
+          child: filteredPatients.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: context.appEdgeInsets(all: 16),
+                    child: Text(
+                      'No patients found',
+                      style: context.fonts.grey14w400,
                     ),
                   ),
+                )
+              : Scrollbar(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: filteredPatients.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final patient = filteredPatients[index];
+                      final isSelected = _selectedPatients.contains(patient);
+                      return CheckboxListTile(
+                        title: Text(patient, style: context.fonts.grey14w600),
+                        value: isSelected,
+                        onChanged: (val) {
+                          setState(() {
+                            if (val == true) {
+                              _selectedPatients.add(patient);
+                            } else {
+                              _selectedPatients.remove(patient);
+                            }
+                          });
+                        },
+                        activeColor: CustomColors.green,
+                        checkColor: CustomColors.black,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: context.appEdgeInsets(horizontal: 16),
+                      );
+                    },
+                  ),
+                ),
         ),
       ],
     );

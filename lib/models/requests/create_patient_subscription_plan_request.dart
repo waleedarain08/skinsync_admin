@@ -31,7 +31,8 @@ class CreatePatientSubscriptionPlanRequest {
       'name': name,
       'base_price': basePrice,
       'simulation_count': simulationCount,
-      'unlimited_simulations': unlimitedSimulations,
+      // backend expects singular key
+      'unlimited_simulation': unlimitedSimulations,
       'posts_view_count': postsViewCount,
       'unlimited_posts_view': unlimitedPostsView,
       'is_active': isActive,

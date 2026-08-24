@@ -163,14 +163,18 @@ class AppSidebar extends StatelessWidget {
   ) {
     final financialsIndex = !isDeploymentMode ? 7 : -1;
     final systemIndex = !isDeploymentMode ? 9 : 7;
-    if (index == 0)
+    if (index == 0) {
       return _SectionLabel(title: 'NETWORK', controller: controller);
-    if (index == 4)
+    }
+    if (index == 4) {
       return _SectionLabel(title: 'OPERATIONS', controller: controller);
-    if (index == financialsIndex)
+    }
+    if (index == financialsIndex) {
       return _SectionLabel(title: 'FINANCIALS', controller: controller);
-    if (index == systemIndex)
+    }
+    if (index == systemIndex) {
       return _SectionLabel(title: 'SYSTEM', controller: controller);
+    }
     return context.verticalSpace(2);
   }
 
