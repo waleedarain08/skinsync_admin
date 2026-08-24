@@ -8,6 +8,7 @@ class PatientSubscriptionPlanModel {
   final bool unlimitedPostsView;
   final List<String>? assignedPatients;
   final bool isActive;
+  final bool isDefault;
 
   PatientSubscriptionPlanModel({
     this.id,
@@ -19,6 +20,7 @@ class PatientSubscriptionPlanModel {
     this.unlimitedPostsView = false,
     this.assignedPatients,
     this.isActive = true,
+    this.isDefault = false,
   });
 
   factory PatientSubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
@@ -27,10 +29,12 @@ class PatientSubscriptionPlanModel {
       name: json['name'] as String?,
       basePrice: (json['base_price'] as num?)?.toDouble(),
       simulationCount: json['simulation_count'] as int? ?? 0,
-      unlimitedSimulations: json['unlimited_simulations'] as bool? ?? false,
+      // backend sometimes uses 'unlimited_simulation' (singular) or 'unlimited_simulations' (plural)
+      unlimitedSimulations: (json['unlimited_simulations'] as bool?) ?? (json['unlimited_simulation'] as bool?) ?? false,
       postsViewCount: json['posts_view_count'] as int? ?? 0,
       unlimitedPostsView: json['unlimited_posts_view'] as bool? ?? false,
       isActive: (json['is_active'] as bool?) ?? true,
+      isDefault: (json['is_default'] as bool?) ?? false,
       assignedPatients: json['assigned_patients'] != null
           ? List<String>.from(json['assigned_patients'] as Iterable)
           : null,
@@ -43,10 +47,12 @@ class PatientSubscriptionPlanModel {
       'name': name,
       'base_price': basePrice,
       'simulation_count': simulationCount,
-      'unlimited_simulations': unlimitedSimulations,
+      // use singular key to match backend expectation
+      'unlimited_simulation': unlimitedSimulations,
       'posts_view_count': postsViewCount,
       'unlimited_posts_view': unlimitedPostsView,
       'is_active': isActive,
+      'is_default': isDefault,
       'assigned_patients': assignedPatients,
     };
   }

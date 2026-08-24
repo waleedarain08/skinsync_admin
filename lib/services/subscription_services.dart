@@ -67,9 +67,14 @@ class SubscriptionServices implements SubscriptionRepository {
 
   @override
   Future<List<PatientSubscriptionPlanModel>> getPatientSubscriptionPlans() async {
-    // Returning dummy data for now
-    await Future<void>.delayed(const Duration(milliseconds: 500));
-    return TreatmentData.dummyPatientSubscriptionPlans;
+    final jsonResponse = await _api.get(Endpoint.patientSubscriptionPlans) as Map<String, dynamic>;
+    final isSuccess = (jsonResponse['is_success'] as bool?) ?? (jsonResponse['status'] as bool?) ?? false;
+    if (!isSuccess) {
+      throw BadRequestException(jsonResponse['message']?.toString() ?? 'Failed to fetch patient plans');
+    }
+
+    final data = jsonResponse['data'] as List<dynamic>? ?? [];
+    return data.map((e) => PatientSubscriptionPlanModel.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override

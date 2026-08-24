@@ -10,6 +10,7 @@ class CreatePatientSubscriptionPlanRequest {
   final bool unlimitedPostsView;
   final List<String>? assignedPatients;
   final bool isActive;
+  final bool isDefault;
 
   CreatePatientSubscriptionPlanRequest({
     this.id,
@@ -21,6 +22,7 @@ class CreatePatientSubscriptionPlanRequest {
     this.unlimitedPostsView = false,
     this.assignedPatients,
     this.isActive = true,
+    this.isDefault = false,
   });
 
   Map<String, dynamic> toJson() {
@@ -29,10 +31,12 @@ class CreatePatientSubscriptionPlanRequest {
       'name': name,
       'base_price': basePrice,
       'simulation_count': simulationCount,
-      'unlimited_simulations': unlimitedSimulations,
+      // backend expects singular key
+      'unlimited_simulation': unlimitedSimulations,
       'posts_view_count': postsViewCount,
       'unlimited_posts_view': unlimitedPostsView,
       'is_active': isActive,
+      'is_default': isDefault,
       'assigned_patients': assignedPatients,
     };
   }
@@ -48,6 +52,7 @@ class CreatePatientSubscriptionPlanRequest {
       unlimitedPostsView: model.unlimitedPostsView,
       assignedPatients: model.assignedPatients,
       isActive: model.isActive,
+      isDefault: model.isDefault,
     );
   }
 }
