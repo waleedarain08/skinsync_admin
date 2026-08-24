@@ -7,6 +7,7 @@ class CustomColors {
   static const Color lightPurple2 = Color(0xFFfcf8ff);
   static const Color slateBlue = Color(0xff556caf);
   static const Color slateBlueLight = Color(0xffCED5E8);
+  static const Color purpleColor = Color(0xffEEA1F0);
 
   static const Color palePurple = Color(0xFFEEF2FF);
   static const Color purpleHover = Color(0x0D6366F1);

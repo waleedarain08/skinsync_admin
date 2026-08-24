@@ -86,6 +86,9 @@ enum Endpoint {
   webRequestDetail('admin/clinic-web-registration/detail/{id}'),
   sendWebRequestNotes('admin/web-requests/{id}/notes'),
   founderClinics('admin/founder-clinic'),
+  patients('admin/patients'),
+  patientDetail('admin/patients/{id}'),
+  patientTreatmentRequest('admin/patient-treatment-request'),
   founderClinicDetail('admin/founder-clinic/detail/{id}'),
   deductionTimings('admin/deduction-timings');
 
@@ -100,10 +103,9 @@ enum Endpoint {
     return updatedPath;
   }
 }
-enum Status {
-  active,
-  inactive,
-}
+
+enum Status { active, inactive }
+
 enum BaseUrls {
   api('https://api.skinsyncai.com/api/'),
   apiQa('https://api-dev.skinsyncai.com/api/');

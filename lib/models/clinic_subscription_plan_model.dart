@@ -12,6 +12,7 @@ class ClinicSubscriptionPlanModel {
   List<PlanBenefit>? benefits;
   List<String>? assignedClinics;
   bool isActive;
+  bool isDefault;
 
   ClinicSubscriptionPlanModel({
     this.id,
@@ -27,6 +28,7 @@ class ClinicSubscriptionPlanModel {
     this.benefits,
     this.assignedClinics,
     this.isActive = true,
+    this.isDefault = false,
   });
 
   factory ClinicSubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
@@ -47,6 +49,7 @@ class ClinicSubscriptionPlanModel {
       technologyFeePerTreatment:
           (json['technology_fee_per_treatment'] as num?)?.toDouble() ?? 0.0,
       isActive: (json['is_active'] as bool?) ?? true,
+      isDefault: (json['is_default'] as bool?) ?? false,
       benefits: json['benefits'] != null
           ? (json['benefits'] as List)
               .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
@@ -71,6 +74,7 @@ class ClinicSubscriptionPlanModel {
       'dynamic_booking_commission_percent': dynamicBookingCommissionPercent,
       'technology_fee_per_treatment': technologyFeePerTreatment,
       'is_active': isActive,
+      'is_default': isDefault,
       'benefits': benefits?.map((e) => e.toJson()).toList(),
       'assigned_clinics': assignedClinics,
     };
