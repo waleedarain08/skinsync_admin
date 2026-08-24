@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/responses/patient_list_response.dart';
+import '../../utils/enums.dart';
 import '../../utils/responsive.dart';
 import '../../utils/theme.dart';
 import '../../view_models/patient_view_model.dart';
@@ -27,6 +28,8 @@ class PatientManagementScreen extends ConsumerStatefulWidget {
 
 class _PatientManagementScreenState
     extends ConsumerState<PatientManagementScreen> {
+  PatientStatus _selectedStatusFilter = PatientStatus.all;
+
   @override
   void initState() {
     super.initState();
@@ -38,17 +41,7 @@ class _PatientManagementScreenState
 
   @override
   Widget build(BuildContext context) {
-    return const _PatientManagementContent();
-  }
-}
-
-class _PatientManagementContent extends ConsumerWidget {
-  const _PatientManagementContent();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
     final patientState = ref.watch(patientProvider);
-
     return GradientScaffold(
       body: SingleChildScrollView(
         padding: context.appEdgeInsets(horizontal: 28, vertical: 28),
@@ -84,6 +77,16 @@ class _PatientManagementContent extends ConsumerWidget {
       ),
     );
   }
+
+  // class _PatientManagementContent extends ConsumerWidget {
+  //   const _PatientManagementContent();
+  //
+  //   @override
+  //   Widget build(BuildContext context, WidgetRef ref) {
+  //     final patientState = ref.watch(patientProvider);
+  //
+  //     return
+  //   }
 
   Widget _buildHeader(BuildContext context) {
     return Row(
@@ -148,7 +151,6 @@ class _PatientManagementContent extends ConsumerWidget {
     PatientState state,
   ) {
     final controller = ref.read(patientProvider.notifier).searchController;
-    String _selectedStatusFilter = 'All Statuses';
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 16),
       child: Row(
@@ -188,18 +190,30 @@ class _PatientManagementContent extends ConsumerWidget {
           ),
           SizedBox(width: 12.w),
           Expanded(
-            child: CustomDropdown<String>(
+            child: CustomDropdown<PatientStatus>(
               label: 'Status',
               hintText: 'All Statuses',
               value: _selectedStatusFilter,
-              items: const [
-                'All Statuses',
-                'Active',
-                'Inactive',
-                'New',
-                'Archived',
-              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (val) {},
+              items: PatientStatus.values
+                  .map(
+                    (status) => DropdownMenuItem(
+                      value: status,
+                      child: Text(status.label),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (val) {
+                setState(() {
+                  _selectedStatusFilter = val ?? PatientStatus.all;
+                  ref
+                      .read(patientProvider.notifier)
+                      .getPatients(
+                        initialCall: true,
+                        showEasyLoading: true,
+                        status: val,
+                      );
+                });
+              },
             ),
           ),
         ],

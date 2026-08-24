@@ -16,12 +16,16 @@ class PatientService implements PatientRepository {
     required int page,
     required int limit,
     String? search,
+    PatientStatus? status,
   }) async {
     final jsonResponse = await _api.get(
       Endpoint.patients,
       queryParams: {
         'page': page.toString(),
         'limit': limit.toString(),
+        'status': status == null || status == PatientStatus.all
+            ? ''
+            : status.name,
         if (search != null && search.isNotEmpty) 'search': search,
       },
     );

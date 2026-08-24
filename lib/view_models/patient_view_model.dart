@@ -7,6 +7,7 @@ import '../models/responses/patient_list_response.dart';
 import '../models/responses/patient_treatment_request_response.dart';
 import '../repositories/patient_repository.dart';
 import '../services/locator.dart';
+import '../utils/enums.dart';
 import 'base_state_model.dart';
 import 'base_view_model.dart';
 
@@ -29,6 +30,7 @@ class PatientViewModel extends BaseViewModel<PatientState> {
   Future<void> getPatients({
     bool initialCall = false,
     bool showEasyLoading = true,
+    PatientStatus? status,
   }) async {
     if (initialCall) {
       state = state.copyWith(page: 1);
@@ -46,6 +48,7 @@ class PatientViewModel extends BaseViewModel<PatientState> {
           page: state.page,
           limit: state.pageSize,
           search: searchController.text,
+          status: status,
         );
 
         state = state.copyWith(

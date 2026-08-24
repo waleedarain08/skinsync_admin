@@ -163,3 +163,15 @@ enum ProductStatus {
 
   const ProductStatus(this.label);
 }
+
+enum PatientStatus {
+  all('All'),
+  active('Active'),
+  inactive('In Active'),
+  New('New'),
+  archived('Archived');
+
+  final String label;
+
+  const PatientStatus(this.label);
+}
