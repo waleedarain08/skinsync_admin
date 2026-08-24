@@ -84,9 +84,9 @@ class RouteGenerator {
             builder: (_, _) => const UserManagement(),
           ),
           GoRoute(
-            name: PatientManagement.routeName,
-            path: PatientManagement.routeName,
-            builder: (_, _) => const PatientManagement(),
+            name: PatientManagementScreen.routeName,
+            path: PatientManagementScreen.routeName,
+            builder: (_, _) => const PatientManagementScreen(),
           ),
           GoRoute(
             name: ClinicManagement.routeName,
@@ -226,9 +226,9 @@ class RouteGenerator {
             builder: (_, _) => const AppointmentDetailScreen(),
           ),
           GoRoute(
-            name: PatientDetailScreen.routeName,
-            path: PatientDetailScreen.routeName,
-            builder: (_, _) => const PatientDetailScreen(),
+            name: PatientManagementDetailScreen.routeName,
+            path: PatientManagementDetailScreen.routeName,
+            builder: (_, _) => const PatientManagementDetailScreen(),
           ),
         ],
       ),

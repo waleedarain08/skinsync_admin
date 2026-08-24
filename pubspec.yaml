@@ -74,6 +74,7 @@ dependencies:
   collection: any
   intl: any
   mime: any
+  before_after: ^3.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
