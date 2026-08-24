@@ -538,6 +538,7 @@ import '../../utils/theme.dart';
 import '../../view_models/patient_view_model.dart';
 import '../../widgets/borderd_container_widget.dart';
 import '../../widgets/custom_outlined_button.dart';
+import '../../widgets/custom_primary_button.dart';
 import '../../widgets/gradient_scaffold.dart';
 import '../../widgets/mini_stat_card.dart';
 import '../../widgets/number_paginator.dart';
@@ -618,16 +619,28 @@ class _PatientManagementContent extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: .spaceBetween,
             children: [
-              Text('Patient Database', style: context.fonts.level1Heading),
-              context.verticalSpace(6),
-              Text(
-                'Manage clinic active patient directory, medical histories, and active treatment journeys.',
-                style: context.fonts.grey13w500,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Patient Database', style: context.fonts.level1Heading),
+                  context.verticalSpace(6),
+                  Text(
+                    // 'Manage clinic active patient directory, medical histories, and active treatment journeys.',
+                    'Unified view of all patients across your clinic network.',
+                    style: context.fonts.grey13w500,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+              CustomPrimaryButton(
+                onTap: () {},
+                icon: Icons.file_download_outlined,
+                label: 'Export Registry',
+                width: context.w(180),
               ),
             ],
           ),
