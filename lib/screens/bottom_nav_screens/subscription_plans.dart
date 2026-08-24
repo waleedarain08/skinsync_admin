@@ -17,6 +17,7 @@ import '../create_clinics_subscription_plan_screen.dart';
 import '../create_patient_subscription_plan_screen.dart';
 
 class SubscriptionPlansTab extends ConsumerStatefulWidget {
+
   static const String routeName = '/subscription-plans';
   const SubscriptionPlansTab({super.key});
 
