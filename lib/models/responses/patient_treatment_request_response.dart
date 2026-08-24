@@ -119,9 +119,9 @@ class PatientTreatmentData {
   factory PatientTreatmentData.fromJson(Map<String, dynamic> json) {
     return PatientTreatmentData(
       treatmentId: json['treatment_id'] ?? 0,
-      description: json["treatment_desc"],
-      image: json["treatment_image"],
-      icon: json["treatment_icon"],
+      description: json['treatment_desc'],
+      image: json['treatment_image'],
+      icon: json['treatment_icon'],
       treatmentName: json['treatment_name'] ?? '',
       areas:
           (json['areas'] as List<dynamic>?)
@@ -155,8 +155,8 @@ class PatientTreatmentAreaData {
     return PatientTreatmentAreaData(
       areaId: json['area_id'] ?? 0,
       areaName: json['area_name'] ?? '',
-      image: json["area_image"],
-      icon: json["area_icon"],
+      image: json['area_image'],
+      icon: json['area_icon'],
       materials:
           (json['materials'] as List<dynamic>?)
               ?.map(

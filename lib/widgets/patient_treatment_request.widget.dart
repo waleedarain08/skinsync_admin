@@ -24,7 +24,7 @@ class SimulationTreatmentRequestCard extends StatefulWidget {
 
 class _SimulationTreatmentRequestCardState
     extends State<SimulationTreatmentRequestCard> {
-  String _selectedSubTab = "Simulation";
+  String _selectedSubTab = 'Simulation';
   bool _isComparisonMode = false;
   final Map<String, double> _sliderValues = {};
 
@@ -75,13 +75,13 @@ class _SimulationTreatmentRequestCardState
           context.verticalSpace(16),
           Row(
             children: [
-              _buildSubTabButton(context, "Simulation"),
+              _buildSubTabButton(context, 'Simulation'),
               context.horizontalSpace(12),
-              _buildSubTabButton(context, "Treatments"),
+              _buildSubTabButton(context, 'Treatments'),
             ],
           ),
           context.verticalSpace(16),
-          if (_selectedSubTab == "Simulation")
+          if (_selectedSubTab == 'Simulation')
             _buildImageComparison(context, request)
           else
             _buildTreatmentsList(context, request),
@@ -136,7 +136,7 @@ class _SimulationTreatmentRequestCardState
         child: Padding(
           padding: context.appEdgeInsets(vertical: 20),
           child: Text(
-            "No simulation images for this request",
+            'No simulation images for this request',
             style: context.fonts.grey14w400,
           ),
         ),
@@ -167,7 +167,7 @@ class _SimulationTreatmentRequestCardState
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _isComparisonMode ? "Slider View" : "Side by Side",
+                    _isComparisonMode ? 'Slider View' : 'Side by Side',
                     style: context.fonts.black12w600,
                   ),
                   SizedBox(width: context.w(4)),
@@ -245,7 +245,7 @@ class _SimulationTreatmentRequestCardState
                             top: context.h(12),
                             left: context.w(12),
                             child: _buildBadge(
-                              "BEFORE",
+                              'BEFORE',
                               Colors.black.withValues(alpha: 0.6),
                             ),
                           ),
@@ -253,7 +253,7 @@ class _SimulationTreatmentRequestCardState
                             top: context.h(12),
                             right: context.w(12),
                             child: _buildBadge(
-                              "AFTER",
+                              'AFTER',
                               Colors.black.withValues(alpha: 0.6),
                             ),
                           ),
@@ -413,7 +413,7 @@ class _SimulationTreatmentRequestCardState
         child: Padding(
           padding: context.appEdgeInsets(vertical: 20),
           child: Text(
-            "No treatments for this request",
+            'No treatments for this request',
             style: context.fonts.grey14w400,
           ),
         ),
@@ -434,7 +434,7 @@ class _SimulationTreatmentRequestCardState
               Padding(
                 padding: EdgeInsets.only(bottom: context.h(8)),
                 child: Text(
-                  "Treatment - ${index + 1}",
+                  'Treatment - ${index + 1}',
                   style: context.fonts.black16w600,
                 ),
               ),
@@ -453,7 +453,7 @@ class _SimulationTreatmentRequestCardState
                     bottom: context.h(10),
                   ),
                   child: Text(
-                    "Selected Areas",
+                    'Selected Areas',
                     style: context.fonts.black14w600.copyWith(
                       color: CustomColors.grey,
                     ),

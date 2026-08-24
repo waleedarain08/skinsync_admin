@@ -94,7 +94,7 @@ class SimulationTreatmentAreaChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(context.r(20)),
       ),
       child: Text(
-        "$materialCount",
+        '$materialCount',
         style: CustomFonts.black13w500.copyWith(
           color: CustomColors.purple,
           fontSize: context.sp(11),
