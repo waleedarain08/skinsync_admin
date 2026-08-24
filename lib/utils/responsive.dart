@@ -47,7 +47,9 @@ abstract class Responsive {
 extension ResponsiveExtension on BuildContext {
   bool get isMobile => MediaQuery.sizeOf(this).width < 480;
 
-  bool get isTablet => MediaQuery.sizeOf(this).width >= 481 && MediaQuery.sizeOf(this).width <= 1024;
+  bool get isTablet =>
+      MediaQuery.sizeOf(this).width >= 481 &&
+      MediaQuery.sizeOf(this).width <= 1024;
 
   bool get isDesktop => MediaQuery.sizeOf(this).width > 1024;
 
@@ -65,6 +67,7 @@ class AdaptiveLayoutRowColumn extends StatelessWidget {
   final double? heightBetween;
   final MainAxisSize? size;
   final bool? expandedWidget;
+  final CrossAxisAlignment? crossAlignment;
 
   const AdaptiveLayoutRowColumn({
     super.key,
@@ -74,6 +77,7 @@ class AdaptiveLayoutRowColumn extends StatelessWidget {
     this.widthBetween,
     this.heightBetween,
     this.expandedWidget,
+    this.crossAlignment,
   });
 
   @override
@@ -91,6 +95,7 @@ class AdaptiveLayoutRowColumn extends StatelessWidget {
       return Row(
         mainAxisAlignment: alignment ?? MainAxisAlignment.start,
         mainAxisSize: size ?? MainAxisSize.max,
+        crossAxisAlignment: crossAlignment ?? CrossAxisAlignment.start,
         children: rowChildren,
       );
     }
@@ -102,6 +107,8 @@ class AdaptiveLayoutRowColumn extends StatelessWidget {
     return Column(
       mainAxisAlignment: alignment ?? MainAxisAlignment.start,
       mainAxisSize: size ?? MainAxisSize.max,
+      crossAxisAlignment: crossAlignment ?? CrossAxisAlignment.stretch,
+
       children: columnChildren,
     );
   }

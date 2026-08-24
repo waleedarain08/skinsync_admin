@@ -23,6 +23,8 @@ class PngAssets {
   static const String logo = '${_assets}logo.png';
   static const String signup = '${_assets}signup.png';
   static const String empty = '${_assets}empty.png';
+  static const String customMarker = '${_assets}custom_marker.png';
+
 }
 
 class SvgAssets {

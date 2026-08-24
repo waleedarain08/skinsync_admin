@@ -4,7 +4,7 @@ abstract class BaseStateModel {
   final int totalPages;
   final int totalResults;
 
-  BaseStateModel({
+  const BaseStateModel({
     this.loading = false,
     this.currentPage = 1,
     this.totalPages = 1,
