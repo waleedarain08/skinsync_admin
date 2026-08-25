@@ -500,14 +500,12 @@ class _PatientManagementDetailScreenState
         child: StatusToggleSwitch(
           status: patient.status,
           onChanged: (newStatus) {
-            if (patient.id != null) {
-              ref
-                  .read(patientProvider.notifier)
-                  .updatePatientStatus(
-                    patientId: patient.id!,
-                    status: newStatus.toLowerCase(),
-                  );
-            }
+            ref
+                .read(patientProvider.notifier)
+                .updatePatientStatus(
+                  patientId: patient.id,
+                  status: newStatus.toLowerCase(),
+                );
           },
           width: context.w(100),
           height: context.h(45),
