@@ -1,5 +1,3 @@
-import '../patient_subscription_plan_model.dart';
-
 class CreatePatientSubscriptionPlanRequest {
   final int? id;
   final String? name;
@@ -27,7 +25,7 @@ class CreatePatientSubscriptionPlanRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
+      // if (id != null) 'id': id,
       'name': name,
       'base_price': basePrice,
       'simulation_count': simulationCount,
@@ -41,18 +39,18 @@ class CreatePatientSubscriptionPlanRequest {
     };
   }
 
-  factory CreatePatientSubscriptionPlanRequest.fromModel(PatientSubscriptionPlanModel model) {
-    return CreatePatientSubscriptionPlanRequest(
-      id: model.id,
-      name: model.name,
-      basePrice: model.basePrice,
-      simulationCount: model.simulationCount,
-      unlimitedSimulations: model.unlimitedSimulations,
-      postsViewCount: model.postsViewCount,
-      unlimitedPostsView: model.unlimitedPostsView,
-      assignedPatients: model.assignedPatients,
-      isActive: model.isActive,
-      isDefault: model.isDefault,
-    );
-  }
+  // factory CreatePatientSubscriptionPlanRequest.fromModel(PatientSubscriptionPlanModel model) {
+  //   return CreatePatientSubscriptionPlanRequest(
+  //     id: model.id,
+  //     name: model.name,
+  //     basePrice: model.basePrice,
+  //     simulationCount: model.simulationCount,
+  //     unlimitedSimulations: model.unlimitedSimulations,
+  //     postsViewCount: model.postsViewCount,
+  //     unlimitedPostsView: model.unlimitedPostsView,
+  //     assignedPatients: model.assignedPatients,
+  //     isActive: model.isActive,
+  //     isDefault: model.isDefault,
+  //   );
+  // }
 }

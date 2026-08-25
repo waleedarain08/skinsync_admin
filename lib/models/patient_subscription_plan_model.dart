@@ -6,7 +6,7 @@ class PatientSubscriptionPlanModel {
   final bool unlimitedSimulations;
   final int postsViewCount;
   final bool unlimitedPostsView;
-  final List<String>? assignedPatients;
+  final List<AssignedPatient>? assignedPatients;
   final bool isActive;
   final bool isDefault;
 
@@ -30,30 +30,41 @@ class PatientSubscriptionPlanModel {
       basePrice: (json['base_price'] as num?)?.toDouble(),
       simulationCount: json['simulation_count'] as int? ?? 0,
       // backend sometimes uses 'unlimited_simulation' (singular) or 'unlimited_simulations' (plural)
-      unlimitedSimulations: (json['unlimited_simulations'] as bool?) ?? (json['unlimited_simulation'] as bool?) ?? false,
+      unlimitedSimulations:
+          (json['unlimited_simulations'] as bool?) ??
+          (json['unlimited_simulation'] as bool?) ??
+          false,
       postsViewCount: json['posts_view_count'] as int? ?? 0,
       unlimitedPostsView: json['unlimited_posts_view'] as bool? ?? false,
       isActive: (json['is_active'] as bool?) ?? true,
       isDefault: (json['is_default'] as bool?) ?? false,
       assignedPatients: json['assigned_patients'] != null
-          ? List<String>.from(json['assigned_patients'] as Iterable)
+          ? List<AssignedPatient>.from(
+              (json['assigned_patients'] as List).map(
+                (json) =>
+                    AssignedPatient.fromJson(json as Map<String, dynamic>),
+              ),
+            )
           : null,
+      // assignedPatients: json['assigned_patients'] != null
+      //     ? List<String>.from(json['assigned_patients'] as Iterable)
+      //     : null,
     );
   }
+}
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'base_price': basePrice,
-      'simulation_count': simulationCount,
-      // use singular key to match backend expectation
-      'unlimited_simulation': unlimitedSimulations,
-      'posts_view_count': postsViewCount,
-      'unlimited_posts_view': unlimitedPostsView,
-      'is_active': isActive,
-      'is_default': isDefault,
-      'assigned_patients': assignedPatients,
-    };
+class AssignedPatient {
+  final int? id;
+  final int? planId;
+  final int? patientId;
+
+  const AssignedPatient({this.id, this.planId, this.patientId});
+
+  factory AssignedPatient.fromJson(Map<String, dynamic> json) {
+    return AssignedPatient(
+      id: json['id'],
+      planId: json['plan_id'],
+      patientId: json['patient_id'],
+    );
   }
 }
