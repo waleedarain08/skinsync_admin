@@ -402,14 +402,14 @@ class _PatientManagementDetailScreenState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(patientProvider.notifier)
-          .getPatientTreatmentRequests(
-            initialCall: true,
-            patientId: widget.patientId,
-          );
-    });
+  //  WidgetsBinding.instance.addPostFrameCallback((_) {
+      // ref
+      //     .read(patientProvider.notifier)
+      //     .getPatientTreatmentRequests(
+      //       initialCall: true,
+      //       patientId: widget.patientId,
+      //     );
+  //  });
   }
 
   @override
@@ -443,7 +443,7 @@ class _PatientManagementDetailScreenState
             context.verticalSpace(24),
             _buildInfoSection(context, patient),
             context.verticalSpace(24),
-            _buildTreatmentRequestsSection(context, patientState),
+        //    _buildTreatmentRequestsSection(context, patientState),
           ],
         ),
       ),

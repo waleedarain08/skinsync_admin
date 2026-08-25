@@ -32,11 +32,11 @@ class AuthViewModel extends BaseViewModel<AuthState> {
   }
 
   Future<bool> login({required String email, required String password}) async {
-    String? fcmToken = await _getFcmToken();
+   // String? fcmToken = await _getFcmToken();
      final request = LoginRequestModel(
       email: email,
       password: password,
-      fcmToken: fcmToken ?? '',
+      //fcmToken: fcmToken ?? '',
     );
     return await runSafely<bool?>(showLoading: true, () async {
           final response = await _authRepository.login(req: request);
