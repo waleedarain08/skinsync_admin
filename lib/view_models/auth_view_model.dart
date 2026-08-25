@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,13 +31,40 @@ class AuthViewModel extends BaseViewModel<AuthState> {
     }
   }
 
-  Future<bool> login({required LoginRequestModel loginReq}) async {
+  Future<bool> login({required String email, required String password}) async {
+    String? fcmToken = await getToken();
+    log("FCM TOKEN __________________$fcmToken");
+    final request = LoginRequestModel(
+      email: email,
+      password: password,
+      //fcmToken: fcmToken ?? '',
+    );
     return await runSafely<bool?>(showLoading: true, () async {
-          final response = await _authRepository.login(req: loginReq);
+          final response = await _authRepository.login(req: request);
           state = state.copyWith(user: response.data!.user);
           return true;
         }) ??
         false;
+  }
+
+  final _messaging = FirebaseMessaging.instance;
+
+  Future<String?> getToken() async {
+    try {
+      final token = await _messaging.getToken(
+        vapidKey:
+            'BCFwKQgRnLkC25FJ7FtUQXZ7qJsV4GcqV-X9wvOujRFwt7mYpT0AoMuEdejrqBUxxPlARQzys5cytkbM7dmxhfo',
+      );
+
+      log('FCM TOKEN: $token');
+
+      return token;
+    } catch (e, stackTrace) {
+      log('FCM TOKEN ERROR: $e');
+      log('$stackTrace');
+
+      return null;
+    }
   }
 
   Future<bool> forgotPassword({required String email}) async {

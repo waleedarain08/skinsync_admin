@@ -77,7 +77,7 @@ class _CreatePatientSubscriptionPlanScreenState
     _isActive = plan?.isActive ?? true;
     _isDefault = plan?.isDefault ?? false;
 
-    _selectedPatients = plan?.assignedPatients ?? [];
+    // _selectedPatients = plan?.assignedPatients ?? [];
     _visibilityType = _selectedPatients.isEmpty
         ? 'All Patients'
         : 'Specific Patients';

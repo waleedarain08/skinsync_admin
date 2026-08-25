@@ -70,6 +70,8 @@ dependencies:
   pdf: ^3.13.0
   flutter_image_compress: ^2.5.1
   animated_toggle_switch: ^0.8.7
+  firebase_messaging: ^16.5.0
+
 
   collection: any
   intl: any

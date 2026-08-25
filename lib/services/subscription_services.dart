@@ -26,7 +26,8 @@ class SubscriptionServices implements SubscriptionRepository {
 
   @override
   Future<ClinicSubscriptionPlanModel> createClinicSubscriptionPlan(
-      CreateClinicSubscriptionPlanRequest request) async {
+    CreateClinicSubscriptionPlanRequest request,
+  ) async {
     final jsonResponse = await _api.post(
       Endpoint.subscriptionPlans,
       body: request.toJson(),
@@ -38,7 +39,9 @@ class SubscriptionServices implements SubscriptionRepository {
 
   @override
   Future<ClinicSubscriptionPlanModel> updateSubscriptionPlan(
-      int id, CreateClinicSubscriptionPlanRequest request) async {
+    int id,
+    CreateClinicSubscriptionPlanRequest request,
+  ) async {
     final jsonResponse = await _api.put(
       Endpoint.updateSubscriptionPlan,
       pathParams: {'id': id.toString()},
@@ -51,14 +54,17 @@ class SubscriptionServices implements SubscriptionRepository {
 
   @override
   Future<bool> deleteSubscriptionPlan(int id) async {
-    final jsonResponse = await _api.delete(
-      Endpoint.deleteSubscriptionPlan,
-      pathParams: {'id': id.toString()},
-    ) as Map<String, dynamic>;
+    final jsonResponse =
+        await _api.delete(
+              Endpoint.deleteSubscriptionPlan,
+              pathParams: {'id': id.toString()},
+            )
+            as Map<String, dynamic>;
     final isSuccess = (jsonResponse['is_success'] as bool?) ?? false;
     if (!isSuccess) {
       throw BadRequestException(
-          jsonResponse['message']?.toString() ?? 'Failed to delete plan');
+        jsonResponse['message']?.toString() ?? 'Failed to delete plan',
+      );
     }
     return true;
   }
@@ -66,20 +72,34 @@ class SubscriptionServices implements SubscriptionRepository {
   // ---------------- PATIENTS ----------------
 
   @override
-  Future<List<PatientSubscriptionPlanModel>> getPatientSubscriptionPlans() async {
-    final jsonResponse = await _api.get(Endpoint.patientSubscriptionPlans) as Map<String, dynamic>;
-    final isSuccess = (jsonResponse['is_success'] as bool?) ?? (jsonResponse['status'] as bool?) ?? false;
+  Future<List<PatientSubscriptionPlanModel>>
+  getPatientSubscriptionPlans() async {
+    final jsonResponse =
+        await _api.get(Endpoint.patientSubscriptionPlans)
+            as Map<String, dynamic>;
+    final isSuccess =
+        (jsonResponse['is_success'] as bool?) ??
+        (jsonResponse['status'] as bool?) ??
+        false;
     if (!isSuccess) {
-      throw BadRequestException(jsonResponse['message']?.toString() ?? 'Failed to fetch patient plans');
+      throw BadRequestException(
+        jsonResponse['message']?.toString() ?? 'Failed to fetch patient plans',
+      );
     }
 
     final data = jsonResponse['data'] as List<dynamic>? ?? [];
-    return data.map((e) => PatientSubscriptionPlanModel.fromJson(e as Map<String, dynamic>)).toList();
+    return data
+        .map(
+          (e) =>
+              PatientSubscriptionPlanModel.fromJson(e as Map<String, dynamic>),
+        )
+        .toList();
   }
 
   @override
   Future<PatientSubscriptionPlanModel> createPatientSubscriptionPlan(
-      CreatePatientSubscriptionPlanRequest request) async {
+    CreatePatientSubscriptionPlanRequest request,
+  ) async {
     final jsonResponse = await _api.post(
       Endpoint.patientSubscriptionPlans,
       body: request.toJson(),
@@ -91,8 +111,10 @@ class SubscriptionServices implements SubscriptionRepository {
 
   @override
   Future<PatientSubscriptionPlanModel> updatePatientSubscriptionPlan(
-      int id, CreatePatientSubscriptionPlanRequest request) async {
-    final jsonResponse = await _api.put(
+    int id,
+    CreatePatientSubscriptionPlanRequest request,
+  ) async {
+    final jsonResponse = await _api.patch(
       Endpoint.updatePatientSubscriptionPlan,
       pathParams: {'id': id.toString()},
       body: request.toJson(),
@@ -104,14 +126,17 @@ class SubscriptionServices implements SubscriptionRepository {
 
   @override
   Future<bool> deletePatientSubscriptionPlan(int id) async {
-    final jsonResponse = await _api.delete(
-      Endpoint.deletePatientSubscriptionPlan,
-      pathParams: {'id': id.toString()},
-    ) as Map<String, dynamic>;
+    final jsonResponse =
+        await _api.delete(
+              Endpoint.deletePatientSubscriptionPlan,
+              pathParams: {'id': id.toString()},
+            )
+            as Map<String, dynamic>;
     final isSuccess = (jsonResponse['is_success'] as bool?) ?? false;
     if (!isSuccess) {
       throw BadRequestException(
-          jsonResponse['message']?.toString() ?? 'Failed to delete plan');
+        jsonResponse['message']?.toString() ?? 'Failed to delete plan',
+      );
     }
     return true;
   }
