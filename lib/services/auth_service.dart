@@ -46,6 +46,8 @@ class AuthService implements AuthRepository {
     return response;
   }
 
+  
+
   @override
   Future<BaseApiResponseModel> forgotPassword({required String email}) async {
     final jsonResponse = await _api.post(

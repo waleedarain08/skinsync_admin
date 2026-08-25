@@ -425,10 +425,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final success = await ref
         .read(authViewModelProvider.notifier)
         .login(
-          loginReq: LoginRequestModel(
+         
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
-          ),
+          
         );
     if (success && mounted) context.go(DashboardScreen.routeName);
   }
