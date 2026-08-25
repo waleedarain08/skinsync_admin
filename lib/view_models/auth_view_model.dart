@@ -32,8 +32,9 @@ class AuthViewModel extends BaseViewModel<AuthState> {
   }
 
   Future<bool> login({required String email, required String password}) async {
-   // String? fcmToken = await _getFcmToken();
-     final request = LoginRequestModel(
+    String? fcmToken = await getToken();
+    log("FCM TOKEN __________________$fcmToken");
+    final request = LoginRequestModel(
       email: email,
       password: password,
       //fcmToken: fcmToken ?? '',
@@ -45,17 +46,26 @@ class AuthViewModel extends BaseViewModel<AuthState> {
         }) ??
         false;
   }
-    Future<String?> _getFcmToken() async {
+
+  final _messaging = FirebaseMessaging.instance;
+
+  Future<String?> getToken() async {
     try {
-      final token = await FirebaseMessaging.instance.getToken();
+      final token = await _messaging.getToken(
+        vapidKey:
+            'BCFwKQgRnLkC25FJ7FtUQXZ7qJsV4GcqV-X9wvOujRFwt7mYpT0AoMuEdejrqBUxxPlARQzys5cytkbM7dmxhfo',
+      );
+
       log('FCM TOKEN: $token');
+
       return token;
-    } catch (e) {
-      log("Error getting FCM token: $e");
+    } catch (e, stackTrace) {
+      log('FCM TOKEN ERROR: $e');
+      log('$stackTrace');
+
       return null;
     }
   }
-
 
   Future<bool> forgotPassword({required String email}) async {
     return await runSafely<bool?>(showLoading: true, () async {
