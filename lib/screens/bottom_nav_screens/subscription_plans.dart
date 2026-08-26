@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../models/clinic_subscription_plan_model.dart';
 import '../../models/patient_subscription_plan_model.dart';
+import '../../models/subscription_plan_benefit_model.dart';
 import '../../utils/theme.dart';
 import '../../view_models/subscription_view_model.dart';
 import '../../widgets/app_badge.dart';
@@ -205,6 +206,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
   ) {
     final activeBenefits =
         plan.benefits?.where((b) => b.enabled).toList() ?? [];
+    final durationOptions = plan.durationOptions ?? [];
 
     return BorderdContainerWidget(
       enableHover: true,
@@ -216,25 +218,74 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(plan.name ?? 'N/A', style: context.fonts.black18w600),
-              _statusBadge(plan.isActive),
+              Row(
+                children: [
+                  _statusBadge(plan.isActive),
+                  if (plan.isLifetime == true) ...[
+                    context.horizontalSpace(8),
+                    const AppBadge(label: 'Lifetime', variant: AppBadgeVariant.info),
+                  ],
+                ],
+              ),
             ],
           ),
           context.verticalSpace(16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
-                style: context.fonts.black32w700.copyWith(
-                  color: CustomColors.purple,
-                  fontSize: context.sp(32),
+          if (plan.isLifetime == true)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                  style: context.fonts.black32w700.copyWith(
+                    color: CustomColors.purple,
+                    fontSize: context.sp(32),
+                  ),
                 ),
-              ),
-              context.horizontalSpace(4),
-              Text('/ month', style: context.fonts.grey12w400),
-            ],
-          ),
+                context.horizontalSpace(4),
+                Text('Lifetime Access', style: context.fonts.grey12w400),
+              ],
+            )
+          else if (durationOptions.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "\$${durationOptions.first.price.toStringAsFixed(2)}",
+                  style: context.fonts.black32w700.copyWith(
+                    color: CustomColors.purple,
+                    fontSize: context.sp(32),
+                  ),
+                ),
+                context.verticalSpace(8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: durationOptions.map((opt) {
+                    return AppBadge(
+                      label: '${opt.name}: \$${opt.price}',
+                      variant: AppBadgeVariant.neutral,
+                    );
+                  }).toList(),
+                ),
+              ],
+            )
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                  style: context.fonts.black32w700.copyWith(
+                    color: CustomColors.purple,
+                    fontSize: context.sp(32),
+                  ),
+                ),
+                context.horizontalSpace(4),
+                Text('/ month', style: context.fonts.grey12w400),
+              ],
+            ),
           context.verticalSpace(24),
           const Divider(),
           context.verticalSpace(24),
@@ -331,6 +382,10 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
     BuildContext context,
     PatientSubscriptionPlanModel plan,
   ) {
+    final activeBenefits =
+        plan.benefits?.where((b) => b.enabled).toList() ?? [];
+    final durationOptions = plan.durationOptions ?? [];
+
     return BorderdContainerWidget(
       enableHover: true,
       padding: context.appEdgeInsets(all: 24),
@@ -348,26 +403,71 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                     context.horizontalSpace(8),
                     const AppBadge(label: 'Default', variant: AppBadgeVariant.info),
                   ],
+                  if (plan.isLifetime == true) ...[
+                    context.horizontalSpace(8),
+                    const AppBadge(label: 'Lifetime', variant: AppBadgeVariant.info),
+                  ],
                 ],
               ),
             ],
           ),
           context.verticalSpace(16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
-                style: context.fonts.black32w700.copyWith(
-                  color: CustomColors.purple,
-                  fontSize: context.sp(32),
+          if (plan.isLifetime == true)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                  style: context.fonts.black32w700.copyWith(
+                    color: CustomColors.purple,
+                    fontSize: context.sp(32),
+                  ),
                 ),
-              ),
-              context.horizontalSpace(4),
-              Text('/ month', style: context.fonts.grey12w400),
-            ],
-          ),
+                context.horizontalSpace(4),
+                Text('Lifetime Access', style: context.fonts.grey12w400),
+              ],
+            )
+          else if (durationOptions.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "\$${durationOptions.first.price.toStringAsFixed(2)}",
+                  style: context.fonts.black32w700.copyWith(
+                    color: CustomColors.purple,
+                    fontSize: context.sp(32),
+                  ),
+                ),
+                context.verticalSpace(8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: durationOptions.map((opt) {
+                    return AppBadge(
+                      label: '${opt.name}: \$${opt.price}',
+                      variant: AppBadgeVariant.neutral,
+                    );
+                  }).toList(),
+                ),
+              ],
+            )
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                  style: context.fonts.black32w700.copyWith(
+                    color: CustomColors.purple,
+                    fontSize: context.sp(32),
+                  ),
+                ),
+                context.horizontalSpace(4),
+                Text('/ month', style: context.fonts.grey12w400),
+              ],
+            ),
           context.verticalSpace(24),
           const Divider(),
           context.verticalSpace(24),
@@ -386,7 +486,34 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
             'Posts View:',
             plan.unlimitedPostsView ? 'Unlimited' : '${plan.postsViewCount}',
           ),
-          const Spacer(),
+          context.verticalSpace(24),
+          Text('INCLUDED FEATURES', style: context.fonts.sectionHeading),
+          context.verticalSpace(16),
+          Expanded(
+            child: ListView.separated(
+              itemCount: activeBenefits.length,
+              separatorBuilder: (_, _) => context.verticalSpace(10),
+              itemBuilder: (context, i) {
+                final benefit = activeBenefits[i];
+                return Row(
+                  children: [
+                    const Icon(
+                      Icons.check_rounded,
+                      color: CustomColors.green,
+                      size: 16,
+                    ),
+                    context.horizontalSpace(8),
+                    Expanded(
+                      child: Text(
+                        benefit.title ?? '',
+                        style: context.fonts.grey13w500,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
           context.verticalSpace(24),
           Row(
             children: [

@@ -1,4 +1,6 @@
 import '../clinic_subscription_plan_model.dart';
+import '../subscription_duration_option.dart';
+import '../subscription_plan_benefit_model.dart';
 
 class CreateClinicSubscriptionPlanRequest {
   final int? id;
@@ -12,9 +14,11 @@ class CreateClinicSubscriptionPlanRequest {
   final double dynamicBookingCommissionPercent;
   final double technologyFeePerTreatment;
   final List<PlanBenefit>? benefits;
-  final List<String>? assignedClinics;
+  final List<int>? assignedClinics;
   final bool isActive;
   final bool isDefault;
+  final bool isLifetime;
+  final List<SubscriptionDurationOption>? durationOptions;
 
   CreateClinicSubscriptionPlanRequest({
     this.id,
@@ -31,6 +35,8 @@ class CreateClinicSubscriptionPlanRequest {
     this.assignedClinics,
     this.isActive = true,
     this.isDefault = false,
+    this.isLifetime = false,
+    this.durationOptions,
   });
 
   Map<String, dynamic> toJson() {
@@ -47,6 +53,8 @@ class CreateClinicSubscriptionPlanRequest {
       'technology_fee_per_treatment': technologyFeePerTreatment,
       'is_active': isActive,
       'is_default': isDefault,
+      'is_lifetime': isLifetime,
+      'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
       'benefits': benefits?.map((e) => e.toJson()).toList(),
       'assigned_clinics': assignedClinics,
     };
@@ -68,6 +76,8 @@ class CreateClinicSubscriptionPlanRequest {
       assignedClinics: model.assignedClinics,
       isActive: model.isActive,
       isDefault: model.isDefault,
+      isLifetime: model.isLifetime,
+      durationOptions: model.durationOptions,
     );
   }
 }
