@@ -12,7 +12,6 @@ import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.da
 import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
-import 'package:skinsync_admin/utils/dummy_data.dart';
 import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 
@@ -196,7 +195,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
         }
 
         state = state.copyWith(
-          webRequests: TreatmentData.dummyWebRequests,
+          webRequests: [],
           webRequestsCurrentPage: targetPage,
           webRequestsTotalPages: 1,
         );
@@ -412,10 +411,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
           );
           state = state.copyWith(
             selectedWebRequestDetail:
-                fallbackModel ??
-                TreatmentData.dummyWebRequests.firstWhereOrNull(
-                  (r) => r.id == requestId,
-                ),
+                fallbackModel 
           );
           return true;
         }) ??
@@ -443,10 +439,8 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
           );
           state = state.copyWith(
             selectedFounderClinicDetail:
-                fallbackModel ??
-                TreatmentData.dummyFounderClinics.firstWhereOrNull(
-                  (r) => r.id == id,
-                ),
+                fallbackModel 
+                
           );
           return true;
         }) ??
