@@ -7,6 +7,7 @@ import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
 import 'package:skinsync_admin/screens/clinic_web_request_detail_screen.dart';
 import 'package:skinsync_admin/screens/founder_clinic_detail_screen.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/widgets/app_loader.dart';
 import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 
@@ -553,7 +554,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                     '${clinic.totalTreatments} Proc',
                     style: context.fonts.grey14w400,
                   ),
-                  _statusBadgeCell(clinic.status ?? 'Active'),
+                  _statusBadgeCell(clinic.status ?? 'Active', clinic.id),
                   _activeActionsCell(clinic),
                 ],
               );
@@ -724,37 +725,50 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
     );
   }
 
-  Widget _statusBadgeCell(String status) {
+  Widget _statusBadgeCell(String status, int? clinicID) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 16.h),
       child: Align(
         alignment: Alignment.centerLeft,
         child: StatusToggleSwitch(
           status: status,
-          width: 90.w, // Adjust as needed
+          width: 90.w,
           height: 28.h,
           onChanged: (newStatus) {
-            // Call your API or ViewModel here
-            debugPrint('Status changed: $newStatus');
+            if (clinicID == null) {
+              debugPrint('Clinic ID is null');
+              return;
+            }
+
+            final Status statusEnum = newStatus.toLowerCase() == 'active'
+                ? Status.active
+                : Status.inactive;
+
+            ref
+                .read(clinicViewModelProvider.notifier)
+                .updateClinicStatus(clinicId: clinicID, status: statusEnum);
+
+            debugPrint('Status changed: $statusEnum');
           },
         ),
       ),
     );
   }
 
-  Widget _invitationStatusBadgeCell(String status) {
+  Widget _invitationStatusBadgeCell(String? status) {
     Color badgeColor = Colors.blue;
-    final String cleanStatus = status.toLowerCase();
+    final String cleanStatus = (status ?? '').toLowerCase().trim();
 
-    if (cleanStatus.contains('sent') ||
+    if (cleanStatus.contains('inactive') || cleanStatus.contains('expired')) {
+      badgeColor = CustomColors.red;
+    } else if (cleanStatus.contains('active') ||
+        cleanStatus.contains('interested') ||
+        cleanStatus.contains('pending')) {
+      badgeColor = CustomColors.green;
+    } else if (cleanStatus.contains('sent') ||
         cleanStatus.contains('invited') ||
         cleanStatus.contains('awaiting')) {
       badgeColor = Colors.blue;
-    } else if (cleanStatus.contains('interested') ||
-        cleanStatus.contains('pending')) {
-      badgeColor = CustomColors.green;
-    } else if (cleanStatus.contains('expired')) {
-      badgeColor = CustomColors.red;
     }
 
     return Padding(
@@ -769,7 +783,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
             border: Border.all(color: badgeColor.withValues(alpha: 0.2)),
           ),
           child: Text(
-            status,
+            status ?? 'N/A',
             style: context.fonts.grey12w600.copyWith(
               color: badgeColor,
               fontSize: 10.sp,
@@ -851,7 +865,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                     _formatDate(request.createdAt),
                     style: context.fonts.grey14w400,
                   ),
-                  _statusBadgeCell(request.status ?? 'Pending'),
+                  _invitationStatusBadgeCell(request.status),
                   _webRequestActionsCell(request),
                 ],
               );
@@ -958,7 +972,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                     _formatDate(clinic.createdAt),
                     style: context.fonts.grey14w400,
                   ),
-                  _statusBadgeCell(clinic.status ?? 'Pending'),
+                  _invitationStatusBadgeCell(clinic.status),
                   _founderClinicActionsCell(clinic),
                 ],
               );

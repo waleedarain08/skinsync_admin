@@ -55,11 +55,11 @@ class FounderClinicDetailScreen extends ConsumerWidget {
                       flex: 3,
                       child: _buildMainContent(context, clinic),
                     ),
-                    context.horizontalSpace(32),
-                    Expanded(
-                      flex: 2,
-                      child: _buildActionSidebar(context, ref, clinic),
-                    ),
+                    //context.horizontalSpace(32),
+                    // Expanded(
+                    //   flex: 2,
+                    //   child: _buildActionSidebar(context, ref, clinic),
+                    // ),
                   ],
                 ),
               ],

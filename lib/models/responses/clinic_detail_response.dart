@@ -46,6 +46,8 @@ class ClinicDetailData {
   final String? status;
   final List<ClinicAvailability>? availability;
   final List<dynamic>? treatments;
+  final String? cc;
+  final String? country;
 
   ClinicDetailData({
     this.clinicId,
@@ -62,6 +64,8 @@ class ClinicDetailData {
     this.status,
     this.availability,
     this.treatments,
+    this.cc,
+    this.country
   });
 
   factory ClinicDetailData.fromJson(Map<String, dynamic> json) => ClinicDetailData(
@@ -83,6 +87,8 @@ class ClinicDetailData {
     treatments: json['treatments'] == null
         ? null
         : List<dynamic>.from(json['treatments']),
+        country: json['country'],
+        cc:json['cc'],
   );
 
   Map<String, dynamic> toJson() => {

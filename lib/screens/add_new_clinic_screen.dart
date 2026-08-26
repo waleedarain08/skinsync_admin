@@ -348,6 +348,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                                 );
                               },
                             ),
+                           
                             SizedBox(height: 24.h),
                             Row(
                               spacing: 24.w,

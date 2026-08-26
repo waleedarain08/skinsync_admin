@@ -1,17 +1,17 @@
-import 'dart:io';
+import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
+import 'package:skinsync_admin/models/requests/update_clinic_request.dart';
 import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
+import 'package:skinsync_admin/widgets/app_network_image.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
@@ -29,16 +29,15 @@ class ClinicDetailScreen extends ConsumerStatefulWidget {
 class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
   bool _isEditMode = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+  Timer? _addressTimer;
+  late TextEditingController _latController = TextEditingController();
+  late TextEditingController _longController = TextEditingController();
   late final TextEditingController _clinicNameController;
   late final TextEditingController _clinicEmailController;
   late final TextEditingController _clinicPhoneController;
   late final TextEditingController _clinicAddressController;
   late final TextEditingController _websiteController;
   late final TextEditingController _descriptionController;
-
-  final ImagePicker _imagePicker = ImagePicker();
-  XFile? _selectedLogo;
 
   @override
   void initState() {
@@ -50,6 +49,18 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     _clinicAddressController = TextEditingController(text: clinic?.address);
     _websiteController = TextEditingController(text: clinic?.website ?? '');
     _descriptionController = TextEditingController(text: clinic?.description);
+    _latController = TextEditingController(text: clinic?.latitude?.toString());
+    _longController = TextEditingController(text: clinic?.longitude?.toString());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(authViewModelProvider.notifier).setCountry(
+        CountryCode.fromCountryCode(clinic?.country ?? 'US'),
+      );
+      ref.read(clinicViewModelProvider.notifier).initClinicImages(
+        banner: clinic?.banner,
+        logo: clinic?.logo,
+      );
+    });
   }
 
   @override
@@ -60,13 +71,10 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     _clinicAddressController.dispose();
     _websiteController.dispose();
     _descriptionController.dispose();
+    _latController.dispose();
+    _longController.dispose();
+    _addressTimer?.cancel();
     super.dispose();
-  }
-
-  Future<void> _pickLogo() async {
-    if (!_isEditMode) return;
-    final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
-    if (image != null) setState(() => _selectedLogo = image);
   }
 
   Future<void> _updateClinic() async {
@@ -74,25 +82,33 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final clinic = ref.read(clinicViewModelProvider).selectedClinicDetail;
     if (clinic == null) return;
 
+    final vmState = ref.read(clinicViewModelProvider);
     final selectedCountry = ref.read(authViewModelProvider).country;
 
-    final req = RegisterClinicReqModel(
+    final req = UpdateClinicRequest(
+      clinicId: clinic.clinicId,
       clinicName: _clinicNameController.text.trim(),
       clinicEmail: _clinicEmailController.text.trim(),
       clinicPhone: _clinicPhoneController.text.trim(),
       clinicAddress: _clinicAddressController.text.trim(),
       cc: selectedCountry.dialCode ?? '+1',
       country: selectedCountry.code ?? 'US',
-      clinicLogo: _selectedLogo?.path ?? clinic.logo ?? 'https://example.com/logo.png',
+      clinicLogo: vmState.clinicImage ?? clinic.logo,
       website: _websiteController.text.trim(),
       description: _descriptionController.text.trim(),
-       
+      clinicLatitude: double.tryParse(_latController.text),
+      clinicLongitude: double.tryParse(_longController.text),
+      banner: vmState.bannerImage ?? clinic.banner,
     );
 
-    final success = await ref.read(clinicViewModelProvider.notifier).updateClinic(clinic.clinicId!, req);
+    final success = await ref
+        .read(clinicViewModelProvider.notifier)
+        .updateClinic(clinic.clinicId!, req);
     if (success && mounted) {
       setState(() => _isEditMode = false);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Clinic updated successfully')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Clinic updated successfully')),
+      );
     }
   }
 
@@ -101,7 +117,11 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     final clinic = ref.watch(clinicViewModelProvider).selectedClinicDetail;
 
     if (clinic == null) {
-      return GradientScaffold(body: Center(child: Text('No Clinic Data Found', style: context.fonts.black16w400)));
+      return GradientScaffold(
+        body: Center(
+          child: Text('No Clinic Data Found', style: context.fonts.black16w400),
+        ),
+      );
     }
 
     final bool isMobile = context.isMobile;
@@ -117,19 +137,26 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(_isEditMode ? Icons.close : Icons.edit_outlined, color: CustomColors.black),
+            icon: Icon(
+              _isEditMode ? Icons.close : Icons.edit_outlined,
+              color: CustomColors.black,
+            ),
             onPressed: () {
-              setState(() {
-                if (_isEditMode) {
-                  _clinicNameController.text = clinic.name ?? '';
-                  _clinicEmailController.text = clinic.email ?? '';
-                  _clinicPhoneController.text = clinic.phone ?? '';
-                  _clinicAddressController.text = clinic.address ?? '';
-                  _descriptionController.text = clinic.description ?? '';
-                  _selectedLogo = null;
-                }
-                _isEditMode = !_isEditMode;
-              });
+              if (_isEditMode) {
+                _clinicNameController.text = clinic.name ?? '';
+                _clinicEmailController.text = clinic.email ?? '';
+                _clinicPhoneController.text = clinic.phone ?? '';
+                _clinicAddressController.text = clinic.address ?? '';
+                _descriptionController.text = clinic.description ?? '';
+                _websiteController.text = clinic.website ?? '';
+                _latController.text = clinic.latitude?.toString() ?? '';
+                _longController.text = clinic.longitude?.toString() ?? '';
+                ref.read(clinicViewModelProvider.notifier).initClinicImages(
+                  banner: clinic.banner,
+                  logo: clinic.logo,
+                );
+              }
+              setState(() => _isEditMode = !_isEditMode);
             },
           ),
           SizedBox(width: 16.w),
@@ -181,90 +208,153 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
   }
 
   Widget _buildHeaderSection(ClinicDetailData clinic) {
-    return BorderdContainerWidget(
-      padding: EdgeInsets.zero,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildBannerAndLogoCard(),
+        SizedBox(height: 16.h),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            clinic.name ?? 'N/A',
+                            style: context.fonts.level2Heading,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        _statusBadge(clinic.status ?? 'Active'),
+                      ],
+                    ),
+                    SizedBox(height: 6.h),
+                    Text(
+                      clinic.address ?? 'N/A',
+                      style: context.fonts.grey14w400,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBannerAndLogoCard() {
+    final state = ref.watch(clinicViewModelProvider);
+    final viewModel = ref.read(clinicViewModelProvider.notifier);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(32.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        image: state.bannerImage != null && state.bannerImage != ''
+            ? DecorationImage(
+                image: NetworkImage(state.bannerImage ?? ''),
+                fit: BoxFit.cover,
+              )
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Banner Image
-          Container(
-            height: 180.h,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: CustomColors.whiteGrey,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12.r),
-                topRight: Radius.circular(12.r),
-              ),
-              image: (clinic.banner != null && clinic.banner!.isNotEmpty)
-                  ? DecorationImage(image: NetworkImage(clinic.banner!), fit: BoxFit.cover)
-                  : null,
-            ),
-            child: (clinic.banner == null || clinic.banner!.isEmpty)
-                ? Center(
-                    child: Icon(
-                      Icons.image_outlined,
-                      size: 48.sp,
-                      color: CustomColors.grey.withValues(alpha: 0.5),
-                    ),
-                  )
-                : null,
-          ),
-          Padding(
-            padding: EdgeInsets.all(24.w),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: _pickLogo,
-                  child: Container(
-                    width: 90.w,
-                    height: 90.w,
-                    decoration: BoxDecoration(
-                      color: CustomColors.whiteGrey,
-                      borderRadius: BorderRadius.circular(20.r),
-                      border: _isEditMode ? Border.all(color: CustomColors.purple, width: 2) : null,
-                      image: _selectedLogo != null
-                          ? DecorationImage(
-                              image: kIsWeb ? NetworkImage(_selectedLogo!.path) : FileImage(File(_selectedLogo!.path)) as ImageProvider,
-                              fit: BoxFit.cover)
-                          : (clinic.logo != null && clinic.logo!.isNotEmpty)
-                              ? DecorationImage(image: NetworkImage(clinic.logo!), fit: BoxFit.cover)
-                              : null,
-                    ),
-                    child: (_selectedLogo == null && (clinic.logo == null || clinic.logo!.isEmpty))
-                        ? Icon(Icons.business_outlined, size: 36.sp, color: CustomColors.black)
-                        : _isEditMode
-                            ? DecoratedBox(
-                                decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(20.r)),
-                                child: const Icon(Icons.camera_alt_outlined, color: Colors.white),
-                              )
-                            : null,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Clinic Logo',
+                  style: context.fonts.black20w600.copyWith(
+                    color: Colors.black,
                   ),
                 ),
-                SizedBox(width: 24.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              clinic.name ?? 'N/A',
-                              style: context.fonts.level2Heading,
-                              overflow: TextOverflow.ellipsis,
+              ),
+              if (_isEditMode)
+                InkWell(
+                  borderRadius: BorderRadius.circular(50.r),
+                  onTap: () {
+                    if (state.bannerImage != null && state.bannerImage != '') {
+                      viewModel.removeBanner();
+                    } else {
+                      viewModel.pickImage(false);
+                    }
+                  },
+                  child: Container(
+                    width: 42.w,
+                    height: 42.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      state.bannerImage == null || state.bannerImage == ''
+                          ? Icons.add_a_photo_outlined
+                          : Icons.close,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          Center(
+            child: InkWell(
+              onTap: _isEditMode ? () => viewModel.pickImage(true) : null,
+              borderRadius: BorderRadius.circular(100.r),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 120.w,
+                    height: 120.w,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _isEditMode ? Colors.teal : CustomColors.border,
+                        width: 2,
+                      ),
+                    ),
+                    child: state.clinicImage != null && state.clinicImage != ''
+                        ? AppNetworkImage(
+                            imageUrl: state.clinicImage ?? '',
+                            width: 140.w,
+                            height: 140.w,
+                            fit: BoxFit.cover,
+                            borderRadius: BorderRadius.circular(12),
+                            errorIcon: Icons.broken_image_outlined,
+                            errorIconSize: 40,
+                          )
+                        : Center(
+                            child: Icon(
+                              _isEditMode
+                                  ? Icons.add_a_photo_outlined
+                                  : Icons.business_outlined,
+                              size: 36.sp,
+                              color: _isEditMode
+                                  ? Colors.deepPurple
+                                  : CustomColors.black,
                             ),
                           ),
-                          SizedBox(width: 12.w),
-                          _statusBadge(clinic.status ?? 'Active'),
-                        ],
-                      ),
-                      SizedBox(height: 6.h),
-                      Text(clinic.address ?? 'N/A', style: context.fonts.grey14w400),
-                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -311,19 +401,66 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                 children: [
                   Text('Phone Number', style: context.fonts.black14w600),
                   SizedBox(height: 10.h),
-                  PhoneWidget(controller: _clinicPhoneController, readOnly: !_isEditMode),
+                  PhoneWidget(
+                    controller: _clinicPhoneController,
+                    readOnly: !_isEditMode,
+                  ),
                 ],
               ),
             ],
           ),
           SizedBox(height: 24.h),
           BuildTextField(
+            readOnly: !_isEditMode,
             label: 'Full Address',
             controller: _clinicAddressController,
-            hintText: 'Enter address',
+            hintText: '123 Main Street, New York, NY 10001',
             validator: Validators.empty,
-            readOnly: !_isEditMode,
+            onChanged: (value) {
+              _addressTimer?.cancel();
+              _addressTimer = Timer(const Duration(milliseconds: 300), () {
+                ref.read(clinicViewModelProvider.notifier).searchPlaces(value);
+              });
+            },
           ),
+          Consumer(
+            builder: (_, ref, _) {
+              final places = ref.watch(
+                clinicViewModelProvider.select((s) => s.searchedPlaces),
+              );
+              if (places.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Column(
+                crossAxisAlignment: .start,
+                spacing: context.h(10),
+                children: [
+                  Text('Suggestions', style: context.fonts.black14w600),
+                  ...List.generate(places.length, (index) {
+                    final place = places[index];
+                    return Card(
+                      child: ListTile(
+                        onTap: () {
+                          _latController.text =
+                              '${place.location?.latitude ?? ''}';
+                          _longController.text =
+                              '${place.location?.longitude ?? ''}';
+                          _clinicAddressController.text =
+                              place.shortFormattedAddress ?? '';
+                          ref
+                              .read(clinicViewModelProvider.notifier)
+                              .clearSearchedPlaces();
+                        },
+                        title: Text(place.displayName?.text ?? 'N/A'),
+                        subtitle: Text(place.shortFormattedAddress ?? 'N/A'),
+                      ),
+                    );
+                  }),
+                ],
+              );
+            },
+          ),
+
           SizedBox(height: 24.h),
           BuildTextField(
             label: 'Website',
@@ -351,9 +488,16 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.medical_services_outlined, size: 40.sp, color: CustomColors.grey),
+            Icon(
+              Icons.medical_services_outlined,
+              size: 40.sp,
+              color: CustomColors.grey,
+            ),
             SizedBox(height: 12.h),
-            Text('No treatments registered currently', style: context.fonts.grey14w500),
+            Text(
+              'No treatments registered currently',
+              style: context.fonts.grey14w500,
+            ),
           ],
         ),
       ),
@@ -365,7 +509,11 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       padding: EdgeInsets.symmetric(vertical: 8.h),
       child: Row(
         children: [
-          Icon(Icons.check_circle_outline_rounded, color: CustomColors.green, size: 20.sp),
+          Icon(
+            Icons.check_circle_outline_rounded,
+            color: CustomColors.green,
+            size: 20.sp,
+          ),
           SizedBox(width: 12.w),
           Text(treatment.toString(), style: context.fonts.black14w500),
         ],
@@ -378,15 +526,30 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       children: [
         _infoSection('Availability & Working Hours', [
           if (clinic.availability == null || clinic.availability!.isEmpty)
-            Text('No working hours registered.', style: context.fonts.grey14w400)
+            Text(
+              'No working hours registered.',
+              style: context.fonts.grey14w400,
+            )
           else
             ...clinic.availability!.map(_buildAvailabilityCard),
         ]),
         SizedBox(height: 24.h),
         _infoSection('Subscription Info', [
-          _statRow(Icons.card_membership_outlined, 'Current Status', clinic.status?.toUpperCase() ?? 'ACTIVE'),
-          _statRow(Icons.map_outlined, 'Latitude', clinic.latitude?.toStringAsFixed(4) ?? 'N/A'),
-          _statRow(Icons.explore_outlined, 'Longitude', clinic.longitude?.toStringAsFixed(4) ?? 'N/A'),
+          _statRow(
+            Icons.card_membership_outlined,
+            'Current Status',
+            clinic.status?.toUpperCase() ?? 'ACTIVE',
+          ),
+          _statRow(
+            Icons.map_outlined,
+            'Latitude',
+            clinic.latitude?.toStringAsFixed(4) ?? 'N/A',
+          ),
+          _statRow(
+            Icons.explore_outlined,
+            'Longitude',
+            clinic.longitude?.toStringAsFixed(4) ?? 'N/A',
+          ),
         ]),
       ],
     );
@@ -415,7 +578,12 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             ],
           ),
           SizedBox(height: 8.h),
-          Text(daysStr, style: context.fonts.grey12w400, maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(
+            daysStr,
+            style: context.fonts.grey12w400,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -448,7 +616,13 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
               Text(label, style: context.fonts.grey13w500),
             ],
           ),
-          Flexible(child: Text(value, style: context.fonts.grey14w600, overflow: TextOverflow.ellipsis)),
+          Flexible(
+            child: Text(
+              value,
+              style: context.fonts.grey14w600,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
@@ -459,7 +633,9 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: isActive ? CustomColors.green.withValues(alpha: 0.1) : CustomColors.red.withValues(alpha: 0.1),
+        color: isActive
+            ? CustomColors.green.withValues(alpha: 0.1)
+            : CustomColors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(

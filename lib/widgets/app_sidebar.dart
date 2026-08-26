@@ -17,22 +17,111 @@ import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 
+/// Single source of truth for a sidebar entry. `routes`, the tappable
+/// items, and the section-header separators are all derived from this
+/// same (filtered) list, so nothing can drift out of sync with manual
+/// index math again.
+class _SidebarEntry {
+  const _SidebarEntry({
+    required this.routeName,
+    required this.icon,
+    required this.label,
+    this.included = true,
+    this.section,
+  });
+
+  final String routeName;
+  final IconData icon;
+  final String label;
+  final bool included;
+  final String? section;
+}
+
+final List<_SidebarEntry> _sidebarEntries = [
+  const _SidebarEntry(
+    routeName: DashboardScreen.routeName,
+    icon: Icons.grid_view_rounded,
+    label: 'Dashboard',
+    section: 'NETWORK',
+  ),
+  const _SidebarEntry(
+    routeName: ExploreScreen.routeName,
+    icon: Icons.explore_outlined,
+    label: 'Explore',
+  ),
+  const _SidebarEntry(
+    routeName: ClinicManagement.routeName,
+    icon: Icons.business_rounded,
+    label: 'Clinics',
+  ),
+  const _SidebarEntry(
+    routeName: AppointmentManagement.routeName,
+    icon: Icons.calendar_today_rounded,
+    label: 'Appointments',
+  ),
+  const _SidebarEntry(
+    routeName: PatientManagementScreen.routeName,
+    icon: Icons.people_alt_rounded,
+    label: 'Patients',
+    section: 'OPERATIONS',
+  ),
+  const _SidebarEntry(
+    routeName: TreatmentManagementScreen.routeName,
+    icon: Icons.medical_services_rounded,
+    label: 'Treatments',
+  ),
+  const _SidebarEntry(
+    routeName: ProductManagement.routeName,
+    icon: Icons.inventory_2_rounded,
+    label: 'Inventory',
+  ),
+  const _SidebarEntry(
+    routeName: SubscriptionPlansTab.routeName,
+    icon: Icons.card_membership_rounded,
+    label: 'Subscriptions',
+    section: 'FINANCIALS',
+    // isDeploymentMode condition removed — always shown now.
+  ),
+  _SidebarEntry(
+    routeName: UserManagement.routeName,
+    icon: Icons.admin_panel_settings_rounded,
+    label: 'Users',
+    included: !isDeploymentMode,
+  ),
+   _SidebarEntry(
+    routeName: PaymentScreen.routeName,
+    icon: Icons.account_balance_wallet_rounded,
+    label: 'Payments',
+     included: !isDeploymentMode,
+  ),
+  _SidebarEntry(
+    routeName: DisputeScreen.routeName,
+    icon: Icons.gavel_rounded,
+    label: 'Disputes',
+    included: !isDeploymentMode,
+  ),
+  const _SidebarEntry(
+    routeName: PushNotificationScreen.routeName,
+    icon: Icons.notifications_active_rounded,
+    label: 'Notifications',
+    section: 'SYSTEM',
+  ),
+  const _SidebarEntry(
+    routeName: SettingScreen.routeName,
+    icon: Icons.settings_rounded,
+    label: 'Settings',
+  ),
+];
+
+/// Only the entries that should currently appear, in display order.
+/// `routes`, `_buildItems`, and `_separatorBuilder` all read from this
+/// same list so tap index <-> route <-> section stay in lockstep.
+List<_SidebarEntry> get _visibleSidebarEntries =>
+    _sidebarEntries.where((e) => e.included).toList();
+
 abstract final class AppSidebarRoutes {
-  static List<String> get routes => [
-    DashboardScreen.routeName,
-    ExploreScreen.routeName,
-    ClinicManagement.routeName,
-    AppointmentManagement.routeName,
-    PatientManagementScreen.routeName,
-    TreatmentManagementScreen.routeName,
-    ProductManagement.routeName,
-    SubscriptionPlansTab.routeName,
-    if (!isDeploymentMode) UserManagement.routeName,
-    if (!isDeploymentMode) PaymentScreen.routeName,
-    if (!isDeploymentMode) DisputeScreen.routeName,
-    PushNotificationScreen.routeName,
-    SettingScreen.routeName,
-  ];
+  static List<String> get routes =>
+      _visibleSidebarEntries.map((e) => e.routeName).toList();
 
   static int indexOf(String location) {
     final list = routes;
@@ -127,53 +216,28 @@ class AppSidebar extends StatelessWidget {
   }
 
   List<SidebarXItem> _buildItems() {
-    SidebarXItem item(int index, IconData icon, String label) =>
-        SidebarXItem(icon: icon, label: label, onTap: () => onItemTap(index));
-
+    final entries = _visibleSidebarEntries;
     return [
-      item(0, Icons.grid_view_rounded, 'Dashboard'),
-      item(1, Icons.explore_outlined, 'Explore'),
-      item(2, Icons.business_rounded, 'Clinics'),
-      item(3, Icons.calendar_today_rounded, 'Appointments'),
-      item(4, Icons.people_alt_rounded, 'Patients'),
-      item(5, Icons.medical_services_rounded, 'Treatments'),
-      item(6, Icons.inventory_2_rounded, 'Inventory'),
-      item(7, Icons.card_membership_rounded, 'Subscriptions'),
-      if (!isDeploymentMode)
-        item(8, Icons.admin_panel_settings_rounded, 'Users'),
-      item(
-        !isDeploymentMode ? 9 : 7,
-        Icons.account_balance_wallet_rounded,
-        'Payments',
-      ),
-      if (!isDeploymentMode) item(10, Icons.gavel_rounded, 'Disputes'),
-      item(
-        !isDeploymentMode ? 11 : 8,
-        Icons.notifications_active_rounded,
-        'Notifications',
-      ),
-      item(!isDeploymentMode ? 12 : 9, Icons.settings_rounded, 'Settings'),
+      for (var i = 0; i < entries.length; i++)
+        SidebarXItem(
+          icon: entries[i].icon,
+          label: entries[i].label,
+          onTap: () => onItemTap(i),
+        ),
     ];
   }
 
-  Widget _separatorBuilder(
+    Widget _separatorBuilder(
     BuildContext context,
     int index,
     SidebarXController controller,
   ) {
-    final financialsIndex = !isDeploymentMode ? 7 : -1;
-    final systemIndex = !isDeploymentMode ? 9 : 7;
-    if (index == 0) {
-      return _SectionLabel(title: 'NETWORK', controller: controller);
-    }
-    if (index == 4) {
-      return _SectionLabel(title: 'OPERATIONS', controller: controller);
-    }
-    if (index == financialsIndex) {
-      return _SectionLabel(title: 'FINANCIALS', controller: controller);
-    }
-    if (index == systemIndex) {
-      return _SectionLabel(title: 'SYSTEM', controller: controller);
+    final entries = _visibleSidebarEntries;
+    final nextIndex = index + 1;
+
+    final section = nextIndex < entries.length ? entries[nextIndex].section : null;
+    if (section != null) {
+      return _SectionLabel(title: section, controller: controller);
     }
     return context.verticalSpace(2);
   }

@@ -6,12 +6,14 @@ import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
 import 'package:skinsync_admin/models/requests/send_notes_request.dart';
+import 'package:skinsync_admin/models/requests/update_clinic_request.dart';
 import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/places_response.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/dummy_data.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/utils/exception.dart';
 
 import '../services/location_service.dart';
@@ -31,48 +33,52 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
   Future<void> initialize() async {
     getClinics(page: state.currentPage, limit: state.pageSize);
     getWebRequests(page: state.webRequestsCurrentPage, limit: state.pageSize);
-    getFounderClinics(page: state.founderClinicsCurrentPage, limit: state.pageSize);
+    getFounderClinics(
+      page: state.founderClinicsCurrentPage,
+      limit: state.pageSize,
+    );
   }
 
- Future<bool?> getClinics({String? search, int? page, int? limit}) async {
-  return await runSafely<bool?>(
-    showLoading: false,
-    onLoadingChange: (loading) {
-      state = state.copyWith(loading: loading);
-    },
-    () async {
-      final int targetPage = page ?? state.currentPage;
-      final int targetLimit = limit ?? state.pageSize;
-      try {
-        final response = await _clinicRepository.getClinics(
-          page: targetPage,
-          limit: targetLimit,
-          search: search ?? '',
-        );
-        if (response.data != null && response.data!.isNotEmpty) {
-          state = state.copyWith(
-            clinics: response.data,
-            currentPage: targetPage,
-            totalPages: response.totalPages,
-            pageSize: targetLimit,
+  Future<bool?> getClinics({String? search, int? page, int? limit}) async {
+    return await runSafely<bool?>(
+      showLoading: false,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final int targetPage = page ?? state.currentPage;
+        final int targetLimit = limit ?? state.pageSize;
+        try {
+          final response = await _clinicRepository.getClinics(
+            page: targetPage,
+            limit: targetLimit,
+            search: search ?? '',
           );
-          return true;
+          if (response.data != null && response.data!.isNotEmpty) {
+            state = state.copyWith(
+              clinics: response.data,
+              currentPage: targetPage,
+              totalPages: response.totalPages,
+              pageSize: targetLimit,
+            );
+            return true;
+          }
+        } catch (e) {
+          // Fail-safe print
         }
-      } catch (e) {
-        // Fail-safe print
-      }
 
-      // Fallback
-      state = state.copyWith(
-        clinics: [],
-        currentPage: targetPage,
-        totalPages: 1,
-        pageSize: targetLimit,
-      );
-      return true;
-    },
-  );
-}
+        // Fallback
+        state = state.copyWith(
+          clinics: [],
+          currentPage: targetPage,
+          totalPages: 1,
+          pageSize: targetLimit,
+        );
+        return true;
+      },
+    );
+  }
+
   final ImagePicker _picker = ImagePicker();
 
   Future<void> pickImage(bool clinicImage) async {
@@ -101,52 +107,60 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     state = state.copyWith(clinicImage: '');
   }
 
+  void initClinicImages({String? banner, String? logo}) {
+    state = state.copyWith(
+      bannerImage: banner,
+      clinicImage: logo,
+    );
+  }
+
   void clearClinicsPagination() {
     state = state.copyWith(totalPages: 1, currentPage: 1);
   }
 
-Future<bool?> getInviteClinics({
-  int? page,
-  int? limit,
-  String? search,
-  String? status,
-}) async {
-  return await runSafely<bool?>(
-    showLoading: false,
-    onLoadingChange: (loading) {
-      state = state.copyWith(loading: loading);
-    },
-    () async {
-      final int targetPage = page ?? state.inviteClinicsCurrentPage;
-      final int targetLimit = limit ?? state.pageSize;
-      try {
-        final response = await _clinicRepository.getInviteClinics(
-          page: targetPage,
-          limit: targetLimit,
-          search: search,
-          status: status,
-        );
+  Future<bool?> getInviteClinics({
+    int? page,
+    int? limit,
+    String? search,
+    String? status,
+  }) async {
+    return await runSafely<bool?>(
+      showLoading: false,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final int targetPage = page ?? state.inviteClinicsCurrentPage;
+        final int targetLimit = limit ?? state.pageSize;
+        try {
+          final response = await _clinicRepository.getInviteClinics(
+            page: targetPage,
+            limit: targetLimit,
+            search: search,
+            status: status,
+          );
+          state = state.copyWith(
+            inviteClinics: response.data ?? [],
+            inviteClinicsCurrentPage: targetPage,
+            inviteClinicsTotalPages: response.totalPages,
+            pageSize: targetLimit,
+          );
+          return true;
+        } catch (e) {
+          // Fail-safe print
+        }
+
         state = state.copyWith(
-          inviteClinics: response.data ?? [],
+          inviteClinics: [],
           inviteClinicsCurrentPage: targetPage,
-          inviteClinicsTotalPages: response.totalPages,
+          inviteClinicsTotalPages: 1,
           pageSize: targetLimit,
         );
         return true;
-      } catch (e) {
-        // Fail-safe print
-      }
+      },
+    );
+  }
 
-      state = state.copyWith(
-        inviteClinics: [],
-        inviteClinicsCurrentPage: targetPage,
-        inviteClinicsTotalPages: 1,
-        pageSize: targetLimit,
-      );
-      return true;
-    },
-  );
-}
   Future<bool?> getWebRequests({
     int? page,
     int? limit,
@@ -262,166 +276,217 @@ Future<bool?> getInviteClinics({
   }
 
   Future<bool> getClinicDetail(int clinicId) async {
-    return await runSafely<bool?>(
-          showLoading: true,
-          () async {
-            try {
-              final response = await _clinicRepository.getClinicDetail(clinicId: clinicId);
-              if (response.isSuccess == true && response.data != null && response.data!.isNotEmpty) {
-                state = state.copyWith(selectedClinicDetail: response.data!.first);
-                return true;
-              }
-            } catch (e) {
-              // Fail-safe print
-            }
-
-            final fallbackModel = state.clinics?.firstWhereOrNull((c) => c.id == clinicId);
-            state = state.copyWith(
-              selectedClinicDetail: ClinicDetailData(
-                clinicId: clinicId,
-                name: fallbackModel?.name ?? 'Glow MedSpa NY Detail',
-                email: fallbackModel?.email ?? 'contact@glowmedspa.com',
-                phone: fallbackModel?.phone ?? '+1 212-555-0198',
-                address: fallbackModel?.address ?? '5th Ave, New York, NY',
-                latitude: 24.8162848,
-                longitude: 67.1105623,
-                logo: fallbackModel?.logo ?? 'https://plus.unsplash.com/premium_photo-1661764391621-08f307405c6d?q=80&w=1000',
-                description: 'A premium New York clinic specializing in advanced dermal treatments and clinical aesthetics.',
-                website: 'https://glowmedspa.com',
-                banner: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
-                status: fallbackModel?.status ?? 'active',
-                availability: [
-                  ClinicAvailability(openTime: '09:00', closeTime: '17:00', days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']),
-                ],
-                treatments: ['Dermal Fillers', 'Laser Resurfacing', 'HydraFacial', 'Microneedling'],
-              ),
+    return await runSafely<bool?>(showLoading: true, () async {
+          try {
+            final response = await _clinicRepository.getClinicDetail(
+              clinicId: clinicId,
             );
-            return true;
-          },
-        ) ??
+            if (response.isSuccess == true &&
+                response.data != null &&
+                response.data!.isNotEmpty) {
+              final clinicDetail = response.data!.first;
+              state = state.copyWith(
+                selectedClinicDetail: clinicDetail,
+                bannerImage: clinicDetail.banner,
+                clinicImage: clinicDetail.logo,
+              );
+              return true;
+            }
+          } catch (e) {
+            // Fail-safe print
+          }
+
+          final fallbackModel = state.clinics?.firstWhereOrNull(
+            (c) => c.id == clinicId,
+          );
+          state = state.copyWith(
+            selectedClinicDetail: ClinicDetailData(
+              clinicId: clinicId,
+              name: fallbackModel?.name ?? 'Glow MedSpa NY Detail',
+              email: fallbackModel?.email ?? 'contact@glowmedspa.com',
+              phone: fallbackModel?.phone ?? '+1 212-555-0198',
+              address: fallbackModel?.address ?? '5th Ave, New York, NY',
+              latitude: 24.8162848,
+              longitude: 67.1105623,
+              logo:
+                  fallbackModel?.logo ??
+                  'https://plus.unsplash.com/premium_photo-1661764391621-08f307405c6d?q=80&w=1000',
+              description:
+                  'A premium New York clinic specializing in advanced dermal treatments and clinical aesthetics.',
+              website: 'https://glowmedspa.com',
+              banner:
+                  'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
+              status: fallbackModel?.status ?? 'active',
+              availability: [
+                ClinicAvailability(
+                  openTime: '09:00',
+                  closeTime: '17:00',
+                  days: [
+                    'Monday',
+                    'Tuesday',
+                    'Wednesday',
+                    'Thursday',
+                    'Friday',
+                  ],
+                ),
+              ],
+              treatments: [
+                'Dermal Fillers',
+                'Laser Resurfacing',
+                'HydraFacial',
+                'Microneedling',
+              ],
+            ),
+          );
+          return true;
+        }) ??
         false;
   }
 
   Future<bool> getInviteClinicDetail(int inviteClinicId) async {
-    return await runSafely<bool?>(
-          showLoading: true,
-          () async {
-            try {
-              final response = await _clinicRepository.getInviteClinicDetail(inviteClinicId: inviteClinicId);
-              if (response.isSuccess == true && response.data != null && response.data!.isNotEmpty) {
-                state = state.copyWith(selectedInviteClinicDetail: response.data!.first);
-                return true;
-              }
-            } catch (e) {
-              // Fail-safe print
-            }
-
-            final fallbackModel = state.inviteClinics?.firstWhereOrNull((c) => c.id == inviteClinicId);
-            state = state.copyWith(
-              selectedInviteClinicDetail: InviteClinicDetailData(
-                clinicId: inviteClinicId,
-                name: fallbackModel?.name ?? 'Radiant Aesthetics Detail',
-                email: fallbackModel?.email ?? 'hello@radiantaesthetics.com',
-                phone: fallbackModel?.phone ?? '+1 415-555-0312',
-                address: fallbackModel?.address ?? 'San Francisco, CA',
-                latitude: 37.7749,
-                longitude: -122.4194,
-                logo: fallbackModel?.logo ?? 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000',
-                description: 'A prospective San Francisco clinic with advanced clinical aesthetic potential.',
-                website: 'https://radiantaesthetics.com',
-                banner: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
-                status: fallbackModel?.status ?? 'pending',
-                availability: [
-                  InviteClinicAvailability(openTime: '10:00', closeTime: '18:00', days: ['Tuesday', 'Wednesday', 'Thursday', 'Friday']),
-                ],
-                treatments: ['Botox Injection', 'Chemical Peel', 'Laser Hair Removal'],
-              ),
+    return await runSafely<bool?>(showLoading: true, () async {
+          try {
+            final response = await _clinicRepository.getInviteClinicDetail(
+              inviteClinicId: inviteClinicId,
             );
-            return true;
-          },
-        ) ??
+            if (response.isSuccess == true &&
+                response.data != null &&
+                response.data!.isNotEmpty) {
+              state = state.copyWith(
+                selectedInviteClinicDetail: response.data!.first,
+              );
+              return true;
+            }
+          } catch (e) {
+            // Fail-safe print
+          }
+
+          final fallbackModel = state.inviteClinics?.firstWhereOrNull(
+            (c) => c.id == inviteClinicId,
+          );
+          state = state.copyWith(
+            selectedInviteClinicDetail: InviteClinicDetailData(
+              clinicId: inviteClinicId,
+              name: fallbackModel?.name ?? 'Radiant Aesthetics Detail',
+              email: fallbackModel?.email ?? 'hello@radiantaesthetics.com',
+              phone: fallbackModel?.phone ?? '+1 415-555-0312',
+              address: fallbackModel?.address ?? 'San Francisco, CA',
+              latitude: 37.7749,
+              longitude: -122.4194,
+              logo:
+                  fallbackModel?.logo ??
+                  'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1000',
+              description:
+                  'A prospective San Francisco clinic with advanced clinical aesthetic potential.',
+              website: 'https://radiantaesthetics.com',
+              banner:
+                  'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
+              status: fallbackModel?.status ?? 'pending',
+              availability: [
+                InviteClinicAvailability(
+                  openTime: '10:00',
+                  closeTime: '18:00',
+                  days: ['Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+                ),
+              ],
+              treatments: [
+                'Botox Injection',
+                'Chemical Peel',
+                'Laser Hair Removal',
+              ],
+            ),
+          );
+          return true;
+        }) ??
         false;
   }
 
   Future<bool> getWebRequestDetail(int requestId) async {
-    return await runSafely<bool?>(
-          showLoading: true,
-          () async {
-            try {
-              final response = await _clinicRepository.getWebRequestDetail(id: requestId);
-              if (response.isSuccess == true && response.data != null) {
-                state = state.copyWith(selectedWebRequestDetail: response.data);
-                return true;
-              }
-            } catch (e) {
-              // Fail-safe
-            }
-
-            final fallbackModel = state.webRequests.firstWhereOrNull((r) => r.id == requestId);
-            state = state.copyWith(
-              selectedWebRequestDetail: fallbackModel ?? TreatmentData.dummyWebRequests.firstWhereOrNull((r) => r.id == requestId),
+    return await runSafely<bool?>(showLoading: true, () async {
+          try {
+            final response = await _clinicRepository.getWebRequestDetail(
+              id: requestId,
             );
-            return true;
-          },
-        ) ??
+            if (response.isSuccess == true && response.data != null) {
+              state = state.copyWith(selectedWebRequestDetail: response.data);
+              return true;
+            }
+          } catch (e) {
+            // Fail-safe
+          }
+
+          final fallbackModel = state.webRequests.firstWhereOrNull(
+            (r) => r.id == requestId,
+          );
+          state = state.copyWith(
+            selectedWebRequestDetail:
+                fallbackModel ??
+                TreatmentData.dummyWebRequests.firstWhereOrNull(
+                  (r) => r.id == requestId,
+                ),
+          );
+          return true;
+        }) ??
         false;
   }
 
   Future<bool> getFounderClinicDetail(int id) async {
-    return await runSafely<bool?>(
-          showLoading: true,
-          () async {
-            try {
-              final response = await _clinicRepository.getFounderClinicDetail(id: id);
-              if (response.isSuccess == true && response.data != null) {
-                state = state.copyWith(selectedFounderClinicDetail: response.data);
-                return true;
-              }
-            } catch (e) {
-              // Fail-safe
-            }
-
-            final fallbackModel = state.founderClinics.firstWhereOrNull((r) => r.id == id);
-            state = state.copyWith(
-              selectedFounderClinicDetail: fallbackModel ?? TreatmentData.dummyFounderClinics.firstWhereOrNull((r) => r.id == id),
+    return await runSafely<bool?>(showLoading: true, () async {
+          try {
+            final response = await _clinicRepository.getFounderClinicDetail(
+              id: id,
             );
-            return true;
-          },
-        ) ??
+            if (response.isSuccess == true && response.data != null) {
+              state = state.copyWith(
+                selectedFounderClinicDetail: response.data,
+              );
+              return true;
+            }
+          } catch (e) {
+            // Fail-safe
+          }
+
+          final fallbackModel = state.founderClinics.firstWhereOrNull(
+            (r) => r.id == id,
+          );
+          state = state.copyWith(
+            selectedFounderClinicDetail:
+                fallbackModel ??
+                TreatmentData.dummyFounderClinics.firstWhereOrNull(
+                  (r) => r.id == id,
+                ),
+          );
+          return true;
+        }) ??
         false;
   }
 
   Future<bool> sendWebRequestNotes(int id, SendNotesRequest req) async {
-    return await runSafely<bool?>(
-          showLoading: true,
-          () async {
-            final response = await _clinicRepository.sendWebRequestNotes(id: id, req: req);
-            return response.isSuccess;
-          },
-        ) ??
+    return await runSafely<bool?>(showLoading: true, () async {
+          final response = await _clinicRepository.sendWebRequestNotes(
+            id: id,
+            req: req,
+          );
+          return response.isSuccess;
+        }) ??
         false;
   }
 
-  Future<bool> updateClinic(int id, RegisterClinicReqModel req) async {
+    
+  Future<bool> updateClinic(int clinicId, UpdateClinicRequest req) async {
     final success =
         await runSafely<bool?>(
-          showLoading: false,
-          onLoadingChange: (loading) {
-            state = state.copyWith(loading: loading);
-          },
+          showLoading: true,
+        
           () async {
-            final updatedClinic = await _clinicRepository.updateClinic(
-              id: id,
+            final response = await _clinicRepository.updateClinic(
+             
               req: req,
             );
-            final currentList = state.clinics ?? [];
-            final newList = currentList
-                .map((c) => c.id == id ? updatedClinic : c)
-                .toList();
-            state = state.copyWith(
-              clinics: newList,
-              selectedClinicId: updatedClinic.id,
-            );
+          if(response.isSuccess){
+            await getClinicDetail(clinicId);
+          }
+           
             return true;
           },
         ) ??
@@ -452,6 +517,22 @@ Future<bool?> getInviteClinics({
         return true;
       },
     );
+  }
+
+  Future<bool?> updateClinicStatus({
+    required int clinicId,
+    required Status status,
+  }) async {
+    return await runSafely<bool?>(showLoading: true, () async {
+      final clinic = await _clinicRepository.updateClinicStatus(
+        clinicId: clinicId,
+        status: status,
+      );
+      if (clinic.isSuccess) {
+        await getClinics();
+      }
+      return true;
+    });
   }
 
   Future<void> searchPlaces(String? query) async {
@@ -559,23 +640,33 @@ class ClinicState extends BaseStateModel {
           selectedInviteClinicId ?? this.selectedInviteClinicId,
       selectedClinicId: selectedClinicId ?? this.selectedClinicId,
       selectedWebRequestId: selectedWebRequestId ?? this.selectedWebRequestId,
-      selectedFounderClinicId: selectedFounderClinicId ?? this.selectedFounderClinicId,
+      selectedFounderClinicId:
+          selectedFounderClinicId ?? this.selectedFounderClinicId,
       searchedPlaces: searchedPlaces ?? this.searchedPlaces,
       bannerImage: bannerImage ?? this.bannerImage,
       clinicImage: clinicImage ?? this.clinicImage,
       currentPage: currentPage ?? this.currentPage,
       pageSize: pageSize ?? this.pageSize,
       totalPages: totalPages ?? this.totalPages,
-      webRequestsTotalPages: webRequestsTotalPages ?? this.webRequestsTotalPages,
-      webRequestsCurrentPage: webRequestsCurrentPage ?? this.webRequestsCurrentPage,
-      founderClinicsTotalPages: founderClinicsTotalPages ?? this.founderClinicsTotalPages,
-      founderClinicsCurrentPage: founderClinicsCurrentPage ?? this.founderClinicsCurrentPage,
-      inviteClinicsTotalPages: inviteClinicsTotalPages ?? this.inviteClinicsTotalPages,
-      inviteClinicsCurrentPage: inviteClinicsCurrentPage ?? this.inviteClinicsCurrentPage,
+      webRequestsTotalPages:
+          webRequestsTotalPages ?? this.webRequestsTotalPages,
+      webRequestsCurrentPage:
+          webRequestsCurrentPage ?? this.webRequestsCurrentPage,
+      founderClinicsTotalPages:
+          founderClinicsTotalPages ?? this.founderClinicsTotalPages,
+      founderClinicsCurrentPage:
+          founderClinicsCurrentPage ?? this.founderClinicsCurrentPage,
+      inviteClinicsTotalPages:
+          inviteClinicsTotalPages ?? this.inviteClinicsTotalPages,
+      inviteClinicsCurrentPage:
+          inviteClinicsCurrentPage ?? this.inviteClinicsCurrentPage,
       selectedClinicDetail: selectedClinicDetail ?? this.selectedClinicDetail,
-      selectedInviteClinicDetail: selectedInviteClinicDetail ?? this.selectedInviteClinicDetail,
-      selectedWebRequestDetail: selectedWebRequestDetail ?? this.selectedWebRequestDetail,
-      selectedFounderClinicDetail: selectedFounderClinicDetail ?? this.selectedFounderClinicDetail,
+      selectedInviteClinicDetail:
+          selectedInviteClinicDetail ?? this.selectedInviteClinicDetail,
+      selectedWebRequestDetail:
+          selectedWebRequestDetail ?? this.selectedWebRequestDetail,
+      selectedFounderClinicDetail:
+          selectedFounderClinicDetail ?? this.selectedFounderClinicDetail,
     );
   }
 }
