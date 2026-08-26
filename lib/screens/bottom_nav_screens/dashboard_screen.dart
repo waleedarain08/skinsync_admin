@@ -25,7 +25,7 @@ class DashboardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Good Morning, Alex',
+                        'Welcome, Alex',
                         style: context.fonts.level1Heading,
                       ),
                       context.verticalSpace(6),
