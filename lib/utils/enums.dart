@@ -32,6 +32,7 @@ enum Endpoint {
   getClinics('admin/cliniclist'),
   registerClinic('admin/clinic/register'),
   updateClinic('admin/clinic/update'),
+  updateClinicStatus('admin/clinic/update-status/{id}'),
   updateAppVersion('admin/app-version'),
   subscriptionPlans('admin/subscription-plans'),
   updateSubscriptionPlan('admin/subscription-plans/{id}'),

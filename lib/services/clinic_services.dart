@@ -44,9 +44,10 @@ class ClinicService implements ClinicRepository {
     required Status status,
   }) async {
     final jsonResponse = await _api.patch(
-      Endpoint.updateClinic,
+      Endpoint.updateClinicStatus,
+      pathParams: {'id' : clinicId.toString()},
       body: {
-        'clinic_id': clinicId.toString(), 'status': status.name,
+        'status': status.name,
       },
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
