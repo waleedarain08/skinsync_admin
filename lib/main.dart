@@ -7,7 +7,7 @@ import 'package:skinsync_admin/firebase_options.dart';
 import 'app_init.dart';
 import 'services/locator.dart';
 
-bool isDeploymentMode = false;
+bool isDeploymentMode = true;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
