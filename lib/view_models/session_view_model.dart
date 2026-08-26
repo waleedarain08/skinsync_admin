@@ -30,7 +30,6 @@ import 'package:skinsync_admin/repositories/session_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
 import 'package:skinsync_admin/utils/exception.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 
 import '../models/session_model.dart';
 import 'base_state_model.dart';
@@ -1159,49 +1158,38 @@ Body       : ${request.toJson()}
     });
   }
 
-  Future<bool?> callDownTimeLevels({required int stepNumber}) async {
-    // Resolve the actual days from the selected level + category presets
-    final presets = ref
-        .read(treatmentViewModelProvider)
-        .selectedCategoryDetail
-        ?.downtimePresets;
-    final level = state.downtimeLevel;
+Future<bool?> callDownTimeLevels({required int stepNumber}) async {
+  final level = state.downtimeLevel;
 
-    final int? downtimeDays = switch (level) {
-      'None' => presets?.none ?? 0,
-      'Low' => presets?.low ?? 2,
-      'Moderate' => presets?.moderate ?? 5,
-      'High' => presets?.high ?? 10,
-      _ => null,
-    };
+  
 
-    final request = DownTimeLevelRequest(
-      stepNumber: stepNumber,
-      downtimeLevel: level,
-      downtimeDays: downtimeDays,
+  final selected = state.downTimeLevelList
+      ?.where((e) => e.level == level)
+      .firstOrNull;
+
+  final downtimeDays = selected?.days;
+
+ 
+
+  final request = DownTimeLevelRequest(
+    stepNumber: stepNumber,
+    downtimeLevel: (level).toLowerCase(),
+    downtimeDays: downtimeDays,
+  );
+
+
+
+  return await runSafely<bool>(() async {
+    await locator<SessionRepository>().downTimeLevels(
+      request: request,
+      id: state.sessionId!,
     );
 
-    log('''
-=========== DOWNTIME LEVEL REQUEST ===========
-Draft ID      : ${state.sessionId}
-Downtime Level: $level
-Downtime Days : $downtimeDays
-Body          : ${request.toJson()}
-=============================================
-''');
+    log('Step Downtime Saved: ${state.sessionId!}');
 
-    return await runSafely<bool>(() async {
-      await _sessionRepository.downTimeLevels(
-        // ← correct endpoint
-        request: request,
-        id: state.sessionId!,
-      );
-
-      log('Step Downtime Saved : ${state.sessionId!}');
-
-      return true;
-    });
-  }
+    return true;
+  });
+}
 
   Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
     final bool isCatDefault = state.providerRolesSource == 'category';
