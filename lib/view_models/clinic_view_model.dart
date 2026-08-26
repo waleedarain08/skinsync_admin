@@ -219,7 +219,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
       () async {
         final int targetPage = page ?? state.founderClinicsCurrentPage;
         final int targetLimit = limit ?? state.pageSize;
-        try {
+        
           final response = await _clinicRepository.getFounderClinics(
             page: targetPage,
             limit: targetLimit,
@@ -235,15 +235,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
             );
             return true;
           }
-        } catch (e) {
-          // Fail-safe
-        }
-
-        state = state.copyWith(
-          founderClinics: TreatmentData.dummyFounderClinics,
-          founderClinicsCurrentPage: targetPage,
-          founderClinicsTotalPages: 1,
-        );
+      
         return true;
       },
     );

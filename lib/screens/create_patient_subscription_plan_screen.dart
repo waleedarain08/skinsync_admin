@@ -794,55 +794,58 @@ class _CreatePatientSubscriptionPlanScreenState
     );
   }
 
-  Widget _buildVisibilitySectionContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Target Availability', style: context.fonts.black14w600),
-        context.verticalSpace(12),
-        Container(
-          height: AppTheme.inputHeight,
+ Widget _buildVisibilitySectionContent() {
+  return Consumer(
+    builder: (context, ref, _) {
+      ref.watch(patientProvider); // keeps the provider alive for as long as this widget is mounted, regardless of _visibilityType
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Target Availability', style: context.fonts.black14w600),
+          context.verticalSpace(12),
+          Container(
+           height: AppTheme.inputHeight,
           padding: context.appEdgeInsets(horizontal: 16),
           decoration: BoxDecoration(
             border: Border.all(color: CustomColors.border),
             borderRadius: context.borderRadius(all: 12),
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _visibilityType,
-              isExpanded: true,
-              icon: const Icon(Icons.keyboard_arrow_down_rounded),
-              items: ['All Patients', 'Specific Patients'].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value, style: context.fonts.black14w400),
-                );
-              }).toList(),
-              onChanged: (val) {
-                setState(() {
-                  _visibilityType = val!;
-                  if (_visibilityType == 'All Patients') {
-                    _selectedPatients = [];
-                  } else if (_visibilityType == 'Specific Patients') {
-                    ref
-                        .read(patientProvider.notifier)
-                        .getPatients(initialCall: true);
-                  }
-                });
-              },
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _visibilityType,
+                isExpanded: true,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                items: ['All Patients', 'Specific Patients'].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value, style: context.fonts.black14w400),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  setState(() {
+                    _visibilityType = val!;
+                    if (_visibilityType == 'All Patients') {
+                      _selectedPatients = [];
+                    } else if (_visibilityType == 'Specific Patients') {
+                      // safe now — watcher already exists from the top of this builder
+                      ref.read(patientProvider.notifier).getPatients(initialCall: true);
+                    }
+                  });
+                },
+              ),
             ),
           ),
-        ),
-        if (_visibilityType == 'Specific Patients') ...[
-          context.verticalSpace(24),
-          Text('Assign to Patients', style: context.fonts.black14w600),
-          context.verticalSpace(12),
-          _buildPatientSelector(),
+          if (_visibilityType == 'Specific Patients') ...[
+            context.verticalSpace(24),
+            Text('Assign to Patients', style: context.fonts.black14w600),
+            context.verticalSpace(12),
+            _buildPatientSelector(),
+          ],
         ],
-      ],
-    );
-  }
-
+      );
+    },
+  );
+}
   Widget _buildPatientSelector() {
     final patientState = ref.watch(patientProvider);
     final filteredPatients = patientState.patients.where((p) {
