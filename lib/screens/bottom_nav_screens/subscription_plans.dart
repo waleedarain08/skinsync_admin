@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../models/clinic_subscription_plan_model.dart';
 import '../../models/patient_subscription_plan_model.dart';
-import '../../models/subscription_plan_benefit_model.dart';
 import '../../utils/theme.dart';
 import '../../view_models/subscription_view_model.dart';
 import '../../widgets/app_badge.dart';

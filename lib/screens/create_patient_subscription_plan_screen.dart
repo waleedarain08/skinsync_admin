@@ -676,113 +676,115 @@ class _CreatePatientSubscriptionPlanScreenState
                                 ),
                               ],
                             ),
-                            SizedBox(height: 32.h),
+                           // SizedBox(height: 32.h),
 
                             // SECTION 3: PLAN FEATURES & BENEFITS
-                            Text(
-                              'SECTION 3: PLAN FEATURES & BENEFITS',
-                              style: context.fonts.sectionHeading,
-                            ),
-                            context.verticalSpace(4),
-                            Text(
-                              'Manage the list of services and features included in this tier.',
-                              style: context.fonts.grey13w500,
-                            ),
-                            SizedBox(height: 24.h),
-                            ..._planBenefits.map(
-                              (benefit) => CheckboxListTile(
-                                title: Text(
-                                  benefit.title ?? '',
-                                  style: context.fonts.black14w600,
-                                ),
-                                subtitle: benefit.description != null &&
-                                        benefit.description!.isNotEmpty
-                                    ? Text(
-                                        benefit.description!,
-                                        style: context.fonts.grey13w500,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      )
-                                    : null,
-                                value: benefit.enabled,
-                                onChanged: (val) {
-                                  setState(() {
-                                    benefit.enabled = val ?? false;
-                                  });
-                                },
-                                activeColor: CustomColors.green,
-                                checkColor: CustomColors.black,
-                                controlAffinity:
-                                    ListTileControlAffinity.leading,
-                                contentPadding: EdgeInsets.zero,
-                                dense: false,
-                              ),
-                            ),
-                            context.verticalSpace(24),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    children: [
-                                      BuildTextField(
-                                        label: 'Feature Title',
-                                        controller: _customBenefitController,
-                                        hintText: 'e.g. Free marketing kit',
-                                      ),
-                                      context.verticalSpace(16),
-                                      BuildTextField(
-                                        label: 'Feature Description (Optional)',
-                                        controller:
-                                            _customDescriptionController,
-                                        hintText: 'Provide more details...',
-                                        maxLines: 2,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                context.horizontalSpace(16),
-                                Padding(
-                                  padding: context.appEdgeInsets(top: 28),
-                                  child: CustomPrimaryButton(
-                                    onTap: _addCustomBenefit,
-                                    label: 'Add Feature',
-                                    width: context.w(160),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            // Text(
+                            //   'SECTION 3: PLAN FEATURES & BENEFITS',
+                            //   style: context.fonts.sectionHeading,
+                            // ),
+                            // context.verticalSpace(4),
+                            // Text(
+                            //   'Manage the list of services and features included in this tier.',
+                            //   style: context.fonts.grey13w500,
+                            // ),
+                            // SizedBox(height: 24.h),
+                            // ..._planBenefits.map(
+                            //   (benefit) => CheckboxListTile(
+                            //     title: Text(
+                            //       benefit.title ?? '',
+                            //       style: context.fonts.black14w600,
+                            //     ),
+                            //     subtitle: benefit.description != null &&
+                            //             benefit.description!.isNotEmpty
+                            //         ? Text(
+                            //             benefit.description!,
+                            //             style: context.fonts.grey13w500,
+                            //             maxLines: 2,
+                            //             overflow: TextOverflow.ellipsis,
+                            //           )
+                            //         : null,
+                            //     value: benefit.enabled,
+                            //     onChanged: (val) {
+                            //       setState(() {
+                            //         benefit.enabled = val ?? false;
+                            //       });
+                            //     },
+                            //     activeColor: CustomColors.green,
+                            //     checkColor: CustomColors.black,
+                            //     controlAffinity:
+                            //         ListTileControlAffinity.leading,
+                            //     contentPadding: EdgeInsets.zero,
+                            //     dense: false,
+                            //   ),
+                            // ),
+                            // context.verticalSpace(24),
+                            // Row(
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   children: [
+                            //     Expanded(
+                            //       child: Column(
+                            //         children: [
+                            //           BuildTextField(
+                            //             label: 'Feature Title',
+                            //             controller: _customBenefitController,
+                            //             hintText: 'e.g. Free marketing kit',
+                            //           ),
+                            //           context.verticalSpace(16),
+                            //           BuildTextField(
+                            //             label: 'Feature Description (Optional)',
+                            //             controller:
+                            //                 _customDescriptionController,
+                            //             hintText: 'Provide more details...',
+                            //             maxLines: 2,
+                            //           ),
+                            //         ],
+                            //       ),
+                            //     ),
+                            //     context.horizontalSpace(16),
+                            //     Padding(
+                            //       padding: context.appEdgeInsets(top: 28),
+                            //       child: CustomPrimaryButton(
+                            //         onTap: _addCustomBenefit,
+                            //         label: 'Add Feature',
+                            //         width: context.w(160),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
+                         
                           ],
                         ),
                       ),
-                      context.verticalSpace(24),
+                    //  context.verticalSpace(24),
 
-                      // SECTION 4: PLAN VISIBILITY
-                      Container(
-                        padding: context.appEdgeInsets(all: 24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: context.appBorderRadius(all: 16),
-                          boxShadow: AppShadows.xs(context),
-                          border: Border.all(color: CustomColors.border),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'SECTION 4: PLAN VISIBILITY',
-                              style: context.fonts.sectionHeading,
-                            ),
-                            context.verticalSpace(4),
-                            Text(
-                              'Control which patients are eligible for this specific subscription tier.',
-                              style: context.fonts.grey13w500,
-                            ),
-                            SizedBox(height: 24.h),
-                            _buildVisibilitySectionContent(),
-                          ],
-                        ),
-                      ),
+                      // // SECTION 4: PLAN VISIBILITY
+                      // Container(
+                      //   padding: context.appEdgeInsets(all: 24),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white,
+                      //     borderRadius: context.appBorderRadius(all: 16),
+                      //     boxShadow: AppShadows.xs(context),
+                      //     border: Border.all(color: CustomColors.border),
+                      //   ),
+                      //   child: Column(
+                      //     crossAxisAlignment: CrossAxisAlignment.start,
+                      //     children: [
+                      //       Text(
+                      //         'SECTION 4: PLAN VISIBILITY',
+                      //         style: context.fonts.sectionHeading,
+                      //       ),
+                      //       context.verticalSpace(4),
+                      //       Text(
+                      //         'Control which patients are eligible for this specific subscription tier.',
+                      //         style: context.fonts.grey13w500,
+                      //       ),
+                      //       SizedBox(height: 24.h),
+                      //       _buildVisibilitySectionContent(),
+                      //     ],
+                      //   ),
+                      // ),
+                  
                     ],
                   ),
                 ),
