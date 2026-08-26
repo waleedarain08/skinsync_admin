@@ -16,8 +16,8 @@ class ClinicModel {
   int get pendingAppointmentsCount => 0;
   String get invitedDate => createdAt != null ? createdAt!.toIso8601String() : '';
   String get subscriptionPlan => 'Premium';
-  int get totalAppointments => 6;
-  int get totalTreatments => 2;
+  int get totalAppointments => 0;
+  int get totalTreatments =>0;
   double get rating => 4.8;
 
   ClinicModel({
