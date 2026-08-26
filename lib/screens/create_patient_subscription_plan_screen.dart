@@ -73,9 +73,11 @@ class _CreatePatientSubscriptionPlanScreenState
     super.initState();
     _initFromModel(widget.planToEdit);
     _initializeBenefits();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(patientProvider.notifier).getPatients(initialCall: true);
-    });
+    if (_visibilityType == 'Specific Patients') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(patientProvider.notifier).getPatients(initialCall: true);
+      });
+    }
   }
 
   void _initFromModel(PatientSubscriptionPlanModel? plan) {
@@ -751,7 +753,13 @@ class _CreatePatientSubscriptionPlanScreenState
               onChanged: (val) {
                 setState(() {
                   _visibilityType = val!;
-                  if (_visibilityType == 'All Patients') _selectedPatients = [];
+                  if (_visibilityType == 'All Patients') {
+                    _selectedPatients = [];
+                  } else if (_visibilityType == 'Specific Patients') {
+                    ref
+                        .read(patientProvider.notifier)
+                        .getPatients(initialCall: true);
+                  }
                 });
               },
             ),
