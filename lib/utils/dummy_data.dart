@@ -175,8 +175,14 @@ class TreatmentData {
       technologyFeePerTreatment: 8,
       isActive: true,
       benefits: [
-        PlanBenefit(title: 'Initial free access', enabled: true),
-        PlanBenefit(title: 'Basic patient records', enabled: true),
+        PlanBenefit(
+            title: 'Initial free access',
+            description: 'Get started with basic platform features at no cost.',
+            enabled: true),
+        PlanBenefit(
+            title: 'Basic patient records',
+            description: 'Digital storage for essential patient information.',
+            enabled: true),
       ],
     ),
     ClinicSubscriptionPlanModel(
@@ -192,8 +198,14 @@ class TreatmentData {
       technologyFeePerTreatment: 5,
       isActive: true,
       benefits: [
-        PlanBenefit(title: 'Patient records and treatment history', enabled: true),
-        PlanBenefit(title: 'Automated invoices', enabled: true),
+        PlanBenefit(
+            title: 'Patient records and treatment history',
+            description: 'Comprehensive digital records for your patients.',
+            enabled: true),
+        PlanBenefit(
+            title: 'Automated invoices',
+            description: 'Generate invoices automatically after treatments.',
+            enabled: true),
       ],
     ),
     ClinicSubscriptionPlanModel(
@@ -209,9 +221,18 @@ class TreatmentData {
       technologyFeePerTreatment: 3,
       isActive: true,
       benefits: [
-        PlanBenefit(title: 'AI consultation and treatment recommendation tools', enabled: true),
-        PlanBenefit(title: 'Before/after simulations', enabled: true),
-        PlanBenefit(title: 'Dynamic pricing system', enabled: true),
+        PlanBenefit(
+            title: 'AI consultation and treatment recommendation tools',
+            description: 'AI-driven analysis for accurate treatment plans.',
+            enabled: true),
+        PlanBenefit(
+            title: 'Before/after simulations',
+            description: 'Visual results for patient consultations.',
+            enabled: true),
+        PlanBenefit(
+            title: 'Dynamic pricing system',
+            description: 'Adjust treatment prices based on various factors.',
+            enabled: true),
       ],
     ),
     ClinicSubscriptionPlanModel(
@@ -227,9 +248,18 @@ class TreatmentData {
       technologyFeePerTreatment: 2,
       isActive: true,
       benefits: [
-        PlanBenefit(title: 'Multi-user clinic access', enabled: true),
-        PlanBenefit(title: 'Priority onboarding and support', enabled: true),
-        PlanBenefit(title: 'Custom branding', enabled: true),
+        PlanBenefit(
+            title: 'Multi-user clinic access',
+            description: 'Access for all your doctors and staff members.',
+            enabled: true),
+        PlanBenefit(
+            title: 'Priority onboarding and support',
+            description: 'Dedicated support for your clinic setup.',
+            enabled: true),
+        PlanBenefit(
+            title: 'Custom branding',
+            description: 'Your clinic logo on reports and invoices.',
+            enabled: true),
       ],
     ),
   ];
@@ -242,6 +272,16 @@ class TreatmentData {
       simulationCount: 5,
       postsViewCount: 20,
       isActive: true,
+      benefits: [
+        PlanBenefit(
+            title: '5 AI Simulations',
+            description: 'Access to 5 skin analysis simulations.',
+            enabled: true),
+        PlanBenefit(
+            title: '20 Posts View',
+            description: 'View up to 20 expert skin care posts.',
+            enabled: true),
+      ],
     ),
     PatientSubscriptionPlanModel(
       id: 2,
@@ -250,6 +290,16 @@ class TreatmentData {
       simulationCount: 15,
       unlimitedPostsView: true,
       isActive: true,
+      benefits: [
+        PlanBenefit(
+            title: '15 AI Simulations',
+            description: 'Access to 15 skin analysis simulations.',
+            enabled: true),
+        PlanBenefit(
+            title: 'Unlimited Posts View',
+            description: 'Unlimited access to all skin care content.',
+            enabled: true),
+      ],
     ),
     PatientSubscriptionPlanModel(
       id: 3,
@@ -258,6 +308,16 @@ class TreatmentData {
       unlimitedSimulations: true,
       unlimitedPostsView: true,
       isActive: true,
+      benefits: [
+        PlanBenefit(
+            title: 'Unlimited AI Simulations',
+            description: 'Generate as many simulations as you need.',
+            enabled: true),
+        PlanBenefit(
+            title: 'Unlimited Posts View',
+            description: 'Full access to all educational materials.',
+            enabled: true),
+      ],
     ),
   ];
 }

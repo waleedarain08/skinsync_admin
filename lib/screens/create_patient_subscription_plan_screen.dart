@@ -34,10 +34,12 @@ class _CreatePatientSubscriptionPlanScreenState
   final _formKey = GlobalKey<FormState>();
 
   late final TextEditingController _nameController;
-  late final TextEditingController _lifetimePriceController;
+  late final TextEditingController _basePriceController;
   late final TextEditingController _simulationCountController;
   late final TextEditingController _postsViewCountController;
   final TextEditingController _customBenefitController =
+      TextEditingController();
+  final TextEditingController _customDescriptionController =
       TextEditingController();
   final TextEditingController _patientSearchController =
       TextEditingController();
@@ -53,15 +55,47 @@ class _CreatePatientSubscriptionPlanScreenState
 
   final List<DurationOptionController> _durationOptions = [];
 
-  final List<String> _predefinedFeatures = [
-    'AI skin analysis and consultation',
-    'Personalized treatment tracking',
-    'Before/after simulation access',
-    'Secure medical records storage',
-    'Direct booking with specialists',
-    'Priority treatment scheduling',
-    'Exclusive discounts on treatments',
-    'Access to community educational content',
+  final List<PlanBenefit> _predefinedFeatures = [
+    PlanBenefit(
+        title: 'AI skin analysis and consultation',
+        description:
+            'Advanced AI-powered analysis for skin conditions and personalized consultation.',
+        enabled: false),
+    PlanBenefit(
+        title: 'Personalized treatment tracking',
+        description:
+            'Track your treatment progress with customized plans and reminders.',
+        enabled: false),
+    PlanBenefit(
+        title: 'Before/after simulation access',
+        description:
+            'Visualize potential results with high-quality before and after simulations.',
+        enabled: false),
+    PlanBenefit(
+        title: 'Secure medical records storage',
+        description:
+            'Safe and encrypted storage for all your medical history and treatment records.',
+        enabled: false),
+    PlanBenefit(
+        title: 'Direct booking with specialists',
+        description:
+            'Skip the queue and book appointments directly with top skin specialists.',
+        enabled: false),
+    PlanBenefit(
+        title: 'Priority treatment scheduling',
+        description:
+            'Get priority access to treatment slots and faster scheduling.',
+        enabled: false),
+    PlanBenefit(
+        title: 'Exclusive discounts on treatments',
+        description:
+            'Access special member-only pricing and discounts on various skin treatments.',
+        enabled: false),
+    PlanBenefit(
+        title: 'Access to community educational content',
+        description:
+            'Educational materials and community forum access for skin care tips.',
+        enabled: false),
   ];
 
   List<PlanBenefit> _planBenefits = [];
@@ -82,7 +116,7 @@ class _CreatePatientSubscriptionPlanScreenState
 
   void _initFromModel(PatientSubscriptionPlanModel? plan) {
     _nameController = TextEditingController(text: plan?.name);
-    _lifetimePriceController = TextEditingController(
+    _basePriceController = TextEditingController(
       text: plan?.isLifetime == true ? plan?.basePrice?.toString() : '',
     );
     _simulationCountController = TextEditingController(
@@ -117,18 +151,26 @@ class _CreatePatientSubscriptionPlanScreenState
   void _initializeBenefits() {
     final existingBenefits = widget.planToEdit?.benefits ?? [];
 
-    _planBenefits = _predefinedFeatures.map((title) {
+    _planBenefits = _predefinedFeatures.map((benefit) {
       final existing = existingBenefits.firstWhere(
-        (b) => b.title == title,
-        orElse: () => PlanBenefit(title: title, enabled: false),
+        (b) => b.title == benefit.title,
+        orElse: () => benefit,
       );
-      return PlanBenefit(title: title, enabled: existing.enabled);
+      return PlanBenefit(
+          title: benefit.title,
+          description: (existing.description != null && existing.description!.isNotEmpty) 
+              ? existing.description 
+              : benefit.description,
+          enabled: existing.enabled);
     }).toList();
 
     for (final benefit in existingBenefits) {
-      if (!_predefinedFeatures.contains(benefit.title)) {
+      if (!_predefinedFeatures.any((b) => b.title == benefit.title)) {
         _planBenefits.add(
-          PlanBenefit(title: benefit.title, enabled: benefit.enabled),
+          PlanBenefit(
+              title: benefit.title,
+              description: benefit.description,
+              enabled: benefit.enabled),
         );
       }
     }
@@ -137,10 +179,11 @@ class _CreatePatientSubscriptionPlanScreenState
   @override
   void dispose() {
     _nameController.dispose();
-    _lifetimePriceController.dispose();
+    _basePriceController.dispose();
     _simulationCountController.dispose();
     _postsViewCountController.dispose();
     _customBenefitController.dispose();
+    _customDescriptionController.dispose();
     _patientSearchController.dispose();
     for (var option in _durationOptions) {
       option.dispose();
@@ -149,11 +192,14 @@ class _CreatePatientSubscriptionPlanScreenState
   }
 
   void _addCustomBenefit() {
-    final text = _customBenefitController.text.trim();
-    if (text.isNotEmpty) {
+    final title = _customBenefitController.text.trim();
+    final description = _customDescriptionController.text.trim();
+    if (title.isNotEmpty) {
       setState(() {
-        _planBenefits.add(PlanBenefit(title: text, enabled: true));
+        _planBenefits.add(
+            PlanBenefit(title: title, description: description, enabled: true));
         _customBenefitController.clear();
+        _customDescriptionController.clear();
       });
     }
   }
@@ -184,7 +230,7 @@ class _CreatePatientSubscriptionPlanScreenState
       double? basePrice;
 
       if (_isLifetime) {
-        basePrice = double.tryParse(_lifetimePriceController.text) ?? 0.0;
+        basePrice = double.tryParse(_basePriceController.text) ?? 0.0;
       } else {
         durationOptions = _durationOptions.map((e) {
           return SubscriptionDurationOption(
@@ -434,8 +480,8 @@ class _CreatePatientSubscriptionPlanScreenState
                             context.verticalSpace(16),
                             if (_isLifetime)
                               BuildTextField(
-                                label: 'Lifetime Price (\$)',
-                                controller: _lifetimePriceController,
+                                label: 'Base Price (\$)',
+                                controller: _basePriceController,
                                 hintText: '0.00',
                                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                 validator: Validators.empty,
@@ -647,8 +693,17 @@ class _CreatePatientSubscriptionPlanScreenState
                               (benefit) => CheckboxListTile(
                                 title: Text(
                                   benefit.title ?? '',
-                                  style: context.fonts.grey14w400,
+                                  style: context.fonts.black14w600,
                                 ),
+                                subtitle: benefit.description != null &&
+                                        benefit.description!.isNotEmpty
+                                    ? Text(
+                                        benefit.description!,
+                                        style: context.fonts.grey13w500,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      )
+                                    : null,
                                 value: benefit.enabled,
                                 onChanged: (val) {
                                   setState(() {
@@ -660,17 +715,30 @@ class _CreatePatientSubscriptionPlanScreenState
                                 controlAffinity:
                                     ListTileControlAffinity.leading,
                                 contentPadding: EdgeInsets.zero,
-                                dense: true,
+                                dense: false,
                               ),
                             ),
                             context.verticalSpace(24),
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(
-                                  child: BuildTextField(
-                                    label: 'Add Custom Feature',
-                                    controller: _customBenefitController,
-                                    hintText: 'e.g. Free marketing kit',
+                                  child: Column(
+                                    children: [
+                                      BuildTextField(
+                                        label: 'Feature Title',
+                                        controller: _customBenefitController,
+                                        hintText: 'e.g. Free marketing kit',
+                                      ),
+                                      context.verticalSpace(16),
+                                      BuildTextField(
+                                        label: 'Feature Description (Optional)',
+                                        controller:
+                                            _customDescriptionController,
+                                        hintText: 'Provide more details...',
+                                        maxLines: 2,
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 context.horizontalSpace(16),
