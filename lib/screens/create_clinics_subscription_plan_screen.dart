@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
 import 'package:skinsync_admin/models/requests/create_clinic_subscription_plan_request.dart';
+import 'package:skinsync_admin/models/subscription_plan_benefit_model.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
@@ -12,6 +13,9 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
+
+import '../models/subscription_duration_option.dart';
 
 class CreateClinicsSubscriptionPlanScreen extends ConsumerStatefulWidget {
   static const String routeName = '/create-clinics-subscription-plan';
@@ -29,7 +33,7 @@ class _CreateClinicsSubscriptionPlanScreenState
   final _formKey = GlobalKey<FormState>();
 
   late final TextEditingController _nameController;
-  late final TextEditingController _priceController;
+  late final TextEditingController _lifetimePriceController;
   late final TextEditingController _doctorSeatsController;
   late final TextEditingController _staffSeatsController;
   late final TextEditingController _standardCommissionController;
@@ -42,10 +46,11 @@ class _CreateClinicsSubscriptionPlanScreenState
   bool _unlimitedDoctors = false;
   bool _unlimitedStaff = false;
   String _visibilityType = 'All Clinics';
-  List<String> _selectedClinics = [];
+  List<int> _selectedClinics = [];
   String _clinicSearchQuery = '';
   bool _isActive = true;
   bool _isDefault = false;
+  bool _isLifetime = false;
 
   final List<String> _predefinedFeatures = [
     'AI consultation and treatment recommendation tools',
@@ -59,6 +64,7 @@ class _CreateClinicsSubscriptionPlanScreenState
   ];
 
   List<PlanBenefit> _planBenefits = [];
+  final List<DurationOptionController> _durationOptions = [];
 
   bool get isEditMode => widget.planToEdit != null;
 
@@ -76,7 +82,9 @@ class _CreateClinicsSubscriptionPlanScreenState
 
   void _initFromNormalPlan(ClinicSubscriptionPlanModel? plan) {
     _nameController = TextEditingController(text: plan?.name);
-    _priceController = TextEditingController(text: plan?.basePrice?.toString());
+    _lifetimePriceController = TextEditingController(
+      text: plan?.isLifetime == true ? plan?.basePrice?.toString() : '',
+    );
     _doctorSeatsController = TextEditingController(
       text: plan?.doctorSeats.toString() ?? '0',
     );
@@ -97,10 +105,21 @@ class _CreateClinicsSubscriptionPlanScreenState
     _unlimitedStaff = plan?.unlimitedStaff ?? false;
     _isActive = plan?.isActive ?? true;
     _isDefault = plan?.isDefault ?? false;
+    _isLifetime = plan?.isLifetime ?? false;
 
     _selectedClinics = plan?.assignedClinics ?? [];
     _visibilityType =
         _selectedClinics.isEmpty ? 'All Clinics' : 'Specific Clinics';
+
+    if (plan?.durationOptions != null && plan!.durationOptions!.isNotEmpty) {
+      for (final option in plan.durationOptions!) {
+        _durationOptions.add(
+          DurationOptionController.fromOption(option),
+        );
+      }
+    } else if (!_isLifetime) {
+      _durationOptions.add(DurationOptionController());
+    }
   }
 
   void _initializeBenefits() {
@@ -126,7 +145,7 @@ class _CreateClinicsSubscriptionPlanScreenState
   @override
   void dispose() {
     _nameController.dispose();
-    _priceController.dispose();
+    _lifetimePriceController.dispose();
     _doctorSeatsController.dispose();
     _staffSeatsController.dispose();
     _standardCommissionController.dispose();
@@ -134,6 +153,9 @@ class _CreateClinicsSubscriptionPlanScreenState
     _techFeeController.dispose();
     _customBenefitController.dispose();
     _clinicSearchController.dispose();
+    for (var option in _durationOptions) {
+      option.dispose();
+    }
     super.dispose();
   }
 
@@ -147,12 +169,64 @@ class _CreateClinicsSubscriptionPlanScreenState
     }
   }
 
+  void _addDurationOption() {
+    setState(() {
+      _durationOptions.add(DurationOptionController());
+    });
+  }
+
+  void _removeDurationOption(int index) {
+    setState(() {
+      _durationOptions[index].dispose();
+      _durationOptions.removeAt(index);
+    });
+  }
+
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
+      if (!_isLifetime && _durationOptions.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('At least one duration option is required')),
+        );
+        return;
+      }
+
+      List<SubscriptionDurationOption>? durationOptions;
+      double? basePrice;
+
+      if (_isLifetime) {
+        basePrice = double.tryParse(_lifetimePriceController.text) ?? 0.0;
+      } else {
+        durationOptions = _durationOptions.map((e) {
+          return SubscriptionDurationOption(
+            name: e.getName(),
+            duration: e.getDays(),
+            price: double.tryParse(e.priceController.text) ?? 0.0,
+          );
+        }).toList();
+
+        if (durationOptions.any((d) => d.duration <= 0)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('All durations must be greater than 0 days')),
+          );
+          return;
+        }
+        
+        if (Set.from(durationOptions.map((e) => e.duration)).length != durationOptions.length) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Duplicate duration options are not allowed')),
+          );
+          return;
+        }
+        // Use first option price as base price for compatibility if needed, 
+        // but backend should ideally use duration_options
+        basePrice = durationOptions.isNotEmpty ? durationOptions.first.price : 0.0;
+      }
+
       final request = CreateClinicSubscriptionPlanRequest(
         id: widget.planToEdit?.id,
         name: _nameController.text,
-        basePrice: double.tryParse(_priceController.text) ?? 0.0,
+        basePrice: basePrice,
         doctorSeats:
             _unlimitedDoctors
                 ? 0
@@ -172,6 +246,8 @@ class _CreateClinicsSubscriptionPlanScreenState
             _visibilityType == 'All Clinics' ? [] : _selectedClinics,
         isActive: _isActive,
         isDefault: _isDefault,
+        isLifetime: _isLifetime,
+        durationOptions: durationOptions,
       );
 
       final success = await ref
@@ -265,28 +341,19 @@ class _CreateClinicsSubscriptionPlanScreenState
                               'SECTION 1: BASIC INFORMATION',
                               style: context.fonts.sectionHeading,
                             ),
-                            SizedBox(height: 16.h),
+                            context.verticalSpace(4),
+                            Text(
+                              'Define the general identity and status of this subscription plan.',
+                              style: context.fonts.grey13w500,
+                            ),
+                            SizedBox(height: 24.h),
                             Row(
                               children: [
                                 Expanded(
-                                  flex: 2,
                                   child: BuildTextField(
                                     label: 'Plan Name',
                                     controller: _nameController,
                                     hintText: 'e.g. Premium Plan',
-                                    validator: Validators.empty,
-                                  ),
-                                ),
-                                context.horizontalSpace(24),
-                                Expanded(
-                                  child: BuildTextField(
-                                    label: 'Base Price (\$)',
-                                    controller: _priceController,
-                                    hintText: '0.00',
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                          decimal: true,
-                                        ),
                                     validator: Validators.empty,
                                   ),
                                 ),
@@ -315,6 +382,8 @@ class _CreateClinicsSubscriptionPlanScreenState
                                       : context.fonts.red13w500,
                                 ),
                                 context.horizontalSpace(32),
+                                const Spacer(),
+
                                 Text(
                                   'Set as Default: ',
                                   style: context.fonts.black14w600,
@@ -338,12 +407,175 @@ class _CreateClinicsSubscriptionPlanScreenState
                             ),
                             SizedBox(height: 32.h),
 
+                            // DURATION & PRICING
+                            Text(
+                              'DURATION & PRICING',
+                              style: context.fonts.sectionHeading,
+                            ),
+                            context.verticalSpace(4),
+                            Text(
+                              'Choose between lifetime access or multiple recurring billing cycles.',
+                              style: context.fonts.grey13w500,
+                            ),
+                            SizedBox(height: 24.h),
+                            Row(
+                              children: [
+                                Text(
+                                  'Lifetime Access: ',
+                                  style: context.fonts.black14w600,
+                                ),
+                                Transform.scale(
+                                  scale: 0.7,
+                                  child: Switch.adaptive(
+                                    value: _isLifetime,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        _isLifetime = val;
+                                        if (val) {
+                                          _durationOptions.clear();
+                                        } else if (_durationOptions.isEmpty) {
+                                          _durationOptions.add(DurationOptionController());
+                                        }
+                                      });
+                                    },
+                                    activeTrackColor: CustomColors.purple,
+                                  ),
+                                ),
+                                Text(
+                                  _isLifetime ? 'Enabled' : 'Disabled',
+                                  style: _isLifetime
+                                      ? context.fonts.purple13w600
+                                      : context.fonts.grey13w500,
+                                ),
+                              ],
+                            ),
+                            context.verticalSpace(16),
+                            if (_isLifetime)
+                              BuildTextField(
+                                label: 'Lifetime Price (\$)',
+                                controller: _lifetimePriceController,
+                                hintText: '0.00',
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                validator: Validators.empty,
+                              )
+                            else ...[
+                              ...List.generate(_durationOptions.length, (index) {
+                                final option = _durationOptions[index];
+                                return Padding(
+                                  padding: context.appEdgeInsets(bottom: 16),
+                                  child: BorderdContainerWidget(
+                                    padding: context.appEdgeInsets(all: 16),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Expanded(
+                                              flex: 2,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Duration Option',
+                                                    style: context.fonts.black13w600,
+                                                  ),
+                                                  context.verticalSpace(8),
+                                                  Container(
+                                                    height: AppTheme.inputHeight,
+                                                    padding: context.appEdgeInsets(horizontal: 12),
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(color: CustomColors.border),
+                                                      borderRadius: context.borderRadius(all: 12),
+                                                    ),
+                                                    child: DropdownButtonHideUnderline(
+                                                      child: DropdownButton<String>(
+                                                        value: option.presetKey,
+                                                        isExpanded: true,
+                                                        icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                                                        items: DurationOptionController.presets.keys.map((String key) {
+                                                          return DropdownMenuItem<String>(
+                                                            value: key,
+                                                            child: Text(key, style: context.fonts.black14w400),
+                                                          );
+                                                        }).toList(),
+                                                        onChanged: (val) {
+                                                          setState(() {
+                                                            option.setPreset(val!);
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            context.horizontalSpace(16),
+                                            Expanded(
+                                              flex: 2,
+                                              child: BuildTextField(
+                                                label: 'Price (\$)',
+                                                controller: option.priceController,
+                                                hintText: '0.00',
+                                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                              ),
+                                            ),
+                                            context.horizontalSpace(16),
+                                            IconButton(
+                                              onPressed: () => _removeDurationOption(index),
+                                              icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.red),
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                          ],
+                                        ),
+                                        if (option.presetKey == 'Custom') ...[
+                                          context.verticalSpace(16),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: BuildTextField(
+                                                  label: 'Custom Name',
+                                                  controller: option.nameController,
+                                                  hintText: 'e.g. 2 Months',
+                                                ),
+                                              ),
+                                              context.horizontalSpace(16),
+                                              Expanded(
+                                                child: BuildTextField(
+                                                  label: 'Days',
+                                                  controller: option.daysController,
+                                                  hintText: '60',
+                                                  keyboardType: TextInputType.number,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
+                              context.verticalSpace(8),
+                              CustomOutlinedButton(
+                                onTap: _addDurationOption,
+                                label: 'Add Duration',
+                                width: context.w(160),
+                                icon: Icons.add,
+                              ),
+                            ],
+                            SizedBox(height: 32.h),
+
                             // SECTION 2: PLAN LIMITS
                             Text(
                               'SECTION 2: PLAN LIMITS',
                               style: context.fonts.sectionHeading,
                             ),
-                            SizedBox(height: 16.h),
+                            context.verticalSpace(4),
+                            Text(
+                              'Specify capacity limits for doctors, staff, and usage metrics.',
+                              style: context.fonts.grey13w500,
+                            ),
+                            SizedBox(height: 24.h),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
@@ -420,7 +652,12 @@ class _CreateClinicsSubscriptionPlanScreenState
                               'SECTION 3: COMMISSION & FEES',
                               style: context.fonts.sectionHeading,
                             ),
-                            SizedBox(height: 16.h),
+                            context.verticalSpace(4),
+                            Text(
+                              'Set the revenue share percentages and technical fees for this plan.',
+                              style: context.fonts.grey13w500,
+                            ),
+                            SizedBox(height: 24.h),
                             Row(
                               children: [
                                 Expanded(
@@ -462,7 +699,12 @@ class _CreateClinicsSubscriptionPlanScreenState
                               'SECTION 4: PLAN FEATURES & BENEFITS',
                               style: context.fonts.sectionHeading,
                             ),
-                            SizedBox(height: 16.h),
+                            context.verticalSpace(4),
+                            Text(
+                              'Manage the list of services and features included in this tier.',
+                              style: context.fonts.grey13w500,
+                            ),
+                            SizedBox(height: 24.h),
                             ..._planBenefits.map(
                               (benefit) => CheckboxListTile(
                                 title: Text(
@@ -525,7 +767,12 @@ class _CreateClinicsSubscriptionPlanScreenState
                               'SECTION 5: PLAN VISIBILITY',
                               style: context.fonts.sectionHeading,
                             ),
-                            SizedBox(height: 16.h),
+                            context.verticalSpace(4),
+                            Text(
+                              'Define which clinics are eligible to view and select this subscription.',
+                              style: context.fonts.grey13w500,
+                            ),
+                            SizedBox(height: 24.h),
                             _buildVisibilitySectionContent(),
                           ],
                         ),
@@ -548,6 +795,7 @@ class _CreateClinicsSubscriptionPlanScreenState
         Text('Target Availability', style: context.fonts.black14w600),
         context.verticalSpace(12),
         Container(
+          height: AppTheme.inputHeight,
           padding: context.appEdgeInsets(horizontal: 16),
           decoration: BoxDecoration(
             border: Border.all(color: CustomColors.border),
@@ -557,10 +805,11 @@ class _CreateClinicsSubscriptionPlanScreenState
             child: DropdownButton<String>(
               value: _visibilityType,
               isExpanded: true,
+              icon: const Icon(Icons.keyboard_arrow_down_rounded),
               items: ['All Clinics', 'Specific Clinics'].map((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value, style: context.fonts.grey14w400),
+                  child: Text(value, style: context.fonts.black14w400),
                 );
               }).toList(),
               onChanged: (val) {
@@ -606,20 +855,20 @@ class _CreateClinicsSubscriptionPlanScreenState
             spacing: context.w(8),
             runSpacing: context.h(8),
             children:
-                _selectedClinics.map((email) {
+                _selectedClinics.map((id) {
                   final clinic = clinics.firstWhere(
-                    (c) => c.email == email,
+                    (c) => c.id == id,
                     orElse: () => clinics.first,
                   );
                   return Chip(
                     label: Text(
-                      clinic.name ?? email,
+                      clinic.name ?? 'ID: $id',
                       style: context.fonts.black13w500,
                     ),
                     backgroundColor: CustomColors.green.withValues(alpha: 0.1),
                     deleteIcon: const Icon(Icons.close, size: 14),
                     onDeleted:
-                        () => setState(() => _selectedClinics.remove(email)),
+                        () => setState(() => _selectedClinics.remove(id)),
                     shape: RoundedRectangleBorder(
                       borderRadius: context.borderRadius(all: 8),
                       side: BorderSide.none,
@@ -654,7 +903,7 @@ class _CreateClinicsSubscriptionPlanScreenState
                       itemBuilder: (context, index) {
                         final clinic = filteredClinics[index];
                         final isSelected = _selectedClinics.contains(
-                          clinic.email,
+                          clinic.id,
                         );
                         return CheckboxListTile(
                           title: Text(
@@ -669,9 +918,9 @@ class _CreateClinicsSubscriptionPlanScreenState
                           onChanged: (val) {
                             setState(() {
                               if (val == true) {
-                                _selectedClinics.add(clinic.email!);
+                                if (clinic.id != null) _selectedClinics.add(clinic.id!);
                               } else {
-                                _selectedClinics.remove(clinic.email);
+                                _selectedClinics.remove(clinic.id);
                               }
                             });
                           },
@@ -708,5 +957,62 @@ class _CreateClinicsSubscriptionPlanScreenState
         Text(label, style: context.fonts.grey13w600),
       ],
     );
+  }
+}
+
+class DurationOptionController {
+  final TextEditingController nameController;
+  final TextEditingController daysController;
+  final TextEditingController priceController;
+  String presetKey;
+
+  static const Map<String, int> presets = {
+    '1 Month': 30,
+    '3 Months': 90,
+    '6 Months': 180,
+    '1 Year': 365,
+    'Custom': 0,
+  };
+
+  DurationOptionController({
+    String? name,
+    int? days,
+    double initialPrice = 0.00,
+  })  : nameController = TextEditingController(text: name),
+        daysController = TextEditingController(text: days?.toString()),
+        priceController = TextEditingController(text: initialPrice.toString()),
+        presetKey = _determinePresetKey(name, days);
+
+  factory DurationOptionController.fromOption(SubscriptionDurationOption option) {
+    return DurationOptionController(
+      name: option.name,
+      days: option.duration,
+      initialPrice: option.price,
+    );
+  }
+
+  static String _determinePresetKey(String? name, int? days) {
+    if (name == null || days == null) return '1 Month';
+    for (var entry in presets.entries) {
+      if (entry.key == name && entry.value == days) return entry.key;
+    }
+    return 'Custom';
+  }
+
+  void setPreset(String key) {
+    presetKey = key;
+    if (key != 'Custom') {
+      nameController.text = key;
+      daysController.text = presets[key].toString();
+    }
+  }
+
+  String getName() => nameController.text;
+  int getDays() => int.tryParse(daysController.text) ?? 0;
+
+  void dispose() {
+    nameController.dispose();
+    daysController.dispose();
+    priceController.dispose();
   }
 }

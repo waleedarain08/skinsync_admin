@@ -3,6 +3,7 @@ import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
 import 'package:skinsync_admin/models/clinic_web_request_model.dart';
 import 'package:skinsync_admin/models/founder_clinic_model.dart';
 import 'package:skinsync_admin/models/patient_subscription_plan_model.dart';
+import 'package:skinsync_admin/models/subscription_plan_benefit_model.dart';
 
 class TreatmentData {
   // Category Hierarchy

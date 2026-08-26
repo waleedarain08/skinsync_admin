@@ -1,3 +1,6 @@
+import 'subscription_duration_option.dart';
+import 'subscription_plan_benefit_model.dart';
+
 class ClinicSubscriptionPlanModel {
   int? id;
   String? name;
@@ -10,9 +13,11 @@ class ClinicSubscriptionPlanModel {
   double dynamicBookingCommissionPercent;
   double technologyFeePerTreatment;
   List<PlanBenefit>? benefits;
-  List<String>? assignedClinics;
+  List<int>? assignedClinics;
   bool isActive;
   bool isDefault;
+  bool isLifetime;
+  List<SubscriptionDurationOption>? durationOptions;
 
   ClinicSubscriptionPlanModel({
     this.id,
@@ -29,6 +34,8 @@ class ClinicSubscriptionPlanModel {
     this.assignedClinics,
     this.isActive = true,
     this.isDefault = false,
+    this.isLifetime = false,
+    this.durationOptions,
   });
 
   factory ClinicSubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
@@ -50,13 +57,20 @@ class ClinicSubscriptionPlanModel {
           (json['technology_fee_per_treatment'] as num?)?.toDouble() ?? 0.0,
       isActive: (json['is_active'] as bool?) ?? true,
       isDefault: (json['is_default'] as bool?) ?? false,
+      isLifetime: (json['is_lifetime'] as bool?) ?? false,
+      durationOptions: json['duration_options'] != null
+          ? (json['duration_options'] as List)
+              .map((e) =>
+                  SubscriptionDurationOption.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
       benefits: json['benefits'] != null
           ? (json['benefits'] as List)
               .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       assignedClinics: json['assigned_clinics'] != null
-          ? List<String>.from(json['assigned_clinics'] as Iterable)
+          ? List<int>.from(json['assigned_clinics'] as Iterable)
           : null,
     );
   }
@@ -75,35 +89,10 @@ class ClinicSubscriptionPlanModel {
       'technology_fee_per_treatment': technologyFeePerTreatment,
       'is_active': isActive,
       'is_default': isDefault,
+      'is_lifetime': isLifetime,
+      'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
       'benefits': benefits?.map((e) => e.toJson()).toList(),
       'assigned_clinics': assignedClinics,
-    };
-  }
-}
-
-class PlanBenefit {
-  String? title;
-  String? description;
-  int? freeMonths; // Kept for model flexibility but will be hidden from normal plan UI
-  bool enabled;
-
-  PlanBenefit({this.title, this.description, this.freeMonths, this.enabled = true});
-
-  factory PlanBenefit.fromJson(Map<String, dynamic> json) {
-    return PlanBenefit(
-      title: json['title'],
-      description: json['description'],
-      freeMonths: json['free_months'],
-      enabled: json['enabled'] ?? true,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'description': description,
-      'free_months': freeMonths,
-      'enabled': enabled,
     };
   }
 }
