@@ -54,7 +54,10 @@ class CreateClinicSubscriptionPlanRequest {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
+      'duration_options': durationOptions?.map((e) => {
+        'duration_id': e.duration?.id,
+        'price': e.basePrice,
+      }).toList(),
       'benefits': benefits?.map((e) => e.toJson()).toList(),
       'assigned_clinics': assignedClinics,
     };
