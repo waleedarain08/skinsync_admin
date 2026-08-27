@@ -3,12 +3,14 @@ class FormModel {
   final String? title;
   final String? url;
   final String? type; // 'consent' or 'compliance'
+  final String? globalSku;
 
   FormModel({
     this.id,
     this.title,
     this.url,
     this.type,
+    this.globalSku,
   });
 
   factory FormModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,7 @@ class FormModel {
       title: json['title'] as String?,
       url: json['url'] as String?,
       type: json['type'] as String?,
+      globalSku: json['global_sku'] as String?,
     );
   }
 
@@ -26,6 +29,7 @@ class FormModel {
       'title': title,
       'url': url,
       'type': type,
+      'global_sku': globalSku,
     };
   }
 }

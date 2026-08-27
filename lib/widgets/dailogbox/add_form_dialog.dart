@@ -2,6 +2,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/models/form_model.dart';
+import 'package:skinsync_admin/utils/sku_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/forms_view_model.dart';
@@ -20,6 +22,7 @@ class AddFormDialog extends StatefulWidget {
 class _AddFormDialogState extends State<AddFormDialog> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
+  final _skuController = TextEditingController();
   PlatformFile? _selectedFile;
 
   Future<void> _pickFile() async {
@@ -38,7 +41,24 @@ class _AddFormDialogState extends State<AddFormDialog> {
   @override
   void dispose() {
     _titleController.dispose();
+    _skuController.dispose();
     super.dispose();
+  }
+
+  void _generateSku(WidgetRef ref) {
+    final state = ref.read(formsViewModelProvider);
+    final List<FormModel> existingForms = [
+      ...(state.consentForms ?? []),
+      ...(state.complianceForms ?? []),
+    ];
+    final List<String> existingSkus = existingForms
+        .map((f) => f.globalSku ?? '')
+        .where((s) => s.isNotEmpty)
+        .toList();
+    
+    setState(() {
+      _skuController.text = SkuUtils.generateSku(existingSkus: existingSkus);
+    });
   }
 
   @override
@@ -57,6 +77,52 @@ class _AddFormDialogState extends State<AddFormDialog> {
               controller: _titleController,
               hintText: 'e.g. Standard Laser Consent',
               validator: Validators.empty,
+            ),
+            context.verticalSpace(24),
+            Consumer(
+              builder: (context, ref, _) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: BuildTextField(
+                        label: 'Global SKU',
+                        controller: _skuController,
+                        hintText: 'XXX-0000-XXXX',
+                        validator: (val) {
+                          final state = ref.read(formsViewModelProvider);
+                          final List<FormModel> existingForms = [
+                            ...(state.consentForms ?? []),
+                            ...(state.complianceForms ?? []),
+                          ];
+                          final List<String> existingSkus = existingForms
+                              .map((f) => f.globalSku ?? '')
+                              .where((s) => s.isNotEmpty)
+                              .toList();
+                          return SkuUtils.validateGlobalSku(val,
+                              existingSkus: existingSkus);
+                        },
+                      ),
+                    ),
+                    context.horizontalSpace(12),
+                    Padding(
+                      padding: context.appEdgeInsets(bottom: 2),
+                      child: IconButton.filled(
+                        onPressed: () => _generateSku(ref),
+                        icon: const Icon(Icons.auto_fix_high_rounded, size: 20),
+                        style: IconButton.styleFrom(
+                          backgroundColor: CustomColors.purple.withValues(alpha: 0.1),
+                          foregroundColor: CustomColors.purple,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: context.borderRadius(all: 10),
+                          ),
+                          fixedSize: Size(context.w(48), context.h(48)),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
             context.verticalSpace(24),
             Text('Form File (PDF)', style: context.fonts.black14w600),
@@ -116,6 +182,7 @@ class _AddFormDialogState extends State<AddFormDialog> {
                       .uploadAndCreateForm(
                         title: _titleController.text,
                         type: widget.type,
+                        sku: _skuController.text.trim(),
                         file: _selectedFile!,
                       );
                   if (success && context.mounted) {

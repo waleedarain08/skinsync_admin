@@ -8,6 +8,7 @@ import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/dailogbox/add_form_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/widgets/pagination_footer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FormsScreen extends ConsumerStatefulWidget {
@@ -73,8 +74,22 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildFormsGrid(context, state.consentForms ?? [], 'consent', state.loading),
-                  _buildFormsGrid(context, state.complianceForms ?? [], 'compliance', state.loading),
+                  _buildFormsGrid(
+                    context,
+                    state.consentForms ?? [],
+                    'consent',
+                    state.loading,
+                    state.consentPage,
+                    state.consentTotalPages,
+                  ),
+                  _buildFormsGrid(
+                    context,
+                    state.complianceForms ?? [],
+                    'compliance',
+                    state.loading,
+                    state.compliancePage,
+                    state.complianceTotalPages,
+                  ),
                 ],
               ),
             ),
@@ -98,25 +113,49 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
     );
   }
 
-  Widget _buildFormsGrid(BuildContext context, List<FormModel> forms, String type, bool isLoading) {
+  Widget _buildFormsGrid(
+    BuildContext context,
+    List<FormModel> forms,
+    String type,
+    bool isLoading,
+    int currentPage,
+    int totalPages,
+  ) {
     if (isLoading && forms.isEmpty) {
       return const Center(child: AppLoader());
     }
 
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: MediaQuery.sizeOf(context).width > 1200 ? 4 : 3,
-        crossAxisSpacing: context.w(24),
-        mainAxisSpacing: context.w(24),
-        childAspectRatio: 1.2,
-      ),
-      itemCount: forms.length + 1, // +1 for the "Add New" card
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return _buildAddFormCard(context, type);
-        }
-        return _buildFormCard(context, forms[index - 1], type);
-      },
+    return Column(
+      children: [
+        Expanded(
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: MediaQuery.sizeOf(context).width > 1200 ? 4 : 3,
+              crossAxisSpacing: context.w(24),
+              mainAxisSpacing: context.w(24),
+              childAspectRatio: 1.2,
+            ),
+            itemCount: forms.length + 1, // +1 for the "Add New" card
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return _buildAddFormCard(context, type);
+              }
+              return _buildFormCard(context, forms[index - 1], type);
+            },
+          ),
+        ),
+        if (totalPages > 1)
+          Padding(
+            padding: context.appEdgeInsets(top: 24),
+            child: PaginationFooter(
+              currentPage: currentPage,
+              totalPages: totalPages,
+              onPageChanged: (page) {
+                ref.read(formsViewModelProvider.notifier).getForms(type, page: page);
+              },
+            ),
+          ),
+      ],
     );
   }
 
@@ -186,8 +225,13 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
           Text(
             form.title ?? 'Untitled Form',
             style: context.fonts.black14w600,
-            maxLines: 2,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
+          ),
+          context.verticalSpace(4),
+          Text(
+            'SKU: ${form.globalSku ?? "N/A"}',
+            style: context.fonts.grey11w600,
           ),
           const Spacer(),
           TextButton.icon(

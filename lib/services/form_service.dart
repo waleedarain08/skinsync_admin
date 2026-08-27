@@ -1,4 +1,4 @@
-import 'package:skinsync_admin/models/form_model.dart';
+import 'package:skinsync_admin/models/requests/create_form_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/form_list_response.dart';
 import 'package:skinsync_admin/repositories/form_repository.dart';
@@ -12,10 +12,18 @@ class FormService implements FormRepository {
   FormService({required ApiBaseHelper api}) : _api = api;
 
   @override
-  Future<FormListResponse> getForms(String type) async {
+  Future<FormListResponse> getForms({
+    required String type,
+    int page = 1,
+    int limit = 10,
+  }) async {
     final jsonResponse = await _api.get(
       Endpoint.forms,
-      queryParams: {'type': type},
+      queryParams: {
+        'type': type,
+        'page': page.toString(),
+        'limit': limit.toString(),
+      },
     ) as Map<String, dynamic>;
     final response = FormListResponse.fromJson(jsonResponse);
     if (!response.isSuccess) throw BadRequestException(response.message);
@@ -23,12 +31,12 @@ class FormService implements FormRepository {
   }
 
   @override
-  Future<BaseApiResponseModel<dynamic>> createForm(FormModel form) async {
+  Future<FormListResponse> createForm(CreateFormRequest request) async {
     final jsonResponse = await _api.post(
       Endpoint.forms,
-      body: form.toJson(),
+      body: request.toJson(),
     );
-    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
+    final response = FormListResponse.fromJson(jsonResponse);
     if (!response.isSuccess) throw BadRequestException(response.message);
     return response;
   }
