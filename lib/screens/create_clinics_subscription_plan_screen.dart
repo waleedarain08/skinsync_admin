@@ -172,7 +172,6 @@ class _CreateClinicsSubscriptionPlanScreenState
       if (_durationOptions.isEmpty && !_isLifetime) {
         _durationOptions.add(DurationOptionController(
           selectedId: durations.first.id,
-          durations: durations,
         ));
       }
     });
@@ -604,6 +603,14 @@ class _CreateClinicsSubscriptionPlanScreenState
                                                         isExpanded: true,
                                                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
                                                         items: [
+                                                          // Always include selectedId if durations list doesn't have it yet (for Edit Mode safety)
+                                                          if (option.selectedId != null &&
+                                                              !(state.durations?.any((d) => d.id == option.selectedId) ?? false))
+                                                            DropdownMenuItem<int>(
+                                                              value: option.selectedId,
+                                                              child: Text(option.initialName ?? 'Loading...',
+                                                                  style: context.fonts.black14w400),
+                                                            ),
                                                           ...({
                                                             for (var d in (state.durations ?? []))
                                                               if (d.id != null &&
@@ -653,13 +660,12 @@ class _CreateClinicsSubscriptionPlanScreenState
                                 );
                               }),
                               context.verticalSpace(8),
-                              if ((state.durations?.length ?? 0) > _durationOptions.length)
-                                CustomOutlinedButton(
-                                  onTap: _addDurationOption,
-                                  label: 'Add Duration',
-                                  width: context.w(160),
-                                  icon: Icons.add,
-                                ),
+                              CustomOutlinedButton(
+                                onTap: _addDurationOption,
+                                label: 'Add Duration',
+                                width: context.w(160),
+                                icon: Icons.add,
+                              ),
                             ],
                             SizedBox(height: 32.h),
 
@@ -1083,14 +1089,17 @@ class _CreateClinicsSubscriptionPlanScreenState
 class DurationOptionController {
   final TextEditingController priceController;
   int? selectedId;
+  String? initialName;
 
   DurationOptionController({
     this.selectedId,
+    this.initialName,
     double initialPrice = 0.00,
     List<SubscriptionDuration> durations = const [],
   })  : priceController = TextEditingController(text: initialPrice.toString()) {
     if (selectedId == null && durations.isNotEmpty) {
       selectedId = durations.first.id;
+      initialName = durations.first.name;
     }
   }
 
@@ -1098,6 +1107,7 @@ class DurationOptionController {
       SubscriptionDurationOption option) {
     return DurationOptionController(
       selectedId: option.duration?.id,
+      initialName: option.duration?.name,
       initialPrice: option.basePrice ?? 0.0,
     );
   }

@@ -99,14 +99,13 @@ class _CreatePatientSubscriptionPlanScreenState
     _selectedBenefitIds = plan?.benefits?.map((e) => e.id).whereType<int>().toList() ?? [];
 
     if (plan?.durationOptions != null && plan!.durationOptions!.isNotEmpty) {
-      // In Edit mode, we don't have global durations list yet, so we just use what's in the option
       for (final option in plan.durationOptions!) {
         _durationOptions.add(
           DurationOptionController.fromOption(option),
         );
       }
     } else if (!_isLifetime && _durationOptions.isEmpty) {
-      // Create mode, will be setup after Load
+      // Setup after load if creating
     }
   }
 
@@ -118,16 +117,7 @@ class _CreatePatientSubscriptionPlanScreenState
       if (_durationOptions.isEmpty && !_isLifetime) {
         _durationOptions.add(DurationOptionController(
           selectedId: durations.first.id,
-          durations: durations,
         ));
-      } else {
-        // Ensure all existing options have a valid selectedId if possible
-        for (var option in _durationOptions) {
-          if (option.selectedId == null || !durations.any((d) => d.id == option.selectedId)) {
-             // If ID is missing from global list, but it's edit mode, maybe it was a bad parse
-             // Or keep it as is if it has a value.
-          }
-        }
       }
     });
   }
@@ -516,6 +506,14 @@ class _CreatePatientSubscriptionPlanScreenState
                                                         isExpanded: true,
                                                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
                                                         items: [
+                                                          // Always include selectedId if durations list doesn't have it yet (for Edit Mode safety)
+                                                          if (option.selectedId != null &&
+                                                              !(state.durations?.any((d) => d.id == option.selectedId) ?? false))
+                                                            DropdownMenuItem<int>(
+                                                              value: option.selectedId,
+                                                              child: Text(option.initialName ?? 'Loading...',
+                                                                  style: context.fonts.black14w400),
+                                                            ),
                                                           ...({
                                                             for (var d in (state.durations ?? []))
                                                               if (d.id != null &&
@@ -565,13 +563,12 @@ class _CreatePatientSubscriptionPlanScreenState
                                 );
                               }),
                               context.verticalSpace(8),
-                              if ((state.durations?.length ?? 0) > _durationOptions.length)
-                                CustomOutlinedButton(
-                                  onTap: _addDurationOption,
-                                  label: 'Add Duration',
-                                  width: context.w(160),
-                                  icon: Icons.add,
-                                ),
+                              CustomOutlinedButton(
+                                onTap: _addDurationOption,
+                                label: 'Add Duration',
+                                width: context.w(160),
+                                icon: Icons.add,
+                              ),
                             ],
                             SizedBox(height: 32.h),
 
@@ -819,14 +816,17 @@ class _CreatePatientSubscriptionPlanScreenState
 class DurationOptionController {
   final TextEditingController priceController;
   int? selectedId;
+  String? initialName;
 
   DurationOptionController({
     this.selectedId,
+    this.initialName,
     double initialPrice = 0.00,
     List<SubscriptionDuration> durations = const [],
   })  : priceController = TextEditingController(text: initialPrice.toString()) {
     if (selectedId == null && durations.isNotEmpty) {
       selectedId = durations.first.id;
+      initialName = durations.first.name;
     }
   }
 
@@ -834,6 +834,7 @@ class DurationOptionController {
       SubscriptionDurationOption option) {
     return DurationOptionController(
       selectedId: option.duration?.id,
+      initialName: option.duration?.name,
       initialPrice: option.basePrice ?? 0.0,
     );
   }
