@@ -31,12 +31,12 @@ class FormService implements FormRepository {
   }
 
   @override
-  Future<FormListResponse> createForm(CreateFormRequest request) async {
+  Future<BaseApiResponseModel<dynamic>> createForm(CreateFormRequest request) async {
     final jsonResponse = await _api.post(
       Endpoint.forms,
       body: request.toJson(),
     );
-    final response = FormListResponse.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
     if (!response.isSuccess) throw BadRequestException(response.message);
     return response;
   }
