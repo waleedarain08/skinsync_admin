@@ -18,12 +18,7 @@ class FormsViewModel extends BaseViewModel<FormsState> {
   final FormRepository _formRepository = locator<FormRepository>();
   final MediaService _mediaService = MediaService();
 
-  Future<void> initialize() async {
-    await Future.wait([
-      getForms('consent', initial: true),
-      getForms('compliance', initial: true),
-    ]);
-  }
+  
 
   Future<void> getForms(String type, {bool initial = false, int? page}) async {
     final currentPage = page ?? (type == 'consent' ? state.consentPage : state.compliancePage);
@@ -33,7 +28,7 @@ class FormsViewModel extends BaseViewModel<FormsState> {
     }
 
     return await runSafely(
-      showLoading: initial,
+      showLoading: false,
       onLoadingChange: (loading) {
         state = state.copyWith(loading: loading);
       },

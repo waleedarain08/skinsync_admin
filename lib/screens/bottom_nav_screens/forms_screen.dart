@@ -30,10 +30,16 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         setState(() {});
+
+        if (_tabController.index == 0) {
+          ref.read(formsViewModelProvider.notifier).getForms('consent', initial: true);
+        } else {
+          ref.read(formsViewModelProvider.notifier).getForms('compliance', initial: true);
+        }
       }
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(formsViewModelProvider.notifier).initialize();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(formsViewModelProvider.notifier).getForms('consent', initial: true);
     });
   }
 
