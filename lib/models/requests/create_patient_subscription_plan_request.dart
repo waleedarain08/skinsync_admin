@@ -41,7 +41,7 @@ class CreatePatientSubscriptionPlanRequest {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'base_price': basePrice, // Now allowing null/actual value as per CURL
+      'base_price': isLifetime ? basePrice : null,
       'assigned_patients': assignedPatients,
       'duration_options': durationOptions?.map((e) => {
         'duration_id': e.duration?.id,
