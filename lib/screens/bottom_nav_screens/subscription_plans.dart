@@ -204,7 +204,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
     ClinicSubscriptionPlanModel plan,
   ) {
     final activeBenefits =
-        plan.benefits?.where((b) => b.enabled).toList() ?? [];
+        plan.benefits?.where((b) => b.enabled).toList() ?? plan.benefits ?? [];
     final durationOptions = plan.durationOptions ?? [];
 
     return BorderdContainerWidget(
@@ -327,6 +327,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
               itemBuilder: (context, i) {
                 final benefit = activeBenefits[i];
                 return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(
                       Icons.check_rounded,
@@ -335,9 +336,24 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                     ),
                     context.horizontalSpace(8),
                     Expanded(
-                      child: Text(
-                        benefit.title ?? '',
-                        style: context.fonts.grey13w500,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            benefit.title ?? '',
+                            style: context.fonts.black13w600,
+                          ),
+                          if (benefit.description != null && benefit.description!.isNotEmpty)
+                            Padding(
+                              padding: context.appEdgeInsets(top: 2),
+                              child: Text(
+                                benefit.description!,
+                                style: context.fonts.grey11w400,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ],
@@ -382,7 +398,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
     PatientSubscriptionPlanModel plan,
   ) {
     final activeBenefits =
-        plan.benefits?.where((b) => b.enabled).toList() ?? [];
+        plan.benefits?.where((b) => b.enabled).toList() ?? plan.benefits ?? [];
     final durationOptions = plan.durationOptions ?? [];
 
     return BorderdContainerWidget(
@@ -486,33 +502,67 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
             plan.unlimitedPostsView ? 'Unlimited' : '${plan.postsViewCount}',
           ),
           context.verticalSpace(24),
-          Text('INCLUDED FEATURES', style: context.fonts.sectionHeading),
-          context.verticalSpace(16),
-          Expanded(
-            child: ListView.separated(
-              itemCount: activeBenefits.length,
-              separatorBuilder: (_, _) => context.verticalSpace(10),
-              itemBuilder: (context, i) {
-                final benefit = activeBenefits[i];
-                return Row(
-                  children: [
-                    const Icon(
-                      Icons.check_rounded,
-                      color: CustomColors.green,
-                      size: 16,
-                    ),
-                    context.horizontalSpace(8),
-                    Expanded(
-                      child: Text(
-                        benefit.title ?? '',
-                        style: context.fonts.grey13w500,
+          if (activeBenefits.isNotEmpty) ...[
+            Text('INCLUDED FEATURES', style: context.fonts.sectionHeading),
+            context.verticalSpace(16),
+            Expanded(
+              child: ListView.separated(
+                itemCount: activeBenefits.length,
+                separatorBuilder: (_, _) => context.verticalSpace(10),
+                itemBuilder: (context, i) {
+                  final benefit = activeBenefits[i];
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.check_rounded,
+                            color: CustomColors.green,
+                            size: 16,
+                          ),
+                          context.horizontalSpace(8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  benefit.title ?? '',
+                                  style: context.fonts.black13w600,
+                                ),
+                                if (benefit.description != null &&
+                                    benefit.description!.isNotEmpty)
+                                  Padding(
+                                    padding: context.appEdgeInsets(top: 2),
+                                    child: Text(
+                                      benefit.description!,
+                                      style: context.fonts.grey11w400,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                if (benefit.sku != null &&
+                                    benefit.sku!.isNotEmpty)
+                                  Padding(
+                                    padding: context.appEdgeInsets(top: 2),
+                                    child: Text(
+                                      'SKU: ${benefit.sku}',
+                                      style: context.fonts.purple10w600,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
+          ] else
+            const Spacer(),
           context.verticalSpace(24),
           Row(
             children: [

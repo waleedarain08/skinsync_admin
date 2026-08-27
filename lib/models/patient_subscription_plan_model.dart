@@ -39,8 +39,8 @@ class PatientSubscriptionPlanModel {
       basePrice: (json['base_price'] as num?)?.toDouble(),
       simulationCount: json['simulation_count'] as int? ?? 0,
       unlimitedSimulations:
-          (json['unlimited_simulations'] as bool?) ??
           (json['unlimited_simulation'] as bool?) ??
+          (json['unlimited_simulations'] as bool?) ??
           false,
       postsViewCount: json['posts_view_count'] as int? ?? 0,
       unlimitedPostsView: json['unlimited_posts_view'] as bool? ?? false,
@@ -84,10 +84,7 @@ class PatientSubscriptionPlanModel {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'duration_options': durationOptions?.map((e) => {
-        'duration_id': e.duration?.id,
-        'base_price': e.basePrice,
-      }).toList(),
+      'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
       'benefits': benefits?.map((e) => e.toJson()).toList(),
       'assigned_patients': assignedPatients?.map((e) => e.patientId).toList(),
     };
