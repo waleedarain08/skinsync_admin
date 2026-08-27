@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinsync_admin/utils/theme.dart';
-import 'package:skinsync_admin/view_models/session_view_model.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
+import '../../utils/theme.dart';
+import '../../view_models/session_view_model.dart';
+import '../../view_models/treatment_view_model.dart';
 
 class DowntimeStep extends ConsumerStatefulWidget {
   const DowntimeStep({super.key});
@@ -21,19 +22,11 @@ class _DowntimeStepState extends ConsumerState<DowntimeStep> {
     );
   }
 
-  String _descriptionForLevel(String? level) {
-    switch (level?.toLowerCase()) {
-      case 'none':
-        return 'No booking restrictions.';
-      case 'low':
-        return 'Short recovery window.';
-      case 'moderate':
-        return 'Standard clinical recovery.';
-      case 'high':
-        return 'Extended recovery required.';
-      default:
-        return 'Recovery window for this level.';
-    }
+  // Generic description built purely from the days value returned by the API.
+  // No per-level hardcoding.
+  String _describeDowntime(int days) {
+    if (days == 0) return 'No booking restrictions.';
+    return 'Patient cannot book other services for $days day${days == 1 ? '' : 's'}.';
   }
 
   Widget _downtimeOption(
@@ -121,7 +114,8 @@ class _DowntimeStepState extends ConsumerState<DowntimeStep> {
   Widget build(BuildContext context) {
     final state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
-    final levels = state.downTimeLevelList;
+
+    final downtimeLevels = state.downTimeLevelList ;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,29 +128,29 @@ class _DowntimeStepState extends ConsumerState<DowntimeStep> {
         ),
         context.verticalSpace(32),
 
-        if (state.loading)
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: CircularProgressIndicator(color: CustomColors.purple),
-            ),
-          )
-        else if (levels.isEmpty)
+        if (downtimeLevels.isEmpty)
           Text(
-            'No downtime levels configured for this treatment.',
-            style: context.fonts.grey13w500,
+            'No downtime levels available for this treatment.',
+            style: context.fonts.grey14w400,
           )
         else
-          for (int i = 0; i < levels.length; i++) ...[
-            _downtimeOption(
-              context,
-              levels[i].level ?? 'Level ${i + 1}',
-              '${levels[i].days ?? 0} Days',
-              _descriptionForLevel(levels[i].level),
-              state.downtimeLevel == levels[i].level,
-              () => viewModel.setDowntimeLevel(levels[i].level ?? ''),
+          for (int i = 0; i < downtimeLevels.length; i++) ...[
+            if (i != 0) context.verticalSpace(16),
+            Builder(
+              builder: (context) {
+                final item = downtimeLevels[i];
+                final level = item.level?.capitalize ?? '';
+                final days = item.days ?? 0;
+                return _downtimeOption(
+                  context,
+                  level,
+                  '$days Days',
+                  _describeDowntime(days),
+                  state.downtimeLevel == level,
+                  () => viewModel.setDowntimeLevel(level),
+                );
+              },
             ),
-            if (i != levels.length - 1) context.verticalSpace(16),
           ],
       ],
     );
