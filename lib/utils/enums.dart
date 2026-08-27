@@ -92,7 +92,8 @@ enum Endpoint {
   patientTreatmentRequest('admin/patient-treatment-request'),
   updatePatientStatus('admin/patient/status/{id}'),
   founderClinicDetail('admin/founder-clinic/detail/{id}'),
-  deductionTimings('admin/deduction-timings');
+  deductionTimings('admin/deduction-timings'),
+  subscriptionDurations('admin/subscription-durations');
 
   final String path;
   const Endpoint(this.path);

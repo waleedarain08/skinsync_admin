@@ -15,7 +15,9 @@ import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
+import '../models/subscription_duration_model.dart';
 import '../models/subscription_duration_option.dart';
+import '../widgets/dailogbox/subscription_duration_dialog.dart';
 
 class CreateClinicsSubscriptionPlanScreen extends ConsumerStatefulWidget {
   static const String routeName = '/create-clinics-subscription-plan';
@@ -110,6 +112,9 @@ class _CreateClinicsSubscriptionPlanScreenState
     _initializeBenefits();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(subscriptionViewModelProvider.notifier)
+          .getSubscriptionDurations(showLoading: true);
       ref.read(clinicViewModelProvider.notifier).initialize();
     });
   }
@@ -146,9 +151,10 @@ class _CreateClinicsSubscriptionPlanScreenState
         _selectedClinics.isEmpty ? 'All Clinics' : 'Specific Clinics';
 
     if (plan?.durationOptions != null && plan!.durationOptions!.isNotEmpty) {
+      final durations = ref.read(subscriptionViewModelProvider).durations ?? [];
       for (final option in plan.durationOptions!) {
         _durationOptions.add(
-          DurationOptionController.fromOption(option),
+          DurationOptionController.fromOption(option, durations),
         );
       }
     } else if (!_isLifetime) {
@@ -493,6 +499,18 @@ class _CreateClinicsSubscriptionPlanScreenState
                                       ? context.fonts.purple13w600
                                       : context.fonts.grey13w500,
                                 ),
+                                const Spacer(),
+                                CustomOutlinedButton(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => const SubscriptionDurationDialog(),
+                                    );
+                                  },
+                                  label: 'Create Duration',
+                                  icon: Icons.add,
+                                  width: 160.w,
+                                ),
                               ],
                             ),
                             context.verticalSpace(16),
@@ -538,15 +556,15 @@ class _CreateClinicsSubscriptionPlanScreenState
                                                         value: option.presetKey,
                                                         isExpanded: true,
                                                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                                                        items: DurationOptionController.presets.keys.map((String key) {
-                                                          return DropdownMenuItem<String>(
-                                                            value: key,
-                                                            child: Text(key, style: context.fonts.black14w400),
-                                                          );
-                                                        }).toList(),
+                                                        items: [
+                                                          ...state.durations?.map((d) => DropdownMenuItem<String>(
+                                                            value: d.name ?? '',
+                                                            child: Text(d.name ?? '', style: context.fonts.black14w400),
+                                                          )) ?? [],
+                                                        ],
                                                         onChanged: (val) {
                                                           setState(() {
-                                                            option.setPreset(val!);
+                                                            option.setPreset(val!, state.durations ?? []);
                                                           });
                                                         },
                                                       ),
@@ -573,29 +591,6 @@ class _CreateClinicsSubscriptionPlanScreenState
                                             ),
                                           ],
                                         ),
-                                        if (option.presetKey == 'Custom') ...[
-                                          context.verticalSpace(16),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: BuildTextField(
-                                                  label: 'Custom Name',
-                                                  controller: option.nameController,
-                                                  hintText: 'e.g. 2 Months',
-                                                ),
-                                              ),
-                                              context.horizontalSpace(16),
-                                              Expanded(
-                                                child: BuildTextField(
-                                                  label: 'Days',
-                                                  controller: option.daysController,
-                                                  hintText: '60',
-                                                  keyboardType: TextInputType.number,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
                                       ],
                                     ),
                                   ),
@@ -1034,45 +1029,43 @@ class DurationOptionController {
   final TextEditingController priceController;
   String presetKey;
 
-  static const Map<String, int> presets = {
-    '1 Month': 30,
-    '3 Months': 90,
-    '6 Months': 180,
-    '1 Year': 365,
-    'Custom': 0,
-  };
-
   DurationOptionController({
     String? name,
     int? days,
     double initialPrice = 0.00,
+    List<SubscriptionDuration> durations = const [],
   })  : nameController = TextEditingController(text: name),
         daysController = TextEditingController(text: days?.toString()),
         priceController = TextEditingController(text: initialPrice.toString()),
-        presetKey = _determinePresetKey(name, days);
+        presetKey = determinePresetKey(name, days, durations);
 
-  factory DurationOptionController.fromOption(SubscriptionDurationOption option) {
+  factory DurationOptionController.fromOption(
+      SubscriptionDurationOption option, List<SubscriptionDuration> durations) {
     return DurationOptionController(
       name: option.name,
       days: option.duration,
       initialPrice: option.price,
+      durations: durations,
     );
   }
 
-  static String _determinePresetKey(String? name, int? days) {
-    if (name == null || days == null) return '1 Month';
-    for (var entry in presets.entries) {
-      if (entry.key == name && entry.value == days) return entry.key;
+  static String determinePresetKey(
+      String? name, int? days, List<SubscriptionDuration> durations) {
+    if (name == null || days == null) {
+      return durations.isNotEmpty ? (durations.first.name ?? '') : '';
     }
-    return 'Custom';
+    for (var d in durations) {
+      if (d.name == name && d.duration == days) return d.name!;
+    }
+    return durations.isNotEmpty ? (durations.first.name ?? '') : '';
   }
 
-  void setPreset(String key) {
+  void setPreset(String key, List<SubscriptionDuration> durations) {
     presetKey = key;
-    if (key != 'Custom') {
-      nameController.text = key;
-      daysController.text = presets[key].toString();
-    }
+    final match = durations.firstWhere((d) => d.name == key,
+        orElse: () => durations.first);
+    nameController.text = match.name ?? '';
+    daysController.text = (match.duration ?? 0).toString();
   }
 
   String getName() => nameController.text;

@@ -2,6 +2,7 @@ import '../models/clinic_subscription_plan_model.dart';
 import '../models/patient_subscription_plan_model.dart';
 import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../models/requests/create_patient_subscription_plan_request.dart';
+import '../models/subscription_duration_model.dart';
 
 abstract class SubscriptionRepository {
   // Clinics
@@ -15,4 +16,8 @@ abstract class SubscriptionRepository {
   Future<PatientSubscriptionPlanModel> createPatientSubscriptionPlan(CreatePatientSubscriptionPlanRequest request);
   Future<PatientSubscriptionPlanModel> updatePatientSubscriptionPlan(int id, CreatePatientSubscriptionPlanRequest request);
   Future<bool> deletePatientSubscriptionPlan(int id);
+
+  // Durations
+  Future<List<SubscriptionDuration>> getSubscriptionDurations();
+  Future<SubscriptionDuration> createSubscriptionDuration(Map<String, dynamic> data);
 }

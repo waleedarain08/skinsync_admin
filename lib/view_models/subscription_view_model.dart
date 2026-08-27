@@ -4,6 +4,7 @@ import '../models/clinic_subscription_plan_model.dart';
 import '../models/patient_subscription_plan_model.dart';
 import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../models/requests/create_patient_subscription_plan_request.dart';
+import '../models/subscription_duration_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
 import 'base_state_model.dart';
@@ -21,7 +22,11 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
       locator<SubscriptionRepository>();
 
   Future<void> initialize() async {
-    await Future.wait([getSubscriptionPlans(), getPatientSubscriptionPlans()]);
+    await Future.wait([
+      getSubscriptionPlans(),
+      getPatientSubscriptionPlans(),
+      getSubscriptionDurations(),
+    ]);
   }
 
   // ---------------- CLINICS ----------------
@@ -135,27 +140,58 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
 
     return success;
   }
+
+  // ---------------- DURATIONS ----------------
+
+  Future<void> getSubscriptionDurations({bool showLoading = false}) async {
+    return await runSafely(
+      showLoading: showLoading,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final durations = await _subscriptionRepository
+            .getSubscriptionDurations();
+        state = state.copyWith(durations: durations);
+      },
+    );
+  }
+
+  Future<bool> createSubscriptionDuration(Map<String, dynamic> data) async {
+    final success =
+        await runSafely<bool?>(showLoading: true, () async {
+          await _subscriptionRepository.createSubscriptionDuration(data);
+          await getSubscriptionDurations();
+          return true;
+        }) ??
+        false;
+    return success;
+  }
 }
 
 class SubscriptionState extends BaseStateModel {
   final List<ClinicSubscriptionPlanModel>? plans;
   final List<PatientSubscriptionPlanModel>? patientPlans;
+  final List<SubscriptionDuration>? durations;
 
   SubscriptionState({
     super.loading,
     this.plans = const [],
     this.patientPlans = const [],
+    this.durations = const [],
   });
 
   SubscriptionState copyWith({
     bool? loading,
     List<ClinicSubscriptionPlanModel>? plans,
     List<PatientSubscriptionPlanModel>? patientPlans,
+    List<SubscriptionDuration>? durations,
   }) {
     return SubscriptionState(
       loading: loading ?? this.loading,
       plans: plans ?? this.plans,
       patientPlans: patientPlans ?? this.patientPlans,
+      durations: durations ?? this.durations,
     );
   }
 }

@@ -4,6 +4,7 @@ import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../models/requests/create_patient_subscription_plan_request.dart';
 import '../models/responses/clinic_subscription_plan_response.dart';
 import '../models/responses/patient_subscription_plan_response.dart';
+import '../models/subscription_duration_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../utils/dummy_data.dart';
 import '../utils/enums.dart';
@@ -139,5 +140,44 @@ class SubscriptionServices implements SubscriptionRepository {
       );
     }
     return true;
+  }
+
+  // ---------------- DURATIONS ----------------
+
+  @override
+  Future<List<SubscriptionDuration>> getSubscriptionDurations() async {
+    final jsonResponse =
+        await _api.get(Endpoint.subscriptionDurations) as Map<String, dynamic>;
+    final isSuccess = (jsonResponse['is_success'] as bool?) ?? false;
+
+    if (!isSuccess) {
+      throw BadRequestException(
+        jsonResponse['message']?.toString() ?? 'Failed to fetch durations',
+      );
+    }
+
+    final data = jsonResponse['data'] as List<dynamic>? ?? [];
+    return data
+        .map((e) => SubscriptionDuration.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  @override
+  Future<SubscriptionDuration> createSubscriptionDuration(
+    Map<String, dynamic> data,
+  ) async {
+    final jsonResponse = await _api.post(
+      Endpoint.subscriptionDurations,
+      body: data,
+    );
+    final isSuccess = (jsonResponse['is_success'] as bool?) ?? false;
+    if (!isSuccess) {
+      throw BadRequestException(
+        jsonResponse['message']?.toString() ?? 'Failed to create duration',
+      );
+    }
+    return SubscriptionDuration.fromJson(
+      jsonResponse['data'] as Map<String, dynamic>,
+    );
   }
 }
