@@ -14,11 +14,16 @@ class SubscriptionDurationOption {
     if (json['duration'] != null) {
       duration = SubscriptionDuration.fromJson(
           json['duration'] as Map<String, dynamic>);
+    } else if (json['duration_id'] != null) {
+      duration = SubscriptionDuration(
+        id: (json['duration_id'] as num?)?.toInt(),
+        name: json['name'] as String?,
+      );
     } else if (json['id'] != null || json['name'] != null) {
       duration = SubscriptionDuration(
-        id: json['id'] as int?,
+        id: (json['id'] as num?)?.toInt(),
         name: json['name'] as String?,
-        duration: json['duration_days'] as int? ?? json['duration'] as int?,
+        duration: (json['duration_days'] as num?)?.toInt() ?? (json['duration'] as num?)?.toInt(),
       );
     }
 

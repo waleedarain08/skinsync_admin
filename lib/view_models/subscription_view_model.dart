@@ -2,11 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/clinic_subscription_plan_model.dart';
 import '../models/patient_subscription_plan_model.dart';
+import '../models/requests/create_benefit_request.dart';
 import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../models/requests/create_patient_subscription_plan_request.dart';
 import '../models/requests/create_subscription_duration_request.dart';
 import '../models/responses/base_response_model.dart';
 import '../models/subscription_duration_model.dart';
+import '../models/subscription_plan_benefit_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
 import 'base_state_model.dart';
@@ -27,6 +29,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
     await Future.wait([
       getSubscriptionPlans(),
       getPatientSubscriptionPlans(),
+      getBenefits(),
       //getSubscriptionDurations(),
     ]);
   }
@@ -149,6 +152,38 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
     return success;
   }
 
+  // ---------------- BENEFITS ----------------
+
+  Future<void> getBenefits() async {
+    return await runSafely(
+      showLoading: false,
+      onLoadingChange: (loading) {
+        state = state.copyWith(loading: loading);
+      },
+      () async {
+        final response =
+            await _subscriptionRepository.getBenefits();
+        state = state.copyWith(patientBenefits: response.data);
+      },
+    );
+  }
+
+  Future<BaseApiResponseModel<dynamic>?> createBenefit(
+    CreateBenefitRequest request,
+  ) async {
+    final response = await runSafely<BaseApiResponseModel<dynamic>>(
+      showLoading: true,
+      () async {
+        final res = await _subscriptionRepository.createBenefit(request);
+        if (res.isSuccess) {
+          await getBenefits();
+        }
+        return res;
+      },
+    );
+    return response;
+  }
+
   // ---------------- DURATIONS ----------------
 
   Future<void> getSubscriptionDurations({bool showLoading = false}) async {
@@ -164,9 +199,9 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
     );
   }
 
-  Future<BaseApiResponseModel?> createSubscriptionDuration(CreateSubscriptionDurationRequest request) async {
+  Future<BaseApiResponseModel<dynamic>?> createSubscriptionDuration(CreateSubscriptionDurationRequest request) async {
     final response =
-        await runSafely<BaseApiResponseModel>(showLoading: true, () async {
+        await runSafely<BaseApiResponseModel<dynamic>>(showLoading: true, () async {
           final res = await _subscriptionRepository.createSubscriptionDuration(request);
           if (res.isSuccess) {
             await getSubscriptionDurations();
@@ -181,12 +216,14 @@ class SubscriptionState extends BaseStateModel {
   final List<ClinicSubscriptionPlanModel>? plans;
   final List<PatientSubscriptionPlanModel>? patientPlans;
   final List<SubscriptionDuration>? durations;
+  final List<PlanBenefit>? patientBenefits;
 
   SubscriptionState({
     super.loading,
     this.plans = const [],
     this.patientPlans = const [],
     this.durations = const [],
+    this.patientBenefits = const [],
   });
 
   SubscriptionState copyWith({
@@ -194,12 +231,14 @@ class SubscriptionState extends BaseStateModel {
     List<ClinicSubscriptionPlanModel>? plans,
     List<PatientSubscriptionPlanModel>? patientPlans,
     List<SubscriptionDuration>? durations,
+    List<PlanBenefit>? patientBenefits,
   }) {
     return SubscriptionState(
       loading: loading ?? this.loading,
       plans: plans ?? this.plans,
       patientPlans: patientPlans ?? this.patientPlans,
       durations: durations ?? this.durations,
+      patientBenefits: patientBenefits ?? this.patientBenefits,
     );
   }
 }

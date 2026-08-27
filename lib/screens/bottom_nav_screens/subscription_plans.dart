@@ -17,7 +17,6 @@ import '../create_clinics_subscription_plan_screen.dart';
 import '../create_patient_subscription_plan_screen.dart';
 
 class SubscriptionPlansTab extends ConsumerStatefulWidget {
-
   static const String routeName = '/subscription-plans';
   const SubscriptionPlansTab({super.key});
 
@@ -129,7 +128,8 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
     );
   }
 
-  Widget _buildClinicPlansContent(BuildContext context, SubscriptionState state) {
+  Widget _buildClinicPlansContent(
+      BuildContext context, SubscriptionState state) {
     final plans = state.plans ?? [];
 
     return ListView(
@@ -164,7 +164,8 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
     );
   }
 
-  Widget _buildPatientPlansContent(BuildContext context, SubscriptionState state) {
+  Widget _buildPatientPlansContent(
+      BuildContext context, SubscriptionState state) {
     final plans = state.patientPlans ?? [];
 
     return ListView(
@@ -216,13 +217,23 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(plan.name ?? 'N/A', style: context.fonts.black18w600),
+              Expanded(
+                child: Text(
+                  plan.name ?? 'N/A',
+                  style: context.fonts.black18w600,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              context.horizontalSpace(8),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   _statusBadge(plan.isActive),
                   if (plan.isLifetime == true) ...[
                     context.horizontalSpace(8),
-                    const AppBadge(label: 'Lifetime', variant: AppBadgeVariant.info),
+                    const AppBadge(
+                        label: 'Lifetime', variant: AppBadgeVariant.info),
                   ],
                 ],
               ),
@@ -246,45 +257,32 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
               ],
             )
           else if (durationOptions.isNotEmpty)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "\$${durationOptions.first.basePrice?.toStringAsFixed(2) ?? '0.00'}",
-                  style: context.fonts.black32w700.copyWith(
-                    color: CustomColors.purple,
-                    fontSize: context.sp(32),
-                  ),
-                ),
-                context.verticalSpace(8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: durationOptions.map((opt) {
-                    return AppBadge(
-                      label: '${opt.duration?.name ?? 'N/A'}: \$${opt.basePrice ?? '0.00'}',
-                      variant: AppBadgeVariant.neutral,
-                    );
-                  }).toList(),
-                ),
-              ],
+            Wrap(
+              spacing: 16,
+              runSpacing: 12,
+              children: durationOptions.map((opt) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      "\$${opt.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                      style: context.fonts.black32w700.copyWith(
+                        color: CustomColors.purple,
+                        fontSize: context.sp(24),
+                      ),
+                    ),
+                    Text(
+                      '/${opt.duration?.name ?? 'N/A'}',
+                      style: context.fonts.grey12w400,
+                    ),
+                  ],
+                );
+              }).toList(),
             )
           else
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
-                  style: context.fonts.black32w700.copyWith(
-                    color: CustomColors.purple,
-                    fontSize: context.sp(32),
-                  ),
-                ),
-                context.horizontalSpace(4),
-                Text('/ month', style: context.fonts.grey12w400),
-              ],
-            ),
+            const SizedBox.shrink(),
           context.verticalSpace(24),
           const Divider(),
           context.verticalSpace(24),
@@ -343,7 +341,8 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                             benefit.title ?? '',
                             style: context.fonts.black13w600,
                           ),
-                          if (benefit.description != null && benefit.description!.isNotEmpty)
+                          if (benefit.description != null &&
+                              benefit.description!.isNotEmpty)
                             Padding(
                               padding: context.appEdgeInsets(top: 2),
                               child: Text(
@@ -410,17 +409,28 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(plan.name ?? 'N/A', style: context.fonts.black18w600),
+              Expanded(
+                child: Text(
+                  plan.name ?? 'N/A',
+                  style: context.fonts.black18w600,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              context.horizontalSpace(8),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   _statusBadge(plan.isActive),
                   if (plan.isDefault == true) ...[
                     context.horizontalSpace(8),
-                    const AppBadge(label: 'Default', variant: AppBadgeVariant.info),
+                    const AppBadge(
+                        label: 'Default', variant: AppBadgeVariant.info),
                   ],
                   if (plan.isLifetime == true) ...[
                     context.horizontalSpace(8),
-                    const AppBadge(label: 'Lifetime', variant: AppBadgeVariant.info),
+                    const AppBadge(
+                        label: 'Lifetime', variant: AppBadgeVariant.info),
                   ],
                 ],
               ),
@@ -444,45 +454,32 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
               ],
             )
           else if (durationOptions.isNotEmpty)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "\$${durationOptions.first.basePrice?.toStringAsFixed(2) ?? '0.00'}",
-                  style: context.fonts.black32w700.copyWith(
-                    color: CustomColors.purple,
-                    fontSize: context.sp(32),
-                  ),
-                ),
-                context.verticalSpace(8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: durationOptions.map((opt) {
-                    return AppBadge(
-                      label: '${opt.duration?.name ?? 'N/A'}: \$${opt.basePrice ?? '0.00'}',
-                      variant: AppBadgeVariant.neutral,
-                    );
-                  }).toList(),
-                ),
-              ],
+            Wrap(
+              spacing: 16,
+              runSpacing: 12,
+              children: durationOptions.map((opt) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      "\$${opt.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                      style: context.fonts.black32w700.copyWith(
+                        color: CustomColors.purple,
+                        fontSize: context.sp(24),
+                      ),
+                    ),
+                    Text(
+                      '/${opt.duration?.name ?? 'N/A'}',
+                      style: context.fonts.grey12w400,
+                    ),
+                  ],
+                );
+              }).toList(),
             )
           else
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  "\$${plan.basePrice?.toStringAsFixed(2) ?? '0.00'}",
-                  style: context.fonts.black32w700.copyWith(
-                    color: CustomColors.purple,
-                    fontSize: context.sp(32),
-                  ),
-                ),
-                context.horizontalSpace(4),
-                Text('/ month', style: context.fonts.grey12w400),
-              ],
-            ),
+            const SizedBox.shrink(),
           context.verticalSpace(24),
           const Divider(),
           context.verticalSpace(24),
@@ -668,5 +665,3 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
     );
   }
 }
-
-

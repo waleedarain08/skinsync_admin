@@ -111,10 +111,13 @@ class _CreateClinicsSubscriptionPlanScreenState
     _initFromNormalPlan(widget.planToEdit);
     _initializeBenefits();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref
           .read(subscriptionViewModelProvider.notifier)
           .getSubscriptionDurations(showLoading: true);
+      
+      _syncDurations();
+
       ref.read(clinicViewModelProvider.notifier).initialize();
     });
   }
@@ -151,15 +154,28 @@ class _CreateClinicsSubscriptionPlanScreenState
         _selectedClinics.isEmpty ? 'All Clinics' : 'Specific Clinics';
 
     if (plan?.durationOptions != null && plan!.durationOptions!.isNotEmpty) {
-      final durations = ref.read(subscriptionViewModelProvider).durations ?? [];
       for (final option in plan.durationOptions!) {
         _durationOptions.add(
-          DurationOptionController.fromOption(option, durations),
+          DurationOptionController.fromOption(option),
         );
       }
     } else if (!_isLifetime && _durationOptions.isEmpty) {
-      _durationOptions.add(DurationOptionController());
+       // Setup after load
     }
+  }
+
+  void _syncDurations() {
+    final durations = ref.read(subscriptionViewModelProvider).durations ?? [];
+    if (durations.isEmpty) return;
+
+    setState(() {
+      if (_durationOptions.isEmpty && !_isLifetime) {
+        _durationOptions.add(DurationOptionController(
+          selectedId: durations.first.id,
+          durations: durations,
+        ));
+      }
+    });
   }
 
   void _initializeBenefits() {
@@ -222,8 +238,24 @@ class _CreateClinicsSubscriptionPlanScreenState
   }
 
   void _addDurationOption() {
+    final durations = ref.read(subscriptionViewModelProvider).durations ?? [];
+    if (durations.isEmpty) return;
+
+    // Find next available duration id
+    final usedIds = _durationOptions.map((e) => e.selectedId).toSet();
+    int? nextId;
+    for (final d in durations) {
+      if (!usedIds.contains(d.id)) {
+        nextId = d.id;
+        break;
+      }
+    }
+
     setState(() {
-      _durationOptions.add(DurationOptionController());
+      _durationOptions.add(DurationOptionController(
+        selectedId: nextId ?? durations.first.id,
+        durations: durations,
+      ));
     });
   }
 
@@ -255,7 +287,7 @@ class _CreateClinicsSubscriptionPlanScreenState
             ref.read(subscriptionViewModelProvider).durations ?? [];
         durationOptions = _durationOptions.map((e) {
           final durationObj = allDurations.firstWhere(
-            (d) => d.name == e.presetKey,
+            (d) => d.id == e.selectedId,
             orElse: () => allDurations.first,
           );
           return SubscriptionDurationOption(
@@ -493,7 +525,7 @@ class _CreateClinicsSubscriptionPlanScreenState
                                         if (val) {
                                           _durationOptions.clear();
                                         } else if (_durationOptions.isEmpty) {
-                                          _durationOptions.add(DurationOptionController());
+                                          _durationOptions.add(DurationOptionController(durations: state.durations ?? []));
                                         }
                                       });
                                     },
@@ -506,42 +538,37 @@ class _CreateClinicsSubscriptionPlanScreenState
                                       ? context.fonts.purple13w600
                                       : context.fonts.grey13w500,
                                 ),
+                                const Spacer(),
+                                CustomOutlinedButton(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => const SubscriptionDurationDialog(),
+                                    );
+                                  },
+                                  label: 'Create Duration',
+                                  icon: Icons.add,
+                                  width: 160.w,
+                                ),
                               ],
                             ),
-                            if (_isLifetime) ...[
-                              context.verticalSpace(16),
+                            context.verticalSpace(16),
+                            if (_isLifetime)
                               BuildTextField(
                                 label: 'Base Price (\$)',
                                 controller: _basePriceController,
                                 hintText: '0.00',
                                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                 validator: Validators.empty,
-                              ),
-                            ] else ...[
-                              context.verticalSpace(24),
-                              Row(
-                                children: [
-                                  Text(
-                                    'Duration Options',
-                                    style: context.fonts.black14w600,
-                                  ),
-                                  const Spacer(),
-                                  CustomOutlinedButton(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => const SubscriptionDurationDialog(),
-                                      );
-                                    },
-                                    label: 'Create Duration',
-                                    icon: Icons.add,
-                                    width: 160.w,
-                                  ),
-                                ],
-                              ),
-                              context.verticalSpace(16),
+                              )
+                            else ...[
                               ...List.generate(_durationOptions.length, (index) {
                                 final option = _durationOptions[index];
+                                final otherUsedIds = _durationOptions
+                                    .where((e) => e != option)
+                                    .map((e) => e.selectedId)
+                                    .toSet();
+
                                 return Padding(
                                   padding: context.appEdgeInsets(bottom: 16),
                                   child: BorderdContainerWidget(
@@ -554,7 +581,8 @@ class _CreateClinicsSubscriptionPlanScreenState
                                             Expanded(
                                               flex: 2,
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     'Duration Option',
@@ -569,21 +597,30 @@ class _CreateClinicsSubscriptionPlanScreenState
                                                       borderRadius: context.borderRadius(all: 12),
                                                     ),
                                                     child: DropdownButtonHideUnderline(
-                                                      child: DropdownButton<String>(
-                                                        value: option.presetKey.isEmpty && (state.durations?.isNotEmpty ?? false) 
-                                                            ? state.durations!.first.name 
-                                                            : option.presetKey,
+                                                      child: DropdownButton<int>(
+                                                        value: state.durations?.any((d) => d.id == option.selectedId) == true 
+                                                            ? option.selectedId 
+                                                            : null,
                                                         isExpanded: true,
                                                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
                                                         items: [
-                                                          ...state.durations?.map((d) => DropdownMenuItem<String>(
-                                                            value: d.name ?? '',
-                                                            child: Text(d.name ?? '', style: context.fonts.black14w400),
-                                                          )) ?? [],
+                                                          ...({
+                                                            for (var d in (state.durations ?? []))
+                                                              if (d.id != null &&
+                                                                  (d.id == option.selectedId ||
+                                                                      !otherUsedIds.contains(d.id)))
+                                                                d.id!: d
+                                                          })
+                                                              .values
+                                                              .map((d) => DropdownMenuItem<int>(
+                                                                    value: d.id,
+                                                                    child: Text(d.name ?? '',
+                                                                        style: context.fonts.black14w400),
+                                                                  )),
                                                         ],
                                                         onChanged: (val) {
                                                           setState(() {
-                                                            option.setPreset(val!, state.durations ?? []);
+                                                            option.selectedId = val;
                                                           });
                                                         },
                                                       ),
@@ -616,12 +653,13 @@ class _CreateClinicsSubscriptionPlanScreenState
                                 );
                               }),
                               context.verticalSpace(8),
-                              CustomOutlinedButton(
-                                onTap: _addDurationOption,
-                                label: 'Add Duration',
-                                width: context.w(160),
-                                icon: Icons.add,
-                              ),
+                              if ((state.durations?.length ?? 0) > _durationOptions.length)
+                                CustomOutlinedButton(
+                                  onTap: _addDurationOption,
+                                  label: 'Add Duration',
+                                  width: context.w(160),
+                                  icon: Icons.add,
+                                ),
                             ],
                             SizedBox(height: 32.h),
 
@@ -1043,56 +1081,28 @@ class _CreateClinicsSubscriptionPlanScreenState
 }
 
 class DurationOptionController {
-  final TextEditingController nameController;
-  final TextEditingController daysController;
   final TextEditingController priceController;
-  String presetKey;
+  int? selectedId;
 
   DurationOptionController({
-    String? name,
-    int? days,
+    this.selectedId,
     double initialPrice = 0.00,
     List<SubscriptionDuration> durations = const [],
-  })  : nameController = TextEditingController(text: name),
-        daysController = TextEditingController(text: days?.toString()),
-        priceController = TextEditingController(text: initialPrice.toString()),
-        presetKey = determinePresetKey(name, days, durations);
+  })  : priceController = TextEditingController(text: initialPrice.toString()) {
+    if (selectedId == null && durations.isNotEmpty) {
+      selectedId = durations.first.id;
+    }
+  }
 
   factory DurationOptionController.fromOption(
-      SubscriptionDurationOption option, List<SubscriptionDuration> durations) {
+      SubscriptionDurationOption option) {
     return DurationOptionController(
-      name: option.duration?.name,
-      days: option.duration?.duration,
+      selectedId: option.duration?.id,
       initialPrice: option.basePrice ?? 0.0,
-      durations: durations,
     );
   }
 
-  static String determinePresetKey(
-      String? name, int? days, List<SubscriptionDuration> durations) {
-    if (name == null || days == null) {
-      return durations.isNotEmpty ? (durations.first.name ?? '') : '';
-    }
-    for (var d in durations) {
-      if (d.name == name && d.duration == days) return d.name!;
-    }
-    return durations.isNotEmpty ? (durations.first.name ?? '') : '';
-  }
-
-  void setPreset(String key, List<SubscriptionDuration> durations) {
-    presetKey = key;
-    final match = durations.firstWhere((d) => d.name == key,
-        orElse: () => durations.first);
-    nameController.text = match.name ?? '';
-    daysController.text = (match.duration ?? 0).toString();
-  }
-
-  String getName() => nameController.text;
-  int getDays() => int.tryParse(daysController.text) ?? 0;
-
   void dispose() {
-    nameController.dispose();
-    daysController.dispose();
     priceController.dispose();
   }
 }

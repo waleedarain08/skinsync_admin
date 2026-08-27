@@ -94,6 +94,7 @@ enum Endpoint {
   founderClinicDetail('admin/founder-clinic/detail/{id}'),
   deductionTimings('admin/deduction-timings'),
   subscriptionDurations('admin/subscription-durations'),
+  benefits('admin/benefits'),
   forms('admin/forms'),
   deleteForm('admin/forms/{id}');
 
@@ -114,7 +115,7 @@ enum Status { active, inactive }
 enum BaseUrls {
   api('https://api.skinsyncai.com/api/'),
  // apiQa('https://api-dev.skinsyncai.com/api/');
-   apiQa('https://gecko-pure-gator.ngrok-free.app/api/');
+   apiQa('https://bgzh46mj-8084.inc1.devtunnels.ms/api/');
 
   final String url;
 

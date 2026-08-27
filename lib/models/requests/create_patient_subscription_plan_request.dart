@@ -13,6 +13,7 @@ class CreatePatientSubscriptionPlanRequest {
   final bool isDefault;
   final bool isLifetime;
   final List<SubscriptionDurationOption>? durationOptions;
+  final List<int>? benefitIds;
 
   CreatePatientSubscriptionPlanRequest({
     this.id,
@@ -27,6 +28,7 @@ class CreatePatientSubscriptionPlanRequest {
     this.isDefault = false,
     this.isLifetime = false,
     this.durationOptions,
+    this.benefitIds,
   });
 
   Map<String, dynamic> toJson() {
@@ -39,12 +41,13 @@ class CreatePatientSubscriptionPlanRequest {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'base_price': isLifetime ? (basePrice ?? 0) : 0,
+      'base_price': basePrice, // Now allowing null/actual value as per CURL
       'assigned_patients': assignedPatients,
       'duration_options': durationOptions?.map((e) => {
         'duration_id': e.duration?.id,
         'price': e.basePrice,
       }).toList(),
+      'benefit_ids': benefitIds,
     };
   }
 }

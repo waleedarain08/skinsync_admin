@@ -11,9 +11,9 @@ class SubscriptionDuration {
 
   factory SubscriptionDuration.fromJson(Map<String, dynamic> json) {
     return SubscriptionDuration(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt() ?? (json['duration_id'] as num?)?.toInt(),
       name: json['name'] as String?,
-      duration: json['duration'] as int?,
+      duration: (json['duration'] as num?)?.toInt() ?? (json['duration_days'] as num?)?.toInt(),
     );
   }
 
