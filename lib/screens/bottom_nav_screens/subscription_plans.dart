@@ -250,7 +250,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "\$${durationOptions.first.price.toStringAsFixed(2)}",
+                  "\$${durationOptions.first.basePrice?.toStringAsFixed(2) ?? '0.00'}",
                   style: context.fonts.black32w700.copyWith(
                     color: CustomColors.purple,
                     fontSize: context.sp(32),
@@ -262,7 +262,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                   runSpacing: 8,
                   children: durationOptions.map((opt) {
                     return AppBadge(
-                      label: '${opt.name}: \$${opt.price}',
+                      label: '${opt.duration?.name ?? 'N/A'}: \$${opt.basePrice ?? '0.00'}',
                       variant: AppBadgeVariant.neutral,
                     );
                   }).toList(),
@@ -432,7 +432,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "\$${durationOptions.first.price.toStringAsFixed(2)}",
+                  "\$${durationOptions.first.basePrice?.toStringAsFixed(2) ?? '0.00'}",
                   style: context.fonts.black32w700.copyWith(
                     color: CustomColors.purple,
                     fontSize: context.sp(32),
@@ -444,7 +444,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                   runSpacing: 8,
                   children: durationOptions.map((opt) {
                     return AppBadge(
-                      label: '${opt.name}: \$${opt.price}',
+                      label: '${opt.duration?.name ?? 'N/A'}: \$${opt.basePrice ?? '0.00'}',
                       variant: AppBadgeVariant.neutral,
                     );
                   }).toList(),

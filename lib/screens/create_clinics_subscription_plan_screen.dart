@@ -249,30 +249,40 @@ class _CreateClinicsSubscriptionPlanScreenState
       if (_isLifetime) {
         basePrice = double.tryParse(_basePriceController.text) ?? 0.0;
       } else {
+        final allDurations =
+            ref.read(subscriptionViewModelProvider).durations ?? [];
         durationOptions = _durationOptions.map((e) {
+          final durationObj = allDurations.firstWhere(
+            (d) => d.name == e.presetKey,
+            orElse: () => allDurations.first,
+          );
           return SubscriptionDurationOption(
-            name: e.getName(),
-            duration: e.getDays(),
-            price: double.tryParse(e.priceController.text) ?? 0.0,
+            duration: durationObj,
+            basePrice: double.tryParse(e.priceController.text) ?? 0.0,
           );
         }).toList();
 
-        if (durationOptions.any((d) => d.duration <= 0)) {
+        if (durationOptions.any((d) => (d.duration?.duration ?? 0) <= 0)) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('All durations must be greater than 0 days')),
+            const SnackBar(
+                content: Text('All durations must be greater than 0 days')),
           );
           return;
         }
-        
-        if (Set.from(durationOptions.map((e) => e.duration)).length != durationOptions.length) {
+
+        if (Set.from(durationOptions.map((e) => e.duration?.id)).length !=
+            durationOptions.length) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Duplicate duration options are not allowed')),
+            const SnackBar(
+                content: Text('Duplicate duration options are not allowed')),
           );
           return;
         }
-        // Use first option price as base price for compatibility if needed, 
+        // Use first option price as base price for compatibility if needed,
         // but backend should ideally use duration_options
-        basePrice = durationOptions.isNotEmpty ? durationOptions.first.price : 0.0;
+        basePrice = durationOptions.isNotEmpty
+            ? durationOptions.first.basePrice
+            : 0.0;
       }
 
       final request = CreateClinicSubscriptionPlanRequest(
@@ -1042,9 +1052,9 @@ class DurationOptionController {
   factory DurationOptionController.fromOption(
       SubscriptionDurationOption option, List<SubscriptionDuration> durations) {
     return DurationOptionController(
-      name: option.name,
-      days: option.duration,
-      initialPrice: option.price,
+      name: option.duration?.name,
+      days: option.duration?.duration,
+      initialPrice: option.basePrice ?? 0.0,
       durations: durations,
     );
   }

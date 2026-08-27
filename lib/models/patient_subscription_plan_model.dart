@@ -81,9 +81,12 @@ class PatientSubscriptionPlanModel {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
+      'duration_options': durationOptions?.map((e) => {
+        'duration_id': e.duration?.id,
+        'base_price': e.basePrice,
+      }).toList(),
       'benefits': benefits?.map((e) => e.toJson()).toList(),
-      'assigned_patients': assignedPatients?.map((e) => e.toJson()).toList(),
+      'assigned_patients': assignedPatients?.map((e) => e.patientId).toList(),
     };
   }
 }
@@ -92,14 +95,16 @@ class AssignedPatient {
   final int? id;
   final int? planId;
   final int? patientId;
+  final String? patientName;
 
-  const AssignedPatient({this.id, this.planId, this.patientId});
+  const AssignedPatient({this.id, this.planId, this.patientId, this.patientName});
 
   factory AssignedPatient.fromJson(Map<String, dynamic> json) {
     return AssignedPatient(
       id: json['id'],
       planId: json['plan_id'],
       patientId: json['patient_id'],
+      patientName: json['patient_name'],
     );
   }
 
@@ -108,6 +113,7 @@ class AssignedPatient {
       'id': id,
       'plan_id': planId,
       'patient_id': patientId,
+      'patient_name': patientName,
     };
   }
 }
