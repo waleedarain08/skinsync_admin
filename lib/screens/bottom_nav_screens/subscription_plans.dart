@@ -257,29 +257,36 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
               ],
             )
           else if (durationOptions.isNotEmpty)
-            Wrap(
-              spacing: 16,
-              runSpacing: 12,
-              children: durationOptions.map((opt) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      "\$${opt.basePrice?.toStringAsFixed(2) ?? '0.00'}",
-                      style: context.fonts.black32w700.copyWith(
-                        color: CustomColors.purple,
-                        fontSize: context.sp(24),
-                      ),
-                    ),
-                    Text(
-                      '/${opt.duration?.name ?? 'N/A'}',
-                      style: context.fonts.grey12w400,
-                    ),
-                  ],
-                );
-              }).toList(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 12,
+                  children: durationOptions.map((opt) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          "\$${opt.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                          style: context.fonts.black32w700.copyWith(
+                            color: CustomColors.purple,
+                            fontSize: context.sp(28),
+                          ),
+                        ),
+                        Text(
+                          '/${opt.duration?.name ?? 'N/A'}',
+                          style: context.fonts.grey12w400.copyWith(
+                            fontSize: context.sp(12),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
             )
           else
             const SizedBox.shrink(),
@@ -454,29 +461,36 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
               ],
             )
           else if (durationOptions.isNotEmpty)
-            Wrap(
-              spacing: 16,
-              runSpacing: 12,
-              children: durationOptions.map((opt) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      "\$${opt.basePrice?.toStringAsFixed(2) ?? '0.00'}",
-                      style: context.fonts.black32w700.copyWith(
-                        color: CustomColors.purple,
-                        fontSize: context.sp(24),
-                      ),
-                    ),
-                    Text(
-                      '/${opt.duration?.name ?? 'N/A'}',
-                      style: context.fonts.grey12w400,
-                    ),
-                  ],
-                );
-              }).toList(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 12,
+                  children: durationOptions.map((opt) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          "\$${opt.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                          style: context.fonts.black32w700.copyWith(
+                            color: CustomColors.purple,
+                            fontSize: context.sp(28),
+                          ),
+                        ),
+                        Text(
+                          '/${opt.duration?.name ?? 'N/A'}',
+                          style: context.fonts.grey12w400.copyWith(
+                            fontSize: context.sp(12),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
             )
           else
             const SizedBox.shrink(),

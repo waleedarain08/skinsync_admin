@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/screens/notification_screen.dart';
 
 import '../screens/sign_in_screen.dart';
 import '../services/locator.dart';
@@ -28,7 +29,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             tablet: () => _MenuButton(context: context), // Show hamburger on tablet too
           ),
           const Spacer(),
-          const _TopBarAction(icon: Icons.notifications_none_rounded, tooltip: 'Notifications', hasBadge: true),
+         _TopBarAction(
+            onTap: (){
+               context.pushNamed(NotificationScreen.routeName);
+            },
+            icon: Icons.notifications_none_rounded, tooltip: 'Notifications', hasBadge: true),
           context.horizontalSpace(20),
           const _TopBarAction(icon: Icons.help_outline_rounded, tooltip: 'Documentation'),
           context.horizontalSpace(20),
@@ -68,11 +73,13 @@ class _TopBarAction extends StatefulWidget {
   final IconData icon;
   final String tooltip;
   final bool hasBadge;
+   final VoidCallback? onTap;
 
   const _TopBarAction({
     required this.icon,
     required this.tooltip,
     this.hasBadge = false,
+    this.onTap,
   });
 
   @override
@@ -93,7 +100,7 @@ class _TopBarActionState extends State<_TopBarAction> {
           clipBehavior: Clip.none,
           children: [
             IconButton(
-              onPressed: () {},
+              onPressed:widget.onTap ??  () {},
               icon: Icon(widget.icon, size: context.sp(24)),
               color: _hovered ? CustomColors.purple : CustomColors.grey,
               style: IconButton.styleFrom(
