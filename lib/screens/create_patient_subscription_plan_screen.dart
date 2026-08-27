@@ -150,7 +150,7 @@ class _CreatePatientSubscriptionPlanScreenState
           DurationOptionController.fromOption(option, durations),
         );
       }
-    } else if (!_isLifetime) {
+    } else if (!_isLifetime && _durationOptions.isEmpty) {
       _durationOptions.add(DurationOptionController());
     }
   }
@@ -238,7 +238,9 @@ class _CreatePatientSubscriptionPlanScreenState
 
       if (_isLifetime) {
         basePrice = double.tryParse(_basePriceController.text) ?? 0.0;
+        durationOptions = [];
       } else {
+        basePrice = 0;
         final allDurations =
             ref.read(subscriptionViewModelProvider).durations ?? [];
         durationOptions = _durationOptions.map((e) {
@@ -268,9 +270,6 @@ class _CreatePatientSubscriptionPlanScreenState
           );
           return;
         }
-        basePrice = durationOptions.isNotEmpty
-            ? durationOptions.first.basePrice
-            : 0.0;
       }
 
       final request = CreatePatientSubscriptionPlanRequest(
@@ -292,7 +291,7 @@ class _CreatePatientSubscriptionPlanScreenState
         isDefault: _isDefault,
         isLifetime: _isLifetime,
         durationOptions: durationOptions,
-        benefits: _planBenefits,
+        //benefits: _planBenefits,
       );
 
       final success = await ref
@@ -492,30 +491,40 @@ class _CreatePatientSubscriptionPlanScreenState
                                       ? context.fonts.purple13w600
                                       : context.fonts.grey13w500,
                                 ),
-                                const Spacer(),
-                                CustomOutlinedButton(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => const SubscriptionDurationDialog(),
-                                    );
-                                  },
-                                  label: 'Create Duration',
-                                  icon: Icons.add,
-                                  width: 160.w,
-                                ),
                               ],
                             ),
-                            context.verticalSpace(16),
-                            if (_isLifetime)
+                            if (_isLifetime) ...[
+                              context.verticalSpace(16),
                               BuildTextField(
                                 label: 'Base Price (\$)',
                                 controller: _basePriceController,
                                 hintText: '0.00',
                                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                 validator: Validators.empty,
-                              )
-                            else ...[
+                              ),
+                            ] else ...[
+                              context.verticalSpace(24),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Duration Options',
+                                    style: context.fonts.black14w600,
+                                  ),
+                                  const Spacer(),
+                                  CustomOutlinedButton(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => const SubscriptionDurationDialog(),
+                                      );
+                                    },
+                                    label: 'Create Duration',
+                                    icon: Icons.add,
+                                    width: 160.w,
+                                  ),
+                                ],
+                              ),
+                              context.verticalSpace(16),
                               ...List.generate(_durationOptions.length, (index) {
                                 final option = _durationOptions[index];
                                 return Padding(
@@ -547,7 +556,9 @@ class _CreatePatientSubscriptionPlanScreenState
                                                     ),
                                                     child: DropdownButtonHideUnderline(
                                                       child: DropdownButton<String>(
-                                                        value: option.presetKey,
+                                                        value: option.presetKey.isEmpty && (state.durations?.isNotEmpty ?? false) 
+                                                            ? state.durations!.first.name 
+                                                            : option.presetKey,
                                                         isExpanded: true,
                                                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
                                                         items: [
@@ -758,7 +769,7 @@ class _CreatePatientSubscriptionPlanScreenState
                             //     ),
                             //   ],
                             // ),
-                         
+
                           ],
                         ),
                       ),
@@ -790,7 +801,7 @@ class _CreatePatientSubscriptionPlanScreenState
                       //     ],
                       //   ),
                       // ),
-                  
+
                     ],
                   ),
                 ),

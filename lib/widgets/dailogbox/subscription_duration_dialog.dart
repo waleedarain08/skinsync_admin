@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/models/requests/create_subscription_duration_request.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
@@ -28,12 +29,16 @@ class _SubscriptionDurationDialogState extends ConsumerState<SubscriptionDuratio
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
-      final success = await ref.read(subscriptionViewModelProvider.notifier).createSubscriptionDuration({
-        'name': _nameController.text.trim(),
-        'duration': int.tryParse(_durationController.text.trim()) ?? 0,
-      });
+      final request = CreateSubscriptionDurationRequest(
+        name: _nameController.text.trim(),
+        duration: int.tryParse(_durationController.text.trim()) ?? 0,
+      );
 
-      if (success && mounted) {
+      final response = await ref
+          .read(subscriptionViewModelProvider.notifier)
+          .createSubscriptionDuration(request);
+
+      if ((response?.isSuccess ?? false) && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Duration created successfully')),

@@ -2,11 +2,15 @@ import '../models/clinic_subscription_plan_model.dart';
 import '../models/patient_subscription_plan_model.dart';
 import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../models/requests/create_patient_subscription_plan_request.dart';
+import '../models/requests/create_subscription_duration_request.dart';
+import '../models/responses/base_response_model.dart';
+import '../models/responses/clinic_subscription_plan_list_response.dart';
 import '../models/responses/clinic_subscription_plan_response.dart';
+import '../models/responses/patient_subscription_plan_list_response.dart';
 import '../models/responses/patient_subscription_plan_response.dart';
-import '../models/subscription_duration_model.dart';
+import '../models/responses/subscription_duration_list_response.dart';
+import '../models/responses/subscription_duration_response.dart';
 import '../repositories/subscription_repository.dart';
-import '../utils/dummy_data.dart';
 import '../utils/enums.dart';
 import '../utils/exception.dart';
 import 'api_base_helper.dart';
@@ -19,10 +23,15 @@ class SubscriptionServices implements SubscriptionRepository {
   // ---------------- CLINICS ----------------
 
   @override
-  Future<List<ClinicSubscriptionPlanModel>> getSubscriptionPlans() async {
-    // Returning dummy data for now as requested
-    await Future<void>.delayed(const Duration(milliseconds: 500));
-    return TreatmentData.dummySubscriptionPlans;
+  Future<ClinicSubscriptionPlanListResponse> getSubscriptionPlans() async {
+    final jsonResponse =
+        await _api.get(Endpoint.subscriptionPlans) as Map<String, dynamic>;
+    final response = ClinicSubscriptionPlanListResponse.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
   }
 
   @override
@@ -54,47 +63,36 @@ class SubscriptionServices implements SubscriptionRepository {
   }
 
   @override
-  Future<bool> deleteSubscriptionPlan(int id) async {
+  Future<BaseApiResponseModel> deleteSubscriptionPlan(int id) async {
     final jsonResponse =
         await _api.delete(
               Endpoint.deleteSubscriptionPlan,
               pathParams: {'id': id.toString()},
             )
             as Map<String, dynamic>;
-    final isSuccess = (jsonResponse['is_success'] as bool?) ?? false;
-    if (!isSuccess) {
-      throw BadRequestException(
-        jsonResponse['message']?.toString() ?? 'Failed to delete plan',
-      );
+    final response = BaseApiResponseModel<Null>.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
     }
-    return true;
+    return response;
   }
 
   // ---------------- PATIENTS ----------------
 
   @override
-  Future<List<PatientSubscriptionPlanModel>>
+  Future<PatientSubscriptionPlanListResponse>
   getPatientSubscriptionPlans() async {
     final jsonResponse =
         await _api.get(Endpoint.patientSubscriptionPlans)
             as Map<String, dynamic>;
-    final isSuccess =
-        (jsonResponse['is_success'] as bool?) ??
-        (jsonResponse['status'] as bool?) ??
-        false;
-    if (!isSuccess) {
-      throw BadRequestException(
-        jsonResponse['message']?.toString() ?? 'Failed to fetch patient plans',
-      );
+    final response = PatientSubscriptionPlanListResponse.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
     }
 
-    final data = jsonResponse['data'] as List<dynamic>? ?? [];
-    return data
-        .map(
-          (e) =>
-              PatientSubscriptionPlanModel.fromJson(e as Map<String, dynamic>),
-        )
-        .toList();
+    return response;
   }
 
   @override
@@ -126,58 +124,49 @@ class SubscriptionServices implements SubscriptionRepository {
   }
 
   @override
-  Future<bool> deletePatientSubscriptionPlan(int id) async {
+  Future<BaseApiResponseModel> deletePatientSubscriptionPlan(int id) async {
     final jsonResponse =
         await _api.delete(
               Endpoint.deletePatientSubscriptionPlan,
               pathParams: {'id': id.toString()},
             )
             as Map<String, dynamic>;
-    final isSuccess = (jsonResponse['is_success'] as bool?) ?? false;
-    if (!isSuccess) {
-      throw BadRequestException(
-        jsonResponse['message']?.toString() ?? 'Failed to delete plan',
-      );
+    final response = BaseApiResponseModel<Null>.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
     }
-    return true;
+    return response;
   }
 
   // ---------------- DURATIONS ----------------
 
   @override
-  Future<List<SubscriptionDuration>> getSubscriptionDurations() async {
+  Future<SubscriptionDurationListResponse> getSubscriptionDurations() async {
     final jsonResponse =
         await _api.get(Endpoint.subscriptionDurations) as Map<String, dynamic>;
-    final isSuccess = (jsonResponse['is_success'] as bool?) ?? false;
+    final response = SubscriptionDurationListResponse.fromJson(jsonResponse);
 
-    if (!isSuccess) {
-      throw BadRequestException(
-        jsonResponse['message']?.toString() ?? 'Failed to fetch durations',
-      );
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
     }
 
-    final data = jsonResponse['data'] as List<dynamic>? ?? [];
-    return data
-        .map((e) => SubscriptionDuration.fromJson(e as Map<String, dynamic>))
-        .toList();
+    return response;
   }
 
   @override
-  Future<SubscriptionDuration> createSubscriptionDuration(
-    Map<String, dynamic> data,
+  Future<BaseApiResponseModel> createSubscriptionDuration(
+    CreateSubscriptionDurationRequest request,
   ) async {
     final jsonResponse = await _api.post(
       Endpoint.subscriptionDurations,
-      body: data,
+      body: request.toJson(),
     );
-    final isSuccess = (jsonResponse['is_success'] as bool?) ?? false;
-    if (!isSuccess) {
-      throw BadRequestException(
-        jsonResponse['message']?.toString() ?? 'Failed to create duration',
-      );
+    final response = SubscriptionDurationResponse.fromJson(jsonResponse);
+
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
     }
-    return SubscriptionDuration.fromJson(
-      jsonResponse['data'] as Map<String, dynamic>,
-    );
+    return response;
   }
 }

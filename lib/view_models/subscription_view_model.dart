@@ -4,6 +4,8 @@ import '../models/clinic_subscription_plan_model.dart';
 import '../models/patient_subscription_plan_model.dart';
 import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../models/requests/create_patient_subscription_plan_request.dart';
+import '../models/requests/create_subscription_duration_request.dart';
+import '../models/responses/base_response_model.dart';
 import '../models/subscription_duration_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
@@ -25,7 +27,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
     await Future.wait([
       getSubscriptionPlans(),
       getPatientSubscriptionPlans(),
-      getSubscriptionDurations(),
+      //getSubscriptionDurations(),
     ]);
   }
 
@@ -38,8 +40,8 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
         state = state.copyWith(loading: loading);
       },
       () async {
-        final plans = await _subscriptionRepository.getSubscriptionPlans();
-        state = state.copyWith(plans: plans);
+        final response = await _subscriptionRepository.getSubscriptionPlans();
+        state = state.copyWith(plans: response.data);
       },
     );
   }
@@ -81,12 +83,15 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
   Future<bool> deleteSubscriptionPlan(int id) async {
     final success =
         await runSafely<bool?>(showLoading: true, () async {
-          await _subscriptionRepository.deleteSubscriptionPlan(id);
-          final currentList = state.plans ?? [];
-          state = state.copyWith(
-            plans: currentList.where((p) => p.id != id).toList(),
-          );
-          return true;
+          final response = await _subscriptionRepository.deleteSubscriptionPlan(id);
+          if (response.isSuccess) {
+            final currentList = state.plans ?? [];
+            state = state.copyWith(
+              plans: currentList.where((p) => p.id != id).toList(),
+            );
+            return true;
+          }
+          return false;
         }) ??
         false;
 
@@ -102,9 +107,9 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
         state = state.copyWith(loading: loading);
       },
       () async {
-        final plans = await _subscriptionRepository
+        final response = await _subscriptionRepository
             .getPatientSubscriptionPlans();
-        state = state.copyWith(patientPlans: plans);
+        state = state.copyWith(patientPlans: response.data);
       },
     );
   }
@@ -129,12 +134,15 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
   Future<bool> deletePatientSubscriptionPlan(int id) async {
     final success =
         await runSafely<bool?>(showLoading: true, () async {
-          await _subscriptionRepository.deletePatientSubscriptionPlan(id);
-          final currentList = state.patientPlans ?? [];
-          state = state.copyWith(
-            patientPlans: currentList.where((p) => p.id != id).toList(),
-          );
-          return true;
+          final response = await _subscriptionRepository.deletePatientSubscriptionPlan(id);
+          if (response.isSuccess) {
+            final currentList = state.patientPlans ?? [];
+            state = state.copyWith(
+              patientPlans: currentList.where((p) => p.id != id).toList(),
+            );
+            return true;
+          }
+          return false;
         }) ??
         false;
 
@@ -150,22 +158,22 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
         state = state.copyWith(loading: loading);
       },
       () async {
-        final durations = await _subscriptionRepository
-            .getSubscriptionDurations();
-        state = state.copyWith(durations: durations);
+        final response = await _subscriptionRepository.getSubscriptionDurations();
+        state = state.copyWith(durations: response.data);
       },
     );
   }
 
-  Future<bool> createSubscriptionDuration(Map<String, dynamic> data) async {
-    final success =
-        await runSafely<bool?>(showLoading: true, () async {
-          await _subscriptionRepository.createSubscriptionDuration(data);
-          await getSubscriptionDurations();
-          return true;
-        }) ??
-        false;
-    return success;
+  Future<BaseApiResponseModel?> createSubscriptionDuration(CreateSubscriptionDurationRequest request) async {
+    final response =
+        await runSafely<BaseApiResponseModel>(showLoading: true, () async {
+          final res = await _subscriptionRepository.createSubscriptionDuration(request);
+          if (res.isSuccess) {
+            await getSubscriptionDurations();
+          }
+          return res;
+        });
+    return response;
   }
 }
 
