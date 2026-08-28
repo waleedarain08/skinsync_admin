@@ -2,9 +2,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/form_model.dart';
 import 'package:skinsync_admin/models/requests/create_form_request.dart';
+import 'package:skinsync_admin/models/requests/update_form_request.dart';
 import 'package:skinsync_admin/repositories/form_repository.dart';
 import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/services/media_service.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/view_models/base_state_model.dart';
 import 'package:skinsync_admin/view_models/base_view_model.dart';
 
@@ -87,11 +89,61 @@ class FormsViewModel extends BaseViewModel<FormsState> {
     }) ?? false;
   }
 
+Future<bool> updateForm({
+  required int id,
+  required String title,
+  required String type,
+  required String sku,
+  required String currentUrl,
+  PlatformFile? file,
+}) async {
+  return await runSafely<bool?>(showLoading: true, () async {
+    String mediaUrl = currentUrl;
+
+    // 1. Upload new file ONLY if provided
+    if (file != null) {
+      final uploadedUrl = await _mediaService.uploadMedia(
+        path: 'forms/$type',
+        file: file,
+      );
+
+      if (uploadedUrl == null) return false;
+      mediaUrl = uploadedUrl;
+    }
+
+    // 2. Save updated data to Backend
+    final request = UpdateFormRequest(
+      title: title,
+      url: mediaUrl,
+      type: type,
+      globalSku: sku,
+    );
+
+    final response = await _formRepository.updateForm(request,id);
+
+    if (response.isSuccess) {
+      await getForms(type);
+      return true;
+    }
+    return false;
+  }) ?? false;
+}
   Future<bool> deleteForm(int id, String type) async {
     return await runSafely<bool?>(showLoading: true, () async {
       final response = await _formRepository.deleteForm(id);
       if (response.isSuccess) {
         await getForms(type, initial: true, page: 1);
+        return true;
+      }
+      return false;
+    }) ?? false;
+  }
+
+   Future<bool> updateFormStatus(int id, Status status) async {
+    return await runSafely<bool?>(showLoading: true, () async {
+      final response = await _formRepository.updateFormsStatus(status: status,id: id);
+      if (response.isSuccess) {
+
         return true;
       }
       return false;

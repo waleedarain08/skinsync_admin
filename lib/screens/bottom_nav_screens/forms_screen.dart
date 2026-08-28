@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/form_model.dart';
+import 'package:skinsync_admin/utils/enums.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/forms_view_model.dart';
 import 'package:skinsync_admin/widgets/app_loader.dart';
@@ -9,6 +10,7 @@ import 'package:skinsync_admin/widgets/dailogbox/add_form_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/pagination_footer.dart';
+import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FormsScreen extends ConsumerStatefulWidget {
@@ -32,14 +34,20 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
         setState(() {});
 
         if (_tabController.index == 0) {
-          ref.read(formsViewModelProvider.notifier).getForms('consent', initial: true);
+          ref
+              .read(formsViewModelProvider.notifier)
+              .getForms('consent', initial: true);
         } else {
-          ref.read(formsViewModelProvider.notifier).getForms('compliance', initial: true);
+          ref
+              .read(formsViewModelProvider.notifier)
+              .getForms('compliance', initial: true);
         }
       }
     });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(formsViewModelProvider.notifier).getForms('consent', initial: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(formsViewModelProvider.notifier)
+          .getForms('consent', initial: true);
     });
   }
 
@@ -139,7 +147,8 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
               crossAxisCount: MediaQuery.sizeOf(context).width > 1200 ? 4 : 3,
               crossAxisSpacing: context.w(24),
               mainAxisSpacing: context.w(24),
-              childAspectRatio: 1.2,
+              // LOWER value = GREATER height. (Change from 1.2 to 0.95)
+              childAspectRatio: 0.95,
             ),
             itemCount: forms.length + 1, // +1 for the "Add New" card
             itemBuilder: (context, index) {
@@ -157,7 +166,9 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
               currentPage: currentPage,
               totalPages: totalPages,
               onPageChanged: (page) {
-                ref.read(formsViewModelProvider.notifier).getForms(type, page: page);
+                ref
+                    .read(formsViewModelProvider.notifier)
+                    .getForms(type, page: page);
               },
             ),
           ),
@@ -185,7 +196,11 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
                 color: CustomColors.purple.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.add_rounded, color: CustomColors.purple, size: 32),
+              child: const Icon(
+                Icons.add_rounded,
+                color: CustomColors.purple,
+                size: 32,
+              ),
             ),
             context.verticalSpace(16),
             Text(
@@ -193,24 +208,35 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
               style: context.fonts.purple14w600,
             ),
             context.verticalSpace(4),
-            Text(
-              'Upload PDF file',
-              style: context.fonts.grey12w400,
-            ),
+            Text('Upload PDF file', style: context.fonts.grey12w400),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFormCard(BuildContext context, FormModel form, String type) {
-    return BorderdContainerWidget(
+ Widget _buildFormCard(BuildContext context, FormModel form, String type) {
+  return InkWell(
+    onTap: () {
+      showDialog(
+        context: context,
+        builder: (context) => AddFormDialog(
+          type: type,
+          form: form, // Pass form instance to prefill
+        ),
+      );
+    },
+    borderRadius: context.borderRadius(all: 16),
+    child: BorderdContainerWidget(
       enableHover: true,
       padding: context.appEdgeInsets(all: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // Top Row: PDF Icon + Delete Button
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
                 padding: context.appEdgeInsets(all: 10),
@@ -218,28 +244,68 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
                   color: CustomColors.red.withValues(alpha: 0.1),
                   borderRadius: context.borderRadius(all: 8),
                 ),
-                child: const Icon(Icons.picture_as_pdf_rounded, color: CustomColors.red, size: 24),
+                child: const Icon(
+                  Icons.picture_as_pdf_rounded,
+                  color: CustomColors.red,
+                  size: 24,
+                ),
               ),
-              const Spacer(),
               IconButton(
                 onPressed: () => _confirmDelete(context, form, type),
-                icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.red, size: 20),
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: CustomColors.red,
+                  size: 20,
+                ),
               ),
             ],
           ),
-          context.verticalSpace(16),
-          Text(
-            form.title ?? 'Untitled Form',
-            style: context.fonts.black14w600,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          context.verticalSpace(4),
-          Text(
-            'SKU: ${form.globalSku ?? "N/A"}',
-            style: context.fonts.grey11w600,
+          const Spacer(),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                form.title ?? 'Untitled Form',
+                style: context.fonts.black14w600,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              context.verticalSpace(4),
+              Text(
+                'SKU: ${form.globalSku ?? "N/A"}',
+                style: context.fonts.grey11w600,
+              ),
+              context.verticalSpace(8),
+            ],
           ),
           const Spacer(),
+
+          Align(
+            alignment: Alignment.centerRight,
+            child: StatusToggleSwitch(
+              status: form.status?.toLowerCase() ?? 'inactive',
+              onChanged: (String newStatusStr) async {
+                if (form.id == null) return;
+
+                final newStatus = newStatusStr.toLowerCase() == 'active'
+                    ? Status.active
+                    : Status.inactive;
+
+                final success = await ref
+                    .read(formsViewModelProvider.notifier)
+                    .updateFormStatus(form.id!, newStatus);
+
+                if (success) {
+                  ref.read(formsViewModelProvider.notifier).getForms(type);
+                }
+              },
+              width: context.w(100),
+              height: context.h(32),
+            ),
+          ),
+          const Spacer(),
+
           TextButton.icon(
             onPressed: () {
               if (form.url != null) {
@@ -257,10 +323,14 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
           ),
         ],
       ),
-    );
-  }
-
-  Future<void> _confirmDelete(BuildContext context, FormModel form, String type) async {
+    ),
+  );
+}
+  Future<void> _confirmDelete(
+    BuildContext context,
+    FormModel form,
+    String type,
+  ) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => StandardDialog(
@@ -285,7 +355,9 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
     );
 
     if (confirm == true && form.id != null) {
-      await ref.read(formsViewModelProvider.notifier).deleteForm(form.id!, type);
+      await ref
+          .read(formsViewModelProvider.notifier)
+          .deleteForm(form.id!, type);
     }
   }
 }

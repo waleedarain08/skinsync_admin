@@ -1,4 +1,5 @@
 import 'package:skinsync_admin/models/requests/create_form_request.dart';
+import 'package:skinsync_admin/models/requests/update_form_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 import 'package:skinsync_admin/models/responses/form_list_response.dart';
 import 'package:skinsync_admin/repositories/form_repository.dart';
@@ -30,11 +31,36 @@ class FormService implements FormRepository {
     return response;
   }
 
+     @override
+  Future<BaseApiResponseModel<dynamic>> updateFormsStatus({required Status status, required int id}) async {
+       final jsonResponse = await _api.patch(
+      Endpoint.updateForm,
+      body: {'status': status.name},
+      pathParams: {'id':id.toString()}
+    );
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
+    if (!response.isSuccess) throw BadRequestException(response.message);
+    return response;
+  }
+     
+
+
   @override
   Future<BaseApiResponseModel<dynamic>> createForm(CreateFormRequest request) async {
     final jsonResponse = await _api.post(
       Endpoint.forms,
       body: request.toJson(),
+    );
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
+    if (!response.isSuccess) throw BadRequestException(response.message);
+    return response;
+  }
+  @override
+  Future<BaseApiResponseModel<dynamic>> updateForm(UpdateFormRequest request,int id) async {
+    final jsonResponse = await _api.patch(
+      Endpoint.updateForm,
+      body: request.toJson(),
+      pathParams: {'id':id.toString()}
     );
     final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
     if (!response.isSuccess) throw BadRequestException(response.message);

@@ -4,6 +4,7 @@ class FormModel {
   final String? url;
   final String? type; // 'consent' or 'compliance'
   final String? globalSku;
+  final String? status;
 
   FormModel({
     this.id,
@@ -11,6 +12,7 @@ class FormModel {
     this.url,
     this.type,
     this.globalSku,
+    this.status
   });
 
   factory FormModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class FormModel {
       url: json['url'] as String?,
       type: json['type'] as String?,
       globalSku: json['global_sku'] as String?,
+      status: json['status']
     );
   }
 
@@ -30,6 +33,7 @@ class FormModel {
       'url': url,
       'type': type,
       'global_sku': globalSku,
+      'status':status
     };
   }
 }

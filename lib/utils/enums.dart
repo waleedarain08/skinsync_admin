@@ -96,6 +96,7 @@ enum Endpoint {
   subscriptionDurations('admin/subscription-durations'),
   benefits('admin/benefits'),
   forms('admin/forms'),
+  updateForm('admin/forms/{id}'),
   notification('admin/notifications'),
   deleteForm('admin/forms/{id}');
 
