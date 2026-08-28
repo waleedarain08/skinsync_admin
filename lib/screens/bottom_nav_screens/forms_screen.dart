@@ -215,117 +215,132 @@ class _FormsScreenState extends ConsumerState<FormsScreen>
     );
   }
 
- Widget _buildFormCard(BuildContext context, FormModel form, String type) {
-  return InkWell(
-    onTap: () {
-      showDialog(
-        context: context,
-        builder: (context) => AddFormDialog(
-          type: type,
-          form: form, // Pass form instance to prefill
-        ),
-      );
-    },
-    borderRadius: context.borderRadius(all: 16),
-    child: BorderdContainerWidget(
-      enableHover: true,
-      padding: context.appEdgeInsets(all: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Top Row: PDF Icon + Delete Button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: context.appEdgeInsets(all: 10),
-                decoration: BoxDecoration(
-                  color: CustomColors.red.withValues(alpha: 0.1),
-                  borderRadius: context.borderRadius(all: 8),
-                ),
-                child: const Icon(
-                  Icons.picture_as_pdf_rounded,
-                  color: CustomColors.red,
-                  size: 24,
-                ),
+Widget _buildFormCard(BuildContext context, FormModel form, String type) {
+  return BorderdContainerWidget(
+    enableHover: true,
+    padding: context.appEdgeInsets(all: 20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Top Row: PDF Icon + Actions (Edit & Delete)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: context.appEdgeInsets(all: 10),
+              decoration: BoxDecoration(
+                color: CustomColors.red.withValues(alpha: 0.1),
+                borderRadius: context.borderRadius(all: 8),
               ),
-              IconButton(
-                onPressed: () => _confirmDelete(context, form, type),
-                icon: const Icon(
-                  Icons.delete_outline_rounded,
-                  color: CustomColors.red,
-                  size: 20,
-                ),
+              child: const Icon(
+                Icons.picture_as_pdf_rounded,
+                color: CustomColors.red,
+                size: 24,
               ),
-            ],
-          ),
-          const Spacer(),
-
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                form.title ?? 'Untitled Form',
-                style: context.fonts.black14w600,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              context.verticalSpace(4),
-              Text(
-                'SKU: ${form.globalSku ?? "N/A"}',
-                style: context.fonts.grey11w600,
-              ),
-              context.verticalSpace(8),
-            ],
-          ),
-          const Spacer(),
-
-          Align(
-            alignment: Alignment.centerRight,
-            child: StatusToggleSwitch(
-              status: form.status?.toLowerCase() ?? 'inactive',
-              onChanged: (String newStatusStr) async {
-                if (form.id == null) return;
-
-                final newStatus = newStatusStr.toLowerCase() == 'active'
-                    ? Status.active
-                    : Status.inactive;
-
-                final success = await ref
-                    .read(formsViewModelProvider.notifier)
-                    .updateFormStatus(form.id!, newStatus);
-
-                if (success) {
-                  ref.read(formsViewModelProvider.notifier).getForms(type);
-                }
-              },
-              width: context.w(100),
-              height: context.h(32),
             ),
-          ),
-          const Spacer(),
-
-          TextButton.icon(
-            onPressed: () {
-              if (form.url != null) {
-                launchUrl(Uri.parse(form.url!));
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Update / Edit Button
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AddFormDialog(
+                        type: type,
+                        form: form, // Pass form instance to prefill
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.edit_outlined,
+                    color: CustomColors.purple,
+                    size: 20,
+                  ),
+                  tooltip: 'Edit Form',
+                ),
+                // Delete Button
+                IconButton(
+                  onPressed: () => _confirmDelete(context, form, type),
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
+                    color: CustomColors.red,
+                    size: 20,
+                  ),
+                  tooltip: 'Delete Form',
+                ),
+              ],
+            ),
+          ],
+        ),
+        const Spacer(),
+  
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              form.title ?? 'Untitled Form',
+              style: context.fonts.black14w600,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            context.verticalSpace(4),
+            Text(
+              'SKU: ${form.globalSku ?? "N/A"}',
+              style: context.fonts.grey11w600,
+            ),
+            context.verticalSpace(8),
+          ],
+        ),
+        const Spacer(),
+  
+        Align(
+          alignment: Alignment.centerRight,
+          child: StatusToggleSwitch(
+            status: form.status?.toLowerCase() ?? 'inactive',
+            onChanged: (String newStatusStr) async {
+              if (form.id == null) return;
+  
+              final newStatus = newStatusStr.toLowerCase() == 'active'
+                  ? Status.active
+                  : Status.inactive;
+  
+              final success = await ref
+                  .read(formsViewModelProvider.notifier)
+                  .updateFormStatus(form.id!, newStatus);
+  
+              if (success) {
+                ref.read(formsViewModelProvider.notifier).getForms(type);
               }
             },
-            icon: const Icon(Icons.visibility_outlined, size: 16),
-            label: const Text('View PDF'),
-            style: TextButton.styleFrom(
-              foregroundColor: CustomColors.purple,
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            width: context.w(100),
+            height: context.h(32),
           ),
-        ],
-      ),
+        ),
+        const Spacer(),
+  
+        TextButton.icon(
+          onPressed: () {
+            if (form.url != null && form.url!.isNotEmpty) {
+              launchUrl(Uri.parse(form.url!));
+            }
+          },
+          icon: const Icon(Icons.visibility_outlined, size: 16),
+          label: const Text('View PDF'),
+          style: TextButton.styleFrom(
+            foregroundColor: CustomColors.purple,
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+      ],
     ),
   );
 }
+ 
+ 
   Future<void> _confirmDelete(
     BuildContext context,
     FormModel form,
