@@ -1,5 +1,3 @@
-import '../models/clinic_subscription_plan_model.dart';
-import '../models/patient_subscription_plan_model.dart';
 import '../models/requests/create_benefit_request.dart';
 import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../models/requests/create_patient_subscription_plan_request.dart';
@@ -13,13 +11,13 @@ import '../models/responses/subscription_duration_list_response.dart';
 abstract class SubscriptionRepository {
   // Clinics
   Future<ClinicSubscriptionPlanListResponse> getSubscriptionPlans();
-  Future<ClinicSubscriptionPlanModel> createClinicSubscriptionPlan(CreateClinicSubscriptionPlanRequest request);
-  Future<ClinicSubscriptionPlanModel> updateSubscriptionPlan(int id, CreateClinicSubscriptionPlanRequest request);
+  Future<BaseApiResponseModel<dynamic>> createClinicSubscriptionPlan(CreateClinicSubscriptionPlanRequest request);
+  Future<BaseApiResponseModel<dynamic>> updateSubscriptionPlan(int id, CreateClinicSubscriptionPlanRequest request);
   Future<BaseApiResponseModel<dynamic>> deleteSubscriptionPlan(int id);
 
   // Patients
   Future<PatientSubscriptionPlanListResponse> getPatientSubscriptionPlans();
-  Future<PatientSubscriptionPlanModel> createPatientSubscriptionPlan(CreatePatientSubscriptionPlanRequest request);
+  Future<BaseApiResponseModel<dynamic>> createPatientSubscriptionPlan(CreatePatientSubscriptionPlanRequest request);
   Future<BaseApiResponseModel<dynamic>> updatePatientSubscriptionPlan(int id, CreatePatientSubscriptionPlanRequest request);
   Future<BaseApiResponseModel<dynamic>> deletePatientSubscriptionPlan(int id);
 
