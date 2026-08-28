@@ -104,7 +104,7 @@ final List<_SidebarEntry> _sidebarEntries = [
   const _SidebarEntry(
     routeName: FormsScreen.routeName,
     icon: Icons.description_rounded,
-    label: 'Forms',
+    label: 'Consent/Compliance Forms',
   ),
   const _SidebarEntry(
     routeName: PushNotificationScreen.routeName,
