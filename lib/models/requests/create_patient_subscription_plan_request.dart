@@ -41,7 +41,7 @@ class CreatePatientSubscriptionPlanRequest {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'base_price': isLifetime ? basePrice : null,
+      'base_price': basePrice ?? 0,
       'assigned_patients': assignedPatients,
       'duration_options': durationOptions?.map((e) => {
         'duration_id': e.duration?.id,

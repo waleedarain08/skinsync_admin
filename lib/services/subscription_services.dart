@@ -1,15 +1,11 @@
-import '../models/clinic_subscription_plan_model.dart';
-import '../models/patient_subscription_plan_model.dart';
 import '../models/requests/create_benefit_request.dart';
 import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../models/requests/create_patient_subscription_plan_request.dart';
 import '../models/requests/create_subscription_duration_request.dart';
 import '../models/responses/base_response_model.dart';
 import '../models/responses/clinic_subscription_plan_list_response.dart';
-import '../models/responses/clinic_subscription_plan_response.dart';
 import '../models/responses/patient_subscription_benefit_list_response.dart';
 import '../models/responses/patient_subscription_plan_list_response.dart';
-import '../models/responses/patient_subscription_plan_response.dart';
 import '../models/responses/subscription_duration_list_response.dart';
 import '../models/responses/subscription_duration_response.dart';
 import '../repositories/subscription_repository.dart';
@@ -37,20 +33,20 @@ class SubscriptionServices implements SubscriptionRepository {
   }
 
   @override
-  Future<ClinicSubscriptionPlanModel> createClinicSubscriptionPlan(
+  Future<BaseApiResponseModel<dynamic>> createClinicSubscriptionPlan(
     CreateClinicSubscriptionPlanRequest request,
   ) async {
     final jsonResponse = await _api.post(
       Endpoint.subscriptionPlans,
       body: request.toJson(),
     );
-    final response = ClinicSubscriptionPlanResponse.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
     if (!response.isSuccess) throw BadRequestException(response.message);
-    return response.data!;
+    return response;
   }
 
   @override
-  Future<ClinicSubscriptionPlanModel> updateSubscriptionPlan(
+  Future<BaseApiResponseModel<dynamic>> updateSubscriptionPlan(
     int id,
     CreateClinicSubscriptionPlanRequest request,
   ) async {
@@ -59,9 +55,9 @@ class SubscriptionServices implements SubscriptionRepository {
       pathParams: {'id': id.toString()},
       body: request.toJson(),
     );
-    final response = ClinicSubscriptionPlanResponse.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
     if (!response.isSuccess) throw BadRequestException(response.message);
-    return response.data!;
+    return response;
   }
 
   @override
@@ -98,16 +94,16 @@ class SubscriptionServices implements SubscriptionRepository {
   }
 
   @override
-  Future<PatientSubscriptionPlanModel> createPatientSubscriptionPlan(
+  Future<BaseApiResponseModel<dynamic>> createPatientSubscriptionPlan(
     CreatePatientSubscriptionPlanRequest request,
   ) async {
     final jsonResponse = await _api.post(
       Endpoint.patientSubscriptionPlans,
       body: request.toJson(),
     );
-    final response = PatientSubscriptionPlanResponse.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
     if (!response.isSuccess) throw BadRequestException(response.message);
-    return response.data!;
+    return response;
   }
 
   @override

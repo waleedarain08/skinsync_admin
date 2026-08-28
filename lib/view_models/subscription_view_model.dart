@@ -54,28 +54,17 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
   ) async {
     final success =
         await runSafely<bool?>(showLoading: true, () async {
-          final ClinicSubscriptionPlanModel newPlan;
           if (request.id != null) {
-            newPlan = await _subscriptionRepository.updateSubscriptionPlan(
+            await _subscriptionRepository.updateSubscriptionPlan(
               request.id!,
               request,
             );
           } else {
-            newPlan = await _subscriptionRepository
+            await _subscriptionRepository
                 .createClinicSubscriptionPlan(request);
           }
 
-          final currentList = state.plans ?? [];
-
-          if (request.id != null) {
-            state = state.copyWith(
-              plans: currentList
-                  .map((p) => p.id == request.id ? newPlan : p)
-                  .toList(),
-            );
-          } else {
-            state = state.copyWith(plans: [...currentList, newPlan]);
-          }
+          await getSubscriptionPlans();
           return true;
         }) ??
         false;
