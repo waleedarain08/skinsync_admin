@@ -92,7 +92,13 @@ enum Endpoint {
   patientTreatmentRequest('admin/patient-treatment-request'),
   updatePatientStatus('admin/patient/status/{id}'),
   founderClinicDetail('admin/founder-clinic/detail/{id}'),
-  deductionTimings('admin/deduction-timings');
+  deductionTimings('admin/deduction-timings'),
+  subscriptionDurations('admin/subscription-durations'),
+  benefits('admin/benefits'),
+  forms('admin/forms'),
+  updateForm('admin/forms/{id}'),
+  notification('admin/notifications'),
+  deleteForm('admin/forms/{id}');
 
   final String path;
   const Endpoint(this.path);
@@ -111,8 +117,7 @@ enum Status { active, inactive }
 enum BaseUrls {
   api('https://api.skinsyncai.com/api/'),
   apiQa('https://api-dev.skinsyncai.com/api/');
-
-  // apiQa('https://gecko-pure-gator.ngrok-free.app/api/');
+ //  apiQa('https://bgzh46mj-8084.inc1.devtunnels.ms/api/');
 
   final String url;
 

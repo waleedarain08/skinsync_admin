@@ -1,0 +1,251 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/models/form_model.dart';
+import 'package:skinsync_admin/utils/sku_utils.dart';
+import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/utils/validators.dart';
+import 'package:skinsync_admin/view_models/forms_view_model.dart';
+import 'package:skinsync_admin/widgets/build_textfield.dart';
+import 'package:skinsync_admin/widgets/custom_primary_button.dart';
+import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
+
+class AddFormDialog extends StatefulWidget {
+  final String type; // 'consent' or 'compliance'
+  final FormModel? form; // Null for Add, non-null for Edit
+
+  const AddFormDialog({super.key, required this.type, this.form});
+
+  @override
+  State<AddFormDialog> createState() => _AddFormDialogState();
+}
+
+class _AddFormDialogState extends State<AddFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _titleController;
+  late final TextEditingController _skuController;
+  PlatformFile? _selectedFile;
+
+  bool get _isEditing => widget.form != null;
+
+  @override
+  void initState() {
+    super.initState();
+    // Prefill data if editing an existing form
+    _titleController = TextEditingController(text: widget.form?.title ?? '');
+    _skuController = TextEditingController(text: widget.form?.globalSku ?? '');
+  }
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.pickFile(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedFile = result;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _skuController.dispose();
+    super.dispose();
+  }
+
+  void _generateSku(WidgetRef ref) {
+    final state = ref.read(formsViewModelProvider);
+    final List<FormModel> existingForms = [
+      ...(state.consentForms ?? []),
+      ...(state.complianceForms ?? []),
+    ];
+    final List<String> existingSkus = existingForms
+        .map((f) => f.globalSku ?? '')
+        .where((s) => s.isNotEmpty && s != widget.form?.globalSku)
+        .toList();
+
+    setState(() {
+      _skuController.text = SkuUtils.generateSku(existingSkus: existingSkus);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final actionLabel = _isEditing ? 'Save Changes' : 'Upload Form';
+    final dialogTitle = _isEditing
+        ? 'Edit ${widget.type == 'consent' ? 'Consent' : 'Compliance'} Form'
+        : 'Add New ${widget.type == 'consent' ? 'Consent' : 'Compliance'} Form';
+
+    return StandardDialog(
+      title: dialogTitle,
+      width: context.w(500),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BuildTextField(
+              label: 'Form Title',
+              controller: _titleController,
+              hintText: 'e.g. Standard Laser Consent',
+              validator: Validators.empty,
+            ),
+            context.verticalSpace(24),
+            Consumer(
+              builder: (context, ref, _) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: BuildTextField(
+                        label: 'Global SKU',
+                        controller: _skuController,
+                        hintText: 'XXX-0000-XXXX',
+                        validator: (val) {
+                          final state = ref.read(formsViewModelProvider);
+                          final List<FormModel> existingForms = [
+                            ...(state.consentForms ?? []),
+                            ...(state.complianceForms ?? []),
+                          ];
+                          final List<String> existingSkus = existingForms
+                              .map((f) => f.globalSku ?? '')
+                              .where(
+                                (s) =>
+                                    s.isNotEmpty && s != widget.form?.globalSku,
+                              )
+                              .toList();
+
+                          return SkuUtils.validateGlobalSku(
+                            val,
+                            existingSkus: existingSkus,
+                          );
+                        },
+                      ),
+                    ),
+                    context.horizontalSpace(12),
+                    Padding(
+                      padding: context.appEdgeInsets(bottom: 2),
+                      child: IconButton.filled(
+                        onPressed: () => _generateSku(ref),
+                        icon: const Icon(Icons.auto_fix_high_rounded, size: 20),
+                        style: IconButton.styleFrom(
+                          backgroundColor: CustomColors.purple.withValues(
+                            alpha: 0.1,
+                          ),
+                          foregroundColor: CustomColors.purple,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: context.borderRadius(all: 10),
+                          ),
+                          fixedSize: Size(context.w(48), context.h(48)),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            context.verticalSpace(24),
+            Text(
+              _isEditing ? 'Form File (PDF - Optional)' : 'Form File (PDF)',
+              style: context.fonts.black14w600,
+            ),
+            context.verticalSpace(8),
+            InkWell(
+              onTap: _pickFile,
+              child: Container(
+                padding: context.appEdgeInsets(all: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: CustomColors.border),
+                  borderRadius: context.borderRadius(all: 12),
+                  color: CustomColors.grey.withValues(alpha: 0.05),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.picture_as_pdf_rounded,
+                      color: CustomColors.red,
+                    ),
+                    context.horizontalSpace(12),
+                    Expanded(
+                      child: Text(
+                        _selectedFile?.name ??
+                            (_isEditing
+                                ? 'Click to replace existing PDF'
+                                : 'Click to select PDF file'),
+                        style: (_selectedFile != null || _isEditing)
+                            ? context.fonts.black14w600
+                            : context.fonts.grey14w400,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (_selectedFile != null)
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        color: CustomColors.green,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            if (!_isEditing && _selectedFile == null) ...[
+              context.verticalSpace(4),
+              Text('Please select a PDF file', style: context.fonts.red11w600),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => context.pop(), child: const Text('Cancel')),
+        Consumer(
+          builder: (context, ref, _) {
+            final state = ref.watch(formsViewModelProvider);
+            return CustomPrimaryButton(
+              onTap: () async {
+                // File selection is required for NEW forms, but optional when EDITING existing ones
+                final isFileValid = _isEditing || _selectedFile != null;
+
+                if (_formKey.currentState!.validate() && isFileValid) {
+                  final bool success;
+                  if (_isEditing) {
+                    success = await ref
+                        .read(formsViewModelProvider.notifier)
+                        .updateForm(
+                          id: widget.form!.id!,
+                          title: _titleController.text.trim(),
+                          sku: _skuController.text.trim(),
+                          type: widget.type,
+                          currentUrl: widget.form?.url ?? '',
+                          file: _selectedFile,
+                        );
+                  } else {
+                    success = await ref
+                        .read(formsViewModelProvider.notifier)
+                        .uploadAndCreateForm(
+                          title: _titleController.text.trim(),
+                          type: widget.type,
+                          sku: _skuController.text.trim(),
+                          file: _selectedFile!,
+                        );
+                  }
+
+                  if (success && context.mounted) {
+                    context.pop();
+                  }
+                }
+              },
+              label: actionLabel,
+              isLoading: state.loading,
+              width: context.w(150),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}

@@ -43,7 +43,6 @@ class CreateClinicSubscriptionPlanRequest {
     return {
       if (id != null) 'id': id,
       'name': name,
-      'base_price': basePrice,
       'doctor_seats': doctorSeats,
       'unlimited_doctors': unlimitedDoctors,
       'staff_seats': staffSeats,
@@ -54,13 +53,19 @@ class CreateClinicSubscriptionPlanRequest {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
-      'benefits': benefits?.map((e) => e.toJson()).toList(),
+      'base_price': basePrice ?? 0,
       'assigned_clinics': assignedClinics,
+      'duration_options': durationOptions?.map((e) => {
+        'duration_id': e.duration?.id,
+        'price': e.basePrice,
+      }).toList(),
+      'benefits': benefits?.map((e) => e.toJson()).toList(),
     };
   }
 
-  factory CreateClinicSubscriptionPlanRequest.fromModel(ClinicSubscriptionPlanModel model) {
+  factory CreateClinicSubscriptionPlanRequest.fromModel(
+    ClinicSubscriptionPlanModel model,
+  ) {
     return CreateClinicSubscriptionPlanRequest(
       id: model.id,
       name: model.name,

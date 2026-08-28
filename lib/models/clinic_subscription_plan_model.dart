@@ -60,17 +60,20 @@ class ClinicSubscriptionPlanModel {
       isLifetime: (json['is_lifetime'] as bool?) ?? false,
       durationOptions: json['duration_options'] != null
           ? (json['duration_options'] as List)
+              .where((e) => e != null)
               .map((e) =>
                   SubscriptionDurationOption.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       benefits: json['benefits'] != null
           ? (json['benefits'] as List)
+              .where((e) => e != null)
               .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       assignedClinics: json['assigned_clinics'] != null
-          ? List<int>.from(json['assigned_clinics'] as Iterable)
+          ? List<int>.from(
+              (json['assigned_clinics'] as Iterable).where((e) => e != null))
           : null,
     );
   }

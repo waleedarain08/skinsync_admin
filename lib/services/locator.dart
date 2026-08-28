@@ -4,6 +4,8 @@ import 'package:skinsync_admin/repositories/booking_repository.dart';
 import 'package:skinsync_admin/repositories/category_repository.dart';
 import 'package:skinsync_admin/repositories/clinic_repository.dart';
 import 'package:skinsync_admin/repositories/explore_repository.dart';
+import 'package:skinsync_admin/repositories/form_repository.dart';
+import 'package:skinsync_admin/repositories/notification_repository.dart';
 import 'package:skinsync_admin/repositories/patient_repository.dart';
 import 'package:skinsync_admin/repositories/product_repository.dart';
 import 'package:skinsync_admin/repositories/provider_role_repository.dart';
@@ -14,6 +16,8 @@ import 'package:skinsync_admin/services/booking_services.dart';
 import 'package:skinsync_admin/services/category_services.dart';
 import 'package:skinsync_admin/services/clinic_services.dart';
 import 'package:skinsync_admin/services/explore_service.dart';
+import 'package:skinsync_admin/services/form_service.dart';
+import 'package:skinsync_admin/services/notification_service.dart';
 import 'package:skinsync_admin/services/patient_service.dart';
 import 'package:skinsync_admin/services/product_services.dart';
 import 'package:skinsync_admin/services/provider_roles_service.dart';
@@ -71,6 +75,12 @@ Future<void> initializeServices() async {
   );
   locator.registerLazySingleton<PatientRepository>(
     () => PatientService(api: apiBaseHelper),
+  );
+   locator.registerLazySingleton<NotificationRepository>(
+    () => NotificationService(api: apiBaseHelper),
+  );
+  locator.registerLazySingleton<FormRepository>(
+    () => FormService(api: apiBaseHelper),
   );
   locator.registerLazySingleton<ExploreRepository>(ExploreService.new);
   final secureStorageService = SecureStorageService();

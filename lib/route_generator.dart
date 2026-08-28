@@ -11,6 +11,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/explore_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/forms_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/home_page.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
@@ -31,6 +32,7 @@ import 'package:skinsync_admin/screens/founder_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/invite_clinic_detail_screen.dart';
 import 'package:skinsync_admin/screens/manage_inventory_data_screen.dart';
 import 'package:skinsync_admin/screens/manage_treatment_data_screen.dart';
+import 'package:skinsync_admin/screens/notification_screen.dart';
 import 'package:skinsync_admin/screens/patient_detail_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/screens/product_detail_screen.dart';
@@ -146,6 +148,11 @@ class RouteGenerator {
             builder: (_, _) => const CreateTreatmentScreen(),
           ),
           GoRoute(
+            name: NotificationScreen.routeName,
+            path: NotificationScreen.routeName,
+            builder: (_, _) => const NotificationScreen(),
+          ),
+          GoRoute(
             name: CreateSessionScreen.routeName,
             path: CreateSessionScreen.routeName,
             builder: (_, _) => const CreateSessionScreen(),
@@ -197,6 +204,11 @@ class RouteGenerator {
             name: SubscriptionPlansTab.routeName,
             path: SubscriptionPlansTab.routeName,
             builder: (_, _) => const SubscriptionPlansTab(),
+          ),
+          GoRoute(
+            name: FormsScreen.routeName,
+            path: FormsScreen.routeName,
+            builder: (_, _) => const FormsScreen(),
           ),
           GoRoute(
             name: SettingScreen.routeName,

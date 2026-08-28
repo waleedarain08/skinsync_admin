@@ -1,20 +1,32 @@
 class PlanBenefit {
+  int? id;
+  String? sku;
   String? title;
   String? description;
   bool enabled;
 
-  PlanBenefit({this.title, this.description, this.enabled = true});
+  PlanBenefit({
+    this.id,
+    this.sku,
+    this.title,
+    this.description,
+    this.enabled = true,
+  });
 
   factory PlanBenefit.fromJson(Map<String, dynamic> json) {
     return PlanBenefit(
-      title: json['title'],
-      description: json['description'],
+      id: json['id'] as int?,
+      sku: json['sku'] as String?,
+      title: json['title'] as String?,
+      description: json['description'] as String?,
       enabled: json['enabled'] ?? true,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      if (id != null) 'id': id,
+      if (sku != null) 'sku': sku,
       'title': title,
       'description': description,
       'enabled': enabled,

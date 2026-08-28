@@ -39,8 +39,8 @@ class PatientSubscriptionPlanModel {
       basePrice: (json['base_price'] as num?)?.toDouble(),
       simulationCount: json['simulation_count'] as int? ?? 0,
       unlimitedSimulations:
-          (json['unlimited_simulations'] as bool?) ??
           (json['unlimited_simulation'] as bool?) ??
+          (json['unlimited_simulations'] as bool?) ??
           false,
       postsViewCount: json['posts_view_count'] as int? ?? 0,
       unlimitedPostsView: json['unlimited_posts_view'] as bool? ?? false,
@@ -49,22 +49,25 @@ class PatientSubscriptionPlanModel {
       isLifetime: (json['is_lifetime'] as bool?) ?? false,
       durationOptions: json['duration_options'] != null
           ? (json['duration_options'] as List)
+              .where((e) => e != null)
               .map((e) =>
                   SubscriptionDurationOption.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       benefits: json['benefits'] != null
           ? (json['benefits'] as List)
+              .where((e) => e != null)
               .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
               .toList()
           : null,
       assignedPatients: json['assigned_patients'] != null
-          ? List<AssignedPatient>.from(
-              (json['assigned_patients'] as List).map(
-                (json) =>
-                    AssignedPatient.fromJson(json as Map<String, dynamic>),
-              ),
-            )
+          ? (json['assigned_patients'] as List)
+              .where((e) => e != null)
+              .map(
+                (e) =>
+                    AssignedPatient.fromJson(e as Map<String, dynamic>),
+              )
+              .toList()
           : null,
     );
   }
@@ -83,7 +86,7 @@ class PatientSubscriptionPlanModel {
       'is_lifetime': isLifetime,
       'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
       'benefits': benefits?.map((e) => e.toJson()).toList(),
-      'assigned_patients': assignedPatients?.map((e) => e.toJson()).toList(),
+      'assigned_patients': assignedPatients?.map((e) => e.patientId).toList(),
     };
   }
 }
@@ -92,14 +95,16 @@ class AssignedPatient {
   final int? id;
   final int? planId;
   final int? patientId;
+  final String? patientName;
 
-  const AssignedPatient({this.id, this.planId, this.patientId});
+  const AssignedPatient({this.id, this.planId, this.patientId, this.patientName});
 
   factory AssignedPatient.fromJson(Map<String, dynamic> json) {
     return AssignedPatient(
       id: json['id'],
       planId: json['plan_id'],
       patientId: json['patient_id'],
+      patientName: json['patient_name'],
     );
   }
 
@@ -108,6 +113,7 @@ class AssignedPatient {
       'id': id,
       'plan_id': planId,
       'patient_id': patientId,
+      'patient_name': patientName,
     };
   }
 }

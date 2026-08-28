@@ -1,5 +1,4 @@
 import '../subscription_duration_option.dart';
-import '../subscription_plan_benefit_model.dart';
 
 class CreatePatientSubscriptionPlanRequest {
   final int? id;
@@ -14,7 +13,7 @@ class CreatePatientSubscriptionPlanRequest {
   final bool isDefault;
   final bool isLifetime;
   final List<SubscriptionDurationOption>? durationOptions;
-  final List<PlanBenefit>? benefits;
+  final List<int>? benefitIds;
 
   CreatePatientSubscriptionPlanRequest({
     this.id,
@@ -29,13 +28,12 @@ class CreatePatientSubscriptionPlanRequest {
     this.isDefault = false,
     this.isLifetime = false,
     this.durationOptions,
-    this.benefits,
+    this.benefitIds,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'base_price': basePrice,
       'simulation_count': simulationCount,
       'unlimited_simulation': unlimitedSimulations,
       'posts_view_count': postsViewCount,
@@ -43,9 +41,13 @@ class CreatePatientSubscriptionPlanRequest {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
-      'benefits': benefits?.map((e) => e.toJson()).toList(),
+      'base_price': basePrice ?? 0,
       'assigned_patients': assignedPatients,
+      'duration_options': durationOptions?.map((e) => {
+        'duration_id': e.duration?.id,
+        'price': e.basePrice,
+      }).toList(),
+      'benefit_ids': benefitIds,
     };
   }
 }

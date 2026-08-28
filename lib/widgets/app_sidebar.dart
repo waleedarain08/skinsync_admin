@@ -5,6 +5,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/explore_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/forms_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/product_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/push_notification_screen.dart';
@@ -99,6 +100,11 @@ final List<_SidebarEntry> _sidebarEntries = [
     icon: Icons.gavel_rounded,
     label: 'Disputes',
     included: !isDeploymentMode,
+  ),
+  const _SidebarEntry(
+    routeName: FormsScreen.routeName,
+    icon: Icons.description_rounded,
+    label: 'Forms',
   ),
   const _SidebarEntry(
     routeName: PushNotificationScreen.routeName,

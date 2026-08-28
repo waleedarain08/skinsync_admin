@@ -38,16 +38,15 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
     );
   }
 
-  Future<bool?> getClinics({String? search, int? page, int? limit}) async {
+  Future<bool?> getClinics({String? search, int? page, int? limit, bool showloading =true}) async {
     return await runSafely<bool?>(
       showLoading: false,
       onLoadingChange: (loading) {
-        state = state.copyWith(loading: loading);
+     showloading ?    state = state.copyWith(loading: loading) : null;
       },
       () async {
         final int targetPage = page ?? state.currentPage;
         final int targetLimit = limit ?? state.pageSize;
-        try {
           final response = await _clinicRepository.getClinics(
             page: targetPage,
             limit: targetLimit,
@@ -62,17 +61,9 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
             );
             return true;
           }
-        } catch (e) {
-          // Fail-safe print
-        }
+      
 
-        // Fallback
-        state = state.copyWith(
-          clinics: [],
-          currentPage: targetPage,
-          totalPages: 1,
-          pageSize: targetLimit,
-        );
+      
         return true;
       },
     );
@@ -268,7 +259,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
   Future<bool> getClinicDetail(int clinicId) async {
     return await runSafely<bool?>(showLoading: true, () async {
-          try {
+         
             final response = await _clinicRepository.getClinicDetail(
               clinicId: clinicId,
             );
@@ -283,52 +274,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
               );
               return true;
             }
-          } catch (e) {
-            // Fail-safe print
-          }
-
-          final fallbackModel = state.clinics?.firstWhereOrNull(
-            (c) => c.id == clinicId,
-          );
-          state = state.copyWith(
-            selectedClinicDetail: ClinicDetailData(
-              clinicId: clinicId,
-              name: fallbackModel?.name ?? 'Glow MedSpa NY Detail',
-              email: fallbackModel?.email ?? 'contact@glowmedspa.com',
-              phone: fallbackModel?.phone ?? '+1 212-555-0198',
-              address: fallbackModel?.address ?? '5th Ave, New York, NY',
-              latitude: 24.8162848,
-              longitude: 67.1105623,
-              logo:
-                  fallbackModel?.logo ??
-                  'https://plus.unsplash.com/premium_photo-1661764391621-08f307405c6d?q=80&w=1000',
-              description:
-                  'A premium New York clinic specializing in advanced dermal treatments and clinical aesthetics.',
-              website: 'https://glowmedspa.com',
-              banner:
-                  'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
-              status: fallbackModel?.status ?? 'active',
-              availability: [
-                ClinicAvailability(
-                  openTime: '09:00',
-                  closeTime: '17:00',
-                  days: [
-                    'Monday',
-                    'Tuesday',
-                    'Wednesday',
-                    'Thursday',
-                    'Friday',
-                  ],
-                ),
-              ],
-              treatments: [
-                'Dermal Fillers',
-                'Laser Resurfacing',
-                'HydraFacial',
-                'Microneedling',
-              ],
-            ),
-          );
+         
           return true;
         }) ??
         false;
@@ -420,7 +366,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
 
   Future<bool> getFounderClinicDetail(int id) async {
     return await runSafely<bool?>(showLoading: true, () async {
-          try {
+          
             final response = await _clinicRepository.getFounderClinicDetail(
               id: id,
             );
@@ -430,18 +376,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
               );
               return true;
             }
-          } catch (e) {
-            // Fail-safe
-          }
-
-          final fallbackModel = state.founderClinics.firstWhereOrNull(
-            (r) => r.id == id,
-          );
-          state = state.copyWith(
-            selectedFounderClinicDetail:
-                fallbackModel 
-                
-          );
+        
           return true;
         }) ??
         false;
@@ -515,7 +450,7 @@ class ClinicViewModel extends BaseViewModel<ClinicState> {
         status: status,
       );
       if (clinic.isSuccess) {
-        await getClinics();
+        await getClinics(showloading: false);
       }
       return true;
     });
