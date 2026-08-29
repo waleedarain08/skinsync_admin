@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 import '../../models/clinic_subscription_plan_model.dart';
 import '../../models/patient_subscription_plan_model.dart';
@@ -129,7 +130,9 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
   }
 
   Widget _buildClinicPlansContent(
-      BuildContext context, SubscriptionState state) {
+    BuildContext context,
+    SubscriptionState state,
+  ) {
     final plans = state.plans ?? [];
 
     return ListView(
@@ -165,7 +168,9 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
   }
 
   Widget _buildPatientPlansContent(
-      BuildContext context, SubscriptionState state) {
+    BuildContext context,
+    SubscriptionState state,
+  ) {
     final plans = state.patientPlans ?? [];
 
     return ListView(
@@ -219,7 +224,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
             children: [
               Expanded(
                 child: Text(
-                  plan.name ?? 'N/A',
+                  (plan.name ?? 'N/A').capitalize,
                   style: context.fonts.black18w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -233,7 +238,9 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                   if (plan.isLifetime == true) ...[
                     context.horizontalSpace(8),
                     const AppBadge(
-                        label: 'Lifetime', variant: AppBadgeVariant.info),
+                      label: 'Lifetime',
+                      variant: AppBadgeVariant.info,
+                    ),
                   ],
                 ],
               ),
@@ -345,7 +352,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            benefit.title ?? '',
+                            (benefit.title ?? '').capitalize,
                             style: context.fonts.black13w600,
                           ),
                           if (benefit.description != null &&
@@ -418,7 +425,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
             children: [
               Expanded(
                 child: Text(
-                  plan.name ?? 'N/A',
+                  (plan.name ?? 'N/A').capitalize,
                   style: context.fonts.black18w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -432,12 +439,16 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                   if (plan.isDefault == true) ...[
                     context.horizontalSpace(8),
                     const AppBadge(
-                        label: 'Default', variant: AppBadgeVariant.info),
+                      label: 'Default',
+                      variant: AppBadgeVariant.info,
+                    ),
                   ],
                   if (plan.isLifetime == true) ...[
                     context.horizontalSpace(8),
                     const AppBadge(
-                        label: 'Lifetime', variant: AppBadgeVariant.info),
+                      label: 'Lifetime',
+                      variant: AppBadgeVariant.info,
+                    ),
                   ],
                 ],
               ),
@@ -539,7 +550,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  benefit.title ?? '',
+                                  (benefit.title ?? '').capitalize,
                                   style: context.fonts.black13w600,
                                 ),
                                 if (benefit.description != null &&

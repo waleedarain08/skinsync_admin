@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import '../../models/responses/patient_list_response.dart';
 import '../../utils/enums.dart';
 import '../../utils/responsive.dart';
@@ -351,7 +352,7 @@ class _PatientManagementScreenState
 
           Expanded(
             child: Text(
-              patient.patientName ?? 'N/A',
+              (patient.patientName ?? 'N/A').capitalize,
               style: context.fonts.black14w600,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

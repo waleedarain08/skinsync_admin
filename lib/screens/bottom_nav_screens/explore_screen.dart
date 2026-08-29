@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/models/explore_models.dart';
@@ -625,7 +624,6 @@ class _ReelCard extends ConsumerWidget {
                             ? CustomColors.purple
                             : CustomColors.grey,
                         onTap: () {
-                         
                           if (reel.id != null) {
                             ref
                                 .read(exploreViewModelProvider.notifier)
@@ -650,7 +648,7 @@ class _ReelCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-               
+
                 if (reel.status.toLowerCase() != Status.active.name)
                   IgnorePointer(
                     child: DecoratedBox(
@@ -858,7 +856,7 @@ class _PostListItem extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   LogoAndNameWidget(
-                    profileName: post.profileName ?? 'N/A',
+                    profileName: (post.profileName ?? 'N/A').capitalize,
                     profileLogo: post.profileLogo ?? '',
                   ),
 
@@ -932,7 +930,7 @@ class _PostListItem extends ConsumerWidget {
                       borderRadius: context.appBorderRadius(all: 4),
                     ),
                     child: Text(
-                      post.category!,
+                      post.category!.capitalize,
                       style: context.fonts.purple11w600,
                     ),
                   ),

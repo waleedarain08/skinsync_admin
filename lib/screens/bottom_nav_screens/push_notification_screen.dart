@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:skinsync_admin/utils/assets.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -52,7 +53,10 @@ class PushNotificationScreen extends StatelessWidget {
                       ],
                     ),
                     context.verticalSpace(40),
-                    Text('Notification Title', style: context.fonts.black16w600),
+                    Text(
+                      'Notification Title',
+                      style: context.fonts.black16w600,
+                    ),
                     context.verticalSpace(10),
                     TextField(
                       decoration: InputDecoration(
@@ -66,15 +70,21 @@ class PushNotificationScreen extends StatelessWidget {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: context.appBorderRadius(all: 10),
-                          borderSide: const BorderSide(color: CustomColors.border),
+                          borderSide: const BorderSide(
+                            color: CustomColors.border,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: context.appBorderRadius(all: 10),
-                          borderSide: const BorderSide(color: CustomColors.purple),
+                          borderSide: const BorderSide(
+                            color: CustomColors.purple,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: context.appBorderRadius(all: 10),
-                          borderSide: const BorderSide(color: CustomColors.border),
+                          borderSide: const BorderSide(
+                            color: CustomColors.border,
+                          ),
                         ),
                       ),
                     ),
@@ -96,15 +106,21 @@ class PushNotificationScreen extends StatelessWidget {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: context.appBorderRadius(all: 10),
-                          borderSide: const BorderSide(color: CustomColors.border),
+                          borderSide: const BorderSide(
+                            color: CustomColors.border,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: context.appBorderRadius(all: 10),
-                          borderSide: const BorderSide(color: CustomColors.purple),
+                          borderSide: const BorderSide(
+                            color: CustomColors.purple,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: context.appBorderRadius(all: 10),
-                          borderSide: const BorderSide(color: CustomColors.border),
+                          borderSide: const BorderSide(
+                            color: CustomColors.border,
+                          ),
                         ),
                       ),
                     ),
@@ -123,15 +139,21 @@ class PushNotificationScreen extends StatelessWidget {
                         ),
                         border: OutlineInputBorder(
                           borderRadius: context.appBorderRadius(all: 10),
-                          borderSide: const BorderSide(color: CustomColors.border),
+                          borderSide: const BorderSide(
+                            color: CustomColors.border,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: context.appBorderRadius(all: 10),
-                          borderSide: const BorderSide(color: CustomColors.purple),
+                          borderSide: const BorderSide(
+                            color: CustomColors.purple,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: context.appBorderRadius(all: 10),
-                          borderSide: const BorderSide(color: CustomColors.border),
+                          borderSide: const BorderSide(
+                            color: CustomColors.border,
+                          ),
                         ),
                       ),
                     ),
@@ -205,7 +227,7 @@ class PushNotificationScreen extends StatelessWidget {
                     ),
                     context.verticalSpace(20),
                     const PushNotificationTable(),
-                     context.verticalSpace(20),
+                    context.verticalSpace(20),
                   ],
                 ),
               ),
@@ -281,9 +303,7 @@ class PushNotificationTable extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: constraints.maxWidth),
               child: DataTable(
-                headingRowColor: WidgetStateProperty.all(
-                  Colors.grey.shade100,
-                ),
+                headingRowColor: WidgetStateProperty.all(Colors.grey.shade100),
                 headingRowHeight: context.h(50),
                 dataRowMinHeight: context.h(60),
                 dataRowMaxHeight: context.h(60),
@@ -305,10 +325,12 @@ class PushNotificationTable extends StatelessWidget {
                   ),
                   DataColumn(
                     columnWidth: FixedColumnWidth(context.w(260)),
-                    label: Text('Message',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis, 
-                    style: context.fonts.black16w600),
+                    label: Text(
+                      'Message',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.fonts.black16w600,
+                    ),
                   ),
                   DataColumn(
                     columnWidth: FixedColumnWidth(context.w(192)),
@@ -393,9 +415,9 @@ class PushNotificationTable extends StatelessWidget {
   ) {
     return DataRow(
       cells: [
-        DataCell(Text(title, style: context.fonts.black14w400)),
-        DataCell(Text(message, style: context.fonts.black14w400)),
-        DataCell(Text(audience, style: context.fonts.black14w400)),
+        DataCell(Text(title.capitalize, style: context.fonts.black14w400)),
+        DataCell(Text(message.capitalize, style: context.fonts.black14w400)),
+        DataCell(Text(audience.capitalize, style: context.fonts.black14w400)),
         DataCell(Text(recipients, style: context.fonts.black14w400)),
         DataCell(Text(sentAtTime, style: context.fonts.black14w400)),
         DataCell(Text(sentAtDate, style: context.fonts.black14w400)),

@@ -5,6 +5,7 @@ import 'package:skinsync_admin/view_models/setting_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 import '../../models/requests/app_version_request.dart';
 import '../../utils/theme.dart';
@@ -200,7 +201,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: context.fonts.black18w600),
+            Text(title.capitalize, style: context.fonts.black18w600),
             SizedBox(height: 15.h),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,

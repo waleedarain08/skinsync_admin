@@ -17,6 +17,7 @@ import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/theme.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 /// Single source of truth for a sidebar entry. `routes`, the tappable
 /// items, and the section-header separators are all derived from this
@@ -89,11 +90,11 @@ final List<_SidebarEntry> _sidebarEntries = [
     label: 'Users',
     included: !isDeploymentMode,
   ),
-   _SidebarEntry(
+  _SidebarEntry(
     routeName: PaymentScreen.routeName,
     icon: Icons.account_balance_wallet_rounded,
     label: 'Payments',
-     included: !isDeploymentMode,
+    included: !isDeploymentMode,
   ),
   _SidebarEntry(
     routeName: DisputeScreen.routeName,
@@ -227,13 +228,13 @@ class AppSidebar extends StatelessWidget {
       for (var i = 0; i < entries.length; i++)
         SidebarXItem(
           icon: entries[i].icon,
-          label: entries[i].label,
+          label: entries[i].label.capitalize,
           onTap: () => onItemTap(i),
         ),
     ];
   }
 
-    Widget _separatorBuilder(
+  Widget _separatorBuilder(
     BuildContext context,
     int index,
     SidebarXController controller,
@@ -241,7 +242,9 @@ class AppSidebar extends StatelessWidget {
     final entries = _visibleSidebarEntries;
     final nextIndex = index + 1;
 
-    final section = nextIndex < entries.length ? entries[nextIndex].section : null;
+    final section = nextIndex < entries.length
+        ? entries[nextIndex].section
+        : null;
     if (section != null) {
       return _SectionLabel(title: section, controller: controller);
     }
@@ -329,7 +332,7 @@ class _SectionLabel extends StatelessWidget {
             right: 16,
             bottom: 8,
           ),
-          child: Text(title, style: context.fonts.grey11w600ls12),
+          child: Text(title.capitalize, style: context.fonts.grey11w600ls12),
         );
       },
     );

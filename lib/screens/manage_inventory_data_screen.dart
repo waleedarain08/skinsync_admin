@@ -11,6 +11,7 @@ import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/product_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 class ManageInventoryDataScreen extends ConsumerStatefulWidget {
   const ManageInventoryDataScreen({super.key});
@@ -22,7 +23,8 @@ class ManageInventoryDataScreen extends ConsumerStatefulWidget {
       _ManageInventoryDataScreenState();
 }
 
-class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataScreen>
+class _ManageInventoryDataScreenState
+    extends ConsumerState<ManageInventoryDataScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -144,7 +146,7 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: context.fonts.black18w600),
+        Text(title.capitalize, style: context.fonts.black18w600),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -152,10 +154,7 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: CustomColors.border),
           ),
-          child: Text(
-            '$count items',
-            style: context.fonts.purple14w600,
-          ),
+          child: Text('$count items', style: context.fonts.purple14w600),
         ),
       ],
     );
@@ -172,10 +171,7 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
     }
     if (items.isEmpty) {
       return Center(
-        child: Text(
-          'No items found',
-          style: context.fonts.grey14w400,
-        ),
+        child: Text('No items found', style: context.fonts.grey14w400),
       );
     }
     return SingleChildScrollView(
@@ -219,7 +215,10 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
                 color: CustomColors.purple,
               ),
             ),
-            title: Text(manufacturer.name, style: context.fonts.black16w600),
+            title: Text(
+              manufacturer.name.capitalize,
+              style: context.fonts.black16w600,
+            ),
             subtitle: Text(
               '${manufacturer.brand.length} associated brands',
               style: context.fonts.grey12w400,
@@ -246,7 +245,10 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
                           size: 18,
                           color: CustomColors.grey,
                         ),
-                        title: Text(brand.name, style: context.fonts.black14w400),
+                        title: Text(
+                          brand.name.capitalize,
+                          style: context.fonts.black14w400,
+                        ),
                       );
                     }).toList(),
                   ),
@@ -285,12 +287,12 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(brand.name, style: context.fonts.black16w600),
-                    context.verticalSpace(4),
                     Text(
-                      'ID: ${brand.id}',
-                      style: context.fonts.grey12w400,
+                      brand.name.capitalize,
+                      style: context.fonts.black16w600,
                     ),
+                    context.verticalSpace(4),
+                    Text('ID: ${brand.id}', style: context.fonts.grey12w400),
                   ],
                 ),
               ),
@@ -328,12 +330,12 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(usage.name, style: context.fonts.black16w600),
-                    context.verticalSpace(4),
                     Text(
-                      'ID: ${usage.id}',
-                      style: context.fonts.grey12w400,
+                      usage.name.capitalize,
+                      style: context.fonts.black16w600,
                     ),
+                    context.verticalSpace(4),
+                    Text('ID: ${usage.id}', style: context.fonts.grey12w400),
                   ],
                 ),
               ),
@@ -371,12 +373,12 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(package.name, style: context.fonts.black16w600),
-                    context.verticalSpace(4),
                     Text(
-                      'ID: ${package.id}',
-                      style: context.fonts.grey12w400,
+                      package.name.capitalize,
+                      style: context.fonts.black16w600,
                     ),
+                    context.verticalSpace(4),
+                    Text('ID: ${package.id}', style: context.fonts.grey12w400),
                   ],
                 ),
               ),
@@ -414,12 +416,12 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(unit.name, style: context.fonts.black16w600),
-                    context.verticalSpace(4),
                     Text(
-                      'ID: ${unit.id}',
-                      style: context.fonts.grey12w400,
+                      unit.name.capitalize,
+                      style: context.fonts.black16w600,
                     ),
+                    context.verticalSpace(4),
+                    Text('ID: ${unit.id}', style: context.fonts.grey12w400),
                   ],
                 ),
               ),
@@ -457,12 +459,12 @@ class _ManageInventoryDataScreenState extends ConsumerState<ManageInventoryDataS
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(supplier.name, style: context.fonts.black16w600),
-                    context.verticalSpace(4),
                     Text(
-                      'ID: ${supplier.id}',
-                      style: context.fonts.grey12w400,
+                      supplier.name.capitalize,
+                      style: context.fonts.black16w600,
                     ),
+                    context.verticalSpace(4),
+                    Text('ID: ${supplier.id}', style: context.fonts.grey12w400),
                   ],
                 ),
               ),

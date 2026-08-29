@@ -17,6 +17,7 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 class ClinicDetailScreen extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-detail';
@@ -50,16 +51,17 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     _websiteController = TextEditingController(text: clinic?.website ?? '');
     _descriptionController = TextEditingController(text: clinic?.description);
     _latController = TextEditingController(text: clinic?.latitude?.toString());
-    _longController = TextEditingController(text: clinic?.longitude?.toString());
+    _longController = TextEditingController(
+      text: clinic?.longitude?.toString(),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authViewModelProvider.notifier).setCountry(
-        CountryCode.fromCountryCode(clinic?.country ?? 'US'),
-      );
-      ref.read(clinicViewModelProvider.notifier).initClinicImages(
-        banner: clinic?.banner,
-        logo: clinic?.logo,
-      );
+      ref
+          .read(authViewModelProvider.notifier)
+          .setCountry(CountryCode.fromCountryCode(clinic?.country ?? 'US'));
+      ref
+          .read(clinicViewModelProvider.notifier)
+          .initClinicImages(banner: clinic?.banner, logo: clinic?.logo);
     });
   }
 
@@ -151,10 +153,9 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                 _websiteController.text = clinic.website ?? '';
                 _latController.text = clinic.latitude?.toString() ?? '';
                 _longController.text = clinic.longitude?.toString() ?? '';
-                ref.read(clinicViewModelProvider.notifier).initClinicImages(
-                  banner: clinic.banner,
-                  logo: clinic.logo,
-                );
+                ref
+                    .read(clinicViewModelProvider.notifier)
+                    .initClinicImages(banner: clinic.banner, logo: clinic.logo);
               }
               setState(() => _isEditMode = !_isEditMode);
             },
@@ -225,7 +226,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                       children: [
                         Flexible(
                           child: Text(
-                            clinic.name ?? 'N/A',
+                            (clinic.name ?? 'N/A').capitalize,
                             style: context.fonts.level2Heading,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -515,7 +516,10 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             size: 20.sp,
           ),
           SizedBox(width: 12.w),
-          Text(treatment.toString(), style: context.fonts.black14w500),
+          Text(
+            treatment.toString().capitalize,
+            style: context.fonts.black14w500,
+          ),
         ],
       ),
     );
@@ -595,7 +599,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: context.fonts.black16w700),
+          Text(title.capitalize, style: context.fonts.black16w700),
           SizedBox(height: 24.h),
           ...children,
         ],
