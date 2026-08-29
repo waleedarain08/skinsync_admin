@@ -11,6 +11,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/explore_screen.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/consent_and_compliance_forms_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/forms_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/home_page.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
@@ -206,6 +207,12 @@ class RouteGenerator {
             builder: (_, _) => const SubscriptionPlansTab(),
           ),
           GoRoute(
+            name: ConsentAndComplianceFormsScreen.routeName,
+            path: ConsentAndComplianceFormsScreen.routeName,
+            builder: (_, _) => const ConsentAndComplianceFormsScreen(),
+           
+          ),
+           GoRoute(
             name: FormsScreen.routeName,
             path: FormsScreen.routeName,
             builder: (_, _) => const FormsScreen(),
