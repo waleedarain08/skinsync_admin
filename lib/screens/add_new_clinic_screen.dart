@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skinsync_admin/models/requests/register_clinic_request_model.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/auth_view_model.dart';
@@ -99,8 +100,6 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
     super.dispose();
   }
 
-
-
   void _addAvailability() {
     setState(() {
       _availabilityEntries.add(AvailabilityEntry());
@@ -155,7 +154,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       consultationFee: num.parse(_initialDepositController.text.trim()),
       initialDeposit: num.parse(_consultationFeeController.text.trim()),
       availability: availability,
-      isInviteClinc: widget.onBoardClinic
+      isInviteClinc: widget.onBoardClinic,
     );
 
     final success = await ref
@@ -348,7 +347,7 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
                                 );
                               },
                             ),
-                           
+
                             SizedBox(height: 24.h),
                             Row(
                               spacing: 24.w,
@@ -502,11 +501,10 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _availabilityEntries.length,
-          separatorBuilder:
-              (_, _) => Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.h),
-                child: Divider(color: CustomColors.grey.withValues(alpha: 0.1)),
-              ),
+          separatorBuilder: (_, _) => Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            child: Divider(color: CustomColors.grey.withValues(alpha: 0.1)),
+          ),
           itemBuilder: (context, index) {
             return _buildAvailabilityRow(index);
           },
@@ -514,8 +512,6 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       ],
     );
   }
-
-
 
   Widget _buildBannerAndLogoCard({
     required BuildContext context,
@@ -644,8 +640,6 @@ class _AddNewClinicScreenState extends ConsumerState<AddNewClinicScreen> {
       ),
     );
   }
-
-
 
   Widget _buildAvailabilityRow(int index) {
     final entry = _availabilityEntries[index];

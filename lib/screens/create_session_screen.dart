@@ -16,6 +16,7 @@ import '../view_models/treatment_view_model.dart';
 import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import '../widgets/live_session_preview_widget.dart';
 import '../widgets/nested_area_selector.dart';
 import '../widgets/protocol_preview_widget.dart';
@@ -380,7 +381,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titles[stepIndex], style: context.fonts.level2Heading),
+                  Text(
+                    titles[stepIndex].capitalize,
+                    style: context.fonts.level2Heading,
+                  ),
                   Text(
                     descriptions[stepIndex],
                     style: context.fonts.grey14w400,
@@ -549,7 +553,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: context.fonts.purple12w700),
+          Text(title.capitalize, style: context.fonts.purple12w700),
           context.verticalSpace(12),
           child,
         ],
@@ -1441,7 +1445,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(p.title, style: context.fonts.black13w400),
+                          Text(
+                            p.title.capitalize,
+                            style: context.fonts.black13w400,
+                          ),
                           Builder(
                             builder: (context) {
                               final pNote = sessionState.selectedProtocolNotes
@@ -1498,7 +1505,7 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(p.title, style: context.fonts.black12w600),
+                    Text(p.title.capitalize, style: context.fonts.black12w600),
                     context.verticalSpace(8),
                     Container(
                       height: context.h(40),

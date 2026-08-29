@@ -10,6 +10,7 @@ import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 class InviteClinicDetailScreen extends ConsumerWidget {
   static const String routeName = '/invite-clinic-detail';
@@ -139,7 +140,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              clinic.name ?? 'N/A',
+                              (clinic.name ?? 'N/A').capitalize,
                               style: context.fonts.level2Heading,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -207,7 +208,11 @@ class InviteClinicDetailScreen extends ConsumerWidget {
               context,
               Icons.calendar_today_outlined,
               'Invitation Date',
-              formatDateTime(clinic.createdAt, includeTime: true, timeSeparator: ' | '),
+              formatDateTime(
+                clinic.createdAt,
+                includeTime: true,
+                timeSeparator: ' | ',
+              ),
             ),
           ],
         ]),
@@ -259,7 +264,10 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             size: context.sp(20),
           ),
           context.horizontalSpace(12),
-          Text(treatment.toString(), style: context.fonts.black14w500),
+          Text(
+            treatment.toString().capitalize,
+            style: context.fonts.black14w500,
+          ),
         ],
       ),
     );
@@ -376,7 +384,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: context.fonts.black16w700),
+          Text(title.capitalize, style: context.fonts.black16w700),
           context.verticalSpace(24),
           ...children,
         ],
@@ -409,7 +417,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
               children: [
                 Text(label, style: context.fonts.grey13w500),
                 Text(
-                  value,
+                  value.capitalize,
                   style: context.fonts.grey14w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

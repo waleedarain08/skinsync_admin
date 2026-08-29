@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/product_model.dart';
 import 'package:skinsync_admin/models/responses/product_detail_response.dart';
 import 'package:skinsync_admin/utils/sku_utils.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
@@ -77,7 +78,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
       ref.read(productViewModelProvider.notifier).setImageNull();
       ref.read(productViewModelProvider.notifier).clearDropdowns();
     });
-   
+
     _nameController = TextEditingController(text: widget.productToEdit?.name);
     _skuController = TextEditingController(
       text: widget.productToEdit?.globalSku,
@@ -167,7 +168,10 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Create New $title', style: context.fonts.black18w600),
+          title: Text(
+            'Create New ${title.capitalize}',
+            style: context.fonts.black18w600,
+          ),
           content: BuildTextField(
             label: 'Name',
             controller: controller,
@@ -229,7 +233,7 @@ class _CreateProductScreenState extends ConsumerState<CreateProductScreen> {
 
             child: image != null && image.isNotEmpty && image != ''
                 ? AppNetworkImage(
-                    imageUrl:  image,
+                    imageUrl: image,
                     width: 140.w,
                     height: 140.w,
                     fit: BoxFit.cover,

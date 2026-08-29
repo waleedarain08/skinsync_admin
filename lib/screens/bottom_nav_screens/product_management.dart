@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/utils/enums.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/widgets/app_loader.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
@@ -229,7 +230,10 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Create New $title', style: context.fonts.black18w600),
+          title: Text(
+            'Create New ${title.capitalize}',
+            style: context.fonts.black18w600,
+          ),
           content: BuildTextField(
             label: 'Name',
             controller: controller,
@@ -478,7 +482,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                   ),
                 ),
                 title: Text(
-                  man.name,
+                  man.name.capitalize,
                   style: context.fonts.black14w600.copyWith(
                     color: isExpanded
                         ? CustomColors.purple
@@ -553,7 +557,7 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
                                 size: context.sp(18),
                               ),
                               title: Text(
-                                brand.name,
+                                brand.name.capitalize,
                                 style: context.fonts.black13w600.copyWith(
                                   color: isBrandExpanded
                                       ? CustomColors.purple
@@ -689,10 +693,13 @@ class _ProductManagementState extends ConsumerState<ProductManagement> {
   }
 
   Widget _productNameCell(ProductModel product) {
-    final displayName = product.name.trim().isEmpty ? 'N/A' : product.name;
-    final displayBrand = product.brand == null || product.brand!.trim().isEmpty
-        ? 'N/A'
-        : product.brand!;
+    final displayName =
+        (product.name.trim().isEmpty ? 'N/A' : product.name).capitalize;
+    final displayBrand =
+        (product.brand == null || product.brand!.trim().isEmpty
+                ? 'N/A'
+                : product.brand!)
+            .capitalize;
     return Padding(
       padding: context.appEdgeInsets(horizontal: 16, vertical: 16),
       child: Row(

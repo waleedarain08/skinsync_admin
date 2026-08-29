@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
@@ -12,9 +13,10 @@ class SelectedAppointmentNotifier extends Notifier<AppointmentDummyModel?> {
   void set(AppointmentDummyModel? a) => state = a;
 }
 
-final selectedAppointmentProvider = NotifierProvider<SelectedAppointmentNotifier, AppointmentDummyModel?>(
-  SelectedAppointmentNotifier.new,
-);
+final selectedAppointmentProvider =
+    NotifierProvider<SelectedAppointmentNotifier, AppointmentDummyModel?>(
+      SelectedAppointmentNotifier.new,
+    );
 
 class AppointmentDetailScreen extends ConsumerWidget {
   static const String routeName = '/appointment-detail';
@@ -27,7 +29,10 @@ class AppointmentDetailScreen extends ConsumerWidget {
     if (appointment == null) {
       return GradientScaffold(
         body: Center(
-          child: Text('No Appointment Data Found', style: context.fonts.black16w400),
+          child: Text(
+            'No Appointment Data Found',
+            style: context.fonts.black16w400,
+          ),
         ),
       );
     }
@@ -54,9 +59,15 @@ class AppointmentDetailScreen extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 3, child: _buildMainContent(context, appointment)),
+                    Expanded(
+                      flex: 3,
+                      child: _buildMainContent(context, appointment),
+                    ),
                     context.horizontalSpace(32),
-                    Expanded(flex: 2, child: _buildSidebar(context, appointment)),
+                    Expanded(
+                      flex: 2,
+                      child: _buildSidebar(context, appointment),
+                    ),
                   ],
                 ),
               ],
@@ -75,7 +86,10 @@ class AppointmentDetailScreen extends ConsumerWidget {
           CircleAvatar(
             radius: 40.r,
             backgroundColor: CustomColors.palePurple,
-            child: Text(a.patientName[0], style: context.fonts.purple16w700),
+            child: Text(
+              a.patientName[0].capitalize,
+              style: context.fonts.purple16w700,
+            ),
           ),
           context.horizontalSpace(32),
           Expanded(
@@ -86,7 +100,7 @@ class AppointmentDetailScreen extends ConsumerWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        a.patientName,
+                        a.patientName.capitalize,
                         style: context.fonts.level2Heading,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -96,14 +110,25 @@ class AppointmentDetailScreen extends ConsumerWidget {
                   ],
                 ),
                 context.verticalSpace(8),
-                Text('${a.treatment} • ${a.clinic}', style: context.fonts.purple14w600),
+                Text(
+                  '${a.treatment.capitalize} • ${a.clinic.capitalize}',
+                  style: context.fonts.purple14w600,
+                ),
                 context.verticalSpace(16),
                 Wrap(
                   spacing: 12.w,
                   runSpacing: 12.h,
                   children: [
-                    _infoChip(context, Icons.calendar_today_outlined, 'Scheduled: ${a.dateTime}'),
-                    _infoChip(context, Icons.person_outline_rounded, 'Provider: ${a.provider}'),
+                    _infoChip(
+                      context,
+                      Icons.calendar_today_outlined,
+                      'Scheduled: ${a.dateTime}',
+                    ),
+                    _infoChip(
+                      context,
+                      Icons.person_outline_rounded,
+                      'Provider: ${a.provider.capitalize}',
+                    ),
                   ],
                 ),
               ],
@@ -118,21 +143,21 @@ class AppointmentDetailScreen extends ConsumerWidget {
     return Column(
       children: [
         _infoSection(context, 'Appointment & Schedule details', [
-          _detailRow(context, 'Consultation / Service Type', a.type),
-          _detailRow(context, 'Assigned Practitioner', a.provider),
+          _detailRow(context, 'Consultation / Service Type', a.type.capitalize),
+          _detailRow(context, 'Assigned Practitioner', a.provider.capitalize),
           _detailRow(context, 'Scheduled Session Time', a.dateTime),
           _detailRow(context, 'Est. Duration', '45 Minutes'),
         ]),
         context.verticalSpace(24),
         _infoSection(context, 'Patient Record Summary', [
-          _detailRow(context, 'Patient Name', a.patientName),
+          _detailRow(context, 'Patient Name', a.patientName.capitalize),
           _detailRow(context, 'Contact Email', a.patientEmail),
-          _detailRow(context, 'Assigned Home Clinic', a.clinic),
+          _detailRow(context, 'Assigned Home Clinic', a.clinic.capitalize),
         ]),
         context.verticalSpace(24),
         _infoSection(context, 'Internal Clinical Notes', [
           Text(
-            'Patient requested a focused skin review prior to starting the ${a.treatment} session. Please monitor baseline redness and lot history codes for skin suitability.',
+            'Patient requested a focused skin review prior to starting the ${a.treatment.capitalize} session. Please monitor baseline redness and lot history codes for skin suitability.',
             style: context.fonts.grey14w400h16,
           ),
         ]),
@@ -144,30 +169,59 @@ class AppointmentDetailScreen extends ConsumerWidget {
     return Column(
       children: [
         _infoSection(context, 'Performance Directory', [
-          _statRow(context, Icons.local_hospital_outlined, 'Associated Clinic', a.clinic),
-          _statRow(context, Icons.payments_outlined, 'Est. Revenue', '\$150.00'),
+          _statRow(
+            context,
+            Icons.local_hospital_outlined,
+            'Associated Clinic',
+            a.clinic.capitalize,
+          ),
+          _statRow(
+            context,
+            Icons.payments_outlined,
+            'Est. Revenue',
+            '\$150.00',
+          ),
         ]),
         context.verticalSpace(24),
         _infoSection(context, 'Activity Tracking Log', [
-          _timelineStep(context, '09:12 AM', 'Appointment Booked', 'Processed automatically via mobile application gateway.'),
+          _timelineStep(
+            context,
+            '09:12 AM',
+            'Appointment Booked',
+            'Processed automatically via mobile application gateway.',
+          ),
           context.verticalSpace(16),
-          _timelineStep(context, '09:30 AM', 'Practitioner Confirmed', 'Assigned practitioner ${a.provider} accepted request.'),
+          _timelineStep(
+            context,
+            '09:30 AM',
+            'Practitioner Confirmed',
+            'Assigned practitioner ${a.provider.capitalize} accepted request.',
+          ),
         ]),
       ],
     );
   }
 
-  Widget _timelineStep(BuildContext context, String time, String title, String desc) {
+  Widget _timelineStep(
+    BuildContext context,
+    String time,
+    String title,
+    String desc,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.check_circle_rounded, color: CustomColors.green, size: context.sp(16)),
+        Icon(
+          Icons.check_circle_rounded,
+          color: CustomColors.green,
+          size: context.sp(16),
+        ),
         context.horizontalSpace(12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: context.fonts.black14w600),
+              Text(title.capitalize, style: context.fonts.black14w600),
               context.verticalSpace(2),
               Text(time, style: context.fonts.grey11w400),
               context.verticalSpace(4),
@@ -179,13 +233,17 @@ class AppointmentDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _infoSection(BuildContext context, String title, List<Widget> children) {
+  Widget _infoSection(
+    BuildContext context,
+    String title,
+    List<Widget> children,
+  ) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: context.fonts.black16w700),
+          Text(title.capitalize, style: context.fonts.black16w700),
           context.verticalSpace(24),
           ...children,
         ],
@@ -201,13 +259,18 @@ class AppointmentDetailScreen extends ConsumerWidget {
         children: [
           Text(label, style: context.fonts.grey13w500),
           context.verticalSpace(4),
-          Text(value, style: context.fonts.black14w600),
+          Text(value.capitalize, style: context.fonts.black14w600),
         ],
       ),
     );
   }
 
-  Widget _statRow(BuildContext context, IconData icon, String label, String value) {
+  Widget _statRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Padding(
       padding: context.appEdgeInsets(bottom: 16),
       child: Row(
@@ -220,23 +283,35 @@ class AppointmentDetailScreen extends ConsumerWidget {
               Text(label, style: context.fonts.grey13w500),
             ],
           ),
-          Flexible(child: Text(value, style: context.fonts.grey14w600, overflow: TextOverflow.ellipsis)),
+          Flexible(
+            child: Text(
+              value,
+              style: context.fonts.grey14w600,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _statusBadge(BuildContext context, String status) {
-    final bool isCompleted = status.toLowerCase() == 'completed' || status.toLowerCase() == 'confirmed';
+    final bool isCompleted =
+        status.toLowerCase() == 'completed' ||
+        status.toLowerCase() == 'confirmed';
     return Container(
       padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isCompleted ? CustomColors.green.withValues(alpha: 0.1) : CustomColors.amber.withValues(alpha: 0.1),
+        color: isCompleted
+            ? CustomColors.green.withValues(alpha: 0.1)
+            : CustomColors.amber.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
         status.toUpperCase(),
-        style: isCompleted ? context.fonts.green10w700 : context.fonts.amber10w800ls1,
+        style: isCompleted
+            ? context.fonts.green10w700
+            : context.fonts.amber10w800ls1,
       ),
     );
   }
@@ -244,7 +319,10 @@ class AppointmentDetailScreen extends ConsumerWidget {
   Widget _infoChip(BuildContext context, IconData icon, String label) {
     return Container(
       padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(color: CustomColors.whiteGrey, borderRadius: BorderRadius.circular(8.r)),
+      decoration: BoxDecoration(
+        color: CustomColors.whiteGrey,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

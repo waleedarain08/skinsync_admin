@@ -5,6 +5,7 @@ import 'package:skinsync_admin/models/treatment_data_models.dart';
 import 'package:skinsync_admin/screens/create_treatment_screen.dart';
 import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
 import 'package:skinsync_admin/utils/enums.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/view_models/category_view_model.dart';
 
 import '../../../../widgets/app_network_image.dart';
@@ -368,7 +369,7 @@ class _TreatmentManagementScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  treatment.patientDisplayName ?? 'N/A',
+                  (treatment.patientDisplayName ?? 'N/A').capitalize,
                   style: context.fonts.black14w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -535,7 +536,7 @@ class _TreatmentManagementScreenState
                     context.push(CreateTreatmentScreen.routeName);
                   },
                   icon: Icons.add_rounded,
-                  label: 'Create Treatment',
+                  label: 'New Treatment',
                   width: context.w(180),
                 ),
               ],
@@ -644,7 +645,7 @@ class _TreatmentManagementScreenState
                         ),
                 ),
                 title: Text(
-                  cat.name,
+                  cat.name.capitalize,
                   style: context.fonts.black14w600.copyWith(
                     color: isExpanded
                         ? CustomColors.purple

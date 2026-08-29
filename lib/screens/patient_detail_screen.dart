@@ -375,6 +375,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/responses/patient_detail_response.dart';
 import '../../utils/theme.dart';
+import '../../utils/string_utils.dart';
 import '../../view_models/patient_view_model.dart';
 import '../../view_models/treatment_view_model.dart';
 import '../../widgets/app_loader.dart';
@@ -402,14 +403,14 @@ class _PatientManagementDetailScreenState
   @override
   void initState() {
     super.initState();
-  //  WidgetsBinding.instance.addPostFrameCallback((_) {
-      // ref
-      //     .read(patientProvider.notifier)
-      //     .getPatientTreatmentRequests(
-      //       initialCall: true,
-      //       patientId: widget.patientId,
-      //     );
-  //  });
+    //  WidgetsBinding.instance.addPostFrameCallback((_) {
+    // ref
+    //     .read(patientProvider.notifier)
+    //     .getPatientTreatmentRequests(
+    //       initialCall: true,
+    //       patientId: widget.patientId,
+    //     );
+    //  });
   }
 
   @override
@@ -443,7 +444,7 @@ class _PatientManagementDetailScreenState
             context.verticalSpace(24),
             _buildInfoSection(context, patient),
             context.verticalSpace(24),
-        //    _buildTreatmentRequestsSection(context, patientState),
+            //    _buildTreatmentRequestsSection(context, patientState),
           ],
         ),
       ),
@@ -465,7 +466,10 @@ class _PatientManagementDetailScreenState
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(p.patientName, style: context.fonts.level2Heading),
+                  Text(
+                    p.patientName.capitalize,
+                    style: context.fonts.level2Heading,
+                  ),
                   context.verticalSpace(4),
                   Container(
                     padding: context.appEdgeInsets(horizontal: 12, vertical: 4),
