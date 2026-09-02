@@ -15,6 +15,7 @@ import '../widgets/custom_outlined_button.dart';
 import '../widgets/custom_primary_button.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../widgets/session_creation_steps/treatment_creation_steps.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 class CreateTreatmentScreen extends ConsumerStatefulWidget {
   const CreateTreatmentScreen({super.key});
@@ -257,7 +258,10 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titles[stepIndex], style: context.fonts.level2Heading),
+                  Text(
+                    titles[stepIndex].capitalize,
+                    style: context.fonts.level2Heading,
+                  ),
                   Text(
                     descriptions[stepIndex],
                     style: context.fonts.grey14w400,
@@ -567,6 +571,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         icon: '',
         image: '',
         subAreasCount: 0,
+        description: '',
+        infoImage: '',
       ),
     );
 
@@ -604,6 +610,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           icon: '',
           image: '',
           subAreasCount: 0,
+          description: '',
+          infoImage: '',
         ),
       );
 

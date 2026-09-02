@@ -25,6 +25,7 @@ import '../../widgets/number_paginator.dart';
 import '../add_new_clinic_screen.dart';
 import '../clinic_detail_screen.dart';
 import '../invite_clinic_detail_screen.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 class ClinicManagement extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-management';
@@ -536,14 +537,14 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                   ),
                 ),
                 children: [
-                  _clinicNameCell(clinic.name, clinic.logo),
+                  _clinicNameCell(clinic.name?.capitalize, clinic.logo),
                   _clinicContactCell(
                     clinic.email,
                     clinic.phone,
                     clinic.address,
                   ),
                   _tableTextCell(
-                    clinic.subscriptionPlan,
+                    clinic.subscriptionPlan.capitalize,
                     style: context.fonts.black14w600,
                   ),
                   _tableTextCell(
@@ -615,7 +616,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                   ),
                 ),
                 children: [
-                  _clinicNameCell(clinic.name ?? '', clinic.logo),
+                  _clinicNameCell(clinic.name?.capitalize ?? '', clinic.logo),
                   _clinicContactCell(
                     clinic.email ?? '',
                     clinic.phone ?? '',
@@ -668,7 +669,7 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
           context.horizontalSpace(12),
           Expanded(
             child: Text(
-              name ?? 'N/A',
+              name?.capitalize ?? 'N/A',
               style: context.fonts.black14w600,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -849,13 +850,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                 ),
                 children: [
                   _tableTextCell(
-                    request.clinicName ?? 'N/A',
+                    request.clinicName?.capitalize ?? 'N/A',
                     style: context.fonts.black14w600,
                   ),
                   _clinicContactCell(
                     request.ownerEmail,
                     request.contactNumber,
-                    request.contactName,
+                    request.contactName?.capitalize,
                   ),
                   _tableTextCell(
                     request.clinicLocation ?? 'N/A',
@@ -956,13 +957,13 @@ class _ClinicManagementState extends ConsumerState<ClinicManagement>
                 ),
                 children: [
                   _tableTextCell(
-                    clinic.clinicName ?? 'N/A',
+                    clinic.clinicName?.capitalize ?? 'N/A',
                     style: context.fonts.black14w600,
                   ),
                   _clinicContactCell(
                     clinic.email,
                     clinic.phone,
-                    clinic.contactName,
+                    clinic.contactName?.capitalize,
                   ),
                   _tableTextCell(
                     clinic.address ?? 'N/A',

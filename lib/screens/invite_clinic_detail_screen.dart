@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
+import 'package:skinsync_admin/screens/shared_treatment_request_screen.dart';
 import 'package:skinsync_admin/utils/date_time_utills.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -139,7 +141,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              clinic.name ?? 'N/A',
+                              (clinic.name ?? 'N/A').capitalize,
                               style: context.fonts.level2Heading,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -207,7 +209,11 @@ class InviteClinicDetailScreen extends ConsumerWidget {
               context,
               Icons.calendar_today_outlined,
               'Invitation Date',
-              formatDateTime(clinic.createdAt, includeTime: true, timeSeparator: ' | '),
+              formatDateTime(
+                clinic.createdAt,
+                includeTime: true,
+                timeSeparator: ' | ',
+              ),
             ),
           ],
         ]),
@@ -259,7 +265,10 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             size: context.sp(20),
           ),
           context.horizontalSpace(12),
-          Text(treatment.toString(), style: context.fonts.black14w500),
+          Text(
+            treatment.toString().capitalize,
+            style: context.fonts.black14w500,
+          ),
         ],
       ),
     );
@@ -278,6 +287,24 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             style: context.fonts.grey13w500h15,
           ),
           context.verticalSpace(24),
+          _actionButton(
+            context,
+            'View Requested Treatment',
+            Icons.assignment_outlined,
+            CustomColors.black,
+            CustomColors.black,
+            () {
+              context.pushNamed(
+                SharedTreatmentRequestScreen.routeName,
+                queryParameters: {
+                  'clinicId': clinic.clinicId.toString(),
+                  'showBackButton': 'true',
+                },
+              );
+            },
+            isOutlined: true,
+          ),
+          context.verticalSpace(12),
           _actionButton(
             context,
             'Invite Clinic Now',
@@ -376,7 +403,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: context.fonts.black16w700),
+          Text(title.capitalize, style: context.fonts.black16w700),
           context.verticalSpace(24),
           ...children,
         ],
@@ -409,7 +436,7 @@ class InviteClinicDetailScreen extends ConsumerWidget {
               children: [
                 Text(label, style: context.fonts.grey13w500),
                 Text(
-                  value,
+                  value.capitalize,
                   style: context.fonts.grey14w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

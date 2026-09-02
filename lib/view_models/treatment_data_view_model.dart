@@ -254,6 +254,8 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     String? sku,
     required String icon,
     required String image,
+    required String? infoImageUrl,
+    required String? description,
   }) async {
     if (name.isEmpty) return;
     final finalSku = (sku == null || sku.isEmpty)
@@ -268,6 +270,8 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
           globalSku: finalSku,
           icon: icon,
           imageUrl: image,
+          infoImageUrl: infoImageUrl ?? '',
+          description: description ?? '',
         );
     // state = state.copyWith(areas: [...state.areas, newArea]);
   }
@@ -278,6 +282,8 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     required String sku,
     required String icon,
     required String image,
+    required String infoImageUrl,
+    required String description,
   }) async {
     await ref
         .read(areaViewModelProvider.notifier)
@@ -287,6 +293,8 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
           globalSku: sku,
           icon: icon,
           imageUrl: image,
+          infoImageUrl: infoImageUrl,
+          description: description
         );
   
   }
@@ -306,6 +314,8 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     String? sku,
     String? icon,
     String? image,
+    String? infoImageUrl,
+    String? description,
   }) async {
     final value = await ref
         .read(areaViewModelProvider.notifier)
@@ -315,6 +325,8 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
           icon: icon!,
           parentId: parentAreaId,
           imageUrl: image!,
+          infoImageUrl: infoImageUrl!,
+          description: description!,
         );
 
     if (value == true) {
@@ -328,6 +340,8 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
     required String icon,
     required String image,
     required int id,
+     required String? infoImageUrl,
+   required String? description,
   }) async {
     final result = await ref
         .read(areaViewModelProvider.notifier)
@@ -337,6 +351,8 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
           globalSku: sku,
           icon: icon,
           imageUrl: image,
+          infoImageUrl: infoImageUrl ?? '',
+          description: description ?? '',
         );
     if (result == true) {
       await ref.read(areaViewModelProvider.notifier).refreshAreas();

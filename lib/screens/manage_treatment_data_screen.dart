@@ -15,6 +15,7 @@ import 'package:skinsync_admin/widgets/dailogbox/area_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/category_creation_dialog.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 import '../models/responses/area_list_response.dart';
 
@@ -86,8 +87,6 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
       );
     }
   }
-
-
 
   static void _showProtocolDialog({
     required BuildContext context,
@@ -359,7 +358,7 @@ class ManageTreatmentDataScreen extends ConsumerStatefulWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(protocol.title, style: context.fonts.black18w600),
+            Text(protocol.title.capitalize, style: context.fonts.black18w600),
             context.verticalSpace(8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -618,6 +617,9 @@ class _ManageTreatmentDataScreenState
                   sku: result['sku'] as String,
                   icon: result['icon'] as String,
                   image: result['image'] as String,
+                  description: result['description'] as String? ?? '',
+                  infoImageUrl:
+                      result['infoImageUrl'] as String? ?? '',
                 );
               }
             },
@@ -789,7 +791,7 @@ class _ManageTreatmentDataScreenState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: context.fonts.black18w600),
+        Text(title.capitalize, style: context.fonts.black18w600),
         CustomPrimaryButton(
           onTap: onAdd,
           icon: Icons.add,
@@ -799,8 +801,6 @@ class _ManageTreatmentDataScreenState
       ],
     );
   }
-
-
 }
 
 class _RecursiveCategoryTile extends StatelessWidget {
@@ -835,7 +835,7 @@ class _RecursiveCategoryTile extends StatelessWidget {
             errorIconColor: CustomColors.purple,
           ),
         ),
-        title: Text(category.name, style: context.fonts.black16w600),
+        title: Text(category.name.capitalize, style: context.fonts.black16w600),
         subtitle: Text(
           '${category.subCategories.length} sub-categories',
           style: context.fonts.grey12w400,
@@ -993,7 +993,7 @@ class _RecursiveAreaTile extends StatelessWidget {
             errorIconColor: CustomColors.purple,
           ),
         ),
-        title: Text(area.name, style: context.fonts.black16w600),
+        title: Text(area.name.capitalize, style: context.fonts.black16w600),
         subtitle: Text(
           '${area.subAreasCount} sub-areas',
           style: context.fonts.grey12w400,
@@ -1022,6 +1022,9 @@ class _RecursiveAreaTile extends StatelessWidget {
                     sku: result['sku'] as String,
                     icon: result['icon'] as String,
                     image: result['image'] as String,
+                    description: result['description'] as String? ?? '',
+                    infoImageUrl:
+                        result['infoImageUrl'] as String? ?? '',
                   );
                 }
               },
@@ -1038,6 +1041,8 @@ class _RecursiveAreaTile extends StatelessWidget {
                     initialIconUrl: area.icon,
                     initialImageUrl: area.image,
                     initialSku: area.globalSku,
+                    initialInfoImageUrl: area.infoImage,
+                    initialDescription: area.description,
                   ),
                 );
                 if (result != null) {
@@ -1048,6 +1053,9 @@ class _RecursiveAreaTile extends StatelessWidget {
                       sku: result['sku'] as String,
                       icon: result['icon'] as String,
                       image: result['image'] as String,
+                      description: result['description'] as String? ?? '',
+                      infoImageUrl:
+                          result['infoImageUrl'] as String? ?? '',
                     );
                   } else {
                     await viewModel.editSubArea(
@@ -1056,6 +1064,9 @@ class _RecursiveAreaTile extends StatelessWidget {
                       sku: result['sku'] as String,
                       icon: result['icon'] as String,
                       image: result['image'] as String,
+                      description: result['description'] as String? ?? '',
+                      infoImageUrl:
+                          result['infoImageUrl'] as String? ?? '',
                     );
                   }
                 }
@@ -1088,9 +1099,9 @@ class _RecursiveAreaTile extends StatelessWidget {
                 area.name,
                 () {
                   if (level == 0) {
-                    viewModel.deleteArea(name:  area.name, id:  area.id);
+                    viewModel.deleteArea(name: area.name, id: area.id);
                   } else {
-                    viewModel.deleteSubArea(id:area.id );
+                    viewModel.deleteSubArea(id: area.id);
                   }
                 },
               ),
@@ -1114,5 +1125,3 @@ class _RecursiveAreaTile extends StatelessWidget {
     );
   }
 }
-
-

@@ -15,7 +15,18 @@ typedef SubAreaSetter =
       String? sku,
       String? icon,
       String? image,
+      String? infoImageUrl,
+      String? description,
     });
+
+typedef AreaAddCallback = void Function(
+  String name,
+  String sku,
+  String icon,
+  String image,
+  String description,
+  String infoImageUrl,
+);
 
 class PreviewItem {
   final String label;
@@ -198,8 +209,7 @@ class NestedAreaSelector extends ConsumerStatefulWidget {
   onSubAreaChildToggle;
 
   // Creation callbacks
-  final void Function(String name, String sku, String icon, String image)
-  onAddArea;
+  final AreaAddCallback onAddArea;
   final SubAreaSetter onAddSubArea;
   final void Function(
     String parentArea,
@@ -231,13 +241,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
   Future<void> _showAddNodeDialog({
     required BuildContext context,
     required String title,
-    required void Function(
-      String name,
-      String sku,
-      String iconUrl,
-      String imageUrl,
-    )
-    onAdd,
+    required AreaAddCallback onAdd,
   }) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -250,6 +254,8 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
         result['sku'] as String,
         result['icon'] as String,
         result['image'] as String,
+        result['description'] as String? ?? '',
+        result['infoImageUrl'] as String? ?? '',
       );
     }
   }
@@ -339,8 +345,7 @@ class _NestedAreaSelectorState extends ConsumerState<NestedAreaSelector> {
                 _showAddNodeDialog(
                   context: context,
                   title: 'Create New Main Area',
-                  onAdd: (name, sku, icon, image) =>
-                      widget.onAddArea(name, sku, icon, image),
+                  onAdd: widget.onAddArea,
                 );
               },
               icon: const Icon(Icons.add_circle_outline, size: 18),
@@ -438,14 +443,9 @@ class _RecursiveAreaTile extends StatelessWidget {
   final Future<void> Function({
     required BuildContext context,
     required String title,
-    required void Function(
-      String name,
-      String sku,
-      String iconUrl,
-      String imageUrl,
-    )
-    onAdd,
-  }) showAddNodeDialog;
+    required AreaAddCallback onAdd,
+  })
+  showAddNodeDialog;
 
   const _RecursiveAreaTile({
     required this.area,
@@ -563,13 +563,16 @@ class _RecursiveAreaTile extends StatelessWidget {
             showAddNodeDialog(
               context: context,
               title: 'Create New Sub-Area in ${area.name}',
-              onAdd: (name, sku, icon, image) => onAddSubArea(
+              onAdd: (name, sku, icon, image, description, infoImageUrl) =>
+                  onAddSubArea(
                 parentAreaId: area.id,
                 parentAreaName: area.name,
                 name: name,
                 sku: sku,
                 icon: icon,
                 image: image,
+                description: description,
+                infoImageUrl: infoImageUrl,
               ),
             );
           },

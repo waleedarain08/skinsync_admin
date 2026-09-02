@@ -9,6 +9,7 @@ import 'package:skinsync_admin/widgets/dailogbox/basic_info_dialog.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/status_toggle_switch.dart';
 import 'package:skinsync_admin/widgets/treatment_session_expansion_tile.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 class TreatmentDetailScreen extends ConsumerWidget {
   const TreatmentDetailScreen({super.key});
@@ -54,7 +55,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         flexibleSpace: AppDecorations.appBarGradient,
         title: Text(
-          detail.patientDisplayName ?? 'Treatment Details',
+          (detail.patientDisplayName ?? 'Treatment Details').capitalize,
           style: context.fonts.black18w600,
         ),
         centerTitle: true,
@@ -159,7 +160,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                detail.patientDisplayName ?? 'N/A',
+                                (detail.patientDisplayName ?? 'N/A').capitalize,
                                 style: context.fonts.level2Heading,
                               ),
                             ),
@@ -180,8 +181,11 @@ class TreatmentDetailScreen extends ConsumerWidget {
                                             newStatus,
                                             callDetail: true,
                                           );
-                                      ref.read(treatmentViewModelProvider.notifier).initialize();
-
+                                      ref
+                                          .read(
+                                            treatmentViewModelProvider.notifier,
+                                          )
+                                          .initialize();
                                     }
                                   },
                                 );
@@ -426,7 +430,7 @@ class TreatmentDetailScreen extends ConsumerWidget {
                               ),
                               context.horizontalSpace(8),
                               Text(
-                                area.areaName ?? 'Target Area',
+                                (area.areaName ?? 'Target Area').capitalize,
                                 style: context.fonts.black14w700.copyWith(
                                   color: CustomColors.purple,
                                 ),

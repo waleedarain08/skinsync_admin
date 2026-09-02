@@ -23,6 +23,7 @@ import 'package:skinsync_admin/services/product_services.dart';
 import 'package:skinsync_admin/services/provider_roles_service.dart';
 import 'package:skinsync_admin/services/session_services.dart';
 import 'package:skinsync_admin/services/subscription_services.dart';
+import 'package:skinsync_admin/view_models/forms_controller.dart';
 
 import '../repositories/auth_repository.dart';
 import '../repositories/setting_repository.dart';
@@ -82,6 +83,9 @@ Future<void> initializeServices() async {
   locator.registerLazySingleton<FormRepository>(
     () => FormService(api: apiBaseHelper),
   );
+   final formsController = FormsController();
+  await formsController.init();
+  locator.registerSingleton(formsController);
   locator.registerLazySingleton<ExploreRepository>(ExploreService.new);
   final secureStorageService = SecureStorageService();
   await secureStorageService.init();

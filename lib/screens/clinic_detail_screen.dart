@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/requests/update_clinic_request.dart';
 import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
+import 'package:skinsync_admin/screens/shared_treatment_request_screen.dart';
 import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
@@ -17,6 +18,7 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/phone_widget.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 class ClinicDetailScreen extends ConsumerStatefulWidget {
   static const String routeName = '/clinic-detail';
@@ -50,16 +52,17 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
     _websiteController = TextEditingController(text: clinic?.website ?? '');
     _descriptionController = TextEditingController(text: clinic?.description);
     _latController = TextEditingController(text: clinic?.latitude?.toString());
-    _longController = TextEditingController(text: clinic?.longitude?.toString());
+    _longController = TextEditingController(
+      text: clinic?.longitude?.toString(),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authViewModelProvider.notifier).setCountry(
-        CountryCode.fromCountryCode(clinic?.country ?? 'US'),
-      );
-      ref.read(clinicViewModelProvider.notifier).initClinicImages(
-        banner: clinic?.banner,
-        logo: clinic?.logo,
-      );
+      ref
+          .read(authViewModelProvider.notifier)
+          .setCountry(CountryCode.fromCountryCode(clinic?.country ?? 'US'));
+      ref
+          .read(clinicViewModelProvider.notifier)
+          .initClinicImages(banner: clinic?.banner, logo: clinic?.logo);
     });
   }
 
@@ -151,10 +154,9 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                 _websiteController.text = clinic.website ?? '';
                 _latController.text = clinic.latitude?.toString() ?? '';
                 _longController.text = clinic.longitude?.toString() ?? '';
-                ref.read(clinicViewModelProvider.notifier).initClinicImages(
-                  banner: clinic.banner,
-                  logo: clinic.logo,
-                );
+                ref
+                    .read(clinicViewModelProvider.notifier)
+                    .initClinicImages(banner: clinic.banner, logo: clinic.logo);
               }
               setState(() => _isEditMode = !_isEditMode);
             },
@@ -216,6 +218,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8.w),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
@@ -225,7 +228,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                       children: [
                         Flexible(
                           child: Text(
-                            clinic.name ?? 'N/A',
+                            (clinic.name ?? 'N/A').capitalize,
                             style: context.fonts.level2Heading,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -240,6 +243,33 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                       style: context.fonts.grey14w400,
                     ),
                   ],
+                ),
+              ),
+              SizedBox(width: 16.w),
+              OutlinedButton.icon(
+                onPressed: () {
+                  context.pushNamed(
+                    SharedTreatmentRequestScreen.routeName,
+                    queryParameters: {
+                      'clinicId': clinic.clinicId.toString(),
+                      'showBackButton': 'true',
+                    },
+                  );
+                },
+                icon: const Icon(
+                  Icons.list_alt_rounded,
+                  color: CustomColors.purple,
+                ),
+                label: Text(
+                  'View Requested Treatments',
+                  style: context.fonts.purple14w600,
+                ),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: Size(0, 52.h),
+                  side: const BorderSide(color: CustomColors.purple),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
                 ),
               ),
             ],
@@ -515,7 +545,10 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
             size: 20.sp,
           ),
           SizedBox(width: 12.w),
-          Text(treatment.toString(), style: context.fonts.black14w500),
+          Text(
+            treatment.toString().capitalize,
+            style: context.fonts.black14w500,
+          ),
         ],
       ),
     );
@@ -595,7 +628,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: context.fonts.black16w700),
+          Text(title.capitalize, style: context.fonts.black16w700),
           SizedBox(height: 24.h),
           ...children,
         ],

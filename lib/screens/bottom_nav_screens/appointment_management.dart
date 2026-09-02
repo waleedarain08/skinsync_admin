@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/appointment_detail_screen.dart';
 import 'package:skinsync_admin/screens/booking_config_screen.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
@@ -416,11 +417,23 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
                 ),
                 children: [
                   _patientCell(a.patientName, a.patientEmail),
-                  _tableTextCell(a.treatment, style: context.fonts.black14w600),
-                  _tableTextCell(a.clinic, style: context.fonts.grey14w400),
-                  _tableTextCell(a.provider, style: context.fonts.grey14w400),
+                  _tableTextCell(
+                    a.treatment.capitalize,
+                    style: context.fonts.black14w600,
+                  ),
+                  _tableTextCell(
+                    a.clinic.capitalize,
+                    style: context.fonts.grey14w400,
+                  ),
+                  _tableTextCell(
+                    a.provider.capitalize,
+                    style: context.fonts.grey14w400,
+                  ),
                   _tableTextCell(a.dateTime, style: context.fonts.black14w600),
-                  _tableTextCell(a.type, style: context.fonts.grey14w400),
+                  _tableTextCell(
+                    a.type.capitalize,
+                    style: context.fonts.grey14w400,
+                  ),
                   _statusBadgeCell(a.status),
                   _actionsCell(a),
                 ],
@@ -450,7 +463,7 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
           CircleAvatar(
             radius: 18.r,
             backgroundColor: CustomColors.palePurple,
-            child: Text(name[0], style: context.fonts.purple12w700),
+            child: Text(name[0].capitalize, style: context.fonts.purple12w700),
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -458,7 +471,7 @@ class _AppointmentManagementState extends ConsumerState<AppointmentManagement> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  name.capitalize,
                   style: context.fonts.black14w600,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

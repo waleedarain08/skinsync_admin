@@ -16,12 +16,15 @@ final areaViewModelProvider = NotifierProvider<AreaViewModel, AreaState>(
   AreaViewModel.new,
 );
 
+enum AreaImageType { icon, banner, infoImage }
+
 class AreaState extends BaseStateModel {
   final List<AreaModel> areas;
   final List<AreaModel> flattenedAreas;
   final String? errorMessage;
   final String? areaIconUrl;
   final String? areaImageUrl;
+  final String? infoImageUrl;
 
   AreaState({
     super.loading,
@@ -30,6 +33,7 @@ class AreaState extends BaseStateModel {
     this.errorMessage,
     this.areaIconUrl,
     this.areaImageUrl,
+    this.infoImageUrl,
   });
 
   AreaState copyWith({
@@ -39,6 +43,7 @@ class AreaState extends BaseStateModel {
     String? errorMessage,
     String? areaIconUrl,
     String? areaImageUrl,
+    String? infoImageUrl,
   }) {
     return AreaState(
       loading: loading ?? this.loading,
@@ -47,6 +52,7 @@ class AreaState extends BaseStateModel {
       errorMessage: errorMessage ?? this.errorMessage,
       areaIconUrl: areaIconUrl ?? this.areaIconUrl,
       areaImageUrl: areaImageUrl ?? this.areaImageUrl,
+      infoImageUrl: infoImageUrl ?? this.infoImageUrl,
     );
   }
 }
@@ -56,6 +62,7 @@ class AreaViewModel extends BaseViewModel<AreaState> {
 
   final AreaRepository _areaRepository = locator<AreaRepository>();
   final ImagePicker _picker = ImagePicker();
+
   Future<void> fetchAreas() async {
     state = state.copyWith(errorMessage: null);
     await runSafely(
@@ -76,31 +83,14 @@ class AreaViewModel extends BaseViewModel<AreaState> {
     );
   }
 
-  // Future<AreaModel?> createArea({
-  //   required String name,
-  //   required String globalSku,
-  //   required String icon,
-  // }) async {
-  //   return await runSafely<AreaModel?>(() async {
-  //     final String? imageUrl = await MediaService().uploadImage(
-  //       'areas/icons/',
-  //       XFile(icon),
-  //     );
-  //     if (imageUrl == null) {
-  //       throw const UnknownException('Failed to upload image');
-  //     }
-  //     return await _areaRepository.createArea(
-  //       AreaRequest(name: name, globalSku: globalSku, icon: imageUrl),
-  //     );
-  //   });
-  // }
-
   Future<bool?> createArea({
     required String name,
     required String globalSku,
     required String icon,
     required int? parentId,
     required String imageUrl,
+    required String infoImageUrl,
+    required String description,
   }) async {
     return await runSafely<bool>(() async {
       await _areaRepository.createArea(
@@ -110,6 +100,8 @@ class AreaViewModel extends BaseViewModel<AreaState> {
           globalSku: globalSku,
           icon: icon,
           image: imageUrl,
+          infoImage: infoImageUrl,
+          description: description
         ),
       );
       await refreshAreas();
@@ -122,6 +114,8 @@ class AreaViewModel extends BaseViewModel<AreaState> {
     required String globalSku,
     required String icon,
     required String imageUrl,
+    required String infoImageUrl,
+    required String description,
     required int id,
   }) async {
     return await runSafely<bool>(() async {
@@ -131,6 +125,8 @@ class AreaViewModel extends BaseViewModel<AreaState> {
           globalSku: globalSku,
           icon: icon,
           image: imageUrl,
+          infoImage: infoImageUrl,
+          description: description,
         ),
         id: id,
       );
@@ -185,21 +181,28 @@ class AreaViewModel extends BaseViewModel<AreaState> {
     return parent?.subAreas ?? [];
   }
 
-  Future<void> pickImage(bool isIcon) async {
+  /// Handles icon, banner, and info image uploads.
+  Future<void> pickAreaMedia(AreaImageType imageType) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
     await runSafely(() async {
-      final path = isIcon ? 'area/icon/' : 'area/image/';
+      final String path = switch (imageType) {
+        AreaImageType.icon => 'area/icon/',
+        AreaImageType.banner => 'area/image/',
+        AreaImageType.infoImage => 'area/info_image/',
+      };
+
       final String? url = await MediaService().uploadImage(path, image);
       if (url == null) {
         throw const UnknownException('Failed to upload image');
       }
-      if (isIcon) {
-        state = state.copyWith(areaIconUrl: url);
-      } else {
-        state = state.copyWith(areaImageUrl: url);
-      }
+
+      state = switch (imageType) {
+        AreaImageType.icon => state.copyWith(areaIconUrl: url),
+        AreaImageType.banner => state.copyWith(areaImageUrl: url),
+        AreaImageType.infoImage => state.copyWith(infoImageUrl: url),
+      };
     });
   }
 

@@ -27,6 +27,8 @@ class AreaModel {
   final String globalSku;
   final String icon;
   final String image;
+  final String? infoImage;
+  final String? description;
   final int subAreasCount;
   final List<AreaModel> subAreas;
 
@@ -37,6 +39,8 @@ class AreaModel {
     required this.icon,
     required this.image,
     required this.subAreasCount,
+    required this.infoImage,
+    required this.description,
     this.subAreas = const [],
   });
 
@@ -53,6 +57,8 @@ class AreaModel {
               ?.map((e) => AreaModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
+      infoImage: json['info_image_url'] as String? ?? '',
+      description: json['description'] as String? ?? ''
     );
   }
 
@@ -76,6 +82,8 @@ class AreaModel {
     String? image,
     int? subAreasCount,
     List<AreaModel>? subAreas,
+    String? infoImage,
+    String? description,
   }) {
     return AreaModel(
       id: id ?? this.id,
@@ -85,6 +93,8 @@ class AreaModel {
       image: image ?? this.image,
       subAreasCount: subAreasCount ?? this.subAreasCount,
       subAreas: subAreas ?? this.subAreas,
+      infoImage: infoImage ?? this.infoImage,
+      description: description ?? this.description,
     );
   }
 }

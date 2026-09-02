@@ -12,6 +12,7 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 
 class ClinicWebRequestDetailScreen extends ConsumerWidget {
   static const String routeName = '/clinic-web-request-detail';
@@ -24,7 +25,10 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
     if (request == null) {
       return GradientScaffold(
         body: Center(
-          child: Text('No Request Data Found', style: context.fonts.black16w400),
+          child: Text(
+            'No Request Data Found',
+            style: context.fonts.black16w400,
+          ),
         ),
       );
     }
@@ -34,7 +38,10 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
         flexibleSpace: AppDecorations.appBarGradient,
         elevation: 0,
         centerTitle: true,
-        title: Text('Registration Request Detail', style: context.fonts.black18w600),
+        title: Text(
+          'Registration Request Detail',
+          style: context.fonts.black18w600,
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: CustomColors.black),
           onPressed: () => context.pop(),
@@ -86,7 +93,9 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
             ),
             child: Center(
               child: Text(
-                (request.clinicOrPracticeName ?? request.clinicName ?? 'W')[0].toUpperCase(),
+                (request.clinicOrPracticeName ?? request.clinicName ?? 'W')
+                    .capitalize[0]
+                    .toUpperCase(),
                 style: context.fonts.purple14w700.copyWith(fontSize: 32),
               ),
             ),
@@ -100,7 +109,10 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        request.clinicOrPracticeName ?? request.clinicName ?? 'N/A',
+                        (request.clinicOrPracticeName ??
+                                request.clinicName ??
+                                'N/A')
+                            .capitalize,
                         style: context.fonts.level2Heading,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -111,7 +123,9 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
                 ),
                 context.verticalSpace(6),
                 Text(
-                  request.primaryClinicAddress ?? request.clinicLocation ?? 'No Address Provided',
+                  request.primaryClinicAddress ??
+                      request.clinicLocation ??
+                      'No Address Provided',
                   style: context.fonts.grey14w400,
                 ),
                 context.verticalSpace(4),
@@ -127,58 +141,146 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, ClinicWebRequestModel request) {
+  Widget _buildMainContent(
+    BuildContext context,
+    ClinicWebRequestModel request,
+  ) {
     return Column(
       children: [
         _infoSection(context, 'Clinic Information', [
-          _infoRow(context, Icons.business_outlined, 'Clinic/Practice Name', request.clinicOrPracticeName ?? 'N/A'),
-          _infoRow(context, Icons.category_outlined, 'Clinic Type', request.clinicType ?? 'N/A'),
-          _infoRow(context, Icons.language_outlined, 'Clinic Website', request.clinicWebsite ?? 'N/A'),
-          _infoRow(context, Icons.location_on_outlined, 'Primary Address', request.primaryClinicAddress ?? 'N/A'),
-          _infoRow(context, Icons.pin_drop_outlined, 'Number of Locations', request.numberOfLocations ?? 'N/A'),
+          _infoRow(
+            context,
+            Icons.business_outlined,
+            'Clinic/Practice Name',
+            request.clinicOrPracticeName ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.category_outlined,
+            'Clinic Type',
+            request.clinicType ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.language_outlined,
+            'Clinic Website',
+            request.clinicWebsite ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.location_on_outlined,
+            'Primary Address',
+            request.primaryClinicAddress ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.pin_drop_outlined,
+            'Number of Locations',
+            request.numberOfLocations ?? 'N/A',
+          ),
         ]),
         context.verticalSpace(24),
         _infoSection(context, 'Contact Person', [
-          _infoRow(context, Icons.person_outline, 'First & Last Name', request.firstAndLastName ?? 'N/A'),
-          _infoRow(context, Icons.badge_outlined, 'Professional Title', request.professionalTitle ?? 'N/A'),
-          _infoRow(context, Icons.email_outlined, 'Business Email', request.businessEmailAddress ?? 'N/A'),
-          _infoRow(context, Icons.phone_outlined, 'Phone Number', request.phoneNumber ?? 'N/A'),
+          _infoRow(
+            context,
+            Icons.person_outline,
+            'First & Last Name',
+            request.firstAndLastName?.capitalize ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.badge_outlined,
+            'Professional Title',
+            request.professionalTitle?.capitalize ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.email_outlined,
+            'Business Email',
+            request.businessEmailAddress ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.phone_outlined,
+            'Phone Number',
+            request.phoneNumber ?? 'N/A',
+          ),
         ]),
         context.verticalSpace(24),
         _infoSection(context, 'Business Volume & Tools', [
-          _infoRow(context, Icons.groups_outlined, 'Approx. Providers', request.approximateNumberOfProviders ?? 'N/A'),
-          _infoRow(context, Icons.person_add_alt_1_outlined, 'Monthly Patient Volume', request.approximateMonthlyPatientVolume ?? 'N/A'),
-          _infoRow(context, Icons.computer_outlined, 'Current Software', request.currentSchedulingEhrCrmOrPracticeManagementSoftware ?? 'N/A'),
+          _infoRow(
+            context,
+            Icons.groups_outlined,
+            'Approx. Providers',
+            request.approximateNumberOfProviders ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.person_add_alt_1_outlined,
+            'Monthly Patient Volume',
+            request.approximateMonthlyPatientVolume ?? 'N/A',
+          ),
+          _infoRow(
+            context,
+            Icons.computer_outlined,
+            'Current Software',
+            request.currentSchedulingEhrCrmOrPracticeManagementSoftware ??
+                'N/A',
+          ),
         ]),
         context.verticalSpace(24),
         _infoSection(context, 'Additional Details', [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('SkinSync AI Capabilities Interested In:', style: context.fonts.black14w600),
+              Text(
+                'SkinSync AI Capabilities Interested In:',
+                style: context.fonts.black14w600,
+              ),
               context.verticalSpace(12),
-              if (request.skinsyncAiCapabilities != null && request.skinsyncAiCapabilities!.isNotEmpty)
+              if (request.skinsyncAiCapabilities != null &&
+                  request.skinsyncAiCapabilities!.isNotEmpty)
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: request.skinsyncAiCapabilities!.map((cap) => Container(
-                    padding: context.appEdgeInsets(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: CustomColors.palePurple,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(cap, style: context.fonts.purple13w600),
-                  )).toList(),
+                  children: request.skinsyncAiCapabilities!
+                      .map(
+                        (cap) => Container(
+                          padding: context.appEdgeInsets(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: CustomColors.palePurple,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(cap, style: context.fonts.purple13w600),
+                        ),
+                      )
+                      .toList(),
                 )
               else
                 Text('None selected', style: context.fonts.grey14w400),
             ],
           ),
           context.verticalSpace(20),
-          _infoRow(context, Icons.campaign_outlined, 'How did you hear about us?', request.howDidYouHearAboutSkinsyncAi ?? 'N/A'),
+          _infoRow(
+            context,
+            Icons.campaign_outlined,
+            'How did you hear about us?',
+            request.howDidYouHearAboutSkinsyncAi ?? 'N/A',
+          ),
           context.verticalSpace(12),
-          _buildCheckRow(context, 'Authorized to create account', request.authorizedToCreateAccount ?? false),
-          _buildCheckRow(context, 'Agreed to Terms & Privacy Policy', request.agreeToTermsOfServiceAndPrivacyPolicy ?? false),
+          _buildCheckRow(
+            context,
+            'Authorized to create account',
+            request.authorizedToCreateAccount ?? false,
+          ),
+          _buildCheckRow(
+            context,
+            'Agreed to Terms & Privacy Policy',
+            request.agreeToTermsOfServiceAndPrivacyPolicy ?? false,
+          ),
         ]),
       ],
     );
@@ -201,7 +303,11 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionSidebar(BuildContext context, WidgetRef ref, ClinicWebRequestModel request) {
+  Widget _buildActionSidebar(
+    BuildContext context,
+    WidgetRef ref,
+    ClinicWebRequestModel request,
+  ) {
     return Column(
       children: [
         _infoSection(context, 'Feedback & Notes', [
@@ -228,7 +334,10 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
             () {
               context.push(
                 AddNewClinicScreen.routeName,
-                extra: (clinic: request.toInviteClinicDetail(), onBoardClinic: true),
+                extra: (
+                  clinic: request.toInviteClinicDetail(),
+                  onBoardClinic: true,
+                ),
               );
             },
           ),
@@ -249,7 +358,11 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _showSendNotesDialog(BuildContext context, WidgetRef ref, ClinicWebRequestModel request) {
+  void _showSendNotesDialog(
+    BuildContext context,
+    WidgetRef ref,
+    ClinicWebRequestModel request,
+  ) {
     final controller = TextEditingController();
     showDialog(
       context: context,
@@ -258,9 +371,15 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Send Notes to ${request.clinicOrPracticeName ?? request.clinicName}', style: context.fonts.black18w600),
+              Text(
+                'Send Notes to ${(request.clinicOrPracticeName ?? request.clinicName)?.capitalize}',
+                style: context.fonts.black18w600,
+              ),
               context.verticalSpace(4),
-              Text('Recipient: ${request.businessEmailAddress ?? request.ownerEmail}', style: context.fonts.grey12w400),
+              Text(
+                'Recipient: ${request.businessEmailAddress ?? request.ownerEmail}',
+                style: context.fonts.grey12w400,
+              ),
             ],
           ),
           content: SizedBox(
@@ -277,46 +396,51 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
               onPressed: () => Navigator.pop(context),
               child: Text('Cancel', style: context.fonts.grey14w600),
             ),
-              CustomPrimaryButton(
-                onTap: () async {
-                  final notes = controller.text.trim();
-                  if (notes.isEmpty) return;
+            CustomPrimaryButton(
+              onTap: () async {
+                final notes = controller.text.trim();
+                if (notes.isEmpty) return;
 
-                  final email = request.businessEmailAddress ?? request.ownerEmail;
-                  if (email == null || email.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Recipient email not found!')),
-                    );
-                    return;
-                  }
+                final email =
+                    request.businessEmailAddress ?? request.ownerEmail;
+                if (email == null || email.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Recipient email not found!')),
+                  );
+                  return;
+                }
 
-                  final req = SendNotesRequest(email: email, notes: notes);
-                  final success = await ref
-                      .read(clinicViewModelProvider.notifier)
-                      .sendWebRequestNotes(request.id!, req);
-                  if (success && context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Notes sent successfully!')),
-                    );
-                  }
-                },
-                label: 'Send Email',
-                width: 120.w,
-              ),
+                final req = SendNotesRequest(email: email, notes: notes);
+                final success = await ref
+                    .read(clinicViewModelProvider.notifier)
+                    .sendWebRequestNotes(request.id!, req);
+                if (success && context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Notes sent successfully!')),
+                  );
+                }
+              },
+              label: 'Send Email',
+              width: 120.w,
+            ),
           ],
         );
       },
     );
   }
 
-  Widget _infoSection(BuildContext context, String title, List<Widget> children) {
+  Widget _infoSection(
+    BuildContext context,
+    String title,
+    List<Widget> children,
+  ) {
     return BorderdContainerWidget(
       padding: context.appEdgeInsets(all: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: context.fonts.black16w700),
+          Text(title.capitalize, style: context.fonts.black16w700),
           context.verticalSpace(24),
           ...children,
         ],
@@ -324,7 +448,12 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _infoRow(BuildContext context, IconData icon, String label, String value) {
+  Widget _infoRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Padding(
       padding: context.appEdgeInsets(bottom: 16),
       child: Row(
@@ -343,7 +472,12 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: context.fonts.grey13w500),
-                Text(value, style: context.fonts.black14w600, maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  value,
+                  style: context.fonts.black14w600,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
@@ -352,7 +486,15 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _actionButton(BuildContext context, String label, IconData icon, Color color, Color textColor, VoidCallback onTap, {bool isOutlined = false}) {
+  Widget _actionButton(
+    BuildContext context,
+    String label,
+    IconData icon,
+    Color color,
+    Color textColor,
+    VoidCallback onTap, {
+    bool isOutlined = false,
+  }) {
     if (isOutlined) {
       return CustomOutlinedButton(
         label: label,
@@ -387,7 +529,10 @@ class ClinicWebRequestDetailScreen extends ConsumerWidget {
         borderRadius: context.borderRadius(all: 20),
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
-      child: Text(status.toUpperCase(), style: context.fonts.grey10w700.copyWith(color: color)),
+      child: Text(
+        status.toUpperCase(),
+        style: context.fonts.grey10w700.copyWith(color: color),
+      ),
     );
   }
 }

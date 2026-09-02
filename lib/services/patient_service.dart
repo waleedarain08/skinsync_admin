@@ -62,6 +62,7 @@ class PatientService implements PatientRepository {
     required int page,
     required int limit,
     int? patientId,
+    int? clinicId,
   }) async {
     final jsonResponse = await _api.get(
       Endpoint.patientTreatmentRequest,
@@ -69,6 +70,7 @@ class PatientService implements PatientRepository {
         'page': page.toString(),
         'limit': limit.toString(),
         if (patientId != null) 'patient_id': patientId.toString(),
+        if (clinicId != null) 'clinic_id': clinicId.toString(),
       },
     );
 

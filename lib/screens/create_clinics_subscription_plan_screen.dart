@@ -14,7 +14,7 @@ import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-
+import 'package:skinsync_admin/utils/string_utils.dart';
 import '../models/subscription_duration_model.dart';
 import '../models/subscription_duration_option.dart';
 import '../widgets/dailogbox/subscription_duration_dialog.dart';
@@ -58,45 +58,53 @@ class _CreateClinicsSubscriptionPlanScreenState
 
   final List<PlanBenefit> _predefinedFeatures = [
     PlanBenefit(
-        title: 'AI consultation and treatment recommendation tools',
-        description:
-            'Access to AI-driven tools for more accurate patient consultations and treatment plans.',
-        enabled: false),
+      title: 'AI consultation and treatment recommendation tools',
+      description:
+          'Access to AI-driven tools for more accurate patient consultations and treatment plans.',
+      enabled: false,
+    ),
     PlanBenefit(
-        title: 'Before/after simulations',
-        description:
-            'Create and store visual simulations to show patients expected treatment outcomes.',
-        enabled: false),
+      title: 'Before/after simulations',
+      description:
+          'Create and store visual simulations to show patients expected treatment outcomes.',
+      enabled: false,
+    ),
     PlanBenefit(
-        title: 'Patient records and treatment history',
-        description:
-            'Comprehensive digital storage for all patient data, records, and treatment logs.',
-        enabled: false),
+      title: 'Patient records and treatment history',
+      description:
+          'Comprehensive digital storage for all patient data, records, and treatment logs.',
+      enabled: false,
+    ),
     PlanBenefit(
-        title: 'Payments dashboard',
-        description:
-            'Integrated dashboard to track clinic revenue, payments, and financial performance.',
-        enabled: false),
+      title: 'Payments dashboard',
+      description:
+          'Integrated dashboard to track clinic revenue, payments, and financial performance.',
+      enabled: false,
+    ),
     PlanBenefit(
-        title: 'Automated invoices',
-        description:
-            'Automatically generate and send professional invoices to patients after treatments.',
-        enabled: false),
+      title: 'Automated invoices',
+      description:
+          'Automatically generate and send professional invoices to patients after treatments.',
+      enabled: false,
+    ),
     PlanBenefit(
-        title: 'Dynamic pricing system',
-        description:
-            'Flexible pricing management based on various clinical and market factors.',
-        enabled: false),
+      title: 'Dynamic pricing system',
+      description:
+          'Flexible pricing management based on various clinical and market factors.',
+      enabled: false,
+    ),
     PlanBenefit(
-        title: 'Multi-user clinic access',
-        description:
-            'Allow multiple doctors and staff members to access the clinic management system.',
-        enabled: false),
+      title: 'Multi-user clinic access',
+      description:
+          'Allow multiple doctors and staff members to access the clinic management system.',
+      enabled: false,
+    ),
     PlanBenefit(
-        title: 'Priority onboarding and support',
-        description:
-            'Get dedicated assistance for setting up your clinic and priority technical support.',
-        enabled: false),
+      title: 'Priority onboarding and support',
+      description:
+          'Get dedicated assistance for setting up your clinic and priority technical support.',
+      enabled: false,
+    ),
   ];
 
   List<PlanBenefit> _planBenefits = [];
@@ -115,7 +123,7 @@ class _CreateClinicsSubscriptionPlanScreenState
       await ref
           .read(subscriptionViewModelProvider.notifier)
           .getSubscriptionDurations(showLoading: true);
-      
+
       _syncDurations();
 
       ref.read(clinicViewModelProvider.notifier).initialize();
@@ -150,17 +158,16 @@ class _CreateClinicsSubscriptionPlanScreenState
     _isLifetime = plan?.isLifetime ?? false;
 
     _selectedClinics = plan?.assignedClinics ?? [];
-    _visibilityType =
-        _selectedClinics.isEmpty ? 'All Clinics' : 'Specific Clinics';
+    _visibilityType = _selectedClinics.isEmpty
+        ? 'All Clinics'
+        : 'Specific Clinics';
 
     if (plan?.durationOptions != null && plan!.durationOptions!.isNotEmpty) {
       for (final option in plan.durationOptions!) {
-        _durationOptions.add(
-          DurationOptionController.fromOption(option),
-        );
+        _durationOptions.add(DurationOptionController.fromOption(option));
       }
     } else if (!_isLifetime && _durationOptions.isEmpty) {
-       // Setup after load
+      // Setup after load
     }
   }
 
@@ -170,9 +177,9 @@ class _CreateClinicsSubscriptionPlanScreenState
 
     setState(() {
       if (_durationOptions.isEmpty && !_isLifetime) {
-        _durationOptions.add(DurationOptionController(
-          selectedId: durations.first.id,
-        ));
+        _durationOptions.add(
+          DurationOptionController(selectedId: durations.first.id),
+        );
       }
     });
   }
@@ -186,20 +193,23 @@ class _CreateClinicsSubscriptionPlanScreenState
         orElse: () => benefit,
       );
       return PlanBenefit(
-          title: benefit.title,
-          description: (existing.description != null && existing.description!.isNotEmpty) 
-              ? existing.description 
-              : benefit.description,
-          enabled: existing.enabled);
+        title: benefit.title,
+        description:
+            (existing.description != null && existing.description!.isNotEmpty)
+            ? existing.description
+            : benefit.description,
+        enabled: existing.enabled,
+      );
     }).toList();
 
     for (final benefit in existingBenefits) {
       if (!_predefinedFeatures.any((b) => b.title == benefit.title)) {
         _planBenefits.add(
           PlanBenefit(
-              title: benefit.title,
-              description: benefit.description,
-              enabled: benefit.enabled),
+            title: benefit.title,
+            description: benefit.description,
+            enabled: benefit.enabled,
+          ),
         );
       }
     }
@@ -229,7 +239,8 @@ class _CreateClinicsSubscriptionPlanScreenState
     if (title.isNotEmpty) {
       setState(() {
         _planBenefits.add(
-            PlanBenefit(title: title, description: description, enabled: true));
+          PlanBenefit(title: title, description: description, enabled: true),
+        );
         _customBenefitController.clear();
         _customDescriptionController.clear();
       });
@@ -251,10 +262,12 @@ class _CreateClinicsSubscriptionPlanScreenState
     }
 
     setState(() {
-      _durationOptions.add(DurationOptionController(
-        selectedId: nextId ?? durations.first.id,
-        durations: durations,
-      ));
+      _durationOptions.add(
+        DurationOptionController(
+          selectedId: nextId ?? durations.first.id,
+          durations: durations,
+        ),
+      );
     });
   }
 
@@ -269,7 +282,9 @@ class _CreateClinicsSubscriptionPlanScreenState
     if (_formKey.currentState!.validate()) {
       if (!_isLifetime && _durationOptions.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('At least one duration option is required')),
+          const SnackBar(
+            content: Text('At least one duration option is required'),
+          ),
         );
         return;
       }
@@ -298,7 +313,8 @@ class _CreateClinicsSubscriptionPlanScreenState
         if (durationOptions.any((d) => (d.duration?.duration ?? 0) <= 0)) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('All durations must be greater than 0 days')),
+              content: Text('All durations must be greater than 0 days'),
+            ),
           );
           return;
         }
@@ -307,7 +323,8 @@ class _CreateClinicsSubscriptionPlanScreenState
             durationOptions.length) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('Duplicate duration options are not allowed')),
+              content: Text('Duplicate duration options are not allowed'),
+            ),
           );
           return;
         }
@@ -317,13 +334,13 @@ class _CreateClinicsSubscriptionPlanScreenState
         id: widget.planToEdit?.id,
         name: _nameController.text,
         basePrice: basePrice,
-        doctorSeats:
-            _unlimitedDoctors
-                ? 0
-                : (int.tryParse(_doctorSeatsController.text) ?? 0),
+        doctorSeats: _unlimitedDoctors
+            ? 0
+            : (int.tryParse(_doctorSeatsController.text) ?? 0),
         unlimitedDoctors: _unlimitedDoctors,
-        staffSeats:
-            _unlimitedStaff ? 0 : (int.tryParse(_staffSeatsController.text) ?? 0),
+        staffSeats: _unlimitedStaff
+            ? 0
+            : (int.tryParse(_staffSeatsController.text) ?? 0),
         unlimitedStaff: _unlimitedStaff,
         standardBookingCommissionPercent:
             double.tryParse(_standardCommissionController.text) ?? 0.0,
@@ -332,8 +349,9 @@ class _CreateClinicsSubscriptionPlanScreenState
         technologyFeePerTreatment:
             double.tryParse(_techFeeController.text) ?? 0.0,
         benefits: _planBenefits,
-        assignedClinics:
-            _visibilityType == 'All Clinics' ? [] : _selectedClinics,
+        assignedClinics: _visibilityType == 'All Clinics'
+            ? []
+            : _selectedClinics,
         isActive: _isActive,
         isDefault: _isDefault,
         isLifetime: _isLifetime,
@@ -524,7 +542,11 @@ class _CreateClinicsSubscriptionPlanScreenState
                                         if (val) {
                                           _durationOptions.clear();
                                         } else if (_durationOptions.isEmpty) {
-                                          _durationOptions.add(DurationOptionController(durations: state.durations ?? []));
+                                          _durationOptions.add(
+                                            DurationOptionController(
+                                              durations: state.durations ?? [],
+                                            ),
+                                          );
                                         }
                                       });
                                     },
@@ -542,7 +564,8 @@ class _CreateClinicsSubscriptionPlanScreenState
                                   onTap: () {
                                     showDialog(
                                       context: context,
-                                      builder: (context) => const SubscriptionDurationDialog(),
+                                      builder: (context) =>
+                                          const SubscriptionDurationDialog(),
                                     );
                                   },
                                   label: 'Create Duration',
@@ -557,11 +580,16 @@ class _CreateClinicsSubscriptionPlanScreenState
                                 label: 'Base Price (\$)',
                                 controller: _basePriceController,
                                 hintText: '0.00',
-                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
                                 validator: Validators.empty,
                               )
                             else ...[
-                              ...List.generate(_durationOptions.length, (index) {
+                              ...List.generate(_durationOptions.length, (
+                                index,
+                              ) {
                                 final option = _durationOptions[index];
                                 final otherUsedIds = _durationOptions
                                     .where((e) => e != option)
@@ -575,7 +603,8 @@ class _CreateClinicsSubscriptionPlanScreenState
                                     child: Column(
                                       children: [
                                         Row(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
                                           children: [
                                             Expanded(
                                               flex: 2,
@@ -585,49 +614,104 @@ class _CreateClinicsSubscriptionPlanScreenState
                                                 children: [
                                                   Text(
                                                     'Duration Option',
-                                                    style: context.fonts.black13w600,
+                                                    style: context
+                                                        .fonts
+                                                        .black13w600,
                                                   ),
                                                   context.verticalSpace(8),
                                                   Container(
-                                                    height: AppTheme.inputHeight,
-                                                    padding: context.appEdgeInsets(horizontal: 12),
+                                                    height:
+                                                        AppTheme.inputHeight,
+                                                    padding: context
+                                                        .appEdgeInsets(
+                                                          horizontal: 12,
+                                                        ),
                                                     decoration: BoxDecoration(
-                                                      border: Border.all(color: CustomColors.border),
-                                                      borderRadius: context.borderRadius(all: 12),
+                                                      border: Border.all(
+                                                        color:
+                                                            CustomColors.border,
+                                                      ),
+                                                      borderRadius: context
+                                                          .borderRadius(
+                                                            all: 12,
+                                                          ),
                                                     ),
                                                     child: DropdownButtonHideUnderline(
                                                       child: DropdownButton<int>(
-                                                        value: state.durations?.any((d) => d.id == option.selectedId) == true 
-                                                            ? option.selectedId 
+                                                        value:
+                                                            state.durations?.any(
+                                                                  (d) =>
+                                                                      d.id ==
+                                                                      option
+                                                                          .selectedId,
+                                                                ) ==
+                                                                true
+                                                            ? option.selectedId
                                                             : null,
                                                         isExpanded: true,
-                                                        icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .keyboard_arrow_down_rounded,
+                                                        ),
                                                         items: [
                                                           // Always include selectedId if durations list doesn't have it yet (for Edit Mode safety)
-                                                          if (option.selectedId != null &&
-                                                              !(state.durations?.any((d) => d.id == option.selectedId) ?? false))
-                                                            DropdownMenuItem<int>(
-                                                              value: option.selectedId,
-                                                              child: Text(option.initialName ?? 'Loading...',
-                                                                  style: context.fonts.black14w400),
+                                                          if (option.selectedId !=
+                                                                  null &&
+                                                              !(state.durations?.any(
+                                                                    (d) =>
+                                                                        d.id ==
+                                                                        option
+                                                                            .selectedId,
+                                                                  ) ??
+                                                                  false))
+                                                            DropdownMenuItem<
+                                                              int
+                                                            >(
+                                                              value: option
+                                                                  .selectedId,
+                                                              child: Text(
+                                                                (option.initialName ??
+                                                                        'Loading...')
+                                                                    .capitalize,
+                                                                style: context
+                                                                    .fonts
+                                                                    .black14w400,
+                                                              ),
                                                             ),
                                                           ...({
-                                                            for (var d in (state.durations ?? []))
-                                                              if (d.id != null &&
-                                                                  (d.id == option.selectedId ||
-                                                                      !otherUsedIds.contains(d.id)))
-                                                                d.id!: d
-                                                          })
-                                                              .values
-                                                              .map((d) => DropdownMenuItem<int>(
-                                                                    value: d.id,
-                                                                    child: Text(d.name ?? '',
-                                                                        style: context.fonts.black14w400),
-                                                                  )),
+                                                            for (var d
+                                                                in (state
+                                                                        .durations ??
+                                                                    []))
+                                                              if (d.id !=
+                                                                      null &&
+                                                                  (d.id ==
+                                                                          option
+                                                                              .selectedId ||
+                                                                      !otherUsedIds
+                                                                          .contains(
+                                                                            d.id,
+                                                                          )))
+                                                                d.id!: d,
+                                                          }).values.map(
+                                                            (
+                                                              d,
+                                                            ) => DropdownMenuItem<int>(
+                                                              value: d.id,
+                                                              child: Text(
+                                                                (d.name ?? '')
+                                                                    .capitalize,
+                                                                style: context
+                                                                    .fonts
+                                                                    .black14w400,
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ],
                                                         onChanged: (val) {
                                                           setState(() {
-                                                            option.selectedId = val;
+                                                            option.selectedId =
+                                                                val;
                                                           });
                                                         },
                                                       ),
@@ -641,15 +725,23 @@ class _CreateClinicsSubscriptionPlanScreenState
                                               flex: 2,
                                               child: BuildTextField(
                                                 label: 'Price (\$)',
-                                                controller: option.priceController,
+                                                controller:
+                                                    option.priceController,
                                                 hintText: '0.00',
-                                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                                keyboardType:
+                                                    const TextInputType.numberWithOptions(
+                                                      decimal: true,
+                                                    ),
                                               ),
                                             ),
                                             context.horizontalSpace(16),
                                             IconButton(
-                                              onPressed: () => _removeDurationOption(index),
-                                              icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.red),
+                                              onPressed: () =>
+                                                  _removeDurationOption(index),
+                                              icon: const Icon(
+                                                Icons.delete_outline_rounded,
+                                                color: CustomColors.red,
+                                              ),
                                               padding: EdgeInsets.zero,
                                             ),
                                           ],
@@ -815,7 +907,8 @@ class _CreateClinicsSubscriptionPlanScreenState
                                   benefit.title ?? '',
                                   style: context.fonts.black14w600,
                                 ),
-                                subtitle: benefit.description != null &&
+                                subtitle:
+                                    benefit.description != null &&
                                         benefit.description!.isNotEmpty
                                     ? Text(
                                         benefit.description!,
@@ -959,13 +1052,12 @@ class _CreateClinicsSubscriptionPlanScreenState
 
   Widget _buildClinicSelector() {
     final clinics = ref.watch(clinicViewModelProvider).clinics ?? [];
-    final filteredClinics =
-        clinics.where((c) {
-          final name = c.name?.toLowerCase() ?? '';
-          final email = c.email?.toLowerCase() ?? '';
-          final query = _clinicSearchQuery.toLowerCase();
-          return name.contains(query) || email.contains(query);
-        }).toList();
+    final filteredClinics = clinics.where((c) {
+      final name = c.name?.toLowerCase() ?? '';
+      final email = c.email?.toLowerCase() ?? '';
+      final query = _clinicSearchQuery.toLowerCase();
+      return name.contains(query) || email.contains(query);
+    }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -980,27 +1072,25 @@ class _CreateClinicsSubscriptionPlanScreenState
           Wrap(
             spacing: context.w(8),
             runSpacing: context.h(8),
-            children:
-                _selectedClinics.map((id) {
-                  final clinic = clinics.firstWhere(
-                    (c) => c.id == id,
-                    orElse: () => clinics.first,
-                  );
-                  return Chip(
-                    label: Text(
-                      clinic.name ?? 'ID: $id',
-                      style: context.fonts.black13w500,
-                    ),
-                    backgroundColor: CustomColors.green.withValues(alpha: 0.1),
-                    deleteIcon: const Icon(Icons.close, size: 14),
-                    onDeleted:
-                        () => setState(() => _selectedClinics.remove(id)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: context.borderRadius(all: 8),
-                      side: BorderSide.none,
-                    ),
-                  );
-                }).toList(),
+            children: _selectedClinics.map((id) {
+              final clinic = clinics.firstWhere(
+                (c) => c.id == id,
+                orElse: () => clinics.first,
+              );
+              return Chip(
+                label: Text(
+                  clinic.name ?? 'ID: $id',
+                  style: context.fonts.black13w500,
+                ),
+                backgroundColor: CustomColors.green.withValues(alpha: 0.1),
+                deleteIcon: const Icon(Icons.close, size: 14),
+                onDeleted: () => setState(() => _selectedClinics.remove(id)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: context.borderRadius(all: 8),
+                  side: BorderSide.none,
+                ),
+              );
+            }).toList(),
           ),
           context.verticalSpace(16),
         ],
@@ -1010,54 +1100,52 @@ class _CreateClinicsSubscriptionPlanScreenState
             border: Border.all(color: CustomColors.border),
             borderRadius: context.borderRadius(all: 12),
           ),
-          child:
-              filteredClinics.isEmpty
-                  ? Center(
-                    child: Padding(
-                      padding: context.appEdgeInsets(all: 16),
-                      child: Text(
-                        'No clinics found',
-                        style: context.fonts.grey14w400,
-                      ),
-                    ),
-                  )
-                  : Scrollbar(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: filteredClinics.length,
-                      separatorBuilder: (_, _) => const Divider(height: 1),
-                      itemBuilder: (context, index) {
-                        final clinic = filteredClinics[index];
-                        final isSelected = _selectedClinics.contains(
-                          clinic.id,
-                        );
-                        return CheckboxListTile(
-                          title: Text(
-                            clinic.name ?? 'N/A',
-                            style: context.fonts.grey14w600,
-                          ),
-                          subtitle: Text(
-                            clinic.email ?? 'N/A',
-                            style: context.fonts.grey13w500,
-                          ),
-                          value: isSelected,
-                          onChanged: (val) {
-                            setState(() {
-                              if (val == true) {
-                                if (clinic.id != null) _selectedClinics.add(clinic.id!);
-                              } else {
-                                _selectedClinics.remove(clinic.id);
-                              }
-                            });
-                          },
-                          activeColor: CustomColors.green,
-                          checkColor: CustomColors.black,
-                          controlAffinity: ListTileControlAffinity.leading,
-                          contentPadding: context.appEdgeInsets(horizontal: 16),
-                        );
-                      },
+          child: filteredClinics.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: context.appEdgeInsets(all: 16),
+                    child: Text(
+                      'No clinics found',
+                      style: context.fonts.grey14w400,
                     ),
                   ),
+                )
+              : Scrollbar(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: filteredClinics.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final clinic = filteredClinics[index];
+                      final isSelected = _selectedClinics.contains(clinic.id);
+                      return CheckboxListTile(
+                        title: Text(
+                          clinic.name ?? 'N/A',
+                          style: context.fonts.grey14w600,
+                        ),
+                        subtitle: Text(
+                          clinic.email ?? 'N/A',
+                          style: context.fonts.grey13w500,
+                        ),
+                        value: isSelected,
+                        onChanged: (val) {
+                          setState(() {
+                            if (val == true) {
+                              if (clinic.id != null)
+                                _selectedClinics.add(clinic.id!);
+                            } else {
+                              _selectedClinics.remove(clinic.id);
+                            }
+                          });
+                        },
+                        activeColor: CustomColors.green,
+                        checkColor: CustomColors.black,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: context.appEdgeInsets(horizontal: 16),
+                      );
+                    },
+                  ),
+                ),
         ),
       ],
     );
@@ -1096,7 +1184,7 @@ class DurationOptionController {
     this.initialName,
     double initialPrice = 0.00,
     List<SubscriptionDuration> durations = const [],
-  })  : priceController = TextEditingController(text: initialPrice.toString()) {
+  }) : priceController = TextEditingController(text: initialPrice.toString()) {
     if (selectedId == null && durations.isNotEmpty) {
       selectedId = durations.first.id;
       initialName = durations.first.name;
@@ -1104,7 +1192,8 @@ class DurationOptionController {
   }
 
   factory DurationOptionController.fromOption(
-      SubscriptionDurationOption option) {
+    SubscriptionDurationOption option,
+  ) {
     return DurationOptionController(
       selectedId: option.duration?.id,
       initialName: option.duration?.name,
