@@ -191,12 +191,26 @@ class _AreasStepState extends ConsumerState<AreasStep> {
                     state,
                     viewModel,
                   ),
-          onAddArea: (String name, String sku, String icon, String image) async {
-            await ref
-                .read(treatmentDataViewModelProvider.notifier)
-                .addArea(name, sku: sku, icon: icon, image: image);
+          onAddArea: (name, sku, icon, image, description, infoImageUrl) {
+            ref.read(treatmentDataViewModelProvider.notifier).addArea(
+              name,
+              sku: sku,
+              icon: icon,
+              image: image,
+              description: description,
+              infoImageUrl: infoImageUrl,
+            );
           },
-          onAddSubArea: ({required int parentAreaId, required String parentAreaName, required String name, String? sku, String? icon, String? image}) =>
+          onAddSubArea: ({
+            required int parentAreaId,
+            required String parentAreaName,
+            required String name,
+            String? sku,
+            String? icon,
+            String? image,
+            String? infoImageUrl,
+            String? description,
+          }) =>
               ref.read(treatmentDataViewModelProvider.notifier).addSubArea(
                     parentAreaId: parentAreaId,
                     parentAreaName: parentAreaName,
@@ -204,6 +218,8 @@ class _AreasStepState extends ConsumerState<AreasStep> {
                     sku: sku,
                     icon: icon,
                     image: image,
+                    infoImageUrl: infoImageUrl,
+                    description: description,
                   ),
           onAddSubAreaChild: (parentArea, parentSubArea, name, sku, icon, image) {
             ref

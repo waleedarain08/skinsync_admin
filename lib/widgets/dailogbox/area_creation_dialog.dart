@@ -18,6 +18,8 @@ class AreaCreationDialog extends ConsumerStatefulWidget {
     this.initialSku,
     this.initialIconUrl,
     this.initialImageUrl,
+    this.initialInfoImageUrl,
+    this.initialDescription,
   });
 
   final String title;
@@ -25,6 +27,8 @@ class AreaCreationDialog extends ConsumerStatefulWidget {
   final String? initialSku;
   final String? initialIconUrl;
   final String? initialImageUrl;
+  final String? initialInfoImageUrl;
+  final String? initialDescription;
 
   @override
   ConsumerState<AreaCreationDialog> createState() => _AreaCreationDialogState();
@@ -33,8 +37,10 @@ class AreaCreationDialog extends ConsumerStatefulWidget {
 class _AreaCreationDialogState extends ConsumerState<AreaCreationDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _skuController;
+  late final TextEditingController _descriptionController;
   String? _iconUrl;
   String? _imageUrl;
+  String? _infoImageUrl;
 
   @override
   void initState() {
@@ -43,20 +49,112 @@ class _AreaCreationDialogState extends ConsumerState<AreaCreationDialog> {
     _skuController = TextEditingController(text: widget.initialSku);
     _iconUrl = widget.initialIconUrl;
     _imageUrl = widget.initialImageUrl;
+    _infoImageUrl = widget.initialInfoImageUrl;
+    _descriptionController = TextEditingController(text: widget.initialDescription);
+
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _skuController.dispose();
+    _descriptionController.dispose();
     super.dispose();
+  }
+
+  Widget _buildImageUploader({
+    required String title,
+    required String? imageUrl,
+    required VoidCallback onTapUpload,
+    required VoidCallback onDelete,
+  }) {
+    final bool hasImage = imageUrl != null && imageUrl.isNotEmpty;
+
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: context.fonts.black14w600),
+          context.verticalSpace(12),
+          !hasImage
+              ? InkWell(
+                  onTap: onTapUpload,
+                  borderRadius: context.appBorderRadius(all: 12),
+                  child: Container(
+                    height: 110,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: CustomColors.whiteGrey,
+                      borderRadius: context.appBorderRadius(all: 12),
+                      border: Border.all(color: CustomColors.border),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.add_photo_alternate_outlined,
+                          color: CustomColors.lightGrey,
+                          size: 24,
+                        ),
+                        context.verticalSpace(4),
+                        Text(
+                          'Upload',
+                          style: context.fonts.grey11w400,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : Container(
+                  height: 110,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: context.appBorderRadius(all: 12),
+                    border: Border.all(color: CustomColors.border),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: context.appBorderRadius(all: 12),
+                    child: Stack(
+                      children: [
+                        AppNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: InkWell(
+                            onTap: onDelete,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: CustomColors.red,
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return StandardDialog(
       title: widget.title,
-      width: context.w(450),
+      width: context.w(550), // Expanded dialog width to comfortably fit 3 columns
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,189 +172,75 @@ class _AreaCreationDialogState extends ConsumerState<AreaCreationDialog> {
             tooltip: 'Must follow pattern XXX-XXXX-XXXX (like BTX-0001-UPRF) and be unique.',
           ),
           context.verticalSpace(16),
+          BuildTextField(
+            label: 'Description',
+            controller: _descriptionController,
+            hintText: 'e.g. Area description goes here',
+          ),
+          
           context.verticalSpace(20),
           Row(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Area Icon', style: context.fonts.black14w600),
-                    context.verticalSpace(12),
-                    _iconUrl == null || _iconUrl!.isEmpty
-                        ? InkWell(
-                            onTap: () async {
-                              await ref.read(areaViewModelProvider.notifier).pickImage(true);
-                              final uploaded = ref.read(areaViewModelProvider).areaIconUrl;
-                              if (uploaded != null) {
-                                setState(() {
-                                  _iconUrl = uploaded;
-                                });
-                              }
-                            },
-                            borderRadius: context.appBorderRadius(all: 12),
-                            child: Container(
-                              height: 110,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: CustomColors.whiteGrey,
-                                borderRadius: context.appBorderRadius(all: 12),
-                                border: Border.all(color: CustomColors.border),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.add_photo_alternate_outlined,
-                                    color: CustomColors.lightGrey,
-                                    size: 24,
-                                  ),
-                                  context.verticalSpace(4),
-                                  Text(
-                                    'Upload Icon',
-                                    style: context.fonts.grey11w400,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : Container(
-                            height: 110,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: context.appBorderRadius(all: 12),
-                              border: Border.all(color: CustomColors.border),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: context.appBorderRadius(all: 12),
-                              child: Stack(
-                                children: [
-                                  AppNetworkImage(
-                                    imageUrl: _iconUrl!,
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                  ),
-                                  Positioned(
-                                    top: 4,
-                                    right: 4,
-                                    child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          _iconUrl = '';
-                                        });
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.delete_outline_rounded,
-                                          color: CustomColors.red,
-                                          size: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                  ],
-                ),
+              // 1. Icon Image Box
+              _buildImageUploader(
+                title: 'Area Icon',
+                imageUrl: _iconUrl,
+                onTapUpload: () async {
+                  await ref.read(areaViewModelProvider.notifier).pickAreaMedia(AreaImageType.icon);
+                  final uploaded = ref.read(areaViewModelProvider).areaIconUrl;
+                  if (uploaded != null) {
+                    setState(() {
+                      _iconUrl = uploaded;
+                    });
+                  }
+                },
+                onDelete: () {
+                  setState(() {
+                    _iconUrl = '';
+                  });
+                },
               ),
-              context.horizontalSpace(16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Banner Image', style: context.fonts.black14w600),
-                    context.verticalSpace(12),
-                    _imageUrl == null || _imageUrl!.isEmpty
-                        ? InkWell(
-                            onTap: () async {
-                              await ref.read(areaViewModelProvider.notifier).pickImage(false);
-                              final uploaded = ref.read(areaViewModelProvider).areaImageUrl;
-                              if (uploaded != null) {
-                                setState(() {
-                                  _imageUrl = uploaded;
-                                });
-                              }
-                            },
-                            borderRadius: context.appBorderRadius(all: 12),
-                            child: Container(
-                              height: 110,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: CustomColors.whiteGrey,
-                                borderRadius: context.appBorderRadius(all: 12),
-                                border: Border.all(color: CustomColors.border),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.add_photo_alternate_outlined,
-                                    color: CustomColors.lightGrey,
-                                    size: 24,
-                                  ),
-                                  context.verticalSpace(4),
-                                  Text(
-                                    'Upload Image',
-                                    style: context.fonts.grey11w400,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : Container(
-                            height: 110,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: context.appBorderRadius(all: 12),
-                              border: Border.all(color: CustomColors.border),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: context.appBorderRadius(all: 12),
-                              child: Stack(
-                                children: [
-                                  AppNetworkImage(
-                                    imageUrl: _imageUrl!,
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                  ),
-                                  Positioned(
-                                    top: 4,
-                                    right: 4,
-                                    child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          _imageUrl = '';
-                                        });
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.delete_outline_rounded,
-                                          color: CustomColors.red,
-                                          size: 16,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                  ],
-                ),
+              context.horizontalSpace(12),
+
+              // 2. Banner Image Box
+              _buildImageUploader(
+                title: 'Banner Image',
+                imageUrl: _imageUrl,
+                onTapUpload: () async {
+                  await ref.read(areaViewModelProvider.notifier).pickAreaMedia(AreaImageType.banner);
+                  final uploaded = ref.read(areaViewModelProvider).areaImageUrl;
+                  if (uploaded != null) {
+                    setState(() {
+                      _imageUrl = uploaded;
+                    });
+                  }
+                },
+                onDelete: () {
+                  setState(() {
+                    _imageUrl = '';
+                  });
+                },
+              ),
+              context.horizontalSpace(12),
+
+              // 3. Info Image Box
+              _buildImageUploader(
+                title: 'Info Image',
+                imageUrl: _infoImageUrl,
+                onTapUpload: () async {
+                  await ref.read(areaViewModelProvider.notifier).pickAreaMedia(AreaImageType.infoImage);
+                  final uploaded = ref.read(areaViewModelProvider).infoImageUrl;
+                  if (uploaded != null) {
+                    setState(() {
+                      _infoImageUrl = uploaded;
+                    });
+                  }
+                },
+                onDelete: () {
+                  setState(() {
+                    _infoImageUrl = '';
+                  });
+                },
               ),
             ],
           ),
@@ -293,7 +277,6 @@ class _AreaCreationDialogState extends ConsumerState<AreaCreationDialog> {
               return;
             }
 
-            // uniqueness check - Only check if SKU has changed
             final dataViewModel = ref.read(
               treatmentDataViewModelProvider.notifier,
             );
@@ -307,10 +290,15 @@ class _AreaCreationDialogState extends ConsumerState<AreaCreationDialog> {
               return;
             }
 
-            if (_iconUrl == null || _iconUrl!.isEmpty || _imageUrl == null || _imageUrl!.isEmpty) {
+            if (_iconUrl == null ||
+                _iconUrl!.isEmpty ||
+                _imageUrl == null ||
+                _imageUrl!.isEmpty ||
+                _infoImageUrl == null ||
+                _infoImageUrl!.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Both Area Icon and Banner Image must be selected!'),
+                  content: Text('Area Icon, Banner Image, and Info Image must all be selected!'),
                   backgroundColor: CustomColors.red,
                 ),
               );
@@ -322,6 +310,8 @@ class _AreaCreationDialogState extends ConsumerState<AreaCreationDialog> {
               'sku': sku,
               'icon': _iconUrl,
               'image': _imageUrl,
+              'infoImageUrl': _infoImageUrl,
+              'description': _descriptionController.text.trim(),
             });
           },
           label: widget.initialSku == null ? 'Add' : 'Update',

@@ -617,6 +617,9 @@ class _ManageTreatmentDataScreenState
                   sku: result['sku'] as String,
                   icon: result['icon'] as String,
                   image: result['image'] as String,
+                  description: result['description'] as String? ?? '',
+                  infoImageUrl:
+                      result['infoImageUrl'] as String? ?? '',
                 );
               }
             },
@@ -1019,6 +1022,9 @@ class _RecursiveAreaTile extends StatelessWidget {
                     sku: result['sku'] as String,
                     icon: result['icon'] as String,
                     image: result['image'] as String,
+                    description: result['description'] as String? ?? '',
+                    infoImageUrl:
+                        result['infoImageUrl'] as String? ?? '',
                   );
                 }
               },
@@ -1035,6 +1041,8 @@ class _RecursiveAreaTile extends StatelessWidget {
                     initialIconUrl: area.icon,
                     initialImageUrl: area.image,
                     initialSku: area.globalSku,
+                    initialInfoImageUrl: area.infoImage,
+                    initialDescription: area.description,
                   ),
                 );
                 if (result != null) {
@@ -1045,6 +1053,9 @@ class _RecursiveAreaTile extends StatelessWidget {
                       sku: result['sku'] as String,
                       icon: result['icon'] as String,
                       image: result['image'] as String,
+                      description: result['description'] as String? ?? '',
+                      infoImageUrl:
+                          result['infoImageUrl'] as String? ?? '',
                     );
                   } else {
                     await viewModel.editSubArea(
@@ -1053,6 +1064,9 @@ class _RecursiveAreaTile extends StatelessWidget {
                       sku: result['sku'] as String,
                       icon: result['icon'] as String,
                       image: result['image'] as String,
+                      description: result['description'] as String? ?? '',
+                      infoImageUrl:
+                          result['infoImageUrl'] as String? ?? '',
                     );
                   }
                 }

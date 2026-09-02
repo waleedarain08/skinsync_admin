@@ -571,6 +571,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
         icon: '',
         image: '',
         subAreasCount: 0,
+        description: '',
+        infoImage: '',
       ),
     );
 
@@ -608,6 +610,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateTreatmentScreen> {
           icon: '',
           image: '',
           subAreasCount: 0,
+          description: '',
+          infoImage: '',
         ),
       );
 
