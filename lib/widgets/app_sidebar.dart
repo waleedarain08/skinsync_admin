@@ -15,6 +15,7 @@ import 'package:skinsync_admin/screens/bottom_nav_screens/treatment_management_s
 import 'package:skinsync_admin/screens/bottom_nav_screens/user_management.dart';
 import 'package:skinsync_admin/screens/dispute_screen.dart';
 import 'package:skinsync_admin/screens/payment_screen.dart';
+import 'package:skinsync_admin/screens/shared_treatment_request_screen.dart';
 import 'package:skinsync_admin/utils/assets.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/string_utils.dart';
@@ -72,6 +73,12 @@ final List<_SidebarEntry> _sidebarEntries = [
     icon: Icons.medical_services_rounded,
     label: 'Treatments',
   ),
+   const _SidebarEntry(
+    routeName: SharedTreatmentRequestScreen.routeName,
+    icon: Icons.medical_services_rounded,
+    label: 'Shared Request',
+  ),
+  
   const _SidebarEntry(
     routeName: ProductManagement.routeName,
     icon: Icons.inventory_2_rounded,

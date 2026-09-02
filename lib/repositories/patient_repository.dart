@@ -17,6 +17,7 @@ abstract class PatientRepository {
     required int page,
     required int limit,
     int? patientId,
+    int? clinicId,
   });
 
   Future<void> updatePatientStatus({

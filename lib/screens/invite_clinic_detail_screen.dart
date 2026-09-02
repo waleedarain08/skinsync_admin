@@ -3,14 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
+import 'package:skinsync_admin/screens/shared_treatment_request_screen.dart';
 import 'package:skinsync_admin/utils/date_time_utills.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-import 'package:skinsync_admin/utils/string_utils.dart';
 
 class InviteClinicDetailScreen extends ConsumerWidget {
   static const String routeName = '/invite-clinic-detail';
@@ -286,6 +287,24 @@ class InviteClinicDetailScreen extends ConsumerWidget {
             style: context.fonts.grey13w500h15,
           ),
           context.verticalSpace(24),
+          _actionButton(
+            context,
+            'View Requested Treatment',
+            Icons.assignment_outlined,
+            CustomColors.black,
+            CustomColors.black,
+            () {
+              context.pushNamed(
+                SharedTreatmentRequestScreen.routeName,
+                queryParameters: {
+                  'clinicId': clinic.clinicId.toString(),
+                  'showBackButton': 'true',
+                },
+              );
+            },
+            isOutlined: true,
+          ),
+          context.verticalSpace(12),
           _actionButton(
             context,
             'Invite Clinic Now',

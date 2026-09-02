@@ -373,6 +373,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skinsync_admin/screens/shared_treatment_request_screen.dart';
 import '../../models/responses/patient_detail_response.dart';
 import '../../utils/theme.dart';
 import '../../utils/string_utils.dart';
@@ -403,14 +404,14 @@ class _PatientManagementDetailScreenState
   @override
   void initState() {
     super.initState();
-    //  WidgetsBinding.instance.addPostFrameCallback((_) {
-    // ref
-    //     .read(patientProvider.notifier)
-    //     .getPatientTreatmentRequests(
-    //       initialCall: true,
-    //       patientId: widget.patientId,
-    //     );
-    //  });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(patientProvider.notifier)
+          .getPatientTreatmentRequests(
+            initialCall: true,
+            patientId: widget.patientId,
+          );
+    });
   }
 
   @override
@@ -525,7 +526,38 @@ class _PatientManagementDetailScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Contact Information', style: context.fonts.subHeading),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Contact Information', style: context.fonts.subHeading),
+              OutlinedButton.icon(
+                onPressed: () {
+                  context.pushNamed(
+                    SharedTreatmentRequestScreen.routeName,
+                    queryParameters: {
+                      'patientId': p.id.toString(),
+                      'showBackButton': 'true',
+                    },
+                  );
+                },
+                icon: const Icon(
+                  Icons.list_alt_rounded,
+                  color: CustomColors.purple,
+                ),
+                label: Text(
+                  'View Requested Treatments',
+                  style: context.fonts.purple14w600,
+                ),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: Size(0, 52.h),
+                  side: const BorderSide(color: CustomColors.purple),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+              ),
+            ],
+          ),
           const Divider(color: CustomColors.border, height: 32),
           _infoRow(context, Icons.email_outlined, 'Email Address', p.email),
           if (p.phoneNumber != '')

@@ -17,7 +17,9 @@ class PatientTreatmentRequestResponse
     required this.totalPages,
   });
 
-  factory PatientTreatmentRequestResponse.fromJson(Map<String, dynamic> json) {
+  factory PatientTreatmentRequestResponse.fromJson(
+    Map<String, dynamic> json,
+  ) {
     return PatientTreatmentRequestResponse(
       isSuccess: json['is_success'] ?? false,
       message: json['message'] ?? '',
@@ -44,6 +46,11 @@ class PatientTreatmentRequestData {
   final int groupId;
   final String name;
 
+  // Patient information
+  final String? patientName;
+  final String? patientImage;
+  final String? patientEmail;
+
   final String? frontImageBefore;
   final String? frontImageAfter;
 
@@ -63,6 +70,9 @@ class PatientTreatmentRequestData {
     required this.userId,
     required this.groupId,
     required this.name,
+    this.patientName,
+    this.patientImage,
+    this.patientEmail,
     this.frontImageBefore,
     this.frontImageAfter,
     this.rightImageBefore,
@@ -74,25 +84,37 @@ class PatientTreatmentRequestData {
     this.updatedAt,
   });
 
-  factory PatientTreatmentRequestData.fromJson(Map<String, dynamic> json) {
+  factory PatientTreatmentRequestData.fromJson(
+    Map<String, dynamic> json,
+  ) {
     return PatientTreatmentRequestData(
       id: json['id'] ?? 0,
       userId: json['user_id'] ?? 0,
       groupId: json['group_id'] ?? 0,
       name: json['name'] ?? '',
+
+      // Patient information
+      patientName: json['patient_name'],
+      patientImage: json['patient_image'],
+      patientEmail: json['patient_email'],
+
       frontImageBefore: json['front_image_before'],
       frontImageAfter: json['front_image_after'],
       rightImageBefore: json['right_image_before'],
       rightImageAfter: json['right_image_after'],
       leftImageBefore: json['left_image_before'],
       leftImageAfter: json['left_image_after'],
+
       treatments:
           (json['treatments'] as List<dynamic>?)
               ?.map(
-                (e) => PatientTreatmentData.fromJson(e as Map<String, dynamic>),
+                (e) => PatientTreatmentData.fromJson(
+                  e as Map<String, dynamic>,
+                ),
               )
               .toList() ??
           [],
+
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
     );
@@ -116,13 +138,15 @@ class PatientTreatmentData {
     required this.areas,
   });
 
-  factory PatientTreatmentData.fromJson(Map<String, dynamic> json) {
+  factory PatientTreatmentData.fromJson(
+    Map<String, dynamic> json,
+  ) {
     return PatientTreatmentData(
       treatmentId: json['treatment_id'] ?? 0,
+      treatmentName: json['treatment_name'] ?? '',
       description: json['treatment_desc'],
       image: json['treatment_image'],
       icon: json['treatment_icon'],
-      treatmentName: json['treatment_name'] ?? '',
       areas:
           (json['areas'] as List<dynamic>?)
               ?.map(
@@ -151,7 +175,9 @@ class PatientTreatmentAreaData {
     required this.materials,
   });
 
-  factory PatientTreatmentAreaData.fromJson(Map<String, dynamic> json) {
+  factory PatientTreatmentAreaData.fromJson(
+    Map<String, dynamic> json,
+  ) {
     return PatientTreatmentAreaData(
       areaId: json['area_id'] ?? 0,
       areaName: json['area_name'] ?? '',
@@ -181,7 +207,9 @@ class PatientTreatmentMaterialData {
     required this.selectedQuantity,
   });
 
-  factory PatientTreatmentMaterialData.fromJson(Map<String, dynamic> json) {
+  factory PatientTreatmentMaterialData.fromJson(
+    Map<String, dynamic> json,
+  ) {
     return PatientTreatmentMaterialData(
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
@@ -189,3 +217,5 @@ class PatientTreatmentMaterialData {
     );
   }
 }
+
+

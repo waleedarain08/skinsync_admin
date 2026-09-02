@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/requests/update_clinic_request.dart';
 import 'package:skinsync_admin/models/responses/clinic_detail_response.dart';
+import 'package:skinsync_admin/screens/shared_treatment_request_screen.dart';
 import 'package:skinsync_admin/utils/responsive.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
@@ -217,6 +218,7 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8.w),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
@@ -241,6 +243,33 @@ class _ClinicDetailScreenState extends ConsumerState<ClinicDetailScreen> {
                       style: context.fonts.grey14w400,
                     ),
                   ],
+                ),
+              ),
+              SizedBox(width: 16.w),
+              OutlinedButton.icon(
+                onPressed: () {
+                  context.pushNamed(
+                    SharedTreatmentRequestScreen.routeName,
+                    queryParameters: {
+                      'clinicId': clinic.clinicId.toString(),
+                      'showBackButton': 'true',
+                    },
+                  );
+                },
+                icon: const Icon(
+                  Icons.list_alt_rounded,
+                  color: CustomColors.purple,
+                ),
+                label: Text(
+                  'View Requested Treatments',
+                  style: context.fonts.purple14w600,
+                ),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: Size(0, 52.h),
+                  side: const BorderSide(color: CustomColors.purple),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
                 ),
               ),
             ],

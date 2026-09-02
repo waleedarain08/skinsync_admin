@@ -92,15 +92,20 @@ class PatientViewModel extends BaseViewModel<PatientState> {
     state = state.copyWith(clearPatientDetail: true);
   }
 
-  void setTreatmentPageNumber(int page) {
-    state = state.copyWith(treatmentPage: page);
-    getPatientTreatmentRequests(patientId: state.patientDetail?.id);
-  }
+Future<void> setTreatmentPageNumber(
+  int page, {
+  int? patientId,
+  int? clinicId,
+}) async {
+  state = state.copyWith(treatmentPage: page);
+  await getPatientTreatmentRequests(patientId: patientId, clinicId: clinicId);
+}
 
   Future<void> getPatientTreatmentRequests({
     bool initialCall = false,
     bool showEasyLoading = true,
     int? patientId,
+    int? clinicId,
   }) async {
     if (initialCall) {
       state = state.copyWith(treatmentPage: 1);
@@ -115,6 +120,7 @@ class PatientViewModel extends BaseViewModel<PatientState> {
           page: state.treatmentPage,
           limit: state.treatmentPageSize,
           patientId: patientId,
+          clinicId: clinicId,
         );
 
         state = state.copyWith(
@@ -127,7 +133,9 @@ class PatientViewModel extends BaseViewModel<PatientState> {
     );
   }
 
-  Future<bool> updatePatientStatus({
+
+
+ Future<bool> updatePatientStatus({
     required int patientId,
     required String status,
   }) async {
