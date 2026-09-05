@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,7 +18,6 @@ import '../widgets/gradient_scaffold.dart';
 import 'package:skinsync_admin/utils/string_utils.dart';
 import '../widgets/live_session_preview_widget.dart';
 import '../widgets/nested_area_selector.dart';
-import '../widgets/protocol_preview_widget.dart';
 import '../widgets/session_creation_steps/treatment_creation_steps.dart';
 
 class CreateSessionScreen extends ConsumerStatefulWidget {
@@ -2015,23 +2013,9 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                 success = (result == true);
               } else if (sessionState.sessionStep == 4) {
                 // Protocols
-                final bool hasProtocolContent =
-                    sessionState.selectedProtocolIds.isNotEmpty ||
-                    sessionState.standaloneNotes.isNotEmpty;
-
-                Uint8List? bytes;
-                if (hasProtocolContent) {
-                  bytes = await ProtocolFormPreview.getPdfBytes(
-                    state: state,
-                    sessionState: sessionState,
-                    dataState: dataState,
-                    categoryState: categoryState,
-                  );
-                }
-
                 final result = await viewModel.callProtocol(
                   stepNumber: sessionState.sessionStep,
-                  bytes: bytes ?? Uint8List(0),
+                  masterProtocols: dataState.protocols,
                 );
                 success = (result == true);
               } else if (sessionState.sessionStep == 5) {

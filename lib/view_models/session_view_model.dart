@@ -1,7 +1,5 @@
 import 'dart:developer';
-import 'dart:typed_data';
 
-import 'package:camera/camera.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' hide Notification;
@@ -1107,43 +1105,63 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     return baseDuration + productDuration + prepTime + cleanupTime;
   }
 
-  // Original callProtocol Implementation
   Future<bool?> callProtocol({
     required int stepNumber,
-    required Uint8List bytes,
+    List<ProtocolItem>? masterProtocols,
   }) async {
-    final mediaService = MediaService();
-    const String pdfName = 'clinicForm.pdf';
+    final List<ProtocolRequestItem> protocolItems = [];
 
-    return await runSafely(
+    for (final id in state.selectedProtocolIds) {
+      final pItem = masterProtocols?.firstWhereOrNull((p) => p.id == id);
+      final title = pItem?.title ?? '';
+
+      final matchingNoteEntry = state.selectedProtocolNotes.firstWhereOrNull(
+        (n) => n.protocolName == title,
+      );
+      final noteText =
+          matchingNoteEntry != null && matchingNoteEntry.notes.isNotEmpty
+              ? matchingNoteEntry.notes.map((e) => e.description).join('\n')
+              : '';
+
+      protocolItems.add(
+        ProtocolRequestItem(
+          fieldId: int.tryParse(id) ?? 0,
+          title: title,
+          note: noteText,
+        ),
+      );
+    }
+
+    final List<ProtocolInstructionItem> instructionItems =
+        state.standaloneNotes.map((note) {
+          return ProtocolInstructionItem(
+            title: note.title ?? '',
+            note: note.description,
+          );
+        }).toList();
+
+    final request = ProtocolRequest(
+      stepNumber: stepNumber,
+      protocols: protocolItems,
+      instrictions: instructionItems,
+    );
+
+    log('''
+=========== PROTOCOL REQUEST ===========
+Step No : $stepNumber
+Body    : ${request.toJson()}
+========================================
+''');
+
+    return await runSafely<bool>(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
-        ClinicalProtocolPdf? clinicalProtocolPdf;
-
-        if (bytes.isNotEmpty) {
-          final uploadedFile = await mediaService.uploadFile(
-            'treatment/pdf',
-            XFile.fromData(bytes, name: pdfName, length: bytes.length),
-          );
-
-          if (uploadedFile == null) {
-            throw const UnknownException('Failed to upload');
-          }
-
-          clinicalProtocolPdf = ClinicalProtocolPdf(
-            name: pdfName,
-            url: uploadedFile,
-          );
-        }
-
         final response = await _sessionRepository.protocol(
-          request: ProtocolRequest(
-            stepNumber: stepNumber,
-            clinicalProtocolPdf: clinicalProtocolPdf,
-          ),
+          request: request,
           id: state.sessionId!,
         );
 
+        log('Protocol Step Saved for Session ID: ${state.sessionId!}');
         return response.isSuccess;
       },
     );
