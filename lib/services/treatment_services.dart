@@ -1,4 +1,5 @@
 
+import 'package:skinsync_admin/models/requests/create_protocol_field_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/basic_info_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/sessions_setup_request.dart';
@@ -90,7 +91,7 @@ class TreatmentServices implements TreatmentRepository {
       queryParams: {'treatment_id': id.toString()},
     );
 
-    final response = BaseApiResponseModel.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -109,7 +110,7 @@ class TreatmentServices implements TreatmentRepository {
       queryParams: {'treatment_id': id.toString()},
     );
 
-    final response = BaseApiResponseModel.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -129,7 +130,7 @@ class TreatmentServices implements TreatmentRepository {
       body: request,
       queryParams: {'treatment_id': draftTreatmentId.toString()},
     );
-    final response = BaseApiResponseModel.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -166,7 +167,7 @@ class TreatmentServices implements TreatmentRepository {
       body: {'status': status},
       queryParams: {'treatment_id': treatmentId.toString()},
     );
-    final response = BaseApiResponseModel.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
@@ -196,7 +197,7 @@ class TreatmentServices implements TreatmentRepository {
       Endpoint.sessionStatus,
       body: request
     );
-    final response = BaseApiResponseModel.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
@@ -214,7 +215,7 @@ class TreatmentServices implements TreatmentRepository {
       body: request.toJson(),
       queryParams: {'treatment_id': treatmentId.toString()},
     );
-    final response = BaseApiResponseModel.fromJson(jsonResponse);
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }
@@ -225,6 +226,21 @@ class TreatmentServices implements TreatmentRepository {
   Future<ProtocolFieldsResponse> getProtocolFields() async {
     final jsonResponse = await _api.get(Endpoint.protocolFields);
     final response = ProtocolFieldsResponse.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<BaseApiResponseModel<dynamic>> createProtocolField(
+    CreateProtocolFieldRequest request,
+  ) async {
+    final jsonResponse = await _api.post(
+      Endpoint.protocolFields,
+      body: request.toJson(),
+    );
+    final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }

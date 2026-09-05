@@ -1,3 +1,4 @@
+import 'package:skinsync_admin/models/requests/create_protocol_field_request.dart';
 import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/basic_info_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/sessions_setup_request.dart';
@@ -55,4 +56,8 @@ abstract class TreatmentRepository {
   });
 
   Future<ProtocolFieldsResponse> getProtocolFields();
+
+  Future<BaseApiResponseModel<dynamic>> createProtocolField(
+    CreateProtocolFieldRequest request,
+  );
 }

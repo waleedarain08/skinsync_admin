@@ -57,12 +57,14 @@ class _ProtocolsStepState extends ConsumerState<ProtocolsStep> {
             child: const Text('Cancel'),
           ),
           CustomPrimaryButton(
-            onTap: () {
-              if (controller.text.isNotEmpty) {
-                ref
+            onTap: () async {
+              if (controller.text.trim().isNotEmpty) {
+                final success = await ref
                     .read(treatmentDataViewModelProvider.notifier)
-                    .addProtocol(controller.text.trim(), type);
-                Navigator.pop(context);
+                    .createProtocolField(controller.text.trim(), type);
+                if (success && context.mounted) {
+                  Navigator.pop(context);
+                }
               }
             },
             label: 'Save Protocol',
