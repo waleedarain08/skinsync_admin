@@ -1158,31 +1158,34 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       unitPriceOverrides: state.isFixedPrice
           ? []
           : state.productUsageEntries.map((entry) {
-              final maxQty =
-                  (double.tryParse(entry.maxQuantityController.text) ?? 1.0)
-                      .ceil();
-              entry.syncUnitPriceControllers(maxQty);
+              final maxQty = getProductMaxQuantity(entry).ceil();
+              final effectiveMaxQty = maxQty < 1 ? 1 : maxQty;
+              entry.syncUnitPriceControllers(effectiveMaxQty);
 
-              final List<int> prices = [];
               if (entry.useDifferentPricingPerUnit) {
+                final List<int> prices = [];
                 for (final c in entry.unitPriceControllers) {
                   prices.add(int.tryParse(c.text.trim()) ?? 0);
                 }
+                return UnitPriceOverride(
+                  productId: entry.productId,
+                  isDiffPrice: true,
+                  pricePerUnit: 0,
+                  pricePerUnitList: prices,
+                );
               } else {
-                final singlePrice =
-                    int.tryParse(
-                      entry.unitPriceControllers.isEmpty
-                          ? '0'
-                          : entry.unitPriceControllers[0].text.trim(),
-                    ) ??
-                    0;
-                prices.addAll(List.filled(maxQty, singlePrice));
+                final singlePrice = int.tryParse(
+                  entry.unitPriceControllers.isEmpty
+                      ? '0'
+                      : entry.unitPriceControllers[0].text.trim(),
+                ) ?? 0;
+                return UnitPriceOverride(
+                  productId: entry.productId,
+                  isDiffPrice: false,
+                  pricePerUnit: singlePrice,
+                  pricePerUnitList: [],
+                );
               }
-
-              return UnitPriceOverride(
-                productId: entry.productId,
-                pricePerUnit: prices,
-              );
             }).toList(),
       isFixedPrice: state.isFixedPrice,
       fixedPrice: state.isFixedPrice
