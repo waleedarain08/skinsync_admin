@@ -105,11 +105,10 @@ class PricingStep extends ConsumerWidget {
             ),
             context.verticalSpace(24),
             ...state.productUsageEntries.map((entry) {
-              final parsedMaxQty =
-                  (double.tryParse(entry.maxQuantityController.text) ?? 1.0).ceil();
-              final maxQty = parsedMaxQty < 1 ? 1 : parsedMaxQty;
+              final maxQty = viewModel.getProductMaxQuantity(entry).ceil();
+              final effectiveMaxQty = maxQty < 1 ? 1 : maxQty;
               final formattedUnit = _formatUnitLabel(entry.unit);
-              entry.syncUnitPriceControllers(maxQty);
+              entry.syncUnitPriceControllers(effectiveMaxQty);
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 24),

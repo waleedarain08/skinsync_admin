@@ -315,7 +315,38 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   }
 
   void _triggerRebuild() {
+    _syncProductMinMaxFromSessionUnits();
     state = state.copyWith();
+  }
+
+  void _syncProductMinMaxFromSessionUnits() {
+    final minVal = minUnitsController.text.trim();
+    final maxVal = maxUnitsController.text.trim();
+    final parsedMin = double.tryParse(minVal) ?? 0.0;
+    final parsedMax = double.tryParse(maxVal) ?? 0.0;
+
+    for (final entry in state.productUsageEntries) {
+      if (parsedMin > 0) {
+        final currentMin =
+            double.tryParse(entry.minQuantityController.text) ?? 0.0;
+        if (currentMin == 0 || currentMin == 1.0) {
+          entry.minQuantityController.text =
+              parsedMin % 1 == 0
+                  ? parsedMin.toInt().toString()
+                  : parsedMin.toString();
+        }
+      }
+      if (parsedMax > 0) {
+        final currentMax =
+            double.tryParse(entry.maxQuantityController.text) ?? 0.0;
+        if (currentMax == 0 || currentMax == 1.0) {
+          entry.maxQuantityController.text =
+              parsedMax % 1 == 0
+                  ? parsedMax.toInt().toString()
+                  : parsedMax.toString();
+        }
+      }
+    }
   }
 
   void selectUnitType(int? id, String? name) {
@@ -942,6 +973,9 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       EasyLoading.dismiss();
     }
 
+    final currentMin = minUnitsController.text.trim();
+    final currentMax = maxUnitsController.text.trim();
+
     final newEntry = ProductUsageEntry(
       productId: productId,
       productName: productName,
@@ -950,6 +984,12 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       boxQuantity: resolvedBoxQuantity,
       clinicCost: resolvedClinicCost,
       retailPricePerUnit: resolvedRetailPrice,
+      minQuantityController: TextEditingController(
+        text: currentMin.isNotEmpty && currentMin != '0' ? currentMin : '1',
+      ),
+      maxQuantityController: TextEditingController(
+        text: currentMax.isNotEmpty && currentMax != '0' ? currentMax : '1',
+      ),
       onChanged: _triggerRebuild,
     );
 
@@ -1033,7 +1073,19 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   }
 
   double getProductMinQuantity(ProductUsageEntry entry) {
-    return double.tryParse(entry.minQuantityController.text) ?? 0.0;
+    final entryMin = double.tryParse(entry.minQuantityController.text) ?? 0.0;
+    final sessionMin = double.tryParse(minUnitsController.text) ?? 0.0;
+    if (entryMin > 0 && entryMin != 1.0) return entryMin;
+    if (sessionMin > 0) return sessionMin;
+    return entryMin;
+  }
+
+  double getProductMaxQuantity(ProductUsageEntry entry) {
+    final entryMax = double.tryParse(entry.maxQuantityController.text) ?? 0.0;
+    final sessionMax = double.tryParse(maxUnitsController.text) ?? 0.0;
+    if (entryMax > 0 && entryMax != 1.0) return entryMax;
+    if (sessionMax > 0) return sessionMax;
+    return entryMax;
   }
 
   double calculateProductUsageDuration() {

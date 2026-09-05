@@ -40,6 +40,6 @@ class UnitPriceOverride {
 
   Map<String, dynamic> toJson() => {
     'product_id': productId,
-   // 'price_per_unit': pricePerUnit,
+    'price_per_unit': pricePerUnit,
   };
 }

@@ -176,8 +176,13 @@ class LiveSessionPreviewWidget extends ConsumerWidget {
                     )
                   else
                     ...sessionState.productUsageEntries.map((e) {
-                      final double minQty = double.tryParse(e.minQuantityController.text) ?? 0.0;
-                      final double maxQty = double.tryParse(e.maxQuantityController.text) ?? 0.0;
+                      final sessionViewModel = ref.read(
+                        sessionViewModelProvider.notifier,
+                      );
+                      final double minQty = sessionViewModel
+                          .getProductMinQuantity(e);
+                      final double maxQty = sessionViewModel
+                          .getProductMaxQuantity(e);
 
                       final String qtyDisplay = '${minQty.toStringAsFixed(1)} - ${maxQty.toStringAsFixed(1)} ${e.unit}';
 

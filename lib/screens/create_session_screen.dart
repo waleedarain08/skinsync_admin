@@ -1129,9 +1129,26 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
                               style: context.fonts.grey11w400,
                             ),
                             context.verticalSpace(4),
-                            Text(
-                              'Consumption Range: Min ${entry.minQuantityController.text} / Max ${entry.maxQuantityController.text} ${entry.unit}',
-                              style: context.fonts.grey11w400,
+                            Builder(
+                              builder: (context) {
+                                final viewModel = ref.read(
+                                  sessionViewModelProvider.notifier,
+                                );
+                                final minQtyVal = viewModel
+                                    .getProductMinQuantity(entry);
+                                final maxQtyVal = viewModel
+                                    .getProductMaxQuantity(entry);
+                                final minText = minQtyVal % 1 == 0
+                                    ? minQtyVal.toInt().toString()
+                                    : minQtyVal.toString();
+                                final maxText = maxQtyVal % 1 == 0
+                                    ? maxQtyVal.toInt().toString()
+                                    : maxQtyVal.toString();
+                                return Text(
+                                  'Consumption Range: Min $minText / Max $maxText ${entry.unit}',
+                                  style: context.fonts.grey11w400,
+                                );
+                              },
                             ),
                             if (entry.notesController.text.isNotEmpty)
                               Text(
@@ -1918,7 +1935,8 @@ class _CreateTreatmentScreenState extends ConsumerState<CreateSessionScreen> {
     ProductUsageEntry entry,
     List<SubAreaConfig> allSubAreas,
   ) {
-    return double.tryParse(entry.minQuantityController.text) ?? 0.0;
+    final viewModel = ref.read(sessionViewModelProvider.notifier);
+    return viewModel.getProductMinQuantity(entry);
   }
 
   double _calculateProductUsageDuration(TreatmentState state) {
