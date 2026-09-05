@@ -1,21 +1,20 @@
 
+import 'package:skinsync_admin/models/requests/create_session_requests/treatment_schedule_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/basic_info_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/sessions_setup_request.dart';
 import 'package:skinsync_admin/models/requests/create_treatment_requests/treatment_area_request.dart';
+import 'package:skinsync_admin/models/requests/create_treatment_requests/update_basic_info_request.dart';
 import 'package:skinsync_admin/models/requests/session_status_request.dart';
 import 'package:skinsync_admin/models/requests/update_treatment_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
-
-import '../models/requests/create_session_requests/treatment_schedule_request.dart';
-import '../models/requests/create_treatment_requests/basic_info_request.dart';
-// import '../models/requests/create_treatment_requests/business_logic_request.dart';
-import '../models/requests/create_treatment_requests/sessions_setup_request.dart';
-import '../models/requests/create_treatment_requests/update_basic_info_request.dart';
-import '../models/responses/basic_info_response.dart';
-import '../models/responses/treatment_detail_response.dart';
-import '../models/responses/treatment_list_response.dart';
-import '../repositories/treatment_repository.dart';
-import '../utils/enums.dart';
-import '../utils/exception.dart';
-import 'api_base_helper.dart';
+import 'package:skinsync_admin/models/responses/basic_info_response.dart';
+import 'package:skinsync_admin/models/responses/protocol_fields_response.dart';
+import 'package:skinsync_admin/models/responses/treatment_detail_response.dart';
+import 'package:skinsync_admin/models/responses/treatment_list_response.dart';
+import 'package:skinsync_admin/repositories/treatment_repository.dart';
+import 'package:skinsync_admin/utils/enums.dart';
+import 'package:skinsync_admin/utils/exception.dart';
+import 'package:skinsync_admin/services/api_base_helper.dart';
 
 class TreatmentServices implements TreatmentRepository {
   // ignore: unused_field
@@ -81,7 +80,7 @@ class TreatmentServices implements TreatmentRepository {
 
 
   @override
-  Future<BaseApiResponseModel> createTreatmentArea(
+  Future<BaseApiResponseModel<dynamic>> createTreatmentArea(
     TreatmentAreaRequest request,
     int id,
   ) async {
@@ -100,7 +99,7 @@ class TreatmentServices implements TreatmentRepository {
   }
 
   @override
-  Future<BaseApiResponseModel> createSchedule(
+  Future<BaseApiResponseModel<dynamic>> createSchedule(
     TreatmentScheduleRequest request,
     int id,
   ) async {
@@ -158,7 +157,7 @@ class TreatmentServices implements TreatmentRepository {
   // }
 
   @override
-  Future<BaseApiResponseModel> updateTreatmentStatus({
+  Future<BaseApiResponseModel<dynamic>> updateTreatmentStatus({
     required int treatmentId,
     required String status,
   }) async {
@@ -190,9 +189,9 @@ class TreatmentServices implements TreatmentRepository {
   }
 
   @override
-Future<BaseApiResponseModel> changeSessionStatus({
+  Future<BaseApiResponseModel<dynamic>> changeSessionStatus({
     required SessionStatusRequest request,
-  }) async{
+  }) async {
     final jsonResponse = await _api.patch(
       Endpoint.sessionStatus,
       body: request
@@ -206,7 +205,7 @@ Future<BaseApiResponseModel> changeSessionStatus({
   }
 
   @override
-  Future<BaseApiResponseModel> updateTreatment({
+  Future<BaseApiResponseModel<dynamic>> updateTreatment({
     required int treatmentId,
     required UpdateTreatmentRequest request,
   }) async {
@@ -216,6 +215,16 @@ Future<BaseApiResponseModel> changeSessionStatus({
       queryParams: {'treatment_id': treatmentId.toString()},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
+    if (!response.isSuccess) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+
+  @override
+  Future<ProtocolFieldsResponse> getProtocolFields() async {
+    final jsonResponse = await _api.get(Endpoint.protocolFields);
+    final response = ProtocolFieldsResponse.fromJson(jsonResponse);
     if (!response.isSuccess) {
       throw BadRequestException(response.message);
     }

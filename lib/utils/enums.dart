@@ -98,7 +98,8 @@ enum Endpoint {
   forms('admin/forms'),
   updateForm('admin/forms/{id}'),
   notification('admin/notifications'),
-  deleteForm('admin/forms/{id}');
+  deleteForm('admin/forms/{id}'),
+  protocolFields('admin/protocol_fields');
 
   final String path;
   const Endpoint(this.path);

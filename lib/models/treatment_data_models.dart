@@ -115,7 +115,26 @@ class CombinationGroup {
   }
 }
 
-enum ProtocolType { checkbox, text }
+enum ProtocolType {
+  checkbox('checkbox'),
+  textField('textField'),
+  text('text');
+
+  final String value;
+  const ProtocolType(this.value);
+
+  bool get isTextField =>
+      this == ProtocolType.textField || this == ProtocolType.text;
+  bool get isCheckbox => this == ProtocolType.checkbox;
+
+  static ProtocolType fromString(String? type) {
+    final lower = type?.toString().toLowerCase() ?? '';
+    if (lower == 'textfield' || lower == 'text') {
+      return ProtocolType.textField;
+    }
+    return ProtocolType.checkbox;
+  }
+}
 
 class ProtocolDescription {
   final String? title;
@@ -150,12 +169,16 @@ class ProtocolItem {
   final String id;
   final String title;
   final ProtocolType type;
+  final String? status;
+  final String? createdAt;
   final List<ProtocolDescription> descriptions;
 
   ProtocolItem({
     required this.id,
     required this.title,
     required this.type,
+    this.status,
+    this.createdAt,
     this.descriptions = const [],
   });
 
@@ -163,12 +186,16 @@ class ProtocolItem {
     String? id,
     String? title,
     ProtocolType? type,
+    String? status,
+    String? createdAt,
     List<ProtocolDescription>? descriptions,
   }) {
     return ProtocolItem(
       id: id ?? this.id,
       title: title ?? this.title,
       type: type ?? this.type,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
       descriptions: descriptions ?? this.descriptions,
     );
   }
@@ -190,11 +217,11 @@ class ProtocolItem {
       ];
     }
     return ProtocolItem(
-      id: json['id'] ?? '',
+      id: json['id']?.toString() ?? '',
       title: json['title'] ?? '',
-      type: json['type'] == 'checkbox'
-          ? ProtocolType.checkbox
-          : ProtocolType.text,
+      type: ProtocolType.fromString(json['type']?.toString()),
+      status: json['status']?.toString(),
+      createdAt: json['created_at']?.toString(),
       descriptions: descs,
     );
   }
@@ -202,7 +229,9 @@ class ProtocolItem {
   Map<String, dynamic> toJson() => {
     'id': id,
     'title': title,
-    'type': type == ProtocolType.checkbox ? 'checkbox' : 'text',
+    'type': type.value,
+    'status': status,
+    'created_at': createdAt,
     'descriptions': descriptions.map((e) => e.toJson()).toList(),
   };
 }

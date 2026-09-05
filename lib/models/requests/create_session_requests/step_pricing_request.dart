@@ -47,8 +47,8 @@ class UnitPriceOverride {
 
   Map<String, dynamic> toJson() => {
     'product_id': productId,
-    'is_diff_price': isDiffPrice ?? false,
-    'price_per_unit': pricePerUnit ?? 0,
-    'price_per_unit_list': pricePerUnitList ?? <int>[],
+   // 'is_diff_price': isDiffPrice ?? false,
+   // 'price_per_unit': pricePerUnit ?? 0,
+   // 'price_per_unit_list': pricePerUnitList ?? <int>[],
   };
 }
