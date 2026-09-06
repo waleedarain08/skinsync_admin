@@ -15,10 +15,10 @@ abstract class SubscriptionRepository {
     CreateClinicSubscriptionPlanRequest request,
   );
   Future<BaseApiResponseModel<dynamic>> updateSubscriptionPlan(
-    int id,
+    String id,
     CreateClinicSubscriptionPlanRequest request,
   );
-  Future<BaseApiResponseModel<dynamic>> deleteSubscriptionPlan(int id);
+  Future<BaseApiResponseModel<dynamic>> deleteSubscriptionPlan(String id);
 
   // Patients
   Future<PatientSubscriptionPlanListResponse> getPatientPlans();

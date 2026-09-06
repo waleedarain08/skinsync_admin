@@ -47,7 +47,7 @@ class SubscriptionServices implements SubscriptionRepository {
 
   @override
   Future<BaseApiResponseModel<dynamic>> updateSubscriptionPlan(
-    int id,
+    String id,
     CreateClinicSubscriptionPlanRequest request,
   ) async {
     final jsonResponse = await _api.put(
@@ -61,7 +61,9 @@ class SubscriptionServices implements SubscriptionRepository {
   }
 
   @override
-  Future<BaseApiResponseModel<dynamic>> deleteSubscriptionPlan(int id) async {
+  Future<BaseApiResponseModel<dynamic>> deleteSubscriptionPlan(
+    String id,
+  ) async {
     final jsonResponse =
         await _api.delete(
               Endpoint.deleteSubscriptionPlan,

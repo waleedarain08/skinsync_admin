@@ -2,7 +2,7 @@ import 'duration_option_model.dart';
 import 'subscription_plan_benefit_model.dart';
 
 class ClinicSubscriptionPlanModel {
-  int? id;
+  String? id;
   String? name;
   double? basePrice;
   int doctorSeats;

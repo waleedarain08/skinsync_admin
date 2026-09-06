@@ -71,24 +71,18 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
     return success;
   }
 
-  Future<bool> deleteSubscriptionPlan(int id) async {
-    final success =
-        await runSafely<bool?>(showLoading: true, () async {
-          final response = await _subscriptionRepository.deleteSubscriptionPlan(
-            id,
-          );
-          if (response.isSuccess) {
-            final currentList = state.plans ?? [];
-            state = state.copyWith(
-              plans: currentList.where((p) => p.id != id).toList(),
-            );
-            return true;
-          }
-          return false;
-        }) ??
-        false;
-
-    return success;
+  Future<bool?> deleteSubscriptionPlan(String id) async {
+    return await runSafely(showLoading: true, () async {
+      final response = await _subscriptionRepository.deleteSubscriptionPlan(id);
+      if (response.isSuccess) {
+        final currentList = state.plans ?? [];
+        state = state.copyWith(
+          plans: currentList.where((p) => p.id != id).toList(),
+        );
+        return true;
+      }
+      return false;
+    });
   }
 
   // ---------------- PATIENTS ----------------

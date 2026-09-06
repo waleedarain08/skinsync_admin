@@ -41,16 +41,10 @@ class CreatePatientSubscriptionPlanRequest {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'base_price': basePrice ?? 0,
+      'base_price': basePrice,
       'assigned_patients': assignedPatients,
       'duration_options': durationOptions
-          ?.map(
-            (e) => {
-              'id': e.id,
-              'interval': e.interval?.name,
-              'amount': e.amount,
-            },
-          )
+          ?.map((e) => {'interval': e.interval?.name, 'amount': e.amount})
           .toList(),
       'benefit_ids': benefitIds,
     };

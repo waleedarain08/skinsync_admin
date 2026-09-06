@@ -13,8 +13,9 @@ import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 
 import '../models/duration_option_model.dart';
+import '../utils/enums.dart';
+import '../utils/string_utils.dart';
 import '../widgets/dailogbox/add_benefit_dialog.dart';
-import '../widgets/dailogbox/subscription_duration_dialog.dart';
 import '../widgets/gradient_scaffold.dart';
 
 class CreatePatientSubscriptionPlanScreen extends ConsumerStatefulWidget {
@@ -56,10 +57,7 @@ class _CreatePatientSubscriptionPlanScreenState
     _initFromModel(widget.planToEdit);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await ref
-          .read(subscriptionViewModelProvider.notifier)
-          .getSubscriptionDurations(showLoading: true);
-
+      // using local PlanInterval values for durations; no fetch required
       _syncDurations();
 
       ref.read(subscriptionViewModelProvider.notifier).getBenefits();
@@ -107,13 +105,10 @@ class _CreatePatientSubscriptionPlanScreenState
   }
 
   void _syncDurations() {
-    final durations = ref.read(subscriptionViewModelProvider).durations ?? [];
-    if (durations.isEmpty) return;
-
     setState(() {
       if (_durationOptions.isEmpty && !_isLifetime) {
         _durationOptions.add(
-          DurationOptionController(selectedId: durations.first.id),
+          DurationOptionController(selectedInterval: PlanInterval.month),
         );
       }
     });
@@ -132,25 +127,21 @@ class _CreatePatientSubscriptionPlanScreenState
   }
 
   void _addDurationOption() {
-    final durations = ref.read(subscriptionViewModelProvider).durations ?? [];
-    if (durations.isEmpty) return;
-
-    // Find next available duration id
-    final usedIds = _durationOptions.map((e) => e.selectedId).toSet();
-    String? nextId;
-    for (final d in durations) {
-      if (!usedIds.contains(d.id)) {
-        nextId = d.id;
+    // use PlanInterval enum options
+    final usedIntervals = _durationOptions
+        .map((e) => e.selectedInterval)
+        .toSet();
+    PlanInterval? next;
+    for (final iv in PlanInterval.values) {
+      if (!usedIntervals.contains(iv)) {
+        next = iv;
         break;
       }
     }
 
     setState(() {
       _durationOptions.add(
-        DurationOptionController(
-          selectedId: nextId ?? durations.first.id,
-          durations: durations,
-        ),
+        DurationOptionController(selectedInterval: next ?? PlanInterval.month),
       );
     });
   }
@@ -181,16 +172,9 @@ class _CreatePatientSubscriptionPlanScreenState
         durationOptions = [];
       } else {
         basePrice = null;
-        final allDurations =
-            ref.read(subscriptionViewModelProvider).durations ?? [];
         durationOptions = _durationOptions.map((e) {
-          final durationObj = allDurations.firstWhere(
-            (d) => d.id == e.selectedId,
-            orElse: () => allDurations.first,
-          );
           return DurationOption(
-            id: durationObj.id,
-            interval: durationObj.interval,
+            interval: e.selectedInterval,
             amount: double.tryParse(e.priceController.text) ?? 0.0,
           );
         }).toList();
@@ -204,15 +188,15 @@ class _CreatePatientSubscriptionPlanScreenState
           return;
         }
 
-        if (Set<String>.from(durationOptions.map((e) => e.id)).length !=
-            durationOptions.length) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Duplicate duration options are not allowed'),
-            ),
-          );
-          return;
-        }
+        // if (Set<String>.from(durationOptions.map((e) => e.id)).length !=
+        //     durationOptions.length) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //       content: Text('Duplicate duration options are not allowed'),
+        //     ),
+        //   );
+        //   return;
+        // }
       }
 
       final request = CreatePatientSubscriptionPlanRequest(
@@ -423,7 +407,7 @@ class _CreatePatientSubscriptionPlanScreenState
                                         } else if (_durationOptions.isEmpty) {
                                           _durationOptions.add(
                                             DurationOptionController(
-                                              durations: state.durations ?? [],
+                                              selectedInterval: .week,
                                             ),
                                           );
                                         }
@@ -460,19 +444,19 @@ class _CreatePatientSubscriptionPlanScreenState
                                     'Duration Options',
                                     style: context.fonts.black14w600,
                                   ),
-                                  const Spacer(),
-                                  CustomOutlinedButton(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) =>
-                                            const SubscriptionDurationDialog(),
-                                      );
-                                    },
-                                    label: 'Create Duration',
-                                    icon: Icons.add,
-                                    width: 160.w,
-                                  ),
+                                  // const Spacer(),
+                                  // CustomOutlinedButton(
+                                  //   onTap: () {
+                                  //     showDialog(
+                                  //       context: context,
+                                  //       builder: (context) =>
+                                  //           const SubscriptionDurationDialog(),
+                                  //     );
+                                  //   },
+                                  //   label: 'Create Duration',
+                                  //   icon: Icons.add,
+                                  //   width: 160.w,
+                                  // ),
                                 ],
                               ),
                               context.verticalSpace(16),
@@ -480,10 +464,10 @@ class _CreatePatientSubscriptionPlanScreenState
                                 index,
                               ) {
                                 final option = _durationOptions[index];
-                                final otherUsedIds = _durationOptions
-                                    .where((e) => e != option)
-                                    .map((e) => e.selectedId)
-                                    .toSet();
+                                // final otherUsedIds = _durationOptions
+                                //     .where((e) => e != option)
+                                //     .map((e) => e.selectedId)
+                                //     .toSet();
 
                                 return Padding(
                                   padding: context.appEdgeInsets(bottom: 16),
@@ -526,79 +510,47 @@ class _CreatePatientSubscriptionPlanScreenState
                                                           ),
                                                     ),
                                                     child: DropdownButtonHideUnderline(
-                                                      child: DropdownButton<String>(
-                                                        value:
-                                                            state.durations?.any(
-                                                                  (d) =>
-                                                                      d.id ==
-                                                                      option
-                                                                          .selectedId,
-                                                                ) ==
-                                                                true
-                                                            ? option.selectedId
-                                                            : null,
+                                                      child: DropdownButton<PlanInterval>(
+                                                        value: option
+                                                            .selectedInterval,
                                                         isExpanded: true,
                                                         icon: const Icon(
                                                           Icons
                                                               .keyboard_arrow_down_rounded,
                                                         ),
                                                         items: [
-                                                          // Always include selectedId if durations list doesn't have it yet (for Edit Mode safety)
-                                                          if (option.selectedId !=
-                                                                  null &&
-                                                              !(state.durations?.any(
-                                                                    (d) =>
-                                                                        d.id ==
-                                                                        option
-                                                                            .selectedId,
-                                                                  ) ??
-                                                                  false))
-                                                            DropdownMenuItem<
-                                                              String
-                                                            >(
-                                                              value: option
-                                                                  .selectedId,
-                                                              child: Text(
-                                                                option.initialName ??
-                                                                    'Loading...',
-                                                                style: context
-                                                                    .fonts
-                                                                    .black14w400,
+                                                          for (var iv
+                                                              in PlanInterval
+                                                                  .values)
+                                                            if (iv ==
+                                                                    option
+                                                                        .selectedInterval ||
+                                                                !_durationOptions
+                                                                    .any(
+                                                                      (e) =>
+                                                                          e.selectedInterval ==
+                                                                          iv,
+                                                                    ))
+                                                              DropdownMenuItem<
+                                                                PlanInterval
+                                                              >(
+                                                                value: iv,
+                                                                child: Text(
+                                                                  iv
+                                                                      .name
+                                                                      .capitalize,
+                                                                  style: context
+                                                                      .fonts
+                                                                      .black14w400,
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ...({
-                                                            for (var d
-                                                                in (state
-                                                                        .durations ??
-                                                                    []))
-                                                              if (d.id !=
-                                                                      null &&
-                                                                  (d.id ==
-                                                                          option
-                                                                              .selectedId ||
-                                                                      !otherUsedIds
-                                                                          .contains(
-                                                                            d.id,
-                                                                          )))
-                                                                d.id!: d,
-                                                          }).values.map(
-                                                            (
-                                                              d,
-                                                            ) => DropdownMenuItem<String>(
-                                                              value: d.id,
-                                                              child: Text(
-                                                                '${d.interval.name} - ${d.amount}',
-                                                                style: context
-                                                                    .fonts
-                                                                    .black14w400,
-                                                              ),
-                                                            ),
-                                                          ),
                                                         ],
                                                         onChanged: (val) {
                                                           setState(() {
-                                                            option.selectedId =
-                                                                val;
+                                                            option.selectedInterval =
+                                                                val ??
+                                                                PlanInterval
+                                                                    .month;
                                                           });
                                                         },
                                                       ),
@@ -639,12 +591,14 @@ class _CreatePatientSubscriptionPlanScreenState
                                 );
                               }),
                               context.verticalSpace(8),
-                              CustomOutlinedButton(
-                                onTap: _addDurationOption,
-                                label: 'Add Duration',
-                                width: context.w(160),
-                                icon: Icons.add,
-                              ),
+                              if (_durationOptions.length <
+                                  PlanInterval.values.length)
+                                CustomOutlinedButton(
+                                  onTap: _addDurationOption,
+                                  label: 'Add Duration',
+                                  width: context.w(160),
+                                  icon: Icons.add,
+                                ),
                             ],
                             SizedBox(height: 32.h),
 
@@ -920,26 +874,17 @@ class _CreatePatientSubscriptionPlanScreenState
 
 class DurationOptionController {
   final TextEditingController priceController;
-  String? selectedId;
-  String? initialName;
+  PlanInterval selectedInterval;
 
   DurationOptionController({
-    this.selectedId,
-    this.initialName,
+    PlanInterval? selectedInterval,
     double initialPrice = 0.00,
-    List<DurationOption> durations = const [],
-  }) : priceController = TextEditingController(text: initialPrice.toString()) {
-    if (selectedId == null && durations.isNotEmpty) {
-      selectedId = durations.first.id;
-      initialName =
-          '${durations.first.interval?.name} - ${durations.first.amount}';
-    }
-  }
+  }) : selectedInterval = selectedInterval ?? PlanInterval.month,
+       priceController = TextEditingController(text: initialPrice.toString());
 
   factory DurationOptionController.fromOption(DurationOption option) {
     return DurationOptionController(
-      selectedId: option.id,
-      initialName: '${option.interval?.name} - ${option.amount}',
+      selectedInterval: option.interval,
       initialPrice: option.amount ?? 0,
     );
   }
