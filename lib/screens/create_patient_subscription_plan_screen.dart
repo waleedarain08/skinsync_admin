@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:skinsync_admin/models/patient_subscription_plan_model.dart';
+import 'package:skinsync_admin/models/patient_plan_model.dart';
 import 'package:skinsync_admin/models/requests/create_patient_subscription_plan_request.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/patient_view_model.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
-import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 
-import '../models/subscription_duration_model.dart';
-import '../models/subscription_duration_option.dart';
+import '../models/duration_option_model.dart';
 import '../widgets/dailogbox/add_benefit_dialog.dart';
 import '../widgets/dailogbox/subscription_duration_dialog.dart';
+import '../widgets/gradient_scaffold.dart';
 
 class CreatePatientSubscriptionPlanScreen extends ConsumerStatefulWidget {
   static const String routeName = '/create-patient-subscription-plan';
-  final PatientSubscriptionPlanModel? planToEdit;
+  final PatientPlan? planToEdit;
 
   const CreatePatientSubscriptionPlanScreen({super.key, this.planToEdit});
 
@@ -60,20 +59,18 @@ class _CreatePatientSubscriptionPlanScreenState
       await ref
           .read(subscriptionViewModelProvider.notifier)
           .getSubscriptionDurations(showLoading: true);
-      
+
       _syncDurations();
 
-      ref
-          .read(subscriptionViewModelProvider.notifier)
-          .getBenefits();
-          
+      ref.read(subscriptionViewModelProvider.notifier).getBenefits();
+
       if (_visibilityType == 'Specific Patients') {
         ref.read(patientProvider.notifier).getPatients(initialCall: true);
       }
     });
   }
 
-  void _initFromModel(PatientSubscriptionPlanModel? plan) {
+  void _initFromModel(PatientPlan? plan) {
     _nameController = TextEditingController(text: plan?.name);
     _basePriceController = TextEditingController(
       text: plan?.isLifetime == true ? plan?.basePrice?.toString() : '',
@@ -91,18 +88,18 @@ class _CreatePatientSubscriptionPlanScreenState
     _isDefault = plan?.isDefault ?? false;
     _isLifetime = plan?.isLifetime ?? false;
 
-    _selectedPatients = plan?.assignedPatients?.map((e) => e.patientId!).toList() ?? [];
+    _selectedPatients =
+        plan?.assignedPatients?.map((e) => e.patientId!).toList() ?? [];
     _visibilityType = _selectedPatients.isEmpty
         ? 'All Patients'
         : 'Specific Patients';
 
-    _selectedBenefitIds = plan?.benefits?.map((e) => e.id).whereType<int>().toList() ?? [];
+    _selectedBenefitIds =
+        plan?.benefits?.map((e) => e.id).whereType<int>().toList() ?? [];
 
     if (plan?.durationOptions != null && plan!.durationOptions!.isNotEmpty) {
       for (final option in plan.durationOptions!) {
-        _durationOptions.add(
-          DurationOptionController.fromOption(option),
-        );
+        _durationOptions.add(DurationOptionController.fromOption(option));
       }
     } else if (!_isLifetime && _durationOptions.isEmpty) {
       // Setup after load if creating
@@ -115,9 +112,9 @@ class _CreatePatientSubscriptionPlanScreenState
 
     setState(() {
       if (_durationOptions.isEmpty && !_isLifetime) {
-        _durationOptions.add(DurationOptionController(
-          selectedId: durations.first.id,
-        ));
+        _durationOptions.add(
+          DurationOptionController(selectedId: durations.first.id),
+        );
       }
     });
   }
@@ -140,7 +137,7 @@ class _CreatePatientSubscriptionPlanScreenState
 
     // Find next available duration id
     final usedIds = _durationOptions.map((e) => e.selectedId).toSet();
-    int? nextId;
+    String? nextId;
     for (final d in durations) {
       if (!usedIds.contains(d.id)) {
         nextId = d.id;
@@ -149,10 +146,12 @@ class _CreatePatientSubscriptionPlanScreenState
     }
 
     setState(() {
-      _durationOptions.add(DurationOptionController(
-        selectedId: nextId ?? durations.first.id,
-        durations: durations,
-      ));
+      _durationOptions.add(
+        DurationOptionController(
+          selectedId: nextId ?? durations.first.id,
+          durations: durations,
+        ),
+      );
     });
   }
 
@@ -167,19 +166,21 @@ class _CreatePatientSubscriptionPlanScreenState
     if (_formKey.currentState!.validate()) {
       if (!_isLifetime && _durationOptions.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('At least one duration option is required')),
+          const SnackBar(
+            content: Text('At least one duration option is required'),
+          ),
         );
         return;
       }
 
-      List<SubscriptionDurationOption>? durationOptions;
+      List<DurationOption>? durationOptions;
       double? basePrice;
 
       if (_isLifetime) {
         basePrice = double.tryParse(_basePriceController.text);
         durationOptions = [];
       } else {
-        basePrice = null; 
+        basePrice = null;
         final allDurations =
             ref.read(subscriptionViewModelProvider).durations ?? [];
         durationOptions = _durationOptions.map((e) {
@@ -187,25 +188,28 @@ class _CreatePatientSubscriptionPlanScreenState
             (d) => d.id == e.selectedId,
             orElse: () => allDurations.first,
           );
-          return SubscriptionDurationOption(
-            duration: durationObj,
-            basePrice: double.tryParse(e.priceController.text) ?? 0.0,
+          return DurationOption(
+            id: durationObj.id,
+            interval: durationObj.interval,
+            amount: double.tryParse(e.priceController.text) ?? 0.0,
           );
         }).toList();
 
-        if (durationOptions.any((d) => (d.duration?.duration ?? 0) <= 0)) {
+        if (durationOptions.any((d) => (d.amount ?? 0) <= 0)) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('All durations must be greater than 0 days')),
+              content: Text('All duration amounts must be greater than 0'),
+            ),
           );
           return;
         }
 
-        if (Set<int?>.from(durationOptions.map((e) => e.duration?.id)).length !=
+        if (Set<String>.from(durationOptions.map((e) => e.id)).length !=
             durationOptions.length) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('Duplicate duration options are not allowed')),
+              content: Text('Duplicate duration options are not allowed'),
+            ),
           );
           return;
         }
@@ -417,7 +421,11 @@ class _CreatePatientSubscriptionPlanScreenState
                                         if (val) {
                                           _durationOptions.clear();
                                         } else if (_durationOptions.isEmpty) {
-                                          _durationOptions.add(DurationOptionController(durations: state.durations ?? []));
+                                          _durationOptions.add(
+                                            DurationOptionController(
+                                              durations: state.durations ?? [],
+                                            ),
+                                          );
                                         }
                                       });
                                     },
@@ -438,7 +446,10 @@ class _CreatePatientSubscriptionPlanScreenState
                                 label: 'Base Price (\$)',
                                 controller: _basePriceController,
                                 hintText: '0.00',
-                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
                                 validator: Validators.empty,
                               ),
                             ] else ...[
@@ -454,7 +465,8 @@ class _CreatePatientSubscriptionPlanScreenState
                                     onTap: () {
                                       showDialog(
                                         context: context,
-                                        builder: (context) => const SubscriptionDurationDialog(),
+                                        builder: (context) =>
+                                            const SubscriptionDurationDialog(),
                                       );
                                     },
                                     label: 'Create Duration',
@@ -464,7 +476,9 @@ class _CreatePatientSubscriptionPlanScreenState
                                 ],
                               ),
                               context.verticalSpace(16),
-                              ...List.generate(_durationOptions.length, (index) {
+                              ...List.generate(_durationOptions.length, (
+                                index,
+                              ) {
                                 final option = _durationOptions[index];
                                 final otherUsedIds = _durationOptions
                                     .where((e) => e != option)
@@ -478,7 +492,8 @@ class _CreatePatientSubscriptionPlanScreenState
                                     child: Column(
                                       children: [
                                         Row(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
                                           children: [
                                             Expanded(
                                               flex: 2,
@@ -488,49 +503,102 @@ class _CreatePatientSubscriptionPlanScreenState
                                                 children: [
                                                   Text(
                                                     'Duration Option',
-                                                    style: context.fonts.black13w600,
+                                                    style: context
+                                                        .fonts
+                                                        .black13w600,
                                                   ),
                                                   context.verticalSpace(8),
                                                   Container(
-                                                    height: AppTheme.inputHeight,
-                                                    padding: context.appEdgeInsets(horizontal: 12),
+                                                    height:
+                                                        AppTheme.inputHeight,
+                                                    padding: context
+                                                        .appEdgeInsets(
+                                                          horizontal: 12,
+                                                        ),
                                                     decoration: BoxDecoration(
-                                                      border: Border.all(color: CustomColors.border),
-                                                      borderRadius: context.borderRadius(all: 12),
+                                                      border: Border.all(
+                                                        color:
+                                                            CustomColors.border,
+                                                      ),
+                                                      borderRadius: context
+                                                          .borderRadius(
+                                                            all: 12,
+                                                          ),
                                                     ),
                                                     child: DropdownButtonHideUnderline(
-                                                      child: DropdownButton<int>(
-                                                        value: state.durations?.any((d) => d.id == option.selectedId) == true 
-                                                            ? option.selectedId 
+                                                      child: DropdownButton<String>(
+                                                        value:
+                                                            state.durations?.any(
+                                                                  (d) =>
+                                                                      d.id ==
+                                                                      option
+                                                                          .selectedId,
+                                                                ) ==
+                                                                true
+                                                            ? option.selectedId
                                                             : null,
                                                         isExpanded: true,
-                                                        icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .keyboard_arrow_down_rounded,
+                                                        ),
                                                         items: [
                                                           // Always include selectedId if durations list doesn't have it yet (for Edit Mode safety)
-                                                          if (option.selectedId != null &&
-                                                              !(state.durations?.any((d) => d.id == option.selectedId) ?? false))
-                                                            DropdownMenuItem<int>(
-                                                              value: option.selectedId,
-                                                              child: Text(option.initialName ?? 'Loading...',
-                                                                  style: context.fonts.black14w400),
+                                                          if (option.selectedId !=
+                                                                  null &&
+                                                              !(state.durations?.any(
+                                                                    (d) =>
+                                                                        d.id ==
+                                                                        option
+                                                                            .selectedId,
+                                                                  ) ??
+                                                                  false))
+                                                            DropdownMenuItem<
+                                                              String
+                                                            >(
+                                                              value: option
+                                                                  .selectedId,
+                                                              child: Text(
+                                                                option.initialName ??
+                                                                    'Loading...',
+                                                                style: context
+                                                                    .fonts
+                                                                    .black14w400,
+                                                              ),
                                                             ),
                                                           ...({
-                                                            for (var d in (state.durations ?? []))
-                                                              if (d.id != null &&
-                                                                  (d.id == option.selectedId ||
-                                                                      !otherUsedIds.contains(d.id)))
-                                                                d.id!: d
-                                                          })
-                                                              .values
-                                                              .map((d) => DropdownMenuItem<int>(
-                                                                    value: d.id,
-                                                                    child: Text(d.name ?? '',
-                                                                        style: context.fonts.black14w400),
-                                                                  )),
+                                                            for (var d
+                                                                in (state
+                                                                        .durations ??
+                                                                    []))
+                                                              if (d.id !=
+                                                                      null &&
+                                                                  (d.id ==
+                                                                          option
+                                                                              .selectedId ||
+                                                                      !otherUsedIds
+                                                                          .contains(
+                                                                            d.id,
+                                                                          )))
+                                                                d.id!: d,
+                                                          }).values.map(
+                                                            (
+                                                              d,
+                                                            ) => DropdownMenuItem<String>(
+                                                              value: d.id,
+                                                              child: Text(
+                                                                '${d.interval.name} - ${d.amount}',
+                                                                style: context
+                                                                    .fonts
+                                                                    .black14w400,
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ],
                                                         onChanged: (val) {
                                                           setState(() {
-                                                            option.selectedId = val;
+                                                            option.selectedId =
+                                                                val;
                                                           });
                                                         },
                                                       ),
@@ -544,15 +612,23 @@ class _CreatePatientSubscriptionPlanScreenState
                                               flex: 2,
                                               child: BuildTextField(
                                                 label: 'Price (\$)',
-                                                controller: option.priceController,
+                                                controller:
+                                                    option.priceController,
                                                 hintText: '0.00',
-                                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                                keyboardType:
+                                                    const TextInputType.numberWithOptions(
+                                                      decimal: true,
+                                                    ),
                                               ),
                                             ),
                                             context.horizontalSpace(16),
                                             IconButton(
-                                              onPressed: () => _removeDurationOption(index),
-                                              icon: const Icon(Icons.delete_outline_rounded, color: CustomColors.red),
+                                              onPressed: () =>
+                                                  _removeDurationOption(index),
+                                              icon: const Icon(
+                                                Icons.delete_outline_rounded,
+                                                color: CustomColors.red,
+                                              ),
                                               padding: EdgeInsets.zero,
                                             ),
                                           ],
@@ -678,7 +754,8 @@ class _CreatePatientSubscriptionPlanScreenState
                                   onTap: () {
                                     showDialog(
                                       context: context,
-                                      builder: (context) => const AddBenefitDialog(),
+                                      builder: (context) =>
+                                          const AddBenefitDialog(),
                                     );
                                   },
                                   label: 'Create Benefit',
@@ -688,73 +765,101 @@ class _CreatePatientSubscriptionPlanScreenState
                               ],
                             ),
                             SizedBox(height: 24.h),
-                            if (state.patientBenefits != null && state.patientBenefits!.isNotEmpty)
+                            if (state.patientBenefits != null &&
+                                state.patientBenefits!.isNotEmpty)
                               GridView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: context.w(16),
-                                  mainAxisSpacing: context.h(16),
-                                  childAspectRatio: 2.2,
-                                ),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: context.w(16),
+                                      mainAxisSpacing: context.h(16),
+                                      childAspectRatio: 2.2,
+                                    ),
                                 itemCount: state.patientBenefits!.length,
                                 itemBuilder: (context, index) {
                                   final benefit = state.patientBenefits![index];
-                                  final isSelected = _selectedBenefitIds.contains(benefit.id);
-                                  
+                                  final isSelected = _selectedBenefitIds
+                                      .contains(benefit.id);
+
                                   return InkWell(
                                     onTap: () {
                                       setState(() {
                                         if (isSelected) {
-                                          _selectedBenefitIds.remove(benefit.id);
+                                          _selectedBenefitIds.remove(
+                                            benefit.id,
+                                          );
                                         } else {
-                                          if (benefit.id != null) _selectedBenefitIds.add(benefit.id!);
+                                          if (benefit.id != null)
+                                            _selectedBenefitIds.add(
+                                              benefit.id!,
+                                            );
                                         }
                                       });
                                     },
                                     borderRadius: context.borderRadius(all: 12),
                                     child: BorderdContainerWidget(
-                                      backgroundColor: isSelected 
-                                          ? CustomColors.green.withValues(alpha: 0.05) 
+                                      backgroundColor: isSelected
+                                          ? CustomColors.green.withValues(
+                                              alpha: 0.05,
+                                            )
                                           : Colors.white,
-                                      borderColor: isSelected ? CustomColors.green : CustomColors.border,
+                                      borderColor: isSelected
+                                          ? CustomColors.green
+                                          : CustomColors.border,
                                       borderWidth: isSelected ? 1.5 : 1,
                                       padding: context.appEdgeInsets(all: 16),
                                       child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: context.appEdgeInsets(top: 2),
+                                            padding: context.appEdgeInsets(
+                                              top: 2,
+                                            ),
                                             child: Icon(
-                                              isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                                              color: isSelected ? CustomColors.green : CustomColors.grey,
+                                              isSelected
+                                                  ? Icons.check_circle_rounded
+                                                  : Icons
+                                                        .radio_button_unchecked_rounded,
+                                              color: isSelected
+                                                  ? CustomColors.green
+                                                  : CustomColors.grey,
                                               size: 20,
                                             ),
                                           ),
                                           context.horizontalSpace(12),
                                           Expanded(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   benefit.title ?? '',
-                                                  style: context.fonts.black14w600,
+                                                  style:
+                                                      context.fonts.black14w600,
                                                   maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                                 context.verticalSpace(4),
                                                 Text(
                                                   'SKU: ${benefit.sku ?? "N/A"}',
-                                                  style: context.fonts.purple10w600,
+                                                  style: context
+                                                      .fonts
+                                                      .purple10w600,
                                                 ),
                                                 context.verticalSpace(4),
                                                 Expanded(
                                                   child: Text(
                                                     benefit.description ?? '',
-                                                    style: context.fonts.grey11w400,
+                                                    style: context
+                                                        .fonts
+                                                        .grey11w400,
                                                     maxLines: 2,
-                                                    overflow: TextOverflow.ellipsis,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
                                                 ),
                                               ],
@@ -815,27 +920,27 @@ class _CreatePatientSubscriptionPlanScreenState
 
 class DurationOptionController {
   final TextEditingController priceController;
-  int? selectedId;
+  String? selectedId;
   String? initialName;
 
   DurationOptionController({
     this.selectedId,
     this.initialName,
     double initialPrice = 0.00,
-    List<SubscriptionDuration> durations = const [],
-  })  : priceController = TextEditingController(text: initialPrice.toString()) {
+    List<DurationOption> durations = const [],
+  }) : priceController = TextEditingController(text: initialPrice.toString()) {
     if (selectedId == null && durations.isNotEmpty) {
       selectedId = durations.first.id;
-      initialName = durations.first.name;
+      initialName =
+          '${durations.first.interval?.name} - ${durations.first.amount}';
     }
   }
 
-  factory DurationOptionController.fromOption(
-      SubscriptionDurationOption option) {
+  factory DurationOptionController.fromOption(DurationOption option) {
     return DurationOptionController(
-      selectedId: option.duration?.id,
-      initialName: option.duration?.name,
-      initialPrice: option.basePrice ?? 0.0,
+      selectedId: option.id,
+      initialName: '${option.interval?.name} - ${option.amount}',
+      initialPrice: option.amount ?? 0,
     );
   }
 

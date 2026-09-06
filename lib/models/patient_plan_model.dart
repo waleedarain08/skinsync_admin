@@ -1,8 +1,8 @@
-import 'subscription_duration_option.dart';
+import 'duration_option_model.dart';
 import 'subscription_plan_benefit_model.dart';
 
-class PatientSubscriptionPlanModel {
-  final int? id;
+class PatientPlan {
+  final String? id;
   final String? name;
   final double? basePrice;
   final int simulationCount;
@@ -13,10 +13,10 @@ class PatientSubscriptionPlanModel {
   final bool isActive;
   final bool isDefault;
   final bool isLifetime;
-  final List<SubscriptionDurationOption>? durationOptions;
+  final List<DurationOption>? durationOptions;
   final List<PlanBenefit>? benefits;
 
-  PatientSubscriptionPlanModel({
+  PatientPlan({
     this.id,
     this.name,
     this.basePrice,
@@ -32,9 +32,9 @@ class PatientSubscriptionPlanModel {
     this.benefits,
   });
 
-  factory PatientSubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
-    return PatientSubscriptionPlanModel(
-      id: json['id'] as int?,
+  factory PatientPlan.fromJson(Map<String, dynamic> json) {
+    return PatientPlan(
+      id: json['id']?.toString(),
       name: json['name'] as String?,
       basePrice: (json['base_price'] as num?)?.toDouble(),
       simulationCount: json['simulation_count'] as int? ?? 0,
@@ -43,51 +43,29 @@ class PatientSubscriptionPlanModel {
           (json['unlimited_simulations'] as bool?) ??
           false,
       postsViewCount: json['posts_view_count'] as int? ?? 0,
-      unlimitedPostsView: json['unlimited_posts_view'] as bool? ?? false,
+      unlimitedPostsView: (json['unlimited_posts_view'] as bool?) ?? false,
       isActive: (json['is_active'] as bool?) ?? true,
       isDefault: (json['is_default'] as bool?) ?? false,
       isLifetime: (json['is_lifetime'] as bool?) ?? false,
       durationOptions: json['duration_options'] != null
           ? (json['duration_options'] as List)
-              .where((e) => e != null)
-              .map((e) =>
-                  SubscriptionDurationOption.fromJson(e as Map<String, dynamic>))
-              .toList()
+                .where((e) => e != null)
+                .map((e) => DurationOption.fromJson(e as Map<String, dynamic>))
+                .toList()
           : null,
       benefits: json['benefits'] != null
           ? (json['benefits'] as List)
-              .where((e) => e != null)
-              .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
-              .toList()
+                .where((e) => e != null)
+                .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
+                .toList()
           : null,
       assignedPatients: json['assigned_patients'] != null
           ? (json['assigned_patients'] as List)
-              .where((e) => e != null)
-              .map(
-                (e) =>
-                    AssignedPatient.fromJson(e as Map<String, dynamic>),
-              )
-              .toList()
+                .where((e) => e != null)
+                .map((e) => AssignedPatient.fromJson(e as Map<String, dynamic>))
+                .toList()
           : null,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'base_price': basePrice,
-      'simulation_count': simulationCount,
-      'unlimited_simulation': unlimitedSimulations,
-      'posts_view_count': postsViewCount,
-      'unlimited_posts_view': unlimitedPostsView,
-      'is_active': isActive,
-      'is_default': isDefault,
-      'is_lifetime': isLifetime,
-      'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
-      'benefits': benefits?.map((e) => e.toJson()).toList(),
-      'assigned_patients': assignedPatients?.map((e) => e.patientId).toList(),
-    };
   }
 }
 
@@ -97,7 +75,12 @@ class AssignedPatient {
   final int? patientId;
   final String? patientName;
 
-  const AssignedPatient({this.id, this.planId, this.patientId, this.patientName});
+  const AssignedPatient({
+    this.id,
+    this.planId,
+    this.patientId,
+    this.patientName,
+  });
 
   factory AssignedPatient.fromJson(Map<String, dynamic> json) {
     return AssignedPatient(

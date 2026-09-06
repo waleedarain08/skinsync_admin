@@ -1,8 +1,8 @@
-import '../patient_subscription_plan_model.dart';
+import '../patient_plan_model.dart';
 import 'base_response_model.dart';
 
 class PatientSubscriptionPlanListResponse
-    extends BaseApiResponseModel<List<PatientSubscriptionPlanModel>> {
+    extends BaseApiResponseModel<List<PatientPlan>> {
   const PatientSubscriptionPlanListResponse({
     required super.isSuccess,
     required super.message,
@@ -17,11 +17,9 @@ class PatientSubscriptionPlanListResponse
     message: json['message'] ?? '',
     data: json['data'] == null
         ? []
-        : List<PatientSubscriptionPlanModel>.from(
+        : List<PatientPlan>.from(
             (json['data'] as List).map(
-              (e) => PatientSubscriptionPlanModel.fromJson(
-                e as Map<String, dynamic>,
-              ),
+              (e) => PatientPlan.fromJson(e as Map<String, dynamic>),
             ),
           ),
   );

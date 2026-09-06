@@ -11,21 +11,37 @@ import '../models/responses/subscription_duration_list_response.dart';
 abstract class SubscriptionRepository {
   // Clinics
   Future<ClinicSubscriptionPlanListResponse> getSubscriptionPlans();
-  Future<BaseApiResponseModel<dynamic>> createClinicSubscriptionPlan(CreateClinicSubscriptionPlanRequest request);
-  Future<BaseApiResponseModel<dynamic>> updateSubscriptionPlan(int id, CreateClinicSubscriptionPlanRequest request);
+  Future<BaseApiResponseModel<dynamic>> createClinicSubscriptionPlan(
+    CreateClinicSubscriptionPlanRequest request,
+  );
+  Future<BaseApiResponseModel<dynamic>> updateSubscriptionPlan(
+    int id,
+    CreateClinicSubscriptionPlanRequest request,
+  );
   Future<BaseApiResponseModel<dynamic>> deleteSubscriptionPlan(int id);
 
   // Patients
-  Future<PatientSubscriptionPlanListResponse> getPatientSubscriptionPlans();
-  Future<BaseApiResponseModel<dynamic>> createPatientSubscriptionPlan(CreatePatientSubscriptionPlanRequest request);
-  Future<BaseApiResponseModel<dynamic>> updatePatientSubscriptionPlan(int id, CreatePatientSubscriptionPlanRequest request);
-  Future<BaseApiResponseModel<dynamic>> deletePatientSubscriptionPlan(int id);
+  Future<PatientSubscriptionPlanListResponse> getPatientPlans();
+  Future<BaseApiResponseModel<dynamic>> createPatientSubscriptionPlan(
+    CreatePatientSubscriptionPlanRequest request,
+  );
+  Future<BaseApiResponseModel<dynamic>> updatePatientSubscriptionPlan(
+    String id,
+    CreatePatientSubscriptionPlanRequest request,
+  );
+  Future<BaseApiResponseModel<dynamic>> deletePatientSubscriptionPlan(
+    String id,
+  );
 
   // Durations
   Future<SubscriptionDurationListResponse> getSubscriptionDurations();
-  Future<BaseApiResponseModel<dynamic>> createSubscriptionDuration(CreateSubscriptionDurationRequest request);
+  Future<BaseApiResponseModel<dynamic>> createSubscriptionDuration(
+    CreateSubscriptionDurationRequest request,
+  );
 
   // Benefits
   Future<PatientSubscriptionBenefitListResponse> getBenefits();
-  Future<BaseApiResponseModel<dynamic>> createBenefit(CreateBenefitRequest request);
+  Future<BaseApiResponseModel<dynamic>> createBenefit(
+    CreateBenefitRequest request,
+  );
 }

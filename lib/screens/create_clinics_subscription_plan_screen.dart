@@ -4,19 +4,19 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
 import 'package:skinsync_admin/models/requests/create_clinic_subscription_plan_request.dart';
 import 'package:skinsync_admin/models/subscription_plan_benefit_model.dart';
+import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/clinic_view_model.dart';
 import 'package:skinsync_admin/view_models/subscription_view_model.dart';
 import 'package:skinsync_admin/widgets/app_search_field.dart';
+import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_outlined_button.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
-import 'package:skinsync_admin/widgets/borderd_container_widget.dart';
-import 'package:skinsync_admin/utils/string_utils.dart';
-import '../models/subscription_duration_model.dart';
-import '../models/subscription_duration_option.dart';
+
+import '../models/duration_option_model.dart';
 import '../widgets/dailogbox/subscription_duration_dialog.dart';
 
 class CreateClinicsSubscriptionPlanScreen extends ConsumerStatefulWidget {
@@ -253,7 +253,7 @@ class _CreateClinicsSubscriptionPlanScreenState
 
     // Find next available duration id
     final usedIds = _durationOptions.map((e) => e.selectedId).toSet();
-    int? nextId;
+    String? nextId;
     for (final d in durations) {
       if (!usedIds.contains(d.id)) {
         nextId = d.id;
@@ -289,7 +289,7 @@ class _CreateClinicsSubscriptionPlanScreenState
         return;
       }
 
-      List<SubscriptionDurationOption>? durationOptions;
+      List<DurationOption>? durationOptions;
       double? basePrice;
 
       if (_isLifetime) {
@@ -304,22 +304,23 @@ class _CreateClinicsSubscriptionPlanScreenState
             (d) => d.id == e.selectedId,
             orElse: () => allDurations.first,
           );
-          return SubscriptionDurationOption(
-            duration: durationObj,
-            basePrice: double.tryParse(e.priceController.text) ?? 0.0,
+          return DurationOption(
+            id: durationObj.id,
+            interval: durationObj.interval,
+            amount: double.tryParse(e.priceController.text) ?? 0.0,
           );
         }).toList();
 
-        if (durationOptions.any((d) => (d.duration?.duration ?? 0) <= 0)) {
+        if (durationOptions.any((d) => (d.amount ?? 0) <= 0)) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('All durations must be greater than 0 days'),
+              content: Text('All duration amounts must be greater than 0'),
             ),
           );
           return;
         }
 
-        if (Set.from(durationOptions.map((e) => e.duration?.id)).length !=
+        if (Set<String>.from(durationOptions.map((e) => e.id)).length !=
             durationOptions.length) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -637,7 +638,7 @@ class _CreateClinicsSubscriptionPlanScreenState
                                                           ),
                                                     ),
                                                     child: DropdownButtonHideUnderline(
-                                                      child: DropdownButton<int>(
+                                                      child: DropdownButton<String>(
                                                         value:
                                                             state.durations?.any(
                                                                   (d) =>
@@ -665,7 +666,7 @@ class _CreateClinicsSubscriptionPlanScreenState
                                                                   ) ??
                                                                   false))
                                                             DropdownMenuItem<
-                                                              int
+                                                              String
                                                             >(
                                                               value: option
                                                                   .selectedId,
@@ -696,10 +697,10 @@ class _CreateClinicsSubscriptionPlanScreenState
                                                           }).values.map(
                                                             (
                                                               d,
-                                                            ) => DropdownMenuItem<int>(
+                                                            ) => DropdownMenuItem<String>(
                                                               value: d.id,
                                                               child: Text(
-                                                                (d.name ?? '')
+                                                                ('${d.interval.name} - ${d.amount}')
                                                                     .capitalize,
                                                                 style: context
                                                                     .fonts
@@ -1176,28 +1177,27 @@ class _CreateClinicsSubscriptionPlanScreenState
 
 class DurationOptionController {
   final TextEditingController priceController;
-  int? selectedId;
+  String? selectedId;
   String? initialName;
 
   DurationOptionController({
     this.selectedId,
     this.initialName,
     double initialPrice = 0.00,
-    List<SubscriptionDuration> durations = const [],
+    List<DurationOption> durations = const [],
   }) : priceController = TextEditingController(text: initialPrice.toString()) {
     if (selectedId == null && durations.isNotEmpty) {
       selectedId = durations.first.id;
-      initialName = durations.first.name;
+      initialName =
+          '${durations.first.interval?.name} - ${durations.first.amount}';
     }
   }
 
-  factory DurationOptionController.fromOption(
-    SubscriptionDurationOption option,
-  ) {
+  factory DurationOptionController.fromOption(DurationOption option) {
     return DurationOptionController(
-      selectedId: option.duration?.id,
-      initialName: option.duration?.name,
-      initialPrice: option.basePrice ?? 0.0,
+      selectedId: option.id,
+      initialName: '${option.interval?.name} - ${option.amount}',
+      initialPrice: option.amount ?? 0,
     );
   }
 

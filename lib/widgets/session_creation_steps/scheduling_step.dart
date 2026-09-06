@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/session_creation_steps/authorized_roles_widget.dart';
 
@@ -56,7 +55,7 @@ class SchedulingStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final SessionState state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
-    final treatmentState = ref.watch(treatmentViewModelProvider);
+    // final treatmentState = ref.watch(treatmentViewModelProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,7 +151,7 @@ class SchedulingStep extends ConsumerWidget {
             ...state.productUsageEntries.asMap().entries.map((item) {
               final idx = item.key;
               final entry = item.value;
-              final allSubAreas = treatmentState.areas.expand((a) => a.subAreas).toList();
+              // final allSubAreas = treatmentState.areas.expand((a) => a.subAreas).toList();
               final minQty = _getProductMinQuantity(entry, viewModel);
               final maxQty = _getProductMaxQuantity(entry, viewModel);
 
@@ -237,7 +236,10 @@ class SchedulingStep extends ConsumerWidget {
               final baseDuration =
                   double.tryParse(viewModel.treatmentDurationController.text) ??
                   0.0;
-              final productDuration = _calculateProductUsageDuration(viewModel, state);
+              final productDuration = _calculateProductUsageDuration(
+                viewModel,
+                state,
+              );
               final prepTime =
                   double.tryParse(viewModel.prepTimeController.text) ?? 0.0;
               final cleanupTime =
@@ -260,7 +262,10 @@ class SchedulingStep extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Base Duration:', style: context.fonts.black14w600),
+                        Text(
+                          'Base Duration:',
+                          style: context.fonts.black14w600,
+                        ),
                         Text(
                           '${baseDuration.toStringAsFixed(baseDuration % 1 == 0 ? 0 : 1)} Minutes',
                           style: context.fonts.black14w600,
@@ -412,7 +417,8 @@ class SchedulingStep extends ConsumerWidget {
                 controller: viewModel.minimumBookingNoticeController,
                 hintText: 'e.g. 24',
                 keyboardType: TextInputType.number,
-                tooltip: 'The minimum number of hours before an appointment that a patient can book this treatment.',
+                tooltip:
+                    'The minimum number of hours before an appointment that a patient can book this treatment.',
               ),
             ),
             context.horizontalSpace(24),
@@ -422,7 +428,8 @@ class SchedulingStep extends ConsumerWidget {
                 controller: viewModel.maximumDaysInAdvanceController,
                 hintText: 'e.g. 90',
                 keyboardType: TextInputType.number,
-                tooltip: 'The maximum number of days in advance that a patient can book this treatment.',
+                tooltip:
+                    'The maximum number of days in advance that a patient can book this treatment.',
               ),
             ),
           ],
@@ -432,7 +439,8 @@ class SchedulingStep extends ConsumerWidget {
         context.verticalSpace(24),
         AuthorizedRolesWidget(
           title: 'Authorized Roles to Change Schedule',
-          description: 'Select which provider roles are authorized to override or modify treatment scheduling and duration controls.',
+          description:
+              'Select which provider roles are authorized to override or modify treatment scheduling and duration controls.',
           selectedRoles: state.schedulingRoles,
           onRoleToggled: viewModel.toggleSchedulingRole,
         ),

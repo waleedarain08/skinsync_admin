@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/clinic_subscription_plan_model.dart';
-import '../models/patient_subscription_plan_model.dart';
+import '../models/duration_option_model.dart';
+import '../models/patient_plan_model.dart';
 import '../models/requests/create_benefit_request.dart';
 import '../models/requests/create_clinic_subscription_plan_request.dart';
 import '../models/requests/create_patient_subscription_plan_request.dart';
 import '../models/requests/create_subscription_duration_request.dart';
 import '../models/responses/base_response_model.dart';
-import '../models/subscription_duration_model.dart';
 import '../models/subscription_plan_benefit_model.dart';
 import '../repositories/subscription_repository.dart';
 import '../services/locator.dart';
@@ -60,8 +60,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
               request,
             );
           } else {
-            await _subscriptionRepository
-                .createClinicSubscriptionPlan(request);
+            await _subscriptionRepository.createClinicSubscriptionPlan(request);
           }
 
           await getSubscriptionPlans();
@@ -75,7 +74,9 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
   Future<bool> deleteSubscriptionPlan(int id) async {
     final success =
         await runSafely<bool?>(showLoading: true, () async {
-          final response = await _subscriptionRepository.deleteSubscriptionPlan(id);
+          final response = await _subscriptionRepository.deleteSubscriptionPlan(
+            id,
+          );
           if (response.isSuccess) {
             final currentList = state.plans ?? [];
             state = state.copyWith(
@@ -99,8 +100,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
         state = state.copyWith(loading: loading);
       },
       () async {
-        final response = await _subscriptionRepository
-            .getPatientSubscriptionPlans();
+        final response = await _subscriptionRepository.getPatientPlans();
         state = state.copyWith(patientPlans: response.data);
       },
     );
@@ -123,22 +123,19 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
     });
   }
 
-  Future<bool> deletePatientSubscriptionPlan(int id) async {
-    final success =
-        await runSafely<bool?>(showLoading: true, () async {
-          final response = await _subscriptionRepository.deletePatientSubscriptionPlan(id);
-          if (response.isSuccess) {
-            final currentList = state.patientPlans ?? [];
-            state = state.copyWith(
-              patientPlans: currentList.where((p) => p.id != id).toList(),
-            );
-            return true;
-          }
-          return false;
-        }) ??
-        false;
-
-    return success;
+  Future<bool?> deletePatientSubscriptionPlan(String id) async {
+    return await runSafely(showLoading: true, () async {
+      final response = await _subscriptionRepository
+          .deletePatientSubscriptionPlan(id);
+      if (response.isSuccess) {
+        final currentList = state.patientPlans ?? [];
+        state = state.copyWith(
+          patientPlans: currentList.where((p) => p.id != id).toList(),
+        );
+        return true;
+      }
+      return false;
+    });
   }
 
   // ---------------- BENEFITS ----------------
@@ -150,8 +147,7 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
         state = state.copyWith(loading: loading);
       },
       () async {
-        final response =
-            await _subscriptionRepository.getBenefits();
+        final response = await _subscriptionRepository.getBenefits();
         state = state.copyWith(patientBenefits: response.data);
       },
     );
@@ -182,29 +178,36 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
         state = state.copyWith(loading: loading);
       },
       () async {
-        final response = await _subscriptionRepository.getSubscriptionDurations();
+        final response = await _subscriptionRepository
+            .getSubscriptionDurations();
         state = state.copyWith(durations: response.data);
       },
     );
   }
 
-  Future<BaseApiResponseModel<dynamic>?> createSubscriptionDuration(CreateSubscriptionDurationRequest request) async {
-    final response =
-        await runSafely<BaseApiResponseModel<dynamic>>(showLoading: true, () async {
-          final res = await _subscriptionRepository.createSubscriptionDuration(request);
-          if (res.isSuccess) {
-            await getSubscriptionDurations();
-          }
-          return res;
-        });
+  Future<BaseApiResponseModel<dynamic>?> createSubscriptionDuration(
+    CreateSubscriptionDurationRequest request,
+  ) async {
+    final response = await runSafely<BaseApiResponseModel<dynamic>>(
+      showLoading: true,
+      () async {
+        final res = await _subscriptionRepository.createSubscriptionDuration(
+          request,
+        );
+        if (res.isSuccess) {
+          await getSubscriptionDurations();
+        }
+        return res;
+      },
+    );
     return response;
   }
 }
 
 class SubscriptionState extends BaseStateModel {
   final List<ClinicSubscriptionPlanModel>? plans;
-  final List<PatientSubscriptionPlanModel>? patientPlans;
-  final List<SubscriptionDuration>? durations;
+  final List<PatientPlan>? patientPlans;
+  final List<DurationOption>? durations;
   final List<PlanBenefit>? patientBenefits;
 
   SubscriptionState({
@@ -218,8 +221,8 @@ class SubscriptionState extends BaseStateModel {
   SubscriptionState copyWith({
     bool? loading,
     List<ClinicSubscriptionPlanModel>? plans,
-    List<PatientSubscriptionPlanModel>? patientPlans,
-    List<SubscriptionDuration>? durations,
+    List<PatientPlan>? patientPlans,
+    List<DurationOption>? durations,
     List<PlanBenefit>? patientBenefits,
   }) {
     return SubscriptionState(

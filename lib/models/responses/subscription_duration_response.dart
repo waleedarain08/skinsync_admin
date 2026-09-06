@@ -1,7 +1,7 @@
-import '../subscription_duration_model.dart';
+import '../duration_option_model.dart';
 import 'base_response_model.dart';
 
-class SubscriptionDurationResponse extends BaseApiResponseModel<SubscriptionDuration> {
+class SubscriptionDurationResponse extends BaseApiResponseModel<DurationOption> {
   const SubscriptionDurationResponse({
     required super.isSuccess,
     required super.message,
@@ -14,6 +14,6 @@ class SubscriptionDurationResponse extends BaseApiResponseModel<SubscriptionDura
         message: json['message'] ?? '',
         data: json['data'] == null
             ? null
-            : SubscriptionDuration.fromJson(json['data'] as Map<String, dynamic>),
+            : DurationOption.fromJson(json['data'] as Map<String, dynamic>),
       );
 }

@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/app_init.dart';
 import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
-import 'package:skinsync_admin/models/patient_subscription_plan_model.dart';
 import 'package:skinsync_admin/models/responses/invite_clinic_detail_response.dart';
 import 'package:skinsync_admin/models/responses/product_detail_response.dart';
 import 'package:skinsync_admin/screens/add_new_clinic_screen.dart';
@@ -9,9 +8,9 @@ import 'package:skinsync_admin/screens/appointment_detail_screen.dart';
 import 'package:skinsync_admin/screens/booking_config_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/appointment_management.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/clinic_management.dart';
+import 'package:skinsync_admin/screens/bottom_nav_screens/consent_and_compliance_forms_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/dashboard_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/explore_screen.dart';
-import 'package:skinsync_admin/screens/bottom_nav_screens/consent_and_compliance_forms_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/forms_screen.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/home_page.dart';
 import 'package:skinsync_admin/screens/bottom_nav_screens/patient_management.dart';
@@ -41,6 +40,8 @@ import 'package:skinsync_admin/screens/shared_treatment_request_screen.dart';
 import 'package:skinsync_admin/screens/sign_in_screen.dart';
 import 'package:skinsync_admin/screens/splash_screen.dart';
 import 'package:skinsync_admin/screens/treatment_detail_screen.dart';
+
+import 'models/patient_plan_model.dart';
 
 class RouteGenerator {
   static final GoRouter router = GoRouter(
@@ -183,7 +184,7 @@ class RouteGenerator {
             path: CreatePatientSubscriptionPlanScreen.routeName,
             builder: (context, state) {
               return CreatePatientSubscriptionPlanScreen(
-                planToEdit: state.extra as PatientSubscriptionPlanModel?,
+                planToEdit: state.extra as PatientPlan?,
               );
             },
           ),
@@ -211,29 +212,28 @@ class RouteGenerator {
             name: ConsentAndComplianceFormsScreen.routeName,
             path: ConsentAndComplianceFormsScreen.routeName,
             builder: (_, _) => const ConsentAndComplianceFormsScreen(),
-           
           ),
-        GoRoute(
-  name: SharedTreatmentRequestScreen.routeName,
-  path: SharedTreatmentRequestScreen.routeName,
-  builder: (context, state) {
-    final patientId = int.tryParse(
-      state.uri.queryParameters['patientId'] ?? '',
-    );
-    final clinicId = int.tryParse(
-      state.uri.queryParameters['clinicId'] ?? '',
-    );
-    final showBackButton =
-        state.uri.queryParameters['showBackButton'] == 'true';
+          GoRoute(
+            name: SharedTreatmentRequestScreen.routeName,
+            path: SharedTreatmentRequestScreen.routeName,
+            builder: (context, state) {
+              final patientId = int.tryParse(
+                state.uri.queryParameters['patientId'] ?? '',
+              );
+              final clinicId = int.tryParse(
+                state.uri.queryParameters['clinicId'] ?? '',
+              );
+              final showBackButton =
+                  state.uri.queryParameters['showBackButton'] == 'true';
 
-    return SharedTreatmentRequestScreen(
-      patientId: patientId,
-      clinicId: clinicId,
-      showBackButton: showBackButton,
-    );
-  },
-),
-           GoRoute(
+              return SharedTreatmentRequestScreen(
+                patientId: patientId,
+                clinicId: clinicId,
+                showBackButton: showBackButton,
+              );
+            },
+          ),
+          GoRoute(
             name: FormsScreen.routeName,
             path: FormsScreen.routeName,
             builder: (_, _) => const FormsScreen(),
