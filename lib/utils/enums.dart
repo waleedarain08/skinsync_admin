@@ -119,8 +119,9 @@ enum Status { active, inactive }
 
 enum BaseUrls {
   api('https://api.skinsyncai.com/api/'),
-  // apiQa('https://api-dev.skinsyncai.com/api/');
-  apiQa('http://localhost:8084/api/');
+  apiQa('https://api-dev.skinsyncai.com/api/');
+
+  // apiQa('http://localhost:8084/api/');
 
   // apiQa('https://bgzh46mj-8084.inc1.devtunnels.ms/api/');
 
