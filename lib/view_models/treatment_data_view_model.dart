@@ -1,5 +1,10 @@
+import 'dart:developer';
 import 'dart:math' as math;
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skinsync_admin/models/requests/create_protocol_field_request.dart';
+import 'package:skinsync_admin/repositories/treatment_repository.dart';
+import 'package:skinsync_admin/services/locator.dart';
 import 'package:skinsync_admin/view_models/area_view_model.dart';
 
 import '../models/responses/area_list_response.dart';
@@ -172,6 +177,47 @@ class TreatmentDataViewModel extends Notifier<TreatmentDataState> {
   }
 
   // --- Protocol Actions ---
+
+  Future<void> fetchProtocolFields() async {
+    try {
+      final repo = locator<TreatmentRepository>();
+      final response = await repo.getProtocolFields();
+      if (response.isSuccess &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+        state = state.copyWith(protocols: response.data!);
+      }
+    } catch (e) {
+      log('Error fetching protocol fields: $e');
+    }
+  }
+
+  Future<bool> createProtocolField(String title, ProtocolType type) async {
+    if (title.isEmpty) return false;
+    EasyLoading.show(status: 'Saving protocol field...');
+    try {
+      final repo = locator<TreatmentRepository>();
+      final request = CreateProtocolFieldRequest(
+        title: title,
+        type: type,
+      );
+      final response = await repo.createProtocolField(request);
+      if (response.isSuccess) {
+        EasyLoading.showSuccess('Protocol field added successfully!');
+        await fetchProtocolFields();
+        return true;
+      } else {
+        EasyLoading.showError(response.message);
+        return false;
+      }
+    } catch (e) {
+      log('Error creating protocol field: $e');
+      EasyLoading.showError('Failed to create protocol field.');
+      return false;
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
 
   void addProtocol(String title, ProtocolType type) {
     if (title.isEmpty) return;

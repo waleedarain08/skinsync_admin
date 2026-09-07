@@ -1,6 +1,5 @@
 import 'package:skinsync_admin/models/clinic_model.dart';
 import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
-import 'package:skinsync_admin/models/patient_subscription_plan_model.dart';
 import 'package:skinsync_admin/models/subscription_plan_benefit_model.dart';
 
 class TreatmentData {
@@ -11,7 +10,8 @@ class TreatmentData {
     'Laser & Energy': ['Resurfacing', 'Tightening'],
   };
 
-  static List<String> get categories => categoriesWithSubcategories.keys.toList();
+  static List<String> get categories =>
+      categoriesWithSubcategories.keys.toList();
 
   // Area Hierarchy
   static const Map<String, List<String>> areasWithSubAreas = {
@@ -47,7 +47,8 @@ class TreatmentData {
       email: 'contact@glowmedspa.com',
       phone: '+1 212-555-0198',
       address: '5th Ave, New York, NY',
-      logo: 'https://plus.unsplash.com/premium_photo-1661764391621-08f307405c6d?q=80&w=1000',
+      logo:
+          'https://plus.unsplash.com/premium_photo-1661764391621-08f307405c6d?q=80&w=1000',
       status: 'Active',
       createdAt: DateTime.parse('2023-01-15'),
     ),
@@ -57,13 +58,13 @@ class TreatmentData {
       email: 'info@sereneskin.com',
       phone: '+1 310-555-0245',
       address: 'Beverly Hills, CA',
-      logo: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
+      logo:
+          'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1000',
       status: 'Active',
       createdAt: DateTime.parse('2023-01-15'),
     ),
   ];
 
-  
   static final List<ClinicSubscriptionPlanModel> dummySubscriptionPlans = [
     ClinicSubscriptionPlanModel(
       id: 0,
@@ -77,13 +78,15 @@ class TreatmentData {
       isActive: true,
       benefits: [
         PlanBenefit(
-            title: 'Initial free access',
-            description: 'Get started with basic platform features at no cost.',
-            enabled: true),
+          title: 'Initial free access',
+          description: 'Get started with basic platform features at no cost.',
+          enabled: true,
+        ),
         PlanBenefit(
-            title: 'Basic patient records',
-            description: 'Digital storage for essential patient information.',
-            enabled: true),
+          title: 'Basic patient records',
+          description: 'Digital storage for essential patient information.',
+          enabled: true,
+        ),
       ],
     ),
     ClinicSubscriptionPlanModel(
@@ -100,13 +103,15 @@ class TreatmentData {
       isActive: true,
       benefits: [
         PlanBenefit(
-            title: 'Patient records and treatment history',
-            description: 'Comprehensive digital records for your patients.',
-            enabled: true),
+          title: 'Patient records and treatment history',
+          description: 'Comprehensive digital records for your patients.',
+          enabled: true,
+        ),
         PlanBenefit(
-            title: 'Automated invoices',
-            description: 'Generate invoices automatically after treatments.',
-            enabled: true),
+          title: 'Automated invoices',
+          description: 'Generate invoices automatically after treatments.',
+          enabled: true,
+        ),
       ],
     ),
     ClinicSubscriptionPlanModel(
@@ -123,17 +128,20 @@ class TreatmentData {
       isActive: true,
       benefits: [
         PlanBenefit(
-            title: 'AI consultation and treatment recommendation tools',
-            description: 'AI-driven analysis for accurate treatment plans.',
-            enabled: true),
+          title: 'AI consultation and treatment recommendation tools',
+          description: 'AI-driven analysis for accurate treatment plans.',
+          enabled: true,
+        ),
         PlanBenefit(
-            title: 'Before/after simulations',
-            description: 'Visual results for patient consultations.',
-            enabled: true),
+          title: 'Before/after simulations',
+          description: 'Visual results for patient consultations.',
+          enabled: true,
+        ),
         PlanBenefit(
-            title: 'Dynamic pricing system',
-            description: 'Adjust treatment prices based on various factors.',
-            enabled: true),
+          title: 'Dynamic pricing system',
+          description: 'Adjust treatment prices based on various factors.',
+          enabled: true,
+        ),
       ],
     ),
     ClinicSubscriptionPlanModel(
@@ -150,75 +158,78 @@ class TreatmentData {
       isActive: true,
       benefits: [
         PlanBenefit(
-            title: 'Multi-user clinic access',
-            description: 'Access for all your doctors and staff members.',
-            enabled: true),
+          title: 'Multi-user clinic access',
+          description: 'Access for all your doctors and staff members.',
+          enabled: true,
+        ),
         PlanBenefit(
-            title: 'Priority onboarding and support',
-            description: 'Dedicated support for your clinic setup.',
-            enabled: true),
+          title: 'Priority onboarding and support',
+          description: 'Dedicated support for your clinic setup.',
+          enabled: true,
+        ),
         PlanBenefit(
-            title: 'Custom branding',
-            description: 'Your clinic logo on reports and invoices.',
-            enabled: true),
+          title: 'Custom branding',
+          description: 'Your clinic logo on reports and invoices.',
+          enabled: true,
+        ),
       ],
     ),
   ];
 
-  static final List<PatientSubscriptionPlanModel> dummyPatientSubscriptionPlans = [
-    PatientSubscriptionPlanModel(
-      id: 1,
-      name: 'Basic Care',
-      basePrice: 19.99,
-      simulationCount: 5,
-      postsViewCount: 20,
-      isActive: true,
-      benefits: [
-        PlanBenefit(
-            title: '5 AI Simulations',
-            description: 'Access to 5 skin analysis simulations.',
-            enabled: true),
-        PlanBenefit(
-            title: '20 Posts View',
-            description: 'View up to 20 expert skin care posts.',
-            enabled: true),
-      ],
-    ),
-    PatientSubscriptionPlanModel(
-      id: 2,
-      name: 'Premium Glow',
-      basePrice: 49.99,
-      simulationCount: 15,
-      unlimitedPostsView: true,
-      isActive: true,
-      benefits: [
-        PlanBenefit(
-            title: '15 AI Simulations',
-            description: 'Access to 15 skin analysis simulations.',
-            enabled: true),
-        PlanBenefit(
-            title: 'Unlimited Posts View',
-            description: 'Unlimited access to all skin care content.',
-            enabled: true),
-      ],
-    ),
-    PatientSubscriptionPlanModel(
-      id: 3,
-      name: 'Unlimited Elite',
-      basePrice: 99.99,
-      unlimitedSimulations: true,
-      unlimitedPostsView: true,
-      isActive: true,
-      benefits: [
-        PlanBenefit(
-            title: 'Unlimited AI Simulations',
-            description: 'Generate as many simulations as you need.',
-            enabled: true),
-        PlanBenefit(
-            title: 'Unlimited Posts View',
-            description: 'Full access to all educational materials.',
-            enabled: true),
-      ],
-    ),
-  ];
+  // static final List<PatientPlan> dummyPatientSubscriptionPlans = [
+  //   PatientPlan(
+  //     id: 1,
+  //     name: 'Basic Care',
+  //     basePrice: 19.99,
+  //     simulationCount: 5,
+  //     postsViewCount: 20,
+  //     isActive: true,
+  //     benefits: [
+  //       PlanBenefit(
+  //           title: '5 AI Simulations',
+  //           description: 'Access to 5 skin analysis simulations.',
+  //           enabled: true),
+  //       PlanBenefit(
+  //           title: '20 Posts View',
+  //           description: 'View up to 20 expert skin care posts.',
+  //           enabled: true),
+  //     ],
+  //   ),
+  //   PatientPlan(
+  //     id: 2,
+  //     name: 'Premium Glow',
+  //     basePrice: 49.99,
+  //     simulationCount: 15,
+  //     unlimitedPostsView: true,
+  //     isActive: true,
+  //     benefits: [
+  //       PlanBenefit(
+  //           title: '15 AI Simulations',
+  //           description: 'Access to 15 skin analysis simulations.',
+  //           enabled: true),
+  //       PlanBenefit(
+  //           title: 'Unlimited Posts View',
+  //           description: 'Unlimited access to all skin care content.',
+  //           enabled: true),
+  //     ],
+  //   ),
+  //   PatientPlan(
+  //     id: 3,
+  //     name: 'Unlimited Elite',
+  //     basePrice: 99.99,
+  //     unlimitedSimulations: true,
+  //     unlimitedPostsView: true,
+  //     isActive: true,
+  //     benefits: [
+  //       PlanBenefit(
+  //           title: 'Unlimited AI Simulations',
+  //           description: 'Generate as many simulations as you need.',
+  //           enabled: true),
+  //       PlanBenefit(
+  //           title: 'Unlimited Posts View',
+  //           description: 'Full access to all educational materials.',
+  //           enabled: true),
+  //     ],
+  //   ),
+  // ];
 }

@@ -1,8 +1,8 @@
-import 'subscription_duration_option.dart';
+import 'duration_option_model.dart';
 import 'subscription_plan_benefit_model.dart';
 
 class ClinicSubscriptionPlanModel {
-  int? id;
+  String? id;
   String? name;
   double? basePrice;
   int doctorSeats;
@@ -17,7 +17,7 @@ class ClinicSubscriptionPlanModel {
   bool isActive;
   bool isDefault;
   bool isLifetime;
-  List<SubscriptionDurationOption>? durationOptions;
+  List<DurationOption>? durationOptions;
 
   ClinicSubscriptionPlanModel({
     this.id,
@@ -49,10 +49,10 @@ class ClinicSubscriptionPlanModel {
       unlimitedStaff: json['unlimited_staff'] ?? false,
       standardBookingCommissionPercent:
           (json['standard_booking_commission_percent'] as num?)?.toDouble() ??
-              0.0,
+          0.0,
       dynamicBookingCommissionPercent:
           (json['dynamic_booking_commission_percent'] as num?)?.toDouble() ??
-              0.0,
+          0.0,
       technologyFeePerTreatment:
           (json['technology_fee_per_treatment'] as num?)?.toDouble() ?? 0.0,
       isActive: (json['is_active'] as bool?) ?? true,
@@ -60,42 +60,42 @@ class ClinicSubscriptionPlanModel {
       isLifetime: (json['is_lifetime'] as bool?) ?? false,
       durationOptions: json['duration_options'] != null
           ? (json['duration_options'] as List)
-              .where((e) => e != null)
-              .map((e) =>
-                  SubscriptionDurationOption.fromJson(e as Map<String, dynamic>))
-              .toList()
+                .where((e) => e != null)
+                .map((e) => DurationOption.fromJson(e as Map<String, dynamic>))
+                .toList()
           : null,
       benefits: json['benefits'] != null
           ? (json['benefits'] as List)
-              .where((e) => e != null)
-              .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
-              .toList()
+                .where((e) => e != null)
+                .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
+                .toList()
           : null,
       assignedClinics: json['assigned_clinics'] != null
           ? List<int>.from(
-              (json['assigned_clinics'] as Iterable).where((e) => e != null))
+              (json['assigned_clinics'] as Iterable).where((e) => e != null),
+            )
           : null,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'base_price': basePrice,
-      'doctor_seats': doctorSeats,
-      'unlimited_doctors': unlimitedDoctors,
-      'staff_seats': staffSeats,
-      'unlimited_staff': unlimitedStaff,
-      'standard_booking_commission_percent': standardBookingCommissionPercent,
-      'dynamic_booking_commission_percent': dynamicBookingCommissionPercent,
-      'technology_fee_per_treatment': technologyFeePerTreatment,
-      'is_active': isActive,
-      'is_default': isDefault,
-      'is_lifetime': isLifetime,
-      'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
-      'benefits': benefits?.map((e) => e.toJson()).toList(),
-      'assigned_clinics': assignedClinics,
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'name': name,
+  //     'base_price': basePrice,
+  //     'doctor_seats': doctorSeats,
+  //     'unlimited_doctors': unlimitedDoctors,
+  //     'staff_seats': staffSeats,
+  //     'unlimited_staff': unlimitedStaff,
+  //     'standard_booking_commission_percent': standardBookingCommissionPercent,
+  //     'dynamic_booking_commission_percent': dynamicBookingCommissionPercent,
+  //     'technology_fee_per_treatment': technologyFeePerTreatment,
+  //     'is_active': isActive,
+  //     'is_default': isDefault,
+  //     'is_lifetime': isLifetime,
+  //     'duration_options': durationOptions?.map((e) => e.toJson()).toList(),
+  //     'benefits': benefits?.map((e) => e.toJson()).toList(),
+  //     'assigned_clinics': assignedClinics,
+  //   };
+  // }
 }

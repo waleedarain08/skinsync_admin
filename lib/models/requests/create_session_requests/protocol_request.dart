@@ -2,22 +2,56 @@ import 'package:skinsync_admin/utils/enums.dart';
 
 class ProtocolRequest {
   final int stepNumber;
-  final ClinicalProtocolPdf? clinicalProtocolPdf;
+  final List<ProtocolRequestItem>? protocols;
+  final List<ProtocolInstructionItem>? instrictions;
 
-  ProtocolRequest({required this.stepNumber, this.clinicalProtocolPdf});
+  ProtocolRequest({
+    required this.stepNumber,
+    this.protocols,
+    this.instrictions,
+  });
 
   Map<String, dynamic> toJson() => {
     'step_number': stepNumber,
     'keys': [CreateTreatmentSteps.protocols.name],
-    'clinical_protocol_pdf': clinicalProtocolPdf?.toJson(),
+    'protocols': protocols == null
+        ? <dynamic>[]
+        : List<dynamic>.from(protocols!.map((x) => x.toJson())),
+    'instrictions': instrictions == null
+        ? <dynamic>[]
+        : List<dynamic>.from(instrictions!.map((x) => x.toJson())),
   };
 }
 
-class ClinicalProtocolPdf {
-  final String? name;
-  final String? url;
+class ProtocolRequestItem {
+  final int? fieldId;
+  final String? title;
+  final String? note;
 
-  ClinicalProtocolPdf({this.name, this.url});
+  ProtocolRequestItem({
+    this.fieldId,
+    this.title,
+    this.note,
+  });
 
-  Map<String, dynamic> toJson() => {'name': name, 'url': url};
+  Map<String, dynamic> toJson() => {
+    'field_id': fieldId,
+    'title': title,
+    'note': note,
+  };
+}
+
+class ProtocolInstructionItem {
+  final String? title;
+  final String? note;
+
+  ProtocolInstructionItem({
+    this.title,
+    this.note,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'note': note,
+  };
 }

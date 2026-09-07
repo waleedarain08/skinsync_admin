@@ -9,8 +9,21 @@ import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/custom_primary_button.dart';
 import 'package:skinsync_admin/widgets/dailogbox/standard_dialog.dart';
 
-class ProtocolsStep extends ConsumerWidget {
+class ProtocolsStep extends ConsumerStatefulWidget {
   const ProtocolsStep({super.key});
+
+  @override
+  ConsumerState<ProtocolsStep> createState() => _ProtocolsStepState();
+}
+
+class _ProtocolsStepState extends ConsumerState<ProtocolsStep> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(treatmentDataViewModelProvider.notifier).fetchProtocolFields();
+    });
+  }
 
   Widget _sectionTitle(BuildContext context, String title, {double? fontSize}) {
     return Text(
@@ -23,7 +36,6 @@ class ProtocolsStep extends ConsumerWidget {
 
   void _showAddProtocolDialog(
     BuildContext context,
-    WidgetRef ref,
     ProtocolType type,
   ) {
     final controller = TextEditingController();
@@ -45,12 +57,14 @@ class ProtocolsStep extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           CustomPrimaryButton(
-            onTap: () {
-              if (controller.text.isNotEmpty) {
-                ref
+            onTap: () async {
+              if (controller.text.trim().isNotEmpty) {
+                final success = await ref
                     .read(treatmentDataViewModelProvider.notifier)
-                    .addProtocol(controller.text.trim(), type);
-                Navigator.pop(context);
+                    .createProtocolField(controller.text.trim(), type);
+                if (success && context.mounted) {
+                  Navigator.pop(context);
+                }
               }
             },
             label: 'Save Protocol',
@@ -235,15 +249,14 @@ class ProtocolsStep extends ConsumerWidget {
   Widget _buildJourneyProtocols(
     BuildContext context,
     TreatmentDataState dataState,
-    WidgetRef ref,
     List<String> selectedIds,
     void Function(String) onToggle,
   ) {
     final checkboxProtocols = dataState.protocols
-        .where((p) => p.type == ProtocolType.checkbox)
+        .where((p) => p.type.isCheckbox)
         .toList();
     final textProtocols = dataState.protocols
-        .where((p) => p.type == ProtocolType.text)
+        .where((p) => p.type.isTextField)
         .toList();
 
     return Column(
@@ -256,7 +269,7 @@ class ProtocolsStep extends ConsumerWidget {
           selectedIds: selectedIds,
           onToggle: onToggle,
           onAdd: () =>
-              _showAddProtocolDialog(context, ref, ProtocolType.checkbox),
+              _showAddProtocolDialog(context, ProtocolType.checkbox),
         ),
         context.verticalSpace(24),
         _buildProtocolGroup(
@@ -265,7 +278,8 @@ class ProtocolsStep extends ConsumerWidget {
           protocols: textProtocols,
           selectedIds: selectedIds,
           onToggle: onToggle,
-          onAdd: () => _showAddProtocolDialog(context, ref, ProtocolType.text),
+          onAdd: () =>
+              _showAddProtocolDialog(context, ProtocolType.textField),
         ),
       ],
     );
@@ -425,7 +439,7 @@ class ProtocolsStep extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
     final dataState = ref.watch(treatmentDataViewModelProvider);
@@ -443,7 +457,6 @@ class ProtocolsStep extends ConsumerWidget {
         _buildJourneyProtocols(
           context,
           dataState,
-          ref,
           state.selectedProtocolIds,
           (id) {
             final pItem = dataState.protocols.firstWhere((p) => p.id == id);

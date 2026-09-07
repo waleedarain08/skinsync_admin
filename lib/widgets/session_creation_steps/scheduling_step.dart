@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
 import 'package:skinsync_admin/view_models/session_view_model.dart';
-import 'package:skinsync_admin/view_models/treatment_view_model.dart';
 import 'package:skinsync_admin/widgets/build_textfield.dart';
 import 'package:skinsync_admin/widgets/session_creation_steps/authorized_roles_widget.dart';
 
@@ -21,25 +20,25 @@ class SchedulingStep extends ConsumerWidget {
 
   double _getProductMinQuantity(
     ProductUsageEntry entry,
-    List<dynamic> allSubAreas,
+    SessionViewModel viewModel,
   ) {
-    return double.tryParse(entry.minQuantityController.text) ?? 0.0;
+    return viewModel.getProductMinQuantity(entry);
   }
 
   double _getProductMaxQuantity(
     ProductUsageEntry entry,
-    List<dynamic> allSubAreas,
+    SessionViewModel viewModel,
   ) {
-    return double.tryParse(entry.maxQuantityController.text) ?? 0.0;
+    return viewModel.getProductMaxQuantity(entry);
   }
 
   double _calculateProductUsageDuration(
-    TreatmentState treatmentState,
+    SessionViewModel viewModel,
     SessionState sessionState,
   ) {
     double total = 0.0;
     for (final entry in sessionState.productUsageEntries) {
-      final minQty = _getProductMinQuantity(entry, const []);
+      final minQty = _getProductMinQuantity(entry, viewModel);
       final perUnit =
           double.tryParse(entry.perUnitDurationController.text) ?? 0.0;
       total += minQty * perUnit;
@@ -56,16 +55,7 @@ class SchedulingStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final SessionState state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
-    //  final treatmentState = ref.watch(treatmentViewModelProvider);
-
-    // Locked to Fixed Duration for now — force underlying state to stay in
-    // sync so submitted payloads correctly send fixed_duration: true instead
-    // of null/false. Remove this block when re-enabling the toggle.
-    if (!state.isFixedDuration) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        viewModel.toggleIsFixedDuration(true);
-      });
-    }
+    // final treatmentState = ref.watch(treatmentViewModelProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,17 +88,16 @@ class SchedulingStep extends ConsumerWidget {
                   ),
                 ),
                 Switch(
-                  value: true,
-                  onChanged: (_) {}, // Locked to Fixed Duration for now
-                  activeThumbColor: CustomColors.purple,
+                  value: state.isFixedDuration,
+                  onChanged: viewModel.toggleIsFixedDuration,
+                  activeThumbColor: CustomColors.white,
                 ),
               ],
             ),
           ),
         ),
         context.verticalSpace(32),
-        if (true) ...[
-          // Locked to Fixed Duration for now (state.isFixedDuration ignored)
+        if (state.isFixedDuration) ...[
           _sectionTitle(context, 'Fixed Duration'),
           context.verticalSpace(24),
           Row(
@@ -127,7 +116,7 @@ class SchedulingStep extends ConsumerWidget {
               ),
             ],
           ),
-        ] /* else ...[
+        ] else ...[
           _sectionTitle(context, 'Base Duration'),
           context.verticalSpace(24),
           Row(
@@ -162,9 +151,9 @@ class SchedulingStep extends ConsumerWidget {
             ...state.productUsageEntries.asMap().entries.map((item) {
               final idx = item.key;
               final entry = item.value;
-              final allSubAreas = treatmentState.areas.expand((a) => a.subAreas).toList();
-              final minQty = _getProductMinQuantity(entry, allSubAreas);
-              final maxQty = _getProductMaxQuantity(entry, allSubAreas);
+              // final allSubAreas = treatmentState.areas.expand((a) => a.subAreas).toList();
+              final minQty = _getProductMinQuantity(entry, viewModel);
+              final maxQty = _getProductMaxQuantity(entry, viewModel);
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -247,7 +236,10 @@ class SchedulingStep extends ConsumerWidget {
               final baseDuration =
                   double.tryParse(viewModel.treatmentDurationController.text) ??
                   0.0;
-              final productDuration = _calculateProductUsageDuration(treatmentState, state);
+              final productDuration = _calculateProductUsageDuration(
+                viewModel,
+                state,
+              );
               final prepTime =
                   double.tryParse(viewModel.prepTimeController.text) ?? 0.0;
               final cleanupTime =
@@ -270,7 +262,10 @@ class SchedulingStep extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Base Duration:', style: context.fonts.black14w600),
+                        Text(
+                          'Base Duration:',
+                          style: context.fonts.black14w600,
+                        ),
                         Text(
                           '${baseDuration.toStringAsFixed(baseDuration % 1 == 0 ? 0 : 1)} Minutes',
                           style: context.fonts.black14w600,
@@ -338,7 +333,7 @@ class SchedulingStep extends ConsumerWidget {
               );
             },
           ),
-        ] */,
+        ],
         context.verticalSpace(32),
         _sectionTitle(context, 'Override & Booking Controls'),
         context.verticalSpace(24),

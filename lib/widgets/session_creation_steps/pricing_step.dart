@@ -28,15 +28,6 @@ class PricingStep extends ConsumerWidget {
     final state = ref.watch(sessionViewModelProvider);
     final viewModel = ref.read(sessionViewModelProvider.notifier);
 
-    // Locked to Fixed Price for now — force underlying state to stay in
-    // sync so submitted payloads correctly send fixed_price / is_fixed_price
-    // instead of null/false. Remove this block when re-enabling the toggle.
-    if (!state.isFixedPrice) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        viewModel.toggleIsFixedPrice(true);
-      });
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -74,17 +65,17 @@ class PricingStep extends ConsumerWidget {
                     ],
                   ),
                 ),
-                 Switch(
-                  value: true,
-                  onChanged:(_){}, // Locked to Fixed Price for now
-                  activeThumbColor: CustomColors.purple,
+                Switch(
+                  value: state.isFixedPrice,
+                  onChanged: viewModel.toggleIsFixedPrice,
+                  activeColor: CustomColors.white,
                 ),
               ],
             ),
           ),
         ),
         context.verticalSpace(32),
-        if (true) ...[ // Locked to Fixed Price for now (state.isFixedPrice ignored)
+        if (state.isFixedPrice) ...[
           _sectionTitle(context, 'Fixed Pricing'),
           context.verticalSpace(24),
           BuildTextField(
@@ -94,7 +85,7 @@ class PricingStep extends ConsumerWidget {
             keyboardType: TextInputType.number,
             validator: Validators.empty,
           ),
-        ] /* else ...[
+        ] else ...[
           _sectionTitle(context, 'Base Pricing'),
           context.verticalSpace(24),
           BuildTextField(
@@ -114,9 +105,10 @@ class PricingStep extends ConsumerWidget {
             ),
             context.verticalSpace(24),
             ...state.productUsageEntries.map((entry) {
-              final maxQty = (double.tryParse(entry.maxQuantityController.text) ?? 1.0).ceil();
+              final maxQty = viewModel.getProductMaxQuantity(entry).ceil();
+              final effectiveMaxQty = maxQty < 1 ? 1 : maxQty;
               final formattedUnit = _formatUnitLabel(entry.unit);
-              entry.syncUnitPriceControllers(maxQty);
+              entry.syncUnitPriceControllers(effectiveMaxQty);
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 24),
@@ -162,7 +154,7 @@ class PricingStep extends ConsumerWidget {
                                 // Trigger rebuild inside the provider to reflect changes
                                 ref.read(sessionViewModelProvider.notifier).syncUnitPriceControllersForState();
                               },
-                              activeColor: CustomColors.purple,
+                              activeColor: CustomColors.white,
                             ),
                           ],
                         ),
@@ -201,7 +193,7 @@ class PricingStep extends ConsumerWidget {
               );
             }),
           ],
-        ] */,
+        ],
         context.verticalSpace(32),
         const Divider(),
         context.verticalSpace(24),

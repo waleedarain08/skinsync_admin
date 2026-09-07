@@ -1,7 +1,7 @@
-import '../subscription_duration_option.dart';
+import '../duration_option_model.dart';
 
 class CreatePatientSubscriptionPlanRequest {
-  final int? id;
+  final String? id;
   final String? name;
   final double? basePrice;
   final int simulationCount;
@@ -12,7 +12,7 @@ class CreatePatientSubscriptionPlanRequest {
   final bool isActive;
   final bool isDefault;
   final bool isLifetime;
-  final List<SubscriptionDurationOption>? durationOptions;
+  final List<DurationOption>? durationOptions;
   final List<int>? benefitIds;
 
   CreatePatientSubscriptionPlanRequest({
@@ -41,12 +41,11 @@ class CreatePatientSubscriptionPlanRequest {
       'is_active': isActive,
       'is_default': isDefault,
       'is_lifetime': isLifetime,
-      'base_price': basePrice ?? 0,
+      'base_price': basePrice,
       'assigned_patients': assignedPatients,
-      'duration_options': durationOptions?.map((e) => {
-        'duration_id': e.duration?.id,
-        'price': e.basePrice,
-      }).toList(),
+      'duration_options': durationOptions
+          ?.map((e) => {'interval': e.interval?.name, 'amount': e.amount})
+          .toList(),
       'benefit_ids': benefitIds,
     };
   }

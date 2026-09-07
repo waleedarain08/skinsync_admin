@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/utils/string_utils.dart';
 
 import '../../models/clinic_subscription_plan_model.dart';
-import '../../models/patient_subscription_plan_model.dart';
+import '../../models/patient_plan_model.dart';
 import '../../utils/theme.dart';
 import '../../view_models/subscription_view_model.dart';
 import '../../widgets/app_badge.dart';
@@ -277,14 +277,14 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          "\$${opt.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                          "\$${opt.amount?.toStringAsFixed(2) ?? '0.00'}",
                           style: context.fonts.black32w700.copyWith(
                             color: CustomColors.purple,
                             fontSize: context.sp(28),
                           ),
                         ),
                         Text(
-                          '/${opt.duration?.name ?? 'N/A'}',
+                          '/${opt.interval?.label ?? 'N/A'}',
                           style: context.fonts.grey12w400.copyWith(
                             fontSize: context.sp(12),
                           ),
@@ -406,10 +406,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
     );
   }
 
-  Widget _buildPatientPlanCard(
-    BuildContext context,
-    PatientSubscriptionPlanModel plan,
-  ) {
+  Widget _buildPatientPlanCard(BuildContext context, PatientPlan plan) {
     final activeBenefits =
         plan.benefits?.where((b) => b.enabled).toList() ?? plan.benefits ?? [];
     final durationOptions = plan.durationOptions ?? [];
@@ -485,14 +482,14 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          "\$${opt.basePrice?.toStringAsFixed(2) ?? '0.00'}",
+                          "\$${opt.amount?.toStringAsFixed(2) ?? '0.00'}",
                           style: context.fonts.black32w700.copyWith(
                             color: CustomColors.purple,
                             fontSize: context.sp(28),
                           ),
                         ),
                         Text(
-                          '/${opt.duration?.name ?? 'N/A'}',
+                          '/${opt.interval?.label ?? 'N/A'}',
                           style: context.fonts.grey12w400.copyWith(
                             fontSize: context.sp(12),
                           ),
@@ -631,7 +628,7 @@ class _SubscriptionPlansTabState extends ConsumerState<SubscriptionPlansTab>
 
   Future<void> _confirmDeletePatientPlan(
     BuildContext context,
-    PatientSubscriptionPlanModel plan,
+    PatientPlan plan,
   ) async {
     final confirm = await _showDeleteDialog(context, plan.name ?? '');
     if (confirm == true && plan.id != null) {

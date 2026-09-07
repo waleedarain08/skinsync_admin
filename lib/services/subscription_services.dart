@@ -47,7 +47,7 @@ class SubscriptionServices implements SubscriptionRepository {
 
   @override
   Future<BaseApiResponseModel<dynamic>> updateSubscriptionPlan(
-    int id,
+    String id,
     CreateClinicSubscriptionPlanRequest request,
   ) async {
     final jsonResponse = await _api.put(
@@ -61,7 +61,9 @@ class SubscriptionServices implements SubscriptionRepository {
   }
 
   @override
-  Future<BaseApiResponseModel<dynamic>> deleteSubscriptionPlan(int id) async {
+  Future<BaseApiResponseModel<dynamic>> deleteSubscriptionPlan(
+    String id,
+  ) async {
     final jsonResponse =
         await _api.delete(
               Endpoint.deleteSubscriptionPlan,
@@ -79,11 +81,9 @@ class SubscriptionServices implements SubscriptionRepository {
   // ---------------- PATIENTS ----------------
 
   @override
-  Future<PatientSubscriptionPlanListResponse>
-  getPatientSubscriptionPlans() async {
+  Future<PatientSubscriptionPlanListResponse> getPatientPlans() async {
     final jsonResponse =
-        await _api.get(Endpoint.patientSubscriptionPlans)
-            as Map<String, dynamic>;
+        await _api.get(Endpoint.patientPlans) as Map<String, dynamic>;
     final response = PatientSubscriptionPlanListResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
@@ -98,7 +98,7 @@ class SubscriptionServices implements SubscriptionRepository {
     CreatePatientSubscriptionPlanRequest request,
   ) async {
     final jsonResponse = await _api.post(
-      Endpoint.patientSubscriptionPlans,
+      Endpoint.patientPlans,
       body: request.toJson(),
     );
     final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
@@ -108,7 +108,7 @@ class SubscriptionServices implements SubscriptionRepository {
 
   @override
   Future<BaseApiResponseModel<dynamic>> updatePatientSubscriptionPlan(
-    int id,
+    String id,
     CreatePatientSubscriptionPlanRequest request,
   ) async {
     final jsonResponse = await _api.patch(
@@ -122,7 +122,9 @@ class SubscriptionServices implements SubscriptionRepository {
   }
 
   @override
-  Future<BaseApiResponseModel<dynamic>> deletePatientSubscriptionPlan(int id) async {
+  Future<BaseApiResponseModel<dynamic>> deletePatientSubscriptionPlan(
+    String id,
+  ) async {
     final jsonResponse =
         await _api.delete(
               Endpoint.deletePatientSubscriptionPlan,
@@ -174,8 +176,9 @@ class SubscriptionServices implements SubscriptionRepository {
   Future<PatientSubscriptionBenefitListResponse> getBenefits() async {
     final jsonResponse =
         await _api.get(Endpoint.benefits) as Map<String, dynamic>;
-    final response =
-        PatientSubscriptionBenefitListResponse.fromJson(jsonResponse);
+    final response = PatientSubscriptionBenefitListResponse.fromJson(
+      jsonResponse,
+    );
 
     if (!response.isSuccess) {
       throw BadRequestException(response.message);

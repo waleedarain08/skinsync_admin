@@ -1,7 +1,5 @@
 import 'dart:developer';
-import 'dart:typed_data';
 
-import 'package:camera/camera.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' hide Notification;
@@ -315,7 +313,38 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   }
 
   void _triggerRebuild() {
+    _syncProductMinMaxFromSessionUnits();
     state = state.copyWith();
+  }
+
+  void _syncProductMinMaxFromSessionUnits() {
+    final minVal = minUnitsController.text.trim();
+    final maxVal = maxUnitsController.text.trim();
+    final parsedMin = double.tryParse(minVal) ?? 0.0;
+    final parsedMax = double.tryParse(maxVal) ?? 0.0;
+
+    for (final entry in state.productUsageEntries) {
+      if (parsedMin > 0) {
+        final currentMin =
+            double.tryParse(entry.minQuantityController.text) ?? 0.0;
+        if (currentMin == 0 || currentMin == 1.0) {
+          entry.minQuantityController.text =
+              parsedMin % 1 == 0
+                  ? parsedMin.toInt().toString()
+                  : parsedMin.toString();
+        }
+      }
+      if (parsedMax > 0) {
+        final currentMax =
+            double.tryParse(entry.maxQuantityController.text) ?? 0.0;
+        if (currentMax == 0 || currentMax == 1.0) {
+          entry.maxQuantityController.text =
+              parsedMax % 1 == 0
+                  ? parsedMax.toInt().toString()
+                  : parsedMax.toString();
+        }
+      }
+    }
   }
 
   void selectUnitType(int? id, String? name) {
@@ -942,6 +971,9 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       EasyLoading.dismiss();
     }
 
+    final currentMin = minUnitsController.text.trim();
+    final currentMax = maxUnitsController.text.trim();
+
     final newEntry = ProductUsageEntry(
       productId: productId,
       productName: productName,
@@ -950,6 +982,12 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       boxQuantity: resolvedBoxQuantity,
       clinicCost: resolvedClinicCost,
       retailPricePerUnit: resolvedRetailPrice,
+      minQuantityController: TextEditingController(
+        text: currentMin.isNotEmpty && currentMin != '0' ? currentMin : '1',
+      ),
+      maxQuantityController: TextEditingController(
+        text: currentMax.isNotEmpty && currentMax != '0' ? currentMax : '1',
+      ),
       onChanged: _triggerRebuild,
     );
 
@@ -1033,7 +1071,19 @@ class SessionViewModel extends BaseViewModel<SessionState> {
   }
 
   double getProductMinQuantity(ProductUsageEntry entry) {
-    return double.tryParse(entry.minQuantityController.text) ?? 0.0;
+    final entryMin = double.tryParse(entry.minQuantityController.text) ?? 0.0;
+    final sessionMin = double.tryParse(minUnitsController.text) ?? 0.0;
+    if (entryMin > 0 && entryMin != 1.0) return entryMin;
+    if (sessionMin > 0) return sessionMin;
+    return entryMin;
+  }
+
+  double getProductMaxQuantity(ProductUsageEntry entry) {
+    final entryMax = double.tryParse(entry.maxQuantityController.text) ?? 0.0;
+    final sessionMax = double.tryParse(maxUnitsController.text) ?? 0.0;
+    if (entryMax > 0 && entryMax != 1.0) return entryMax;
+    if (sessionMax > 0) return sessionMax;
+    return entryMax;
   }
 
   double calculateProductUsageDuration() {
@@ -1055,43 +1105,63 @@ class SessionViewModel extends BaseViewModel<SessionState> {
     return baseDuration + productDuration + prepTime + cleanupTime;
   }
 
-  // Original callProtocol Implementation
   Future<bool?> callProtocol({
     required int stepNumber,
-    required Uint8List bytes,
+    List<ProtocolItem>? masterProtocols,
   }) async {
-    final mediaService = MediaService();
-    const String pdfName = 'clinicForm.pdf';
+    final List<ProtocolRequestItem> protocolItems = [];
 
-    return await runSafely(
+    for (final id in state.selectedProtocolIds) {
+      final pItem = masterProtocols?.firstWhereOrNull((p) => p.id == id);
+      final title = pItem?.title ?? '';
+
+      final matchingNoteEntry = state.selectedProtocolNotes.firstWhereOrNull(
+        (n) => n.protocolName == title,
+      );
+      final noteText =
+          matchingNoteEntry != null && matchingNoteEntry.notes.isNotEmpty
+              ? matchingNoteEntry.notes.map((e) => e.description).join('\n')
+              : '';
+
+      protocolItems.add(
+        ProtocolRequestItem(
+          fieldId: int.tryParse(id) ?? 0,
+          title: title,
+          note: noteText,
+        ),
+      );
+    }
+
+    final List<ProtocolInstructionItem> instructionItems =
+        state.standaloneNotes.map((note) {
+          return ProtocolInstructionItem(
+            title: note.title ?? '',
+            note: note.description,
+          );
+        }).toList();
+
+    final request = ProtocolRequest(
+      stepNumber: stepNumber,
+      protocols: protocolItems,
+      instrictions: instructionItems,
+    );
+
+    log('''
+=========== PROTOCOL REQUEST ===========
+Step No : $stepNumber
+Body    : ${request.toJson()}
+========================================
+''');
+
+    return await runSafely<bool>(
       onLoadingChange: (loading) => state = state.copyWith(loading: loading),
       () async {
-        ClinicalProtocolPdf? clinicalProtocolPdf;
-
-        if (bytes.isNotEmpty) {
-          final uploadedFile = await mediaService.uploadFile(
-            'treatment/pdf',
-            XFile.fromData(bytes, name: pdfName, length: bytes.length),
-          );
-
-          if (uploadedFile == null) {
-            throw const UnknownException('Failed to upload');
-          }
-
-          clinicalProtocolPdf = ClinicalProtocolPdf(
-            name: pdfName,
-            url: uploadedFile,
-          );
-        }
-
         final response = await _sessionRepository.protocol(
-          request: ProtocolRequest(
-            stepNumber: stepNumber,
-            clinicalProtocolPdf: clinicalProtocolPdf,
-          ),
+          request: request,
           id: state.sessionId!,
         );
 
+        log('Protocol Step Saved for Session ID: ${state.sessionId!}');
         return response.isSuccess;
       },
     );
@@ -1106,31 +1176,34 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       unitPriceOverrides: state.isFixedPrice
           ? []
           : state.productUsageEntries.map((entry) {
-              final maxQty =
-                  (double.tryParse(entry.maxQuantityController.text) ?? 1.0)
-                      .ceil();
-              entry.syncUnitPriceControllers(maxQty);
+              final maxQty = getProductMaxQuantity(entry).ceil();
+              final effectiveMaxQty = maxQty < 1 ? 1 : maxQty;
+              entry.syncUnitPriceControllers(effectiveMaxQty);
 
-              final List<int> prices = [];
               if (entry.useDifferentPricingPerUnit) {
+                final List<int> prices = [];
                 for (final c in entry.unitPriceControllers) {
                   prices.add(int.tryParse(c.text.trim()) ?? 0);
                 }
+                return UnitPriceOverride(
+                  productId: entry.productId,
+                  isDiffPrice: true,
+                  pricePerUnit: 0,
+                  pricePerUnitList: prices,
+                );
               } else {
-                final singlePrice =
-                    int.tryParse(
-                      entry.unitPriceControllers.isEmpty
-                          ? '0'
-                          : entry.unitPriceControllers[0].text.trim(),
-                    ) ??
-                    0;
-                prices.addAll(List.filled(maxQty, singlePrice));
+                final singlePrice = int.tryParse(
+                  entry.unitPriceControllers.isEmpty
+                      ? '0'
+                      : entry.unitPriceControllers[0].text.trim(),
+                ) ?? 0;
+                return UnitPriceOverride(
+                  productId: entry.productId,
+                  isDiffPrice: false,
+                  pricePerUnit: singlePrice,
+                  pricePerUnitList: [],
+                );
               }
-
-              return UnitPriceOverride(
-                productId: entry.productId,
-                pricePerUnit: prices,
-              );
             }).toList(),
       isFixedPrice: state.isFixedPrice,
       fixedPrice: state.isFixedPrice

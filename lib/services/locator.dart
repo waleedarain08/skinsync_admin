@@ -27,7 +27,7 @@ import 'package:skinsync_admin/view_models/forms_controller.dart';
 
 import '../repositories/auth_repository.dart';
 import '../repositories/setting_repository.dart';
-import '../repositories/treatment_repository.dart';
+import 'package:skinsync_admin/repositories/treatment_repository.dart';
 import 'api_base_helper.dart';
 import 'auth_service.dart';
 import 'setting_service.dart';

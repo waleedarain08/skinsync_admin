@@ -1,3 +1,5 @@
+import 'package:skinsync_admin/utils/string_utils.dart';
+
 enum SharedPreferencesKeys {
   themeModeKey('theme-mode'),
   accessTokenKey('access-token'),
@@ -37,7 +39,7 @@ enum Endpoint {
   subscriptionPlans('admin/patient-subscription-plans'),
   updateSubscriptionPlan('admin/subscription-plans/{id}'),
   deleteSubscriptionPlan('admin/subscription-plans/{id}'),
-  patientSubscriptionPlans('admin/patient-subscription-plans'),
+  patientPlans('admin/patient-subscription-plans'),
   updatePatientSubscriptionPlan('admin/patient-subscription-plans/{id}'),
   deletePatientSubscriptionPlan('admin/patient-subscription-plans/{id}'),
   categories('admin/categories'),
@@ -98,7 +100,8 @@ enum Endpoint {
   forms('admin/forms'),
   updateForm('admin/forms/{id}'),
   notification('admin/notifications'),
-  deleteForm('admin/forms/{id}');
+  deleteForm('admin/forms/{id}'),
+  protocolFields('admin/protocol_fields');
 
   final String path;
   const Endpoint(this.path);
@@ -117,6 +120,8 @@ enum Status { active, inactive }
 enum BaseUrls {
   api('https://api.skinsyncai.com/api/'),
   apiQa('https://api-dev.skinsyncai.com/api/');
+
+  // apiQa('http://localhost:8084/api/');
 
   // apiQa('https://bgzh46mj-8084.inc1.devtunnels.ms/api/');
 
@@ -181,4 +186,14 @@ enum PatientStatus {
   final String label;
 
   const PatientStatus(this.label);
+}
+
+enum PlanInterval {
+  week,
+  month,
+  year;
+
+  String get label {
+    return name.capitalize;
+  }
 }

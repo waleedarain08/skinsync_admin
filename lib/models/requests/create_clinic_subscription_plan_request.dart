@@ -1,9 +1,9 @@
 import '../clinic_subscription_plan_model.dart';
-import '../subscription_duration_option.dart';
+import '../duration_option_model.dart';
 import '../subscription_plan_benefit_model.dart';
 
 class CreateClinicSubscriptionPlanRequest {
-  final int? id;
+  final String? id;
   final String? name;
   final double? basePrice;
   final int doctorSeats;
@@ -18,7 +18,7 @@ class CreateClinicSubscriptionPlanRequest {
   final bool isActive;
   final bool isDefault;
   final bool isLifetime;
-  final List<SubscriptionDurationOption>? durationOptions;
+  final List<DurationOption>? durationOptions;
 
   CreateClinicSubscriptionPlanRequest({
     this.id,
@@ -55,10 +55,15 @@ class CreateClinicSubscriptionPlanRequest {
       'is_lifetime': isLifetime,
       'base_price': basePrice ?? 0,
       'assigned_clinics': assignedClinics,
-      'duration_options': durationOptions?.map((e) => {
-        'duration_id': e.duration?.id,
-        'price': e.basePrice,
-      }).toList(),
+      'duration_options': durationOptions
+          ?.map(
+            (e) => {
+              'id': e.id,
+              'interval': e.interval?.name,
+              'amount': e.amount,
+            },
+          )
+          .toList(),
       'benefits': benefits?.map((e) => e.toJson()).toList(),
     };
   }
