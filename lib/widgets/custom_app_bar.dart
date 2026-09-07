@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/screens/notification_screen.dart';
+import 'package:skinsync_admin/view_models/auth_view_model.dart';
 
 import '../screens/sign_in_screen.dart';
 import '../services/locator.dart';
@@ -17,7 +19,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       height: AppSpacing.topBarHeight(context),
       decoration: const BoxDecoration(
         gradient: CustomColors.purpleWhiteStateBlueLightGradient,
-        border: Border(bottom: BorderSide(color: CustomColors.border, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: CustomColors.border, width: 1),
+        ),
       ),
       padding: context.appEdgeInsets(horizontal: 24),
       child: Row(
@@ -26,16 +30,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             context,
             defaultValue: const SizedBox.shrink(),
             mobile: () => _MenuButton(context: context),
-            tablet: () => _MenuButton(context: context), // Show hamburger on tablet too
+            tablet: () =>
+                _MenuButton(context: context), // Show hamburger on tablet too
           ),
           const Spacer(),
-         _TopBarAction(
-            onTap: (){
-               context.pushNamed(NotificationScreen.routeName);
+          _TopBarAction(
+            onTap: () {
+              context.pushNamed(NotificationScreen.routeName);
             },
-            icon: Icons.notifications_none_rounded, tooltip: 'Notifications', hasBadge: true),
+            icon: Icons.notifications_none_rounded,
+            tooltip: 'Notifications',
+            hasBadge: true,
+          ),
           context.horizontalSpace(20),
-          const _TopBarAction(icon: Icons.help_outline_rounded, tooltip: 'Documentation'),
+          const _TopBarAction(
+            icon: Icons.help_outline_rounded,
+            tooltip: 'Documentation',
+          ),
           context.horizontalSpace(20),
           const VerticalDivider(width: 1, indent: 20, endIndent: 20),
           context.horizontalSpace(20),
@@ -59,10 +70,16 @@ class _MenuButton extends StatelessWidget {
       padding: context.appEdgeInsets(right: 12),
       child: IconButton(
         onPressed: () => Scaffold.of(context).openDrawer(),
-        icon: Icon(Icons.menu_rounded, color: CustomColors.black, size: context.sp(26)),
+        icon: Icon(
+          Icons.menu_rounded,
+          color: CustomColors.black,
+          size: context.sp(26),
+        ),
         style: IconButton.styleFrom(
           backgroundColor: CustomColors.whiteGrey,
-          shape: RoundedRectangleBorder(borderRadius: context.borderRadius(all: 8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: context.borderRadius(all: 8),
+          ),
         ),
       ),
     );
@@ -73,7 +90,7 @@ class _TopBarAction extends StatefulWidget {
   final IconData icon;
   final String tooltip;
   final bool hasBadge;
-   final VoidCallback? onTap;
+  final VoidCallback? onTap;
 
   const _TopBarAction({
     required this.icon,
@@ -100,11 +117,13 @@ class _TopBarActionState extends State<_TopBarAction> {
           clipBehavior: Clip.none,
           children: [
             IconButton(
-              onPressed:widget.onTap ??  () {},
+              onPressed: widget.onTap ?? () {},
               icon: Icon(widget.icon, size: context.sp(24)),
               color: _hovered ? CustomColors.purple : CustomColors.grey,
               style: IconButton.styleFrom(
-                backgroundColor: _hovered ? CustomColors.palePurple : Colors.transparent,
+                backgroundColor: _hovered
+                    ? CustomColors.palePurple
+                    : Colors.transparent,
                 shape: RoundedRectangleBorder(
                   borderRadius: context.borderRadius(all: 8),
                 ),
@@ -147,18 +166,29 @@ class _UserProfile extends StatelessWidget {
       ),
       child: Container(
         padding: context.appEdgeInsets(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          borderRadius: context.borderRadius(all: 8),
-        ),
+        decoration: BoxDecoration(borderRadius: context.borderRadius(all: 8)),
         child: Row(
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text('Alex MedSpa', style: context.fonts.black12w600),
-                Text('Super Admin', style: context.fonts.grey10w400),
-              ],
+            Consumer(
+              builder: (_, ref, _) {
+                final user = ref.watch(
+                  authViewModelProvider.select((s) => s.user),
+                );
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      user?.name ?? 'Admin',
+                      style: context.fonts.black12w600,
+                    ),
+                    Text(
+                      user?.email ?? 'Super Admin',
+                      style: context.fonts.grey10w400,
+                    ),
+                  ],
+                );
+              },
             ),
             context.horizontalSpace(12),
             Container(
@@ -168,22 +198,38 @@ class _UserProfile extends StatelessWidget {
                 color: CustomColors.purple,
                 borderRadius: context.borderRadius(all: 8),
               ),
-              child: Icon(Icons.person_rounded, size: context.sp(22), color: CustomColors.white),
+              child: Icon(
+                Icons.person_rounded,
+                size: context.sp(22),
+                color: CustomColors.white,
+              ),
             ),
             context.horizontalSpace(4),
-            Icon(Icons.keyboard_arrow_down_rounded, size: context.sp(16), color: CustomColors.lightGrey),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: context.sp(16),
+              color: CustomColors.lightGrey,
+            ),
           ],
         ),
       ),
       itemBuilder: (context) => <PopupMenuEntry<void>>[
         PopupMenuItem<void>(
           enabled: false,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Alex MedSpa', style: context.fonts.black14w600),
-              Text('admin@skinsync.ai', style: context.fonts.grey12w400),
-            ],
+          child: Consumer(
+            builder: (_, ref, _) {
+              final user = ref.watch(
+                authViewModelProvider.select((s) => s.user),
+              );
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(user?.name ?? 'Admin', style: context.fonts.black14w600),
+                  if (user?.email != null)
+                    Text(user!.email!, style: context.fonts.grey12w400),
+                ],
+              );
+            },
           ),
         ),
         const PopupMenuDivider(),
@@ -191,7 +237,11 @@ class _UserProfile extends StatelessWidget {
           onTap: () {},
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: context.sp(18), color: CustomColors.grey),
+              Icon(
+                Icons.person_outline_rounded,
+                size: context.sp(18),
+                color: CustomColors.grey,
+              ),
               context.horizontalSpace(16),
               const Text('Account Profile'),
             ],
@@ -206,9 +256,19 @@ class _UserProfile extends StatelessWidget {
           },
           child: Row(
             children: [
-              Icon(Icons.logout_rounded, color: CustomColors.red, size: context.sp(18)),
+              Icon(
+                Icons.logout_rounded,
+                color: CustomColors.red,
+                size: context.sp(18),
+              ),
               context.horizontalSpace(16),
-              const Text('Logout', style: TextStyle(color: CustomColors.red, fontWeight: FontWeight.w600)),
+              const Text(
+                'Logout',
+                style: TextStyle(
+                  color: CustomColors.red,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ),

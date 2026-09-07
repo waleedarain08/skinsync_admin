@@ -24,10 +24,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Welcome, Alex',
-                        style: context.fonts.level1Heading,
-                      ),
+                      Text('Welcome!', style: context.fonts.level1Heading),
                       context.verticalSpace(6),
                       Text(
                         "Here's a summary of your MedSpa network performance.",
