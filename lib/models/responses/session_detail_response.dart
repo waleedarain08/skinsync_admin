@@ -1,3 +1,4 @@
+import 'package:skinsync_admin/models/requests/create_session_requests/protocol_request.dart';
 import 'package:skinsync_admin/models/responses/base_response_model.dart';
 
 class SessionDetailResponse extends BaseApiResponseModel<SessionDetailDto> {
@@ -27,6 +28,8 @@ class SessionDetailDto {
   final int currentStep;
   final bool isCompleted;
   final List<SessionProductUsageDto> productUsages;
+  final List<ProtocolRequestItem> protocols;
+  final List<ProtocolInstructionItem> instructions;
   final int baseDuration;
   final int prepTime;
   final int cleanupTime;
@@ -72,6 +75,8 @@ class SessionDetailDto {
     required this.areaName,
     required this.title,
     required this.sessionNumber,
+    this.protocols =const [],
+    this.instructions= const [],
     required this.status,
     required this.currentStep,
     required this.isCompleted,
@@ -126,6 +131,14 @@ class SessionDetailDto {
       isCompleted: json['is_completed'] as bool? ?? false,
       productUsages: (json['billable_materials'] as List? ?? json['product_usages'] as List?)
               ?.map((e) => SessionProductUsageDto.fromJson(e))
+              .toList() ??
+          [],
+      protocols: (json['protocols'] as List?)
+              ?.map((e) => ProtocolRequestItem.fromJson(e))
+              .toList() ??
+          [], 
+         instructions: (json['instructions'] as List?)
+              ?.map((e) => ProtocolInstructionItem.fromJson(e))
               .toList() ??
           [],
       baseDuration: json['base_duration'] as int? ?? 0,

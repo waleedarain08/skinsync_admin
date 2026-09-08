@@ -11,16 +11,40 @@ class ProtocolRequest {
     this.instrictions,
   });
 
+  factory ProtocolRequest.fromJson(Map<String, dynamic> json) {
+    return ProtocolRequest(
+      stepNumber: json['step_number'] ?? 0,
+      protocols: json['protocols'] != null
+          ? List<ProtocolRequestItem>.from(
+              json['protocols'].map(
+                (x) => ProtocolRequestItem.fromJson(x),
+              ),
+            )
+          : null,
+      instrictions: json['instructions'] != null
+          ? List<ProtocolInstructionItem>.from(
+              json['instructions'].map(
+                (x) => ProtocolInstructionItem.fromJson(x),
+              ),
+            )
+          : null,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
-    'step_number': stepNumber,
-    'keys': [CreateTreatmentSteps.protocols.name],
-    'protocols': protocols == null
-        ? <dynamic>[]
-        : List<dynamic>.from(protocols!.map((x) => x.toJson())),
-    'instructions': instrictions == null
-        ? <dynamic>[]
-        : List<dynamic>.from(instrictions!.map((x) => x.toJson())),
-  };
+        'step_number': stepNumber,
+        'keys': [CreateTreatmentSteps.protocols.name],
+        'protocols': protocols == null
+            ? <dynamic>[]
+            : List<dynamic>.from(
+                protocols!.map((x) => x.toJson()),
+              ),
+        'instructions': instrictions == null
+            ? <dynamic>[]
+            : List<dynamic>.from(
+                instrictions!.map((x) => x.toJson()),
+              ),
+      };
 }
 
 class ProtocolRequestItem {
@@ -34,11 +58,19 @@ class ProtocolRequestItem {
     this.note,
   });
 
+  factory ProtocolRequestItem.fromJson(Map<String, dynamic> json) {
+    return ProtocolRequestItem(
+      fieldId: json['field_id'],
+      title: json['title'],
+      note: json['note'],
+    );
+  }
+
   Map<String, dynamic> toJson() => {
-    'field_id': fieldId,
-    'title': title,
-    'note': note,
-  };
+        'field_id': fieldId,
+        'title': title,
+        'note': note,
+      };
 }
 
 class ProtocolInstructionItem {
@@ -50,8 +82,15 @@ class ProtocolInstructionItem {
     this.note,
   });
 
+  factory ProtocolInstructionItem.fromJson(Map<String, dynamic> json) {
+    return ProtocolInstructionItem(
+      title: json['title'],
+      note: json['note'],
+    );
+  }
+
   Map<String, dynamic> toJson() => {
-    'title': title,
-    'note': note,
-  };
+        'title': title,
+        'note': note,
+      };
 }
