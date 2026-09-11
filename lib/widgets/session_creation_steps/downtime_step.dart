@@ -29,6 +29,15 @@ class _DowntimeStepState extends ConsumerState<DowntimeStep> {
     return 'Patient cannot book other services for $days day${days == 1 ? '' : 's'}.';
   }
 
+  bool _isSelectedDowntimeLevel(String level, String selectedLevel) {
+    String normalize(String value) {
+      final normalized = value.trim().toLowerCase().replaceAll('_', ' ');
+      return normalized == 'no downtime' ? 'none' : normalized;
+    }
+
+    return normalize(level) == normalize(selectedLevel);
+  }
+
   Widget _downtimeOption(
     BuildContext context,
     String title,
@@ -146,7 +155,7 @@ class _DowntimeStepState extends ConsumerState<DowntimeStep> {
                   level,
                   '$days Days',
                   _describeDowntime(days),
-                  state.downtimeLevel == level,
+                  _isSelectedDowntimeLevel(level, state.downtimeLevel),
                   () => viewModel.setDowntimeLevel(level),
                 );
               },
