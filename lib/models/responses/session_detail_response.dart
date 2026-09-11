@@ -10,7 +10,9 @@ class SessionDetailResponse extends BaseApiResponseModel<SessionDetailDto> {
 
   factory SessionDetailResponse.fromJson(Map<String, dynamic> json) {
     return SessionDetailResponse(
-      data: json['data'] != null ? SessionDetailDto.fromJson(json['data']) : null,
+      data: json['data'] != null
+          ? SessionDetailDto.fromJson(json['data'])
+          : null,
       isSuccess: json['is_success'] as bool? ?? false,
       message: json['message'] as String? ?? '',
     );
@@ -67,6 +69,11 @@ class SessionDetailDto {
   final double? minimumUnits;
   final double? maximumUnits;
   final List<int> otherMaterials;
+  final List<String> inventoryProductsRoles;
+  final List<String> schedulingRoles;
+  final List<String> pricingRoles;
+
+  final bool isDiffPrice;
 
   SessionDetailDto({
     required this.id,
@@ -75,8 +82,8 @@ class SessionDetailDto {
     required this.areaName,
     required this.title,
     required this.sessionNumber,
-    this.protocols =const [],
-    this.instructions= const [],
+    this.protocols = const [],
+    this.instructions = const [],
     required this.status,
     required this.currentStep,
     required this.isCompleted,
@@ -116,6 +123,10 @@ class SessionDetailDto {
     this.minimumUnits,
     this.maximumUnits,
     required this.otherMaterials,
+    this.inventoryProductsRoles = const [],
+    this.schedulingRoles = const [],
+    this.pricingRoles = const [],
+    this.isDiffPrice = false,
   });
 
   factory SessionDetailDto.fromJson(Map<String, dynamic> json) {
@@ -129,29 +140,35 @@ class SessionDetailDto {
       status: json['status'] as String? ?? 'Active',
       currentStep: json['current_step'] as int? ?? 1,
       isCompleted: json['is_completed'] as bool? ?? false,
-      productUsages: (json['billable_materials'] as List? ?? json['product_usages'] as List?)
+      productUsages:
+          (json['billable_materials'] as List? ??
+                  json['product_usages'] as List?)
               ?.map((e) => SessionProductUsageDto.fromJson(e))
               .toList() ??
           [],
-      protocols: (json['protocols'] as List?)
+      protocols:
+          (json['protocols'] as List?)
               ?.map((e) => ProtocolRequestItem.fromJson(e))
               .toList() ??
-          [], 
-         instructions: (json['instructions'] as List?)
+          [],
+      instructions:
+          (json['instructions'] as List?)
               ?.map((e) => ProtocolInstructionItem.fromJson(e))
               .toList() ??
           [],
       baseDuration: json['base_duration'] as int? ?? 0,
       prepTime: json['prep_time'] as int? ?? 0,
       cleanupTime: json['cleanup_time'] as int? ?? 0,
-      productDurations: (json['product_durations'] as List?)
+      productDurations:
+          (json['product_durations'] as List?)
               ?.map((e) => SessionProductDurationDto.fromJson(e))
               .toList() ??
           [],
       allowClinicOverride: json['allow_clinic_override'] as bool? ?? false,
       allowProviderOverride: json['allow_provider_override'] as bool? ?? false,
       onlineBookable: json['online_bookable'] as bool? ?? false,
-      manualApprovalRequired: json['manual_approval_required'] as bool? ?? false,
+      manualApprovalRequired:
+          json['manual_approval_required'] as bool? ?? false,
       minimumBookingNotice: json['minimum_booking_notice'] as int? ?? 0,
       maximumDaysInAdvance: json['maximum_days_in_advance'] as int? ?? 0,
       calculatedTotalDuration: json['calculated_total_duration'] as int? ?? 0,
@@ -160,57 +177,97 @@ class SessionDetailDto {
       basePrice: (json['base_price'] as num?)?.toDouble() ?? 0.0,
       isFixedPrice: json['is_fixed_price'] as bool? ?? false,
       fixedPrice: (json['fixed_price'] as num?)?.toDouble() ?? 0.0,
-      unitPriceOverrides: (json['unit_price_overrides'] as List?)
+      unitPriceOverrides:
+          (json['unit_price_overrides'] as List?)
               ?.map((e) => SessionUnitPriceOverrideDto.fromJson(e))
               .toList() ??
           [],
       clinicalProtocolPdf: json['clinical_protocol_pdf'] != null
           ? SessionAttachmentDto.fromJson(json['clinical_protocol_pdf'])
           : null,
-      preTreatmentInstructions: json['pre_treatment_instructions'] as String? ?? '',
-      preTreatmentAttachments: (json['pre_treatment_attachments'] as List?)
+      preTreatmentInstructions:
+          json['pre_treatment_instructions'] as String? ?? '',
+      preTreatmentAttachments:
+          (json['pre_treatment_attachments'] as List?)
               ?.map((e) => SessionAttachmentDto.fromJson(e))
               .toList() ??
           [],
       postTreatmentInstructions: json['post_treatment_instructions'] ?? '',
-      postTreatmentAttachments: (json['post_treatment_attachments'] as List?)
+      postTreatmentAttachments:
+          (json['post_treatment_attachments'] as List?)
               ?.map((e) => SessionAttachmentDto.fromJson(e))
               .toList() ??
           [],
-      requirePostTreatmentPhotos: json['require_post_treatment_photos'] as bool? ?? false,
-      photoMilestone: (json['photo_milestone'] as List?)
+      requirePostTreatmentPhotos:
+          json['require_post_treatment_photos'] as bool? ?? false,
+      photoMilestone:
+          (json['photo_milestone'] as List?)
               ?.map((e) => PhotoMilestoneDto.fromJson(e))
               .toList() ??
           [],
-      preNotifications: (json['pre_notifications'] as List?)
+      preNotifications:
+          (json['pre_notifications'] as List?)
               ?.map((e) => SessionNotificationDto.fromJson(e))
               .toList() ??
           [],
-      postNotifications: (json['post_notifications'] as List?)
+      postNotifications:
+          (json['post_notifications'] as List?)
               ?.map((e) => SessionNotificationDto.fromJson(e))
               .toList() ??
           [],
       downtimeLevel: json['downtime_level'] as String? ?? 'none',
       downtimeDays: json['downtime_days'] as int? ?? 0,
-      allowedRoles: (json['allowed_roles'] as List?)?.map((e) => e as String).toList() ?? [],
-      followUps: (json['follow_ups'] as List?)
+      allowedRoles:
+          (json['allowed_roles'] as List?)?.map((e) => e as String).toList() ??
+          [],
+      followUps:
+          (json['follow_ups'] as List?)
               ?.map((e) => SessionFollowUpDto.fromJson(e))
               .toList() ??
           [],
       preTreatmentConsentForm: json['pre_treatment_consent_form'] != null
           ? SessionAttachmentDto.fromJson(json['pre_treatment_consent_form'])
           : null,
-      selectedUnitTypeId: json['selected_unit_type_id'] is int 
+      selectedUnitTypeId: json['selected_unit_type_id'] is int
           ? json['selected_unit_type_id'] as int?
-          : (json['selected_unit_type_id'] as Map<String, dynamic>?)?['id'] as int?,
+          : (json['selected_unit_type_id'] as Map<String, dynamic>?)?['id']
+                as int?,
       minimumUnits: (json['minimum_units'] as num?)?.toDouble() ?? 0.0,
       maximumUnits: (json['maximum_units'] as num?)?.toDouble() ?? 0.0,
-      otherMaterials: (json['other_materials'] as List?)
-              ?.map((e) => e is int ? e : ((e as Map<String, dynamic>)['product_id'] ?? (e)['id']) as int)
+      otherMaterials:
+          (json['other_materials'] as List?)
+              ?.map(
+                (e) => e is int
+                    ? e
+                    : ((e as Map<String, dynamic>)['product_id'] ?? (e)['id'])
+                          as int,
+              )
               .toList() ??
           [],
+      inventoryProductsRoles: _parseRoleNames(json['inventory_products_roles']),
+      schedulingRoles: _parseRoleNames(json['scheduling_roles']),
+      pricingRoles: _parseRoleNames(json['pricing_roles']),
+
+      isDiffPrice: json['is_diff_price'] as bool? ?? false,
     );
   }
+}
+
+List<String> _parseRoleNames(dynamic value) {
+  if (value is! List) return [];
+
+  return value
+      .map((role) {
+        if (role is String) return role;
+        if (role is Map<String, dynamic>) {
+          return role['name']?.toString() ??
+              role['role_name']?.toString() ??
+              '';
+        }
+        return '';
+      })
+      .where((role) => role.isNotEmpty)
+      .toList();
 }
 
 class SessionProductUsageDto {
@@ -238,9 +295,10 @@ class SessionProductUsageDto {
 
   factory SessionProductUsageDto.fromJson(Map<String, dynamic> json) {
     return SessionProductUsageDto(
-      productId: json['product_id'] is int 
-          ? json['product_id'] as int 
-          : (json['product_id'] as Map<String, dynamic>?)?['id'] as int? ?? (json['id'] as int? ?? 0),
+      productId: json['product_id'] is int
+          ? json['product_id'] as int
+          : (json['product_id'] as Map<String, dynamic>?)?['id'] as int? ??
+                (json['id'] as int? ?? 0),
       productName: json['product_name'] as String? ?? '',
       productImage: json['product_image'] as String? ?? '',
       productSku: json['product_sku'] as String? ?? '',
@@ -276,20 +334,45 @@ class SessionProductDurationDto {
 class SessionUnitPriceOverrideDto {
   final int productId;
   final String productName;
+  final bool isDiffPrice;
   final double pricePerUnit;
+  final List<int> pricePerUnitList;
 
   SessionUnitPriceOverrideDto({
     required this.productId,
     required this.productName,
+    required this.isDiffPrice,
     required this.pricePerUnit,
+    required this.pricePerUnitList,
   });
 
   factory SessionUnitPriceOverrideDto.fromJson(Map<String, dynamic> json) {
     return SessionUnitPriceOverrideDto(
       productId: json['product_id'] as int? ?? 0,
       productName: json['product_name'] as String? ?? '',
+      isDiffPrice: json['is_diff_price'] as bool? ?? false,
       pricePerUnit: (json['price_per_unit'] as num?)?.toDouble() ?? 0.0,
+      pricePerUnitList:
+          (json['price_per_unit_list'] as List?)
+              ?.map((e) {
+                if (e is num) {
+                  return e.toInt();
+                }
+                return 0;
+              })
+              .where((e) => e != 0)
+              .toList() ??
+          [],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'product_id': productId,
+      'product_name': productName,
+      'price_per_unit': pricePerUnit,
+      'price_per_unit_list': pricePerUnitList,
+    };
   }
 }
 
@@ -298,11 +381,7 @@ class SessionAttachmentDto {
   final String url;
   final String? type;
 
-  SessionAttachmentDto({
-    required this.name,
-    required this.url,
-    this.type,
-  });
+  SessionAttachmentDto({required this.name, required this.url, this.type});
 
   factory SessionAttachmentDto.fromJson(Map<String, dynamic> json) {
     return SessionAttachmentDto(
@@ -343,10 +422,7 @@ class PhotoMilestoneDto {
   final int numberOfDays;
   final int requiredPhotos;
 
-  PhotoMilestoneDto({
-    required this.numberOfDays,
-    required this.requiredPhotos,
-  });
+  PhotoMilestoneDto({required this.numberOfDays, required this.requiredPhotos});
 
   factory PhotoMilestoneDto.fromJson(Map<String, dynamic> json) {
     return PhotoMilestoneDto(
