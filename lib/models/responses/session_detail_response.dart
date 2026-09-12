@@ -354,13 +354,7 @@ class SessionUnitPriceOverrideDto {
       pricePerUnit: (json['price_per_unit'] as num?)?.toDouble() ?? 0.0,
       pricePerUnitList:
           (json['price_per_unit_list'] as List?)
-              ?.map((e) {
-                if (e is num) {
-                  return e.toInt();
-                }
-                return 0;
-              })
-              .where((e) => e != 0)
+              ?.map((e) => e is num ? e.toInt() : int.tryParse('$e') ?? 0)
               .toList() ??
           [],
     );
