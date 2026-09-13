@@ -29,6 +29,8 @@ class ExploreState extends BaseStateModel {
   final String? pickedVideoUrl;
   final String? pickedThumbnailUrl;
   final List<PostCategoryModel> postCategories;
+  final List<PostCategoryModel>? reelTags;
+  final  List<PostCategoryModel>? postTags;
 
   ExploreState({
     super.loading = false,
@@ -43,6 +45,8 @@ class ExploreState extends BaseStateModel {
     this.pickedVideoUrl,
     this.pickedThumbnailUrl,
     this.postCategories = const [],
+    this.postTags,
+    this.reelTags
   });
 
   ExploreState copyWith({
@@ -61,6 +65,9 @@ class ExploreState extends BaseStateModel {
     bool clearPickedVideo = false,
     bool clearPickedThumbnail = false,
     List<PostCategoryModel>? postCategories,
+     List<PostCategoryModel>? reelTags,
+      List<PostCategoryModel>? postTags,
+
   }) {
     return ExploreState(
       loading: loading ?? this.loading,
@@ -81,6 +88,8 @@ class ExploreState extends BaseStateModel {
           ? null
           : (pickedThumbnailUrl ?? this.pickedThumbnailUrl),
       postCategories: postCategories ?? this.postCategories,
+      postTags: postTags?? this.postTags,
+      reelTags: reelTags?? this.reelTags
     );
   }
 
@@ -98,6 +107,8 @@ class ExploreState extends BaseStateModel {
       pickedVideoUrl: null,
       pickedThumbnailUrl: null,
       postCategories: postCategories,
+      postTags:postTags,
+      reelTags:reelTags
     );
   }
 }
@@ -304,13 +315,36 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
       state = state.copyWith(postCategories: categories);
     });
   }
+   Future<void> fetchPostTags() async {
+    return await runSafely(() async {
+      final postTags = await _repository.fetchPostTags();
+      state = state.copyWith(postTags: postTags);
+    });
+  }
+   Future<void> fetchReelTags() async {
+    return await runSafely(() async {
+      final reelTags = await _repository.fetchReelsTags();
+      state = state.copyWith(reelTags: reelTags);
+    });
+  }
 
-  Future<void> createPostCategory(String name) async {
+
+   Future<void> createReelTag(String name) async {
     return await runSafely(
       onLoadingChange: (l) => state = state.copyWith(loading: l),
       () async {
-        await _repository.createPostCategory(name);
-        EasyLoading.showSuccess('Category created successfully');
+        await _repository.addReelTag(name);
+       await EasyLoading.showSuccess('Tag created successfully');
+        await fetchReelTags();
+      },
+    );
+  }
+   Future<void> createPostTag(String name) async {
+    return await runSafely(
+      onLoadingChange: (l) => state = state.copyWith(loading: l),
+      () async {
+        await _repository.addPostTag(name);
+        EasyLoading.showSuccess('Tag created successfully');
         await fetchPostCategories();
       },
     );
