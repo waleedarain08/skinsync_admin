@@ -345,7 +345,7 @@ class ExploreViewModel extends BaseViewModel<ExploreState> {
       () async {
         await _repository.addPostTag(name);
         EasyLoading.showSuccess('Tag created successfully');
-        await fetchPostCategories();
+        await fetchPostTags();
       },
     );
   }
