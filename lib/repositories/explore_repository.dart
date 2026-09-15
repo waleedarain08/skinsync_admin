@@ -24,5 +24,8 @@ abstract class ExploreRepository {
   Future<BaseApiResponseModel> updatePostStatus(int id, String status);
   Future<BaseApiResponseModel> deletePost(int id);
   Future<List<PostCategoryModel>> fetchPostCategories();
-  Future<BaseApiResponseModel> createPostCategory(String name);
+   Future<List<PostCategoryModel>> fetchPostTags();
+    Future<List<PostCategoryModel>> fetchReelsTags();
+     Future<BaseApiResponseModel> addReelTag(String name);
+      Future<BaseApiResponseModel> addPostTag(String name);
 }

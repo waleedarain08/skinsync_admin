@@ -116,7 +116,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
   void _showAddReelDialog(BuildContext context) {
     final titleController = TextEditingController();
     final descController = TextEditingController();
-    final tagsController = TextEditingController();
+    // Which tags are toggled on — only these go in the request.
+    List<String> selectedTags = [];
+
+    // Populate the chip pool from the API.
+    ref.read(exploreViewModelProvider.notifier).fetchReelTags();
 
     showDialog(
       context: context,
@@ -124,6 +128,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
       builder: (context) => Consumer(
         builder: (context, ref, child) {
           final state = ref.watch(exploreViewModelProvider);
+          final availableTags = (state.reelTags ?? [])
+              .map((e) => e.name)
+              .toList();
           return AlertDialog(
             title: Text('Add New Reel', style: context.fonts.black20w600),
             content: SizedBox(
@@ -178,10 +185,36 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
                       ],
                     ),
                     context.verticalSpace(16),
-                    BuildTextField(
-                      label: 'Tags (comma separated)',
-                      controller: tagsController,
-                      hintText: 'e.g. skin, care, routine',
+                    StatefulBuilder(
+                      builder: (context, setDialogState) {
+                        return _buildTagsField(
+                          context: context,
+                          availableTags: availableTags,
+                          selectedTags: selectedTags,
+                          onToggle: (tag) {
+                            setDialogState(() {
+                              if (selectedTags.contains(tag)) {
+                                selectedTags.remove(tag);
+                              } else {
+                                selectedTags.add(tag);
+                              }
+                            });
+                          },
+                          onAddNew: () => _showAddTagDialog(
+                            context,
+                            onTagAdded: (tag) {
+                              ref
+                                  .read(exploreViewModelProvider.notifier)
+                                  .createReelTag(tag);
+                              setDialogState(() {
+                                if (!selectedTags.contains(tag)) {
+                                  selectedTags.add(tag);
+                                }
+                              });
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -216,11 +249,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
                     description: descController.text,
                     videoUrl: state.pickedVideoUrl!,
                     thumbnail: state.pickedThumbnailUrl,
-                    tags: tagsController.text
-                        .split(',')
-                        .map((e) => e.trim())
-                        .where((e) => e.isNotEmpty)
-                        .toList(),
+                    tags: selectedTags,
                   );
                   ref
                       .read(exploreViewModelProvider.notifier)
@@ -241,7 +270,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
     final titleController = TextEditingController();
     final contentController = TextEditingController();
     String? selectedCategory;
-    final tagsController = TextEditingController();
+    // Which tags are toggled on — only these go in the request.
+    List<String> selectedTags = [];
+
+    // Populate the chip pool from the API.
+    ref.read(exploreViewModelProvider.notifier).fetchPostTags();
 
     showDialog(
       context: context,
@@ -249,6 +282,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
       builder: (context) => Consumer(
         builder: (context, ref, child) {
           final state = ref.watch(exploreViewModelProvider);
+          final availableTags = (state.postTags ?? [])
+              .map((e) => e.name)
+              .toList();
           return AlertDialog(
             title: Text(
               'Add New Community Post',
@@ -317,10 +353,36 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
                       },
                     ),
                     context.verticalSpace(16),
-                    BuildTextField(
-                      label: 'Tags (comma separated)',
-                      controller: tagsController,
-                      hintText: 'e.g. advice, community, help',
+                    StatefulBuilder(
+                      builder: (context, setDialogState) {
+                        return _buildTagsField(
+                          context: context,
+                          availableTags: availableTags,
+                          selectedTags: selectedTags,
+                          onToggle: (tag) {
+                            setDialogState(() {
+                              if (selectedTags.contains(tag)) {
+                                selectedTags.remove(tag);
+                              } else {
+                                selectedTags.add(tag);
+                              }
+                            });
+                          },
+                          onAddNew: () => _showAddTagDialog(
+                            context,
+                            onTagAdded: (tag) {
+                              ref
+                                  .read(exploreViewModelProvider.notifier)
+                                  .createPostTag(tag);
+                              setDialogState(() {
+                                if (!selectedTags.contains(tag)) {
+                                  selectedTags.add(tag);
+                                }
+                              });
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -352,11 +414,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
                     content: contentController.text,
                     imageUrl: state.pickedImageUrl!,
                     category: selectedCategory,
-                    tags: tagsController.text
-                        .split(',')
-                        .map((e) => e.trim())
-                        .where((e) => e.isNotEmpty)
-                        .toList(),
+                    tags: selectedTags,
                   );
                   ref
                       .read(exploreViewModelProvider.notifier)
@@ -415,6 +473,146 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen>
           ],
         );
       },
+    );
+  }
+
+  /// Same shape as [_showCreateCategoryDialog], worded for tags: lets the
+  /// user type a brand-new tag to add to the pool (it's auto-selected too).
+  void _showAddTagDialog(
+    BuildContext context, {
+    required Function(String) onTagAdded,
+  }) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Add New Tag', style: context.fonts.black18w600),
+          content: BuildTextField(
+            label: 'Name',
+            controller: controller,
+            hintText: 'Enter tag name...',
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: CustomPrimaryButton(
+                onTap: () {
+                  final name = controller.text.trim();
+
+                  if (name.isNotEmpty) {
+                    // No API call
+                    onTagAdded(name);
+
+                    Navigator.pop(context);
+                  }
+                },
+                label: 'Add',
+                width: 100.w,
+              ),
+            ),
+            SizedBox(height: 10.h),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel', style: context.fonts.grey14w600),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Tags field used by both the reel and post dialogs: a label row with an
+  /// "Add Tag" affordance (mirroring the category dropdown's create action),
+  /// and every available tag rendered as a toggleable chip below it. Tapping
+  /// a chip selects/deselects it — only the selected ones are sent to the API.
+  Widget _buildTagsField({
+    required BuildContext context,
+    required List<String> availableTags,
+    required List<String> selectedTags,
+    required void Function(String tag) onToggle,
+    required VoidCallback onAddNew,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Tags', style: context.fonts.black14w600),
+            InkWell(
+              onTap: onAddNew,
+              borderRadius: context.appBorderRadius(all: 8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 4,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.add_circle_outline,
+                      color: CustomColors.purple,
+                      size: 18,
+                    ),
+                    context.horizontalSpace(4),
+                    Text('Add Tag', style: context.fonts.purple11w600),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        context.verticalSpace(12),
+        availableTags.isEmpty
+            ? Container(
+                width: double.infinity,
+                padding: context.appEdgeInsets(all: 12),
+                decoration: BoxDecoration(
+                  color: CustomColors.whiteGrey,
+                  borderRadius: context.appBorderRadius(all: 12),
+                  border: Border.all(color: CustomColors.border),
+                ),
+                child: Text(
+                  'No tags available yet',
+                  style: context.fonts.grey12w400,
+                ),
+              )
+            : Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: availableTags.map((tag) {
+                  final isSelected = selectedTags.contains(tag);
+                  return FilterChip(
+                    label: Text(
+                      tag,
+                      style: context.fonts.purple11w600.copyWith(
+                        color: isSelected ? Colors.white : CustomColors.purple,
+                      ),
+                    ),
+                    selected: isSelected,
+                    onSelected: (_) => onToggle(tag),
+                    showCheckmark: false,
+                    selectedColor: CustomColors.purple,
+                    backgroundColor: CustomColors.lightPurple.withValues(
+                      alpha: 0.1,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: CustomColors.purple.withValues(
+                          alpha: isSelected ? 1 : 0.2,
+                        ),
+                      ),
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  );
+                }).toList(),
+              ),
+      ],
     );
   }
 

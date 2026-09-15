@@ -328,20 +328,18 @@ class SessionViewModel extends BaseViewModel<SessionState> {
         final currentMin =
             double.tryParse(entry.minQuantityController.text) ?? 0.0;
         if (currentMin == 0 || currentMin == 1.0) {
-          entry.minQuantityController.text =
-              parsedMin % 1 == 0
-                  ? parsedMin.toInt().toString()
-                  : parsedMin.toString();
+          entry.minQuantityController.text = parsedMin % 1 == 0
+              ? parsedMin.toInt().toString()
+              : parsedMin.toString();
         }
       }
       if (parsedMax > 0) {
         final currentMax =
             double.tryParse(entry.maxQuantityController.text) ?? 0.0;
         if (currentMax == 0 || currentMax == 1.0) {
-          entry.maxQuantityController.text =
-              parsedMax % 1 == 0
-                  ? parsedMax.toInt().toString()
-                  : parsedMax.toString();
+          entry.maxQuantityController.text = parsedMax % 1 == 0
+              ? parsedMax.toInt().toString()
+              : parsedMax.toString();
         }
       }
     }
@@ -673,8 +671,26 @@ class SessionViewModel extends BaseViewModel<SessionState> {
                   (e) => e.productId == override.productId,
                 );
                 if (entry != null) {
-                  final controller = getControllerForUnit(entry.unit);
-                  controller.text = override.pricePerUnit.toString();
+                  final maxQty = getProductMaxQuantity(entry).ceil();
+                  final effectiveMaxQty = maxQty < 1 ? 1 : maxQty;
+                  entry.syncUnitPriceControllers(effectiveMaxQty);
+                  entry.useDifferentPricingPerUnit = override.isDiffPrice;
+
+                  if (override.isDiffPrice) {
+                    for (
+                      var i = 0;
+                      i < entry.unitPriceControllers.length;
+                      i++
+                    ) {
+                      final price = i < override.pricePerUnitList.length
+                          ? override.pricePerUnitList[i]
+                          : 0;
+                      entry.unitPriceControllers[i].text = price.toString();
+                    }
+                  } else {
+                    entry.unitPriceControllers[0].text = override.pricePerUnit
+                        .toString();
+                  }
                 }
               }
 
@@ -767,16 +783,16 @@ class SessionViewModel extends BaseViewModel<SessionState> {
               state = state.copyWith(
                 downtimeLevel: detail.downtimeLevel,
                 selectedRoles: detail.allowedRoles,
-                materialsRoles: detail.allowedRoles,
-                materialsRolesSource: detail.allowedRoles.isNotEmpty
+                materialsRoles: detail.inventoryProductsRoles,
+                materialsRolesSource: detail.inventoryProductsRoles.isNotEmpty
                     ? 'custom'
                     : 'category',
-                schedulingRoles: detail.allowedRoles,
-                schedulingRolesSource: detail.allowedRoles.isNotEmpty
+                schedulingRoles: detail.schedulingRoles,
+                schedulingRolesSource: detail.schedulingRoles.isNotEmpty
                     ? 'custom'
                     : 'category',
-                pricingRoles: detail.allowedRoles,
-                pricingRolesSource: detail.allowedRoles.isNotEmpty
+                pricingRoles: detail.pricingRoles,
+                pricingRolesSource: detail.pricingRoles.isNotEmpty
                     ? 'custom'
                     : 'category',
               );
@@ -1156,8 +1172,8 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       );
       final noteText =
           matchingNoteEntry != null && matchingNoteEntry.notes.isNotEmpty
-              ? matchingNoteEntry.notes.map((e) => e.description).join('\n')
-              : '';
+          ? matchingNoteEntry.notes.map((e) => e.description).join('\n')
+          : '';
 
       protocolItems.add(
         ProtocolRequestItem(
@@ -1168,13 +1184,14 @@ class SessionViewModel extends BaseViewModel<SessionState> {
       );
     }
 
-    final List<ProtocolInstructionItem> instructionItems =
-        state.standaloneNotes.map((note) {
+    final List<ProtocolInstructionItem> instructionItems = state.standaloneNotes
+        .map((note) {
           return ProtocolInstructionItem(
             title: note.title ?? '',
             note: note.description,
           );
-        }).toList();
+        })
+        .toList();
 
     final request = ProtocolRequest(
       stepNumber: stepNumber,
@@ -1228,11 +1245,13 @@ Body    : ${request.toJson()}
                   pricePerUnitList: prices,
                 );
               } else {
-                final singlePrice = int.tryParse(
-                  entry.unitPriceControllers.isEmpty
-                      ? '0'
-                      : entry.unitPriceControllers[0].text.trim(),
-                ) ?? 0;
+                final singlePrice =
+                    int.tryParse(
+                      entry.unitPriceControllers.isEmpty
+                          ? '0'
+                          : entry.unitPriceControllers[0].text.trim(),
+                    ) ??
+                    0;
                 return UnitPriceOverride(
                   productId: entry.productId,
                   isDiffPrice: false,
@@ -1267,38 +1286,32 @@ Body       : ${request.toJson()}
     });
   }
 
-Future<bool?> callDownTimeLevels({required int stepNumber}) async {
-  final level = state.downtimeLevel;
+  Future<bool?> callDownTimeLevels({required int stepNumber}) async {
+    final level = state.downtimeLevel;
 
-  
+    final selected = state.downTimeLevelList
+        ?.where((e) => e.level == level)
+        .firstOrNull;
 
-  final selected = state.downTimeLevelList
-      ?.where((e) => e.level == level)
-      .firstOrNull;
+    final downtimeDays = selected?.days;
 
-  final downtimeDays = selected?.days;
-
- 
-
-  final request = DownTimeLevelRequest(
-    stepNumber: stepNumber,
-    downtimeLevel: (level).toLowerCase(),
-    downtimeDays: downtimeDays,
-  );
-
-
-
-  return await runSafely<bool>(() async {
-    await locator<SessionRepository>().downTimeLevels(
-      request: request,
-      id: state.sessionId!,
+    final request = DownTimeLevelRequest(
+      stepNumber: stepNumber,
+      downtimeLevel: (level).toLowerCase(),
+      downtimeDays: downtimeDays,
     );
 
-    log('Step Downtime Saved: ${state.sessionId!}');
+    return await runSafely<bool>(() async {
+      await locator<SessionRepository>().downTimeLevels(
+        request: request,
+        id: state.sessionId!,
+      );
 
-    return true;
-  });
-}
+      log('Step Downtime Saved: ${state.sessionId!}');
+
+      return true;
+    });
+  }
 
   Future<bool?> callAllowedProviderRoles({required int stepNumber}) async {
     final bool isCatDefault = state.providerRolesSource == 'category';

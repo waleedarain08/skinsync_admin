@@ -148,11 +148,34 @@ class ExploreService implements ExploreRepository {
     final response = await _api.get(Endpoint.postCategories);
     return PostCategoryListResponse.fromJson(response).data ?? [];
   }
-
+    @override
+  Future<List<PostCategoryModel>> fetchPostTags() async {
+    final response = await _api.get(Endpoint.postTag);
+    return PostCategoryListResponse.fromJson(response).data ?? [];
+  }
   @override
-  Future<BaseApiResponseModel> createPostCategory(String name) async {
+  Future<List<PostCategoryModel>> fetchReelsTags() async {
+    final response = await _api.get(Endpoint.reelTag);
+    return PostCategoryListResponse.fromJson(response).data ?? [];
+  }
+ 
+  @override
+  Future<BaseApiResponseModel> addPostTag(String name) async {
     final jsonResponse = await _api.post(
-      Endpoint.postCategories,
+      Endpoint.postTag,
+      body: {'name': name},
+    );
+    final response = BaseApiResponseModel.fromJson(jsonResponse);
+
+    if (!(response.isSuccess)) {
+      throw BadRequestException(response.message);
+    }
+    return response;
+  }
+  @override
+  Future<BaseApiResponseModel> addReelTag(String name) async {
+    final jsonResponse = await _api.post(
+      Endpoint.reelTag,
       body: {'name': name},
     );
     final response = BaseApiResponseModel.fromJson(jsonResponse);
