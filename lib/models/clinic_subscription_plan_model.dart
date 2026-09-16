@@ -41,20 +41,19 @@ class ClinicSubscriptionPlanModel {
   factory ClinicSubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
     return ClinicSubscriptionPlanModel(
       id: json['id']?.toString(),
-      name: json['name'],
+      name: json['name'] as String?,
       basePrice: (json['base_price'] as num?)?.toDouble(),
-      doctorSeats: json['doctor_seats'] ?? json['simulation_count'] ?? 0,
-      unlimitedDoctors:
-          json['unlimited_doctor'] ?? json['unlimited_doctors'] ?? json['unlimited_simulation'] ?? false,
-      staffSeats: json['staff_seats'] ?? json['posts_view_count'] ?? 0,
-      unlimitedStaff:
-          json['unlimited_staff'] ?? json['unlimited_posts_view'] ?? false,
+      doctorSeats: (json['doctor_seats'] ?? 0) as int,
+      unlimitedDoctors: (json['unlimited_doctor'] ??
+          false) as bool,
+      staffSeats: (json['staff_seats']?? 0) as int,
+      unlimitedStaff: (json['unlimited_staff'] ?? false) as bool,
       standardBookingCommissionPercent:
           (json['standard_booking_commission_percent'] as num?)?.toDouble() ??
-          0.0,
+              0.0,
       dynamicBookingCommissionPercent:
           (json['dynamic_booking_commission_percent'] as num?)?.toDouble() ??
-          0.0,
+              0.0,
       technologyFeePerTreatment:
           (json['technology_fee_per_treatment'] as num?)?.toDouble() ?? 0.0,
       isActive: (json['is_active'] as bool?) ?? true,
@@ -62,23 +61,23 @@ class ClinicSubscriptionPlanModel {
       isLifetime: (json['is_lifetime'] as bool?) ?? false,
       durationOptions: json['duration_options'] != null
           ? (json['duration_options'] as List)
-                .where((e) => e != null)
-                .map((e) => DurationOption.fromJson(e as Map<String, dynamic>))
-                .toList()
+              .where((e) => e != null)
+              .map((e) => DurationOption.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
       benefits: json['benefits'] != null
           ? (json['benefits'] as List)
-                .where((e) => e != null)
-                .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
-                .toList()
+              .where((e) => e != null)
+              .map((e) => PlanBenefit.fromJson(e as Map<String, dynamic>))
+              .toList()
           : null,
       assignedClinics: json['assigned_clinics'] != null
-          ? List<int>.from(
-              (json['assigned_clinics'] as Iterable).where((e) => e != null),
-            )
+          ? (json['assigned_clinics'] as List)
+              .map((e) => (e as num).toInt())
+              .toList()
           : json['assigned_patients'] != null
               ? (json['assigned_patients'] as List)
-                  .map((e) => e['clinic_id'] as int)
+                  .map((e) => (e['clinic_id'] as num).toInt())
                   .toList()
               : null,
     );
