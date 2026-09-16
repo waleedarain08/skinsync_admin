@@ -23,7 +23,7 @@ class SubscriptionServices implements SubscriptionRepository {
   @override
   Future<ClinicSubscriptionPlanListResponse> getSubscriptionPlans() async {
     final jsonResponse =
-        await _api.get(Endpoint.subscriptionPlans) as Map<String, dynamic>;
+        await _api.get(Endpoint.clinicPlans) as Map<String, dynamic>;
     final response = ClinicSubscriptionPlanListResponse.fromJson(jsonResponse);
 
     if (!response.isSuccess) {
@@ -37,7 +37,7 @@ class SubscriptionServices implements SubscriptionRepository {
     CreateClinicSubscriptionPlanRequest request,
   ) async {
     final jsonResponse = await _api.post(
-      Endpoint.subscriptionPlans,
+      Endpoint.clinicPlans,
       body: request.toJson(),
     );
     final response = BaseApiResponseModel<dynamic>.fromJson(jsonResponse);
@@ -50,8 +50,8 @@ class SubscriptionServices implements SubscriptionRepository {
     String id,
     CreateClinicSubscriptionPlanRequest request,
   ) async {
-    final jsonResponse = await _api.put(
-      Endpoint.updateSubscriptionPlan,
+    final jsonResponse = await _api.patch(
+      Endpoint.updateClinicPlan,
       pathParams: {'id': id.toString()},
       body: request.toJson(),
     );
@@ -66,7 +66,7 @@ class SubscriptionServices implements SubscriptionRepository {
   ) async {
     final jsonResponse =
         await _api.delete(
-              Endpoint.deleteSubscriptionPlan,
+              Endpoint.deleteClinicPlan,
               pathParams: {'id': id.toString()},
             )
             as Map<String, dynamic>;

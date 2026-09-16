@@ -40,13 +40,15 @@ class ClinicSubscriptionPlanModel {
 
   factory ClinicSubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
     return ClinicSubscriptionPlanModel(
-      id: json['id'],
+      id: json['id']?.toString(),
       name: json['name'],
       basePrice: (json['base_price'] as num?)?.toDouble(),
-      doctorSeats: json['doctor_seats'] ?? 0,
-      unlimitedDoctors: json['unlimited_doctors'] ?? false,
-      staffSeats: json['staff_seats'] ?? 0,
-      unlimitedStaff: json['unlimited_staff'] ?? false,
+      doctorSeats: json['doctor_seats'] ?? json['simulation_count'] ?? 0,
+      unlimitedDoctors:
+          json['unlimited_doctor'] ?? json['unlimited_doctors'] ?? json['unlimited_simulation'] ?? false,
+      staffSeats: json['staff_seats'] ?? json['posts_view_count'] ?? 0,
+      unlimitedStaff:
+          json['unlimited_staff'] ?? json['unlimited_posts_view'] ?? false,
       standardBookingCommissionPercent:
           (json['standard_booking_commission_percent'] as num?)?.toDouble() ??
           0.0,
@@ -74,7 +76,11 @@ class ClinicSubscriptionPlanModel {
           ? List<int>.from(
               (json['assigned_clinics'] as Iterable).where((e) => e != null),
             )
-          : null,
+          : json['assigned_patients'] != null
+              ? (json['assigned_patients'] as List)
+                  .map((e) => e['clinic_id'] as int)
+                  .toList()
+              : null,
     );
   }
 

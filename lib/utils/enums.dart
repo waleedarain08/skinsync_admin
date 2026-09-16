@@ -36,6 +36,9 @@ enum Endpoint {
   updateClinic('admin/clinic/update'),
   updateClinicStatus('admin/clinic/update-status/{id}'),
   updateAppVersion('admin/app-version'),
+  clinicPlans('admin/clinic-subscription-plans'),
+  updateClinicPlan('admin/clinic-subscription-plans/{id}'),
+  deleteClinicPlan('admin/clinic-subscription-plans/{id}'),
   subscriptionPlans('admin/patient-subscription-plans'),
   updateSubscriptionPlan('admin/subscription-plans/{id}'),
   deleteSubscriptionPlan('admin/subscription-plans/{id}'),
@@ -121,11 +124,9 @@ enum Status { active, inactive }
 
 enum BaseUrls {
   api('https://api.skinsyncai.com/api/'),
-  apiQa('https://api-dev.skinsyncai.com/api/');
+  // apiQa('https://api-dev.skinsyncai.com/api/');
 
-  // apiQa('http://localhost:8084/api/');
-
-  // apiQa('https://bgzh46mj-8084.inc1.devtunnels.ms/api/');
+  apiQa('http://localhost:8084/api/');
 
   final String url;
 

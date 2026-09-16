@@ -3,7 +3,6 @@ import '../duration_option_model.dart';
 import '../subscription_plan_benefit_model.dart';
 
 class CreateClinicSubscriptionPlanRequest {
-  final String? id;
   final String? name;
   final double? basePrice;
   final int doctorSeats;
@@ -21,7 +20,6 @@ class CreateClinicSubscriptionPlanRequest {
   final List<DurationOption>? durationOptions;
 
   CreateClinicSubscriptionPlanRequest({
-    this.id,
     this.name,
     this.basePrice,
     this.doctorSeats = 0,
@@ -41,10 +39,9 @@ class CreateClinicSubscriptionPlanRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      if (id != null) 'id': id,
       'name': name,
       'doctor_seats': doctorSeats,
-      'unlimited_doctors': unlimitedDoctors,
+      'unlimited_doctor': unlimitedDoctors,
       'staff_seats': staffSeats,
       'unlimited_staff': unlimitedStaff,
       'standard_booking_commission_percent': standardBookingCommissionPercent,
@@ -54,17 +51,18 @@ class CreateClinicSubscriptionPlanRequest {
       'is_default': isDefault,
       'is_lifetime': isLifetime,
       'base_price': basePrice ?? 0,
-      'assigned_clinics': assignedClinics,
-      'duration_options': durationOptions
-          ?.map(
-            (e) => {
-              'id': e.id,
-              'interval': e.interval?.name,
-              'amount': e.amount,
-            },
-          )
-          .toList(),
-      'benefits': benefits?.map((e) => e.toJson()).toList(),
+      if (assignedClinics != null) 'assigned_clinics': assignedClinics,
+      if (benefits != null)
+        'benefit_ids': benefits!.map((e) => e.id).whereType<int>().toList(),
+      if (durationOptions != null)
+        'duration_options': durationOptions!
+            .map(
+              (e) => {
+                'interval': e.interval?.name,
+                'amount': e.amount,
+              },
+            )
+            .toList(),
     };
   }
 
@@ -72,7 +70,6 @@ class CreateClinicSubscriptionPlanRequest {
     ClinicSubscriptionPlanModel model,
   ) {
     return CreateClinicSubscriptionPlanRequest(
-      id: model.id,
       name: model.name,
       basePrice: model.basePrice,
       doctorSeats: model.doctorSeats,

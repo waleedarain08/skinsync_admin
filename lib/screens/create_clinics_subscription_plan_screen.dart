@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skinsync_admin/models/clinic_subscription_plan_model.dart';
 import 'package:skinsync_admin/models/requests/create_clinic_subscription_plan_request.dart';
-import 'package:skinsync_admin/models/subscription_plan_benefit_model.dart';
 import 'package:skinsync_admin/utils/string_utils.dart';
 import 'package:skinsync_admin/utils/theme.dart';
 import 'package:skinsync_admin/utils/validators.dart';
@@ -18,6 +17,7 @@ import 'package:skinsync_admin/widgets/gradient_scaffold.dart';
 
 import '../models/duration_option_model.dart';
 import '../utils/enums.dart';
+import '../widgets/dailogbox/add_benefit_dialog.dart';
 import '../widgets/dailogbox/subscription_duration_dialog.dart';
 
 class CreateClinicsSubscriptionPlanScreen extends ConsumerStatefulWidget {
@@ -42,10 +42,6 @@ class _CreateClinicsSubscriptionPlanScreenState
   late final TextEditingController _standardCommissionController;
   late final TextEditingController _dynamicCommissionController;
   late final TextEditingController _techFeeController;
-  final TextEditingController _customBenefitController =
-      TextEditingController();
-  final TextEditingController _customDescriptionController =
-      TextEditingController();
   final TextEditingController _clinicSearchController = TextEditingController();
 
   bool _unlimitedDoctors = false;
@@ -57,58 +53,7 @@ class _CreateClinicsSubscriptionPlanScreenState
   bool _isDefault = false;
   bool _isLifetime = false;
 
-  final List<PlanBenefit> _predefinedFeatures = [
-    PlanBenefit(
-      title: 'AI consultation and treatment recommendation tools',
-      description:
-          'Access to AI-driven tools for more accurate patient consultations and treatment plans.',
-      enabled: false,
-    ),
-    PlanBenefit(
-      title: 'Before/after simulations',
-      description:
-          'Create and store visual simulations to show patients expected treatment outcomes.',
-      enabled: false,
-    ),
-    PlanBenefit(
-      title: 'Patient records and treatment history',
-      description:
-          'Comprehensive digital storage for all patient data, records, and treatment logs.',
-      enabled: false,
-    ),
-    PlanBenefit(
-      title: 'Payments dashboard',
-      description:
-          'Integrated dashboard to track clinic revenue, payments, and financial performance.',
-      enabled: false,
-    ),
-    PlanBenefit(
-      title: 'Automated invoices',
-      description:
-          'Automatically generate and send professional invoices to patients after treatments.',
-      enabled: false,
-    ),
-    PlanBenefit(
-      title: 'Dynamic pricing system',
-      description:
-          'Flexible pricing management based on various clinical and market factors.',
-      enabled: false,
-    ),
-    PlanBenefit(
-      title: 'Multi-user clinic access',
-      description:
-          'Allow multiple doctors and staff members to access the clinic management system.',
-      enabled: false,
-    ),
-    PlanBenefit(
-      title: 'Priority onboarding and support',
-      description:
-          'Get dedicated assistance for setting up your clinic and priority technical support.',
-      enabled: false,
-    ),
-  ];
-
-  List<PlanBenefit> _planBenefits = [];
+  List<int> _selectedBenefitIds = [];
   final List<DurationOptionController> _durationOptions = [];
 
   bool get isEditMode => widget.planToEdit != null;
@@ -118,12 +63,12 @@ class _CreateClinicsSubscriptionPlanScreenState
     super.initState();
 
     _initFromNormalPlan(widget.planToEdit);
-    _initializeBenefits();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // using local PlanInterval values for durations; no fetch required
       _syncDurations();
 
+      ref.read(subscriptionViewModelProvider.notifier).getBenefits();
       ref.read(clinicViewModelProvider.notifier).initialize();
     });
   }
@@ -156,9 +101,11 @@ class _CreateClinicsSubscriptionPlanScreenState
     _isLifetime = plan?.isLifetime ?? false;
 
     _selectedClinics = plan?.assignedClinics ?? [];
-    _visibilityType = _selectedClinics.isEmpty
-        ? 'All Clinics'
-        : 'Specific Clinics';
+    _visibilityType =
+        _selectedClinics.isEmpty ? 'All Clinics' : 'Specific Clinics';
+
+    _selectedBenefitIds =
+        plan?.benefits?.map((e) => e.id).whereType<int>().toList() ?? [];
 
     if (plan?.durationOptions != null && plan!.durationOptions!.isNotEmpty) {
       for (final option in plan.durationOptions!) {
@@ -179,37 +126,6 @@ class _CreateClinicsSubscriptionPlanScreenState
     });
   }
 
-  void _initializeBenefits() {
-    final existingBenefits = widget.planToEdit?.benefits ?? [];
-
-    _planBenefits = _predefinedFeatures.map((benefit) {
-      final existing = existingBenefits.firstWhere(
-        (b) => b.title == benefit.title,
-        orElse: () => benefit,
-      );
-      return PlanBenefit(
-        title: benefit.title,
-        description:
-            (existing.description != null && existing.description!.isNotEmpty)
-            ? existing.description
-            : benefit.description,
-        enabled: existing.enabled,
-      );
-    }).toList();
-
-    for (final benefit in existingBenefits) {
-      if (!_predefinedFeatures.any((b) => b.title == benefit.title)) {
-        _planBenefits.add(
-          PlanBenefit(
-            title: benefit.title,
-            description: benefit.description,
-            enabled: benefit.enabled,
-          ),
-        );
-      }
-    }
-  }
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -219,27 +135,11 @@ class _CreateClinicsSubscriptionPlanScreenState
     _standardCommissionController.dispose();
     _dynamicCommissionController.dispose();
     _techFeeController.dispose();
-    _customBenefitController.dispose();
-    _customDescriptionController.dispose();
     _clinicSearchController.dispose();
     for (var option in _durationOptions) {
       option.dispose();
     }
     super.dispose();
-  }
-
-  void _addCustomBenefit() {
-    final title = _customBenefitController.text.trim();
-    final description = _customDescriptionController.text.trim();
-    if (title.isNotEmpty) {
-      setState(() {
-        _planBenefits.add(
-          PlanBenefit(title: title, description: description, enabled: true),
-        );
-        _customBenefitController.clear();
-        _customDescriptionController.clear();
-      });
-    }
   }
 
   void _addDurationOption() {
@@ -272,6 +172,7 @@ class _CreateClinicsSubscriptionPlanScreenState
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
+      final state = ref.read(subscriptionViewModelProvider);
       if (!_isLifetime && _durationOptions.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -318,8 +219,11 @@ class _CreateClinicsSubscriptionPlanScreenState
         }
       }
 
+      final benefits = state.patientBenefits
+          ?.where((b) => _selectedBenefitIds.contains(b.id))
+          .toList();
+
       final request = CreateClinicSubscriptionPlanRequest(
-        id: widget.planToEdit?.id,
         name: _nameController.text,
         basePrice: basePrice,
         doctorSeats: _unlimitedDoctors
@@ -336,10 +240,9 @@ class _CreateClinicsSubscriptionPlanScreenState
             double.tryParse(_dynamicCommissionController.text) ?? 0.0,
         technologyFeePerTreatment:
             double.tryParse(_techFeeController.text) ?? 0.0,
-        benefits: _planBenefits,
-        assignedClinics: _visibilityType == 'All Clinics'
-            ? []
-            : _selectedClinics,
+        benefits: benefits,
+        assignedClinics:
+            _visibilityType == 'All Clinics' ? [] : _selectedClinics,
         isActive: _isActive,
         isDefault: _isDefault,
         isLifetime: _isLifetime,
@@ -348,7 +251,7 @@ class _CreateClinicsSubscriptionPlanScreenState
 
       final success = await ref
           .read(subscriptionViewModelProvider.notifier)
-          .createClinicSubscriptionPlan(request);
+          .createClinicSubscriptionPlan(request, clinicPlanId: widget.planToEdit?.id);
       if (success && mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -844,80 +747,154 @@ class _CreateClinicsSubscriptionPlanScreenState
                             SizedBox(height: 32.h),
 
                             // SECTION 4: PLAN FEATURES & BENEFITS
-                            Text(
-                              'SECTION 4: PLAN FEATURES & BENEFITS',
-                              style: context.fonts.sectionHeading,
-                            ),
-                            context.verticalSpace(4),
-                            Text(
-                              'Manage the list of services and features included in this tier.',
-                              style: context.fonts.grey13w500,
-                            ),
-                            SizedBox(height: 24.h),
-                            ..._planBenefits.map(
-                              (benefit) => CheckboxListTile(
-                                title: Text(
-                                  benefit.title ?? '',
-                                  style: context.fonts.black14w600,
-                                ),
-                                subtitle:
-                                    benefit.description != null &&
-                                        benefit.description!.isNotEmpty
-                                    ? Text(
-                                        benefit.description!,
-                                        style: context.fonts.grey13w500,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      )
-                                    : null,
-                                value: benefit.enabled,
-                                onChanged: (val) {
-                                  setState(() {
-                                    benefit.enabled = val ?? false;
-                                  });
-                                },
-                                activeColor: CustomColors.green,
-                                checkColor: CustomColors.black,
-                                controlAffinity:
-                                    ListTileControlAffinity.leading,
-                                contentPadding: EdgeInsets.zero,
-                                dense: false,
-                              ),
-                            ),
-                            context.verticalSpace(24),
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Expanded(
-                                  child: Column(
-                                    children: [
-                                      BuildTextField(
-                                        label: 'Feature Title',
-                                        controller: _customBenefitController,
-                                        hintText: 'e.g. Free marketing kit',
-                                      ),
-                                      context.verticalSpace(16),
-                                      BuildTextField(
-                                        label: 'Feature Description (Optional)',
-                                        controller:
-                                            _customDescriptionController,
-                                        hintText: 'Provide more details...',
-                                        maxLines: 2,
-                                      ),
-                                    ],
-                                  ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'SECTION 4: PLAN FEATURES & BENEFITS',
+                                      style: context.fonts.sectionHeading,
+                                    ),
+                                    context.verticalSpace(4),
+                                    Text(
+                                      'Manage the list of services and features included in this tier.',
+                                      style: context.fonts.grey13w500,
+                                    ),
+                                  ],
                                 ),
-                                context.horizontalSpace(16),
-                                Padding(
-                                  padding: context.appEdgeInsets(top: 28),
-                                  child: CustomPrimaryButton(
-                                    onTap: _addCustomBenefit,
-                                    label: 'Add Feature',
-                                    width: context.w(160),
-                                  ),
+                                CustomOutlinedButton(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          const AddBenefitDialog(),
+                                    );
+                                  },
+                                  label: 'Create Benefit',
+                                  icon: Icons.add,
+                                  width: 160.w,
                                 ),
                               ],
                             ),
+                            SizedBox(height: 24.h),
+                            if (state.patientBenefits != null &&
+                                state.patientBenefits!.isNotEmpty)
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: context.w(16),
+                                      mainAxisSpacing: context.h(16),
+                                      childAspectRatio: 2.2,
+                                    ),
+                                itemCount: state.patientBenefits!.length,
+                                itemBuilder: (context, index) {
+                                  final benefit = state.patientBenefits![index];
+                                  final isSelected = _selectedBenefitIds
+                                      .contains(benefit.id);
+
+                                  return InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        if (isSelected) {
+                                          _selectedBenefitIds.remove(
+                                            benefit.id,
+                                          );
+                                        } else {
+                                          if (benefit.id != null)
+                                            _selectedBenefitIds.add(
+                                              benefit.id!,
+                                            );
+                                        }
+                                      });
+                                    },
+                                    borderRadius: context.borderRadius(all: 12),
+                                    child: BorderdContainerWidget(
+                                      backgroundColor: isSelected
+                                          ? CustomColors.green.withValues(
+                                              alpha: 0.05,
+                                            )
+                                          : Colors.white,
+                                      borderColor: isSelected
+                                          ? CustomColors.green
+                                          : CustomColors.border,
+                                      borderWidth: isSelected ? 1.5 : 1,
+                                      padding: context.appEdgeInsets(all: 16),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: context.appEdgeInsets(
+                                              top: 2,
+                                            ),
+                                            child: Icon(
+                                              isSelected
+                                                  ? Icons.check_circle_rounded
+                                                  : Icons
+                                                        .radio_button_unchecked_rounded,
+                                              color: isSelected
+                                                  ? CustomColors.green
+                                                  : CustomColors.grey,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          context.horizontalSpace(12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  benefit.title ?? '',
+                                                  style:
+                                                      context.fonts.black14w600,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                context.verticalSpace(4),
+                                                Text(
+                                                  'SKU: ${benefit.sku ?? "N/A"}',
+                                                  style: context
+                                                      .fonts
+                                                      .purple10w600,
+                                                ),
+                                                context.verticalSpace(4),
+                                                Expanded(
+                                                  child: Text(
+                                                    benefit.description ?? '',
+                                                    style: context
+                                                        .fonts
+                                                        .grey11w400,
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              )
+                            else
+                              Center(
+                                child: Padding(
+                                  padding: context.appEdgeInsets(all: 16),
+                                  child: Text(
+                                    'No benefits available to select.',
+                                    style: context.fonts.grey13w500,
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),

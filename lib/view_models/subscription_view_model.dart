@@ -51,12 +51,15 @@ class SubscriptionViewModel extends BaseViewModel<SubscriptionState> {
 
   Future<bool> createClinicSubscriptionPlan(
     CreateClinicSubscriptionPlanRequest request,
+  {
+    String? clinicPlanId,
+  }
   ) async {
     final success =
         await runSafely<bool?>(showLoading: true, () async {
-          if (request.id != null) {
+          if (clinicPlanId != null) {
             await _subscriptionRepository.updateSubscriptionPlan(
-              request.id!,
+              clinicPlanId,
               request,
             );
           } else {
